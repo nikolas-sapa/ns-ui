@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "registry:build": "shadcn build",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "verify": "node scripts/verify.ts"
   },
   "dependencies": {
     "geist": "1.7.2",
@@ -20,8 +21,11 @@
     "@types/node": "26.1.1",
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
+    "playwright": "1.61.1",
     "shadcn": "4.13.0",
     "tailwindcss": "4.3.2",
+    "tsx": "4.23.0",
     "typescript": "7.0.2"
-  }
+  },
+  "type": "module"
 }

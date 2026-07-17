@@ -21,9 +21,9 @@ Work the **frontier**: any ticket whose blockers are all done. After ticket 2, t
 
 **Blocked by:** Walking skeleton.
 
-- [ ] Verify passes on the seed component and writes its screenshots into the component folder
-- [ ] A console error or blank render makes verify exit non-zero
-- [ ] A metadata sidecar missing a required field makes verify exit non-zero
+- [x] Verify passes on the seed component and writes its screenshots into the component folder
+- [x] A console error or blank render makes verify exit non-zero
+- [x] A metadata sidecar missing a required field makes verify exit non-zero
 
 ## Glass-button to the bar
 
