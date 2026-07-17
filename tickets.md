@@ -42,10 +42,10 @@ Work the **frontier**: any ticket whose blockers are all done. After ticket 2, t
 
 **Blocked by:** Quality gate. (Parallel with glass-button.)
 
-- [ ] Particle field visibly reacts to cursor; smooth on a laptop (no jank at 1440p)
-- [ ] Staggered text reveal on load with physics-based easing; CTA present
-- [ ] Renders a usable static fallback when WebGL is unavailable
-- [ ] Passes verify with committed screenshots; judge loop completed against Vercel/Linear-level reference
+- [x] Particle field visibly reacts to cursor; smooth on a laptop (no jank at 1440p)
+- [x] Staggered text reveal on load with physics-based easing; CTA present
+- [x] Renders a usable static fallback when WebGL is unavailable
+- [x] Passes verify with committed screenshots; judge loop completed against Vercel/Linear-level reference
 
 ## Install story end-to-end
 

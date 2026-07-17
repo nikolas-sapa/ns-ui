@@ -10,7 +10,7 @@ export function GlassButton({
   return (
     <button
       className={[
-        "relative inline-flex items-center justify-center overflow-hidden rounded-md px-5 py-2.5 text-sm font-medium text-foreground",
+        "relative inline-flex items-center justify-center overflow-hidden rounded-sm px-5 py-2.5 text-sm font-medium text-foreground",
         // glass material: translucent fill, heavy blur, saturation boost
         "bg-black/[0.04] backdrop-blur-xl backdrop-saturate-150 dark:bg-white/[0.06]",
         "border border-black/10 dark:border-white/10",

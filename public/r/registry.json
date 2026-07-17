@@ -16,6 +16,20 @@
         }
       ],
       "dependencies": []
+    },
+    {
+      "name": "particle-hero",
+      "type": "registry:ui",
+      "title": "Particle Hero",
+      "description": "Full-viewport hero with a cursor-reactive WebGL particle field and staggered text reveal.",
+      "files": [
+        {
+          "path": "registry/core/particle-hero/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/particle-hero.tsx"
+        }
+      ],
+      "dependencies": ["three", "@react-three/fiber", "motion"]
     }
   ]
 }
