@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --surface: #fafafa;
+  --border: #ebebeb;
+  --muted: #8f8f8f;
+  --accent: #006bff;
+  --accent-hover: #0059d1;
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --surface: #171717;
+  --border: #2e2e2e;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+
+  /* Literal family names — @theme inline resolves at parse time (shadcn/Geist gotcha) */
+  --font-sans: "Geist", "Geist Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+}

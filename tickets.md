@@ -10,10 +10,10 @@ Work the **frontier**: any ticket whose blockers are all done. After ticket 2, t
 
 **Blocked by:** None — can start immediately.
 
-- [ ] Preview page renders the seed component's demo full-bleed in dark mode with Geist fonts
-- [ ] Registry build completes and emits an installable JSON payload for the seed component
-- [ ] Metadata sidecar (name, collection, tags, instruction, dependencies) exists for the seed and is included in the build
-- [ ] Repo runs from clean clone: install → dev server → preview page works
+- [x] Preview page renders the seed component's demo full-bleed in dark mode with Geist fonts
+- [x] Registry build completes and emits an installable JSON payload for the seed component
+- [x] Metadata sidecar (name, collection, tags, instruction, dependencies) exists for the seed and is included in the build
+- [x] Repo runs from clean clone: install → dev server → preview page works
 
 ## Quality gate: automated verify
 

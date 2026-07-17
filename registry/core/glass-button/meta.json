@@ -1,0 +1,7 @@
+{
+  "name": "glass-button",
+  "collection": "core",
+  "tags": ["button", "glass", "micro-interaction"],
+  "instruction": "A liquid-glass button: translucent blurred surface, thin light border, subtle hover lift and press scale, visible keyboard focus ring, for a dark minimal (Geist-style) design system.",
+  "dependencies": []
+}

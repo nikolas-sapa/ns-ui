@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "ns-ui",
+  "homepage": "http://localhost:3000",
+  "items": [
+    {
+      "name": "glass-button",
+      "type": "registry:ui",
+      "title": "Glass Button",
+      "description": "Liquid-glass button with translucent blurred surface and press states.",
+      "files": [
+        {
+          "path": "registry/core/glass-button/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/glass-button.tsx"
+        }
+      ],
+      "dependencies": []
+    }
+  ]
+}
