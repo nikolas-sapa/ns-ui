@@ -31,10 +31,10 @@ Work the **frontier**: any ticket whose blockers are all done. After ticket 2, t
 
 **Blocked by:** Quality gate.
 
-- [ ] Passes verify with committed screenshots (all states × both themes)
-- [ ] Hover/press/focus states are distinct and animated with physics-based easing
-- [ ] Judge loop completed — final screenshots hold up against Aceternity/Magic UI-level reference
-- [ ] Accessible: keyboard focus visible, works as a real button
+- [x] Passes verify with committed screenshots (all states × both themes)
+- [x] Hover/press/focus states are distinct and animated with physics-based easing
+- [x] Judge loop completed — final screenshots hold up against Aceternity/Magic UI-level reference
+- [x] Accessible: keyboard focus visible, works as a real button
 
 ## particle-hero (flagship)
 
