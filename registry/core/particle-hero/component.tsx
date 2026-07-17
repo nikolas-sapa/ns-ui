@@ -106,6 +106,9 @@ const reveal: Variants = {
   }),
 };
 
+const ctaClasses =
+  "inline-flex items-center justify-center rounded-sm bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors duration-150 hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+
 const revealProps = (reduced: boolean, i: number) =>
   ({ variants: reveal, initial: reduced ? false : "hidden", animate: "show", custom: i }) as const;
 
@@ -114,12 +117,14 @@ export function ParticleHero({
   headline = "Interfaces with gravity.",
   subline = "A registry of components built one at a time, each earning its place.",
   cta = "Browse components",
+  ctaHref,
   onCtaClick,
 }: {
   eyebrow?: string;
   headline?: string;
   subline?: string;
   cta?: string;
+  ctaHref?: string;
   onCtaClick?: () => void;
 }) {
   const webgl = useWebGLSupport();
@@ -168,12 +173,15 @@ export function ParticleHero({
           className="mt-8"
           {...revealProps(reduced, 3)}
         >
-          <button
-            onClick={onCtaClick}
-            className="inline-flex items-center justify-center rounded-sm bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors duration-150 hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-          >
-            {cta}
-          </button>
+          {ctaHref ? (
+            <a href={ctaHref} className={ctaClasses}>
+              {cta}
+            </a>
+          ) : (
+            <button onClick={onCtaClick} className={ctaClasses}>
+              {cta}
+            </button>
+          )}
         </motion.div>
       </div>
     </section>

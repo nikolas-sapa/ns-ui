@@ -3,5 +3,5 @@
 import { ParticleHero } from "./component";
 
 export default function ParticleHeroDemo() {
-  return <ParticleHero />;
+  return <ParticleHero ctaHref="/" />;
 }
