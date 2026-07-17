@@ -15,7 +15,16 @@
           "target": "components/ui/glass-button.tsx"
         }
       ],
-      "dependencies": []
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "button",
+          "glass",
+          "micro-interaction"
+        ],
+        "instruction": "A liquid-glass button: translucent blurred surface, thin light border, subtle hover lift and press scale, visible keyboard focus ring, for a dark minimal (Geist-style) design system."
+      }
     },
     {
       "name": "particle-hero",
@@ -29,7 +38,21 @@
           "target": "components/ui/particle-hero.tsx"
         }
       ],
-      "dependencies": ["three", "@react-three/fiber", "motion"]
+      "dependencies": [
+        "three",
+        "@react-three/fiber",
+        "motion"
+      ],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "hero",
+          "webgl",
+          "particles",
+          "text-reveal"
+        ],
+        "instruction": "A dark full-viewport hero section: a WebGL particle field of thousands of small gray dots that drift gently and repel away from the cursor, behind a staggered spring-physics text reveal (mono eyebrow, large tight headline, muted subline) and a single accent CTA, with a radial vignette keeping edges quiet. Static dot-grid fallback without WebGL, reduced-motion respected."
+      }
     }
   ]
 }

@@ -10,10 +10,11 @@ export default function GlassButtonDemo() {
         aria-hidden
         className="absolute inset-0 [background-image:radial-gradient(circle,var(--color-border)_1px,transparent_1px)] [background-size:24px_24px]"
       />
-      {/* orb sits directly behind the button so the glass visibly blurs it */}
+      {/* neutral orb behind the button so the glass visibly blurs it
+          (accent is interaction-only per design DNA, not scenery) */}
       <div
         aria-hidden
-        className="absolute left-1/2 top-1/2 h-40 w-40 -translate-x-[60%] -translate-y-[55%] rounded-full bg-accent/15 blur-2xl dark:bg-accent/20"
+        className="absolute left-1/2 top-1/2 h-40 w-40 -translate-x-[60%] -translate-y-[55%] rounded-full bg-black/10 blur-2xl dark:bg-white/15"
       />
       <GlassButton>Get started</GlassButton>
     </div>

@@ -46,13 +46,15 @@ ns-ui/
 ```json
 {
   "name": "particle-hero",
+  "title": "Particle Hero",
+  "description": "Full-viewport hero with a cursor-reactive WebGL particle field.",
   "collection": "core",
   "tags": ["hero", "webgl", "particles"],
   "instruction": "A dark hero section with a WebGL particle field that reacts to cursor movement and staggered headline reveal.",
   "dependencies": ["three", "@react-three/fiber", "motion"]
 }
 ```
-`instruction` is written as the prompt that *should* produce this component — that is the future SFT/RAG pair.
+`instruction` is written as the prompt that *should* produce this component — that is the future SFT/RAG pair. meta.json is the single source of truth: `scripts/build-registry.ts` generates `registry.json` from the sidecars (collection/tags/instruction ride along in each item's `meta` field) and runs `shadcn build`. `public/r/` is generated output, not committed.
 
 ## Quality gate
 

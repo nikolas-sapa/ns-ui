@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run registry:build && next build",
     "start": "next start",
-    "registry:build": "shadcn build",
+    "registry:build": "node scripts/build-registry.ts",
     "typecheck": "tsc --noEmit",
     "verify": "node scripts/verify.ts"
   },
@@ -28,7 +28,6 @@
     "playwright": "1.61.1",
     "shadcn": "4.13.0",
     "tailwindcss": "4.3.2",
-    "tsx": "4.23.0",
     "typescript": "7.0.2"
   },
   "type": "module"

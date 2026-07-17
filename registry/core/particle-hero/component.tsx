@@ -106,6 +106,9 @@ const reveal: Variants = {
   }),
 };
 
+const revealProps = (reduced: boolean, i: number) =>
+  ({ variants: reveal, initial: reduced ? false : "hidden", animate: "show", custom: i }) as const;
+
 export function ParticleHero({
   eyebrow = "ns-ui",
   headline = "Interfaces with gravity.",
@@ -145,37 +148,25 @@ export function ParticleHero({
       <div className="relative z-10 mx-auto max-w-2xl px-6 text-center">
         <motion.p
           className="font-mono text-xs uppercase tracking-[0.2em] text-muted"
-          variants={reveal}
-          initial={reduced ? false : "hidden"}
-          animate="show"
-          custom={0}
+          {...revealProps(reduced, 0)}
         >
           {eyebrow}
         </motion.p>
         <motion.h1
           className="mt-4 text-5xl font-semibold tracking-tight sm:text-6xl"
-          variants={reveal}
-          initial={reduced ? false : "hidden"}
-          animate="show"
-          custom={1}
+          {...revealProps(reduced, 1)}
         >
           {headline}
         </motion.h1>
         <motion.p
           className="mx-auto mt-5 max-w-lg text-base text-muted"
-          variants={reveal}
-          initial={reduced ? false : "hidden"}
-          animate="show"
-          custom={2}
+          {...revealProps(reduced, 2)}
         >
           {subline}
         </motion.p>
         <motion.div
           className="mt-8"
-          variants={reveal}
-          initial={reduced ? false : "hidden"}
-          animate="show"
-          custom={3}
+          {...revealProps(reduced, 3)}
         >
           <button
             onClick={onCtaClick}

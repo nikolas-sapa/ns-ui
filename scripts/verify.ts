@@ -9,7 +9,15 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:3000";
-const META_FIELDS = ["name", "collection", "tags", "instruction", "dependencies"] as const;
+const META_FIELDS = [
+  "name",
+  "title",
+  "description",
+  "collection",
+  "tags",
+  "instruction",
+  "dependencies",
+] as const;
 
 type Item = { name: string };
 const registry = JSON.parse(readFileSync(join(ROOT, "registry.json"), "utf8"));
@@ -61,7 +69,12 @@ async function verifyComponent(page: Page, name: string, dir: string) {
     page.on("pageerror", onPageError);
 
     await page.goto(`${BASE_URL}/preview/${name}`, { waitUntil: "networkidle" });
+    // park the mouse away — it persists across navigations and a resting
+    // hover fakes the "default" state (bit us: light-default === light-hover)
+    await page.mouse.move(0, 0);
     if (theme === "light") {
+      // ponytail: post-mount class removal — components reading theme at mount
+      // will screenshot wrong; upgrade to a ?theme= param when one exists
       await page.evaluate(() => document.documentElement.classList.remove("dark"));
     }
     // settle animations/entrances before judging
@@ -80,12 +93,28 @@ async function verifyComponent(page: Page, name: string, dir: string) {
 
     await shoot(page, dir, theme, "default");
 
-    // hover state: first interactive element, if any
+    // interaction states: first interactive element, if any
     const interactive = page.locator("button, a, [role=button]").first();
     if (await interactive.count()) {
       await interactive.hover();
       await page.waitForTimeout(400);
       await shoot(page, dir, theme, "hover");
+      // hover must actually change pixels, else the state is dead
+      const [def, hov] = ["default", "hover"].map((s) =>
+        readFileSync(join(dir, "screenshots", `${theme}-${s}.png`))
+      );
+      if (def.equals(hov)) fail(`${name} [${theme}]: hover state identical to default`);
+
+      await page.mouse.down();
+      await page.waitForTimeout(250);
+      await shoot(page, dir, theme, "press");
+      await page.mouse.up();
+
+      await page.mouse.move(0, 0);
+      await interactive.focus();
+      await page.waitForTimeout(250);
+      await shoot(page, dir, theme, "focus");
+      await page.keyboard.press("Escape");
     }
 
     // mid-scroll state, only when the page actually scrolls
