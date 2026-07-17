@@ -53,5 +53,5 @@ Work the **frontier**: any ticket whose blockers are all done. After ticket 2, t
 
 **Blocked by:** Walking skeleton.
 
-- [ ] Fresh scratch project: one CLI add command → component source lands + deps install → component renders
-- [ ] README quickstart covers: run dev, run verify, add new component, install into another project
+- [x] Fresh scratch project: one CLI add command → component source lands + deps install → component renders
+- [x] README quickstart covers: run dev, run verify, add new component, install into another project
