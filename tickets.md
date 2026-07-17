@@ -55,3 +55,23 @@ Work the **frontier**: any ticket whose blockers are all done. After ticket 2, t
 
 - [x] Fresh scratch project: one CLI add command → component source lands + deps install → component renders
 - [x] README quickstart covers: run dev, run verify, add new component, install into another project
+
+## decrypt-text (harvest #4)
+
+**What to build:** Scramble-to-decode text reveal: mono glyphs churn and lock left-to-right with per-character settle deadlines and a brightness highlight on the resolving character. Zero width jitter (mono charset), real text in aria-label with churn aria-hidden, instant render under prefers-reduced-motion.
+
+**Blocked by:** None — gate exists.
+
+- [x] Locks left-to-right, no layout jitter during churn
+- [x] aria-label carries final text; churning spans aria-hidden; reduced-motion renders instantly
+- [x] Passes verify + judge loop
+
+## ascii-dither-media (harvest #1)
+
+**What to build:** Canvas renderer mapping a source (image or animated noise) to a luminance-driven glyph grid — ASCII, Bayer-dither, and dot-matrix modes, cursor-proximity resolve, monochrome #ededed on #0a0a0a.
+
+**Blocked by:** decrypt-text (one-at-a-time rhythm, shares no code).
+
+- [ ] Three modes render from one engine; cursor proximity brightens/resolves cells
+- [ ] 60fps on laptop at full-bleed; static first-frame under reduced motion
+- [ ] Passes verify + judge loop

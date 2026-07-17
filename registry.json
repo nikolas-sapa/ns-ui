@@ -4,6 +4,30 @@
   "homepage": "http://localhost:3000",
   "items": [
     {
+      "name": "decrypt-text",
+      "type": "registry:ui",
+      "title": "Decrypt Text",
+      "description": "Scramble-to-decode text reveal with left-to-right character locking.",
+      "files": [
+        {
+          "path": "registry/core/decrypt-text/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/decrypt-text.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "text",
+          "reveal",
+          "mono",
+          "micro-interaction"
+        ],
+        "instruction": "A scramble-to-decode text reveal: monospace glyphs churn randomly and lock into the final string left to right with a per-character stagger, the currently resolving character brightened, unresolved characters dimmed. No layout jitter (mono charset), final text exposed via aria-label with churning spans aria-hidden, instant render under prefers-reduced-motion."
+      }
+    },
+    {
       "name": "glass-button",
       "type": "registry:ui",
       "title": "Glass Button",
