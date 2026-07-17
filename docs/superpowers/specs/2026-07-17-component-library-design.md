@@ -62,11 +62,15 @@ A component is **done** only when:
 2. Screenshot-judge loop completed: render → screenshot → critique against reference standard (Aceternity/Codrops-level bar) → iterate until it holds up.
 3. Screenshots committed under the component folder (`screenshots/`) — doubles as corpus data.
 
+## Taste profile (owner-stated, 2026-07-17)
+
+Loved: shader/particle backgrounds · text & scroll choreography · 3D/interactive objects (tilt cards, cursor-following) · micro-craft (nice buttons, liquid glass). NOT drawn to aurora/glow gradient flash — so `core` is the primary collection; `loud` exists but is not the roadmap driver.
+
 ## Component #1
 
-`core/particle-hero` — Geist-dark hero section: WebGL particle/dot field reacting to cursor (r3f), staggered text reveal (Motion), one CTA. Proves shader + motion + restraint in a single piece; immediately usable in client work.
+`core/particle-hero` — Geist-dark hero section: WebGL particle/dot field reacting to cursor (r3f), staggered text reveal (Motion), one CTA. Combines the owner's top two loved styles (shader background + text choreography); immediately usable in client work.
 
-Subsequent components: one at a time, each through the full gate. No batch scaffolding of empty component folders.
+**Roadmap candidates after #1 (one at a time, each through the full gate, no batch scaffolding):** liquid-glass button set → 3D tilt card → scroll-story section → text scramble/morph headline.
 
 ## Install story
 
