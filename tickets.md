@@ -98,3 +98,10 @@ Press-and-hold destructive action, error-red ring traces border, early release d
 - [x] mercury-minimap (core): liquid-metal scroll minimap, gooey section ticks
 - [x] slide-to-shatter (core): Voronoi crack-density slider, full travel shatters, early release heals
 All: strict TS, verify gate (slide-to-shatter needed a thumb hover fix), contact-sheet judge pass.
+
+## Fusion batch r2 (breeder workflow x10, 2026-07-18) — DONE
+
+12 ideators (9 fresh pairs + 2 mutations + wildcard) → 36 concepts → judge top-10 → parallel build → gate.
+- [x] moire-dial, vapor-countdown, crack-compare, cardio-baseline, chronicle-bar, ligature-melt, respire-field, warp-lattice (core)
+- [x] erosion-trail, frost-scrub (loud)
+- [x] 10/10 strict TS + verify gate first try; contact-sheet judged mid-interaction

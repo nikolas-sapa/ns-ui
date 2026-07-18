@@ -29,6 +29,89 @@
       }
     },
     {
+      "name": "cardio-baseline",
+      "type": "registry:ui",
+      "title": "Cardio Baseline",
+      "description": "Text whose baseline is a live EKG trace: each beat fires a QRS spike that travels under the letters, throwing every glyph up the waveform before it spring-settles flat.",
+      "files": [
+        {
+          "path": "registry/core/cardio-baseline/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cardio-baseline.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "text",
+          "ekg",
+          "waveform",
+          "svg",
+          "spring",
+          "beat",
+          "raf",
+          "imperative"
+        ],
+        "instruction": "A text component whose baseline is an EKG trace. Render one inline-block DOM span per glyph (measured once via offsetLeft/offsetWidth, remeasured on ResizeObserver and fonts.ready; baseline found with a zero-height inline-block marker span whose offsetTop is the baseline) plus one absolutely-positioned SVG holding a polyline trace and a sweep dot, all written by a single direct-DOM rAF loop with no React state on the hot path. The trace is a 1.5px #8f8f8f flatline at the text baseline; a 4px #ffffff sweep dot rides it at 320 px/s, wrapping at the right edge. Each beat injects a piecewise QRS-T kernel at the left edge — half-sine segments: Q dip +6px/40ms, R spike -46px/70ms, S dip +10px/50ms, T bump -8px/180ms — propagating right at 900 px/s as wave(x,t) = kernel(t - t0 - x/900), summed over active beats. While the kernel passes under a glyph's center the glyph is position-driven: translateY = wave(centerX) and rotation = atan(local slope, sampled ±4px) clamped ±9°, with velocity tracked so the handoff is continuous. Once the wave passes, the glyph rings down on an underdamped spring (k=140 s^-2, zeta=0.45 — two visible wobbles, then flat) while rotation decays exponentially. Polyline points sampled every 6px are rewritten in the same frame, and the dot's cy follows the wave under its x. Beats fire from a bpm prop timer (default 64, in a separate effect so rate changes never reset glyph state) or imperatively via a ref handle beat() for real events (deploys, messages). The loop sleeps once every wave has exited the right edge and all glyph residuals are < 0.1px, waking on the timer or beat(). Under prefers-reduced-motion: static flatline plus typeset text, no dot, no timers, no listeners. Zero dependencies."
+      }
+    },
+    {
+      "name": "chronicle-bar",
+      "type": "registry:ui",
+      "title": "Chronicle Bar",
+      "description": "Determinate progress bar whose leading edge narrates each phase in typed mono, then docks it below the track as a timestamped milestone ledger.",
+      "files": [
+        {
+          "path": "registry/core/chronicle-bar/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/chronicle-bar.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "progress",
+          "loader",
+          "typography",
+          "mono",
+          "ledger",
+          "micro-interaction"
+        ],
+        "instruction": "A determinate progress bar whose fill front is a live narrator, pure DOM and zero deps. Track: 4px tall, transparent bed with a hairline border; fill #ededed; the leading edge is a 2px #006bff cursor block (the only accent), which fades out once the run completes. Fill width eases toward the controlled value (0-100) with cubic-bezier(0.22,1,0.36,1) over 450ms per value change, written direct-DOM (style.width/transform) from a single rAF loop that runs only while easing, typing, or docking, then sleeps. A font-mono text-xs caption is anchored to the leading edge (clamped inside track bounds) and types the current phase label at 24 chars/s; the first 3 glyphs scramble-decode from an A-Z/0-9/symbol charset for ~2 frames each before locking (a small decrypt-text dose). When the fill crosses a phase's `at` percent, the caption scales to 0.92 over 220ms ease-out (origin bottom-left) and fades, and a milestone docks below the track: a 1px x 6px vertical tick at the phase's percent position plus label and elapsed mm:ss.s in font-mono text-[10px] text-muted, edge-clamped so labels never overflow; milestones fade in over 260ms. A finished bar reads as a ledger of everything the loader did. Props: value 0-100 (controlled, a decrease resets the ledger and elapsed clock), phases {at, label}[]. Accessibility: progressbar role with live aria-valuenow, milestones announced through a visually-hidden polite live region. Under prefers-reduced-motion the fill jumps instantly, captions render fully typed, and ticks appear immediately."
+      }
+    },
+    {
+      "name": "crack-compare",
+      "type": "registry:ui",
+      "title": "Crack Compare",
+      "description": "Before/after comparison slider whose divider is a living Voronoi crack seam — fast drags spawn branching micro-fissures, slow drags heal them shut, and release settles with a 1px specular glint traveling the fracture.",
+      "files": [
+        {
+          "path": "registry/core/crack-compare/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/crack-compare.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "compare",
+          "slider",
+          "before-after",
+          "voronoi",
+          "crack",
+          "canvas",
+          "clip-path",
+          "physics",
+          "image-diff"
+        ],
+        "instruction": "A before/after comparison slider whose divider is a living crack seam instead of a straight line. Two absolutely-stacked DOM layers (arbitrary before/after children) sit in a rounded-md border-border frame; the after layer is clipped by a CSS clip-path polygon that follows a jagged seam polyline, and a single DPR-aware canvas overlay draws the hairline crack strokes on top. Seam geometry: seed ~140 Poisson-disc points across the pane; at sample rows spaced ~0.55 cell-heights apart, find the nearest and second-nearest seeds to (handleX, y) and solve the point on their perpendicular bisector — an exact Voronoi cell wall from half-plane math — clamped to ±18px of the handle, giving x-offsets stored relative to the handle so the seam translates with it and only re-jags when the handle crosses into a new cell (nearest-seed id change), with new offsets eased in exponentially. Motion: handle x follows the pointer through a taut spring (k=170 s⁻², zeta=0.85, no wobble) integrated semi-implicitly in one direct-DOM rAF loop that writes the clip-path polygon string, the handle transform, and all canvas strokes with zero React state on the hot path and sleeps whenever settled. While dragging with |vx| > 600 px/s, spawn 2–4 micro-fissure branches (30–70px two-segment polylines, stroke alpha mapped to velocity, capped at 28) anchored to seam offsets; once speed drops below threshold each fissure retracts tip-first over 300ms ease-out. On pointer release the seam settles on the same spring, then a 1px rgba(255,255,255,0.5) specular dash ~56px long travels the full seam arc-length over 450ms. Seam strokes are grayscale only: 1px rgba(255,255,255,0.32) hairline plus a 0.75px-offset 0.5px ghost pass. Interaction: pointer capture on a 40px-wide full-height handle strip with a 28px glass grip chip (rounded-sm, border-white/15, bg-white/10, backdrop-blur), a hidden native range input (sr-only, step 2) so arrow keys move 2% per press with a focus-visible accent outline echoed onto the grip, onChange fired on release/keyboard only, and a ResizeObserver rebuild preserving the split fraction. prefers-reduced-motion drops the canvas and spring entirely for a straight 1px bg-border divider with standard instant compare behavior. Zero dependencies."
+      }
+    },
+    {
       "name": "decrypt-text",
       "type": "registry:ui",
       "title": "Decrypt Text",
@@ -148,6 +231,31 @@
       }
     },
     {
+      "name": "ligature-melt",
+      "type": "registry:ui",
+      "title": "Ligature Melt",
+      "description": "Headline whose glyphs liquefy near the cursor — an SVG gooey filter fuses neighbors into temporary ligatures that spring apart on leave.",
+      "files": [
+        {
+          "path": "registry/core/ligature-melt/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/ligature-melt.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "text",
+          "cursor",
+          "svg-filter",
+          "goo",
+          "micro-interaction"
+        ],
+        "instruction": "A headline where characters near the cursor liquefy into temporary ligatures. One span per glyph inside a container carrying CSS filter: url(#goo); the inline SVG filter is feGaussianBlur stdDeviation 6 into an feColorMatrix with alpha row 0 0 0 19 -9 (blur + threshold), so overlapping glyph edges fuse into metaball necks. Text stays real DOM — selectable and SEO-safe, the filter is visual only. A Gaussian field (sigma 70px) around the cursor x scales affected glyphs to 1 + 0.35*g and translates them toward the cursor by up to 6px so edges overlap and goo; total line width stays constant by redistributing the induced width surplus as compression across out-of-field spans each frame with line start/end pinned. Per-span state (scale x/y, dx) lives in plain arrays written as transforms by a direct-DOM rAF loop — no React state on the hot path. Approach eases via lerp 0.15/frame; on pointer leave every span snaps back on an underdamped spring (k = 170 s^-2, zeta = 0.55) with visible surface-tension overshoot as the ligatures pinch apart. Loop sleeps when max delta < 0.002. Spans are measured once via offsetLeft/offsetWidth and remeasured on ResizeObserver. Under prefers-reduced-motion the filter is removed and the text renders static and crisp with no listeners. Zero dependencies."
+      }
+    },
+    {
       "name": "magnetic-dock",
       "type": "registry:ui",
       "title": "Magnetic Dock",
@@ -196,6 +304,34 @@
           "micro-interaction"
         ],
         "instruction": "Build a fixed-right table-of-contents minimap where scroll progress renders as liquid mercury inside a 48px-wide, 60vh-tall SVG rail. Use one goo filter (feGaussianBlur stdDeviation 4 into an feColorMatrix with alpha row 0 0 0 19 -9) over a liquid group filled with the foreground token: a 4px rounded-rect column from rail top to the blob, a leading r=7 blob circle, and per-section r=4 circles that start hidden; outside the filter, draw crisp unfilled r=4 ticks stroked with the muted token at each section's evenly mapped y. Map window scroll through the sections' document offsets piecewise-linearly to a target y, and drive the blob with a semi-implicit Euler spring (stiffness 120, damping 20, slightly underdamped so stops land with a droplet wobble) integrated in a requestAnimationFrame loop that writes only via setAttribute, reads scroll from a ref set by a passive listener, and sleeps when velocity and error settle. Stretch the blob volume-preservingly by velocity — scaleY = 1 + clamp(|v|*0.004, 0, 0.8), scaleX = 1/sqrt(scaleY) — shifted a few px toward the travel direction so fast scroll visibly teardrops the leading edge. When the blob passes within 6px of a tick, reveal that tick's hidden circle inside the goo group (the filter renders the merge) and fade the outline tick; scrolling back up re-hides it so the goo neck snaps and releases the dot. On pointer within 24px of a tick, grow a helper circle in the goo group from r 0 to 5 positioned 60% of the way from the column toward the tick so the liquid bulges at the cursor; clicking a tick smooth-scrolls its section into view. Geist Mono text-xs labels slide in from translateX(-8px) to 0 over 150ms ease-out on rail hover, muted by default and foreground when active. Under prefers-reduced-motion swap the whole goo layer for a plain 2px filled line plus dots with instant active states and no animation loop. Auto-discover section[id] elements when no sections prop is given."
+      }
+    },
+    {
+      "name": "moire-dial",
+      "type": "registry:ui",
+      "title": "Moire Dial",
+      "description": "Weighted rotary knob tuned like a radio: counter-rotating line gratings shimmer with moire interference, and a hidden word only resolves at the detent.",
+      "files": [
+        {
+          "path": "registry/core/moire-dial/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/moire-dial.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "canvas",
+          "moire",
+          "dial",
+          "knob",
+          "physics",
+          "interference",
+          "hidden-message",
+          "detent"
+        ],
+        "instruction": "A weighted rotary knob whose feedback channel is optical interference, built on a DPR-clamped (max 2) Canvas 2D field. Two fine-line gratings (1px #ededed strokes at ~0.5 alpha, 6px pitch): grating A is fixed and carries a hidden message as a locally phase-inverted region — the message glyphs are rasterized offscreen to an alpha mask (singularity-text sampling pattern) and inside the mask A's line phase is offset by half a pitch, so the word only gains contrast when the overlay aligns; grating B is an oversized pre-rendered square that rotates with the dial angle through a radio-vernier gear ratio (~0.15), its phase chosen so its lines coincide with A's background lines at zero rotation. Both gratings are pre-rendered to offscreen canvases and composited per frame. Knob: 160px disc, bg-surface with border-border ring, a 24-tick ring layer rotating rigidly with the dial, a needle that lags the ring through a second-order spring (k=120 s^-2, zeta=0.75, weighted Inertial-Dial feel), and a font-mono ALIGNMENT percent readout below. Interaction: pointer-capture drag maps pointer angle about the knob center to ring angle with smoothed angular velocity; on release omega integrates under friction decay 3.5 s^-1 (flick spins, coasts, settles). Detent: within +-4 deg of alignment a snap spring (k=200 s^-2, zeta=0.9) pulls to exact zero with one tiny overshoot and the readout ticks to 100%. A single direct-DOM rAF loop is the sole writer (canvas draw, ring/needle transforms, readout text, slider value — no React state on the hot path) and sleeps when |omega| < 0.02 rad/s and needle error < 0.05 deg. Keyboard a11y via a visually hidden range input (arrows step 2 deg, aria-valuetext reports percent aligned, short detent grace so steps can escape the band). Under prefers-reduced-motion the dial renders the aligned state statically with the word legible and steps instantly with no loop. Zero dependencies."
       }
     },
     {
@@ -255,6 +391,33 @@
       }
     },
     {
+      "name": "respire-field",
+      "type": "registry:ui",
+      "title": "Respire Field",
+      "description": "Text input whose focus ring is a living membrane: a noise-displaced canvas loop that breathes on idle, dilates on focus, sends a peristaltic pulse from the caret on each keystroke, constricts and quivers on error, and exhales once on valid submit.",
+      "files": [
+        {
+          "path": "registry/core/respire-field/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/respire-field.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "input",
+          "form",
+          "canvas",
+          "noise",
+          "membrane",
+          "micro-interaction",
+          "focus-ring"
+        ],
+        "instruction": "Build a text input whose focus ring is a living membrane. Keep a real, fully native <input> (focus, selection, autofill intact) and overlay a decoration-only <canvas> (position absolute, inset -24px, pointer-events none). Draw the membrane as a closed loop of 96 points parameterized around the input's rounded-rect perimeter (6px corner radius, positions plus outward normals precomputed on resize), each point displaced along its outward normal by 2-octave value noise sampled on a closed ring (the noise2(s*3, t*0.15) frequency mapped onto a circle of radius 3/2pi so the loop has no seam). Idle breath: 1.5px amplitude on a 4.5s sine period. Focus: base offset glides 0 to +6px over 350ms on cubic-bezier(0.22, 1, 0.36, 1) via a Newton-Raphson bezier solver, breath amplitude rises to 2.5px, stroke lerps #8f8f8f to #ededed. Keystroke: on each input event, map the caret x (measureText with the input's computed font, selectionStart in try/catch with end-of-value fallback for email inputs) to the top-edge perimeter position and launch a Gaussian pulse (sigma 0.06 normalized perimeter, 5px amplitude) as two wavefronts traveling opposite directions at 1.2 perimeters/s, decaying with tau 0.6s. Error prop: constrict -3px, quiver at 14Hz/1.2px for 500ms on the rising edge, stroke blends toward rgba(234,0,29,0.6) (status use only). Valid submit (bumped exhaleKey prop): breath amplitude spikes +8px and decays over 700ms cubic ease-out. Stroke stays 1px. All animation runs on a direct-DOM rAF loop with locals/refs only, no React state on the hot path; the loop sleeps when the input is blurred and every transient has settled below 0.05px, waking on focus, input, error, or exhale changes. prefers-reduced-motion: no canvas, standard 1px border-border with the default focus ring. Zero dependencies; Geist dark tokens (bg-surface field, text-foreground, rounded-sm)."
+      }
+    },
+    {
       "name": "signal-terrain",
       "type": "registry:ui",
       "title": "Signal Terrain",
@@ -307,6 +470,113 @@
           "physics"
         ],
         "instruction": "A frosted-glass confirm slider where destruction IS the progress indicator: a 320×56 DOM track in the house glass recipe (bg-white/[0.06], backdrop-blur-xl, white/10 border, inset top specular, rounded-md) carries a DPR-aware canvas overlay and a 48px grabbable thumb. On mount, seed ~48 Poisson-disc points across the track and compute exact Voronoi cells once via half-plane bisector clipping; deduped cell walls become crack polylines, each assigned a reveal threshold t from its distance to the thumb origin, and the same cells are reused later as shard polygons. Dragging (pointer capture, progress in a ref, thumb transform set in a rAF loop, zero React state on the hot path) strokes every polyline with t<p segment-by-segment from its near end — 1px rgba(255,255,255,0.35) hairline plus a 0.75px-offset 0.5px rgba(255,255,255,0.12) ghost for glass depth — and past p=0.6 the whole track shudders ±0.5px per frame. Release early and p springs back to 0 (stiffness 220, damping 26) so the cracks retract along the same t-mapping, healing for free. At p≥0.98 the DOM glass hides instantly and the canvas flips to shard mode: each Voronoi cell tumbles outward from the thumb at 120–420px/s under 1800px/s² gravity with ±3rad/s spin, fading over 700ms; after ~900ms the canvas clears, revealing a bg-surface row with a check icon and mono CONFIRMED. The rAF loop sleeps whenever settled, and prefers-reduced-motion drops the canvas entirely for a plain slide with an instant confirmed swap."
+      }
+    },
+    {
+      "name": "vapor-countdown",
+      "type": "registry:ui",
+      "title": "Vapor Countdown",
+      "description": "Live countdown where each digit change is a phase transition: the outgoing digit sublimates into grains on curl-noise wind while the incoming digit condenses from the same cloud.",
+      "files": [
+        {
+          "path": "registry/core/vapor-countdown/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/vapor-countdown.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "canvas",
+          "particles",
+          "countdown",
+          "typography",
+          "noise",
+          "spring",
+          "time"
+        ],
+        "instruction": "A live HH MM SS countdown rendered as monochrome grains on a DPR-aware Canvas 2D over a real <time> element (aria-live=off, tabular Geist Sans 600, visually transparent) so screen readers get truth and reduced motion gets a static visible countdown with the canvas hidden. After document.fonts.ready, rasterize digits 0-9 once on an offscreen canvas sized to one tabular digit cell, sampling alpha > 128 at a 3px stride, capped at 2500 grains per digit, stored in Float32Array pools (x, y, vx, vy, hx, hy). Each second boundary a setTimeout tick updates the DOM digits and, for every changed column, runs a phase transition: outgoing grains move to a vapor pool with a 600-900ms per-grain lifespan, driven by wind equal to the curl of a 2-octave value-noise field (field scale 0.008, per-grain speed 40-90 px/s, biased upward) with alpha fading over life; incoming grains spawn from the departing cloud region with slight jitter and spring to their new glyph homes with k=90 s^-2, zeta=0.55, per-frame drag 0.92, dt clamped to 32ms, so a full swap reads settled in ~800ms. Grains draw as 2x2 fillRect #ededed with alpha 0.5 + 0.5*min(1, speed/500); vapor multiplies in its life fade. The rAF loop wakes on each tick and sleeps when every column has grains within 0.5px of home with |v| < 2 and no live vapor; settled columns (hours, minutes) skip physics entirely and draw one flat pass, so seconds churn constantly while hours stay typographically calm. Canvas overdraws the layout box (110px headroom) so rising vapor never clips. Props: targetDate (Date | string | epoch ms, default 24h out), labels row in font-mono text-muted beneath the groups. Zero dependencies."
+      }
+    },
+    {
+      "name": "warp-lattice",
+      "type": "registry:ui",
+      "title": "Warp Lattice",
+      "description": "Card grid on a magnetized hairline lattice — the cursor bends the grid lines and the DOM cards sample the same displacement field, riding the bent sheet.",
+      "files": [
+        {
+          "path": "registry/core/warp-lattice/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/warp-lattice.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "canvas",
+          "grid",
+          "cursor",
+          "cards",
+          "field",
+          "micro-interaction"
+        ],
+        "instruction": "A functional 3x2 DOM card grid drawn over its own full-bleed canvas lattice, where the lattice is the magnetized medium. Lattice: 32px cells, every line sampled every 8px, stroked rgba(46,46,46) with alpha rising 0.25 to 0.6 inside the field. One pure displacement function shared by canvas and cards: pull = (cursor - p) * A * exp(-r^2 / (2 * 140^2)), A tuned for a 22px peak bend, magnitude clamped to 0.35r so lines never cross the pointer. The cursor position itself is smoothed at lerp 0.14 per frame so flicks lag and the sheet visibly relaxes behind fast moves. Cards translate field(center) * 0.35; the nearest card gets 0.6x field plus scale 1.02 and a #006bff border — the only accent. A single direct-DOM rAF loop writes both canvas and card transforms with no React state, sleeps when the smoothed cursor error is under 0.05px and all card deltas under 0.02px, and pointerleave eases everything home with the same interruptible lerp. prefers-reduced-motion: static flat lattice, static cards, hover reduced to a border highlight. Zero dependencies."
+      }
+    },
+    {
+      "name": "erosion-trail",
+      "type": "registry:ui",
+      "title": "Erosion Trail",
+      "description": "The cursor is a river — dragging across a live topographic map carves a channel into the heightfield, marching-squares isolines reflowing into canyon walls with a faint waterline; release and sediment heals the terrain back over ~6 seconds.",
+      "files": [
+        {
+          "path": "registry/loud/erosion-trail/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/erosion-trail.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "loud",
+        "tags": [
+          "terrain",
+          "topographic",
+          "cursor",
+          "canvas",
+          "marching-squares",
+          "drag",
+          "physics"
+        ],
+        "instruction": "Build a full-bleed Canvas 2D topographic map where the cursor is a river that carves persistent channels. Keep a 96x96 Float32Array heightfield: a fixed base from deterministic 2-octave value noise (hash-sin lattice, 0.65/0.35 octave weights, ~3.4 features across the sheet) minus a separate carve-delta layer, rebuilt into a field array per frame. Render isolines via marching squares on the coarse grid every 0.08 elevation between the frame's min and max, batched into two Path2D strokes: hairline 0.75px #2e2e2e minors with every 5th contour index (k % 5 === 0) at 1px #8f8f8f — handle both saddle cases (5 and 10) with double segments and lazily interpolate only crossed edges. Carving: on pointer-down drag (setPointerCapture, touch-none), a Gaussian brush with sigma = 28px subtracts carve delta along the segment between velocity-smoothed pointer samples (head lerps 0.25/frame toward the raw pointer to prevent scalloping) at 0.9 elevation/s, scaled by inverse speed — full depth below 80 px/s tapering linearly to 0.25x at 400 px/s so dwelling digs canyons — stamped every half-sigma along the segment with the per-frame deposit split across stamps, delta clamped to 1. Waterline: while the pointer is down only, nodes whose carve delta exceeds 0.12 within 40px of the recent trail (ring buffer of the last 10 smoothed points) fill as cell rects in rgba(0,107,255,0.35) — the single accent, earned by interaction. Healing: every frame each node's delta decays exponentially toward zero with tau = 2.2s (95% healed around 6.5s) so contours visibly breathe back. Direct-DOM rAF loop with no React state on the hot path: runs while carving or while max |delta| > 0.002, then zeroes the residue, draws a final frame, and sleeps; pointerdown wakes it. Include a font-mono corner readout of cursor grid coords updated via textContent in the pointermove handler, DPR-aware sizing capped at 2 with a ResizeObserver redraw, and a prefers-reduced-motion fallback that renders the static contour sheet with no carving and no waterline. Zero dependencies, house tokens only."
+      }
+    },
+    {
+      "name": "frost-scrub",
+      "type": "registry:ui",
+      "title": "Frost Scrub",
+      "description": "Scroll-scrubbed defroster — a pinned full-bleed image behind rippled shower glass anneals from heavy frost with chromatic fringing to optical clarity, sealed by a specular sweep.",
+      "files": [
+        {
+          "path": "registry/loud/frost-scrub/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/frost-scrub.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "loud",
+        "tags": [
+          "scroll",
+          "webgl",
+          "shader",
+          "image",
+          "refraction",
+          "glass",
+          "hero"
+        ],
+        "instruction": "Build a pinned scroll-scrub frosted-glass reveal: a 300vh section holds a position:sticky h-screen pane; behind a rippled shower-glass shader sits a full-bleed image (prop src, else a monochrome studio still — sphere, wall glow, ground shadow, film grain — generated once on an offscreen canvas so the bare component is network-free). Raw WebGL 1, zero deps: one fullscreen triangle-strip quad and a single fragment shader. A 256x256 seamlessly-tiling RGBA noise texture is generated once on the CPU from two octaves of periodic sin-hash value noise (house noise2 on a wrapped lattice); central-difference gradients pack a normal map into RG with ripple height in B, sampled in the shader at gl_FragCoord in CSS px over REPEAT wrap. Refraction offset = normal.xy * pow(1-p, 1.6) * 42px; chromatic dispersion samples R/G/B at offset scales 1.0 / 1.012 / 1.024 so fringing lives on every ripple edge; frost scatter = 5-tap Poisson blur at radius (1-p)*10px; frost also lifts the pane toward white (mix 0.22 at full frost) with ripple-height shading; a white specular band (smoothstep width 0.08 along a diagonal UV axis) crosses the pane exactly once as p runs 0.92 to 1.0. Scroll model: a passive window scroll listener writes target progress (-rect.top / (sectionHeight - viewportHeight), clamped 0-1) to a closure variable; a direct-DOM rAF loop lerps rendered progress toward it at 0.12/frame, snaps and sleeps when |target - current| < 0.001, and wakes on scroll only — no React state anywhere on the hot path, fully reversible in both directions. Overlay side rail in font-mono: vertical-rl caption SCROLL TO ANNEAL, a 1px track filled via scaleY transform, and a zero-padded live percent, all updated by textContent/style writes inside the same loop (plus an optional onProgress callback). If WebGL or shader compile is unavailable, fall back to a plain object-cover img with CSS blur(12px * (1-p)) driven by the same lerp. Under prefers-reduced-motion render a single shader frame at p=1 — clear image with a faint frost vignette confined to the pane edges via an edge-frost uniform — and collapse the section to one viewport with no listeners."
       }
     },
     {
