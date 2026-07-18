@@ -1,0 +1,9 @@
+{
+  "name": "fling-segment",
+  "title": "Fling Segment",
+  "description": "Segmented control with a grabbable pill — fling it, it coasts on real release velocity, rubber-bands off the ends, and snaps into the nearest detent.",
+  "collection": "core",
+  "tags": ["control", "form", "segmented", "physics", "drag"],
+  "instruction": "Segmented control whose selection pill is grabbable: drag and release it anywhere along the track and it coasts on real release velocity (mean of pointer samples from the last 80 ms) under exponential friction v*=exp(-4.5*dt), rubber-bands off the track edges (beyond-track displacement rendered scaled 0.35, spring back k=320 zeta=0.9), and below 300 px/s captures into the nearest segment detent via a spring k=280 zeta=0.8 with one small overshoot. Click and keyboard remain instant no-drag paths: measure the target segment's width first (segments may differ) and glide both x and width with a critically damped spring k=220 zeta=1, ~260 ms. Pure DOM — the pill is an absolutely-positioned node driven by offset transforms relative to its layout slot on a direct-DOM rAF loop, zero React state on the hot path; a 1 s forced-settle deadline guarantees physics never jitters forever; the loop sleeps at a velocity epsilon and pauses offscreen via IntersectionObserver. role=radiogroup of role=radio buttons: ArrowLeft/Right/Up/Down move selection, Home/End jump to first/last, Space/Enter commit the focused segment, focus ring uses the accent token, and onValueChange fires once on detent commit, never per-frame. Reduced motion: the pill repositions instantly and drag release selects the nearest segment with no coast. All ink is token-relative CSS — no canvas.",
+  "dependencies": []
+}
