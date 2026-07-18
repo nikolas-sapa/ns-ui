@@ -7,7 +7,9 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 // input as pills; orbital radius is inverse match score, so the gravity sim
 // IS the ranking visualization. Top match rides the tightest, fastest orbit
 // (Kepler-flavored: omega = 1.6 * sqrt(120 / r)) and is consumed on Enter;
-// weak matches (< 0.25) destabilize and get flung off as the query sharpens.
+// weak matches (< 0.25) destabilize, get flung off as the query sharpens,
+// and despawn once their fade completes. An empty query is neutral: every
+// command rides a calm staggered orbit until typing sharpens the field.
 // Hybrid rendering: real <input> combobox + sr-only listbox for a11y, DOM
 // label pills positioned per-frame from the sim (crisp text), one Canvas 2D
 // layer underneath for orbit trails + the horizon glow ring. Every drawn
@@ -55,7 +57,10 @@ const FLING_ACCEL = 400; // px/s^2 outward on unstable orbits
 const FADE_S = 0.5; // s — unstable fade-out
 const CONSUME_R_TAU = 0.12; // s — radius decay constant on Enter
 const CONSUME_MS = 260; // scale/opacity consumption duration
-const TRAIL_TAU = 0.6; // s — trail alpha decay constant
+const TRAIL_TAU = 0.24; // s — trail alpha decay constant (ink gone < ~1 s)
+const TRAIL_MAX_AGE = 1; // s — hard cap on a trail segment's life
+const TRAIL_ALPHA = 0.3; // stroke alpha at segment birth
+const TRAIL_CAP = 900; // max live trail segments
 const GOLDEN = 2.399963229728653; // rad — initial angular spread
 const DT_MAX = 0.05; // s — clamp tab-switch jumps
 const FIT_REF = R_MIN + R_SPAN + 40; // px the field wants per half-axis
@@ -222,6 +227,16 @@ export function EventHorizonCommand({
   }, [commands]);
 
   const results = useMemo<Scored[]>(() => {
+    if (!query.trim()) {
+      // empty query = NEUTRAL: everything orbits calmly. Scores are staggered
+      // across a band so radii (and thus Kepler speeds) differ per command —
+      // distinct omegas shear initial clusters apart into even spacing.
+      const n = Math.max(1, commands.length - 1);
+      return commands.map((item, i) => ({
+        item,
+        score: 0.62 - (0.34 * i) / n,
+      }));
+    }
     return commands
       .map((item) => ({ item, score: fuzzyScore(query, item.label) }))
       .filter((s) => s.score >= UNSTABLE_BELOW)
@@ -295,7 +310,7 @@ export function EventHorizonCommand({
           mode: "active",
           r: goal + 140,
           vr: 0,
-          theta: hash01(res.item.id) * Math.PI * 2 + i * GOLDEN,
+          theta: i * GOLDEN + hash01(res.item.id) * 0.6, // sunflower spread
           gFrom: goal,
           gTo: goal,
           gStart: now - GLIDE_MS,
@@ -348,9 +363,12 @@ export function EventHorizonCommand({
     if (!root || !canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    const trail = document.createElement("canvas");
-    const tctx = trail.getContext("2d");
-    if (!tctx) return;
+    // Trails live as a segment list redrawn each frame with time-based alpha —
+    // never an accumulation canvas: 8-bit destination-in fades quantize to a
+    // permanent residue floor. Age-pruned segments provably reach zero, and
+    // stale ink vanishes on the first frame after the loop wakes from a sleep.
+    type Seg = { x0: number; y0: number; x1: number; y1: number; a0: number; born: number };
+    let segs: Seg[] = [];
 
     let w = 0;
     let h = 0;
@@ -358,17 +376,10 @@ export function EventHorizonCommand({
     let raf = 0;
     let last = 0;
     let visible = true;
-    let trailMax = 0; // running max of trail ink; painting stops below 0.01
     let smoothConf = 0.5;
     let flash = 0; // accent pulse on consumption
     let colors = readTokens(root);
     const dampC = 2 * ZETA * Math.sqrt(SPRING_K);
-
-    const clearTrail = () => {
-      tctx.setTransform(1, 0, 0, 1, 0, 0);
-      tctx.clearRect(0, 0, trail.width, trail.height);
-      trailMax = 0;
-    };
 
     const resize = () => {
       const rect = root.getBoundingClientRect();
@@ -377,16 +388,14 @@ export function EventHorizonCommand({
       dpr = Math.min(2, window.devicePixelRatio || 1);
       canvas.width = Math.max(1, Math.round(w * dpr));
       canvas.height = Math.max(1, Math.round(h * dpr));
-      trail.width = canvas.width;
-      trail.height = canvas.height;
-      clearTrail();
+      segs = [];
     };
     resize();
 
     // theme flips re-derive every drawn color live (screenshot gate: both themes)
     const mo = new MutationObserver(() => {
       colors = readTokens(root);
-      clearTrail();
+      segs = [];
     });
     mo.observe(document.documentElement, {
       attributes: true,
@@ -404,19 +413,6 @@ export function EventHorizonCommand({
       // squash orbits to fit the container; guarded well above zero
       const sx = Math.min(1, Math.max(0.05, (w / 2 - 130) / FIT_REF));
       const sy = Math.min(1, Math.max(0.05, (h / 2 - 60) / FIT_REF));
-
-      // trail decay: alpha *= exp(-dt / 0.6); stop painting under epsilon
-      const fade = Math.exp(-dt / TRAIL_TAU);
-      const trailAwake = trailMax >= 0.01;
-      if (trailAwake) {
-        tctx.setTransform(1, 0, 0, 1, 0, 0);
-        tctx.globalCompositeOperation = "destination-in";
-        tctx.fillStyle = `rgba(0,0,0,${fade})`;
-        tctx.fillRect(0, 0, trail.width, trail.height);
-        tctx.globalCompositeOperation = "source-over";
-        trailMax *= fade;
-      }
-      tctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
       // ------------------------------------------------------------- orbits
       for (const o of orbitRef.current.values()) {
@@ -436,11 +432,16 @@ export function EventHorizonCommand({
           o.theta += 1.6 * Math.sqrt(120 / Math.max(20, o.r)) * dt;
           o.alpha -= dt / FADE_S;
           if (o.alpha <= 0) {
+            // fade complete -> despawn: hidden pills also leave the hit-test
+            // layer so a stale position can never be clicked
             o.mode = "hidden";
             o.alpha = 0;
             o.hasPrev = false;
             const el = pillRefs.current.get(o.id);
-            if (el) el.style.opacity = "0";
+            if (el) {
+              el.style.opacity = "0";
+              el.style.visibility = "hidden";
+            }
             continue;
           }
         } else {
@@ -456,37 +457,41 @@ export function EventHorizonCommand({
             o.hasPrev = false;
             flash = 1;
             const el = pillRefs.current.get(o.id);
-            if (el) el.style.opacity = "0";
+            if (el) {
+              el.style.opacity = "0";
+              el.style.visibility = "hidden";
+            }
             consumedRef.current(o.id); // onSelect fires at consumption
             continue;
           }
         }
 
-        const x = cx + Math.cos(o.theta) * o.r * sx;
-        const y = cy + Math.sin(o.theta) * o.r * sy;
+        // ox/oy are offsets from the field center; x/y absolute canvas coords
+        const ox = Math.cos(o.theta) * o.r * sx;
+        const oy = Math.sin(o.theta) * o.r * sy;
+        const x = cx + ox;
+        const y = cy + oy;
 
         if (o.hasPrev && o.alpha > 0.02) {
           const dx = x - o.px;
           const dy = y - o.py;
-          if (dx * dx + dy * dy < 120 * 120) {
-            const a = 0.3 * o.alpha;
-            tctx.strokeStyle = rgba(colors.fg, a);
-            tctx.lineWidth = 1;
-            tctx.beginPath();
-            tctx.moveTo(o.px, o.py);
-            tctx.lineTo(x, y);
-            tctx.stroke();
-            if (a > trailMax) trailMax = a;
+          const d2 = dx * dx + dy * dy;
+          if (d2 > 2 && d2 < 120 * 120) {
+            segs.push({ x0: o.px, y0: o.py, x1: x, y1: y, a0: TRAIL_ALPHA * o.alpha, born: now });
           }
         }
         o.px = x;
         o.py = y;
         o.hasPrev = true;
 
+        // pills are anchored at left-1/2 top-1/2, so they get the OFFSET
+        // (feeding absolute coords would double the center and pile every
+        // pill into the bottom-right corner)
         const el = pillRefs.current.get(o.id);
         if (el) {
           el.style.opacity = o.alpha.toFixed(3);
-          el.style.transform = `translate(-50%,-50%) translate3d(${x.toFixed(2)}px,${y.toFixed(2)}px,0) scale(${o.scale.toFixed(3)})`;
+          el.style.visibility = "visible";
+          el.style.transform = `translate(-50%,-50%) translate3d(${ox.toFixed(2)}px,${oy.toFixed(2)}px,0) scale(${o.scale.toFixed(3)})`;
         }
       }
 
@@ -500,6 +505,25 @@ export function EventHorizonCommand({
       ctx.beginPath();
       ctx.ellipse(cx, cy, R_MIN * sx, R_MIN * sy, 0, 0, Math.PI * 2);
       ctx.stroke();
+
+      // trails: each segment fades exp(-age / 0.24 s) and is pruned once
+      // invisible or older than 1 s — ink fully dissolves, nothing accumulates
+      if (segs.length > TRAIL_CAP) segs.splice(0, segs.length - TRAIL_CAP);
+      if (segs.length) {
+        const keep: Seg[] = [];
+        for (const s of segs) {
+          const age = (now - s.born) / 1000;
+          const a = s.a0 * Math.exp(-age / TRAIL_TAU);
+          if (age > TRAIL_MAX_AGE || a < 0.012) continue;
+          keep.push(s);
+          ctx.strokeStyle = rgba(colors.fg, a);
+          ctx.beginPath();
+          ctx.moveTo(s.x0, s.y0);
+          ctx.lineTo(s.x1, s.y1);
+          ctx.stroke();
+        }
+        segs = keep;
+      }
 
       // query-confidence mass (mean top-3 score) breathes the glow 24-48 px
       const rs = resultsRef.current;
@@ -522,8 +546,6 @@ export function EventHorizonCommand({
       ctx.beginPath();
       ctx.arc(cx, cy, glowR, 0, Math.PI * 2);
       ctx.stroke();
-
-      ctx.drawImage(trail, 0, 0, w, h);
     };
     raf = requestAnimationFrame(loop);
 
@@ -554,20 +576,25 @@ export function EventHorizonCommand({
     if (!autoTypeQuery || !openState || reduced || scriptStoppedRef.current)
       return;
     const timers: number[] = [];
-    const cycle = () => {
-      timers.splice(0).forEach((t) => window.clearTimeout(t));
-      setQuery("");
-      setHighlight(0);
+    const type = (delay: number, step: number) => {
       for (let i = 1; i <= autoTypeQuery.length; i++) {
         timers.push(
           window.setTimeout(() => {
             setQuery(autoTypeQuery.slice(0, i));
             setHighlight(0);
-          }, 700 + i * 190)
+          }, delay + i * step)
         );
       }
     };
-    timers.push(window.setTimeout(cycle, 300));
+    const cycle = () => {
+      timers.splice(0).forEach((t) => window.clearTimeout(t));
+      setQuery(""); // brief calm-orbit beat between passes
+      setHighlight(0);
+      type(600, 160);
+    };
+    // first pass starts promptly (first char ~400 ms) so an early "default"
+    // screenshot catches a mid-query state, not the idle placeholder
+    type(250, 150);
     const iv = window.setInterval(cycle, Math.max(2000, autoTypeLoopMs));
     const stop = () => {
       window.clearInterval(iv);
@@ -723,7 +750,11 @@ export function EventHorizonCommand({
                       ? "border-accent ring-1 ring-accent"
                       : "border-border hover:border-foreground/30"
                   }`}
-                  style={{ opacity: 0, transform: "translate(-50%,-50%)" }}
+                  style={{
+                    opacity: 0,
+                    visibility: "hidden",
+                    transform: "translate(-50%,-50%)",
+                  }}
                 >
                   <span className="text-xs text-foreground">{c.label}</span>
                   {c.category ? (

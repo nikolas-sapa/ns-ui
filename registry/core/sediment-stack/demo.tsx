@@ -22,7 +22,6 @@ const SEQUENCE: DemoEvent[] = [
   { severity: "info", title: "Static assets uploaded", message: "312 files · 8.4 MB → edge network" },
   { severity: "warning", title: "Cold start p99 elevated", message: "iad1 · 1.28s (budget 800ms)" },
   { severity: "error", title: "Function crashed", message: "/api/checkout · TypeError: cart is undefined" },
-  { severity: "info", title: "Edge cache invalidated", message: "142 keys purged in 90ms" },
   { severity: "warning", title: "Env var missing in preview", message: "STRIPE_WEBHOOK_SECRET not set" },
   { severity: "error", title: "Deploy gate failed", message: "e2e · 3 of 118 specs red" },
 ];

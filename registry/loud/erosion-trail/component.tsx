@@ -86,6 +86,19 @@ export function ErosionTrail({
       }
     }
 
+    // ambient drift — a static per-node phase map; sampling sin(phase − t·speed)
+    // reads as slow traveling ripples through the contours, alive at rest
+    const driftFreq = 0.9 / (N - 1);
+    const driftPhase = new Float32Array(NN);
+    for (let gy = 0; gy < N; gy++) {
+      for (let gx = 0; gx < N; gx++) {
+        driftPhase[gy * N + gx] =
+          noise2(gx * driftFreq + 41.3, gy * driftFreq + 27.6) * Math.PI * 2;
+      }
+    }
+    const ambientAmp = contourStep * 0.42;
+    const driftSpeed = (Math.PI * 2) / 10; // one full drift cycle ≈ 10s
+
     let w = 0;
     let h = 0;
     let dpr = 1;
@@ -106,6 +119,8 @@ export function ErosionTrail({
     // hot-path state — locals only, never React state
     let raf = 0;
     let last = 0;
+    let elapsed = 0;
+    let visible = true;
     let down = false;
     let rawX = 0;
     let rawY = 0;
@@ -117,6 +132,59 @@ export function ErosionTrail({
     const trailX = new Float32Array(TRAIL_MAX);
     const trailY = new Float32Array(TRAIL_MAX);
     let trailLen = 0;
+
+    // ambient sediment — a handful of specks trickling downhill along the
+    // static base gradient, independent of drag; the idle "alive" layer.
+    // Skipped entirely under reduced motion (arrays stay zero-length).
+    const P = reduced ? 0 : 42;
+    const partX = new Float32Array(P);
+    const partY = new Float32Array(P);
+    const partAge = new Float32Array(P);
+    const partLife = new Float32Array(P);
+    const spawnParticle = (i: number) => {
+      partX[i] = Math.random() * w;
+      partY[i] = Math.random() * h;
+      partAge[i] = 0;
+      partLife[i] = 3 + Math.random() * 4;
+    };
+    for (let i = 0; i < P; i++) spawnParticle(i);
+
+    const updateParticles = (dt: number) => {
+      for (let i = 0; i < P; i++) {
+        const gx = Math.min(N - 2, Math.max(1, Math.round(partX[i]! / cellW)));
+        const gy = Math.min(N - 2, Math.max(1, Math.round(partY[i]! / cellH)));
+        const row = gy * N;
+        const dHdx = (base[row + gx + 1]! - base[row + gx - 1]!) / (2 * cellW);
+        const dHdy = (base[row + N + gx]! - base[row - N + gx]!) / (2 * cellH);
+        let vx = -dHdx * 2600;
+        let vy = -dHdy * 2600;
+        const sp = Math.hypot(vx, vy);
+        if (sp > 26) {
+          vx = (vx / sp) * 26;
+          vy = (vy / sp) * 26;
+        } else if (sp < 4) {
+          // near-flat ground — a slow noise-driven nudge so it never stalls
+          const a =
+            noise2(partX[i]! * 0.01, partY[i]! * 0.01 + elapsed * 0.15) *
+            Math.PI *
+            2;
+          vx = Math.cos(a) * 6;
+          vy = Math.sin(a) * 6;
+        }
+        partX[i]! += vx * dt;
+        partY[i]! += vy * dt;
+        partAge[i]! += dt;
+        if (
+          partAge[i]! > partLife[i]! ||
+          partX[i]! < 0 ||
+          partX[i]! > w ||
+          partY[i]! < 0 ||
+          partY[i]! > h
+        ) {
+          spawnParticle(i);
+        }
+      }
+    };
 
     const carveSegment = (dt: number) => {
       const segLen = Math.hypot(sx - lastSx, sy - lastSy);
@@ -175,7 +243,10 @@ export function ErosionTrail({
       let minH = Infinity;
       let maxH = -Infinity;
       for (let i = 0; i < NN; i++) {
-        const v = base[i]! - delta[i]!;
+        const v =
+          base[i]! -
+          delta[i]! +
+          ambientAmp * Math.sin(driftPhase[i]! - elapsed * driftSpeed);
         field[i] = v;
         if (v < minH) minH = v;
         if (v > maxH) maxH = v;
@@ -308,11 +379,30 @@ export function ErosionTrail({
       ctx.strokeStyle = "#8f8f8f";
       ctx.lineWidth = 1;
       ctx.stroke(major);
+
+      // ambient sediment specks — soft in/out fade over their lifespan
+      if (P > 0) {
+        ctx.fillStyle = "#8f8f8f";
+        for (let i = 0; i < P; i++) {
+          const life = partLife[i]!;
+          const age = partAge[i]!;
+          const fadeIn = Math.min(1, age / 0.6);
+          const fadeOut = Math.min(1, (life - age) / 0.6);
+          const alpha = Math.max(0, Math.min(fadeIn, fadeOut)) * 0.5;
+          if (alpha <= 0.01) continue;
+          ctx.globalAlpha = alpha;
+          ctx.beginPath();
+          ctx.arc(partX[i]!, partY[i]!, 1.4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+      }
     };
 
     const loop = (now: number) => {
       const dt = last === 0 ? 1 / 60 : Math.min(0.05, (now - last) / 1000);
       last = now;
+      elapsed += dt;
 
       if (down) {
         // velocity-smoothed trail head prevents scalloping
@@ -331,21 +421,23 @@ export function ErosionTrail({
         delta[i] = v;
         if (v > maxDelta) maxDelta = v;
       }
+      if (!down && maxDelta <= 0.002) delta.fill(0);
 
+      updateParticles(dt);
       draw();
 
-      if (down || maxDelta > 0.002) {
+      // ambient drift + sediment keep this looping while visible — it only
+      // sleeps once scrolled offscreen or under reduced motion (never enters)
+      if (visible) {
         raf = requestAnimationFrame(loop);
       } else {
-        // fully healed — snap the residue to zero, final frame, sleep
-        delta.fill(0);
-        draw();
         raf = 0;
         last = 0;
       }
     };
 
     const wake = () => {
+      if (reduced) return;
       if (!raf) {
         last = 0;
         raf = requestAnimationFrame(loop);
@@ -402,6 +494,27 @@ export function ErosionTrail({
     });
     ro.observe(root);
 
+    // ambient motion pauses off-screen — the loop is the only thing that
+    // should ever spin while nothing is looking at it
+    const io = reduced
+      ? null
+      : new IntersectionObserver(
+          (entries) => {
+            const entry = entries[0];
+            if (!entry) return;
+            visible = entry.isIntersecting;
+            if (visible) {
+              wake();
+            } else if (raf) {
+              cancelAnimationFrame(raf);
+              raf = 0;
+              last = 0;
+            }
+          },
+          { threshold: 0 }
+        );
+    if (io) io.observe(root);
+
     root.addEventListener("pointermove", onMove);
     root.addEventListener("pointerleave", onLeave);
     if (!reduced) {
@@ -411,13 +524,19 @@ export function ErosionTrail({
       root.addEventListener("lostpointercapture", onUp);
     }
 
-    // initial static sheet (also the reduced-motion final state)
-    draw();
+    // reduced motion renders once and stays put — a real static fallback;
+    // otherwise the ambient loop starts immediately, alive before any input
+    if (reduced) {
+      draw();
+    } else {
+      wake();
+    }
 
     return () => {
       cancelAnimationFrame(raf);
       raf = 0;
       ro.disconnect();
+      if (io) io.disconnect();
       root.removeEventListener("pointermove", onMove);
       root.removeEventListener("pointerleave", onLeave);
       if (!reduced) {

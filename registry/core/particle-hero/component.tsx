@@ -1,47 +1,73 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { motion, useReducedMotion, type Variants } from "motion/react";
 
 const COUNT = 6000;
 const FIELD = { w: 22, h: 12 };
+// cursor influence radius in screen pixels; converted to world units per-frame
+// since world-units-per-pixel changes with viewport size
+const CURSOR_RADIUS_PX = 120;
+// resting cursor position, far outside the field — falloff is ~0 here, so
+// easing back to this point on pointer-leave reads as a spring return
+const REST = new THREE.Vector2(999, 999);
 
 // All particle motion lives in the vertex shader — zero per-particle CPU work.
-// JS only eases the cursor uniform each frame so repulsion trails smoothly.
+// JS only eases the cursor uniform each frame so repulsion trails smoothly,
+// and re-derives uColorBase/uColorLift from CSS tokens on theme change.
 const vertexShader = /* glsl */ `
   uniform float uTime;
   uniform vec2 uCursor;
+  uniform float uRadius;
   attribute float aSeed;
-  varying float vFade;
+  varying float vLift;
   void main() {
     vec3 p = position;
     p.x += sin(uTime * 0.4 + aSeed) * 0.3;
     p.y += cos(uTime * 0.32 + aSeed * 1.7) * 0.3;
     vec2 d = p.xy - uCursor;
-    float f = min(1.2 / (dot(d, d) + 0.35), 2.2);
-    p.xy += d * f * 0.35;
-    vFade = 1.0 - clamp(f * 0.3, 0.0, 0.6); // slightly dim displaced particles
+    float dist = length(d);
+    // smooth falloff to 0 at uRadius, 1 at the cursor — displacement, size and
+    // brightness all key off this so the reaction reads as one coherent lift
+    float falloff = 1.0 - smoothstep(0.0, uRadius, dist);
+    vec2 dir = dist > 0.0001 ? d / dist : vec2(0.0);
+    p.xy += dir * falloff * uRadius * 0.55;
+    vLift = falloff;
     vec4 mv = modelViewMatrix * vec4(p, 1.0);
-    gl_PointSize = 42.0 / -mv.z;
+    gl_PointSize = (42.0 / -mv.z) * (1.0 + falloff * 0.7);
     gl_Position = projectionMatrix * mv;
   }
 `;
 
 const fragmentShader = /* glsl */ `
-  varying float vFade;
+  uniform vec3 uColorBase;
+  uniform vec3 uColorLift;
+  varying float vLift;
   void main() {
     float d = length(gl_PointCoord - 0.5);
-    float alpha = smoothstep(0.5, 0.15, d) * 0.55 * vFade;
+    float alpha = smoothstep(0.5, 0.15, d) * (0.55 + vLift * 0.35);
     if (alpha < 0.01) discard;
-    gl_FragColor = vec4(vec3(0.561), alpha); // #8f8f8f
+    gl_FragColor = vec4(mix(uColorBase, uColorLift, vLift), alpha);
   }
 `;
 
-function Particles({ still }: { still: boolean }) {
+// #rrggbb / #rgb -> 0-1 float triple; falls back to muted gray on parse miss
+function parseColor(hex: string): [number, number, number] | null {
+  const s = hex.trim();
+  const m = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(s);
+  if (!m) return null;
+  let h = m[1];
+  if (h.length === 3) h = h.split("").map((c) => c + c).join("");
+  const n = parseInt(h, 16);
+  return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+}
+
+function Particles({ still, visible }: { still: boolean; visible: RefObject<boolean> }) {
   const material = useRef<THREE.ShaderMaterial>(null);
-  const { viewport, pointer } = useThree();
+  const pointerInside = useRef(false);
+  const { viewport, pointer, size, gl } = useThree();
 
   const { positions, seeds } = useMemo(() => {
     const positions = new Float32Array(COUNT * 3);
@@ -56,17 +82,67 @@ function Particles({ still }: { still: boolean }) {
   }, []);
 
   const uniforms = useMemo(
-    () => ({ uTime: { value: 0 }, uCursor: { value: new THREE.Vector2(99, 99) } }),
+    () => ({
+      uTime: { value: 0 },
+      uCursor: { value: REST.clone() },
+      uRadius: { value: 1 },
+      uColorBase: { value: new THREE.Vector3(0.561, 0.561, 0.561) },
+      uColorLift: { value: new THREE.Vector3(0.929, 0.929, 0.929) },
+    }),
     []
   );
 
+  // track pointer enter/leave on the canvas element directly — pointer.x/y
+  // from useThree freezes at the last in-bounds sample on leave, so without
+  // this the cursor uniform would never ease back to rest
+  useEffect(() => {
+    const el = gl.domElement;
+    const enter = () => (pointerInside.current = true);
+    const leave = () => (pointerInside.current = false);
+    el.addEventListener("pointerenter", enter);
+    el.addEventListener("pointerleave", leave);
+    return () => {
+      el.removeEventListener("pointerenter", enter);
+      el.removeEventListener("pointerleave", leave);
+    };
+  }, [gl]);
+
+  // derive dot colors from CSS tokens at mount, and again whenever the theme
+  // class flips — mirrors the pattern used by other canvas components in
+  // this registry (e.g. solargraph-hero)
+  useEffect(() => {
+    const derive = () => {
+      const u = material.current?.uniforms;
+      if (!u) return;
+      const cs = getComputedStyle(document.documentElement);
+      const base = parseColor(cs.getPropertyValue("--muted")) ?? [0.561, 0.561, 0.561];
+      const lift = parseColor(cs.getPropertyValue("--foreground")) ?? [0.929, 0.929, 0.929];
+      (u.uColorBase.value as THREE.Vector3).set(...base);
+      (u.uColorLift.value as THREE.Vector3).set(...lift);
+    };
+    derive();
+    const mo = new MutationObserver(derive);
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => mo.disconnect();
+  }, []);
+
   useFrame(({ clock }) => {
-    if (!material.current || still) return;
-    material.current.uniforms.uTime.value = clock.elapsedTime;
-    // ease cursor toward pointer for a trailing, weighty feel
-    const c = material.current.uniforms.uCursor.value as THREE.Vector2;
-    c.x += ((pointer.x * viewport.width) / 2 - c.x) * 0.08;
-    c.y += ((pointer.y * viewport.height) / 2 - c.y) * 0.08;
+    if (!material.current || !visible.current) return; // paused while scrolled offscreen
+    const u = material.current.uniforms;
+    // radius is defined in screen pixels; convert using this frame's
+    // world-units-per-pixel so the reaction stays ~120px regardless of
+    // viewport size or DPR
+    u.uRadius.value = (CURSOR_RADIUS_PX * viewport.width) / size.width;
+    if (still) return; // reduced motion: freeze drift and cursor reaction alike
+    u.uTime.value = clock.elapsedTime;
+    const target = pointerInside.current
+      ? new THREE.Vector2((pointer.x * viewport.width) / 2, (pointer.y * viewport.height) / 2)
+      : REST;
+    // exponential ease toward target — trailing weight when following the
+    // cursor, spring-like relaxation back to rest once it leaves
+    const c = u.uCursor.value as THREE.Vector2;
+    c.x += (target.x - c.x) * 0.08;
+    c.y += (target.y - c.y) * 0.08;
   });
 
   return (
@@ -129,13 +205,29 @@ export function ParticleHero({
 }) {
   const webgl = useWebGLSupport();
   const reduced = useReducedMotion() ?? false;
+  const sectionRef = useRef<HTMLElement>(null);
+  const visible = useRef(true);
+
+  // pause the rAF-driven drift/cursor work while the hero is scrolled offscreen
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([entry]) => {
+      visible.current = entry.isIntersecting;
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   return (
-    <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background">
+    <section
+      ref={sectionRef}
+      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background"
+    >
       {webgl ? (
         <div className="absolute inset-0" aria-hidden>
           <Canvas camera={{ position: [0, 0, 8], fov: 50 }} dpr={[1, 2]}>
-            <Particles still={reduced} />
+            <Particles still={reduced} visible={visible} />
           </Canvas>
         </div>
       ) : (

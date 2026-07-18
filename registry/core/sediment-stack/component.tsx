@@ -89,6 +89,11 @@ type TimerEntry = {
   remaining: number;
 };
 
+// tray composition only (not a sim constant): keeps the physics floor a few
+// px above the frame's visible bottom edge so a rotated card's circle-proxy
+// corner overhang never visually crosses the clipped edge
+const FLOOR_INSET = 6;
+
 // severity → left-rail color only; the card itself stays on neutral tokens
 const RAIL: Record<SedimentSeverity, string> = {
   error: "var(--error, #ea001d)",
@@ -151,14 +156,14 @@ function CardInner({
   onDismiss: () => void;
 }) {
   return (
-    <div className="flex items-start gap-2.5 py-2.5 pl-3 pr-1.5">
+    <div className="flex items-start gap-2.5 py-2 pl-3 pr-1.5">
       <span className="mt-0.5 shrink-0 text-muted">{ICONS[toast.severity]}</span>
       <div className="min-w-0 flex-1">
         <p className="truncate text-[13px] font-medium leading-tight text-foreground">
           {toast.title}
         </p>
         {toast.message ? (
-          <p className="mt-1 truncate font-mono text-[11px] leading-tight text-muted">
+          <p className="mt-0.5 truncate font-mono text-[11px] leading-tight text-muted">
             {toast.message}
           </p>
         ) : null}
@@ -244,8 +249,10 @@ export const SedimentStack = forwardRef<
   const wakeRef = useRef<() => void>(() => {});
   const kickRef = useRef<() => void>(() => {});
   const shadowRef = useRef("0 10px 24px -10px rgba(0,0,0,0.28)");
+  const restShadowRef = useRef("0 3px 10px -6px rgba(0,0,0,0.3)");
   const seqRef = useRef(0);
   const bornRef = useRef(0);
+  const spawnSlotRef = useRef(0);
 
   const [toasts, setToasts] = useState<ToastRec[]>(() =>
     (initial ?? []).map((t, i) => ({
@@ -269,16 +276,20 @@ export const SedimentStack = forwardRef<
     return () => mq.removeEventListener("change", update);
   }, []);
 
-  // hover-lift shadow tint derives from the --foreground token so it reads in
-  // both themes; re-derived live when the theme class flips on <html>
+  // hover-lift + resting shadows both tint from the --foreground token so
+  // they read in both themes; re-derived live when the theme class flips on
+  // <html>. Resting shadow is a subtle version applied to every settled card
+  // so the pile reads as sitting under real weight, not flat cutouts.
   useEffect(() => {
     const rootEl = document.documentElement;
     const derive = () => {
       const fg = getComputedStyle(rootEl).getPropertyValue("--foreground");
       const rgb = parseColor(fg) ?? { r: 0, g: 0, b: 0 };
       shadowRef.current = `0 10px 24px -10px rgba(${rgb.r},${rgb.g},${rgb.b},0.28)`;
+      restShadowRef.current = `0 3px 10px -6px rgba(${rgb.r},${rgb.g},${rgb.b},0.3)`;
       for (const b of bodiesRef.current.values()) {
-        if (b.hovered && !b.dead) b.el.style.boxShadow = shadowRef.current;
+        if (b.dead) continue;
+        b.el.style.boxShadow = b.hovered ? shadowRef.current : restShadowRef.current;
       }
     };
     derive();
@@ -411,8 +422,10 @@ export const SedimentStack = forwardRef<
 
   useImperativeHandle(ref, () => ({ push, dismiss, clear }), [push, dismiss, clear]);
 
-  // spawn a rigid body the moment a card element mounts: top-right entry,
-  // vx jitter ±40 px/s, rotation jitter ±4°, mass by severity (3/2/1)
+  // spawn a rigid body the moment a card element mounts: entry x round-robins
+  // across a handful of tray-width slots (jittered) so the pile heaps instead
+  // of sliding in from one edge, vx jitter ±40 px/s, rotation jitter ±4°,
+  // mass by severity (3/2/1)
   const attach = useCallback(
     (t: ToastRec, el: HTMLDivElement | null) => {
       const bodies = bodiesRef.current;
@@ -442,10 +455,28 @@ export const SedimentStack = forwardRef<
         lxs.push(-span + (span * 2 * i) / (count - 1));
       const mass = t.severity === "error" ? 3 : t.severity === "warning" ? 2 : 1;
       const inertia = (mass * (w * w + h * h)) / 12;
+      // distribute drop x across up to 4 tray slots (round-robin + jitter)
+      // instead of always the far-right edge, so the pile heaps rather than
+      // sliding in flat from one side
+      const SLOT_COUNT = 4;
+      const slotLeft = hw + 8;
+      const slotRight = cw - hw - 8;
+      const slotSpan = slotRight - slotLeft;
+      let x: number;
+      if (cw > w + 40 && slotSpan > 0) {
+        const n = Math.min(SLOT_COUNT, Math.max(1, Math.floor(slotSpan / 40) + 1));
+        const slot = spawnSlotRef.current % n;
+        spawnSlotRef.current++;
+        const frac = n === 1 ? 0.5 : slot / (n - 1);
+        const jitter = (Math.random() - 0.5) * Math.min(28, slotSpan / n);
+        x = Math.min(slotRight, Math.max(slotLeft, slotLeft + frac * slotSpan + jitter));
+      } else {
+        x = Math.max(hw + 2, cw - hw - 2);
+      }
       const body: Body = {
         id: t.id,
         el,
-        x: cw > w + 40 ? cw - hw - 16 - Math.random() * 24 : Math.max(hw + 2, cw - hw - 2),
+        x,
         y: -hh - 6,
         a: (Math.random() - 0.5) * ((8 * Math.PI) / 180),
         vx: (Math.random() - 0.5) * 40,
@@ -476,6 +507,7 @@ export const SedimentStack = forwardRef<
         age: 0,
       };
       el.style.transform = `translate3d(${(body.x - hw).toFixed(2)}px, ${(body.y - hh).toFixed(2)}px, 0) rotate(${body.a.toFixed(4)}rad)`;
+      el.style.boxShadow = restShadowRef.current;
       bodies.set(t.id, body);
       recomputeDepth();
       wakeRef.current();
@@ -856,7 +888,7 @@ export const SedimentStack = forwardRef<
       const b = bodiesRef.current.get(id);
       if (b && !b.dead) {
         b.hovered = false;
-        b.el.style.boxShadow = "";
+        b.el.style.boxShadow = restShadowRef.current;
         kickRef.current();
       }
     },
@@ -949,34 +981,44 @@ export const SedimentStack = forwardRef<
 
   return (
     <div
-      ref={containerRef}
       role="region"
       aria-label={ariaLabel}
       className={`relative overflow-hidden ${className}`}
     >
-      {toasts.map((t) => (
-        <div
-          key={t.id}
-          ref={(el) => attach(t, el)}
-          role={t.severity === "error" ? "alert" : "status"}
-          onPointerDown={(e) => beginDrag(t.id, e)}
-          onPointerMove={(e) => moveDrag(t.id, e)}
-          onPointerUp={() => endDrag(t.id, false)}
-          onPointerCancel={() => endDrag(t.id, true)}
-          onPointerEnter={() => hoverIn(t.id)}
-          onPointerLeave={() => hoverOut(t.id)}
-          className="absolute left-0 top-0 w-72 max-w-[calc(100%-16px)] cursor-grab touch-pan-y select-none rounded-sm border border-border bg-surface transition-opacity duration-150 will-change-transform hover:border-foreground/20"
-          style={{
-            borderLeftWidth: 3,
-            borderLeftColor: RAIL[t.severity],
-            // constant in props → React never rewrites it over the sim's
-            // per-frame writes; attach() replaces it before first paint
-            transform: "translate3d(-200%, -200%, 0)",
-          }}
-        >
-          <CardInner toast={t} onDismiss={() => dismiss(t.id)} />
-        </div>
-      ))}
+      {/* physics frame is FLOOR_INSET px shorter than the visible box — the
+          sim's floor sits above the clip line instead of exactly on it, so
+          resting cards never read as clipped */}
+      <div ref={containerRef} className="absolute inset-x-0 top-0" style={{ height: `calc(100% - ${FLOOR_INSET}px)` }}>
+        {toasts.map((t) => (
+          <div
+            key={t.id}
+            ref={(el) => attach(t, el)}
+            role={t.severity === "error" ? "alert" : "status"}
+            onPointerDown={(e) => beginDrag(t.id, e)}
+            onPointerMove={(e) => moveDrag(t.id, e)}
+            onPointerUp={() => endDrag(t.id, false)}
+            onPointerCancel={() => endDrag(t.id, true)}
+            onPointerEnter={() => hoverIn(t.id)}
+            onPointerLeave={() => hoverOut(t.id)}
+            className="absolute left-0 top-0 w-64 max-w-[calc(100%-16px)] cursor-grab touch-pan-y select-none rounded-sm border border-border bg-surface transition-opacity duration-150 will-change-transform hover:border-foreground/20"
+            style={{
+              borderLeftWidth: 3,
+              borderLeftColor: RAIL[t.severity],
+              // constant in props → React never rewrites it over the sim's
+              // per-frame writes; attach() replaces it before first paint
+              transform: "translate3d(-200%, -200%, 0)",
+            }}
+          >
+            <CardInner toast={t} onDismiss={() => dismiss(t.id)} />
+          </div>
+        ))}
+      </div>
+      {/* soft vignette reads the inset floor gap as intentional depth, not a
+          rendering gap */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-background/60 to-transparent"
+      />
     </div>
   );
 });

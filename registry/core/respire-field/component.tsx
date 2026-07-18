@@ -121,6 +121,33 @@ export function RespireField({
     const py = new Float32Array(POINTS);
     const nx = new Float32Array(POINTS);
     const ny = new Float32Array(POINTS);
+    const dx = new Float32Array(POINTS); // displaced ring, rebuilt every frame
+    const dy = new Float32Array(POINTS);
+
+    // stroke endpoints resolved from CSS tokens (muted → foreground, error),
+    // re-resolved when the theme class on <html> flips
+    let mutC: [number, number, number] = [143, 143, 143];
+    let fgC: [number, number, number] = [237, 237, 237];
+    let errC: [number, number, number] = [234, 0, 29];
+    const parseColor = (
+      v: string,
+      fb: [number, number, number]
+    ): [number, number, number] => {
+      if (!measure || !v) return fb;
+      measure.fillStyle = "#000000";
+      measure.fillStyle = v.trim();
+      const m = /^#([0-9a-f]{6})$/.exec(measure.fillStyle);
+      if (!m || !m[1]) return fb;
+      const n = parseInt(m[1], 16);
+      return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+    };
+    const deriveColors = () => {
+      const root = getComputedStyle(document.documentElement);
+      mutC = parseColor(root.getPropertyValue("--muted"), [143, 143, 143]);
+      fgC = parseColor(root.getPropertyValue("--foreground"), [237, 237, 237]);
+      errC = parseColor(root.getPropertyValue("--error"), [234, 0, 29]);
+    };
+    deriveColors();
 
     // s=0 at the left end of the top edge, clockwise: top → TR arc → right
     // → BR arc → bottom → BL arc → left → TL arc. Positions + outward normals.
@@ -211,6 +238,12 @@ export function RespireField({
       dpr = Math.min(2, window.devicePixelRatio || 1);
       canvas.width = Math.max(1, Math.round((w + PAD * 2) * dpr));
       canvas.height = Math.max(1, Math.round((h + PAD * 2) * dpr));
+      // a canvas is a replaced element: absolute + inset does NOT stretch it,
+      // it lays out at its intrinsic (buffer) size — dpr× too big. Pin the
+      // CSS size explicitly so buffer*1/dpr === CSS px and the membrane hugs
+      // the field instead of rendering as a giant dpr-scaled polygon.
+      canvas.style.width = `${w + PAD * 2}px`;
+      canvas.style.height = `${h + PAD * 2}px`;
       const cs = getComputedStyle(input);
       font = cs.font || `${cs.fontSize} ${cs.fontFamily}`;
       padLeft = parseFloat(cs.paddingLeft) || 0;
@@ -307,7 +340,6 @@ export function RespireField({
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, w + PAD * 2, h + PAD * 2);
-      ctx.beginPath();
       for (let i = 0; i < POINTS; i++) {
         const s = i / POINTS;
         const n = noise2(
@@ -330,18 +362,39 @@ export function RespireField({
             (Math.exp(-(d1 * d1) / TWO_SIGMA2) +
               Math.exp(-(d2 * d2) / TWO_SIGMA2));
         }
-        const x = (px[i] ?? 0) + (nx[i] ?? 0) * disp;
-        const y = (py[i] ?? 0) + (ny[i] ?? 0) * disp;
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
+        // hard ceiling: transients can momentarily stack — never leave the
+        // canvas overhang, so the ring always hugs the field
+        if (disp > PAD - 1) disp = PAD - 1;
+        dx[i] = (px[i] ?? 0) + (nx[i] ?? 0) * disp;
+        dy[i] = (py[i] ?? 0) + (ny[i] ?? 0) * disp;
+      }
+      // closed Catmull-Rom spline through the displaced ring (bezier form,
+      // tangents (p2-p0)/6) — 96 linear segments leave each 6px corner arc
+      // with ~1 sample and read as sharp angles; the spline keeps it round
+      ctx.beginPath();
+      ctx.moveTo(dx[0] ?? 0, dy[0] ?? 0);
+      for (let i = 0; i < POINTS; i++) {
+        const p0 = (i + POINTS - 1) % POINTS;
+        const p2 = (i + 1) % POINTS;
+        const p3 = (i + 2) % POINTS;
+        ctx.bezierCurveTo(
+          (dx[i] ?? 0) + ((dx[p2] ?? 0) - (dx[p0] ?? 0)) / 6,
+          (dy[i] ?? 0) + ((dy[p2] ?? 0) - (dy[p0] ?? 0)) / 6,
+          (dx[p2] ?? 0) - ((dx[p3] ?? 0) - (dx[i] ?? 0)) / 6,
+          (dy[p2] ?? 0) - ((dy[p3] ?? 0) - (dy[i] ?? 0)) / 6,
+          dx[p2] ?? 0,
+          dy[p2] ?? 0
+        );
       }
       ctx.closePath();
-      // stroke: #8f8f8f blurred → #ededed focused, blended toward
-      // rgba(234,0,29,0.6) while the error state holds (status use only)
-      const g = Math.round(143 + (237 - 143) * fp);
-      const cr = Math.round(g + (234 - g) * errMix);
-      const cg = Math.round(g * (1 - errMix));
-      const cb = Math.round(g + (29 - g) * errMix);
+      // stroke: muted token blurred → foreground token focused, blended
+      // toward the error token at 0.6 alpha while error holds (status only)
+      const cr0 = mutC[0] + (fgC[0] - mutC[0]) * fp;
+      const cg0 = mutC[1] + (fgC[1] - mutC[1]) * fp;
+      const cb0 = mutC[2] + (fgC[2] - mutC[2]) * fp;
+      const cr = Math.round(cr0 + (errC[0] - cr0) * errMix);
+      const cg = Math.round(cg0 + (errC[1] - cg0) * errMix);
+      const cb = Math.round(cb0 + (errC[2] - cb0) * errMix);
       ctx.strokeStyle = `rgba(${cr},${cg},${cb},${1 - 0.4 * errMix})`;
       ctx.lineWidth = 1;
       ctx.lineJoin = "round";
@@ -366,8 +419,9 @@ export function RespireField({
       raf = requestAnimationFrame(loop);
     };
 
+    let onscreen = true;
     const wake = () => {
-      if (!raf) {
+      if (onscreen && !raf) {
         last = 0;
         raf = requestAnimationFrame(loop);
       }
@@ -402,11 +456,34 @@ export function RespireField({
       wake();
     });
     ro.observe(wrap);
+    // theme flip (class change on <html>) → re-derive stroke tokens + repaint
+    const mo = new MutationObserver(() => {
+      deriveColors();
+      wake();
+    });
+    mo.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    // offscreen → park the rAF loop; back onscreen → repaint and resume
+    const io = new IntersectionObserver((entries) => {
+      onscreen = entries[entries.length - 1]?.isIntersecting ?? true;
+      if (!onscreen && raf) {
+        cancelAnimationFrame(raf);
+        raf = 0;
+        last = 0;
+      } else if (onscreen) {
+        wake();
+      }
+    });
+    io.observe(wrap);
 
     return () => {
       cancelAnimationFrame(raf);
       wakeRef.current = null;
       ro.disconnect();
+      mo.disconnect();
+      io.disconnect();
       input.removeEventListener("focus", onFocus);
       input.removeEventListener("blur", onBlur);
       input.removeEventListener("input", onInput);
@@ -435,10 +512,14 @@ export function RespireField({
       <input
         ref={inputRef}
         {...inputProps}
+        aria-invalid={error}
         className={
           reduced
-            ? // reduced motion: canvas hidden, standard border + default ring
-              "w-full rounded-sm border border-border bg-surface px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted/60"
+            ? // reduced motion: canvas hidden, standard border + default ring;
+              // error still visible via the border (canvas quiver is gone)
+              `w-full rounded-sm border bg-surface px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted/60 ${
+                error ? "border-[#ea001d]" : "border-border"
+              }`
             : "w-full rounded-sm border border-transparent bg-surface px-3.5 py-2.5 text-sm text-foreground outline-none placeholder:text-muted/60"
         }
       />
