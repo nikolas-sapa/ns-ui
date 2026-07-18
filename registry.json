@@ -172,6 +172,33 @@
       }
     },
     {
+      "name": "mercury-minimap",
+      "type": "registry:ui",
+      "title": "Mercury Minimap",
+      "description": "TOC minimap where scroll progress is a column of liquid mercury — a gooey SVG blob climbs the rail, absorbs section ticks, teardrops under fast scroll, and bulges toward hovered ticks.",
+      "files": [
+        {
+          "path": "registry/core/mercury-minimap/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/mercury-minimap.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "nav",
+          "scroll",
+          "svg",
+          "goo",
+          "toc",
+          "cursor",
+          "micro-interaction"
+        ],
+        "instruction": "Build a fixed-right table-of-contents minimap where scroll progress renders as liquid mercury inside a 48px-wide, 60vh-tall SVG rail. Use one goo filter (feGaussianBlur stdDeviation 4 into an feColorMatrix with alpha row 0 0 0 19 -9) over a liquid group filled with the foreground token: a 4px rounded-rect column from rail top to the blob, a leading r=7 blob circle, and per-section r=4 circles that start hidden; outside the filter, draw crisp unfilled r=4 ticks stroked with the muted token at each section's evenly mapped y. Map window scroll through the sections' document offsets piecewise-linearly to a target y, and drive the blob with a semi-implicit Euler spring (stiffness 120, damping 20, slightly underdamped so stops land with a droplet wobble) integrated in a requestAnimationFrame loop that writes only via setAttribute, reads scroll from a ref set by a passive listener, and sleeps when velocity and error settle. Stretch the blob volume-preservingly by velocity — scaleY = 1 + clamp(|v|*0.004, 0, 0.8), scaleX = 1/sqrt(scaleY) — shifted a few px toward the travel direction so fast scroll visibly teardrops the leading edge. When the blob passes within 6px of a tick, reveal that tick's hidden circle inside the goo group (the filter renders the merge) and fade the outline tick; scrolling back up re-hides it so the goo neck snaps and releases the dot. On pointer within 24px of a tick, grow a helper circle in the goo group from r 0 to 5 positioned 60% of the way from the column toward the tick so the liquid bulges at the cursor; clicking a tick smooth-scrolls its section into view. Geist Mono text-xs labels slide in from translateX(-8px) to 0 over 150ms ease-out on rail hover, muted by default and foreground when active. Under prefers-reduced-motion swap the whole goo layer for a plain 2px filled line plus dots with instant active states and no animation loop. Auto-discover section[id] elements when no sections prop is given."
+      }
+    },
+    {
       "name": "particle-hero",
       "type": "registry:ui",
       "title": "Particle Hero",
@@ -197,6 +224,142 @@
           "text-reveal"
         ],
         "instruction": "A dark full-viewport hero section: a WebGL particle field of thousands of small gray dots that drift gently and repel away from the cursor, behind a staggered spring-physics text reveal (mono eyebrow, large tight headline, muted subline) and a single accent CTA, with a radial vignette keeping edges quiet. Static dot-grid fallback without WebGL, reduced-motion respected."
+      }
+    },
+    {
+      "name": "particle-tunnel-scrub",
+      "type": "registry:ui",
+      "title": "Particle Tunnel Scrub",
+      "description": "Scroll scrubs a camera through a monochrome point tunnel — velocity stretches dots into motion streaks, cursor drift adds parallax, and mono section labels at fixed depths snap into focus as you fly past.",
+      "files": [
+        {
+          "path": "registry/core/particle-tunnel-scrub/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/particle-tunnel-scrub.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "scroll",
+          "canvas",
+          "particles",
+          "3d",
+          "parallax",
+          "scrub",
+          "typography",
+          "monochrome"
+        ],
+        "instruction": "Build a scroll-scrubbed particle tunnel section: a 400vh wrapper with a position:sticky full-viewport Canvas 2D inside it, roughly 3000 points seeded in a cylinder shell (radius 120-900 world units, depth 0-4000) and projected manually with scale = 600/(z - camZ), culling anything behind the camera. Read scroll progress from the section's getBoundingClientRect in a passive scroll listener that writes a plain variable, map it to camZ = p*3600, and drive everything from a direct-DOM rAF loop with no React state on the hot path that sleeps once scroll, pointer parallax, and springs are all settled. Keep an EMA (alpha=0.12) of scroll velocity and stretch each point into a motion streak along its per-frame projected delta with length clamp(|v|*0.06, 0, 40)px, relaxed back to dots by a spring (k=60, zeta=0.8) when scrolling stops; add cursor parallax by lerping camera x/y at 0.08/frame toward pointer offset from viewport center times 0.04. Points are #8f8f8f, brightening toward #ededed proportional to 1/(z - camZ). Overlay four Geist Mono labels (text-sm tracking-widest) centered on screen at fixed world depths 700/1600/2500/3400 and write their opacity, blur, and scale directly to style each frame: fully focused within +-300 units of camZ, falling to opacity 0 and blur 6px over the next 900 units, scale running 0.92 to 1.08 through the pass so they fly by. Under prefers-reduced-motion draw one static starfield frame and render the labels as a normal stacked list that fades in over 200ms via IntersectionObserver."
+      }
+    },
+    {
+      "name": "signal-terrain",
+      "type": "registry:ui",
+      "title": "Signal Terrain",
+      "description": "Unknown-Pleasures ridgeline chart whose live history recedes into scrolling ambient noise terrain, dented gravitationally by the cursor.",
+      "files": [
+        {
+          "path": "registry/core/signal-terrain/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/signal-terrain.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "canvas",
+          "data-viz",
+          "ridgeline",
+          "noise",
+          "cursor",
+          "ambient",
+          "chart"
+        ],
+        "instruction": "An Unknown-Pleasures wireframe landscape on a DPR-aware Canvas 2D: ~96 columns by 40 rows of ridgeline polylines drawn back to front, each row stroked then filled below with #0a0a0a so nearer ridges occlude farther ones (painter's-algorithm ridgeline trick); row y-spacing eases quadratically so rows compress at the horizon and row width narrows ~35% toward the back. Height per vertex = ambient + data: ambient is 2-octave value noise scrolling toward the viewer at 0.06 u/s with 18px amplitude scaled up toward the front; data is a series prop (number[]) where sample age maps to row depth, so each new sample enters at the front row and the whole history glides one row back over 600ms with cubic-bezier(0.22,1,0.36,1) interpolation between fractional row offsets, the chart's history literally receding into ambient terrain. The cursor dents the mesh with a screen-space gaussian (sigma 90px, max depth 26px): dent amount lerps toward full at 0.12/frame while hovered and releases through an underdamped spring (k=70 s^-2, zeta=0.6) for one visible rebound. Stroke fades from 1.5px #ededed at the front row to 1px rgba(143,143,143,0.25) at the horizon. Data and pointer live in refs; a single rAF loop is the only writer and pauses when the element leaves the viewport. Under prefers-reduced-motion: no noise scroll, no dent, a static render of the current series redrawn instantly on data change. With an empty series it idles as pure atmosphere; with no noise it reads as a strict chart."
+      }
+    },
+    {
+      "name": "slide-to-shatter",
+      "type": "registry:ui",
+      "title": "Slide to Shatter",
+      "description": "Frosted-glass confirm slider where drag distance drives Voronoi crack density — release early and the cracks heal on a spring; complete the travel and the pane explodes into tumbling glass shards revealing the confirmed state.",
+      "files": [
+        {
+          "path": "registry/core/slide-to-shatter/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/slide-to-shatter.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "slider",
+          "confirm",
+          "destructive",
+          "glass",
+          "canvas",
+          "voronoi",
+          "shatter",
+          "physics"
+        ],
+        "instruction": "A frosted-glass confirm slider where destruction IS the progress indicator: a 320×56 DOM track in the house glass recipe (bg-white/[0.06], backdrop-blur-xl, white/10 border, inset top specular, rounded-md) carries a DPR-aware canvas overlay and a 48px grabbable thumb. On mount, seed ~48 Poisson-disc points across the track and compute exact Voronoi cells once via half-plane bisector clipping; deduped cell walls become crack polylines, each assigned a reveal threshold t from its distance to the thumb origin, and the same cells are reused later as shard polygons. Dragging (pointer capture, progress in a ref, thumb transform set in a rAF loop, zero React state on the hot path) strokes every polyline with t<p segment-by-segment from its near end — 1px rgba(255,255,255,0.35) hairline plus a 0.75px-offset 0.5px rgba(255,255,255,0.12) ghost for glass depth — and past p=0.6 the whole track shudders ±0.5px per frame. Release early and p springs back to 0 (stiffness 220, damping 26) so the cracks retract along the same t-mapping, healing for free. At p≥0.98 the DOM glass hides instantly and the canvas flips to shard mode: each Voronoi cell tumbles outward from the thumb at 120–420px/s under 1800px/s² gravity with ±3rad/s spin, fading over 700ms; after ~900ms the canvas clears, revealing a bg-surface row with a check icon and mono CONFIRMED. The rAF loop sleeps whenever settled, and prefers-reduced-motion drops the canvas entirely for a plain slide with an instant confirmed swap."
+      }
+    },
+    {
+      "name": "prism-drag-split",
+      "type": "registry:ui",
+      "title": "Prism Drag Split",
+      "description": "A frosted prism strip rides the cursor across a headline, magnifying the text beneath it and tearing it into velocity-driven RGB channel slices that snap back with spring overshoot.",
+      "files": [
+        {
+          "path": "registry/loud/prism-drag-split/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/prism-drag-split.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "loud",
+        "tags": [
+          "cursor",
+          "text",
+          "rgb-split",
+          "chromatic-aberration",
+          "glass",
+          "spring",
+          "headline"
+        ],
+        "instruction": "A frosted prism strip that rides the cursor across a headline and refracts the text beneath it — spatial, physical refraction, not a global hover filter. Pure DOM, zero deps. Base headline (Geist Sans 600) split into per-char spans with kerning and ligatures disabled so split and continuous layouts register exactly. The prism is an absolutely-positioned 120px strip: overflow-hidden, backdrop-blur-md, bg-background/85 occluding fill, 1px white/10 borders, inset specular shadow per the glass recipe, and a 12px mask fade on both vertical content edges. Inside it live three full-width clones of the headline in pure #ff0000/#00ff00/#0000ff with mix-blend-screen (they recombine to near-white where aligned), each scaled 1.06 about the strip's current center and counter-translated by -stripX so glyphs stay registered with the base — a lens, not a sticker. The strip follows the cursor via a manual spring integrator (stiffness 300, damping 24, mass 1, semi-implicit Euler) in a rAF loop with position and velocity held in refs and styles written via el.style.transform — no React state on the hot path, loop sleeps when settled. Channel dispersion is velocity-proportional: red dx = clamp(v × 0.018, ±14px), blue mirrored, green fixed, so a stationary strip shows converged text and dragging tears it into RGB slices. When the strip clears a glyph's center the rAF loop toggles a class on that span directly, springing it from a 6px offset (signed by travel direction) back to rest over 350ms with cubic-bezier(0.34,1.56,0.64,1) overshoot. On pointerleave the strip springs back to center rest. Under prefers-reduced-motion there is no rAF: the strip pins statically at 38% of the headline with fixed ±6px channel offsets so the frozen dispersion still reads as the concept."
+      }
+    },
+    {
+      "name": "singularity-text",
+      "type": "registry:ui",
+      "title": "Singularity Text",
+      "description": "Headline as a monochrome particle cloud — the cursor is a gravity well that eats letters into an orbital accretion ring, then releases them to spring back into typeset.",
+      "files": [
+        {
+          "path": "registry/loud/singularity-text/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/singularity-text.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "loud",
+        "tags": [
+          "hero",
+          "text",
+          "particles",
+          "cursor",
+          "canvas",
+          "physics"
+        ],
+        "instruction": "Build a hero headline rendered as a monochrome particle cloud on a single DPR-aware Canvas 2D positioned over a visually hidden real h1 (opacity-0 so semantics and a11y survive; under prefers-reduced-motion the canvas is hidden and the static h1 shows instead). On mount, after document.fonts.ready, draw the headline (Geist Sans 600, clamp(3rem,9vw,7rem)) to an offscreen canvas, getImageData, and sample alpha>128 on a 3px stride into one Float32Array of (x,y,vx,vy,hx,hy) capped near 5k particles — no React state anywhere on the hot path, pointer position lives in closure variables on a direct-DOM rAF loop. Physics integrates with dt clamped to 32ms: the cursor is a gravity well with a 180px capture radius; inside it each particle gets radial acceleration a = G/max(d², 24²) with G around 4e6 px³/s² plus a tangential component 0.6x the radial so particles spiral into orbit instead of beelining; particles within 48px of the cursor render 1.6x brighter as 2-4px velocity-aligned streaks — that band is the accretion ring — over a thin #8f8f8f guide circle at r=36 (alpha 0.15). Outside the well or on pointerleave, particles spring home with k=90 s⁻² and ζ=0.55 (underdamped, so letters visibly overshoot as they reform) with 0.92/frame velocity drag. Fill #ededed with per-particle alpha 0.5-1 keyed to speed, and sleep the rAF loop when every particle is within 0.5px of home and the cursor has left. Pointermove engages the well, pointerleave releases everything, no click behavior."
       }
     }
   ]

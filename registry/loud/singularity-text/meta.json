@@ -1,0 +1,9 @@
+{
+  "name": "singularity-text",
+  "title": "Singularity Text",
+  "description": "Headline as a monochrome particle cloud — the cursor is a gravity well that eats letters into an orbital accretion ring, then releases them to spring back into typeset.",
+  "collection": "loud",
+  "tags": ["hero", "text", "particles", "cursor", "canvas", "physics"],
+  "instruction": "Build a hero headline rendered as a monochrome particle cloud on a single DPR-aware Canvas 2D positioned over a visually hidden real h1 (opacity-0 so semantics and a11y survive; under prefers-reduced-motion the canvas is hidden and the static h1 shows instead). On mount, after document.fonts.ready, draw the headline (Geist Sans 600, clamp(3rem,9vw,7rem)) to an offscreen canvas, getImageData, and sample alpha>128 on a 3px stride into one Float32Array of (x,y,vx,vy,hx,hy) capped near 5k particles — no React state anywhere on the hot path, pointer position lives in closure variables on a direct-DOM rAF loop. Physics integrates with dt clamped to 32ms: the cursor is a gravity well with a 180px capture radius; inside it each particle gets radial acceleration a = G/max(d², 24²) with G around 4e6 px³/s² plus a tangential component 0.6x the radial so particles spiral into orbit instead of beelining; particles within 48px of the cursor render 1.6x brighter as 2-4px velocity-aligned streaks — that band is the accretion ring — over a thin #8f8f8f guide circle at r=36 (alpha 0.15). Outside the well or on pointerleave, particles spring home with k=90 s⁻² and ζ=0.55 (underdamped, so letters visibly overshoot as they reform) with 0.92/frame velocity drag. Fill #ededed with per-particle alpha 0.5-1 keyed to speed, and sleep the rAF loop when every particle is within 0.5px of home and the cursor has left. Pointermove engages the well, pointerleave releases everything, no click behavior.",
+  "dependencies": []
+}

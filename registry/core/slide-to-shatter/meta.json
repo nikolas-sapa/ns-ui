@@ -1,0 +1,9 @@
+{
+  "name": "slide-to-shatter",
+  "title": "Slide to Shatter",
+  "description": "Frosted-glass confirm slider where drag distance drives Voronoi crack density — release early and the cracks heal on a spring; complete the travel and the pane explodes into tumbling glass shards revealing the confirmed state.",
+  "collection": "core",
+  "tags": ["slider", "confirm", "destructive", "glass", "canvas", "voronoi", "shatter", "physics"],
+  "instruction": "A frosted-glass confirm slider where destruction IS the progress indicator: a 320×56 DOM track in the house glass recipe (bg-white/[0.06], backdrop-blur-xl, white/10 border, inset top specular, rounded-md) carries a DPR-aware canvas overlay and a 48px grabbable thumb. On mount, seed ~48 Poisson-disc points across the track and compute exact Voronoi cells once via half-plane bisector clipping; deduped cell walls become crack polylines, each assigned a reveal threshold t from its distance to the thumb origin, and the same cells are reused later as shard polygons. Dragging (pointer capture, progress in a ref, thumb transform set in a rAF loop, zero React state on the hot path) strokes every polyline with t<p segment-by-segment from its near end — 1px rgba(255,255,255,0.35) hairline plus a 0.75px-offset 0.5px rgba(255,255,255,0.12) ghost for glass depth — and past p=0.6 the whole track shudders ±0.5px per frame. Release early and p springs back to 0 (stiffness 220, damping 26) so the cracks retract along the same t-mapping, healing for free. At p≥0.98 the DOM glass hides instantly and the canvas flips to shard mode: each Voronoi cell tumbles outward from the thumb at 120–420px/s under 1800px/s² gravity with ±3rad/s spin, fading over 700ms; after ~900ms the canvas clears, revealing a bg-surface row with a check icon and mono CONFIRMED. The rAF loop sleeps whenever settled, and prefers-reduced-motion drops the canvas entirely for a plain slide with an instant confirmed swap.",
+  "dependencies": []
+}

@@ -11,4 +11,10 @@ export const demos: Record<string, ComponentType> = {
   "magnetic-dock": lazy(() => import("./core/magnetic-dock/demo")),
   "dynamic-weight-text": lazy(() => import("./core/dynamic-weight-text/demo")),
   "hold-to-confirm": lazy(() => import("./core/hold-to-confirm/demo")),
+  "signal-terrain": lazy(() => import("./core/signal-terrain/demo")),
+  "particle-tunnel-scrub": lazy(() => import("./core/particle-tunnel-scrub/demo")),
+  "slide-to-shatter": lazy(() => import("./core/slide-to-shatter/demo")),
+  "mercury-minimap": lazy(() => import("./core/mercury-minimap/demo")),
+  "singularity-text": lazy(() => import("./loud/singularity-text/demo")),
+  "prism-drag-split": lazy(() => import("./loud/prism-drag-split/demo")),
 };

@@ -87,3 +87,14 @@ Variable-font weight morphs per letter by cursor proximity, gaussian falloff, di
 Press-and-hold destructive action, error-red ring traces border, early release drains back.
 - [x] Full hold confirms ("Deleted"), early release cancels — probed both paths
 - [x] Keyboard hold (Space/Enter) supported; passes verify + judge loop
+
+## Fusion batch (breeder workflow, 2026-07-18) — DONE
+
+8 ideators × forced gene pairs → 24 concepts → judge top-6 → parallel build → gate.
+- [x] singularity-text (loud): headline particles eaten by cursor gravity well, accretion ring, spring reform
+- [x] prism-drag-split (loud): draggable frosted prism, velocity-proportional RGB channel tear
+- [x] particle-tunnel-scrub (core): scroll-scrubbed 3D point tunnel, velocity streaks, depth labels
+- [x] signal-terrain (core): live data as ridgeline terrain, cursor gravity dent, ambient idle
+- [x] mercury-minimap (core): liquid-metal scroll minimap, gooey section ticks
+- [x] slide-to-shatter (core): Voronoi crack-density slider, full travel shatters, early release heals
+All: strict TS, verify gate (slide-to-shatter needed a thumb hover fix), contact-sheet judge pass.
