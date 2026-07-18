@@ -1,0 +1,9 @@
+{
+  "name": "glass-panel",
+  "title": "Glass Panel",
+  "description": "Container-level liquid glass: blur, saturation, noise grain, specular rim, graduated shadow ramp.",
+  "collection": "core",
+  "tags": ["surface", "glass", "card", "container"],
+  "instruction": "A liquid-glass container surface built as a layer stack: backdrop blur with saturation boost, tiled SVG noise grain blended over the fill, an inset specular rim lit from above, and a four-step graduated shadow ramp for depth, with children rendered above the glass. Works over any moving or static backdrop, both themes.",
+  "dependencies": []
+}

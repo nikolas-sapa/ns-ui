@@ -7,4 +7,6 @@ export const demos: Record<string, ComponentType> = {
   "particle-hero": lazy(() => import("./core/particle-hero/demo")),
   "decrypt-text": lazy(() => import("./core/decrypt-text/demo")),
   "ascii-dither-media": lazy(() => import("./core/ascii-dither-media/demo")),
+  "glass-panel": lazy(() => import("./core/glass-panel/demo")),
+  "magnetic-dock": lazy(() => import("./core/magnetic-dock/demo")),
 };

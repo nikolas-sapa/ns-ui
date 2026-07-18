@@ -76,6 +76,54 @@
       }
     },
     {
+      "name": "glass-panel",
+      "type": "registry:ui",
+      "title": "Glass Panel",
+      "description": "Container-level liquid glass: blur, saturation, noise grain, specular rim, graduated shadow ramp.",
+      "files": [
+        {
+          "path": "registry/core/glass-panel/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/glass-panel.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "surface",
+          "glass",
+          "card",
+          "container"
+        ],
+        "instruction": "A liquid-glass container surface built as a layer stack: backdrop blur with saturation boost, tiled SVG noise grain blended over the fill, an inset specular rim lit from above, and a four-step graduated shadow ramp for depth, with children rendered above the glass. Works over any moving or static backdrop, both themes."
+      }
+    },
+    {
+      "name": "magnetic-dock",
+      "type": "registry:ui",
+      "title": "Magnetic Dock",
+      "description": "Cursor-proximity magnification row with Gaussian falloff — macOS-dock physics for any children.",
+      "files": [
+        {
+          "path": "registry/core/magnetic-dock/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/magnetic-dock.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "nav",
+          "cursor",
+          "dock",
+          "micro-interaction"
+        ],
+        "instruction": "A horizontal dock that magnifies its children based on cursor proximity with a Gaussian distance falloff: items scale up and lift as the pointer nears, neighbors swell progressively less, everything settles back with interruptible easing on leave. Direct-DOM rAF loop with no React state on the hot path, transform-origin bottom, static under prefers-reduced-motion."
+      }
+    },
+    {
       "name": "particle-hero",
       "type": "registry:ui",
       "title": "Particle Hero",

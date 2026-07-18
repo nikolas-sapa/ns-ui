@@ -1,0 +1,9 @@
+{
+  "name": "magnetic-dock",
+  "title": "Magnetic Dock",
+  "description": "Cursor-proximity magnification row with Gaussian falloff — macOS-dock physics for any children.",
+  "collection": "core",
+  "tags": ["nav", "cursor", "dock", "micro-interaction"],
+  "instruction": "A horizontal dock that magnifies its children based on cursor proximity with a Gaussian distance falloff: items scale up and lift as the pointer nears, neighbors swell progressively less, everything settles back with interruptible easing on leave. Direct-DOM rAF loop with no React state on the hot path, transform-origin bottom, static under prefers-reduced-motion.",
+  "dependencies": []
+}
