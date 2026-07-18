@@ -5,8 +5,9 @@ import { useEffect, useRef } from "react";
 // ---------------------------------------------------------------------------
 // Knockout404 — the 404 rendered as literal absence: every frame, a freshly
 // refilled --surface plane is carved with destination-out so the numerals
-// become holes revealing a dim grain void beneath (precomputed value-noise
-// tile + 12 drifting motes). A hairline stencil bevel rims the cutout,
+// become holes revealing a deep grain void beneath (precomputed value-noise
+// tile + 12 drifting motes), with an inner wall-light glow clipped to the
+// holes so the cut reads as depth. A bright stencil bevel rims the cutout,
 // rebuilt each frame from ~400 traced edge points whose spring-loaded
 // normals bulge outward near the cursor (gaussian falloff, one small
 // overshoot, forced-settle deadline). Because the frame starts from an
@@ -239,7 +240,7 @@ const INTRO_MS = 2200; // ambient mote drift on mount before first sleep
 const MOTES = 12;
 const MOTE_SPEED = 4; // px/s
 const MOTE_ALPHA = 0.3;
-const GRAIN_ALPHA = 0.15;
+const GRAIN_ALPHA = 0.2;
 const EPS_D = 0.05; // px
 const EPS_V = 1; // px/s
 const DT_MAX = 0.05;
@@ -285,11 +286,13 @@ export function Knockout404({
     const glyphCv = document.createElement("canvas");
     const sampler = document.createElement("canvas");
     const grainCv = document.createElement("canvas");
+    const glowCv = document.createElement("canvas");
     const pctx = plane.getContext("2d");
     const gctx = glyphCv.getContext("2d");
     const sctx = sampler.getContext("2d", { willReadFrequently: true });
     const grctx = grainCv.getContext("2d");
-    if (!pctx || !gctx || !sctx || !grctx) return;
+    const glctx = glowCv.getContext("2d");
+    if (!pctx || !gctx || !sctx || !grctx || !glctx) return;
 
     const fontFamily = getComputedStyle(root).fontFamily || "sans-serif";
 
@@ -297,9 +300,11 @@ export function Knockout404({
     let surfaceCss = "#171717";
     let borderCss = "#2e2e2e";
     let mutedCss = "#8f8f8f";
-    let voidCss = "#0a0a0a";
+    let voidCss = "#050505";
     let rimShadowCss = "#1c1c1c";
-    let rimCatchCss = "#7a7a7a";
+    let rimCatchCss = "#b5b5b5";
+    let edgeCss = "#9a9a9a";
+    let glowCss = "#b0b0b0";
     let mutedRgb: Vec3 = [143, 143, 143];
     const derive = () => {
       const cs = getComputedStyle(document.documentElement);
@@ -309,19 +314,24 @@ export function Knockout404({
       const border = parseColor(cs.getPropertyValue("--border")) ?? [46, 46, 46];
       mutedRgb = parseColor(cs.getPropertyValue("--muted")) ?? [143, 143, 143];
       const lum = (0.2126 * bg[0] + 0.7152 * bg[1] + 0.0722 * bg[2]) / 255;
-      // the void must read dimmer than the surface in BOTH themes: dark uses
-      // raw --background (already darker); light pulls it toward --foreground
-      voidCss = css(lum < 0.5 ? bg : mix(bg, fg, 0.07));
+      // the void must read CLEARLY dimmer than the surface in BOTH themes:
+      // dark crushes --background toward black; light pulls it a solid step
+      // toward --foreground — the interior/surface gap is the legibility floor
+      voidCss = css(lum < 0.5 ? mix(bg, [0, 0, 0], 0.6) : mix(bg, fg, 0.16));
       surfaceCss = css(surface);
       borderCss = css(border);
       mutedCss = css(mutedRgb);
       // stencil bevel, engraved in both themes: the tone mixed toward the
       // darker token is the top-left inner shadow, the lighter one the
       // bottom-right catch-light — a hole, never an emboss
-      const towardFg = mix(border, fg, 0.45);
+      const towardFg = mix(border, fg, 0.8);
       const towardBg = mix(border, bg, 0.55);
       rimShadowCss = css(lum < 0.5 ? towardBg : towardFg);
       rimCatchCss = css(lum < 0.5 ? towardFg : towardBg);
+      // crisp definition stroke + inner wall-light, both toward --foreground:
+      // brighter than the surface in dark, darker than the surface in light
+      edgeCss = css(mix(border, fg, 0.55));
+      glowCss = css(mix(mutedRgb, fg, 0.45));
     };
     derive();
 
@@ -388,6 +398,46 @@ export function Knockout404({
       ranges = res.ranges;
     };
 
+    // -- inner wall-light: soft glow hugging the cut edge, clipped to the
+    // holes via destination-in against the glyph mask — static per
+    // resize/theme, so draw() just blits it. This is what makes the digit
+    // interiors read as carved depth instead of vanishing into the void.
+    const buildGlow = () => {
+      if (!ranges.length) return;
+      glowCv.width = canvas.width;
+      glowCv.height = canvas.height;
+      glctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      glctx.clearRect(0, 0, w, h);
+      glctx.strokeStyle = glowCss;
+      glctx.lineJoin = "round";
+      glctx.beginPath();
+      for (let r = 0; r < ranges.length; r += 2) {
+        const s = ranges[r];
+        const e = ranges[r + 1];
+        for (let i = s; i < e; i++) {
+          const o = i * 6;
+          if (i === s) glctx.moveTo(pts[o], pts[o + 1]);
+          else glctx.lineTo(pts[o], pts[o + 1]);
+        }
+        glctx.closePath();
+      }
+      const blur = Math.max(14, fs * 0.07);
+      glctx.shadowColor = glowCss;
+      glctx.lineWidth = 3;
+      glctx.shadowBlur = blur;
+      glctx.globalAlpha = 0.85;
+      glctx.stroke();
+      glctx.shadowBlur = blur * 2.4;
+      glctx.globalAlpha = 0.5;
+      glctx.stroke();
+      glctx.shadowBlur = 0;
+      glctx.globalAlpha = 1;
+      glctx.globalCompositeOperation = "destination-in";
+      glctx.setTransform(1, 0, 0, 1, 0, 0);
+      glctx.drawImage(glyphCv, 0, 0);
+      glctx.globalCompositeOperation = "source-over";
+    };
+
     // -- motes: 12 slow sparks wrapped inside the glyph's bounding box ------
     const moteX = new Float32Array(MOTES);
     const moteY = new Float32Array(MOTES);
@@ -443,19 +493,26 @@ export function Knockout404({
       if (ready) {
         buildGlyph();
         buildEdges();
+        buildGlow();
         initMotes();
         placeContent();
       }
     };
     resize();
 
-    const strokeRim = (ox: number, oy: number, color: string, alpha: number) => {
+    const strokeRim = (
+      ox: number,
+      oy: number,
+      color: string,
+      alpha: number,
+      width = 1
+    ) => {
       if (!ranges.length) return;
       ctx.save();
       ctx.translate(ox, oy);
       ctx.strokeStyle = color;
       ctx.globalAlpha = alpha;
-      ctx.lineWidth = 1;
+      ctx.lineWidth = width;
       ctx.lineJoin = "round";
       ctx.beginPath();
       for (let r = 0; r < ranges.length; r += 2) {
@@ -505,10 +562,13 @@ export function Knockout404({
       pctx.drawImage(glyphCv, 0, 0, w, h);
       pctx.globalCompositeOperation = "source-over";
       ctx.drawImage(plane, 0, 0, w, h);
-      // (d) stencil bevel rim, restroked from the displaced point list
-      strokeRim(-0.75, -0.75, rimShadowCss, 0.9);
-      strokeRim(0.75, 0.75, rimCatchCss, 0.9);
-      strokeRim(0, 0, borderCss, 1);
+      // (c2) inner wall-light blit — the holes catch light along their edges
+      if (glowCv.width > 0) ctx.drawImage(glowCv, 0, 0, w, h);
+      // (d) stencil bevel rim, restroked from the displaced point list —
+      // bright catch + 1.5px definition stroke keep the digits unmistakable
+      strokeRim(-0.75, -0.75, rimShadowCss, 0.95);
+      strokeRim(0.75, 0.75, rimCatchCss, 1);
+      strokeRim(0, 0, edgeCss, 1, 1.5);
     };
 
     // -- hot-path state: locals only, never React state ---------------------
@@ -628,7 +688,10 @@ export function Knockout404({
     const mo = new MutationObserver(() => {
       derive();
       buildGrain();
-      if (sized && ready) buildGlyph();
+      if (sized && ready) {
+        buildGlyph();
+        buildGlow();
+      }
       draw();
       wake();
     });
@@ -655,6 +718,7 @@ export function Knockout404({
       if (sized) {
         buildGlyph();
         buildEdges();
+        buildGlow();
         initMotes();
         placeContent();
       }

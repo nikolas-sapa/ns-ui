@@ -15,14 +15,14 @@ export default function CardioBaselineDemo() {
         <div className="rounded-md border border-border bg-surface px-8 pb-8 pt-24">
           <CardioBaseline
             ref={ekgRef}
-            bpm={64}
+            bpm={50}
             className="font-mono text-4xl font-semibold tracking-tight text-foreground"
           >
             SYSTEMS NOMINAL
           </CardioBaseline>
           <div className="mt-14 flex items-center justify-between gap-4 border-t border-border pt-4">
             <span className="font-mono text-[11px] tracking-widest text-muted">
-              64 BPM — SINUS RHYTHM
+              50 BPM — SINUS RHYTHM
             </span>
             <button
               type="button"

@@ -14,7 +14,7 @@ export default function NeedleStepperDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / needle-stepper — every adjustment etched on the drum
+        ns-ui / needle-stepper — a number stepper that draws its own history
       </p>
 
       {/* thermostat panel */}
@@ -25,7 +25,7 @@ export default function NeedleStepperDemo() {
               Climate — Zone 2
             </h2>
             <p className="mt-1 text-sm text-muted">
-              Living room loop. The drum keeps the last 20 setpoint moves.
+              Set the target temperature for the living room.
             </p>
           </div>
           <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted">
@@ -52,7 +52,8 @@ export default function NeedleStepperDemo() {
           </div>
 
           <NeedleStepper
-            label="Setpoint °C"
+            label="Target temperature"
+            unit="°C"
             value={setpoint}
             onValueChange={setSetpoint}
             min={10}
@@ -60,8 +61,11 @@ export default function NeedleStepperDemo() {
             step={0.5}
           />
 
-          <p className="font-mono text-[10px] text-muted">
-            red bands mark the 10–30 °C safety bounds · hold − / + to sweep
+          <p className="text-xs text-muted">
+            Click − or + (or type a number) to change the target. Each change
+            is etched onto the history strip on the right — the ringed dot is
+            your latest adjustment. A red edge appears when you hit the 10–30
+            °C limit.
           </p>
         </div>
       </div>
@@ -86,22 +90,27 @@ export default function NeedleStepperDemo() {
             </p>
           </div>
         </div>
-        <div className="border-t border-border px-6 py-5">
+        <div className="flex flex-col gap-3 border-t border-border px-6 py-5">
           <NeedleStepper
             label="Quantity"
+            unit="pcs"
             value={qty}
             onValueChange={setQty}
             min={1}
             max={12}
             step={1}
           />
+          <p className="text-xs text-muted">
+            Changing the quantity updates the subtotal above. Hold − or + to
+            sweep quickly.
+          </p>
         </div>
       </div>
 
       <p className="max-w-md text-center text-xs text-muted">
-        Arrow keys step, Shift+Arrow jumps 10 steps, Home/End snap to the
-        bounds, typed values clamp on Enter. Hitting a bound gives the needle a
-        hard-stop quiver.
+        Keyboard: arrow keys step, Shift+Arrow jumps 10 steps, Home/End snap to
+        the limits, typed values clamp on Enter. Hitting a limit gives the
+        needle a hard-stop quiver.
       </p>
     </div>
   );

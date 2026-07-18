@@ -8,10 +8,13 @@ import { useEffect, useRef, useState } from "react";
 // oscillations, forced-settle 900 ms) swings across a 64px paper strip to
 // each committed value; every commit advances the strip 26px downward over
 // 600 ms ease-out (event-driven, loop sleeps between) and etches a pen trace
-// of the last 20 adjustments as a pruned polyline, alpha fading 0.9 -> 0.15
-// by age index with full clears each frame (no destination-in). Min/max show
-// as --error edge bands at 12% alpha; clamping at a bound fires a hard-stop
-// quiver (±2px, 2 cycles, 180 ms). Direct-DOM rAF, no React state on the hot
+// of the last 20 adjustments as a pruned polyline, alpha fading 0.9 -> 0.2
+// by age index with full clears each frame (no destination-in); the newest
+// etch mark is highlighted (solid dot + halo) and the strip carries a
+// "history" label. An --error edge band appears only while the value sits at
+// min/max; clamping fires a hard-stop quiver (±2px, 2 cycles, 180 ms). The
+// committed value renders as a large mono hero input flanked by prominent
+// -/+ buttons. Direct-DOM rAF, no React state on the hot
 // path; all drum ink getComputedStyle-derived at mount and re-derived on
 // documentElement class flips. prefers-reduced-motion: instant needle jumps,
 // static trace, no strip animation.
@@ -69,6 +72,7 @@ export function NeedleStepper({
   max = 100,
   step = 1,
   label = "Value",
+  unit,
   onValueChange,
   disabled = false,
   className = "",
@@ -81,6 +85,8 @@ export function NeedleStepper({
   step?: number;
   /** accessible name for the spinbutton */
   label?: string;
+  /** unit suffix rendered beside the value, e.g. "°C" */
+  unit?: string;
   onValueChange?: (value: number) => void;
   disabled?: boolean;
   className?: string;
@@ -173,10 +179,16 @@ export function NeedleStepper({
       if (!sized) return;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, w, h); // full clear — no accumulating alpha
-      // min/max status bands (semantic --error, status use only)
-      ctx.fillStyle = rgba(err, 0.12);
-      ctx.fillRect(0, 0, PAD_X, h);
-      ctx.fillRect(w - PAD_X, 0, PAD_X, h);
+      // bound status band (semantic --error, status use only): only drawn on
+      // the edge actually hit, so red always means "at the limit"
+      const { min: lo, max: hi } = boundsRef.current;
+      if (lastV <= lo) {
+        ctx.fillStyle = rgba(err, 0.16);
+        ctx.fillRect(0, 0, PAD_X, h);
+      } else if (lastV >= hi) {
+        ctx.fillStyle = rgba(err, 0.16);
+        ctx.fillRect(w - PAD_X, 0, PAD_X, h);
+      }
       // drum feed lines, fixed in strip space so they roll with the paper
       ctx.strokeStyle = rgba(bd, 0.45);
       ctx.lineWidth = 1;
@@ -197,7 +209,7 @@ export function NeedleStepper({
       const nx = x + qOff;
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
-      ctx.lineWidth = 1.5;
+      ctx.lineWidth = 1.75;
       let px = nx;
       let py = PEN_Y;
       const n = points.length;
@@ -205,7 +217,7 @@ export function NeedleStepper({
         const p = points[i];
         if (!p) continue;
         const age = n - 1 - i;
-        const a = Math.max(0.15, 0.9 - (0.75 * age) / (MAX_TRACE - 1));
+        const a = Math.max(0.2, 0.9 - (0.7 * age) / (MAX_TRACE - 1));
         const cx = xFor(p.v);
         const cy = PEN_Y + (scrollCur - p.s);
         ctx.strokeStyle = rgba(fg, a);
@@ -215,11 +227,27 @@ export function NeedleStepper({
         ctx.stroke();
         ctx.fillStyle = rgba(fg, a);
         ctx.beginPath();
-        ctx.arc(cx, cy, 1.4, 0, Math.PI * 2);
+        ctx.arc(cx, cy, 1.6, 0, Math.PI * 2);
         ctx.fill();
         px = cx;
         py = cy;
         if (cy > h + 4) break; // scrolled off the strip — stop early
+      }
+      // newest etch mark highlighted: solid dot + halo ring on the pen line
+      const newest = points[n - 1];
+      if (newest) {
+        const hx = xFor(newest.v);
+        const hy = PEN_Y + (scrollCur - newest.s);
+        ctx.fillStyle = rgba(fg, 1);
+        ctx.beginPath();
+        ctx.arc(hx, hy, 2.4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = rgba(fg, 0.35);
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(hx, hy, 4.5, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.lineWidth = 1.75;
       }
       // weighted needle: counterweight, stem, tip riding the pen line
       ctx.strokeStyle = rgba(fg, 0.9);
@@ -469,8 +497,8 @@ export function NeedleStepper({
   const atMin = current <= min;
   const atMax = current >= max;
   const btnBase =
-    "flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-sm border border-border bg-background text-foreground outline-none transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface";
-  const btnLive = "cursor-pointer hover:border-foreground/25 hover:bg-foreground/[0.05] active:bg-foreground/[0.09]";
+    "flex h-11 w-11 shrink-0 select-none items-center justify-center rounded-sm border border-border bg-background text-foreground outline-none transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface";
+  const btnLive = "cursor-pointer hover:border-foreground/30 hover:bg-foreground/[0.06] active:bg-foreground/[0.1]";
   const btnDead = "cursor-default opacity-40";
 
   return (
@@ -484,7 +512,7 @@ export function NeedleStepper({
         <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted">
           {label}
         </span>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-3">
           <button
             type="button"
             tabIndex={-1}
@@ -496,33 +524,42 @@ export function NeedleStepper({
             onPointerCancel={endHold}
             className={`${btnBase} ${disabled || atMin ? btnDead : btnLive}`}
           >
-            <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
               <path
-                d="M2 6h8"
+                d="M2.5 7h9"
                 stroke="currentColor"
-                strokeWidth="1.5"
+                strokeWidth="2"
                 strokeLinecap="round"
                 fill="none"
               />
             </svg>
           </button>
-          <input
-            type="text"
-            inputMode="numeric"
-            autoComplete="off"
-            spellCheck={false}
-            role="spinbutton"
-            aria-label={label}
-            aria-valuemin={min}
-            aria-valuemax={max}
-            aria-valuenow={current}
-            disabled={disabled}
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            onKeyDown={onKeyDown}
-            onBlur={commitFromText}
-            className="h-8 w-16 min-w-0 flex-1 rounded-sm border border-border bg-background px-2 text-center font-mono text-sm text-foreground outline-none transition-colors hover:border-foreground/25 focus-visible:border-accent focus-visible:ring-1 focus-visible:ring-accent disabled:cursor-not-allowed"
-          />
+          {/* value hero: mono, ch-sized input so the unit hugs the digits */}
+          <div className="flex min-w-0 flex-1 items-baseline justify-center gap-1.5">
+            <input
+              type="text"
+              inputMode="numeric"
+              autoComplete="off"
+              spellCheck={false}
+              role="spinbutton"
+              aria-label={label}
+              aria-valuemin={min}
+              aria-valuemax={max}
+              aria-valuenow={current}
+              disabled={disabled}
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              onKeyDown={onKeyDown}
+              onBlur={commitFromText}
+              style={{ width: `${Math.max(text.length, 1) + 1}ch` }}
+              className="max-w-full rounded-sm border border-transparent bg-transparent text-center font-mono text-3xl font-semibold tracking-tight text-foreground outline-none transition-colors hover:border-border focus-visible:border-accent focus-visible:ring-1 focus-visible:ring-accent disabled:cursor-not-allowed"
+            />
+            {unit ? (
+              <span className="shrink-0 font-mono text-sm text-muted">
+                {unit}
+              </span>
+            ) : null}
+          </div>
           <button
             type="button"
             tabIndex={-1}
@@ -534,11 +571,11 @@ export function NeedleStepper({
             onPointerCancel={endHold}
             className={`${btnBase} ${disabled || atMax ? btnDead : btnLive}`}
           >
-            <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
               <path
-                d="M6 2v8M2 6h8"
+                d="M7 2.5v9M2.5 7h9"
                 stroke="currentColor"
-                strokeWidth="1.5"
+                strokeWidth="2"
                 strokeLinecap="round"
                 fill="none"
               />
@@ -549,15 +586,20 @@ export function NeedleStepper({
           min {min} · max {max} · step {step}
         </span>
       </div>
+      {/* adjustment-history strip: labeled drum, newest etch on the top line */}
       <div
-        ref={drumRef}
         aria-hidden
-        className="relative w-16 shrink-0 self-stretch border-l border-border bg-background"
+        className="flex w-20 shrink-0 flex-col self-stretch border-l border-border bg-background"
       >
-        <canvas
-          ref={canvasRef}
-          className="pointer-events-none absolute left-0 top-0"
-        />
+        <span className="border-b border-border py-1 text-center font-mono text-[9px] uppercase tracking-[0.18em] text-muted">
+          history
+        </span>
+        <div ref={drumRef} className="relative min-h-0 flex-1">
+          <canvas
+            ref={canvasRef}
+            className="pointer-events-none absolute left-0 top-0"
+          />
+        </div>
       </div>
     </div>
   );

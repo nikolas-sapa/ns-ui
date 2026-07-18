@@ -225,6 +225,7 @@ export default function FlingSegmentDemo() {
           </button>
           <FlingSegment
             aria-label="Task view"
+            introFling
             options={[
               { value: "list", label: "List" },
               { value: "board", label: "Board" },
@@ -250,9 +251,9 @@ export default function FlingSegmentDemo() {
       </div>
 
       <p className="max-w-md text-center text-xs text-muted">
-        Drag the pill and let go — it coasts on release velocity, rubber-bands
-        off the ends, and snaps into the nearest detent. Clicks and arrow keys
-        stay instant.
+        Click a segment and it switches instantly. Or grab the pill (the raised
+        tab with the grip dots), throw it, and it coasts, bounces off the ends,
+        and snaps into the nearest segment. Arrow keys work too.
       </p>
     </div>
   );

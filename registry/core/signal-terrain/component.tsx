@@ -297,27 +297,6 @@ export function SignalTerrain({
         ctx.lineWidth = 1 + 0.5 * mix;
         ctx.stroke();
       }
-
-      // cursor-dent highlight: the mesh deformation alone reads as noise at
-      // rest, so bloom the dent center with a foreground-token glow scaled to
-      // dent depth — makes the interaction discoverable without touching sigma/depth
-      if (hasDent) {
-        const glowR = dentSigma * 1.4;
-        const glowA = Math.min(0.3, Math.abs(dentAmt) * 0.3);
-        const glow = ctx.createRadialGradient(px, py, 0, px, py, glowR);
-        glow.addColorStop(
-          0,
-          `rgba(${strokeHighRGB.r},${strokeHighRGB.g},${strokeHighRGB.b},${glowA})`
-        );
-        glow.addColorStop(
-          1,
-          `rgba(${strokeHighRGB.r},${strokeHighRGB.g},${strokeHighRGB.b},0)`
-        );
-        ctx.fillStyle = glow;
-        ctx.beginPath();
-        ctx.arc(px, py, glowR, 0, Math.PI * 2);
-        ctx.fill();
-      }
     };
 
     if (reduced) {

@@ -54,7 +54,7 @@ export const CardioBaseline = forwardRef<
     className?: string;
   }
 >(function CardioBaseline(
-  { children = "SYSTEMS NOMINAL", bpm = 64, className = "" },
+  { children = "SYSTEMS NOMINAL", bpm = 50, className = "" },
   ref
 ) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -262,11 +262,23 @@ export const CardioBaseline = forwardRef<
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [children]);
 
-  // bpm timer — separate effect so rate changes don't reset glyph state
+  // bpm timer — separate effect so rate changes don't reset glyph state.
+  // Resting rhythm isn't metronomic: each interval jitters ±8% around the
+  // nominal period (mild sinus-arrhythmia feel) via a self-rescheduling
+  // timeout rather than a fixed setInterval.
   useEffect(() => {
     if (bpm <= 0 || reducedRef.current) return;
-    const id = setInterval(() => beatRef.current?.(), 60000 / bpm);
-    return () => clearInterval(id);
+    let id: ReturnType<typeof setTimeout>;
+    const schedule = () => {
+      const period = 60000 / bpm;
+      const jitter = 1 + (Math.random() * 2 - 1) * 0.08;
+      id = setTimeout(() => {
+        beatRef.current?.();
+        schedule();
+      }, period * jitter);
+    };
+    schedule();
+    return () => clearTimeout(id);
   }, [bpm]);
 
   return (
