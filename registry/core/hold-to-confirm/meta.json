@@ -1,0 +1,9 @@
+{
+  "name": "hold-to-confirm",
+  "title": "Hold to Confirm",
+  "description": "Press-and-hold destructive action — a ring traces the border, release early to cancel.",
+  "collection": "core",
+  "tags": ["button", "destructive", "micro-interaction", "confirmation"],
+  "instruction": "A destructive-action button requiring press-and-hold: while held, an error-red ring traces the button border via SVG stroke offset; releasing early drains the ring back at 2.5x speed; when the ring closes the action confirms, the label swaps and the button gives a small spring pulse. Works with pointer and keyboard (hold Space/Enter). No accidental destructive clicks.",
+  "dependencies": []
+}

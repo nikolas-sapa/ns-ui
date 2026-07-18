@@ -9,4 +9,6 @@ export const demos: Record<string, ComponentType> = {
   "ascii-dither-media": lazy(() => import("./core/ascii-dither-media/demo")),
   "glass-panel": lazy(() => import("./core/glass-panel/demo")),
   "magnetic-dock": lazy(() => import("./core/magnetic-dock/demo")),
+  "dynamic-weight-text": lazy(() => import("./core/dynamic-weight-text/demo")),
+  "hold-to-confirm": lazy(() => import("./core/hold-to-confirm/demo")),
 };

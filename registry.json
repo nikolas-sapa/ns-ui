@@ -53,6 +53,30 @@
       }
     },
     {
+      "name": "dynamic-weight-text",
+      "type": "registry:ui",
+      "title": "Dynamic Weight Text",
+      "description": "Letters morph variable-font weight by cursor proximity — pure typography interaction.",
+      "files": [
+        {
+          "path": "registry/core/dynamic-weight-text/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/dynamic-weight-text.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "text",
+          "typography",
+          "cursor",
+          "variable-font"
+        ],
+        "instruction": "A headline whose individual letters morph between a light and a heavy variable-font weight based on horizontal cursor proximity with a Gaussian falloff, easing smoothly as the pointer moves and settling back when it leaves. Pure typography — no color, no particles. Direct-DOM rAF loop, real text in aria-label, static under prefers-reduced-motion."
+      }
+    },
+    {
       "name": "glass-button",
       "type": "registry:ui",
       "title": "Glass Button",
@@ -97,6 +121,30 @@
           "container"
         ],
         "instruction": "A liquid-glass container surface built as a layer stack: backdrop blur with saturation boost, tiled SVG noise grain blended over the fill, an inset specular rim lit from above, and a four-step graduated shadow ramp for depth, with children rendered above the glass. Works over any moving or static backdrop, both themes."
+      }
+    },
+    {
+      "name": "hold-to-confirm",
+      "type": "registry:ui",
+      "title": "Hold to Confirm",
+      "description": "Press-and-hold destructive action — a ring traces the border, release early to cancel.",
+      "files": [
+        {
+          "path": "registry/core/hold-to-confirm/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/hold-to-confirm.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "button",
+          "destructive",
+          "micro-interaction",
+          "confirmation"
+        ],
+        "instruction": "A destructive-action button requiring press-and-hold: while held, an error-red ring traces the button border via SVG stroke offset; releasing early drains the ring back at 2.5x speed; when the ring closes the action confirms, the label swaps and the button gives a small spring pulse. Works with pointer and keyboard (hold Space/Enter). No accidental destructive clicks."
       }
     },
     {

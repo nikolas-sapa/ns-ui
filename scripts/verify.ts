@@ -93,10 +93,13 @@ async function verifyComponent(page: Page, name: string, dir: string) {
 
     await shoot(page, dir, theme, "default");
 
-    // interaction states: first interactive element, if any
-    const interactive = page.locator("button, a, [role=button]").first();
+    // interaction states: first VISIBLE interactive element, if any
+    const interactive = page
+      .locator("button, a, [role=button]")
+      .filter({ visible: true })
+      .first();
     if (await interactive.count()) {
-      await interactive.hover();
+      await interactive.hover({ timeout: 5000 });
       await page.waitForTimeout(400);
       await shoot(page, dir, theme, "hover");
       // hover must actually change pixels, else the state is dead

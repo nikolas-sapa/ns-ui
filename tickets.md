@@ -75,3 +75,15 @@ Work the **frontier**: any ticket whose blockers are all done. After ticket 2, t
 - [x] Three modes render from one engine; cursor proximity brightens/resolves cells
 - [x] 60fps on laptop at full-bleed; static first-frame under reduced motion
 - [x] Passes verify + judge loop
+
+## dynamic-weight-text (crawl novel #1) — DONE
+
+Variable-font weight morphs per letter by cursor proximity, gaussian falloff, direct-DOM rAF.
+- [x] Weight gradient follows cursor, settles on leave; reduced-motion static
+- [x] Passes verify + judge loop (cursor-position probe)
+
+## hold-to-confirm (crawl novel #5) — DONE
+
+Press-and-hold destructive action, error-red ring traces border, early release drains back.
+- [x] Full hold confirms ("Deleted"), early release cancels — probed both paths
+- [x] Keyboard hold (Space/Enter) supported; passes verify + judge loop
