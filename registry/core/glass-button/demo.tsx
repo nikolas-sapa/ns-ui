@@ -14,7 +14,7 @@ export default function GlassButtonDemo() {
           (accent is interaction-only per design DNA, not scenery) */}
       <div
         aria-hidden
-        className="absolute left-1/2 top-1/2 h-40 w-40 -translate-x-[60%] -translate-y-[55%] rounded-full bg-black/10 blur-2xl dark:bg-white/15"
+        className="absolute left-1/2 top-1/2 h-40 w-40 -translate-x-[60%] -translate-y-[55%] animate-[pulse_5s_ease-in-out_infinite] rounded-full bg-black/10 blur-2xl motion-reduce:animate-none dark:bg-white/15"
       />
       <GlassButton>Get started</GlassButton>
     </div>

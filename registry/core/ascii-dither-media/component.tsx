@@ -107,10 +107,11 @@ export function AsciiDitherMedia({
 
       for (let gy = 0; gy < rows; gy++) {
         for (let gx = 0; gx < cols; gx++) {
-          // gamma deepens the noise floor: large areas go empty, crests pop
+          // gamma deepens the noise floor: large areas go empty, crests pop.
+          // x-advection makes the field travel, not just undulate in place
           let lum = imageLum
             ? imageLum[gy * cols + gx]
-            : Math.pow(noise(gx * 0.35, gy * 0.35, t), 1.7);
+            : Math.pow(noise(gx * 0.35 + t * 0.22, gy * 0.35, t), 1.7);
           const px = gx * cellSize + cellSize / 2;
           const py = gy * cellSize + cellSize / 2;
           // gaussian-ish cursor boost
@@ -145,7 +146,7 @@ export function AsciiDitherMedia({
     };
 
     const loop = () => {
-      t += 0.016;
+      t += 0.028;
       draw();
       raf = requestAnimationFrame(loop);
     };

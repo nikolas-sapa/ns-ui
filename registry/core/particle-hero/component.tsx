@@ -17,8 +17,8 @@ const vertexShader = /* glsl */ `
   varying float vFade;
   void main() {
     vec3 p = position;
-    p.x += sin(uTime * 0.25 + aSeed) * 0.12;
-    p.y += cos(uTime * 0.2 + aSeed * 1.7) * 0.12;
+    p.x += sin(uTime * 0.4 + aSeed) * 0.3;
+    p.y += cos(uTime * 0.32 + aSeed * 1.7) * 0.3;
     vec2 d = p.xy - uCursor;
     float f = min(1.2 / (dot(d, d) + 0.35), 2.2);
     p.xy += d * f * 0.35;

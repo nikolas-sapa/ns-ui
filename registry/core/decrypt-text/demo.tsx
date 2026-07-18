@@ -13,6 +13,7 @@ export default function DecryptTextDemo() {
       <DecryptText
         replayKey={replayKey}
         text="ACCESS GRANTED"
+        ambient={3200}
         className="text-4xl font-semibold tracking-tight sm:text-5xl"
       />
       <button

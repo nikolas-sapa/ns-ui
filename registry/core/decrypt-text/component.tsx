@@ -8,6 +8,7 @@ export function DecryptText({
   text,
   delay = 150,
   stagger = 55,
+  ambient = 0,
   className = "",
   replayKey = 0,
 }: {
@@ -16,6 +17,8 @@ export function DecryptText({
   delay?: number;
   /** ms between character locks (left to right) */
   stagger?: number;
+  /** ms between idle glitches re-scrambling a few characters; 0 = off */
+  ambient?: number;
   className?: string;
   /** bump to replay the animation */
   replayKey?: number;
@@ -23,6 +26,7 @@ export function DecryptText({
   const chars = Array.from(text);
   const [locked, setLocked] = useState(-1);
   const [churn, setChurn] = useState<string[]>(chars.map(() => ""));
+  const [glitch, setGlitch] = useState<ReadonlySet<number>>(new Set());
   const reduced = useRef(false);
 
   const randomGlyph = useCallback(
@@ -58,10 +62,43 @@ export function DecryptText({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [text, delay, stagger, replayKey]);
 
+  // idle life: every `ambient` ms a few adjacent characters glitch and relock
+  useEffect(() => {
+    if (!ambient || reduced.current) return;
+    let churnId: ReturnType<typeof setInterval> | undefined;
+    const id = setInterval(() => {
+      const start = Math.floor(Math.random() * Math.max(1, chars.length - 3));
+      const span = new Set(
+        [start, start + 1, start + 2].filter((i) => i < chars.length && chars[i] !== " ")
+      );
+      setGlitch(span);
+      let n = 0;
+      churnId = setInterval(() => {
+        setChurn((prev) =>
+          prev.map((c, i) => (span.has(i) ? randomGlyph() : c))
+        );
+        if (++n > 6) {
+          clearInterval(churnId);
+          setGlitch(new Set());
+        }
+      }, 55);
+    }, ambient);
+    return () => {
+      clearInterval(id);
+      if (churnId) clearInterval(churnId);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ambient, text, replayKey]);
+
   return (
     <span aria-label={text} role="text" className={`font-mono ${className}`}>
       {chars.map((c, i) => {
-        const state = i <= locked ? "locked" : i === locked + 1 ? "resolving" : "churning";
+        const state =
+          i <= locked && !glitch.has(i)
+            ? "locked"
+            : i === locked + 1 || glitch.has(i)
+              ? "resolving"
+              : "churning";
         return (
           <span
             key={i}
