@@ -136,6 +136,33 @@
       }
     },
     {
+      "name": "drape-menu",
+      "type": "registry:ui",
+      "title": "Drape Menu",
+      "description": "Dropdown whose panel is a live verlet cloth pinned to the trigger — it falls and drapes like an awning, labels ride the weave, the cursor billows the fabric, and close yanks it back up.",
+      "files": [
+        {
+          "path": "registry/core/drape-menu/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/drape-menu.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "menu",
+          "dropdown",
+          "cloth",
+          "physics",
+          "verlet",
+          "cursor",
+          "nav"
+        ],
+        "instruction": "Build a dropdown menu whose panel is a live 2D verlet cloth pinned along its top edge to the trigger's bottom edge. Simulate a 10x14 point grid with structural constraints only and 3 relaxation iterations per frame; gravity 2400 px/s^2, velocity damping 0.99 per step. On open the vertices start compressed at the trigger's bottom edge and fall freely, draping taut in roughly 380-500 ms — emergent from the physics, not tweened. A Canvas 2D layer underneath draws per-quad fold shading from a vertex-normal approximation (horizontal stretch = sheen toward the lighter ink, lateral lean = shadow toward the darker ink), with every drawn color derived from getComputedStyle CSS tokens (--surface/--border/--foreground/--background) at mount and re-derived live via a MutationObserver on the documentElement class so both themes shade correctly. Menu items are real DOM nodes (role=menu/menuitem) anchored to designated vertex rows: each item's transform is its anchor vertex translate plus a rotation from the local row slope clamped to +/-6 degrees, and each label fades in over 120 ms once its anchor row's vertical velocity drops below 8 px/s. Cursor proximity billows the weave: an upward force F = 900 * exp(-d^2 / (2*60^2)) px/s^2 on vertices within ~150 px of the pointer. Close yanks every vertex back to the trigger point on a per-vertex critically damped spring (k = 120 s^-2, zeta = 1.0) and unmounts once max displacement is under 0.5 px. Hot path is refs-only direct-DOM in a single rAF loop that sleeps when max per-frame displacement is under 0.02 px and wakes on pointermove/open/close; ResizeObserver re-derives cloth width from the trigger rect with a zero-size guard, and all listeners, observers, and the canvas are torn down on close/unmount. Full menu semantics: aria-expanded trigger, arrow-key navigation, Home/End, Enter selects, Esc closes and returns focus to the trigger, outside click closes; hovered/focused items get a token-relative bg-surface highlight plus an accent left rail and accent focus-visible ring. Under prefers-reduced-motion render a plain dropdown with a 150 ms opacity/scale-98% fade and no cloth or canvas."
+      }
+    },
+    {
       "name": "dynamic-weight-text",
       "type": "registry:ui",
       "title": "Dynamic Weight Text",
@@ -157,6 +184,58 @@
           "variable-font"
         ],
         "instruction": "A headline whose individual letters morph between a light and a heavy variable-font weight based on horizontal cursor proximity with a Gaussian falloff, easing smoothly as the pointer moves and settling back when it leaves. Pure typography — no color, no particles. Direct-DOM rAF loop, real text in aria-label, static under prefers-reduced-motion."
+      }
+    },
+    {
+      "name": "flock-stack",
+      "type": "registry:ui",
+      "title": "Flock Stack",
+      "description": "Avatar stack that mills as a live boids flock and resolves into the classic overlapping row on hover, with the +N badge appearing only once the formation settles.",
+      "files": [
+        {
+          "path": "registry/core/flock-stack/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/flock-stack.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "avatar",
+          "boids",
+          "physics",
+          "hover",
+          "team",
+          "micro-interaction"
+        ],
+        "instruction": "A team avatar stack that never sits still: 7 DOM avatar circles (28 px, initials, ring-2 ring-background) mill inside a bounded card region as a real boids flock driven by a canvas-free vector sim (separation r34/w1.4, alignment r60/w0.6, cohesion r90/w0.5, max speed 60 px/s, soft-wall 300 px/s^2 ramping inside 24 px of the edge, damping pow(0.98, dt*60)). Hovering or keyboard-focusing the container ramps a per-avatar seek force toward its slot in the classic -8 px overlap right-aligned row from 0 to weight 2.2 over 400 ms, summed into the same three rules with arrival slowdown inside 40 px, so the tidy group photo is itself a settled flocking state. When every agent is within 2 px of its slot at under 1 px/s the +N badge fades in over 200 ms; release ramps the seek off over 400 ms and the flock disperses back to milling. Transforms are written per-frame on a refs-only direct-DOM rAF loop that pauses offscreen (IntersectionObserver) and on document.hidden, and genuinely sleeps once resolved and settled below 0.5 px/s until hover exit; ResizeObserver re-derives bounds and slots with zero-size and zero-length-vector guards. Hovering an individual avatar once resolved lifts it 3 px and shows a token-styled name tooltip. All colors are CSS token classes (bg-surface, border-border, ring-background) so both themes self-adapt. prefers-reduced-motion renders the static resolved row with the badge always visible."
+      }
+    },
+    {
+      "name": "frostbite-switch",
+      "type": "registry:ui",
+      "title": "Frostbite Switch",
+      "description": "iOS-style switch whose OFF state grows dendritic ice across the track; switching ON melts it in reverse with droplet run-off before the thumb springs over.",
+      "files": [
+        {
+          "path": "registry/core/frostbite-switch/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/frostbite-switch.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "switch",
+          "toggle",
+          "canvas",
+          "particles",
+          "micro-interaction",
+          "form"
+        ],
+        "instruction": "Build an iOS-style toggle (real <button role=switch aria-checked>, 52x30 track, 26px thumb, rounded-full) with a canvas 2D overlay clipped to the track (DPR clamp 2). On switch-to-OFF, 5-7 seeded stochastic branching walkers grow a dendritic ice skin from the thumb's leading edge: 2px steps at 140 px/s, heading jitter +/-25 deg, child-branch probability 0.15/step, max depth 4, stroke width tapering 1.4 to 0.6px by depth, ~700ms total, mulberry32-seeded per state-change so regrowth is deterministic in-session. On switch-to-ON, melt traverses segments in reverse growth order over 450ms while 6-10 droplets detach (gravity 1200 px/s^2, 400ms lifetime, fade out); the thumb slide starts 120ms into the melt on a spring (k=170 s^-2, zeta=0.85, one small overshoot) and the track ramps an accent-tinted glow over 200ms. Idle OFF state breathes crystal-layer opacity +/-0.06 at 0.2 Hz by mutating canvas style opacity only (no redraw), paused offscreen via IntersectionObserver and when the document is hidden; rAF fully sleeps at grow/melt end states. Crystal ink ramps --foreground (trunks) toward --border (tips) with tapering alpha, all colors read via getComputedStyle at mount and re-derived on a MutationObserver watching documentElement class changes so ice is visible on both themes. Accent focus-visible ring, token-relative hover border, disabled renders crystals at 40% opacity with no shimmer, prefers-reduced-motion swaps to two static frames (full crystal OFF / clear ON) with a snapping thumb. Guard zero-size tracks before seeding walkers; tear down every observer, listener, and rAF on unmount and free the segment arrays."
       }
     },
     {
@@ -418,6 +497,116 @@
       }
     },
     {
+      "name": "ripple-unfold",
+      "type": "registry:ui",
+      "title": "Ripple Unfold",
+      "description": "Media reveal driven by a height-field water sim: a ripple front sweeps from the trigger point, popping grid tiles open as the wave crosses them and refracting revealed tiles like wet glass; the cursor keeps stirring the water after full reveal.",
+      "files": [
+        {
+          "path": "registry/core/ripple-unfold/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/ripple-unfold.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "canvas",
+          "media",
+          "reveal",
+          "wave-sim",
+          "tiles",
+          "refraction",
+          "cursor",
+          "scroll-trigger"
+        ],
+        "instruction": "A media surface behind a coarse tile grid on a single DPR-aware Canvas 2D (DPR clamp 2), image pre-drawn to an offscreen canvas (or a token-derived generative artwork when no src is given). A height-field wave sim runs on a grid matched to tile resolution (~28x18 cells, tile ≈ 32px at 900px width; cols derived from width/32, zero-size guarded): classic discrete wave equation — v[c] += (4-neighbor avg − h[c]) * 0.5 per step, h += v, global damping ×0.985/step, 2 sim steps per frame, Neumann edges. Trigger (IntersectionObserver at 0.35 visibility, or first pointer entry) injects impulse h=1.0 at the trigger cell; a tile pops open when local |h| > 0.12 — scale 0.6→1 on a spring (k=90 s⁻², ζ=0.7) plus a rotateX-style vertical squash 35%→0 over 320ms with cubic-bezier(0.22,1,0.36,1); reveal = drawImage of that tile's source rect. Revealed tiles refract: source rect offset by (gradient of h) × 6px for a wet-glass shimmer. If the coarse wave dies below threshold before reaching the corners, stragglers are flush-scheduled outward from the trigger cell so the reveal always completes. After full reveal, pointermove injects impulse 0.35 at the cursor cell, throttled to one per frame. Pre-reveal tiles draw a border-token hairline, a faint foreground lift, and an accent-alpha shimmer proportional to |h| — every drawn color derived from --border/--accent/--foreground/--surface/--muted via a getComputedStyle probe at mount and re-derived live via MutationObserver on documentElement class changes, so both themes render correctly. The rAF loop is the sole writer (no React state on hot paths) and sleeps when max|h| < 0.004 AND max|v| < 0.004 and all tile springs are settled; it wakes on pointer or trigger and pauses offscreen via IntersectionObserver. IntersectionObserver, ResizeObserver (recompute grid, guard 0x0), MutationObserver, and all pointer listeners are torn down on unmount. Pure media surface: role=img with aria-label, no click behavior. Under prefers-reduced-motion tiles reveal instantly in a single paint with zero wave distortion, static image thereafter."
+      }
+    },
+    {
+      "name": "rule-sparkline",
+      "type": "registry:ui",
+      "title": "Rule Sparkline",
+      "description": "Inline KPI sparkline grown over an elementary cellular-automaton texture — the Wolfram rule is picked by the series' volatility, one generation column per data point.",
+      "files": [
+        {
+          "path": "registry/core/rule-sparkline/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/rule-sparkline.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "canvas",
+          "data-viz",
+          "sparkline",
+          "cellular-automaton",
+          "generative",
+          "scrub",
+          "kpi"
+        ],
+        "instruction": "An inline KPI sparkline on a single DPR-aware (clamp 2) Canvas 2D where the backdrop is an elementary 1D cellular automaton that reads the data instead of decorating it. CA: cells 3px tall, state vector vertical, one generation COLUMN per data point advancing left to right — each data point extrudes the next generation. The Wolfram rule is selected by the series' coefficient of variation (stddev/mean, zero-mean and zero-size guarded): cv < 0.08 → rule 4 (sparse), 0.08–0.2 → rule 108, 0.2–0.4 → rule 110, > 0.4 → rule 30 (chaotic). The seed row derives from the first value's IEEE-754 bits through a mulberry32 walk so identical data reproduces identical texture. The CA is computed once per data update and painted to a cached offscreen canvas in --foreground ink at 8–14% per-cell hashed alpha — never per frame. Motion is entrance-only: CA and the --accent polyline reveal left→right over 900ms with cubic-bezier(0.22,1,0.36,1) — the CA via a clip-rect (source-rect blit) sweep, the line via canvas setLineDash([pathLen*frac, pathLen]) dash-offset; a data push extrudes only the new tail generations and re-sweeps just that region over 200ms. Cursor scrub: a vertical hairline eases to the snapped nearest-point x with a critically damped spring (k=250 s^-2, zeta=1.0) plus an accent dot on the line and a font-mono DOM readout positioned by direct transform writes; the wrapper is focusable and left/right arrows step the readout. rAF exists only during entrance/tail sweeps and unsettled scrub — cancelled otherwise, the texture is the ambient interest. All drawn colors (--foreground, --accent, --muted) are read via getComputedStyle at mount and re-derived (offscreen CA repainted) by a MutationObserver on documentElement class changes so both themes survive; ResizeObserver recomputes the cell grid and geometry; every observer/listener/rAF torn down on unmount. prefers-reduced-motion: finished CA texture and full line painted instantly, scrub readout still works with the hairline snapping instead of easing. Demo: three stacked metric tiles (calm Revenue / moderate Latency / volatile Errors) on a surface card with mono labels, large tabular numbers, success/error delta pills, and per-tile RULE/CV captions so the rule-vs-volatility mapping is visible by comparison."
+      }
+    },
+    {
+      "name": "scroll-caliper",
+      "type": "registry:ui",
+      "title": "Scroll Caliper",
+      "description": "A vernier caliper pinned to a scroll container's edge whose spring-damped jaws close over the active section's extent while a mono readout ticks px and percent, tick marks streaking with velocity-scaled motion blur.",
+      "files": [
+        {
+          "path": "registry/core/scroll-caliper/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/scroll-caliper.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "svg",
+          "scroll",
+          "instrument",
+          "spring",
+          "sections",
+          "hud",
+          "readout",
+          "measurement"
+        ],
+        "instruction": "A vernier caliper instrument, ~48px wide, pinned to the right edge of a bounded overflow-y scroll container it measures. Built in SVG (tick scale, vernier subscale on the lower jaw, jaw blades, beam spine) plus a DOM font-mono readout chip; every transform is written directly in a rAF loop via refs, never React state. Sections are detected with an IntersectionObserver (root = the scroller) on [data-section] children, active = most visible pixels. The jaws map the active section's top/bottom to container-space y and chase those targets with a spring k=120 s^-2, zeta=0.9 (near-critical, a hair of lag); the readout needle (percent of the section swept past the container center) rides a softer spring k=90 s^-2, zeta=0.55 so it visibly over-settles and wobbles when scrolling stops. Tick scale: minor graduations every 2px (--border ink), majors every 8px and long index lines every 40px (--foreground ink), path d rebuilt only on resize and translated by -(scrollTop % 8) per frame so the scale scrolls with content. Motion blur: a duplicated tick layer offset along the scroll direction with opacity clamp(|v|/3000, 0, 0.6) and blur clamp(|v|/200, 0, 10)/2 px, velocity from per-frame scrollTop delta exponentially smoothed at alpha 0.2, layer removed entirely at rest for crispness. Section change flashes the readout label accent for 200ms and updates a throttled visually-hidden live region ('Section 2 of 4, 38%'); the instrument itself is aria-hidden and read-only, no fake affordances. The scroll listener is passive and only wakes the loop; the loop sleeps when 150ms have passed since the last scroll AND all three springs are inside the settle epsilon (|x-target| < 0.05, |v| < 0.05). All SVG ink is currentColor via token classes (text-border, text-foreground, text-accent only on the active-value marker) so both themes restyle live with zero numeric color reads; the readout chip is bg-surface with border-foreground/20. Guards: zero-height containers skip rebuild, zero-height sections never divide, IntersectionObserver/ResizeObserver/scroll listener/flash and announce timers all torn down on unmount. prefers-reduced-motion: jaws and needle snap instantly, no blur layer, no wobble."
+      }
+    },
+    {
+      "name": "sediment-stack",
+      "type": "registry:ui",
+      "title": "Sediment Stack",
+      "description": "Toast stack with real gravity — notifications thud into a jostling heap, errors sink under their own mass, and the pile resettles when one is dismissed.",
+      "files": [
+        {
+          "path": "registry/core/sediment-stack/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/sediment-stack.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "toast",
+          "notification",
+          "physics",
+          "gravity",
+          "rigid-body",
+          "micro-interaction",
+          "feedback"
+        ],
+        "instruction": "A toast system where notifications fall under real gravity and pile into a jostling heap at the base of a docked surface. RENDERING: real DOM toast cards (severity icon, title, mono message, dismiss button, role=status/alert) whose translate/rotate transforms are written per-frame by a rigid-body-lite 2D sim — refs only on the hot path, no React state, no canvas. Each card's collision proxy is a rounded box: a row of circles of half-card-height radius along the card midline (corner circles plus midline fill), so corners round off and nothing tunnels through edge gaps; container floor and walls are static planes. MOTION: gravity 1800 px/s^2 at fixed 120Hz substeps; restitution 0.15 applied only above an 80 px/s impact threshold; tangential Coulomb friction mu 0.85 at every contact; angular damping 0.92/frame framerate-normalized via pow(0.92, dt*60); mass by severity error=3 / warning=2 / info=1 so heavier bodies displace lighter ones on impact and errors migrate toward the pile floor. Toasts spawn top-right with vx jitter +/-40 px/s and rotation jitter +/-4 deg; each arrival's impact impulse briefly jostles the pile. SLEEP: the whole sim parks when every body holds |v| < 3 px/s and |omega| < 0.02 rad/s for 12 consecutive frames; spawn, dismiss, hover, drag, and resize wake it. Auto-dismiss default 6s per toast, paused on hover; oldest layers fade to opacity 0.55 as newer sediment lands. Dismissing removes the collision body instantly (150ms opacity fade on the card) and the sediment above resettles under gravity. INTERACTION: hover lifts the card 2px and applies a shadow tinted from the --foreground token (derived via getComputedStyle at mount and re-derived by a MutationObserver watching the documentElement class for theme flips); drag right past 80px dismisses, under-threshold release springs back with k=180, zeta=0.9 while the held card goes kinematic so the pile leans on it. Severity color appears only as a 3px left rail using var(--error)/var(--warning)/var(--success); everything else is neutral tokens (bg-surface, border-border, hover:border-foreground/20, accent focus ring on dismiss buttons). REDUCED MOTION: classic static vertical list, newest on top, instant add/remove with 150ms opacity fades, no physics. Imperative handle exposes push/dismiss/clear. ResizeObserver re-derives floor and walls (zero-size container guarded, coincident-center collision normals fall back to vertical); every rAF, observer, listener, and timer is torn down on unmount."
+      }
+    },
+    {
       "name": "signal-terrain",
       "type": "registry:ui",
       "title": "Signal Terrain",
@@ -470,6 +659,34 @@
           "physics"
         ],
         "instruction": "A frosted-glass confirm slider where destruction IS the progress indicator: a 320×56 DOM track in the house glass recipe (bg-white/[0.06], backdrop-blur-xl, white/10 border, inset top specular, rounded-md) carries a DPR-aware canvas overlay and a 48px grabbable thumb. On mount, seed ~48 Poisson-disc points across the track and compute exact Voronoi cells once via half-plane bisector clipping; deduped cell walls become crack polylines, each assigned a reveal threshold t from its distance to the thumb origin, and the same cells are reused later as shard polygons. Dragging (pointer capture, progress in a ref, thumb transform set in a rAF loop, zero React state on the hot path) strokes every polyline with t<p segment-by-segment from its near end — 1px rgba(255,255,255,0.35) hairline plus a 0.75px-offset 0.5px rgba(255,255,255,0.12) ghost for glass depth — and past p=0.6 the whole track shudders ±0.5px per frame. Release early and p springs back to 0 (stiffness 220, damping 26) so the cracks retract along the same t-mapping, healing for free. At p≥0.98 the DOM glass hides instantly and the canvas flips to shard mode: each Voronoi cell tumbles outward from the thumb at 120–420px/s under 1800px/s² gravity with ±3rad/s spin, fading over 700ms; after ~900ms the canvas clears, revealing a bg-surface row with a check icon and mono CONFIRMED. The rAF loop sleeps whenever settled, and prefers-reduced-motion drops the canvas entirely for a plain slide with an instant confirmed swap."
+      }
+    },
+    {
+      "name": "solargraph-hero",
+      "type": "registry:ui",
+      "title": "Solargraph Hero",
+      "description": "Hero card whose canvas behaves like a long-exposure photograph: cursor movement burns light streaks that never clear per frame, only decay on a 4s half-life, accumulating a light painting of the session.",
+      "files": [
+        {
+          "path": "registry/core/solargraph-hero/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/solargraph-hero.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "canvas",
+          "hero",
+          "cursor",
+          "trail",
+          "long-exposure",
+          "accumulation",
+          "ambient",
+          "blend-mode"
+        ],
+        "instruction": "A hero card whose background canvas behaves like a long-exposure photograph — persistence, not live emission. Two offscreen accumulation buffers (never cleared per frame) hold pure white intensity strokes and are composited onto a visible DPR-clamp-2 canvas sitting behind fully clickable DOM hero copy (canvas pointer-events none, pointer tracked on the hero root). Pointer samples are exponentially smoothed and joined as quadratic curves through midpoints, line width 1.5 + clamp(speed/1200, 0, 1.5) px with shadowBlur 12 for glow; each segment lands in buffer A with 60% probability (primary tint) or buffer B (secondary). Decay is framerate-independent: every frame paint destination-out black at alpha = 1 - exp(-dt/tau), tau = halfLife/ln2 (~4s half-life), and strokes draw at globalAlpha 0.35 so repeated passes asymptote instead of whiting out. Tint is applied at composite time via a source-in fill of each intensity buffer, stacked source-over then lighter — so the recolor pass is inherent and a theme flip re-tints the whole accumulated exposure on the next composite. Theme mode is chosen from the derived --background luminance via getComputedStyle at mount and re-derived live through a MutationObserver on documentElement class: dark composites with CSS mix-blend-mode screen using --accent (60%) and --foreground (40%) tints; light flips to multiply with tints from --muted and a --border/--muted mix so trails darken instead of vanishing on white. The rAF loop tracks an energy scalar (sum of recent stroke alpha, decaying with the same tau) and sleeps when no pointermove for 500ms AND energy < 0.02 (wiping the invisible residue), wakes on pointermove, pauses offscreen via IntersectionObserver; ResizeObserver resizes buffers preserving the exposure via a scaled copy and guards zero-size containers; all observers and listeners torn down on unmount. On load a scripted 2s figure-eight (Lissajous) drives the pointer so the exposure photographs before any real input; a real pointermove cancels it. Under prefers-reduced-motion: one seeded synthetic static exposure along the figure-eight at low alpha, no accumulation, no loop, re-rendered on resize and theme change. Demo is a full hero composition: padded surface card, mono eyebrow, Geist Sans 600 tight-tracked H1, muted subhead, dual CTA row (accent primary with accent-hover, ghost secondary with border-foreground/20 hover and accent focus ring), and a 4-mark grayscale trust-logo row."
       }
     },
     {
@@ -526,6 +743,33 @@
       }
     },
     {
+      "name": "aurora-flow-chart",
+      "type": "registry:ui",
+      "title": "Aurora Flow Chart",
+      "description": "Area chart whose fill is a live aurora curtain — series values drive curtain height per column, a cool-to-warm hue band tracks local trend direction (falling cool, rising warm), the noise-warped top edge drifts even at rest, and data updates glide the curve to its new shape with a staggered ease.",
+      "files": [
+        {
+          "path": "registry/loud/aurora-flow-chart/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/aurora-flow-chart.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "loud",
+        "tags": [
+          "chart",
+          "data-viz",
+          "canvas",
+          "noise",
+          "ambient",
+          "tooltip",
+          "dashboard"
+        ],
+        "instruction": "Build an area chart component where the fill IS an aurora curtain, rendered on a DPR-clamped (max 2) Canvas 2D with a DOM layer for axis captions, legend, and tooltip (font-mono, text-muted). Curtain: for each 2px x-column, interpolate the normalized series value to a column height, warp the top edge with deterministic 2-octave value noise (0.65/0.35 octave weights, smoothstep interpolation) at amplitude 6% of column height drifting 0.05 noise-u/s, and fill the strip with a vertical alpha falloff pow(1 - y/h, 1.6) from the warped top edge down to the baseline. Implement the falloff as two pre-baked 1x256 alpha-strip offscreen canvases tinted at the cool and warm ramp endpoints, blended per column via globalAlpha by a mix value 0.5 + localSlope*14 clamped 0..1 (slope measured over a 4-index window: falling = cooler teal, rising = warmer magenta), plus a 1.5px luminous cap in the hsl-interpolated hue riding the warped edge. Every drawn color derives from theme tokens read via getComputedStyle on documentElement (--background, --foreground, --border, --accent), with the aurora ramp endpoints keyed to background luminance (bright HSL L=60 on dark, deep L=37 on light so the curtain reads on white), re-derived live by a MutationObserver watching documentElement class changes that rebakes the strips. Motion: data updates glide each column start-to-target with cubic-bezier(0.22,1,0.36,1) over 600ms, staggered 4ms per column left to right; ambient drift runs whenever visible via a direct-DOM rAF loop with zero React state on the hot path. Interaction: pointermove shows a DOM tooltip (label, value, delta) snapped to the nearest data point with a crosshair that spring-follows pointer x at k=200 s^-2 zeta=1, and a 3px accent-token dot rides the warped top edge at the active point (accent reserved for this interaction only); arrow keys step the active point when the wrapper is focused (token-relative accent focus ring). Performance: full stop offscreen via IntersectionObserver (drift time accumulator pauses), paint rate capped to 30fps when the pointer has been idle over 5s and no glide or spring is in flight, wake on pointer or re-entry; prefers-reduced-motion renders a single static frame with noise at t=0, no drift or glide (data changes repaint instantly, tooltip still works). Guard zero-size containers and empty series before normalizing (nice-ceil the max, never divide by zero), and tear down the rAF, static rAF, IntersectionObserver, ResizeObserver, MutationObserver, and all pointer/keyboard listeners on unmount. Y-gridlines use the border token at reduced alpha with mono DOM captions; a small legend maps the two ramp endpoints to falling/rising."
+      }
+    },
+    {
       "name": "erosion-trail",
       "type": "registry:ui",
       "title": "Erosion Trail",
@@ -550,6 +794,33 @@
           "physics"
         ],
         "instruction": "Build a full-bleed Canvas 2D topographic map where the cursor is a river that carves persistent channels. Keep a 96x96 Float32Array heightfield: a fixed base from deterministic 2-octave value noise (hash-sin lattice, 0.65/0.35 octave weights, ~3.4 features across the sheet) minus a separate carve-delta layer, rebuilt into a field array per frame. Render isolines via marching squares on the coarse grid every 0.08 elevation between the frame's min and max, batched into two Path2D strokes: hairline 0.75px #2e2e2e minors with every 5th contour index (k % 5 === 0) at 1px #8f8f8f — handle both saddle cases (5 and 10) with double segments and lazily interpolate only crossed edges. Carving: on pointer-down drag (setPointerCapture, touch-none), a Gaussian brush with sigma = 28px subtracts carve delta along the segment between velocity-smoothed pointer samples (head lerps 0.25/frame toward the raw pointer to prevent scalloping) at 0.9 elevation/s, scaled by inverse speed — full depth below 80 px/s tapering linearly to 0.25x at 400 px/s so dwelling digs canyons — stamped every half-sigma along the segment with the per-frame deposit split across stamps, delta clamped to 1. Waterline: while the pointer is down only, nodes whose carve delta exceeds 0.12 within 40px of the recent trail (ring buffer of the last 10 smoothed points) fill as cell rects in rgba(0,107,255,0.35) — the single accent, earned by interaction. Healing: every frame each node's delta decays exponentially toward zero with tau = 2.2s (95% healed around 6.5s) so contours visibly breathe back. Direct-DOM rAF loop with no React state on the hot path: runs while carving or while max |delta| > 0.002, then zeroes the residue, draws a final frame, and sleeps; pointerdown wakes it. Include a font-mono corner readout of cursor grid coords updated via textContent in the pointermove handler, DPR-aware sizing capped at 2 with a ResizeObserver redraw, and a prefers-reduced-motion fallback that renders the static contour sheet with no carving and no waterline. Zero dependencies, house tokens only."
+      }
+    },
+    {
+      "name": "event-horizon-command",
+      "type": "registry:ui",
+      "title": "Event Horizon Command",
+      "description": "Cmd-K palette where fuzzy-match results orbit the input as label pills — orbital radius is inverse match score, so the gravity sim is the ranking: the top match rides the tightest fastest orbit, weak matches destabilize and fling off, and Enter consumes the winner into the horizon glow.",
+      "files": [
+        {
+          "path": "registry/loud/event-horizon-command/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/event-horizon-command.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "loud",
+        "tags": [
+          "command-palette",
+          "cmd-k",
+          "orbit",
+          "physics",
+          "fuzzy-search",
+          "canvas",
+          "keyboard"
+        ],
+        "instruction": "Build a Cmd-K command palette where fuzzy-match results orbit the input as pills and the gravity sim IS the ranking visualization. Rendering is hybrid: a real <input> (role=combobox, aria-expanded, aria-controls, aria-activedescendant, focus trapped while open, toggled by Cmd/Ctrl+K, closed by Esc) plus an sr-only listbox (role=listbox/option) for a11y; each result is a DOM label pill positioned per-frame via style.transform from the sim so text stays crisp, over a single Canvas 2D layer (DPR clamped to 2) that draws orbit trails and the horizon glow ring. Fuzzy matching is a self-contained scored subsequence (consecutive-run bonus, word-start bonus, gap penalty, query-length confidence — no fuse.js). Motion: each result gets target radius r = 70 + (1 - score) * 220 px around the input center (plus small deterministic per-id jitter, radii squashed to fit the container with zero-size guards); a radial spring pulls toward it with k = 40 s^-2, zeta = 0.8, while tangential speed omega = 1.6 * sqrt(120 / r) rad/s keeps tighter orbits faster (Kepler-flavored). Every keystroke re-scores and retargets radii, glided with cubic-bezier(0.22,1,0.36,1) over 450 ms. Scores below 0.25 destabilize: 400 px/s^2 outward acceleration plus a 500 ms fade, then despawn. Enter consumes the highlighted winner: radius decays exp(-t/120ms) into the horizon, scale 1 -> 0.6 and opacity -> 0 over 260 ms, onSelect fires at consumption with a brief accent flash in the glow. Trails accumulate on an offscreen canvas whose alpha decays exp(-dt/0.6s) via destination-in fades, and trail painting stops once all trail ink falls under 0.01. Query confidence (mean of the top-3 scores) breathes the horizon glow radius between 24 and 48 px. Keyboard: ArrowUp/Down cycle the highlight (accent ring on the highlighted pill via token classes, never hex), Enter selects, Esc closes, clicking a pill selects. The rAF loop is ambient while open but fully pauses when the palette is closed or offscreen (IntersectionObserver), and every listener, observer, and the demo auto-type timer is torn down on unmount. All drawn colors (glow, trails, horizon ring) are derived from getComputedStyle CSS tokens (--foreground/--accent/--border) at mount and re-derived live via a MutationObserver on documentElement class changes so both themes render correctly. Under prefers-reduced-motion render a plain static ranked DOM listbox with standard styling and zero canvas. Include an optional autoTypeQuery prop that scripts a character-by-character query on a loop for demos."
       }
     },
     {
