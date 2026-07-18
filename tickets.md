@@ -72,6 +72,6 @@ Work the **frontier**: any ticket whose blockers are all done. After ticket 2, t
 
 **Blocked by:** decrypt-text (one-at-a-time rhythm, shares no code).
 
-- [ ] Three modes render from one engine; cursor proximity brightens/resolves cells
-- [ ] 60fps on laptop at full-bleed; static first-frame under reduced motion
-- [ ] Passes verify + judge loop
+- [x] Three modes render from one engine; cursor proximity brightens/resolves cells
+- [x] 60fps on laptop at full-bleed; static first-frame under reduced motion
+- [x] Passes verify + judge loop

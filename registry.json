@@ -4,6 +4,31 @@
   "homepage": "http://localhost:3000",
   "items": [
     {
+      "name": "ascii-dither-media",
+      "type": "registry:ui",
+      "title": "ASCII Dither Media",
+      "description": "Luminance-to-glyph canvas renderer: ASCII, Bayer-dither, and dot-matrix modes with cursor-proximity resolve.",
+      "files": [
+        {
+          "path": "registry/core/ascii-dither-media/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/ascii-dither-media.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "background",
+          "ascii",
+          "dither",
+          "canvas",
+          "cursor"
+        ],
+        "instruction": "A full-bleed canvas engine that maps a source (animated flowing noise by default, or an image) to a luminance-driven monochrome glyph grid with three modes: ASCII characters in a density ramp, 4x4 Bayer-matrix dithered pixels, and dot-matrix circles sized by brightness. The cursor brightens and resolves nearby cells with a Gaussian falloff and eased trailing. Direct-DOM rAF loop with no React state, theme-aware glyph color, single static frame under prefers-reduced-motion."
+      }
+    },
+    {
       "name": "decrypt-text",
       "type": "registry:ui",
       "title": "Decrypt Text",
