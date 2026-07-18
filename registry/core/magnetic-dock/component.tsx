@@ -27,10 +27,22 @@ export function MagneticDock({
     if (!container) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const items = Array.from(container.children) as HTMLElement[];
-    const scales = items.map(() => 1);
+    let items: HTMLElement[] = [];
+    let scales: number[] = [];
     let cursorX: number | null = null;
     let raf = 0;
+
+    // re-sync from the live DOM whenever children are added/removed/reordered
+    // — keeps the loop from animating a stale snapshot (and stale detached nodes).
+    const sync = () => {
+      const next = Array.from(container.children) as HTMLElement[];
+      scales = next.map((el) => {
+        const i = items.indexOf(el);
+        return i === -1 ? 1 : scales[i];
+      });
+      items = next;
+    };
+    sync();
 
     const loop = () => {
       let settled = true;
@@ -56,6 +68,16 @@ export function MagneticDock({
         }
         const s = scales[i];
         el.style.transform = `translate(${shift}px, ${-(s - 1) * lift}px) scale(${s})`;
+        // magnification amount 0..1 — sells depth beyond scale/lift alone,
+        // color-mix(currentColor) so the glow adapts to each theme automatically.
+        const t = Math.max(0, (s - 1) / gain);
+        if (t > 0.002) {
+          el.style.filter = `brightness(${1 + t * 0.12})`;
+          el.style.boxShadow = `0 ${4 + t * 10}px ${10 + t * 16}px -4px color-mix(in srgb, currentColor ${Math.round(15 + t * 25)}%, transparent)`;
+        } else {
+          el.style.filter = "";
+          el.style.boxShadow = "";
+        }
       });
       raf = settled && cursorX === null ? 0 : requestAnimationFrame(loop);
     };
@@ -72,10 +94,17 @@ export function MagneticDock({
       wake();
     };
 
+    const observer = new MutationObserver(() => {
+      sync();
+      wake();
+    });
+    observer.observe(container, { childList: true });
+
     container.addEventListener("pointermove", onMove);
     container.addEventListener("pointerleave", onLeave);
     return () => {
       cancelAnimationFrame(raf);
+      observer.disconnect();
       container.removeEventListener("pointermove", onMove);
       container.removeEventListener("pointerleave", onLeave);
     };

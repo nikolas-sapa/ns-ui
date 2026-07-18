@@ -62,6 +62,16 @@ export function SingularityText({
     let pointerY = 0;
     let pointerActive = false;
     let disposed = false;
+    let fgColor = "#ededed";
+    let guideColor = "#8f8f8f";
+
+    // resolve theme tokens fresh — light/dark swap --foreground between
+    // #171717 and #ededed, so a hardcoded fill would go invisible on light
+    const readTokens = () => {
+      const cs = getComputedStyle(document.documentElement);
+      fgColor = cs.getPropertyValue("--foreground").trim() || "#ededed";
+      guideColor = cs.getPropertyValue("--muted").trim() || "#8f8f8f";
+    };
 
     const init = () => {
       const rect = container.getBoundingClientRect();
@@ -126,14 +136,17 @@ export function SingularityText({
       // guide circle under the accretion band
       if (pointerActive) {
         ctx.globalAlpha = 0.15;
-        ctx.strokeStyle = "#8f8f8f";
+        ctx.strokeStyle = guideColor;
         ctx.beginPath();
         ctx.arc(pointerX, pointerY, GUIDE_RADIUS, 0, Math.PI * 2);
         ctx.stroke();
       }
 
-      ctx.fillStyle = "#ededed";
-      ctx.strokeStyle = "#ffffff"; // 1.6x brighter than #ededed clamps to white
+      // accretion streaks reuse the same token; the 1.6x pop comes from
+      // globalAlpha (clamped to 1), not a separate hardcoded bright color —
+      // that keeps it correct on both light (#171717) and dark (#ededed) fg
+      ctx.fillStyle = fgColor;
+      ctx.strokeStyle = fgColor;
       let settled = true;
 
       for (let i = 0; i < count; i++) {
@@ -237,6 +250,18 @@ export function SingularityText({
     };
 
     let ro: ResizeObserver | undefined;
+    readTokens();
+    // live theme re-derive: token flip on <html class="dark"> repaints with
+    // the new foreground/muted colors without a remount or particle reinit
+    const mo = new MutationObserver(() => {
+      readTokens();
+      wake();
+    });
+    mo.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
     // sample only after Geist has loaded — a fallback-font raster is wrong
     document.fonts.ready.then(() => {
       if (disposed) return;
@@ -262,6 +287,7 @@ export function SingularityText({
       cancelAnimationFrame(raf);
       raf = 0;
       ro?.disconnect();
+      mo.disconnect();
       container.removeEventListener("pointermove", onMove);
       container.removeEventListener("pointerleave", onLeave);
     };

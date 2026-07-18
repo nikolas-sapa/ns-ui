@@ -296,11 +296,11 @@ export const CardioBaseline = forwardRef<
         <polyline
           ref={lineRef}
           fill="none"
-          stroke="#8f8f8f"
+          style={{ stroke: "var(--muted)" }}
           strokeWidth="1.5"
           strokeLinejoin="round"
         />
-        <circle ref={dotRef} r="2" fill="#ffffff" />
+        <circle ref={dotRef} r="2" style={{ fill: "var(--foreground)" }} />
       </svg>
     </div>
   );

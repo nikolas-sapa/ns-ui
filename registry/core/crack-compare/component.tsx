@@ -28,6 +28,31 @@ const SPRING_C = 2 * 0.85 * Math.sqrt(SPRING_K); // zeta 0.85 — taut, no wobbl
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 const easeOut = (t: number) => 1 - (1 - t) ** 3;
 
+function parseColor(raw: string): { r: number; g: number; b: number } | null {
+  const v = raw.trim();
+  if (v.startsWith("#")) {
+    const hex = v.slice(1);
+    if (hex.length === 3) {
+      const r = parseInt(hex[0] + hex[0], 16);
+      const g = parseInt(hex[1] + hex[1], 16);
+      const b = parseInt(hex[2] + hex[2], 16);
+      if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)) return null;
+      return { r, g, b };
+    }
+    if (hex.length >= 6) {
+      const r = parseInt(hex.slice(0, 2), 16);
+      const g = parseInt(hex.slice(2, 4), 16);
+      const b = parseInt(hex.slice(4, 6), 16);
+      if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)) return null;
+      return { r, g, b };
+    }
+    return null;
+  }
+  const m = v.match(/rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)/i);
+  if (!m) return null;
+  return { r: Number(m[1]), g: Number(m[2]), b: Number(m[3]) };
+}
+
 /** dart-throwing Poisson disc — relaxes min distance if the pane is crowded */
 function poissonPoints(w: number, h: number, count: number, minDist: number): Pt[] {
   const pts: Pt[] = [];
@@ -157,6 +182,7 @@ export function CrackCompare({
       lastSpawn: 0,
       pendingGlint: false,
       glintStart: -1,
+      seamRGB: { r: 255, g: 255, b: 255 },
     };
 
     /** seam x-offsets (relative to the handle) solved on the local Voronoi walls */
@@ -239,18 +265,20 @@ export function CrackCompare({
       }
       const t1 = pointAt(pts, cum, head);
       ctx.lineTo(t1.x, t1.y);
+      const { r, g, b } = S.seamRGB;
       ctx.lineWidth = 1;
-      ctx.strokeStyle = "rgba(255,255,255,0.5)";
+      ctx.strokeStyle = `rgba(${r},${g},${b},0.5)`;
       ctx.stroke();
     };
 
     const draw = (now: number, pts: Pt[]) => {
       ctx.clearRect(0, 0, w, h);
       if (pts.length < 2) return;
-      // seam: hairline + offset ghost stroke for glass depth — grayscale only
+      // seam: hairline + offset ghost stroke for glass depth — token-derived, theme-aware
+      const { r, g, b } = S.seamRGB;
       const passes = [
-        { o: 0.75, lw: 0.5, c: "rgba(255,255,255,0.10)" },
-        { o: 0, lw: 1, c: "rgba(255,255,255,0.32)" },
+        { o: 0.75, lw: 0.5, c: `rgba(${r},${g},${b},0.10)` },
+        { o: 0, lw: 1, c: `rgba(${r},${g},${b},0.32)` },
       ];
       for (const pass of passes) {
         ctx.beginPath();
@@ -273,7 +301,7 @@ export function CrackCompare({
         ctx.beginPath();
         strokePartial(S.x + f.ox, f.oy, f.pts, drawn);
         ctx.lineWidth = 0.75;
-        ctx.strokeStyle = `rgba(255,255,255,${(f.alpha * heal).toFixed(3)})`;
+        ctx.strokeStyle = `rgba(${r},${g},${b},${(f.alpha * heal).toFixed(3)})`;
         ctx.stroke();
       }
       if (S.glintStart >= 0) drawGlint(now, pts);
@@ -471,6 +499,19 @@ export function CrackCompare({
       grip.classList.remove("outline", "outline-2", "outline-offset-2", "outline-accent");
     };
 
+    /** re-sample the seam color off the resolved --foreground token so the
+     * crack reads on light or dark content alike, then repaint once even at rest */
+    const deriveSeamColor = () => {
+      const raw = getComputedStyle(document.documentElement).getPropertyValue("--foreground");
+      S.seamRGB = parseColor(raw) ?? S.seamRGB;
+      if (S.raf) return;
+      const pts = seamPts();
+      if (pts.length >= 2) draw(performance.now(), pts);
+    };
+    deriveSeamColor();
+    const themeObserver = new MutationObserver(deriveSeamColor);
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+
     const ro = new ResizeObserver(build);
     ro.observe(root);
     handle.addEventListener("pointerdown", onDown);
@@ -483,6 +524,7 @@ export function CrackCompare({
     return () => {
       cancelAnimationFrame(S.raf);
       ro.disconnect();
+      themeObserver.disconnect();
       handle.removeEventListener("pointerdown", onDown);
       handle.removeEventListener("pointermove", onMove);
       handle.removeEventListener("pointerup", onUp);
@@ -546,7 +588,7 @@ export function CrackCompare({
       >
         <div
           ref={gripRef}
-          className="flex h-7 w-7 items-center justify-center rounded-sm border border-white/15 bg-white/10 text-muted shadow-[inset_0_1px_0_0_rgba(255,255,255,0.18),0_2px_8px_-2px_rgba(0,0,0,0.5)] backdrop-blur-md transition-colors duration-150 hover:border-white/30 hover:text-foreground"
+          className="flex h-7 w-7 items-center justify-center rounded-sm border border-foreground/15 bg-foreground/10 text-muted shadow-[inset_0_1px_0_0_color-mix(in_srgb,var(--foreground)_18%,transparent),0_2px_8px_-2px_rgba(0,0,0,0.5)] backdrop-blur-md transition-colors duration-150 hover:border-foreground/30 hover:text-foreground"
         >
           <svg
             width="14"

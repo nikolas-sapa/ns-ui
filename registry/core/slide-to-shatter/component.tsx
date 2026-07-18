@@ -25,6 +25,7 @@ const PAD_BOTTOM = 320;
 const COMMIT_AT = 0.98;
 const SHATTER_MS = 900;
 const FADE_MS = 700;
+const KEY_STEP = 0.08;
 
 /** dart-throwing Poisson disc — relaxes min distance if the pane is crowded */
 function poissonPoints(w: number, h: number, count: number, minDist: number): Pt[] {
@@ -455,16 +456,58 @@ export function SlideToShatter({
       }
     };
 
+    // Arrow keys nudge p by KEY_STEP; Home/End jump to the ends; Enter/Space
+    // confirms outright — mirrors the pointer path without engaging the rAF
+    // loop for a static value (loop only wakes once travel actually commits).
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (S.mode === "shatter" || S.mode === "spring" || glass.style.visibility === "hidden") return;
+      let next: number;
+      switch (e.key) {
+        case "ArrowRight":
+        case "ArrowUp":
+          next = S.p + KEY_STEP;
+          break;
+        case "ArrowLeft":
+        case "ArrowDown":
+          next = S.p - KEY_STEP;
+          break;
+        case "Home":
+          next = 0;
+          break;
+        case "End":
+        case "Enter":
+        case " ":
+          next = 1;
+          break;
+        default:
+          return;
+      }
+      e.preventDefault();
+      next = Math.min(1, Math.max(0, next));
+      S.p = next;
+      S.startP = next;
+      thumb.setAttribute("aria-valuenow", String(Math.round(next * 100)));
+      if (S.p >= COMMIT_AT) {
+        commit();
+      } else {
+        S.mode = "idle";
+        setThumb(S.p);
+        if (!reduced) drawCracks(S.p);
+      }
+    };
+
     thumb.addEventListener("pointerdown", onDown);
     thumb.addEventListener("pointermove", onMove);
     thumb.addEventListener("pointerup", onUp);
     thumb.addEventListener("pointercancel", onUp);
+    thumb.addEventListener("keydown", onKeyDown);
     return () => {
       cancelAnimationFrame(S.raf);
       thumb.removeEventListener("pointerdown", onDown);
       thumb.removeEventListener("pointermove", onMove);
       thumb.removeEventListener("pointerup", onUp);
       thumb.removeEventListener("pointercancel", onUp);
+      thumb.removeEventListener("keydown", onKeyDown);
       root.style.transform = "";
     };
   }, [width, height, shardCount, resetKey]);
@@ -506,7 +549,7 @@ export function SlideToShatter({
       {/* frosted pane — house glass recipe */}
       <div
         ref={glassRef}
-        className={`absolute inset-0 overflow-hidden rounded-md border border-white/10 bg-white/[0.06] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12),0_8px_24px_-8px_rgba(0,0,0,0.5)] backdrop-blur-xl backdrop-saturate-150 ${
+        className={`absolute inset-0 overflow-hidden rounded-md border border-black/15 bg-white/60 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.7),0_8px_24px_-8px_rgba(0,0,0,0.28)] backdrop-blur-xl backdrop-saturate-150 dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12),0_8px_24px_-8px_rgba(0,0,0,0.5)] ${
           confirmed ? "invisible" : ""
         }`}
       >
@@ -537,7 +580,7 @@ export function SlideToShatter({
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={0}
-        className={`absolute flex cursor-grab touch-none items-center justify-center rounded-sm border border-white/15 bg-white/10 text-muted transition-colors duration-150 hover:border-white/30 hover:bg-white/15 hover:text-foreground shadow-[inset_0_1px_0_0_rgba(255,255,255,0.18),0_2px_8px_-2px_rgba(0,0,0,0.5)] will-change-transform active:cursor-grabbing ${
+        className={`absolute flex cursor-grab touch-none items-center justify-center rounded-sm border border-black/15 bg-black/[0.04] text-muted transition-colors duration-150 hover:border-black/25 hover:bg-black/[0.08] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background shadow-[inset_0_1px_0_0_rgba(255,255,255,0.6),0_2px_8px_-2px_rgba(0,0,0,0.25)] will-change-transform active:cursor-grabbing dark:border-white/15 dark:bg-white/10 dark:hover:border-white/30 dark:hover:bg-white/15 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.18),0_2px_8px_-2px_rgba(0,0,0,0.5)] ${
           confirmed ? "invisible" : ""
         }`}
         style={{ left: INSET, top: INSET, width: thumbSize, height: thumbSize }}

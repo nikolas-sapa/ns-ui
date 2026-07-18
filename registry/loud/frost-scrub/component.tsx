@@ -281,6 +281,11 @@ export function FrostScrub({
   const imgRef = useRef<HTMLImageElement>(null);
   const barRef = useRef<HTMLSpanElement>(null);
   const pctRef = useRef<HTMLSpanElement>(null);
+  const onProgressRef = useRef(onProgress);
+
+  useEffect(() => {
+    onProgressRef.current = onProgress;
+  }, [onProgress]);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -301,7 +306,7 @@ export function FrostScrub({
     const readout = (p: number) => {
       pct.textContent = `${String(Math.round(p * 100)).padStart(3, "0")}%`;
       bar.style.transform = `scaleY(${p.toFixed(4)})`;
-      onProgress?.(p);
+      onProgressRef.current?.(p);
     };
 
     let art: HTMLCanvasElement | null = null;
@@ -417,6 +422,13 @@ export function FrostScrub({
           uploadSource(image, image.naturalWidth, image.naturalHeight);
           render?.(current);
         };
+        image.onerror = () => {
+          if (disposed) return;
+          console.error(`FrostScrub: failed to load src "${src}", falling back to default art`);
+          const a = getArt();
+          if (a) uploadSource(a, a.width, a.height);
+          render?.(current);
+        };
         image.src = src;
       } else {
         const a = getArt();
@@ -516,7 +528,9 @@ export function FrostScrub({
       ro.disconnect();
       gl?.getExtension("WEBGL_lose_context")?.loseContext();
     };
-  }, [src, maxOffset, frostRadius, dispersion, onProgress]);
+    // onProgress intentionally excluded — delivered via onProgressRef so an
+    // unmemoized inline callback can't tear down the GL setup every render.
+  }, [src, maxOffset, frostRadius, dispersion]);
 
   return (
     <section

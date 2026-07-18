@@ -14,12 +14,45 @@ const NEAR_CLIP = 24; // cull points closer than this to the camera
 const SPRING_K = 60;
 const SPRING_C = 2 * 0.8 * Math.sqrt(SPRING_K);
 
-// monochrome depth ramp: #8f8f8f far -> #ededed near, alpha rises with proximity
-const SHADES = Array.from({ length: 24 }, (_, i) => {
-  const t = i / 23;
-  const g = Math.round(143 + (237 - 143) * t);
-  return `rgba(${g},${g},${g},${(0.3 + 0.7 * t).toFixed(3)})`;
-});
+// monochrome depth ramp: alpha rises 0.3 -> 1.0 with proximity, color pinned
+// to the live --foreground token so contrast against the page background is
+// correct in both themes (near = full foreground opacity, far = faded toward bg).
+function buildShades(rgb: { r: number; g: number; b: number }) {
+  return Array.from({ length: 24 }, (_, i) => {
+    const t = i / 23;
+    return `rgba(${rgb.r},${rgb.g},${rgb.b},${(0.3 + 0.7 * t).toFixed(3)})`;
+  });
+}
+
+function parseColor(raw: string): { r: number; g: number; b: number } | null {
+  const v = raw.trim();
+  if (v.startsWith("#")) {
+    const hex = v.slice(1);
+    if (hex.length === 3) {
+      const r = parseInt(hex[0] + hex[0], 16);
+      const g = parseInt(hex[1] + hex[1], 16);
+      const b = parseInt(hex[2] + hex[2], 16);
+      if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)) return null;
+      return { r, g, b };
+    }
+    if (hex.length >= 6) {
+      const r = parseInt(hex.slice(0, 2), 16);
+      const g = parseInt(hex.slice(2, 4), 16);
+      const b = parseInt(hex.slice(4, 6), 16);
+      if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)) return null;
+      return { r, g, b };
+    }
+    return null;
+  }
+  const m = v.match(/rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)/);
+  if (m) return { r: Number(m[1]), g: Number(m[2]), b: Number(m[3]) };
+  return null;
+}
+
+function readForegroundShades() {
+  const raw = getComputedStyle(document.documentElement).getPropertyValue("--foreground");
+  return buildShades(parseColor(raw) ?? { r: 143, g: 143, b: 143 });
+}
 
 // deterministic PRNG so the field is identical across mounts and screenshots
 function mulberry32(seed: number) {
@@ -95,6 +128,7 @@ export function ParticleTunnelScrub({
     const dirX = new Float32Array(pointCount);
     const dirY = new Float32Array(pointCount);
     let hasPrev = false;
+    let shades = readForegroundShades();
 
     const labelCount = labels.length;
     const labelDepths = labels.map((_, i) => labelDepthAt(i, labelCount));
@@ -166,7 +200,7 @@ export function ParticleTunnelScrub({
         prevY[i] = sy;
 
         const near = Math.min(1, 420 / dz);
-        const shade = SHADES[Math.min(23, (near * 23) | 0)] ?? "#8f8f8f";
+        const shade = shades[Math.min(23, (near * 23) | 0)] ?? "#8f8f8f";
         const size = Math.min(3.2, Math.max(0.6, s * 1.5));
         if (drawStreaks && (dirX[i] !== 0 || dirY[i] !== 0)) {
           ctx.strokeStyle = shade;
@@ -247,6 +281,16 @@ export function ParticleTunnelScrub({
       wake();
     };
 
+    // re-derive the shade ramp from --foreground whenever the theme class
+    // flips on <html>, so light/dark contrast stays correct without a remount
+    const onThemeChange = () => {
+      shades = readForegroundShades();
+      dirty = true;
+      wake();
+    };
+    const themeObserver = new MutationObserver(onThemeChange);
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+
     resize();
     readScroll();
     lastCamZ = p * TRAVEL; // no phantom velocity on mount mid-page
@@ -257,6 +301,7 @@ export function ParticleTunnelScrub({
     window.addEventListener("pointermove", onPointer, { passive: true });
     return () => {
       cancelAnimationFrame(raf);
+      themeObserver.disconnect();
       window.removeEventListener("scroll", readScroll);
       window.removeEventListener("resize", resize);
       window.removeEventListener("pointermove", onPointer);
@@ -272,6 +317,7 @@ export function ParticleTunnelScrub({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     const { px, py, pz } = seedPoints(pointCount);
+    let shades = readForegroundShades();
     const draw = () => {
       const rect = canvas.getBoundingClientRect();
       const w = rect.width;
@@ -290,14 +336,23 @@ export function ParticleTunnelScrub({
         const sy = h / 2 + py[i] * s;
         if (sx < -10 || sx > w + 10 || sy < -10 || sy > h + 10) continue;
         const near = Math.min(1, 420 / dz);
-        ctx.fillStyle = SHADES[Math.min(23, (near * 23) | 0)] ?? "#8f8f8f";
+        ctx.fillStyle = shades[Math.min(23, (near * 23) | 0)] ?? "#8f8f8f";
         const size = Math.min(3.2, Math.max(0.6, s * 1.5));
         ctx.fillRect(sx - size / 2, sy - size / 2, size, size);
       }
     };
     draw();
+    const onThemeChange = () => {
+      shades = readForegroundShades();
+      draw();
+    };
+    const themeObserver = new MutationObserver(onThemeChange);
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
     window.addEventListener("resize", draw);
-    return () => window.removeEventListener("resize", draw);
+    return () => {
+      themeObserver.disconnect();
+      window.removeEventListener("resize", draw);
+    };
   }, [reduced, pointCount]);
 
   // reduced motion: labels fade in 200ms via IntersectionObserver
@@ -329,6 +384,14 @@ export function ParticleTunnelScrub({
     >
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         <canvas ref={canvasRef} aria-hidden className="absolute inset-0 h-full w-full" />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(circle at center, transparent 40%, var(--background) 96%)",
+          }}
+        />
         {!reduced &&
           labels.map((label, i) => (
             <div

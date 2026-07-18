@@ -53,6 +53,31 @@ const glideEase = makeBezier(0.22, 1, 0.36, 1);
 
 const EMPTY: number[] = [];
 
+function parseColor(raw: string): { r: number; g: number; b: number } | null {
+  const v = raw.trim();
+  if (v.startsWith("#")) {
+    const hex = v.slice(1);
+    if (hex.length === 3) {
+      const r = parseInt(hex[0] + hex[0], 16);
+      const g = parseInt(hex[1] + hex[1], 16);
+      const b = parseInt(hex[2] + hex[2], 16);
+      if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)) return null;
+      return { r, g, b };
+    }
+    if (hex.length >= 6) {
+      const r = parseInt(hex.slice(0, 2), 16);
+      const g = parseInt(hex.slice(2, 4), 16);
+      const b = parseInt(hex.slice(4, 6), 16);
+      if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)) return null;
+      return { r, g, b };
+    }
+    return null;
+  }
+  const m = v.match(/rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)/i);
+  if (!m) return null;
+  return { r: Number(m[1]), g: Number(m[2]), b: Number(m[3]) };
+}
+
 // ---------------------------------------------------------------------------
 // SignalTerrain — Unknown-Pleasures ridgeline landscape where incoming data
 // samples scroll forward as ridgelines (history recedes into ambient Perlin
@@ -153,6 +178,32 @@ export function SignalTerrain({
     const invRows = 1 / Math.max(1, rows - 1);
     const twoSigma2 = 2 * dentSigma * dentSigma;
 
+    // theme tokens — resolved from CSS custom properties, never hardcoded,
+    // so occlusion fill and ridgeline stroke read correctly in light or dark
+    let fillRGB = { r: 10, g: 10, b: 10 };
+    let strokeLowRGB = { r: 143, g: 143, b: 143 };
+    let strokeHighRGB = { r: 237, g: 237, b: 237 };
+    const deriveTokens = () => {
+      const cs = getComputedStyle(document.documentElement);
+      fillRGB =
+        parseColor(cs.getPropertyValue("--surface")) ??
+        parseColor(cs.getPropertyValue("--background")) ??
+        fillRGB;
+      strokeHighRGB = parseColor(cs.getPropertyValue("--foreground")) ?? strokeHighRGB;
+      strokeLowRGB = parseColor(cs.getPropertyValue("--muted")) ?? strokeLowRGB;
+    };
+    deriveTokens();
+    // theme can flip after mount (class toggle on <html>, no remount) — without
+    // this, fillRGB/strokeRGB stay frozen at whatever theme was active at mount
+    const themeObserver = new MutationObserver(() => {
+      deriveTokens();
+      if (reduced) drawRef.current?.();
+    });
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
     const draw = (now: number) => {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, w, h);
@@ -229,20 +280,43 @@ export function SignalTerrain({
         ctx.lineTo(x0 + rowW, h + 2);
         ctx.lineTo(x0, h + 2);
         ctx.closePath();
-        ctx.fillStyle = "#0a0a0a";
+        ctx.fillStyle = `rgb(${fillRGB.r},${fillRGB.g},${fillRGB.b})`;
         ctx.fill();
 
-        // ridgeline stroke: rgba(143,143,143,0.25) 1px at the horizon
-        // fading to #ededed 1.5px at the front
+        // ridgeline stroke: muted-token color 1px at the horizon fading to
+        // foreground-token color 1.5px at the front — theme-derived, not hardcoded
         const mix = Math.pow(t, 1.3);
-        const g = Math.round(143 + (237 - 143) * mix);
+        const rr = Math.round(strokeLowRGB.r + (strokeHighRGB.r - strokeLowRGB.r) * mix);
+        const rg = Math.round(strokeLowRGB.g + (strokeHighRGB.g - strokeLowRGB.g) * mix);
+        const rb = Math.round(strokeLowRGB.b + (strokeHighRGB.b - strokeLowRGB.b) * mix);
         const a = 0.25 + 0.75 * mix;
         ctx.beginPath();
         ctx.moveTo(xs[0] ?? 0, ys[0] ?? 0);
         for (let c = 1; c < cols; c++) ctx.lineTo(xs[c] ?? 0, ys[c] ?? 0);
-        ctx.strokeStyle = `rgba(${g},${g},${g},${a})`;
+        ctx.strokeStyle = `rgba(${rr},${rg},${rb},${a})`;
         ctx.lineWidth = 1 + 0.5 * mix;
         ctx.stroke();
+      }
+
+      // cursor-dent highlight: the mesh deformation alone reads as noise at
+      // rest, so bloom the dent center with a foreground-token glow scaled to
+      // dent depth — makes the interaction discoverable without touching sigma/depth
+      if (hasDent) {
+        const glowR = dentSigma * 1.4;
+        const glowA = Math.min(0.3, Math.abs(dentAmt) * 0.3);
+        const glow = ctx.createRadialGradient(px, py, 0, px, py, glowR);
+        glow.addColorStop(
+          0,
+          `rgba(${strokeHighRGB.r},${strokeHighRGB.g},${strokeHighRGB.b},${glowA})`
+        );
+        glow.addColorStop(
+          1,
+          `rgba(${strokeHighRGB.r},${strokeHighRGB.g},${strokeHighRGB.b},0)`
+        );
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(px, py, glowR, 0, Math.PI * 2);
+        ctx.fill();
       }
     };
 
@@ -258,6 +332,7 @@ export function SignalTerrain({
       ro.observe(root);
       return () => {
         ro.disconnect();
+        themeObserver.disconnect();
         drawRef.current = null;
       };
     }
@@ -315,6 +390,7 @@ export function SignalTerrain({
       cancelAnimationFrame(raf);
       io.disconnect();
       ro.disconnect();
+      themeObserver.disconnect();
       root.removeEventListener("pointermove", onMove);
       root.removeEventListener("pointerdown", onMove);
       root.removeEventListener("pointerleave", onLeave);

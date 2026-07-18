@@ -50,7 +50,7 @@ export default function ChronicleBarDemo() {
       </p>
 
       <div
-        className="w-full max-w-xl"
+        className="w-full max-w-xl rounded-xl border border-border bg-surface px-8 py-10"
         onPointerEnter={() => {
           pausedRef.current = true;
         }}

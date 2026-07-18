@@ -221,11 +221,15 @@ export function PrismDragSplit({
       <div
         ref={stripRef}
         aria-hidden
-        className="pointer-events-none absolute inset-y-0 left-0 isolate overflow-hidden border-x border-white/10 bg-background/85 backdrop-blur-md will-change-transform shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12),inset_0_-1px_0_0_rgba(255,255,255,0.06),0_8px_24px_-8px_rgba(0,0,0,0.5)]"
+        className="pointer-events-none absolute inset-y-0 left-0 isolate overflow-hidden border-x border-black/10 dark:border-white/10 bg-background/85 backdrop-blur-md will-change-transform shadow-[inset_0_1px_0_0_rgba(0,0,0,0.06),inset_0_-1px_0_0_rgba(0,0,0,0.03),0_8px_24px_-8px_rgba(0,0,0,0.25)] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12),inset_0_-1px_0_0_rgba(255,255,255,0.06),0_8px_24px_-8px_rgba(0,0,0,0.5)]"
         style={{ width: stripWidth }}
       >
-        {/* refracted content, edge-faded so glyphs melt in instead of hard-clipping */}
-        <div className="absolute inset-0 [mask-image:linear-gradient(to_right,transparent,black_12px,black_calc(100%-12px),transparent)]">
+        {/* refracted content, edge-faded so glyphs melt in instead of hard-clipping.
+            Forced dark tint (not theme-token-driven) so the mix-blend-screen RGB
+            clones always pop against a near-black backdrop — screen blending
+            against a near-white light-mode background would wash channel text
+            out to invisible. */}
+        <div className="absolute inset-0 bg-[#0a0a0a]/90 [mask-image:linear-gradient(to_right,transparent,black_12px,black_calc(100%-12px),transparent)]">
           {(
             [
               [redRef, "#ff0000"],

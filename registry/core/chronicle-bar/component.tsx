@@ -85,6 +85,10 @@ export function ChronicleBar({
   const prevRef = useRef<number | null>(null);
   const [milestones, setMilestones] = useState<Milestone[]>([]);
 
+  // content-derived key: rebuild the narrator only when the phase sequence
+  // itself changes, not on every inline-array re-render from the consumer
+  const phasesKey = phases.map((p) => `${p.at}:${p.label}`).join("|");
+
   useEffect(() => {
     const track = trackRef.current;
     const fill = fillRef.current;
@@ -273,7 +277,8 @@ export function ChronicleBar({
       ro.disconnect();
       pushRef.current = null;
     };
-  }, [phases]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on phasesKey, not the phases reference
+  }, [phasesKey]);
 
   useEffect(() => {
     const prev = prevRef.current;
@@ -290,10 +295,10 @@ export function ChronicleBar({
 @media (prefers-reduced-motion: reduce){.ns-chronicle-in{animation:none}}`}</style>
 
       {/* narrator caption, anchored to the leading edge */}
-      <div className="relative h-5" aria-hidden>
+      <div className="relative h-6 mb-1" aria-hidden>
         <span
           ref={captionRef}
-          className="absolute bottom-0 left-0 origin-bottom-left whitespace-nowrap font-mono text-xs text-foreground will-change-transform"
+          className="absolute bottom-0 left-0 origin-bottom-left whitespace-nowrap font-mono text-sm text-foreground will-change-transform"
         />
       </div>
 
@@ -323,11 +328,11 @@ export function ChronicleBar({
         {milestones.map((m) => (
           <div key={`${m.at}-${m.label}`} className="ns-chronicle-in">
             <span
-              className="absolute top-0 h-1.5 w-px -translate-x-1/2 bg-muted"
+              className="absolute top-0 h-2 w-0.5 -translate-x-1/2 bg-muted"
               style={{ left: `${m.at}%` }}
             />
             <span
-              className="absolute top-2.5 whitespace-nowrap font-mono text-[10px] tracking-wide text-muted"
+              className="absolute top-3 whitespace-nowrap font-mono text-[11px] tracking-wide text-muted"
               style={{
                 left: `${m.at}%`,
                 transform:

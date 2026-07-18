@@ -97,6 +97,23 @@ export function MoireDial({
     let offA: HTMLCanvasElement | null = null; // fixed grating + inverted word
     let offB: HTMLCanvasElement | null = null; // rotating overlay grating
 
+    // grating ink derives from the --foreground token so the field is
+    // legible in both themes — re-read whenever the theme class flips.
+    let gratingFill = "rgba(237,237,237,0.5)";
+    const deriveGratingFill = () => {
+      const fg = getComputedStyle(document.documentElement)
+        .getPropertyValue("--foreground")
+        .trim();
+      if (!fg) return;
+      const probe = document.createElement("canvas").getContext("2d");
+      if (!probe) return;
+      probe.fillStyle = fg;
+      const [r, g, b] = probe.fillStyle.match(/\d+/g)?.map(Number) ?? [];
+      if (r === undefined) return;
+      gratingFill = `rgba(${r},${g},${b},0.5)`;
+    };
+    deriveGratingFill();
+
     const build = () => {
       const rect = field.getBoundingClientRect();
       w = Math.round(rect.width);
@@ -128,7 +145,7 @@ export function MoireDial({
       const actx = offA.getContext("2d");
       if (!actx) return;
       actx.scale(dpr, dpr);
-      actx.fillStyle = "rgba(237,237,237,0.5)";
+      actx.fillStyle = gratingFill;
       for (let y = 0; y <= h; y += pitch) actx.fillRect(0, y, w, 1);
       actx.globalCompositeOperation = "destination-out";
       actx.drawImage(mask, 0, 0, w, h);
@@ -138,7 +155,7 @@ export function MoireDial({
       const ictx = inv.getContext("2d");
       if (!ictx) return;
       ictx.scale(dpr, dpr);
-      ictx.fillStyle = "rgba(237,237,237,0.5)";
+      ictx.fillStyle = gratingFill;
       for (let y = pitch / 2; y <= h; y += pitch) ictx.fillRect(0, y, w, 1);
       ictx.globalCompositeOperation = "destination-in";
       ictx.drawImage(mask, 0, 0, w, h);
@@ -154,7 +171,7 @@ export function MoireDial({
       const bctx = offB.getContext("2d");
       if (!bctx) return;
       bctx.scale(dpr, dpr);
-      bctx.fillStyle = "rgba(237,237,237,0.5)";
+      bctx.fillStyle = gratingFill;
       const phase = ((diag / 2 - h / 2) % pitch + pitch) % pitch;
       for (let y = phase; y <= diag; y += pitch) bctx.fillRect(0, y, diag, 1);
     };
@@ -326,6 +343,18 @@ export function MoireDial({
     });
     ro.observe(field);
 
+    // theme toggle flips the `dark` class on <html> — re-derive the grating
+    // ink from --foreground and re-rasterize, or light mode ships blank
+    const mo = new MutationObserver(() => {
+      deriveGratingFill();
+      build();
+      render();
+    });
+    mo.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
     knob.addEventListener("pointerdown", onDown);
     knob.addEventListener("pointermove", onMove);
     knob.addEventListener("pointerup", onUp);
@@ -337,6 +366,7 @@ export function MoireDial({
       cancelAnimationFrame(raf);
       raf = 0;
       ro.disconnect();
+      mo.disconnect();
       knob.removeEventListener("pointerdown", onDown);
       knob.removeEventListener("pointermove", onMove);
       knob.removeEventListener("pointerup", onUp);
@@ -369,7 +399,7 @@ export function MoireDial({
         />
         <div
           ref={knobRef}
-          className="relative h-40 w-40 cursor-grab touch-none select-none rounded-full border border-border bg-surface active:cursor-grabbing focus-within:outline-2 focus-within:outline-offset-4 focus-within:outline-accent"
+          className="relative h-40 w-40 cursor-grab touch-none select-none rounded-full border border-border bg-surface active:cursor-grabbing focus-within:outline focus-within:outline-2 focus-within:outline-offset-4 focus-within:outline-accent"
         >
           <input
             ref={inputRef}

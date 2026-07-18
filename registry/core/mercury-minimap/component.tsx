@@ -82,7 +82,21 @@ export function MercuryMinimap({
         id: el.id,
         label: el.dataset.minimapLabel ?? el.id.toUpperCase(),
       }));
-    setItems(discover());
+    // guard against unstable `sections` identity (e.g. an inline array literal
+    // passed by the consumer): only commit a new `items` reference when the
+    // discovered content actually changed, otherwise the mercury-loop effect
+    // below (keyed on `items`) would tear down and rebuild every render.
+    setItems((prev) => {
+      const next = discover();
+      if (
+        prev &&
+        prev.length === next.length &&
+        prev.every((p, i) => p.id === next[i]?.id && p.label === next[i]?.label)
+      ) {
+        return prev;
+      }
+      return next;
+    });
     const measure = () => setH(Math.round(window.innerHeight * 0.6));
     measure();
     window.addEventListener("resize", measure);
@@ -132,8 +146,10 @@ export function MercuryMinimap({
       v += (stiffness * (target - y) - damping * v) * dt;
       y += v * dt;
 
-      // volume-preserving droplet stretch, oriented along travel
-      const sY = 1 + Math.min(Math.abs(v) * 0.004, 0.8);
+      // volume-preserving droplet stretch, oriented along travel. A small
+      // constant bias keeps the blob a teardrop (not a plain circle) even at
+      // rest, so the liquid-mercury mechanic reads in a still frame too.
+      const sY = 1.06 + Math.min(Math.abs(v) * 0.004, 0.74);
       const sX = 1 / Math.sqrt(sY);
       const lead = Math.sign(v) * (sY - 1) * 4;
       blobRef.current?.setAttribute(

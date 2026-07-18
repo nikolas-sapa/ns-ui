@@ -122,6 +122,15 @@ export function VaporCountdown({
 
     // ---- canvas / particle state (unused under reduced motion) -------------
     const ctx = canvas.getContext("2d");
+
+    // grain color tracks the real foreground token — read fresh on theme
+    // change so light/dark both draw legible ink, never a hardcoded hex.
+    let grainColor = "#ededed";
+    const updateGrainColor = () => {
+      grainColor = getComputedStyle(digitEls[0]).color || grainColor;
+    };
+    updateGrainColor();
+
     const slots: Slot[] = Array.from({ length: 6 }, () => ({
       g: new Float32Array(MAX_GRAINS * FLOATS),
       v: new Float32Array(MAX_GRAINS * FLOATS),
@@ -144,7 +153,7 @@ export function VaporCountdown({
       const dt = Math.min(Math.max((now - last) / 1000, 0), DT_MAX);
       last = now;
       ctx.clearRect(0, 0, cw, ch);
-      ctx.fillStyle = "#ededed";
+      ctx.fillStyle = grainColor;
       let anyActive = false;
 
       for (let s = 0; s < 6; s++) {
@@ -451,12 +460,28 @@ export function VaporCountdown({
       ro.observe(root);
     });
 
+    // re-derive grain color on theme toggle — class/data-theme flips on
+    // documentElement, and OS-level scheme changes fire through matchMedia.
+    const onThemeChange = () => {
+      updateGrainColor();
+      wake();
+    };
+    const mo = new MutationObserver(onThemeChange);
+    mo.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class", "data-theme"],
+    });
+    const colorScheme = window.matchMedia("(prefers-color-scheme: dark)");
+    colorScheme.addEventListener("change", onThemeChange);
+
     return () => {
       disposed = true;
       if (timer) clearTimeout(timer);
       cancelAnimationFrame(raf);
       raf = 0;
       ro?.disconnect();
+      mo.disconnect();
+      colorScheme.removeEventListener("change", onThemeChange);
     };
   }, [targetKey]);
 

@@ -12,6 +12,19 @@ import { useEffect, useRef } from "react";
 
 const DEFAULT_LABELS = ["01", "02", "03", "04", "05", "06"];
 
+// Idle ambient drift — a slow lissajous orbit sampled by the same field so
+// the lattice never sits dead flat when nothing is hovering it.
+const IDLE_AMT = 0.16; // fraction of full field strength at rest
+const IDLE_ANGULAR_SPEED = 0.00022; // rad/ms
+
+// Reads a `#rrggbb` custom property into a "r,g,b" string for rgba() strings.
+function hexToRgbString(hex: string): string | null {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m || !m[1]) return null;
+  const int = parseInt(m[1], 16);
+  return `${(int >> 16) & 255},${(int >> 8) & 255},${int & 255}`;
+}
+
 type FieldSample = { ox: number; oy: number; w: number };
 
 // The shared displacement field. Pull toward the cursor with gaussian
@@ -111,12 +124,26 @@ export function WarpLattice({
     let amt = 0; // field strength, eases 0 <-> 1 with the same lerp
     let hovering = false;
     let litIdx = -1; // card carrying the accent border
+    let visible = true; // IntersectionObserver — pause the loop offscreen
+    let lineRGB = "46,46,46"; // overwritten by readLineColor() before first draw
     const centerX = new Float32Array(n);
     const centerY = new Float32Array(n);
     const scaleCur = new Float32Array(n).fill(1);
     const prevTx = new Float32Array(n);
     const prevTy = new Float32Array(n);
     const out: FieldSample = { ox: 0, oy: 0, w: 0 };
+
+    // Line color tracks the theme's border token — read once at mount and
+    // re-read whenever the root's class list flips (dark <-> light), so
+    // contrast stays correct in both instead of a color coincidentally
+    // tuned for dark mode.
+    const readLineColor = () => {
+      const raw = getComputedStyle(document.documentElement)
+        .getPropertyValue("--border")
+        .trim();
+      lineRGB = hexToRgbString(raw) ?? lineRGB;
+    };
+    readLineColor();
 
     const measure = () => {
       const rect = root.getBoundingClientRect();
@@ -137,7 +164,7 @@ export function WarpLattice({
 
     // Lattice pass: every line sampled every `sampleStep` px, each segment
     // bucketed by field influence so strokes batch into 6 alpha levels —
-    // rgba(46,46,46) rising 0.25 -> 0.6 inside the field.
+    // the theme's --border color rising 0.25 -> 0.6 inside the field.
     const NB = 6;
     const draw = () => {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -203,7 +230,7 @@ export function WarpLattice({
         const a = 0.25 + (0.35 * b) / (NB - 1);
         const p = paths[b];
         if (!p) continue;
-        ctx.strokeStyle = `rgba(46,46,46,${a})`;
+        ctx.strokeStyle = `rgba(${lineRGB},${a})`;
         ctx.stroke(p);
       }
     };
@@ -217,14 +244,40 @@ export function WarpLattice({
         draw();
       });
       ro.observe(root);
-      return () => ro.disconnect();
+      const mo = new MutationObserver(() => {
+        readLineColor();
+        draw();
+      });
+      mo.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["class"],
+      });
+      return () => {
+        ro.disconnect();
+        mo.disconnect();
+      };
     }
 
-    const loop = () => {
+    const loop = (now: number) => {
+      // resting state drifts a slow lissajous orbit through the field at low
+      // amplitude — ambient motion is the default look, not an extra that
+      // only appears on hover
+      let targetX: number;
+      let targetY: number;
+      let amtTarget: number;
+      if (hovering) {
+        targetX = tx;
+        targetY = ty;
+        amtTarget = 1;
+      } else {
+        const ang = now * IDLE_ANGULAR_SPEED;
+        targetX = w / 2 + Math.cos(ang) * w * 0.22;
+        targetY = h / 2 + Math.sin(ang * 1.3) * h * 0.22;
+        amtTarget = IDLE_AMT;
+      }
       // smoothed cursor: lerp per frame, flicks lag and the sheet relaxes
-      sx += (tx - sx) * cursorLerp;
-      sy += (ty - sy) * cursorLerp;
-      const amtTarget = hovering ? 1 : 0;
+      sx += (targetX - sx) * cursorLerp;
+      sy += (targetY - sy) * cursorLerp;
       amt += (amtTarget - amt) * cursorLerp;
 
       // nearest card = the focused one — accent border, the only accent
@@ -282,8 +335,10 @@ export function WarpLattice({
         el.style.transform = `translate3d(${cx}px, ${cy}px, 0) scale(${s})`;
       });
 
-      // sleep when everything has settled — pointer events wake the loop
-      const cursorErr = Math.abs(tx - sx) + Math.abs(ty - sy);
+      // sleep when everything has settled — pointer events wake the loop.
+      // While at rest the idle target itself keeps drifting, so this only
+      // fires once a steady hover position has fully caught up.
+      const cursorErr = Math.abs(targetX - sx) + Math.abs(targetY - sy);
       const settled =
         cursorErr < 0.05 &&
         Math.abs(amtTarget - amt) < 0.001 &&
@@ -329,9 +384,39 @@ export function WarpLattice({
     root.addEventListener("pointerdown", onMove);
     root.addEventListener("pointerleave", onLeave);
 
+    // idle ambient motion only costs cycles while the lattice is on screen
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        visible = entry?.isIntersecting ?? true;
+        if (visible) {
+          wake();
+        } else if (raf) {
+          cancelAnimationFrame(raf);
+          raf = 0;
+        }
+      },
+      { threshold: 0 }
+    );
+    io.observe(root);
+
+    // re-derive the line color from the theme token whenever dark/light
+    // toggles the root's class list
+    const mo = new MutationObserver(() => {
+      readLineColor();
+      draw();
+    });
+    mo.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    if (visible) wake(); // start the ambient orbit immediately, not on first pointer event
+
     return () => {
       cancelAnimationFrame(raf);
       ro.disconnect();
+      io.disconnect();
+      mo.disconnect();
       root.removeEventListener("pointermove", onMove);
       root.removeEventListener("pointerdown", onMove);
       root.removeEventListener("pointerleave", onLeave);

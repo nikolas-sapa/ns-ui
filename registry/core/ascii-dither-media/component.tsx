@@ -55,6 +55,10 @@ export function AsciiDitherMedia({
     const cursor = { x: -1e4, y: -1e4, tx: -1e4, ty: -1e4 };
     let raf = 0;
     let t = 0;
+    // bumped on every sampleImage() dispatch so a late-resolving onload from
+    // a superseded resize (rapid window-resize) can detect it's stale and
+    // bail instead of writing imageLum sized to an out-of-date cols/rows
+    let sampleGen = 0;
 
     const resize = () => {
       dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -70,27 +74,43 @@ export function AsciiDitherMedia({
       if (src) sampleImage();
     };
 
+    // coalesce bursts of resize events (dragging a window edge fires dozens)
+    // into one recompute + one image refetch/redecode
+    let resizeTimer: ReturnType<typeof setTimeout> | null = null;
+    const onResize = () => {
+      if (resizeTimer) clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        resizeTimer = null;
+        resize();
+      }, 150);
+    };
+
     const sampleImage = () => {
       if (!src) return;
+      const gen = ++sampleGen;
+      const sampleCols = cols;
+      const sampleRows = rows;
       const img = new Image();
       img.crossOrigin = "anonymous";
       img.onload = () => {
+        if (gen !== sampleGen) return; // superseded by a newer resize/sample
         const buf = document.createElement("canvas");
-        buf.width = cols;
-        buf.height = rows;
+        buf.width = sampleCols;
+        buf.height = sampleRows;
         const bctx = buf.getContext("2d");
         if (!bctx) return;
         // cover-fit the image into the grid
-        const scale = Math.max(cols / img.width, rows / img.height);
+        const scale = Math.max(sampleCols / img.width, sampleRows / img.height);
         const w = img.width * scale;
         const h = img.height * scale;
-        bctx.drawImage(img, (cols - w) / 2, (rows - h) / 2, w, h);
-        const data = bctx.getImageData(0, 0, cols, rows).data;
-        imageLum = new Float32Array(cols * rows);
-        for (let i = 0; i < cols * rows; i++) {
-          imageLum[i] =
+        bctx.drawImage(img, (sampleCols - w) / 2, (sampleRows - h) / 2, w, h);
+        const data = bctx.getImageData(0, 0, sampleCols, sampleRows).data;
+        const lum = new Float32Array(sampleCols * sampleRows);
+        for (let i = 0; i < sampleCols * sampleRows; i++) {
+          lum[i] =
             (0.2126 * data[i * 4] + 0.7152 * data[i * 4 + 1] + 0.0722 * data[i * 4 + 2]) / 255;
         }
+        imageLum = lum;
         if (reduced) draw(); // static sources still need one paint
       };
       img.src = src;
@@ -162,7 +182,7 @@ export function AsciiDitherMedia({
     };
 
     resize();
-    window.addEventListener("resize", resize);
+    window.addEventListener("resize", onResize);
     canvas.addEventListener("pointermove", onPointer);
     canvas.addEventListener("pointerleave", onLeave);
     if (reduced) {
@@ -172,7 +192,8 @@ export function AsciiDitherMedia({
     }
     return () => {
       cancelAnimationFrame(raf);
-      window.removeEventListener("resize", resize);
+      if (resizeTimer) clearTimeout(resizeTimer);
+      window.removeEventListener("resize", onResize);
       canvas.removeEventListener("pointermove", onPointer);
       canvas.removeEventListener("pointerleave", onLeave);
     };

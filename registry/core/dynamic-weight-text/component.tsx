@@ -44,7 +44,10 @@ export function DynamicWeightText({
         if (Math.abs(target - weights[i]) > 0.5) settled = false;
         el.style.fontWeight = String(Math.round(weights[i]));
       });
-      raf = settled && cursorX === null ? 0 : requestAnimationFrame(loop);
+      // Park once weights converge — target only changes when cursorX moves
+      // (or the pointer leaves), both of which call wake() below, so it's
+      // safe to stop re-scheduling while the pointer sits still.
+      raf = settled ? 0 : requestAnimationFrame(loop);
     };
     const wake = () => {
       if (!raf) raf = requestAnimationFrame(loop);
