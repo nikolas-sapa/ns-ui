@@ -636,9 +636,11 @@ export function FrostbiteSwitch({
         const p = Math.min(1, t / MELT_S);
         // front recedes just ahead of the sliding thumb: a near-linear sweep,
         // but never closer than a few px past the thumb's leading edge
+        const thumbFloor =
+          pendingAt < 0 ? Math.min(w + 6, thumbX + THUMB + 5) : 0;
         const front = Math.max(
           (0.3 * p + 0.7 * easeOutCubic(p) * p) * (w + 6),
-          Math.min(w + 6, thumbX + THUMB + 5)
+          thumbFloor
         );
         for (const d of crystal.plan) {
           if (!d.spawned && d.birth <= meltThr && front > d.x) {
