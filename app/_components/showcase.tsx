@@ -11,12 +11,13 @@ const installFor = (name: string) =>
 /**
  * How many demos may run at once.
  *
- * Only one component (particle-hero) uses three/r3f, so the browser's ~16
- * WebGL-context ceiling is not the binding constraint here — 36 of the 50 are
- * 2D-canvas + requestAnimationFrame loops, so the real budget is CPU. 12 is
- * comfortably above the maximum number of cards that can touch the viewport
- * at once (6 at 1440x900, 9 at 2560x1440 / 3 columns) so an on-screen card is
- * never evicted, and low enough to keep the main thread responsive.
+ * Each preview is now an iframe onto /preview/<name>, so a mount costs a page
+ * load as well as CPU. The cap is nonetheless pinned by the "never evict a
+ * visible card" invariant, not by budget: measured on-screen card counts are
+ * 6 at 1440x900 (2 columns) and 12 at 2560x1080 (3 columns inside the
+ * 1600px container, ~4 rows in view). Setting the cap below 12 therefore
+ * changes nothing at the wide shape — measured: cap 9 still mounted 12 — it
+ * only removes the off-screen preload budget at the narrow ones.
  */
 const MOUNT_CAP = 12;
 

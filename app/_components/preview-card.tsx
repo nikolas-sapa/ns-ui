@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useCallback, useLayoutEffect, useRef, useState } from "react";
-import { demos } from "@/registry/index";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { CopyButton } from "./copy-button";
 
 export type RegistryEntry = {
@@ -13,12 +12,25 @@ export type RegistryEntry = {
 };
 
 /**
- * Demos are authored against a real viewport (most are `min-h-screen`). Each
- * preview therefore renders into a *virtual viewport* sized `160vh x 100vh`
- * — the real viewport height, so `100vh` inside the demo resolves correctly,
- * and 16:10 so it drops into the card's aspect box with no letterboxing —
- * then is CSS-scaled down. Measuring happens before paint so the 1400px-wide
- * demo never flashes at full size.
+ * The preview's viewport, in CSS pixels. 16:10 so it drops into the card's
+ * aspect box with no letterboxing.
+ */
+const FRAME_W = 1440;
+const FRAME_H = 900;
+
+/**
+ * Demos are authored against a real viewport (`min-h-screen`, `vw` units,
+ * `position: fixed`, media queries). Emulating one with a scaled div does not
+ * work: viewport units inside the demo resolve against the *browser* viewport,
+ * not the div, so the card drifted from the direct link at every window shape
+ * that was not exactly 16:10 (a 9vw headline overshot by 48% at 2560x1080).
+ *
+ * So each preview gets a real viewport instead — an iframe onto
+ * `/preview/<name>`, the very page we are trying to match, sized to
+ * {@link FRAME_W}x{@link FRAME_H} and CSS-scaled down into the card. An iframe
+ * *is* a viewport, so `vw`/`vh`/`w-screen`/`fixed`/media queries resolve
+ * exactly as they do on the direct link, at every window shape. `scale()` is a
+ * paint-time effect on the parent and never reaches the frame's own layout.
  */
 export function PreviewCard({
   entry,
@@ -32,31 +44,33 @@ export function PreviewCard({
   installCommand: string;
 }) {
   const boxRef = useRef<HTMLDivElement | null>(null);
-  const stageRef = useRef<HTMLDivElement | null>(null);
   const [scale, setScale] = useState<number | null>(null);
+  const [loaded, setLoaded] = useState(false);
 
   const measure = useCallback(() => {
     const box = boxRef.current;
-    const stage = stageRef.current;
-    if (!box || !stage) return;
-    const stageW = stage.offsetWidth;
-    if (!stageW) return;
-    setScale(box.clientWidth / stageW);
+    if (!box) return;
+    const w = box.clientWidth;
+    if (!w) return;
+    setScale(w / FRAME_W);
   }, []);
 
   useLayoutEffect(() => {
     measure();
     const box = boxRef.current;
     if (!box) return;
+    // The frame is a fixed pixel size, so only the card's own width matters.
     const ro = new ResizeObserver(measure);
     ro.observe(box);
-    // stage height tracks 100vh, which a height-only window resize changes
-    window.addEventListener("resize", measure);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener("resize", measure);
-    };
+    return () => ro.disconnect();
   }, [measure]);
+
+  // Unmounting removes the iframe, which tears its page down. Clearing
+  // `loaded` means a card scrolled back into view shows the placeholder again
+  // until its fresh frame has actually painted, rather than flashing blank.
+  useEffect(() => {
+    if (!active) setLoaded(false);
+  }, [active]);
 
   const setCardRef = useCallback(
     (el: HTMLElement | null) => {
@@ -65,48 +79,53 @@ export function PreviewCard({
     [registerRef, entry.name],
   );
 
-  const Demo = demos[entry.name];
-  const mounted = active && scale !== null && Boolean(Demo);
+  const mounted = active && scale !== null;
 
   return (
     <article
       ref={setCardRef}
       data-name={entry.name}
       data-mounted={mounted ? "true" : "false"}
+      data-loaded={loaded ? "true" : "false"}
       className="group relative flex scroll-mt-24 flex-col"
     >
+      {/* Aspect-locked from first paint, so the frame arriving shifts nothing. */}
       <div
         ref={boxRef}
         className="relative aspect-[16/10] w-full overflow-hidden rounded-md border border-border bg-surface transition-colors duration-200 group-hover:border-muted/40 motion-reduce:transition-none"
       >
-        <Placeholder visible={!mounted} />
-        <div
-          ref={stageRef}
-          // `inert` keeps the demos' own buttons/inputs out of the tab order —
-          // pointer-events:none only blocks the mouse. Interaction belongs on
-          // the full preview page.
-          inert
-          aria-hidden
-          className="pointer-events-none absolute left-0 top-0 h-screen w-[160vh] origin-top-left select-none"
-          style={{
-            transform: `scale(${scale ?? 0})`,
-            visibility: mounted ? "visible" : "hidden",
-          }}
-        >
-          {mounted ? (
-            <Suspense fallback={null}>
-              <Demo />
-            </Suspense>
-          ) : null}
-        </div>
+        <Placeholder visible={!loaded} />
+        {mounted ? (
+          <iframe
+            // `?embed=1` only makes the demo inert inside the frame — see the
+            // preview route. The page it renders is otherwise identical.
+            src={`/preview/${entry.name}?embed=1`}
+            title={`${entry.title} preview`}
+            loading="lazy"
+            tabIndex={-1}
+            // `inert` keeps the demo's own buttons/inputs out of the tab order —
+            // pointer-events:none only blocks the mouse. Interaction belongs on
+            // the full preview page.
+            inert
+            aria-hidden
+            onLoad={() => setLoaded(true)}
+            className="pointer-events-none absolute left-0 top-0 origin-top-left border-0 bg-transparent"
+            style={{
+              width: FRAME_W,
+              height: FRAME_H,
+              transform: `scale(${scale ?? 0})`,
+              opacity: loaded ? 1 : 0,
+            }}
+          />
+        ) : null}
       </div>
 
       <div className="mt-3 flex items-start gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline gap-2">
             {/* The title is the link; `after:inset-0` stretches its hit area
-                over the whole card without covering the description, so the
-                copy is still selectable. */}
+                over the whole card. The description below lifts itself back
+                above that overlay so the copy stays selectable. */}
             <h3 className="truncate text-sm font-medium tracking-tight">
               <Link
                 href={`/preview/${entry.name}`}
@@ -121,7 +140,7 @@ export function PreviewCard({
               </span>
             ) : null}
           </div>
-          <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted">
+          <p className="relative z-10 mt-1 line-clamp-2 text-xs leading-relaxed text-muted">
             {entry.description}
           </p>
         </div>
