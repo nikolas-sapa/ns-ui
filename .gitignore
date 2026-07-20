@@ -4,3 +4,4 @@ public/r/
 next-env.d.ts
 *.tsbuildinfo
 .DS_Store
+.vercel

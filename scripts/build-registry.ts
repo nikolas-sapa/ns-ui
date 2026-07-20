@@ -39,7 +39,8 @@ writeFileSync(
     {
       $schema: "https://ui.shadcn.com/schema/registry.json",
       name: "ns-ui",
-      homepage: "http://localhost:3000",
+      // ponytail: env override so prod builds carry the real URL; localhost stays the dev default
+      homepage: process.env.REGISTRY_HOMEPAGE ?? "http://localhost:3000",
       items,
     },
     null,
