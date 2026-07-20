@@ -2,6 +2,18 @@
 
 Personal registry of high-craft components. Two collections: `core` (Geist-dark restraint) and `loud` (flashy showcase). Spec: `docs/superpowers/specs/2026-07-17-component-library-design.md`.
 
+## Use it
+
+Install any component into a shadcn-configured project, zero config:
+
+```bash
+npx shadcn add https://design.helpmarq.com/r/<name>.json
+```
+
+**For AI agents:** `GET https://design.helpmarq.com/llms.txt` — the whole catalog (props, use-cases,
+install commands) as plain text, one fetch, no MCP server required. Full behavioral detail per
+component: `https://design.helpmarq.com/llms-full.txt`.
+
 ## Run
 
 ```bash

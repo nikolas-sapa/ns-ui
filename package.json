@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "npm run registry:build && next build",
     "start": "next start",
-    "registry:build": "node scripts/build-registry.ts",
+    "registry:build": "node scripts/build-registry.ts && node scripts/build-llms.ts",
+    "llms:build": "node scripts/build-llms.ts",
     "typecheck": "tsc --noEmit",
     "verify": "node scripts/verify.ts"
   },

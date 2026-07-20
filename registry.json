@@ -687,7 +687,7 @@
           "particles",
           "text-reveal"
         ],
-        "instruction": "A dark full-viewport hero section: a WebGL particle field of thousands of small gray dots that drift gently and, within roughly 120px of the cursor, push away, brighten and enlarge with a smooth falloff — plus a constellation effect: thin foreground-token filaments connect nearby lifted dots to their 2-3 nearest neighbors (alpha tapering with proximity, hard-capped segment count) and a faint soft foreground halo rides the eased cursor, everything spring-easing back to rest and fading out when the cursor leaves. Behind it sits a staggered spring-physics text reveal (mono eyebrow, large tight headline, muted subline) and a single accent CTA, with a radial vignette keeping edges quiet. Strictly monochrome dots/filaments/halo (muted-to-foreground only, no accent). Static dot-grid fallback without WebGL, reduced-motion respected (cursor reaction, filaments and halo disabled)."
+        "instruction": "A dark full-viewport hero section: a WebGL particle field of thousands of small gray dots that drift gently, and the cursor acts as a reversed-polarity magnet — dots within roughly 170px are displaced outward along the (dot - cursor) direction with a smooth falloff, opening an elastic void that trails the pointer and springs back to rest when it leaves. No glow, no halo, no linking lines; brightness and dot size never change. Behind it sits a staggered spring-physics text reveal (mono eyebrow, large tight headline, muted subline) and a single accent CTA, with a radial vignette keeping edges quiet. Strictly monochrome dots from the muted token, no accent. Static dot-grid fallback without WebGL, reduced-motion respected (drift and repulsion frozen)."
       }
     },
     {
