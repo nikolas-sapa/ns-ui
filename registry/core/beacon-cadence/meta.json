@@ -1,0 +1,21 @@
+{
+  "name": "beacon-cadence",
+  "title": "Beacon Cadence",
+  "description": "A 20-64px inline status glyph for agent work where the motion pattern itself is the signal — five states, five distinct cadences, no color and no swapped icon.",
+  "collection": "core",
+  "tags": [
+    "status",
+    "indicator",
+    "agent",
+    "svg",
+    "motion",
+    "aria-live",
+    "loading",
+    "icon"
+  ],
+  "instruction": "An inline status glyph, 20-64px, meant to sit beside a Geist Sans text label like 'Solving…'. The whole point: the motion pattern encodes state, not color and not a swapped icon, so it stays legible to someone who cannot see color or is scanning quickly. It renders one field of six SVG dots arranged in a hexagonal ring (24x24 viewBox, clock positions starting at 12 o'clock) plus a center element used by some states, all filled from var(--foreground) with per-dot opacity as the only other channel. Five states, each a genuinely distinct cadence built from the same dot field: working spins the whole ring steadily at constant linear speed (360deg/1.2s), with the six dots pre-set to a decaying comet-trail opacity gradient so even a single frame reads as motion-in-one-direction; searching leaves the ring stationary as a base transform but oscillates it back and forth across a bounded 70deg arc (cubic-bezier ease, 1.7s) with only two adjacent dots bright and the rest dim, reading as a sweeping beam rather than a rotation; awaiting-input holds the entire ring completely still and uniformly dim and instead breathes a separate center dot (scale 0.8-1.22, opacity 0.5-1, ease-in-out, 1.9s) — the only state with motion at the center rather than the ring; blocked holds the ring at one fixed dot permanently missing (a gap the ring can't close) and snap-jitters the whole ring through a few degrees on a stepped (not eased) timing function, a juddery stall distinct from every smooth cadence; done stops moving entirely — full ring, all six dots at full opacity, plus a checkmark path that plays a one-time spring settle-in (cubic-bezier(.34,1.56,.64,1), 420ms) on mount via a React key on state, then holds static. Every state's non-animated resting opacity pattern (comet trail / bright cluster / uniform dim / broken gap / complete ring) is deliberately chosen to be legible completely on its own, because under prefers-reduced-motion every animation class is simply removed via a CSS media query and that resting pattern is exactly what's left — five distinct static glyphs, never five states collapsed into one frozen spinner. Exposes state to assistive tech itself: the root is role=status aria-live=polite wrapping an aria-hidden SVG and a visually hidden (sr-only) text node that reads a plain label ('Working' / 'Searching' / 'Awaiting input' / 'Blocked' / 'Done') by default, overridable via a label prop so it can announce the same copy the consumer displays visually (e.g. 'Solving…') — a moving glyph alone tells a screen reader nothing, this makes every transition an announced live-region update. Props: state (the five-value union, required), size (px, default 24, legible from 20 to 64 since all geometry is in viewBox units and scales proportionally with no fine detail that vanishes small), label (accessible text override), className. Pure CSS keyframes driving SVG transforms and opacity, zero dependencies, no canvas.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "none"
+  }
+}

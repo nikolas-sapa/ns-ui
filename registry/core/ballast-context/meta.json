@@ -1,0 +1,32 @@
+{
+  "name": "ballast-context",
+  "title": "Ballast Context",
+  "description": "A context-window budget meter: one hairline stacked bar segmenting the window into system prompt / tools / history / current turn, told apart by fill pattern instead of color, that visibly resettles rather than jumps when the window compacts.",
+  "collection": "core",
+  "tags": [
+    "meter",
+    "progress",
+    "context-window",
+    "tokens",
+    "llm",
+    "agent",
+    "data-viz",
+    "mono",
+    "dashboard",
+    "budget",
+    "accessibility"
+  ],
+  "instruction": "A context-window budget meter for agent UIs: one hairline stacked bar (rounded-full, 10px tall, 1px --border ring, bg-background bed) segmenting the window into five shares — system prompt, tools, conversation history, current turn, and the unclaimed remainder — plus a font-mono tabular-nums readout and a text legend underneath. Pure DOM/CSS, no canvas, no SVG paint loop, no rAF: each segment is a flex child whose flex-basis is its percentage of max(capacity, used) so the five always sum to a full bar even when usage exceeds capacity, and a min-width floor (3px) on any segment that has real tokens keeps it from vanishing below a legible sliver — the browser's own flex-shrink gives it room by shrinking the larger segments, not a hand-rolled pixel solver, so a segment with zero tokens renders zero width honestly and one with tokens never fakes a mark it didn't earn. The palette is monochrome by house rule, so segments are told apart primarily by a stepped weight ramp (four flat, unmistakably different color-mix() tones against --foreground, never --accent — 22/30/40/52% — so even a 3px sliver reads as a distinct step, with no fill ever falling through to a bare or transparent look that would misread as free space) plus a bonus pattern layered on top of each base tone once a segment is wide enough to resolve it (system stays flat, tools gets a 45deg diagonal hatch, history a stipple, current turn a close vertical hatch that breathes gently — a 2.6s opacity pulse — while it's the live, growing share); a hairline 1px --background divider sits between every adjacent pair so boundaries stay crisp even when two neighboring tones land close together, and the free remainder is bare track. Compaction is just a prop change — react re-renders new percentages and every segment eases into them on a shared 520ms cubic-bezier(0.22,1,0.36,1) flex-basis transition, so the resettle itself is what communicates that compaction happened, never an instant jump. Approaching capacity reads as a warning through form, never a red fill: once free space drops to or below `lowFreeThreshold` (prop, fraction of capacity, default 0.08) or usage exceeds capacity outright, the track gains a slow pulsing inset ring, the readout goes bold and grows a small triangle glyph, and the free segment (if any width remains) grows a diagonal hazard hatch. Props: capacity, system, tools, history, turn (all plain numbers, tokens, fully controlled — the component holds no state of its own), lowFreeThreshold, ariaLabel, className. Accessibility: the bar itself is aria-hidden (a redundant visual against the text that follows); a role=group wraps the whole meter with an accessible name; the token readout is a real aria-live=polite paragraph so async updates get announced; the legend below the bar is plain DOM text — label, exact token count, and a percentage (values under 1% but above zero read '<1%' rather than rounding to a misleading 0%) — for every one of the five shares, so assistive tech gets the real numbers regardless of what the bar renders. The component exposes no interactive controls of its own (display-only, correctly skipped by the tab-reachability check) and renders correctly in both themes since every ink is a CSS custom property, never a literal. prefers-reduced-motion drops the flex-basis transition, the current-turn breathing, and the hazard pulse entirely — every state (empty, mid-fill, near-capacity, over-budget) stays fully legible, just static. Demo: an agent-session card (claude-4.5, 200K-token window) seeded with a realistic mid-fill baseline so the resting screenshot already shows the meter doing its job, plus a live status line, a CALL TOOL button that grows the tools share, a COMPACT CONTEXT button that shrinks history to roughly a ninth of itself and lets the resettle play, a RESET SESSION button, and a background interval that streams small turns into the current-turn share and folds each one into history after it settles — pausing near 94% usage the way a real agent would compact before running out, so the near-capacity warning state is reachable just by leaving the demo running.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "press",
+    "target": "[data-ballast-compact]",
+    "hold": 180,
+    "period": 4500,
+    "delay": 700
+  },
+  "card": {
+    "focus": "[role=\"group\"]",
+    "padding": 1.4
+  }
+}
