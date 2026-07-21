@@ -11,8 +11,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 // enabled feature count); the beam angle integrates a torque spring
 // (θ'' = -42(θ - θ_target) - 5.5θ') for exactly one visible overshoot, with a
 // hard 2s forced-settle deadline so stacked rapid toggles always resolve.
-// Idle default look is a ±0.4° ambient sine sway (6s period), suppressed for
-// 4s after any interaction. A mono verdict caption under the fulcrum updates
+// Idle default look is a ±0.4° ambient sway (~6s period, jittered per mount
+// plus a slow secondary harmonic so it never reads as a metronome), suppressed
+// for 4s after any interaction. A mono verdict caption under the fulcrum updates
 // on settle, never mid-swing. Direct-DOM rAF hot path, refs only.
 // ---------------------------------------------------------------------------
 
@@ -67,7 +68,7 @@ const DEADLINE_MS = 2000; // forced-settle snap
 const MAX_TILT = (9 * Math.PI) / 180; // tilt clamp ±9°
 const TILT_PER_UNIT = 0.028; // rad per weight unit of imbalance
 const AMB_AMP = (0.4 * Math.PI) / 180; // idle sway ±0.4°
-const AMB_PERIOD = 6000; // 6s sway period
+const AMB_PERIOD = 6000; // base sway period (jittered per mount, see engine)
 const SUPPRESS_MS = 4000; // sway suppressed after any interaction
 const OMEGA_EPS = 0.001; // rad/s sleep threshold
 const THETA_EPS = 0.0008; // rad — "at target" threshold
@@ -317,6 +318,12 @@ export function CounterpoiseTiers({
     let deadlineAt = interactionAt + DEADLINE_MS;
     let ramp = 0; // ambient sway ramp 0..1
     let wakeTimer = 0;
+    // ambient sway jitter — randomized once per mount so the idle sway never
+    // reads as a metronomic, perfectly-repeating cycle
+    const ambPeriod = AMB_PERIOD * (0.9 + Math.random() * 0.2); // 5400-6600ms
+    const ambPhase = Math.random() * Math.PI * 2;
+    const amb2Period = ambPeriod * 2.37; // slow secondary harmonic, non-integer ratio
+    const amb2Phase = Math.random() * Math.PI * 2;
 
     const computeTarget = () => {
       const m = modelRef.current;
@@ -360,8 +367,11 @@ export function CounterpoiseTiers({
       ramp = suppressed
         ? Math.max(0, ramp - dt / 0.4)
         : Math.min(1, ramp + dt / 1.5);
-      const thVis =
-        th + ramp * AMB_AMP * Math.sin((now / AMB_PERIOD) * Math.PI * 2);
+      const sway =
+        (Math.sin((now / ambPeriod) * Math.PI * 2 + ambPhase) +
+          0.35 * Math.sin((now / amb2Period) * Math.PI * 2 + amb2Phase)) /
+        1.35;
+      const thVis = th + ramp * AMB_AMP * sway;
       render(thVis);
 
       // sleep: settled, no pending target, and sway suppressed — schedule a

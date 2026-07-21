@@ -64,7 +64,8 @@ const ALI_R = 60;
 const ALI_W = 0.6;
 const COH_R = 90;
 const COH_W = 0.5;
-const MAX_SPEED = 60; // px/s while milling
+const MAX_SPEED = 60; // px/s while milling — keeps the ambient drift calm
+const SEEK_MAX_SPEED = 480; // px/s ceiling while seeking, ramped in with seekT
 const MAX_FORCE = 260; // steering clamp, px/s^2
 const WALL_M = 24; // soft-wall ramp distance
 const WALL_F = 300; // px/s^2 at the edge
@@ -252,13 +253,25 @@ export function FlockStack({
       );
       const seekW = SEEK_W * seekT;
       const mill = 1 - seekT; // milling drive fades as the seek ramps in
-      // the three rules stay summed, attenuated so arrival can actually settle
-      const flockW = 1 - 0.9 * seekT;
-      if (!wantSeek) setResolved(false); // badge fades out on release
+      // the three rules stay summed, attenuated so arrival can actually settle —
+      // must reach exactly 0 at full seek (mirrors `mill`) or a residual
+      // separation force fights the seek force forever at tight slot spacing
+      const flockW = Math.max(0, 1 - seekT);
+      // milling's MAX_SPEED (60 px/s) is deliberately slow for a calm resting
+      // drift, but that same cap made a from-scatter seek arrival take
+      // 5-6+ seconds — far past the 400ms seek-ramp. Ramp a higher travel
+      // ceiling in with seekT so milling speed is untouched at rest and the
+      // seek phase alone gets a real sprint toward the slot.
+      const travelCap = MAX_SPEED + (SEEK_MAX_SPEED - MAX_SPEED) * seekT;
 
       const damp = Math.pow(0.98, dt * 60);
       let allNear = true;
       let allStill = true;
+      // position-only — deliberately NOT the same test as `allNear` (which
+      // also gates on speed): a wake-from-sleep velocity kick can trip a
+      // speed threshold for a frame without the avatar visibly leaving its
+      // slot, and clearing the badge on that alone is exactly the flicker.
+      let anyDeparted = false;
 
       for (let i = 0; i < n; i++) {
         const xi = px[i] ?? 0;
@@ -377,7 +390,7 @@ export function FlockStack({
           const dy = slotY - yi;
           const d = Math.hypot(dx, dy);
           if (d > 1e-4) {
-            const spd = d < ARRIVE_R ? MAX_SPEED * (d / ARRIVE_R) : MAX_SPEED;
+            const spd = d < ARRIVE_R ? travelCap * (d / ARRIVE_R) : travelCap;
             const fx = (dx / d) * spd - vxi;
             const fy = (dy / d) * spd - vyi;
             const s = clampScale(fx, fy);
@@ -386,12 +399,12 @@ export function FlockStack({
           }
         }
 
-        // integrate: damping 0.98/frame normalized, milling speed cap
+        // integrate: damping 0.98/frame normalized, speed cap ramps with seekT
         vxi = (vxi + ax * dt) * damp;
         vyi = (vyi + ay * dt) * damp;
         const sp2 = Math.hypot(vxi, vyi);
-        if (sp2 > MAX_SPEED) {
-          const s = MAX_SPEED / sp2;
+        if (sp2 > travelCap) {
+          const s = travelCap / sp2;
           vxi *= s;
           vyi *= s;
         }
@@ -435,14 +448,22 @@ export function FlockStack({
         vy[i] = vyi;
 
         const speed = Math.hypot(vxi, vyi);
-        if (Math.hypot(sxT - nx, slotY - ny) > 2 || speed >= 1) allNear = false;
+        const slotDist = Math.hypot(sxT - nx, slotY - ny);
+        if (slotDist > 2 || speed >= 1) allNear = false;
         if (speed >= 0.5) allStill = false;
+        if (slotDist > 2) anyDeparted = true;
 
         const el = items[i];
         if (el) {
           el.style.transform = `translate3d(${nx - half}px, ${ny - half}px, 0)`;
         }
       }
+
+      // badge clears only once an avatar has actually left its slot (position,
+      // not the speed-inclusive `allNear`) — not on every momentary
+      // pointer-out, so a hover blip that never visibly moves the row can't
+      // flicker the badge
+      if (resolvedNow && anyDeparted) setResolved(false);
 
       if (wantSeek && seekT >= 1) {
         if (allNear) setResolved(true);

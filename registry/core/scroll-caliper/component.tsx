@@ -369,6 +369,9 @@ export function ScrollCaliper({
     <div ref={rootRef} className={`relative w-full overflow-hidden ${className}`}>
       <div
         ref={scrollerRef}
+        tabIndex={0}
+        role="region"
+        aria-label="scrollable content, measured by caliper"
         className="h-full overflow-y-auto overscroll-contain pr-16 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {children ?? <FallbackSections />}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useId, useMemo, useRef } from "react";
 
 // ---------------------------------------------------------------------------
 // AuroraFlowChart — area chart whose fill IS an aurora curtain. The series
@@ -178,6 +178,8 @@ export function AuroraFlowChart({
   const tipLabelRef = useRef<HTMLSpanElement>(null);
   const tipValueRef = useRef<HTMLSpanElement>(null);
   const tipDeltaRef = useRef<HTMLSpanElement>(null);
+  const liveRef = useRef<HTMLDivElement>(null);
+  const descId = useId();
   const coolSwatchRef = useRef<HTMLSpanElement>(null);
   const warmSwatchRef = useRef<HTMLSpanElement>(null);
   const retargetRef = useRef<((pts: AuroraPoint[]) => void) | null>(null);
@@ -214,6 +216,7 @@ export function AuroraFlowChart({
     const tipLabel = tipLabelRef.current;
     const tipValue = tipValueRef.current;
     const tipDelta = tipDeltaRef.current;
+    const live = liveRef.current;
     if (!root || !canvas || !tip) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
@@ -451,16 +454,21 @@ export function AuroraFlowChart({
     const updateTipContent = () => {
       if (activeIdx < 0 || activeIdx >= count) return;
       const v = values[activeIdx] ?? 0;
-      if (tipLabel) tipLabel.textContent = labels[activeIdx] ?? "";
-      if (tipValue) tipValue.textContent = fmtRef.current(v);
-      if (tipDelta) {
-        if (activeIdx === 0) {
-          tipDelta.textContent = "Δ —";
-        } else {
-          const d = v - (values[activeIdx - 1] ?? v);
-          tipDelta.textContent = `Δ ${d >= 0 ? "+" : "−"}${fmtRef.current(Math.abs(d))}`;
-        }
+      const label = labels[activeIdx] ?? "";
+      const valueText = fmtRef.current(v);
+      let deltaText: string;
+      if (activeIdx === 0) {
+        deltaText = "Δ —";
+      } else {
+        const d = v - (values[activeIdx - 1] ?? v);
+        deltaText = `Δ ${d >= 0 ? "+" : "−"}${fmtRef.current(Math.abs(d))}`;
       }
+      if (tipLabel) tipLabel.textContent = label;
+      if (tipValue) tipValue.textContent = valueText;
+      if (tipDelta) tipDelta.textContent = deltaText;
+      // mirror into the live region so screen readers hear the value on
+      // arrow-step — the tooltip itself is aria-hidden (direct-DOM, not React)
+      if (live) live.textContent = `${label} ${valueText} ${deltaText}`;
     };
 
     // reduced motion: no loop at all — one static frame (noise at t=0),
@@ -697,8 +705,9 @@ export function AuroraFlowChart({
     <div
       ref={rootRef}
       tabIndex={0}
-      role="img"
+      role="group"
       aria-label={ariaLabel}
+      aria-describedby={descId}
       className={`relative w-full cursor-crosshair select-none overflow-hidden rounded-md outline-none focus-visible:ring-2 focus-visible:ring-accent/60 ${className}`}
       style={{ height }}
     >
@@ -706,6 +715,16 @@ export function AuroraFlowChart({
         ref={canvasRef}
         aria-hidden
         className="absolute inset-0 h-full w-full"
+      />
+
+      {/* visually-hidden live region — mirrors the tooltip text so arrow-key
+          stepping announces the active point to screen readers */}
+      <div
+        ref={liveRef}
+        id={descId}
+        aria-live="polite"
+        className="absolute h-px w-px overflow-hidden whitespace-nowrap"
+        style={{ clip: "rect(0 0 0 0)", clipPath: "inset(50%)" }}
       />
 
       {/* y-gridline captions — DOM ink wears text tokens, themes for free */}

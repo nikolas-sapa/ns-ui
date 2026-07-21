@@ -31,6 +31,7 @@ const V_EPS = 0.02; // px/frame sleep epsilon
 const LEVEL_EPS = 0.3; // px distance-to-target sleep epsilon
 const FILL_ALPHA = 0.2;
 const LINE_ALPHA = 0.6;
+const RIM_ALPHA = 0.3; // faint empty-tank baseline shown at zero entropy
 // splash spread across five neighboring columns
 const KERNEL = [0.25, 0.6, 1, 0.6, 0.25] as const;
 
@@ -138,9 +139,8 @@ export function TideGaugePassword({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const reduced = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
+    const motionMq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let reduced = motionMq.matches;
 
     // -- token-derived ink: read at mount, re-derived on theme class change --
     let mutedC: Vec3 = [143, 143, 143];
@@ -183,7 +183,18 @@ export function TideGaugePassword({
       if (!sized) return;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, w, h); // full clear + redraw — nothing accumulates
-      if (level < 0.5) return;
+      if (level < 0.5) {
+        // zero-entropy idle: no fill, but a faint rim a couple px above the
+        // frame's own border (the outermost row is clipped by the frame's
+        // overflow-hidden) so the tank floor reads as a gauge even at rest.
+        ctx.beginPath();
+        ctx.moveTo(0, h - 3);
+        ctx.lineTo(w, h - 3);
+        ctx.strokeStyle = `rgba(${mutedC[0]},${mutedC[1]},${mutedC[2]},${RIM_ALPHA})`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        return;
+      }
       const yBase = h - level;
       const t = Math.max(0, Math.min(1, level / (h * MAX_FILL)));
       const c = mix(mutedC, accentC, t);
@@ -424,6 +435,16 @@ export function TideGaugePassword({
       if (!document.hidden) wake();
     };
     document.addEventListener("visibilitychange", onVis);
+    // live OS-setting re-derive, mirroring the documentElement class observer
+    const onMotionChange = () => {
+      reduced = motionMq.matches;
+      if (reduced) {
+        cancelAnimationFrame(raf);
+        raf = 0;
+        snapFlat();
+      }
+    };
+    motionMq.addEventListener("change", onMotionChange);
 
     return () => {
       cancelAnimationFrame(raf);
@@ -433,6 +454,7 @@ export function TideGaugePassword({
       io.disconnect();
       mo.disconnect();
       document.removeEventListener("visibilitychange", onVis);
+      motionMq.removeEventListener("change", onMotionChange);
       engineRef.current = null;
     };
   }, []);

@@ -331,8 +331,12 @@ export function RippleUnfold({
     };
 
     // classic discrete wave equation, Neumann edges, damping 0.985/step
+    // (0.95/step once every tile has opened — nothing is visibly changing
+    // by then, so the idle tail decays below EPS in under a second instead
+    // of several)
     const step = () => {
       const c = cols;
+      const damping = openedCount >= total ? 0.95 : 0.985;
       for (let j = 0; j < rows; j++) {
         const row = j * c;
         for (let i = 0; i < c; i++) {
@@ -342,7 +346,7 @@ export function RippleUnfold({
           const r = i < c - 1 ? hf[idx + 1]! : hc;
           const u = j > 0 ? hf[idx - c]! : hc;
           const d = j < rows - 1 ? hf[idx + c]! : hc;
-          vf[idx] = (vf[idx]! + ((l + r + u + d) * 0.25 - hc) * 0.5) * 0.985;
+          vf[idx] = (vf[idx]! + ((l + r + u + d) * 0.25 - hc) * 0.5) * damping;
         }
       }
       maxH = 0;

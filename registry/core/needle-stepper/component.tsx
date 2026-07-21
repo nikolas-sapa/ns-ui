@@ -110,6 +110,11 @@ export function NeedleStepper({
   const [internal, setInternal] = useState(() => clampRound(defaultValue));
   const current = isControlled ? clampRound(value) : internal;
   const [text, setText] = useState(() => String(current));
+  // mirrors :hover/:active into data-attrs so the site's synthetic pointer
+  // driver (isTrusted: false) can still demonstrate button feedback —
+  // Chromium never flips real pseudo-classes for script-dispatched events.
+  const [hoverDir, setHoverDir] = useState(0); // -1 | 0 | 1
+  const [pressDir, setPressDir] = useState(0); // -1 | 0 | 1
 
   const valueRef = useRef(current);
   valueRef.current = current;
@@ -450,11 +455,13 @@ export function NeedleStepper({
     if (hold.interval !== null) clearInterval(hold.interval);
     hold.timeout = null;
     hold.interval = null;
+    setPressDir(0);
   };
   const startHold = (dir: number) => (e: React.PointerEvent) => {
     e.preventDefault(); // keep focus where it is; no text selection
     if (disabled) return;
     endHold();
+    setPressDir(dir);
     stepBy(dir); // immediate step
     holdRef.current.timeout = setTimeout(() => {
       holdRef.current.interval = setInterval(
@@ -498,7 +505,8 @@ export function NeedleStepper({
   const atMax = current >= max;
   const btnBase =
     "flex h-11 w-11 shrink-0 select-none items-center justify-center rounded-sm border border-border bg-background text-foreground outline-none transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface";
-  const btnLive = "cursor-pointer hover:border-foreground/30 hover:bg-foreground/[0.06] active:bg-foreground/[0.1]";
+  const btnLive =
+    "cursor-pointer hover:border-foreground/30 hover:bg-foreground/[0.06] active:bg-foreground/[0.1] data-[hover=true]:border-foreground/30 data-[hover=true]:bg-foreground/[0.06] data-[press=true]:bg-foreground/[0.1]";
   const btnDead = "cursor-default opacity-40";
 
   return (
@@ -520,8 +528,14 @@ export function NeedleStepper({
             aria-disabled={disabled || atMin}
             onPointerDown={startHold(-1)}
             onPointerUp={endHold}
-            onPointerLeave={endHold}
+            onPointerEnter={() => setHoverDir(-1)}
+            onPointerLeave={() => {
+              endHold();
+              setHoverDir((d) => (d === -1 ? 0 : d));
+            }}
             onPointerCancel={endHold}
+            data-hover={hoverDir === -1}
+            data-press={pressDir === -1}
             className={`${btnBase} ${disabled || atMin ? btnDead : btnLive}`}
           >
             <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
@@ -567,8 +581,14 @@ export function NeedleStepper({
             aria-disabled={disabled || atMax}
             onPointerDown={startHold(1)}
             onPointerUp={endHold}
-            onPointerLeave={endHold}
+            onPointerEnter={() => setHoverDir(1)}
+            onPointerLeave={() => {
+              endHold();
+              setHoverDir((d) => (d === 1 ? 0 : d));
+            }}
             onPointerCancel={endHold}
+            data-hover={hoverDir === 1}
+            data-press={pressDir === 1}
             className={`${btnBase} ${disabled || atMax ? btnDead : btnLive}`}
           >
             <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">

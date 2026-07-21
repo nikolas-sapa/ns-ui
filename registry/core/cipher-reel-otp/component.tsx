@@ -211,6 +211,16 @@ export function CipherReelOtp({
         }
         return;
       }
+      if (c.mode === "empty") {
+        // idle look: one settled glyph at ambient alpha, never the
+        // multi-row blend — that blend is reserved for in-flight frames
+        const g = STRIP[(((Math.round(c.pos) + c.offset) % N) + N) % N];
+        if (g) {
+          ctx.fillStyle = rgba(fg, c.alpha);
+          ctx.fillText(g, cx, cy);
+        }
+        return;
+      }
       const rowH = ch * 0.6;
       const base = Math.floor(c.pos);
       for (let r = base - 1; r <= base + 2; r++) {

@@ -131,6 +131,11 @@ export function HeatwaveLedger({
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [selected, setSelected] = useState<ReadonlySet<string>>(() => new Set());
   const [reduced, setReduced] = useState(false);
+  // mirrors row hover into a data-attribute alongside the CSS `hover:` classes
+  // below — Chromium never advances `:hover` for the site's synthetic
+  // (isTrusted: false) autoplay driver, so the cosmetic hover tint needs a JS
+  // source of truth too (same pattern as glass-button).
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const wrapRef = useRef<HTMLDivElement>(null);
   const tableRef = useRef<HTMLTableElement>(null);
@@ -531,11 +536,12 @@ export function HeatwaveLedger({
 
               // token-relative fills only: hover raises one surface step,
               // selection sits one step above that
+              // (`data-[hover=true]` mirrors `:hover` for synthetic/driver input)
               const bg = isSel
                 ? "bg-foreground/[0.06]"
                 : isHot && reduced
-                  ? "bg-foreground/[0.04] hover:bg-foreground/[0.06]"
-                  : "hover:bg-foreground/[0.04]";
+                  ? "bg-foreground/[0.04] hover:bg-foreground/[0.06] data-[hover=true]:bg-foreground/[0.06]"
+                  : "hover:bg-foreground/[0.04] data-[hover=true]:bg-foreground/[0.04]";
 
               return (
                 <tr
@@ -546,8 +552,15 @@ export function HeatwaveLedger({
                   }}
                   style={style}
                   aria-selected={isSel}
-                  onPointerEnter={isHot && !reduced ? () => setFreeze(row.id, 1) : undefined}
-                  onPointerLeave={isHot && !reduced ? () => setFreeze(row.id, 0) : undefined}
+                  data-hover={hoveredId === row.id}
+                  onPointerEnter={() => {
+                    setHoveredId(row.id);
+                    if (isHot && !reduced) setFreeze(row.id, 1);
+                  }}
+                  onPointerLeave={() => {
+                    setHoveredId((h) => (h === row.id ? null : h));
+                    if (isHot && !reduced) setFreeze(row.id, 0);
+                  }}
                   onFocus={isHot && !reduced ? () => setFreeze(row.id, 1) : undefined}
                   onBlur={isHot && !reduced ? onRowBlur(row.id) : undefined}
                   className={`border-b border-border transition-colors duration-150 last:border-b-0 ${bg}`}

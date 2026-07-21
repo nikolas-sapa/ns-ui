@@ -211,6 +211,8 @@ export function EventHorizonCommand({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const pillRefs = useRef(new Map<string, HTMLDivElement>());
+  // lazily-measured pill half-size, used to keep labels clear of the input
+  const pillSizeRef = useRef(new Map<string, { hw: number; hh: number }>());
   const orbitRef = useRef(new Map<string, Orbit>());
   const clearScriptRef = useRef<(() => void) | null>(null);
   const scriptStoppedRef = useRef(false);
@@ -379,6 +381,11 @@ export function EventHorizonCommand({
     let smoothConf = 0.5;
     let flash = 0; // accent pulse on consumption
     let colors = readTokens(root);
+    // input's own footprint (half-extents), so orbiting labels can be kept
+    // clear of it — re-measured on resize, not per-frame (layout is static
+    // between resizes: fixed width/padding, so no per-frame reflow cost)
+    let inputHalfW = 0;
+    let inputHalfH = 0;
     const dampC = 2 * ZETA * Math.sqrt(SPRING_K);
 
     const resize = () => {
@@ -389,6 +396,9 @@ export function EventHorizonCommand({
       canvas.width = Math.max(1, Math.round(w * dpr));
       canvas.height = Math.max(1, Math.round(h * dpr));
       segs = [];
+      const inputRect = inputRef.current?.getBoundingClientRect();
+      inputHalfW = inputRect ? inputRect.width / 2 : 0;
+      inputHalfH = inputRect ? inputRect.height / 2 : 0;
     };
     resize();
 
@@ -489,9 +499,29 @@ export function EventHorizonCommand({
         // pill into the bottom-right corner)
         const el = pillRefs.current.get(o.id);
         if (el) {
+          // keep-out: the input sits centered on the same origin the pills
+          // orbit around, so any pill whose orbit swings through the
+          // horizontal band behind it would render with its label clipped
+          // under the input chrome. Nudge the LABEL (not the physics
+          // ox/oy above, which stay true for the trail) just clear of the
+          // input's measured footprint — orbit radius/speed are untouched.
+          let labelOx = ox;
+          let labelOy = oy;
+          if (inputHalfW > 0) {
+            let size = pillSizeRef.current.get(o.id);
+            if (!size) {
+              size = { hw: el.offsetWidth / 2, hh: el.offsetHeight / 2 };
+              if (size.hw > 0 && size.hh > 0) pillSizeRef.current.set(o.id, size);
+            }
+            const clearW = inputHalfW + size.hw;
+            const clearH = inputHalfH + size.hh + 4; // small breathing gap
+            if (Math.abs(labelOx) < clearW && Math.abs(labelOy) < clearH) {
+              labelOy = (labelOy < 0 ? -1 : 1) * clearH;
+            }
+          }
           el.style.opacity = o.alpha.toFixed(3);
           el.style.visibility = "visible";
-          el.style.transform = `translate(-50%,-50%) translate3d(${ox.toFixed(2)}px,${oy.toFixed(2)}px,0) scale(${o.scale.toFixed(3)})`;
+          el.style.transform = `translate(-50%,-50%) translate3d(${labelOx.toFixed(2)}px,${labelOy.toFixed(2)}px,0) scale(${o.scale.toFixed(3)})`;
         }
       }
 

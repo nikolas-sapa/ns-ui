@@ -64,6 +64,14 @@ function mulberry32(a: number) {
 const SLEEP_MS = 500; // pointer-idle threshold before the loop may sleep
 const ENERGY_EPS = 0.02; // residual-exposure floor — below this, sleep + wipe
 const INTRO_MS = 2000; // scripted figure-eight duration on load
+// decay is batched over this many seconds of real elapsed time before being
+// applied to the buffers. Canvas alpha is an 8-bit channel — the per-frame
+// erosion this represents (~0.3% of a stroke's alpha at 60fps) rounds away to
+// nothing every single frame, so the buffer never visibly fades. Batching the
+// same exponential math over a bigger dt removes enough alpha in one op to
+// survive 8-bit rounding, with no change to the actual half-life curve since
+// exp(-dt/tau) compounds identically whether applied in small or large steps.
+const DECAY_STEP_S = 0.15;
 
 export function SolargraphHero({
   children,
@@ -326,6 +334,7 @@ export function SolargraphHero({
     let energy = 0; // running sum of recent stroke alpha, decays with tau
     let introActive = intro;
     let introT0 = -1;
+    let decayAccum = 0; // real seconds of decay owed to the buffers, batched
 
     const loop = (now: number) => {
       raf = 0;
@@ -360,7 +369,12 @@ export function SolargraphHero({
         }
       }
 
-      decay(dt);
+      // batch the destination-out erosion — see DECAY_STEP_S above
+      decayAccum += dt;
+      if (decayAccum >= DECAY_STEP_S) {
+        decay(decayAccum);
+        decayAccum = 0;
+      }
       energy *= Math.exp(-dt / tau);
 
       if (hasChain) {
@@ -397,6 +411,7 @@ export function SolargraphHero({
         clearBuffers(); // wipe the invisible residue so wake starts clean
         composite();
         energy = 0;
+        decayAccum = 0;
         last = 0;
         return; // raf stays 0 — genuinely asleep
       }

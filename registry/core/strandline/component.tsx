@@ -133,6 +133,7 @@ type Wave = {
   sTip: number;
   recedeP: number;
   deposits: boolean; // false for hover replays — no residue ring
+  deposited: boolean; // true once breakWave() has actually landed the marker
   done: boolean;
   segD: Float32Array; // crest comb: distance behind tip
   segP: Float32Array; // perpendicular jitter ±3px
@@ -217,6 +218,11 @@ export function Strandline({
     let visible = true;
     let mainWave: Wave | null = null;
     let replayWave: Wave | null = null;
+    // true only while a wave is still in flight and hasn't landed yet — once
+    // breakWave() fires, the marker is already stranded so it must not be
+    // double-counted as "reserved" for the rest of the recede tail.
+    const reserved = (wv: Wave | null): wv is Wave =>
+      wv !== null && wv.deposits && !wv.deposited;
     const queue: number[] = [];
     const flecks: Fleck[] = [];
     let strandedCount = 0;
@@ -334,6 +340,7 @@ export function Strandline({
         sTip: 0,
         recedeP: 0,
         deposits,
+        deposited: false,
         done: false,
         segD,
         segP,
@@ -400,7 +407,7 @@ export function Strandline({
 
     const syncControls = () => {
       const launched =
-        strandedCount + queue.length + (mainWave && mainWave.deposits ? 1 : 0);
+        strandedCount + queue.length + (reserved(mainWave) ? 1 : 0);
       if (counterRef.current)
         counterRef.current.textContent = `${reduced ? n : strandedCount} / ${n}`;
       if (nextRef.current) nextRef.current.disabled = reduced || launched >= n;
@@ -592,7 +599,10 @@ export function Strandline({
     const breakWave = (wv: Wave, now: number) => {
       const bx = xs[wv.target]!;
       spawnFlecks(bx, axisY, wv.deposits ? 24 : 8, now);
-      if (wv.deposits) depositMarker(wv.target, now);
+      if (wv.deposits) {
+        depositMarker(wv.target, now);
+        wv.deposited = true;
+      }
     };
 
     const stepWave = (wv: Wave, now: number) => {
@@ -694,7 +704,7 @@ export function Strandline({
       advance: () => {
         if (reduced) return;
         const launched =
-          strandedCount + queue.length + (mainWave && mainWave.deposits ? 1 : 0);
+          strandedCount + queue.length + (reserved(mainWave) ? 1 : 0);
         if (launched >= n) return;
         queue.push(launched);
         syncControls();
@@ -703,7 +713,7 @@ export function Strandline({
       retreat: () => {
         if (reduced) return;
         if (queue.length > 0) queue.pop();
-        else if (mainWave && mainWave.deposits) {
+        else if (reserved(mainWave)) {
           // cancel the incoming wave: it recedes without depositing
           mainWave.deposits = false;
           if (mainWave.phase === "travel") {
