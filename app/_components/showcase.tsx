@@ -7,7 +7,19 @@ import { ThemeToggle } from "./theme-toggle";
 import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
 
 const installFor = (name: string) =>
-  `npx shadcn@latest add ${REGISTRY_ORIGIN}/r/${name}.json`;
+  `npx shadcn add ${REGISTRY_ORIGIN}/r/${name}.json`;
+
+/**
+ * The header command used to read `/r/[name].json`, which copies a command
+ * that fails. It now shows a real component so the clipboard always holds
+ * something runnable; the caption says any name substitutes.
+ */
+const EXAMPLE_NAME = "particle-hero";
+
+export type ShowcaseEntry = RegistryEntry & { tags: string[] };
+
+const FOOTER_LINK =
+  "rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent";
 
 /**
  * How many demos may run at once.
@@ -27,8 +39,9 @@ const PRELOAD_MARGIN = 600;
 
 type Filter = "all" | "core" | "loud";
 
-export function Showcase({ items }: { items: RegistryEntry[] }) {
+export function Showcase({ items }: { items: ShowcaseEntry[] }) {
   const [filter, setFilter] = useState<Filter>("all");
+  const [query, setQuery] = useState("");
 
   const counts = useMemo(() => {
     let core = 0;
@@ -40,11 +53,33 @@ export function Showcase({ items }: { items: RegistryEntry[] }) {
     return { all: items.length, core, loud };
   }, [items]);
 
-  const visibleItems = useMemo(
-    () =>
-      filter === "all" ? items : items.filter((i) => i.collection === filter),
-    [items, filter],
-  );
+  /**
+   * One lowercase string per component to match against. 50 items, so this is
+   * a plain substring scan on every keystroke — no index, no debounce.
+   */
+  const haystacks = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const i of items) {
+      map.set(
+        i.name,
+        `${i.name} ${i.title} ${i.description} ${i.tags.join(" ")} ${
+          i.collection
+        }`.toLowerCase(),
+      );
+    }
+    return map;
+  }, [items]);
+
+  const visibleItems = useMemo(() => {
+    const inCollection =
+      filter === "all" ? items : items.filter((i) => i.collection === filter);
+    const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+    if (terms.length === 0) return inCollection;
+    return inCollection.filter((i) => {
+      const hay = haystacks.get(i.name) ?? "";
+      return terms.every((t) => hay.includes(t));
+    });
+  }, [items, filter, query, haystacks]);
 
   const { registerRef, isActive } = useMountManager();
 
@@ -81,18 +116,20 @@ export function Showcase({ items }: { items: RegistryEntry[] }) {
           <div className="mt-3 flex w-full items-start gap-2 rounded-md border border-border bg-surface py-2 pl-3.5 pr-1.5">
             {/* explicit <wbr> so a wrap lands after the origin, not mid-domain */}
             <code className="min-w-0 flex-1 break-words font-mono text-xs leading-6 text-foreground">
-              npx shadcn@latest add {REGISTRY_ORIGIN}
+              npx shadcn add {REGISTRY_ORIGIN}
               <wbr />
-              /r/<span className="text-muted">[name]</span>.json
+              /r/{EXAMPLE_NAME}.json
             </code>
             <CopyButton
               variant="inline"
-              value={`npx shadcn@latest add ${REGISTRY_ORIGIN}/r/[name].json`}
+              value={installFor(EXAMPLE_NAME)}
               label="Copy install command"
             />
           </div>
           <p className="mt-2.5 text-xs leading-relaxed text-muted">
-            Or copy a component&rsquo;s exact command from its card.
+            Runs as-is. Swap{" "}
+            <span className="font-mono text-foreground">{EXAMPLE_NAME}</span>
+            {" for any component name, or copy a card’s exact command."}
           </p>
         </div>
       </header>
@@ -127,15 +164,50 @@ export function Showcase({ items }: { items: RegistryEntry[] }) {
               );
             })}
           </div>
-          <p className="hidden font-mono text-xs text-muted sm:block">
-            {visibleItems.length} shown
-          </p>
+          <div className="flex min-w-0 items-center gap-3">
+            <label htmlFor="component-search" className="sr-only">
+              Search components
+            </label>
+            <input
+              id="component-search"
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search"
+              autoComplete="off"
+              spellCheck={false}
+              className="w-20 min-w-0 rounded-sm border border-border bg-surface px-2 py-1 text-sm text-foreground outline-none transition-colors placeholder:text-muted focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none sm:w-56 sm:px-2.5"
+            />
+            <p
+              aria-live="polite"
+              className="shrink-0 font-mono text-[11px] text-muted sm:text-xs"
+            >
+              {visibleItems.length} shown
+            </p>
+          </div>
         </div>
       </div>
 
       {/* Two columns up to 2xl: the demos are full-viewport designs, so a
           wider card is the difference between reading as a component and
           reading as a smudge. */}
+      {visibleItems.length === 0 ? (
+        <div className="mt-24 text-center">
+          <p className="text-sm text-muted">
+            No component matches{" "}
+            <span className="font-mono text-foreground">{query}</span>
+            {filter === "all" ? "" : ` in ${filter}`}.
+          </p>
+          <button
+            type="button"
+            onClick={() => setQuery("")}
+            className="mt-3 rounded-sm px-2 py-1 font-mono text-xs text-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            Clear search
+          </button>
+        </div>
+      ) : null}
+
       <div className="mt-10 grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-2 2xl:grid-cols-3">
         {visibleItems.map((entry) => (
           <PreviewCard
@@ -148,15 +220,34 @@ export function Showcase({ items }: { items: RegistryEntry[] }) {
         ))}
       </div>
 
-      <footer className="mt-24 border-t border-border pt-6 font-mono text-xs text-muted">
-        For AI agents:{" "}
-        <a href="/llms.txt" className="underline underline-offset-2 hover:text-foreground">
-          /llms.txt
-        </a>{" "}
-        ·{" "}
-        <a href="/llms-full.txt" className="underline underline-offset-2 hover:text-foreground">
-          /llms-full.txt
-        </a>
+      <footer className="mt-24 flex flex-wrap items-baseline justify-between gap-x-8 gap-y-3 border-t border-border pt-6 font-mono text-xs text-muted">
+        <p>
+          For AI agents:{" "}
+          <a href="/llms.txt" className={FOOTER_LINK}>
+            /llms.txt
+          </a>{" "}
+          ·{" "}
+          <a href="/llms-full.txt" className={FOOTER_LINK}>
+            /llms-full.txt
+          </a>
+        </p>
+        <p>
+          <a href="/changelog" className={FOOTER_LINK}>
+            Changelog
+          </a>{" "}
+          ·{" "}
+          {/* Owner's call to keep this live: the repo is public, MIT and pushed —
+              it 404s only because of an account-level GitHub flag pending appeal.
+              Expected to resolve itself when the flag lifts. */}
+          <a href="https://github.com/nikolas-sapa/ns-ui" className={FOOTER_LINK}>
+            GitHub
+          </a>{" "}
+          ·{" "}
+          <a href="https://nikolas.helpmarq.com" className={FOOTER_LINK}>
+            Built by Nikolas
+          </a>
+        </p>
+        <p className="mt-2">Built with love for developers, with Claude Code.</p>
       </footer>
     </main>
   );

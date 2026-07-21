@@ -4,10 +4,30 @@ import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { ThemeSync } from "./_components/theme-sync";
 import { NO_FLASH_SCRIPT } from "@/lib/theme";
+import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
+
+const title = "ns-ui";
+const description = "Personal component registry";
 
 export const metadata: Metadata = {
-  title: "ns-ui",
-  description: "Personal component registry",
+  // Resolves every relative URL in this metadata object (including the
+  // opengraph-image/twitter-image file conventions) against the same
+  // env-driven origin the rest of the app uses — so pointing the registry at
+  // a new host stays the one-variable change lib/registry-origin.ts promises.
+  metadataBase: new URL(REGISTRY_ORIGIN),
+  title,
+  description,
+  openGraph: {
+    title,
+    description,
+    siteName: title,
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+  },
 };
 
 export default function RootLayout({

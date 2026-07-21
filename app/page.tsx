@@ -1,13 +1,14 @@
 import registry from "@/registry.json";
-import { Showcase } from "./_components/showcase";
-import type { RegistryEntry } from "./_components/preview-card";
+import { Showcase, type ShowcaseEntry } from "./_components/showcase";
 
-const items: RegistryEntry[] = registry.items
+const items: ShowcaseEntry[] = registry.items
   .map((item) => ({
     name: item.name,
     title: item.title,
     description: item.description,
     collection: item.meta?.collection ?? "core",
+    // Search matches tags too, so the projection carries them to the client.
+    tags: item.meta?.tags ?? [],
   }))
   .sort((a, b) => a.title.localeCompare(b.title));
 

@@ -3,8 +3,23 @@
   "title": "Glass Button",
   "description": "Liquid-glass button with translucent blurred surface and press states.",
   "collection": "core",
-  "tags": ["button", "glass", "micro-interaction"],
+  "tags": [
+    "button",
+    "glass",
+    "micro-interaction"
+  ],
   "useWhen": "the default general-purpose button — translucent liquid-glass surface with hover lift and press states; use for any ordinary CTA, not a destructive action needing deliberate confirmation.",
   "instruction": "A liquid-glass button: translucent blurred surface, thin light border, subtle hover lift and press scale, visible keyboard focus ring, for a dark minimal (Geist-style) design system.",
-  "dependencies": []
+  "dependencies": [],
+  "card": {
+    "focus": "button",
+    "padding": 1.1
+  },
+  "autoplay": {
+    "mode": "press",
+    "target": "button",
+    "hold": 1400,
+    "period": 3600,
+    "delay": 700
+  }
 }

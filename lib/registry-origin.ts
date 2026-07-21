@@ -4,9 +4,12 @@
 // apart the way they just did (llms.txt pointed at design.helpmarq.com while
 // the showcase pointed at ns-ui-registry.vercel.app).
 //
-// design.helpmarq.com is the intended custom domain but its DNS record
-// hasn't resolved yet, so the default stays the origin that resolves today.
-// Once DNS resolves: set NEXT_PUBLIC_REGISTRY_ORIGIN=https://design.helpmarq.com
-// in Vercel (all environments) and redeploy — no source change needed.
+// design.helpmarq.com is now live (cert issued, serving the full registry) and
+// is the canonical origin, so it is the DEFAULT rather than an env-only
+// override. That matters: the env var is only set on Vercel, so while the
+// fallback pointed at the vercel.app host, any local build, fresh clone or
+// artifact generated off-platform baked the wrong URL into llms.txt,
+// registry.json and every install command. ns-ui-registry.vercel.app still
+// serves the identical files as an alias.
 export const REGISTRY_ORIGIN =
-  process.env.NEXT_PUBLIC_REGISTRY_ORIGIN ?? "https://ns-ui-registry.vercel.app";
+  process.env.NEXT_PUBLIC_REGISTRY_ORIGIN ?? "https://design.helpmarq.com";

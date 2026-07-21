@@ -5,7 +5,7 @@ dependency-light components (a Geist-dark "core" set + a deliberately flashy "lo
 Every component installs as plain source you own — no runtime package, no MCP server.
 
 Install directly, zero config:
-  npx shadcn add https://ns-ui-registry.vercel.app/r/<name>.json
+  npx shadcn add https://design.helpmarq.com/r/<name>.json
 
 This drops component.tsx into your project (components/ui/<name>.tsx) and pulls its npm
 deps via shadcn. No account, no API key.
@@ -18,7 +18,7 @@ Requirements before you use any of these:
   utility classes — no shipped CSS file). Fonts assumed Geist Sans / Geist Mono (components
   inherit font-family, they don't set it). Per-component npm deps listed below as "deps".
 
-Full behavioral detail (long form, one paragraph per component): https://ns-ui-registry.vercel.app/llms-full.txt
+Full behavioral detail (long form, one paragraph per component): https://design.helpmarq.com/llms-full.txt
 
 Each block below:
   ## <name>  [collection]
@@ -26,7 +26,7 @@ Each block below:
   use when: <selection guidance — the problem it solves, not a restatement of the title>
   props: <condensed public prop signature: name, type, optionality, default, purpose>
   deps: <npm dependencies beyond react>
-  install: npx shadcn add https://ns-ui-registry.vercel.app/r/<name>.json
+  install: npx shadcn add https://design.helpmarq.com/r/<name>.json
 
 ## ascii-dither-media  [core]
 ASCII Dither Media — Luminance-to-glyph canvas renderer: ASCII, Bayer-dither, and dot-matrix modes w…
@@ -38,7 +38,7 @@ props:
   cursorRadius?: number = 140
   className?: string
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/ascii-dither-media.json
+install: npx shadcn add https://design.helpmarq.com/r/ascii-dither-media.json
 
 ## cardio-baseline  [core]
 Cardio Baseline — Text whose baseline is a live EKG trace: each beat fires a QRS spike that trave…
@@ -48,7 +48,7 @@ props:
   bpm?: number = 50
   className?: string
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/cardio-baseline.json
+install: npx shadcn add https://design.helpmarq.com/r/cardio-baseline.json
 
 ## caustic-coverflow  [core]
 Caustic Coverflow — 3D coverflow gallery whose frosted-glass cards run a live caustic-light simulat…
@@ -61,7 +61,7 @@ props:
   className?: string
   aria-label?: string = "Coverflow gallery"
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/caustic-coverflow.json
+install: npx shadcn add https://design.helpmarq.com/r/caustic-coverflow.json
 
 ## caustic-select  [core]
 Caustic Select — Single-select whose frosted-glass trigger and listbox sit over drifting caustic…
@@ -77,7 +77,7 @@ props:
   name?: string
   className?: string
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/caustic-select.json
+install: npx shadcn add https://design.helpmarq.com/r/caustic-select.json
 
 ## chronicle-bar  [core]
 Chronicle Bar — Determinate progress bar whose leading edge narrates each phase in typed mono,…
@@ -88,7 +88,7 @@ props:
   className?: string
   aria-label?: string = "Progress"
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/chronicle-bar.json
+install: npx shadcn add https://design.helpmarq.com/r/chronicle-bar.json
 
 ## cipher-reel-otp  [core]
 Cipher Reel OTP — 6-box code entry where each box is a tiny slot-machine cipher reel: keystrokes…
@@ -105,7 +105,7 @@ props:
   onComplete?: (code: string) => void
   className?: string
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/cipher-reel-otp.json
+install: npx shadcn add https://design.helpmarq.com/r/cipher-reel-otp.json
 
 ## counterpoise-tiers  [core]
 Counterpoise Tiers — Pricing section rendered as a literal balance scale: two tier cards hang as pan…
@@ -116,7 +116,7 @@ props:
   annualMultiplier?: number = 0.8
   className?: string
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/counterpoise-tiers.json
+install: npx shadcn add https://design.helpmarq.com/r/counterpoise-tiers.json
 
 ## crack-compare  [core]
 Crack Compare — Before/after comparison slider whose divider is a living Voronoi crack seam — f…
@@ -132,7 +132,7 @@ props:
   onChange?: (value: number) => void
   className?: string
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/crack-compare.json
+install: npx shadcn add https://design.helpmarq.com/r/crack-compare.json
 
 ## decrypt-text  [core]
 Decrypt Text — Scramble-to-decode text reveal with left-to-right character locking.
@@ -145,7 +145,7 @@ props:
   className?: string
   replayKey?: number = 0
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/decrypt-text.json
+install: npx shadcn add https://design.helpmarq.com/r/decrypt-text.json
 
 ## drape-menu  [core]
 Drape Menu — Dropdown whose panel is a live verlet cloth pinned to the trigger — it falls an…
@@ -157,7 +157,7 @@ props:
   minWidth?: number = 264
   className?: string
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/drape-menu.json
+install: npx shadcn add https://design.helpmarq.com/r/drape-menu.json
 
 ## dynamic-weight-text  [core]
 Dynamic Weight Text — Letters morph variable-font weight by cursor proximity — pure typography intera…
@@ -169,7 +169,7 @@ props:
   sigma?: number = 90
   className?: string
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/dynamic-weight-text.json
+install: npx shadcn add https://design.helpmarq.com/r/dynamic-weight-text.json
 
 ## fling-segment  [core]
 Fling Segment — Segmented control with a visibly grabbable pill (grip dots, hover lift) — fling…
@@ -183,7 +183,7 @@ props:
   className?: string
   aria-label?: string = "View"
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/fling-segment.json
+install: npx shadcn add https://design.helpmarq.com/r/fling-segment.json
 
 ## flock-stack  [core]
 Flock Stack — Avatar stack that mills as a live boids flock and resolves into the classic ove…
@@ -195,7 +195,7 @@ props:
   className?: string = "h-[120px]"
   aria-label?: string
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/flock-stack.json
+install: npx shadcn add https://design.helpmarq.com/r/flock-stack.json
 
 ## frostbite-switch  [core]
 Frostbite Switch — iOS-style switch whose OFF state freezes over: seeded dendritic frost feathers…
@@ -208,21 +208,21 @@ props:
   className?: string
   aria-label?: string = "Toggle"
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/frostbite-switch.json
+install: npx shadcn add https://design.helpmarq.com/r/frostbite-switch.json
 
 ## glass-button  [core]
 Glass Button — Liquid-glass button with translucent blurred surface and press states.
 use when: the default general-purpose button — translucent liquid-glass surface with hover lift and press states; use for any ordinary CTA, not a destructive action needing deliberate confirmation.
 props: (extends ButtonHTMLAttributes<HTMLButtonElement>)
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/glass-button.json
+install: npx shadcn add https://design.helpmarq.com/r/glass-button.json
 
 ## glass-panel  [core]
 Glass Panel — Container-level liquid glass: blur, saturation, noise grain, specular rim, grad…
 use when: a card (surface, glass, container).
 props: (extends HTMLAttributes<HTMLDivElement>)
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/glass-panel.json
+install: npx shadcn add https://design.helpmarq.com/r/glass-panel.json
 
 ## heatwave-ledger  [core]
 Heatwave Ledger — Dense ops table where rows above a heat threshold shimmer like air over asphalt…
@@ -234,7 +234,7 @@ props:
   timestamp?: string = "updated 09:41:07 U…
   className?: string
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/heatwave-ledger.json
+install: npx shadcn add https://design.helpmarq.com/r/heatwave-ledger.json
 
 ## hold-to-confirm  [core]
 Hold to Confirm — Press-and-hold destructive action — monochrome ink pours up from the press poin…
@@ -246,7 +246,7 @@ props:
   onConfirm?: () => void
   className?: string
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/hold-to-confirm.json
+install: npx shadcn add https://design.helpmarq.com/r/hold-to-confirm.json
 
 ## ligature-melt  [core]
 Ligature Melt — Headline whose glyphs liquefy near the cursor — an SVG gooey filter fuses neigh…
@@ -259,7 +259,7 @@ props:
   blur?: number = 6
   className?: string
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/ligature-melt.json
+install: npx shadcn add https://design.helpmarq.com/r/ligature-melt.json
 
 ## lodestone-hero  [core]
 Lodestone Hero — Full-bleed hero where the headline exists twice: crisp DOM type above, and bene…
@@ -275,7 +275,7 @@ props:
   ambientFilings?: number = 600
   className?: string
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/lodestone-hero.json
+install: npx shadcn add https://design.helpmarq.com/r/lodestone-hero.json
 
 ## loupe-slider  [core]
 Loupe Slider — Slider read through a circular magnifying loupe riding the thumb: the tick bene…
@@ -294,7 +294,7 @@ props:
   className?: string
   aria-label?: string = "Value"
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/loupe-slider.json
+install: npx shadcn add https://design.helpmarq.com/r/loupe-slider.json
 
 ## magnetic-dock  [core]
 Magnetic Dock — Cursor-proximity magnification row with Gaussian falloff — macOS-dock physics f…
@@ -306,7 +306,7 @@ props:
   lift?: number = 16
   className?: string
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/magnetic-dock.json
+install: npx shadcn add https://design.helpmarq.com/r/magnetic-dock.json
 
 ## mercury-minimap  [core]
 Mercury Minimap — TOC minimap where scroll progress is a column of liquid mercury — a gooey SVG b…
@@ -319,7 +319,7 @@ props:
   damping?: number = 20
   className?: string
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/mercury-minimap.json
+install: npx shadcn add https://design.helpmarq.com/r/mercury-minimap.json
 
 ## moire-dial  [core]
 Moire Dial — Weighted rotary knob tuned like a radio: counter-rotating line gratings shimmer…
@@ -334,7 +334,7 @@ props:
   className?: string
   aria-label?: string = "Moire tuning dial"
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/moire-dial.json
+install: npx shadcn add https://design.helpmarq.com/r/moire-dial.json
 
 ## needle-stepper  [core]
 Needle Stepper — Bounded numeric stepper with a large mono value readout, prominent -/+ buttons,…
@@ -351,7 +351,7 @@ props:
   disabled?: boolean = false
   className?: string
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/needle-stepper.json
+install: npx shadcn add https://design.helpmarq.com/r/needle-stepper.json
 
 ## particle-hero  [core]
 Particle Hero — Full-viewport hero with a cursor-reactive WebGL particle field and staggered te…
@@ -364,7 +364,7 @@ props:
   ctaHref?: string
   onCtaClick?: () => void
 deps: three, @react-three/fiber, motion
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/particle-hero.json
+install: npx shadcn add https://design.helpmarq.com/r/particle-hero.json
 
 ## particle-tunnel-scrub  [core]
 Particle Tunnel Scrub — Scroll scrubs a camera through a monochrome point tunnel — velocity stretches d…
@@ -374,7 +374,7 @@ props:
   pointCount?: number = 3000
   className?: string
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/particle-tunnel-scrub.json
+install: npx shadcn add https://design.helpmarq.com/r/particle-tunnel-scrub.json
 
 ## respire-field  [core]
 Respire Field — Text input whose focus ring is a living membrane: a noise-displaced canvas loop…
@@ -385,7 +385,7 @@ props:
   className?: string
   (extends Omit<InputHTMLAttributes<HTMLInputElement>, "className">)
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/respire-field.json
+install: npx shadcn add https://design.helpmarq.com/r/respire-field.json
 
 ## ripple-unfold  [core]
 Ripple Unfold — Media reveal driven by a height-field water sim: a ripple front sweeps from the…
@@ -399,7 +399,7 @@ props:
   className?: string = "aspect-[16/10]"
   aria-label?: string = "Media revealed by…
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/ripple-unfold.json
+install: npx shadcn add https://design.helpmarq.com/r/ripple-unfold.json
 
 ## rule-sparkline  [core]
 Rule Sparkline — Inline KPI sparkline grown over an elementary cellular-automaton texture — the…
@@ -413,7 +413,7 @@ props:
   className?: string = "h-14"
   aria-label?: string = "KPI sparkline"
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/rule-sparkline.json
+install: npx shadcn add https://design.helpmarq.com/r/rule-sparkline.json
 
 ## scan-sweep-stats  [core]
 Scan Sweep Stats — Dashboard KPI grid under an observatory radar: a 1px accent arm sweeps the pane…
@@ -426,7 +426,7 @@ props:
   toleranceDeg?: number = 2
   className?: string
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/scan-sweep-stats.json
+install: npx shadcn add https://design.helpmarq.com/r/scan-sweep-stats.json
 
 ## scroll-caliper  [core]
 Scroll Caliper — A vernier caliper pinned to a scroll container's edge whose spring-damped jaws…
@@ -440,7 +440,7 @@ props:
   needleDamping?: number = 0.55
   className?: string = "h-[480px]"
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/scroll-caliper.json
+install: npx shadcn add https://design.helpmarq.com/r/scroll-caliper.json
 
 ## sediment-stack  [core]
 Sediment Stack — Toast stack with real gravity — notifications thud into a jostling heap, errors…
@@ -453,7 +453,7 @@ props:
   className?: string = "h-96"
   aria-label?: string = "Notifications"
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/sediment-stack.json
+install: npx shadcn add https://design.helpmarq.com/r/sediment-stack.json
 
 ## signal-terrain  [core]
 Signal Terrain — Unknown-Pleasures ridgeline chart whose live history recedes into scrolling amb…
@@ -470,7 +470,7 @@ props:
   className?: string = "h-96"
   aria-label?: string = "Live signal terrai…
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/signal-terrain.json
+install: npx shadcn add https://design.helpmarq.com/r/signal-terrain.json
 
 ## slide-to-shatter  [core]
 Slide to Shatter — Frosted-glass confirm slider where drag distance drives Voronoi crack density —…
@@ -485,7 +485,7 @@ props:
   resetKey?: number = 0
   className?: string
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/slide-to-shatter.json
+install: npx shadcn add https://design.helpmarq.com/r/slide-to-shatter.json
 
 ## solargraph-hero  [core]
 Solargraph Hero — Hero card whose canvas behaves like a long-exposure photograph: cursor movement…
@@ -497,7 +497,7 @@ props:
   intro?: boolean = true
   className?: string
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/solargraph-hero.json
+install: npx shadcn add https://design.helpmarq.com/r/solargraph-hero.json
 
 ## strandline  [core]
 Strandline — Changelog timeline drawn as a beach strand: each release arrives as a foam cres…
@@ -508,7 +508,7 @@ props:
   className?: string = "h-80"
   aria-label?: string = "Release timeline s…
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/strandline.json
+install: npx shadcn add https://design.helpmarq.com/r/strandline.json
 
 ## terminator-date-field  [core]
 Terminator Date Field — Masked date input whose popover calendar doubles as a moon-phase almanac: every…
@@ -521,7 +521,7 @@ props:
   disabled?: boolean = false
   className?: string
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/terminator-date-field.json
+install: npx shadcn add https://design.helpmarq.com/r/terminator-date-field.json
 
 ## tide-gauge-password  [core]
 Tide Gauge Password — Password field with a canvas water tank behind the masked text: entropy raises…
@@ -538,7 +538,7 @@ props:
   disabled?: boolean = false
   className?: string
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/tide-gauge-password.json
+install: npx shadcn add https://design.helpmarq.com/r/tide-gauge-password.json
 
 ## updraft-dropzone  [core]
 Updraft Dropzone — File dropzone as a thermal field: dragging spawns rising accent convection wisp…
@@ -551,7 +551,7 @@ props:
   className?: string
   aria-label?: string = "Upload files"
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/updraft-dropzone.json
+install: npx shadcn add https://design.helpmarq.com/r/updraft-dropzone.json
 
 ## vapor-countdown  [core]
 Vapor Countdown — Live countdown where each digit change is a phase transition: the outgoing digi…
@@ -561,7 +561,7 @@ props:
   labels?: readonly [string, string, string] | null = DEFAULT_LABELS
   className?: string
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/vapor-countdown.json
+install: npx shadcn add https://design.helpmarq.com/r/vapor-countdown.json
 
 ## warp-lattice  [core]
 Warp Lattice — Card grid on a magnetized hairline lattice — the cursor bends the grid lines an…
@@ -576,7 +576,7 @@ props:
   className?: string = "min-h-[520px]"
   aria-label?: string = "Card grid on a cur…
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/warp-lattice.json
+install: npx shadcn add https://design.helpmarq.com/r/warp-lattice.json
 
 ## aurora-flow-chart  [loud]
 Aurora Flow Chart — Area chart whose fill is a live aurora curtain — series values drive curtain he…
@@ -591,7 +591,7 @@ props:
   className?: string
   aria-label?: string = "Aurora flow chart"
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/aurora-flow-chart.json
+install: npx shadcn add https://design.helpmarq.com/r/aurora-flow-chart.json
 
 ## core-sample-scroll  [loud]
 Core Sample Scroll — Pinned scroll story — the viewport becomes a geological core cross-section and…
@@ -602,7 +602,7 @@ props:
   trackVh?: number = 250
   className?: string
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/core-sample-scroll.json
+install: npx shadcn add https://design.helpmarq.com/r/core-sample-scroll.json
 
 ## erosion-trail  [loud]
 Erosion Trail — The cursor is a river — dragging across a live topographic map carves a channel…
@@ -617,7 +617,7 @@ props:
   className?: string = "h-96"
   aria-label?: string = "Topographic map —…
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/erosion-trail.json
+install: npx shadcn add https://design.helpmarq.com/r/erosion-trail.json
 
 ## event-horizon-command  [loud]
 Event Horizon Command — Cmd-K palette where fuzzy-match results orbit the input as label pills — orbita…
@@ -633,7 +633,7 @@ props:
   autoTypeLoopMs?: number = 6000
   className?: string = "h-[560px]"
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/event-horizon-command.json
+install: npx shadcn add https://design.helpmarq.com/r/event-horizon-command.json
 
 ## frost-scrub  [loud]
 Frost Scrub — Scroll-scrubbed defroster — a pinned full-bleed image behind rippled shower gla…
@@ -648,7 +648,7 @@ props:
   className?: string
   onProgress?: (p: number) => void
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/frost-scrub.json
+install: npx shadcn add https://design.helpmarq.com/r/frost-scrub.json
 
 ## knockout-404  [loud]
 Knockout 404 — 404 numerals rendered as literal absence — destination-out punches the glyphs t…
@@ -662,7 +662,7 @@ props:
   secondaryHref?: string = "#support"
   className?: string
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/knockout-404.json
+install: npx shadcn add https://design.helpmarq.com/r/knockout-404.json
 
 ## prism-drag-split  [loud]
 Prism Drag Split — A frosted prism strip rides the cursor across a headline, magnifying the text b…
@@ -678,7 +678,7 @@ props:
   magnify?: number = 1.06
   className?: string
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/prism-drag-split.json
+install: npx shadcn add https://design.helpmarq.com/r/prism-drag-split.json
 
 ## singularity-text  [loud]
 Singularity Text — Headline as a monochrome particle cloud — the cursor is a gravity well that eat…
@@ -691,4 +691,4 @@ props:
   damping?: number = 0.55
   className?: string
 deps: (none)
-install: npx shadcn add https://ns-ui-registry.vercel.app/r/singularity-text.json
+install: npx shadcn add https://design.helpmarq.com/r/singularity-text.json

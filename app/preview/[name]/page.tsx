@@ -1,8 +1,36 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { demos } from "@/registry/index";
+import registry from "@/registry.json";
 import autoplayMap from "@/lib/autoplay.generated.json";
 import { parseAutoplay } from "@/lib/autoplay";
 import { AutoplayDriver } from "./autoplay-driver";
+
+// The per-component opengraph-image.tsx in this same folder is picked up by
+// the file-convention automatically — this only needs to supply the title
+// and description text, both openGraph and twitter fall back to `title`/
+// `description` unless overridden, so they're set explicitly instead to
+// guarantee og:title/twitter:title are correct rather than relying on that
+// implicit resolution.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ name: string }>;
+}): Promise<Metadata> {
+  const { name } = await params;
+  const item = registry.items.find((i) => i.name === name);
+  if (!item) return {};
+
+  const title = `${item.title} — ns-ui`;
+  const description = item.description;
+
+  return {
+    title,
+    description,
+    openGraph: { title, description, type: "website" },
+    twitter: { card: "summary_large_image", title, description },
+  };
+}
 
 export default async function PreviewPage({
   params,

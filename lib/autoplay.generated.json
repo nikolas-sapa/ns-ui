@@ -1,4 +1,18 @@
 {
+  "caustic-coverflow": {
+    "mode": "drag",
+    "target": "[role=\"group\"]",
+    "from": [
+      0.78,
+      0.5
+    ],
+    "to": [
+      0.22,
+      0.5
+    ],
+    "period": 7000,
+    "delay": 800
+  },
   "caustic-select": {
     "mode": "press",
     "target": "button[aria-haspopup=\"listbox\"]",
@@ -44,6 +58,20 @@
     "inset": -0.1,
     "period": 4600
   },
+  "fling-segment": {
+    "mode": "drag",
+    "target": "[role=\"radiogroup\"]",
+    "from": [
+      0.14,
+      0.5
+    ],
+    "to": [
+      0.85,
+      0.5
+    ],
+    "period": 5000,
+    "delay": 400
+  },
   "flock-stack": {
     "mode": "pointer-path",
     "path": "sweep",
@@ -57,6 +85,13 @@
     "target": "button[role=\"switch\"]",
     "hold": 200,
     "period": 1200
+  },
+  "glass-button": {
+    "mode": "press",
+    "target": "button",
+    "hold": 1400,
+    "period": 3600,
+    "delay": 700
   },
   "heatwave-ledger": {
     "mode": "pointer-path",
@@ -120,6 +155,14 @@
     "mode": "press",
     "target": "button[aria-label=\"Increase Target temperature\"]",
     "hold": 2400
+  },
+  "particle-hero": {
+    "mode": "pointer-path",
+    "path": "orbit",
+    "target": "canvas",
+    "inset": 0.32,
+    "period": 6000,
+    "delay": 600
   },
   "particle-tunnel-scrub": {
     "mode": "scroll",

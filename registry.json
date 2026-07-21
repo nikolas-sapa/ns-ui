@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
   "name": "ns-ui",
-  "homepage": "https://ns-ui-registry.vercel.app",
+  "homepage": "https://design.helpmarq.com",
   "items": [
     {
       "name": "ascii-dither-media",

@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { CopyButton } from "./copy-button";
+import cardFrames from "@/lib/card-frame.generated.json";
+import { fitTo, parseCardFrame, type Fit } from "@/lib/card-frame";
 
 export type RegistryEntry = {
   name: string;
@@ -44,8 +46,18 @@ export function PreviewCard({
   installCommand: string;
 }) {
   const boxRef = useRef<HTMLDivElement | null>(null);
+  const frameRef = useRef<HTMLIFrameElement | null>(null);
   const [scale, setScale] = useState<number | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [fit, setFit] = useState<Fit | null>(null);
+
+  // Optional per-component framing hint (see lib/card-frame.ts). Absent for
+  // all but a handful of components, and absent means "frame the whole
+  // viewport", exactly as before.
+  const frame = useMemo(
+    () => parseCardFrame((cardFrames as Record<string, unknown>)[entry.name]),
+    [entry.name],
+  );
 
   const measure = useCallback(() => {
     const box = boxRef.current;
@@ -55,22 +67,92 @@ export function PreviewCard({
     setScale(w / FRAME_W);
   }, []);
 
+  /**
+   * Re-derive the crop from the live preview document.
+   *
+   * The subject's box can only be read from inside the frame — it depends on
+   * the demo's own layout, fonts and (for canvas components) first paint — so
+   * this is measured, not declared. Same origin, so `contentDocument` is
+   * readable; the try/catch is belt-and-braces for a frame torn down mid-read.
+   * Anything that fails to resolve leaves `fit` null, which is the untouched
+   * full-viewport framing. Framing is deliberately independent of autoplay and
+   * of reduced motion: cropping is layout, not animation.
+   */
+  const refit = useCallback(() => {
+    if (!frame) return;
+    const box = boxRef.current;
+    const el = frameRef.current;
+    if (!box || !el) return;
+    const cardW = box.clientWidth;
+    const cardH = box.clientHeight;
+    if (!cardW || !cardH) return;
+    let next: Fit | null = null;
+    try {
+      const subject = el.contentDocument?.querySelector(frame.focus);
+      if (subject) {
+        next = fitTo(subject.getBoundingClientRect(), frame, cardW, cardH, FRAME_W, FRAME_H);
+      }
+    } catch {
+      next = null;
+    }
+    setFit((prev) => (same(prev, next) ? prev : next));
+  }, [frame]);
+
   useLayoutEffect(() => {
     measure();
     const box = boxRef.current;
     if (!box) return;
     // The frame is a fixed pixel size, so only the card's own width matters.
-    const ro = new ResizeObserver(measure);
+    const ro = new ResizeObserver(() => {
+      measure();
+      refit();
+    });
     ro.observe(box);
     return () => ro.disconnect();
-  }, [measure]);
+  }, [measure, refit]);
 
   // Unmounting removes the iframe, which tears its page down. Clearing
   // `loaded` means a card scrolled back into view shows the placeholder again
   // until its fresh frame has actually painted, rather than flashing blank.
   useEffect(() => {
-    if (!active) setLoaded(false);
+    if (!active) {
+      setLoaded(false);
+      setFit(null);
+    }
   }, [active]);
+
+  // `onLoad` is a race: React attaches the handler after the element is in the
+  // DOM, so an iframe whose document is already complete by then (warm cache,
+  // instant dev response) fires `load` into nothing and the card stays at
+  // opacity 0 — a blank stage. Poll the frame's own readyState for the first
+  // few seconds as a floor. Same origin, so this is readable; the try/catch
+  // covers a frame torn down mid-poll.
+  useEffect(() => {
+    if (!active || loaded) return;
+    const id = window.setInterval(() => {
+      try {
+        if (frameRef.current?.contentDocument?.readyState === "complete") {
+          // Fit in the same batch as the fade-in, so the frame's first visible
+          // paint is already cropped rather than zooming in afterwards.
+          refit();
+          setLoaded(true);
+        }
+      } catch {
+        /* frame gone */
+      }
+    }, 120);
+    return () => window.clearInterval(id);
+  }, [active, loaded, refit]);
+
+  // `load` fires before webfonts settle and before a canvas/WebGL demo has
+  // laid anything out, so the first measurement of the subject can be wrong or
+  // absent. Re-measure a few times over the first couple of seconds; `same()`
+  // makes the repeats free once the layout has stopped moving.
+  useEffect(() => {
+    if (!loaded || !frame) return;
+    const timers = [0, 250, 800, 2000].map((ms) => window.setTimeout(refit, ms));
+    return () => timers.forEach(window.clearTimeout);
+  }, [loaded, frame, refit]);
 
   const setCardRef = useCallback(
     (el: HTMLElement | null) => {
@@ -97,6 +179,7 @@ export function PreviewCard({
         <Placeholder visible={!loaded} />
         {mounted ? (
           <iframe
+            ref={frameRef}
             // `?embed=1` only makes the demo inert inside the frame — see the
             // preview route. The page it renders is otherwise identical.
             // `&autoplay=1` additionally runs the shared autoplay driver, so
@@ -113,12 +196,17 @@ export function PreviewCard({
             // the full preview page.
             inert
             aria-hidden
-            onLoad={() => setLoaded(true)}
-            className="pointer-events-none absolute left-0 top-0 origin-top-left border-0 bg-transparent"
+            onLoad={() => {
+              refit();
+              setLoaded(true);
+            }}
+            className="pointer-events-none absolute left-0 top-0 origin-top-left border-0 bg-transparent transition-transform duration-200 ease-out motion-reduce:transition-none"
             style={{
               width: FRAME_W,
               height: FRAME_H,
-              transform: `scale(${scale ?? 0})`,
+              transform: fit
+                ? `translate(${fit.tx}px, ${fit.ty}px) scale(${fit.scale})`
+                : `scale(${scale ?? 0})`,
               opacity: loaded ? 1 : 0,
             }}
           />
@@ -156,6 +244,16 @@ export function PreviewCard({
         />
       </div>
     </article>
+  );
+}
+
+/** Sub-pixel-stable equality, so repeat measurements don't re-render. */
+function same(a: Fit | null, b: Fit | null) {
+  if (!a || !b) return a === b;
+  return (
+    Math.abs(a.scale - b.scale) < 0.0005 &&
+    Math.abs(a.tx - b.tx) < 0.5 &&
+    Math.abs(a.ty - b.ty) < 0.5
   );
 }
 
