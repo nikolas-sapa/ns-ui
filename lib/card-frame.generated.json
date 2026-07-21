@@ -7,6 +7,11 @@
     "focus": ".max-w-2xl",
     "padding": 0.06
   },
+  "frostbite-switch": {
+    "focus": ".max-w-md",
+    "padding": 0.1,
+    "maxZoom": 2.4
+  },
   "glass-button": {
     "focus": "button",
     "padding": 1.1
