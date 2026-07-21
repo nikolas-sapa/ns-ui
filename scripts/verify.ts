@@ -68,15 +68,21 @@ async function verifyComponent(page: Page, name: string, dir: string) {
     page.on("console", onConsole);
     page.on("pageerror", onPageError);
 
+    // Emulate BEFORE navigating: the no-flash script in <head> picks the theme
+    // at load from localStorage, else prefers-color-scheme. Playwright defaults
+    // an unconfigured context to light, so once the hardcoded `dark` class came
+    // off <html> (theme toggle), the "dark" pass silently screenshotted LIGHT —
+    // the gate covered light twice and claimed both themes for months of runs.
+    await page.emulateMedia({ colorScheme: theme });
     await page.goto(`${BASE_URL}/preview/${name}`, { waitUntil: "networkidle" });
     // park the mouse away — it persists across navigations and a resting
     // hover fakes the "default" state (bit us: light-default === light-hover)
     await page.mouse.move(0, 0);
-    if (theme === "light") {
-      // ponytail: post-mount class removal — components reading theme at mount
-      // will screenshot wrong; upgrade to a ?theme= param when one exists
-      await page.evaluate(() => document.documentElement.classList.remove("dark"));
-    }
+    // belt and braces: assert the class both ways rather than only removing it,
+    // so this cannot silently degrade again if the default flips.
+    await page.evaluate((t) => {
+      document.documentElement.classList.toggle("dark", t === "dark");
+    }, theme);
     // settle animations/entrances before judging
     await page.waitForTimeout(1000);
 
@@ -136,6 +142,19 @@ async function verifyComponent(page: Page, name: string, dir: string) {
     }
     page.off("console", onConsole);
     page.off("pageerror", onPageError);
+  }
+
+  // The gate must be able to catch its own blindness: if the two theme passes
+  // produce identical pixels, the theme was never actually switched and every
+  // "verified in both themes" claim is worthless. This exact failure shipped
+  // silently once — the dark pass was rendering light after the theme toggle
+  // removed the hardcoded class. Cheap byte compare, no tolerance needed:
+  // real theme swaps change the background of every single pixel.
+  const [darkShot, lightShot] = ["dark", "light"].map((t) =>
+    readFileSync(join(dir, "screenshots", `${t}-default.png`))
+  );
+  if (darkShot.equals(lightShot)) {
+    fail(`${name}: dark and light screenshots are identical — theme never switched`);
   }
 }
 
