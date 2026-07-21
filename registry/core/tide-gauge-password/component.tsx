@@ -349,6 +349,59 @@ export function TideGaugePassword({
 
     engineRef.current = { input: inputFn, ripple: rippleFn };
 
+    // -- landing-page card demo (autoplay) -----------------------------------
+    // The shared autoplay driver (app/preview/[name]/autoplay-driver.tsx) only
+    // synthesises Pointer/Mouse events. This component's entire demonstration
+    // is value-driven — typed characters via <input onChange> — which no
+    // pointer/scroll/press/drag descriptor can reach, and the one
+    // pointer-reachable surface (the reveal toggle -> ripple) is invisible on
+    // an empty tank. So meta.json declares "mode": "none" (no shared driver
+    // mounts, no data-autoplay-root/inert change) and, gated strictly on the
+    // ?autoplay=1 query param the embed sets, this scripts a password being
+    // typed and deleted by calling the exact same `inputFn` real typing
+    // already calls — no new rendering path, no bespoke canvas animation.
+    // Real users never see this: the param is absent on both the plain
+    // /preview page and on plain ?embed=1.
+    let scriptTimer = 0;
+    let scriptCancelled = false;
+    if (!isControlled && !reduced) {
+      const isAutoplay =
+        new URLSearchParams(window.location.search).get("autoplay") === "1";
+      if (isAutoplay) {
+        const script = "Tr0ub4dor&3";
+        const TYPE_MS = 190;
+        const DELETE_MS = 110;
+        const HOLD_MS = 850;
+        const REST_MS = 700;
+        const setVal = (v: string) => {
+          input.value = v;
+          setBand((prev) => {
+            const b = bandOf(scorePassword(v));
+            return prev === b ? prev : b;
+          });
+          inputFn(v);
+        };
+        const typeStep = (i: number) => {
+          if (scriptCancelled) return;
+          setVal(script.slice(0, i));
+          scriptTimer = window.setTimeout(
+            () => (i < script.length ? typeStep(i + 1) : deleteStep(script.length)),
+            i < script.length ? TYPE_MS : HOLD_MS
+          );
+        };
+        const deleteStep = (len: number) => {
+          if (scriptCancelled) return;
+          const next = len - 1;
+          setVal(script.slice(0, Math.max(0, next)));
+          scriptTimer = window.setTimeout(
+            () => (next > 0 ? deleteStep(next) : typeStep(1)),
+            next > 0 ? DELETE_MS : REST_MS
+          );
+        };
+        scriptTimer = window.setTimeout(() => typeStep(1), 500);
+      }
+    }
+
     // -- observers ----------------------------------------------------------
     const ro = new ResizeObserver(resize);
     ro.observe(frame);
@@ -374,6 +427,8 @@ export function TideGaugePassword({
 
     return () => {
       cancelAnimationFrame(raf);
+      scriptCancelled = true;
+      window.clearTimeout(scriptTimer);
       ro.disconnect();
       io.disconnect();
       mo.disconnect();

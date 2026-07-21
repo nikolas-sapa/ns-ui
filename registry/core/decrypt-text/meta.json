@@ -4,6 +4,12 @@
   "description": "Scramble-to-decode text reveal with left-to-right character locking.",
   "collection": "core",
   "tags": ["text", "reveal", "mono", "micro-interaction"],
+  "autoplay": {
+    "mode": "press",
+    "target": "button",
+    "hold": 150,
+    "period": 1800
+  },
   "instruction": "A scramble-to-decode text reveal: monospace glyphs churn randomly and lock into the final string left to right with a per-character stagger, the currently resolving character brightened, unresolved characters dimmed. No layout jitter (mono charset), final text exposed via aria-label with churning spans aria-hidden, instant render under prefers-reduced-motion.",
   "dependencies": []
 }

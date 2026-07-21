@@ -99,7 +99,12 @@ export function PreviewCard({
           <iframe
             // `?embed=1` only makes the demo inert inside the frame — see the
             // preview route. The page it renders is otherwise identical.
-            src={`/preview/${entry.name}?embed=1`}
+            // `&autoplay=1` additionally runs the shared autoplay driver, so
+            // components that only wake on input (hover, press, drag, scroll)
+            // demonstrate themselves in the card instead of showing a still
+            // frame. Components without an `autoplay` descriptor in their
+            // meta.json are unaffected.
+            src={`/preview/${entry.name}?embed=1&autoplay=1`}
             title={`${entry.title} preview`}
             loading="lazy"
             tabIndex={-1}

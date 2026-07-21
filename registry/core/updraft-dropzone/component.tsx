@@ -496,6 +496,67 @@ export function UpdraftDropzone({
     };
   }, []);
 
+  // -- landing-card autoplay bridge -----------------------------------------
+  // The component's only live interaction is the native HTML5 drag/drop API
+  // (dragenter/dragover/dragleave/drop with a real DataTransfer) — there is
+  // no pointer/hover/press affordance to synthesize against, so the shared
+  // autoplay driver (which only dispatches Pointer/Mouse events) cannot
+  // reach it as-is. This bridges the driver's synthetic pointer sweep into
+  // the exact same setDrag/dragPoint calls the real dragenter/dragover
+  // handlers already make, and — on the synthetic "leave" that closes each
+  // sweep — into the exact same processFiles() the real onDrop handler
+  // calls, with a File built via the standard constructible DataTransfer.
+  // No new animation or state machine: every visual (wisps, border, the
+  // buoy-and-dock flight) is the engine that already exists for real drops.
+  // Native listeners (not React props) mirror the pattern this repo already
+  // uses for driver-driven hover (magnetic-dock's
+  // addEventListener("pointerleave", ...)) so the driver's directly-
+  // dispatched, non-bubbling pointerleave is caught reliably.
+  // Gated on [data-autoplay-root]: the preview route only ever stamps that
+  // attribute for `embed=1&autoplay=1` cards, so a real mouse hover on
+  // /preview/updraft-dropzone (or plain ?embed=1) never wires this up and
+  // behaves exactly as before.
+  useEffect(() => {
+    const zone = zoneRef.current;
+    if (!zone || !zone.closest("[data-autoplay-root]")) return;
+    let dragging = false;
+    const baseline = () => defaultFiles.map((f, i) => ({ ...f, id: `uf-d${i}` }));
+    const onMove = (e: PointerEvent) => {
+      if (!dragging) {
+        dragging = true;
+        setIsOver(true);
+        engineRef.current?.setDrag(true);
+      }
+      engineRef.current?.dragPoint(e.clientX);
+    };
+    const onLeave = () => {
+      if (!dragging) return;
+      dragging = false;
+      setIsOver(false);
+      engineRef.current?.setDrag(false);
+      // bound growth: clear the chip the *previous* sweep dropped before
+      // adding this sweep's — so a chip stays docked and visible for a
+      // full cycle (not just the ~300ms rest beat) and a card left running
+      // never accumulates chips.
+      setFiles(baseline());
+      onFilesChange?.(baseline());
+      // demo "drop": a synthetic accepted file rides the same buoy-and-dock
+      // flight a real drop uses, via the same processFiles() a real onDrop
+      // calls — accept-types validation runs on it exactly as it would on
+      // a real file.
+      const dt = new DataTransfer();
+      dt.items.add(new File(["demo"], "render-log.txt", { type: "text/plain" }));
+      processFiles(dt.files, null);
+    };
+    zone.addEventListener("pointermove", onMove);
+    zone.addEventListener("pointerleave", onLeave);
+    return () => {
+      zone.removeEventListener("pointermove", onMove);
+      zone.removeEventListener("pointerleave", onLeave);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultFiles]);
+
   // launch flights for freshly docked chips — layout effect so the offset
   // transform lands before paint (no flash of the chip already docked)
   useLayoutEffect(() => {

@@ -1,12 +1,21 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useSearchParams } from "next/navigation";
 import { RespireField } from "./component";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export default function RespireFieldDemo() {
-  const [value, setValue] = useState("");
+  // Landing-page autoplay can only dispatch pointer/click events at the real
+  // submit button — it can't type — so a valid email is seeded here only
+  // when `?autoplay=1` is present, letting the driver's repeated submit
+  // presses replay the real "valid submit -> exhale" path instead of the
+  // "invalid submit -> constrict/quiver" one. The plain preview (no query
+  // param) is unaffected: value still starts empty and stays fully
+  // interactive.
+  const autoplay = useSearchParams().get("autoplay") === "1";
+  const [value, setValue] = useState(autoplay ? "you@example.com" : "");
   const [error, setError] = useState(false);
   const [sent, setSent] = useState(false);
   const [exhaleKey, setExhaleKey] = useState(0);

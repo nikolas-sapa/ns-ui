@@ -371,7 +371,12 @@ export function DrapeMenu({
         for (let c = 0; c < COLS; c++) {
           const i = r * COLS + c;
           sim.posX[i] = c * g.dx0;
-          sim.posY[i] = r * 1.5;
+          // fraction of rest length, not an absolute px start: the prior fixed
+          // `r * 1.5` compressed rows to ~1/13th of dy0, which this solver's
+          // 3-iteration relax can't recover from and folds into a stuck ~14px
+          // clump instead of draping (reproduced with a plain click). 0.5 keeps
+          // the compressed-then-falls look inside the solver's convergence basin.
+          sim.posY[i] = r * g.dy0 * 0.5;
           sim.prevX[i] = sim.posX[i];
           sim.prevY[i] = sim.posY[i];
         }

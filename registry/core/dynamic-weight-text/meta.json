@@ -4,6 +4,13 @@
   "description": "Letters morph variable-font weight by cursor proximity — pure typography interaction.",
   "collection": "core",
   "tags": ["text", "typography", "cursor", "variable-font"],
+  "autoplay": {
+    "mode": "pointer-path",
+    "path": "sweep",
+    "target": "span[role=text]",
+    "inset": -0.1,
+    "period": 4600
+  },
   "instruction": "A headline whose individual letters morph between a light and a heavy variable-font weight based on horizontal cursor proximity with a Gaussian falloff, easing smoothly as the pointer moves and settling back when it leaves. Pure typography — no color, no particles. Direct-DOM rAF loop, real text in aria-label, static under prefers-reduced-motion.",
   "dependencies": []
 }
