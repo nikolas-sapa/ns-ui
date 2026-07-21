@@ -223,7 +223,18 @@ export function EmergeDialog({
         className,
       ].join(" ")}
     >
-      <div ref={panelRef} className="flex flex-col gap-5 p-6">
+      {/* showModal() focuses the first focusable descendant unless something
+          claims it. Left alone that is whatever control happens to come first —
+          on a destructive dialog it pre-selects an option the user never chose,
+          and paints a focus ring on it at rest. Take it here: focus lands
+          inside the dialog (screen readers announce the title, Tab starts at
+          the top) without preselecting anything. */}
+      <div
+        ref={panelRef}
+        autoFocus
+        tabIndex={-1}
+        className="flex flex-col gap-5 p-6 outline-none"
+      >
         {(title || description) && (
           <div className="flex flex-col gap-2">
             {title && (
