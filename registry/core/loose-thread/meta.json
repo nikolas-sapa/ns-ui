@@ -1,0 +1,27 @@
+{
+  "name": "loose-thread",
+  "title": "Loose Thread",
+  "description": "Tag input where Backspace on an empty field arms the last tag with a depleting bar instead of deleting it — a second Backspace inside the window removes it.",
+  "collection": "core",
+  "tags": [
+    "input",
+    "tags",
+    "form",
+    "keyboard",
+    "undo",
+    "micro-interaction"
+  ],
+  "autoplay": {
+    "mode": "pointer-path",
+    "path": "sweep",
+    "target": "button",
+    "inset": -0.2,
+    "period": 4200
+  },
+  "instruction": "A tag / chip multi-input — a bordered field of rounded pills each with an 18px circular remove button, a borderless flex-1 text input, and a muted hint line below that doubles as the rejection message. Its one deviation from every other tag field is what Backspace does to an empty input: it does not delete the last tag, it arms it. The armed pill takes an accent border and a 2px accent bar inside it depletes left-to-right over exactly armDuration (default 2000ms); a second Backspace inside that window removes it, and any other keystroke, any pointer press anywhere, a blur, or the bar running out disarms. That removes the classic accident of destroying three tags because you over-backspaced while typing fast, and the depleting bar makes the two-step rule discoverable rather than mysterious. The armed state is disarmed from four independent directions — the timer, the input's key/change/blur handlers, a capture-phase document pointerdown listener that exists only while something is armed, and a guard that drops the armed id the moment it stops matching a tag actually present at that position — because the reach-for-the-mouse case shifts the tag list under a pending timer and would otherwise strand a pill wearing the accent ring forever. Controlled or uncontrolled, resolved once from whether `value` is passed and never mirrored into state. Commit keys default to Enter and comma; entries pass through an optional validate that returns a normalized string or null to reject, with duplicates and a max cap rejected the same way and announced. Full keyboard model: clicking the field focuses the input, ArrowLeft from an empty input jumps to the last tag, remove buttons use roving tabindex with ArrowLeft/ArrowRight/Home/End, Enter, Space, Delete or Backspace on a focused tag removes it immediately (explicit focus is explicit intent, so no arming there), Escape returns to the input, and a visually-hidden polite live region announces additions, removals and the arming prompt. Hover is tracked in React rather than :hover so synthetic pointer events reach it. Zero dependencies, one useRef timer cleared on unmount, colors from --background, --foreground, --surface, --border, --muted and --accent only, so both themes read correctly. prefers-reduced-motion drops the tag entrance and the caret blink and freezes the depletion bar at full width, leaving the armed state unmistakable without motion while the live region carries the timing.",
+  "dependencies": [],
+  "card": {
+    "focus": ".ns-lt-field",
+    "padding": 1.5
+  }
+}
