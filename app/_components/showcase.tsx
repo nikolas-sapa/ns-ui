@@ -5,6 +5,8 @@ import { CopyButton } from "./copy-button";
 import { PreviewCard, type RegistryEntry } from "./preview-card";
 import { ThemeToggle } from "./theme-toggle";
 import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
+import { CATEGORIES, categorize } from "@/lib/search-categories";
+import { SYNONYM_TEXT } from "@/lib/search-synonyms";
 
 const installFor = (name: string) =>
   `npx shadcn add ${REGISTRY_ORIGIN}/r/${name}.json`;
@@ -16,7 +18,11 @@ const installFor = (name: string) =>
  */
 const EXAMPLE_NAME = "particle-hero";
 
-export type ShowcaseEntry = RegistryEntry & { tags: string[] };
+export type ShowcaseEntry = RegistryEntry & {
+  tags: string[];
+  /** useWhen + the instruction's lead sentence — the plainest-spoken copy. */
+  prose: string;
+};
 
 const FOOTER_LINK =
   "rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent";
@@ -39,8 +45,22 @@ const PRELOAD_MARGIN = 600;
 
 type Filter = "all" | "core" | "loud";
 
+/**
+ * Words a newcomer can click when nothing matched. Each is a real query that
+ * returns results through the synonym map.
+ */
+const RESCUE_QUERIES = ["dropdown", "toggle", "chart", "hero", "toast", "table"];
+
+/** Glue words, ignored by the loose fallback below. */
+const STOPWORDS = new Set([
+  "a", "an", "and", "any", "are", "as", "at", "be", "can", "do", "does", "for",
+  "how", "i", "in", "is", "it", "its", "me", "my", "need", "of", "on", "or",
+  "some", "that", "the", "this", "to", "use", "want", "when", "with", "you",
+]);
+
 export function Showcase({ items }: { items: ShowcaseEntry[] }) {
   const [filter, setFilter] = useState<Filter>("all");
+  const [category, setCategory] = useState<string | null>(null);
   const [query, setQuery] = useState("");
 
   const counts = useMemo(() => {
@@ -53,9 +73,26 @@ export function Showcase({ items }: { items: ShowcaseEntry[] }) {
     return { all: items.length, core, loud };
   }, [items]);
 
+  /** name -> category ids, computed once from the components' own tags. */
+  const memberships = useMemo(() => categorize(items), [items]);
+
+  const categories = useMemo(
+    () =>
+      CATEGORIES.map((c) => ({
+        ...c,
+        count: items.filter((i) => memberships.get(i.name)?.includes(c.id))
+          .length,
+      })).filter((c) => c.count > 0),
+    [items, memberships],
+  );
+
   /**
    * One lowercase string per component to match against. 50 items, so this is
    * a plain substring scan on every keystroke — no index, no debounce.
+   *
+   * The synonym words are folded in here rather than matched separately, so a
+   * multi-word plain query ("file upload") still works term by term against
+   * the existing every-term rule.
    */
   const haystacks = useMemo(() => {
     const map = new Map<string, string>();
@@ -64,22 +101,52 @@ export function Showcase({ items }: { items: ShowcaseEntry[] }) {
         i.name,
         `${i.name} ${i.title} ${i.description} ${i.tags.join(" ")} ${
           i.collection
-        }`.toLowerCase(),
+        } ${i.prose} ${SYNONYM_TEXT[i.name] ?? ""}`.toLowerCase(),
       );
     }
     return map;
   }, [items]);
 
-  const visibleItems = useMemo(() => {
-    const inCollection =
-      filter === "all" ? items : items.filter((i) => i.collection === filter);
+  const { visibleItems, loose } = useMemo(() => {
     const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
-    if (terms.length === 0) return inCollection;
-    return inCollection.filter((i) => {
-      const hay = haystacks.get(i.name) ?? "";
-      return terms.every((t) => hay.includes(t));
-    });
-  }, [items, filter, query, haystacks]);
+    const inScope = items.filter(
+      (i) =>
+        (filter === "all" || i.collection === filter) &&
+        (!category || memberships.get(i.name)?.includes(category)),
+    );
+    if (terms.length === 0) return { visibleItems: inScope, loose: false };
+
+    const strict = inScope.filter((i) =>
+      terms.every((t) => (haystacks.get(i.name) ?? "").includes(t)),
+    );
+    if (strict.length > 0) return { visibleItems: strict, loose: false };
+
+    // Nothing matched every word. A sentence-shaped query ("reacts to the
+    // cursor") is a real thing to type, and a dead end is the worst answer, so
+    // fall back to any-word matching ranked by how many words hit. Glue words
+    // are dropped first — "the" is a substring of half the registry's copy and
+    // would rank noise to the top.
+    const words = terms.filter((t) => !STOPWORDS.has(t));
+    const scored = inScope
+      .map((i) => {
+        const hay = haystacks.get(i.name) ?? "";
+        return { item: i, hits: words.filter((w) => hay.includes(w)).length };
+      })
+      .filter((s) => s.hits > 0)
+      .sort((a, b) => b.hits - a.hits);
+    return {
+      visibleItems: scored.map((s) => s.item),
+      loose: scored.length > 0,
+    };
+  }, [items, filter, category, query, haystacks, memberships]);
+
+  const activeCategory = categories.find((c) => c.id === category);
+  const filtered = filter !== "all" || category !== null || query !== "";
+  const clearAll = () => {
+    setFilter("all");
+    setCategory(null);
+    setQuery("");
+  };
 
   const { registerRef, isActive } = useMountManager();
 
@@ -176,7 +243,7 @@ export function Showcase({ items }: { items: ShowcaseEntry[] }) {
               placeholder="Search"
               autoComplete="off"
               spellCheck={false}
-              className="w-20 min-w-0 rounded-sm border border-border bg-surface px-2 py-1 text-sm text-foreground outline-none transition-colors placeholder:text-muted focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none sm:w-56 sm:px-2.5"
+              className="w-28 min-w-0 rounded-sm border border-border bg-surface px-2 py-1 text-sm text-foreground outline-none transition-colors placeholder:text-muted focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none sm:w-56 sm:px-2.5"
             />
             <p
               aria-live="polite"
@@ -186,26 +253,105 @@ export function Showcase({ items }: { items: ShowcaseEntry[] }) {
             </p>
           </div>
         </div>
+
+        {/* What is this for? — the row a newcomer uses instead of guessing the
+            house vocabulary. Roles, not tags: 166 tags, 128 of them singletons,
+            would be noise. */}
+        <div className="mt-2.5 flex items-center gap-2">
+          <div
+            role="group"
+            aria-label="Filter by what the component is for"
+            className="-mb-1 flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto pb-1"
+          >
+            {categories.map((c) => {
+              const on = category === c.id;
+              return (
+                <button
+                  key={c.id}
+                  type="button"
+                  aria-pressed={on}
+                  onClick={() => setCategory(on ? null : c.id)}
+                  className={`shrink-0 rounded-full border px-2.5 py-1 text-xs outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-accent ${
+                    on
+                      ? "border-accent bg-accent text-white"
+                      : "border-border text-muted hover:border-muted hover:text-foreground"
+                  }`}
+                >
+                  {c.label}
+                  <span
+                    className={`ml-1.5 font-mono text-[11px] ${
+                      on ? "text-white/70" : "text-muted"
+                    }`}
+                  >
+                    {c.count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          {filtered ? (
+            <button
+              type="button"
+              onClick={clearAll}
+              className="shrink-0 rounded-sm px-1.5 py-1 text-xs text-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+            >
+              Clear
+            </button>
+          ) : null}
+        </div>
       </div>
 
       {/* Two columns up to 2xl: the demos are full-viewport designs, so a
           wider card is the difference between reading as a component and
           reading as a smudge. */}
       {visibleItems.length === 0 ? (
-        <div className="mt-24 text-center">
+        <div className="mx-auto mt-24 max-w-md text-center">
           <p className="text-sm text-muted">
-            No component matches{" "}
-            <span className="font-mono text-foreground">{query}</span>
+            Nothing matches{" "}
+            {query ? (
+              <span className="font-mono text-foreground">{query}</span>
+            ) : (
+              "these filters"
+            )}
+            {activeCategory ? ` in ${activeCategory.label.toLowerCase()}` : ""}
             {filter === "all" ? "" : ` in ${filter}`}.
           </p>
+          <p className="mt-5 text-xs text-muted">
+            Components here are named evocatively, so plain words are the way
+            in. Try one:
+          </p>
+          <div className="mt-3 flex flex-wrap justify-center gap-1.5">
+            {RESCUE_QUERIES.map((q) => (
+              <button
+                key={q}
+                type="button"
+                onClick={() => {
+                  setQuery(q);
+                  setCategory(null);
+                  setFilter("all");
+                }}
+                className="rounded-full border border-border px-2.5 py-1 font-mono text-xs text-muted outline-none transition-colors hover:border-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none"
+              >
+                {q}
+              </button>
+            ))}
+          </div>
           <button
             type="button"
-            onClick={() => setQuery("")}
-            className="mt-3 rounded-sm px-2 py-1 font-mono text-xs text-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+            onClick={clearAll}
+            className="mt-5 rounded-sm px-2 py-1 font-mono text-xs text-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
           >
-            Clear search
+            Show all {items.length}
           </button>
         </div>
+      ) : null}
+
+      {loose ? (
+        <p className="mt-10 text-xs text-muted">
+          Nothing matches every word of{" "}
+          <span className="font-mono text-foreground">{query}</span> — showing
+          the closest, best first.
+        </p>
       ) : null}
 
       <div className="mt-10 grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-2 2xl:grid-cols-3">
