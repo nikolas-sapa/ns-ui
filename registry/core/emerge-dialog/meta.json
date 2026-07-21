@@ -1,0 +1,22 @@
+{
+  "name": "emerge-dialog",
+  "title": "Emerge Dialog",
+  "description": "A native <dialog> modal that grows out of the control that opened it and returns into it on close.",
+  "collection": "core",
+  "tags": [
+    "dialog",
+    "modal",
+    "overlay",
+    "flip",
+    "accessibility"
+  ],
+  "autoplay": {
+    "mode": "press",
+    "target": "[data-close]",
+    "hold": 300,
+    "period": 4600,
+    "delay": 1000
+  },
+  "instruction": "A controlled modal built on the native <dialog> element opened with showModal(), so the focus trap, background inertness, Escape-to-close, top-layer stacking and ::backdrop come from the platform rather than a hand-rolled implementation. The entrance is a FLIP morph: the trigger element's bounding rect is measured at open time (never at mount — it moves on scroll and resize), inverted into a single translate+scale transform on the dialog, and played out to identity, with the corner radius counter-scaled so it reads constant and the panel content fading in slightly late so real text never squashes through a small scale. Closing runs the same transform backwards so the panel returns into the trigger; the close is timer-driven rather than transitionend-driven, so a backgrounded tab can never strand an un-closed dialog, and a re-open landing mid-close cancels the pending timer and resets styles first. With no triggerRef (opened programmatically) it falls back to a centered scale-in. Escape's `cancel` event is intercepted so the return-to-origin still plays, backdrop clicks dismiss (opt-out via dismissOnBackdrop), and any close the component didn't originate is reported back through onOpenChange. The backdrop is a token-derived dim with no blur — ink-over-paper in light, the background token's own near-black in dark — set via a custom property that ::backdrop inherits from the dialog. prefers-reduced-motion skips the morph and the scrim fade entirely and opens instantly, fully functional.",
+  "dependencies": []
+}

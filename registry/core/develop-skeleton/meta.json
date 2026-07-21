@@ -1,0 +1,22 @@
+{
+  "name": "develop-skeleton",
+  "title": "Develop Skeleton",
+  "description": "Loading wrapper whose placeholder blocks develop into the real content — a masked sweep resolves the text instead of swapping it.",
+  "collection": "core",
+  "tags": [
+    "skeleton",
+    "loading",
+    "placeholder",
+    "transition",
+    "css-animation"
+  ],
+  "autoplay": {
+    "mode": "none"
+  },
+  "instruction": "A loading-state wrapper, not a grey rectangle: <DevelopSkeleton loading={isLoading} blocks={...}>{content}</DevelopSkeleton>. While loading it renders placeholder blocks described by a declarative `blocks` prop (heading / text with a line count / circle / box / row groups) — the children are never measured, because they are not mounted at all until the data arrives. Each bar sits on the --border token and carries a slow sweep built from a recessed --background trough followed by a --muted crest, staggered bar to bar by a negative animation delay so the panel reads as one wave travelling through it, rather than the white-to-grey shine every other skeleton ships. When `loading` flips false the two layers stack and the placeholder develops into the content like a print coming up in a tray: a soft-edged alpha mask sweeps downward, the ghost blocks blur out and settle upward while the children un-blur and gain contrast behind them, top first, with no swap and no flash. Everything animating is CSS, so there is no rAF loop and no canvas; React only runs a three-state phase machine (loading / developing / ready), and flipping back to loading mid-develop cancels the pending settle rather than stranding a half-developed layer. Content that mounts already-loaded skips the transition entirely. The wrapper is aria-busy while loading with an sr-only status label; prefers-reduced-motion drops to still blocks, no sweep, and an instant swap.",
+  "dependencies": [],
+  "card": {
+    "focus": "[aria-busy]",
+    "padding": 1.5
+  }
+}
