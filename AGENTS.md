@@ -33,13 +33,6 @@ silently overwritten on the next build. If something in the generated output is 
 / `public/llms-full.txt` are NOT gitignored; they're small enough to commit, and get regenerated on
 every build anyway so a stale commit self-heals on the next deploy.
 
-## Registering a component
-
-Adding a component isn't done until it's wired into `registry/index.tsx` — the central lazy demo
-map (`name -> lazy(() => import(...))`). A component with a folder but no entry there won't render
-on `/preview/<name>` or pass verification. This is the one place that isn't derived from `meta.json`
-and has to be hand-edited per component.
-
 ## Autoplay — how a card demonstrates itself
 
 Landing-page cards are iframes onto `/preview/<name>?embed=1&autoplay=1`, scaled down and

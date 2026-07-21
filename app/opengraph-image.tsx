@@ -23,26 +23,11 @@ export const contentType = "image/png";
 
 const FONT_DIR = join(process.cwd(), "node_modules/geist/dist/fonts");
 
-// The headline count is READ from the built registry, never typed. It was
-// hardcoded to 50 and went stale the moment the registry hit 56.
-async function componentCount() {
-  const raw = await readFile(
-    join(process.cwd(), "public/r/registry.json"),
-    "utf8",
-  );
-  const items = JSON.parse(raw).items;
-  if (!Array.isArray(items) || items.length === 0) {
-    throw new Error("registry.json has no items — run `npm run registry:build`");
-  }
-  return items.length;
-}
-
 export default async function Image() {
-  const [sansRegular, sansSemibold, mono, count] = await Promise.all([
+  const [sansRegular, sansSemibold, mono] = await Promise.all([
     readFile(join(FONT_DIR, "geist-sans/Geist-Regular.ttf")),
     readFile(join(FONT_DIR, "geist-sans/Geist-SemiBold.ttf")),
     readFile(join(FONT_DIR, "geist-mono/GeistMono-Regular.ttf")),
-    componentCount(),
   ]);
 
   const installLabel = `${REGISTRY_ORIGIN.replace(/^https?:\/\//, "")}/r/[name].json`;
@@ -95,7 +80,7 @@ export default async function Image() {
               color: TOKEN.foreground,
             }}
           >
-            {`${count} React components.`}
+            React components.
           </div>
           <div
             style={{
