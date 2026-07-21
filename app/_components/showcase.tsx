@@ -170,7 +170,7 @@ export function Showcase({ items }: { items: ShowcaseEntry[] }) {
             A personal registry of {items.length} React components.
           </h1>
           <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted">
-            Canvas, motion and glass, built on Geist tokens for light and dark.
+            Canvas, motion and glass — themed by your own CSS tokens, light and dark.
             Every card below is the real component running live. Click one to
             open it full size.
           </p>

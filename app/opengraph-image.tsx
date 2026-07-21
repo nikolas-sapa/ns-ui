@@ -80,7 +80,7 @@ export default async function Image() {
               color: TOKEN.foreground,
             }}
           >
-            50 React components,
+            50 React components.
           </div>
           <div
             style={{
@@ -88,10 +88,10 @@ export default async function Image() {
               fontWeight: 600,
               lineHeight: 1.12,
               letterSpacing: -2,
-              color: TOKEN.foreground,
+              color: TOKEN.muted,
             }}
           >
-            built on Geist.
+            One command each.
           </div>
           <div
             style={{
