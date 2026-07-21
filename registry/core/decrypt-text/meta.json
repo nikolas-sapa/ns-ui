@@ -4,6 +4,7 @@
   "description": "Scramble-to-decode text reveal with left-to-right character locking.",
   "collection": "core",
   "tags": ["text", "reveal", "mono", "micro-interaction"],
+  "useWhen": "the classic scramble-to-decode reveal — monospace glyphs churn and lock into the final string left to right; use for a one-shot on-mount/on-trigger reveal, not a persistent cursor-driven effect.",
   "autoplay": {
     "mode": "press",
     "target": "button",

@@ -4,6 +4,7 @@
   "description": "Scroll scrubs a camera through a monochrome point tunnel — velocity stretches dots into motion streaks, cursor drift adds parallax, and mono section labels at fixed depths snap into focus as you fly past.",
   "collection": "core",
   "tags": ["scroll", "canvas", "particles", "3d", "parallax", "scrub", "typography", "monochrome"],
+  "useWhen": "scroll flies a camera through a 3D particle tunnel with velocity-streaked dots and mono labels snapping into focus at fixed depths; use for a flythrough narrative, not a content-crossfade story or an instrument/HUD readout.",
   "autoplay": {
     "mode": "scroll",
     "period": 4000

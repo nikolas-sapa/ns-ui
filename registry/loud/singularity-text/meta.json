@@ -4,6 +4,7 @@
   "description": "Headline as a monochrome particle cloud — the cursor is a gravity well that eats letters into an orbital accretion ring, then releases them to spring back into typeset.",
   "collection": "loud",
   "tags": ["hero", "text", "particles", "cursor", "canvas", "physics"],
+  "useWhen": "a hero built from ONLY a headline, no surrounding CTA/copy layout — rendered as a particle cloud the cursor pulls into an orbiting accretion ring and releases to spring back into type; zero deps, use when the headline alone should be the whole scene.",
   "autoplay": {
     "mode": "pointer-path",
     "path": "sweep",

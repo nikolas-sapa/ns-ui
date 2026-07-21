@@ -420,6 +420,14 @@ function formatPropLines(name: string, warnings: string[], compact: boolean): st
 // "use when" derivation — tag-driven, not a restatement of the title.
 // Functional tags name the UI role (what it IS); everything else is treated
 // as a differentiator (what makes THIS one worth picking over a plain default).
+//
+// This is a fallback: components sharing a role and only differentiated by a
+// tag dump (e.g. three hero canvases that all just list "cursor") give an
+// agent nothing to decide on. Where that happened, meta.useWhen carries a
+// hand-authored, source-of-truth-is-meta.instruction sentence naming the
+// actual distinguishing behavior instead — see deriveUseWhen above. Add
+// meta.useWhen to a component only once it turns out to share a role with
+// something else; singletons are unambiguous by tag-derivation alone.
 // ---------------------------------------------------------------------------
 
 const FUNCTIONAL_TAGS: Record<string, string> = {
@@ -502,6 +510,8 @@ function humanizeTag(t: string): string {
 }
 
 function deriveUseWhen(meta: Meta): string {
+  // Hand-authored guidance wins when present — see meta.useWhen below for why.
+  if (meta.useWhen) return meta.useWhen;
   const tags = meta.tags ?? [];
   let needIdx = tags.findIndex((t) => FUNCTIONAL_TAGS[t]);
   let need: string;
@@ -528,6 +538,10 @@ type Meta = {
   tags: string[];
   instruction: string;
   dependencies: string[];
+  // Optional hand-authored "use when" override — see the deriveUseWhen
+  // comment above. Site-only: build-registry.ts never reads this, so it
+  // can't leak into the published registry:ui items in public/r/*.json.
+  useWhen?: string;
 };
 
 const dirByName: Record<string, "core" | "loud"> = {};

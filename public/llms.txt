@@ -42,7 +42,7 @@ install: npx shadcn add https://ns-ui-registry.vercel.app/r/ascii-dither-media.j
 
 ## cardio-baseline  [core]
 Cardio Baseline — Text whose baseline is a live EKG trace: each beat fires a QRS spike that trave…
-use when: an animated text/headline effect (ekg, waveform, svg).
+use when: text with a live EKG baseline — each beat's QRS spike throws every glyph up the waveform before it spring-settles flat, firable imperatively via a ref for real events (deploys, messages); use for a heartbeat/pulse motif, not a generic reveal.
 props:
   children?: string = "SYSTEMS NOMINAL"
   bpm?: number = 50
@@ -136,7 +136,7 @@ install: npx shadcn add https://ns-ui-registry.vercel.app/r/crack-compare.json
 
 ## decrypt-text  [core]
 Decrypt Text — Scramble-to-decode text reveal with left-to-right character locking.
-use when: an animated text/headline effect (reveal, mono, micro interaction).
+use when: the classic scramble-to-decode reveal — monospace glyphs churn and lock into the final string left to right; use for a one-shot on-mount/on-trigger reveal, not a persistent cursor-driven effect.
 props:
   text: string
   delay?: number = 150
@@ -161,7 +161,7 @@ install: npx shadcn add https://ns-ui-registry.vercel.app/r/drape-menu.json
 
 ## dynamic-weight-text  [core]
 Dynamic Weight Text — Letters morph variable-font weight by cursor proximity — pure typography intera…
-use when: an animated text/headline effect (typography, cursor, variable font).
+use when: letters continuously morph variable-font weight by cursor proximity — pure typography, no particles/canvas/color, no discrete reveal moment; use for an ambient, subtle hover-driven headline.
 props:
   text: string
   minWeight?: number = 300
@@ -212,7 +212,7 @@ install: npx shadcn add https://ns-ui-registry.vercel.app/r/frostbite-switch.jso
 
 ## glass-button  [core]
 Glass Button — Liquid-glass button with translucent blurred surface and press states.
-use when: a clickable button (glass, micro interaction).
+use when: the default general-purpose button — translucent liquid-glass surface with hover lift and press states; use for any ordinary CTA, not a destructive action needing deliberate confirmation.
 props: (extends ButtonHTMLAttributes<HTMLButtonElement>)
 deps: (none)
 install: npx shadcn add https://ns-ui-registry.vercel.app/r/glass-button.json
@@ -238,7 +238,7 @@ install: npx shadcn add https://ns-ui-registry.vercel.app/r/heatwave-ledger.json
 
 ## hold-to-confirm  [core]
 Hold to Confirm — Press-and-hold destructive action — monochrome ink pours up from the press poin…
-use when: a clickable button (destructive, micro interaction, confirmation).
+use when: a press-and-hold DESTRUCTIVE confirm — ink pours up from the press point and recoils if released early; use whenever an action needs deliberate hold-to-confirm, not a plain single-tap button.
 props:
   children: ReactNode
   confirmedLabel?: ReactNode = "Done"
@@ -250,7 +250,7 @@ install: npx shadcn add https://ns-ui-registry.vercel.app/r/hold-to-confirm.json
 
 ## ligature-melt  [core]
 Ligature Melt — Headline whose glyphs liquefy near the cursor — an SVG gooey filter fuses neigh…
-use when: an animated text/headline effect (cursor, svg filter, goo).
+use when: glyphs liquefy and fuse into gooey ligatures near the cursor via an SVG filter, drifting even at rest and springing apart on leave; use for a squishy, organic headline, not a legibility-first reveal.
 props:
   text?: string = "SURFACE TENSION"
   sigma?: number = 70
@@ -263,7 +263,7 @@ install: npx shadcn add https://ns-ui-registry.vercel.app/r/ligature-melt.json
 
 ## lodestone-hero  [core]
 Lodestone Hero — Full-bleed hero where the headline exists twice: crisp DOM type above, and bene…
-use when: a hero/landing section (canvas, vector field, dipole).
+use when: a hero whose headline exists twice — crisp DOM type over a Canvas 2D field of iron-filing strokes that bend toward the cursor and snap toward the CTA on hover; zero deps, best when the headline itself should feel physically alive.
 props:
   eyebrow?: string = "FIELD-ALIGNED INFR…
   headlineLines?: string[] = ["Every signal bend…
@@ -279,7 +279,7 @@ install: npx shadcn add https://ns-ui-registry.vercel.app/r/lodestone-hero.json
 
 ## loupe-slider  [core]
 Loupe Slider — Slider read through a circular magnifying loupe riding the thumb: the tick bene…
-use when: a slider or range input (input, form, canvas).
+use when: a slider read through a circular magnifying loupe that rides the thumb, sharpening the tick beneath it while the rest of the scale stays soft-focus; use for precise value-reading (audio scrub, zoom level), not a destructive confirm gesture.
 props:
   value?: number
   defaultValue?: number = 50
@@ -298,7 +298,7 @@ install: npx shadcn add https://ns-ui-registry.vercel.app/r/loupe-slider.json
 
 ## magnetic-dock  [core]
 Magnetic Dock — Cursor-proximity magnification row with Gaussian falloff — macOS-dock physics f…
-use when: site navigation (cursor, dock, micro interaction).
+use when: a macOS-dock-style row that magnifies items under cursor proximity with Gaussian falloff; use for an icon/action dock or nav row, not for showing scroll/read position through a document.
 props:
   children: ReactNode
   gain?: number = 0.55
@@ -310,7 +310,7 @@ install: npx shadcn add https://ns-ui-registry.vercel.app/r/magnetic-dock.json
 
 ## mercury-minimap  [core]
 Mercury Minimap — TOC minimap where scroll progress is a column of liquid mercury — a gooey SVG b…
-use when: site navigation (scroll, svg, goo).
+use when: a scroll-position TOC/minimap where a gooey mercury blob climbs a rail and absorbs section ticks as you scroll; use to show progress through a long document, not for magnifying items in an icon row.
 props:
   sections?: MinimapSection[]
   selector?: string = "section[id]"
@@ -355,7 +355,7 @@ install: npx shadcn add https://ns-ui-registry.vercel.app/r/needle-stepper.json
 
 ## particle-hero  [core]
 Particle Hero — Full-viewport hero with a cursor-reactive WebGL particle field and staggered te…
-use when: a hero/landing section (webgl, particles, text reveal).
+use when: a hero with a real WebGL particle field the cursor repels — an elastic void that trails the pointer — plus staggered text reveal; the only hero in this set with npm deps (three, @react-three/fiber, motion), so pick it when true GPU depth is worth the heavier install.
 props:
   eyebrow?: string = "ns-ui"
   headline?: string = "Interfaces with gr…
@@ -368,7 +368,7 @@ install: npx shadcn add https://ns-ui-registry.vercel.app/r/particle-hero.json
 
 ## particle-tunnel-scrub  [core]
 Particle Tunnel Scrub — Scroll scrubs a camera through a monochrome point tunnel — velocity stretches d…
-use when: a scroll-driven effect (canvas, particles, 3d).
+use when: scroll flies a camera through a 3D particle tunnel with velocity-streaked dots and mono labels snapping into focus at fixed depths; use for a flythrough narrative, not a content-crossfade story or an instrument/HUD readout.
 props:
   labels?: string[] = ["01 SIGNAL", "02 N…
   pointCount?: number = 3000
@@ -378,7 +378,7 @@ install: npx shadcn add https://ns-ui-registry.vercel.app/r/particle-tunnel-scru
 
 ## respire-field  [core]
 Respire Field — Text input whose focus ring is a living membrane: a noise-displaced canvas loop…
-use when: a text/number input (form, canvas, noise).
+use when: a general-purpose text input whose focus ring is a breathing membrane that pulses per keystroke and constricts on error; use for any field needing organic focus/validation feedback, not specifically passwords.
 props:
   error?: boolean = false
   exhaleKey?: number = 0
@@ -430,7 +430,7 @@ install: npx shadcn add https://ns-ui-registry.vercel.app/r/scan-sweep-stats.jso
 
 ## scroll-caliper  [core]
 Scroll Caliper — A vernier caliper pinned to a scroll container's edge whose spring-damped jaws…
-use when: a scroll-driven effect (svg, instrument, spring).
+use when: a vernier-caliper HUD pinned to a scroll container's edge that measures the active section with a live px/percent readout; use as a scroll-position instrument, not a narrative or a 3D flythrough.
 props:
   children?: ReactNode
   sectionSelector?: string = "[data-section]"
@@ -457,7 +457,7 @@ install: npx shadcn add https://ns-ui-registry.vercel.app/r/sediment-stack.json
 
 ## signal-terrain  [core]
 Signal Terrain — Unknown-Pleasures ridgeline chart whose live history recedes into scrolling amb…
-use when: a chart (canvas, data viz, ridgeline).
+use when: an Unknown-Pleasures ridgeline chart where live history recedes into scrolling noise terrain, dented by the cursor; use for a live/ambient data feed with a generative-landscape feel, not when trend direction is the point.
 props:
   series?: number[] = EMPTY
   cols?: number = 96
@@ -474,7 +474,7 @@ install: npx shadcn add https://ns-ui-registry.vercel.app/r/signal-terrain.json
 
 ## slide-to-shatter  [core]
 Slide to Shatter — Frosted-glass confirm slider where drag distance drives Voronoi crack density —…
-use when: a slider or range input (confirm, destructive, glass).
+use when: a frosted-glass CONFIRM slider — drag distance grows Voronoi cracks that heal if you stop early, and shatter into glass shards on full travel; use for a destructive confirm action, not a plain value-reading input.
 props:
   label?: string = "SLIDE TO CONFIRM"
   confirmedLabel?: string = "CONFIRMED"
@@ -489,7 +489,7 @@ install: npx shadcn add https://ns-ui-registry.vercel.app/r/slide-to-shatter.jso
 
 ## solargraph-hero  [core]
 Solargraph Hero — Hero card whose canvas behaves like a long-exposure photograph: cursor movement…
-use when: a hero/landing section (canvas, cursor, trail).
+use when: a hero whose canvas behaves like a long-exposure photograph — cursor movement burns light trails that persist and decay over ~4s, building an ambient light-painting rather than reacting live; zero deps, best for a quieter, card-style hero.
 props:
   children?: ReactNode
   halfLifeMs?: number = 4000
@@ -525,7 +525,7 @@ install: npx shadcn add https://ns-ui-registry.vercel.app/r/terminator-date-fiel
 
 ## tide-gauge-password  [core]
 Tide Gauge Password — Password field with a canvas water tank behind the masked text: entropy raises…
-use when: a text/number input (password, form, canvas).
+use when: a password field specifically — a canvas water tank behind the masked text where entropy raises the tide and keystrokes slosh a real wave; use when strength itself should be legible, not for general text input.
 props:
   label?: string = "Password"
   name?: string = "password"
@@ -580,7 +580,7 @@ install: npx shadcn add https://ns-ui-registry.vercel.app/r/warp-lattice.json
 
 ## aurora-flow-chart  [loud]
 Aurora Flow Chart — Area chart whose fill is a live aurora curtain — series values drive curtain he…
-use when: a chart (data viz, canvas, noise).
+use when: an area chart whose fill is a live aurora curtain — height tracks values, hue tracks trend direction (cool falling, warm rising); use when trend direction itself is the story and you need a real tooltip/axis, not an ambient backdrop.
 props:
   data?: AuroraPoint[] = DEFAULT_DATA
   height?: number = 300
@@ -595,7 +595,7 @@ install: npx shadcn add https://ns-ui-registry.vercel.app/r/aurora-flow-chart.js
 
 ## core-sample-scroll  [loud]
 Core Sample Scroll — Pinned scroll story — the viewport becomes a geological core cross-section and…
-use when: a scroll-driven effect (story, canvas, hero).
+use when: a pinned scroll story where the viewport becomes a geological core sample and a drill bit descends through strata as DOM content panels crossfade per band; use for a long-form narrative with distinct content sections, not an abstract flythrough or a real-image reveal.
 props:
   bands?: CoreSampleBand[] = DEFAULT_BANDS
   totalDepth?: number = 128
@@ -637,7 +637,7 @@ install: npx shadcn add https://ns-ui-registry.vercel.app/r/event-horizon-comman
 
 ## frost-scrub  [loud]
 Frost Scrub — Scroll-scrubbed defroster — a pinned full-bleed image behind rippled shower gla…
-use when: a scroll-driven effect (webgl, shader, image).
+use when: a pinned scroll-scrubbed WebGL shader that anneals a full-bleed image from frosted shower glass to clarity as you scroll; use to reveal a real photo/image, not an abstract or generative scene.
 props:
   src?: string
   alt?: string = "Image annealing fr…
@@ -666,7 +666,7 @@ install: npx shadcn add https://ns-ui-registry.vercel.app/r/knockout-404.json
 
 ## prism-drag-split  [loud]
 Prism Drag Split — A frosted prism strip rides the cursor across a headline, magnifying the text b…
-use when: an animated text/headline effect (cursor, rgb split, chromatic aberration).
+use when: a frosted prism strip rides the cursor across a headline, magnifying it and tearing it into velocity-driven RGB channel slices that snap back with overshoot; use for a glitchy, chromatic-aberration headline moment, not a soft/organic one.
 props:
   text?: string = "REFRACTION"
   stripWidth?: number = 120
@@ -682,7 +682,7 @@ install: npx shadcn add https://ns-ui-registry.vercel.app/r/prism-drag-split.jso
 
 ## singularity-text  [loud]
 Singularity Text — Headline as a monochrome particle cloud — the cursor is a gravity well that eat…
-use when: a hero/landing section (text, particles, cursor).
+use when: a hero built from ONLY a headline, no surrounding CTA/copy layout — rendered as a particle cloud the cursor pulls into an orbiting accretion ring and releases to spring back into type; zero deps, use when the headline alone should be the whole scene.
 props:
   text?: string = "SINGULARITY"
   gravity?: number = 4_000_000

@@ -4,6 +4,7 @@
   "description": "Full-bleed hero where the headline exists twice: crisp DOM type above, and beneath it a canvas field of iron-filing strokes solved from a two-pole dipole field, so the type visibly iron-files into existence as the cursor approaches and CTA hover bends the whole field toward the button.",
   "collection": "core",
   "tags": ["canvas", "hero", "vector-field", "dipole", "particles", "cursor", "letter-mask", "text", "ambient"],
+  "useWhen": "a hero whose headline exists twice — crisp DOM type over a Canvas 2D field of iron-filing strokes that bend toward the cursor and snap toward the CTA on hover; zero deps, best when the headline itself should feel physically alive.",
   "autoplay": {
     "mode": "pointer-path",
     "path": "sweep",

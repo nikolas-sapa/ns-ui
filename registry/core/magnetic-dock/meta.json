@@ -9,6 +9,7 @@
     "dock",
     "micro-interaction"
   ],
+  "useWhen": "a macOS-dock-style row that magnifies items under cursor proximity with Gaussian falloff; use for an icon/action dock or nav row, not for showing scroll/read position through a document.",
   "autoplay": {
     "mode": "pointer-path",
     "path": "sweep",

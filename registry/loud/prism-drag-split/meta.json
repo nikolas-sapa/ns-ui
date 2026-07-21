@@ -4,6 +4,7 @@
   "description": "A frosted prism strip rides the cursor across a headline, magnifying the text beneath it and tearing it into velocity-driven RGB channel slices that snap back with spring overshoot.",
   "collection": "loud",
   "tags": ["cursor", "text", "rgb-split", "chromatic-aberration", "glass", "spring", "headline"],
+  "useWhen": "a frosted prism strip rides the cursor across a headline, magnifying it and tearing it into velocity-driven RGB channel slices that snap back with overshoot; use for a glitchy, chromatic-aberration headline moment, not a soft/organic one.",
   "autoplay": {
     "mode": "pointer-path",
     "path": "sweep",

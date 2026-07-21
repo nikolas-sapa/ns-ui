@@ -4,6 +4,7 @@
   "description": "Letters morph variable-font weight by cursor proximity — pure typography interaction.",
   "collection": "core",
   "tags": ["text", "typography", "cursor", "variable-font"],
+  "useWhen": "letters continuously morph variable-font weight by cursor proximity — pure typography, no particles/canvas/color, no discrete reveal moment; use for an ambient, subtle hover-driven headline.",
   "autoplay": {
     "mode": "pointer-path",
     "path": "sweep",
