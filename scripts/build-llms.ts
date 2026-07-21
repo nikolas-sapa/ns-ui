@@ -13,9 +13,12 @@
 import { readFileSync, writeFileSync, readdirSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { REGISTRY_ORIGIN } from "../lib/registry-origin.ts";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const HOMEPAGE = process.env.REGISTRY_HOMEPAGE ?? "https://design.helpmarq.com";
+// Single source of truth (lib/registry-origin.ts) — see that file for the
+// DNS-pending backstory and the one-line switch once it resolves.
+const HOMEPAGE = REGISTRY_ORIGIN;
 
 // ---------------------------------------------------------------------------
 // Bracket-balanced text utilities — the only "parsing" this script does.

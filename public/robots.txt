@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# AI-agent quickstart — component list, props, install commands.
+# See https://llmstxt.org
+# /llms.txt
+# /llms-full.txt

@@ -4,6 +4,7 @@ import { readFileSync, writeFileSync, readdirSync, existsSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { REGISTRY_ORIGIN } from "../lib/registry-origin.ts";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -39,8 +40,9 @@ writeFileSync(
     {
       $schema: "https://ui.shadcn.com/schema/registry.json",
       name: "ns-ui",
-      // ponytail: env override so prod builds carry the real URL; localhost stays the dev default
-      homepage: process.env.REGISTRY_HOMEPAGE ?? "http://localhost:3000",
+      // Single source of truth (lib/registry-origin.ts) — same origin the
+      // showcase and llms.txt install commands use, so this can't drift.
+      homepage: REGISTRY_ORIGIN,
       items,
     },
     null,

@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CopyButton } from "./copy-button";
 import { PreviewCard, type RegistryEntry } from "./preview-card";
+import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
 
-const REGISTRY_ORIGIN = "https://ns-ui-registry.vercel.app";
 const installFor = (name: string) =>
   `npx shadcn@latest add ${REGISTRY_ORIGIN}/r/${name}.json`;
 
@@ -143,6 +143,17 @@ export function Showcase({ items }: { items: RegistryEntry[] }) {
           />
         ))}
       </div>
+
+      <footer className="mt-24 border-t border-border pt-6 font-mono text-xs text-muted">
+        For AI agents:{" "}
+        <a href="/llms.txt" className="underline underline-offset-2 hover:text-foreground">
+          /llms.txt
+        </a>{" "}
+        ·{" "}
+        <a href="/llms-full.txt" className="underline underline-offset-2 hover:text-foreground">
+          /llms-full.txt
+        </a>
+      </footer>
     </main>
   );
 }

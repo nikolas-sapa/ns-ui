@@ -16,6 +16,10 @@ export default function RootLayout({
       lang="en"
       className={`dark ${GeistSans.variable} ${GeistMono.variable}`}
     >
+      <head>
+        <link rel="llms-txt" href="/llms.txt" />
+        <link rel="llms-txt" href="/llms-full.txt" title="full" />
+      </head>
       <body className="bg-background font-sans text-foreground antialiased">
         {children}
       </body>
