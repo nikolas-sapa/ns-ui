@@ -115,6 +115,10 @@ export function LoupeSlider({
   const current = isControlled ? value : internal;
   const currentRef = useRef(current);
   currentRef.current = current;
+  // mirrors :hover into data-hover — synthetic/dispatched pointer events never
+  // flip Chromium's real hover pseudo-class, so an autoplay driver using them
+  // needs an attribute to target (additive, doesn't change real-pointer feel)
+  const [hover, setHover] = useState(false);
 
   const defaultLabel = (v: number) =>
     step < 1 ? v.toFixed(1) : String(Math.round(v));
@@ -191,9 +195,16 @@ export function LoupeSlider({
       return Math.min(max, Math.max(min, Number(q.toFixed(6))));
     };
 
-    // geometry hugs the lens center: through the 1.8x pass a point at dy from
-    // cy lands at dy*1.8, so labels sit at cy+6 (-> +10.8) to stay inside the
-    // 22px lens radius instead of being magnified out past its rim
+    // geometry hugs the lens center: the clip radius is LENS_R*mag/MAG_BASE
+    // and the draw pass is scaled by `mag` around the same center, so a
+    // pre-mag point at offset d from (lx,cy) lands at d*mag post-transform —
+    // the mag-INDEPENDENT safe envelope is |d| <= LENS_R/MAG_BASE (R0),
+    // regardless of the 1.8->2.0 wobble. That only bounds height though:
+    // labels also need their magnified WIDTH inside the chord at that
+    // offset, so they sit at the lens's vertical center (dy small, near 0)
+    // for the widest available chord, AND get measured + font-shrunk per
+    // label so arbitrary formatLabel strings (not just 2-digit numbers)
+    // never get sliced by the rim.
     const drawScale = (g: CanvasRenderingContext2D) => {
       let minor = tickStep && tickStep > 0 ? tickStep : niceStep(span() / 60);
       while (span() / minor > 240) minor *= 2; // cap the tick count
@@ -225,13 +236,27 @@ export function LoupeSlider({
         g.lineTo(x, axisY + 10);
       }
       g.stroke();
-      g.font = `500 9px ${monoFam}`;
+      // labels: near lens-center for max chord width, font shrunk per-label
+      // when it would still overflow that chord (see comment above drawScale)
+      const R0 = LENS_R / MAG_BASE;
+      const labelDy = 2; // small clearance below the major tick tips (-2)
+      const maxWidth =
+        2 * Math.sqrt(Math.max(0, R0 * R0 - labelDy * labelDy)) * 0.92;
+      const baseFontPx = 9;
       g.textAlign = "center";
       g.textBaseline = "middle";
       g.fillStyle = rgba(fg, 0.9);
       for (let i = 0; i <= count; i += every) {
         const v = Number((min + i * minor).toFixed(6));
-        g.fillText(labelRef.current(v), xFor(v), cy + 6);
+        const text = labelRef.current(v);
+        g.font = `500 ${baseFontPx}px ${monoFam}`;
+        const measured = g.measureText(text).width;
+        const fontPx =
+          measured > maxWidth && measured > 0
+            ? Math.max(5, baseFontPx * (maxWidth / measured))
+            : baseFontPx;
+        if (fontPx !== baseFontPx) g.font = `500 ${fontPx}px ${monoFam}`;
+        g.fillText(text, xFor(v), cy + labelDy);
       }
     };
 
@@ -544,6 +569,7 @@ export function LoupeSlider({
   return (
     <div
       ref={containerRef}
+      data-hover={hover}
       className={`group relative h-16 w-full cursor-ew-resize touch-none select-none font-mono ${className}`}
       onPointerDown={(e) => {
         e.preventDefault();
@@ -556,6 +582,8 @@ export function LoupeSlider({
       }}
       onPointerUp={() => engineRef.current?.dragEnd()}
       onPointerCancel={() => engineRef.current?.dragEnd()}
+      onPointerEnter={() => setHover(true)}
+      onPointerLeave={() => setHover(false)}
     >
       <canvas
         ref={canvasRef}
@@ -565,7 +593,7 @@ export function LoupeSlider({
       <div
         ref={loupeRef}
         aria-hidden
-        className="pointer-events-none absolute left-0 top-0 h-11 w-11 rounded-full border border-border shadow-[0_2px_10px_-4px_rgba(0,0,0,0.4)] transition-colors duration-200 will-change-transform group-hover:border-foreground/40"
+        className="pointer-events-none absolute left-0 top-0 h-11 w-11 rounded-full border border-border shadow-[0_2px_10px_-4px_rgba(0,0,0,0.4)] transition-colors duration-200 will-change-transform group-hover:border-foreground/40 group-data-[hover=true]:border-foreground/40"
       />
       <div
         ref={thumbRef}
@@ -582,7 +610,7 @@ export function LoupeSlider({
       >
         <span
           aria-hidden
-          className="absolute left-1/2 top-1/2 h-4 w-0.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground/80 transition-colors duration-200 group-hover:bg-foreground"
+          className="absolute left-1/2 top-1/2 h-4 w-0.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground/80 transition-colors duration-200 group-hover:bg-foreground group-data-[hover=true]:bg-foreground"
         />
       </div>
     </div>

@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import {
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 
 // ---------------------------------------------------------------------------
@@ -161,8 +168,9 @@ function drawMoon(
 
 const easeOutExpo = (t: number) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t));
 const pad2 = (n: number) => String(n).padStart(2, "0");
+const pad4 = (n: number) => String(n).padStart(4, "0");
 const fmt = (d: Date) =>
-  `${pad2(d.getMonth() + 1)}/${pad2(d.getDate())}/${d.getFullYear()}`;
+  `${pad2(d.getMonth() + 1)}/${pad2(d.getDate())}/${pad4(d.getFullYear())}`;
 const addDays = (d: Date, n: number) =>
   new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
 function addMonths(d: Date, n: number) {
@@ -196,6 +204,7 @@ function parseMasked(text: string): Date | null {
   const mo = Number(m[1]);
   const da = Number(m[2]);
   const yr = Number(m[3]);
+  if (yr < 1000 || yr > 9999) return null; // reject non-4-digit-real years
   const d = new Date(yr, mo - 1, da);
   return d.getFullYear() === yr && d.getMonth() === mo - 1 && d.getDate() === da
     ? d
@@ -247,6 +256,7 @@ export function TerminatorDateField({
   const geomRef = useRef<GridGeom | null>(null);
   const justOpenedRef = useRef(false);
   const closeTimerRef = useRef(0);
+  const pendingCaretRef = useRef<number | null>(null);
   const animRef = useRef<{
     iconF: number | null;
     iconAnim: { from: number; to: number; start: number } | null;
@@ -553,6 +563,15 @@ export function TerminatorDateField({
     return () => window.clearTimeout(closeTimerRef.current);
   }, []);
 
+  // restore caret after the mask reformats `text` — React resets the DOM
+  // value on every render, which otherwise collapses the caret to the end
+  useLayoutEffect(() => {
+    const pos = pendingCaretRef.current;
+    if (pos === null) return;
+    pendingCaretRef.current = null;
+    inputRef.current?.setSelectionRange(pos, pos);
+  }, [text]);
+
   const close = (focusBack: boolean) => {
     window.clearTimeout(closeTimerRef.current);
     animRef.current.transit = null;
@@ -658,7 +677,30 @@ export function TerminatorDateField({
           aria-invalid={invalid || undefined}
           aria-describedby={helperId}
           onChange={(e) => {
-            const next = maskText(e.target.value);
+            const raw = e.target.value;
+            const caret = e.target.selectionStart ?? raw.length;
+            // caret position expressed as "how many digits precede it" is
+            // stable across reformatting; slash count shifts around it
+            const digitsBeforeCaret = raw
+              .slice(0, caret)
+              .replace(/\D/g, "").length;
+            const next = maskText(raw);
+            let pos = next.length;
+            if (digitsBeforeCaret <= 0) {
+              pos = 0;
+            } else {
+              let seen = 0;
+              for (let i = 0; i < next.length; i++) {
+                if (/\d/.test(next[i])) {
+                  seen++;
+                  if (seen === digitsBeforeCaret) {
+                    pos = i + 1;
+                    break;
+                  }
+                }
+              }
+            }
+            pendingCaretRef.current = pos;
             setText(next);
             const d = parseMasked(next);
             if (d) {

@@ -114,7 +114,20 @@ function parseColor(raw: string): Vec3 | null {
     return null;
   }
   const m = s.match(/rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)/);
-  return m ? [Number(m[1]), Number(m[2]), Number(m[3])] : null;
+  if (m) return [Number(m[1]), Number(m[2]), Number(m[3])];
+  // non-hex/rgb tokens (oklch(), hsl(), lab(), color(), named colors, …) —
+  // let the browser normalize the value instead of regexing every possible
+  // CSS color syntax: write it into a throwaway element and read back
+  // getComputedStyle(...).color, which browsers always resolve to rgb()/rgba().
+  if (typeof document === "undefined") return null;
+  const probe = document.createElement("span");
+  probe.style.color = s;
+  if (!probe.style.color) return null; // invalid value, not just an unhandled format
+  document.body.appendChild(probe);
+  const resolved = getComputedStyle(probe).color;
+  document.body.removeChild(probe);
+  const m2 = resolved.match(/rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)/);
+  return m2 ? [Number(m2[1]), Number(m2[2]), Number(m2[3])] : null;
 }
 
 function formatSize(bytes: number): string {
@@ -631,6 +644,7 @@ export function UpdraftDropzone({
       const next = [...files, ...accepted];
       setFiles(next);
       onFilesChange?.(next);
+      messages.push(...accepted.map((f) => `${f.name} added`));
     }
     if (newRejects.length > 0) setRejects((rs) => [...rs, ...newRejects]);
     if (messages.length > 0) setAnnounce(messages.join(". "));

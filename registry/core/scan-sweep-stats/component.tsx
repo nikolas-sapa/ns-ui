@@ -509,12 +509,33 @@ export function ScanSweepStats({
     document.addEventListener("visibilitychange", onVis);
 
     // hover/focus wakes a card immediately — replay only, accent stays earned
-    const hoverBound: Array<[HTMLElement, () => void]> = [];
+    // `data-raised` mirrors group-hover/group-focus-visible so the CSS-only
+    // raise overlay also responds to the site's synthetic autoplay driver,
+    // which dispatches trusted-looking pointerenter/pointerleave but never
+    // moves Chromium's real :hover state machine.
+    const hoverBound: Array<[HTMLElement, string, () => void]> = [];
     for (const c of records) {
       const h = () => wakeCard(c, c.active && c.accent);
+      const raise = () => {
+        c.el.dataset.raised = "true";
+      };
+      const lower = () => {
+        c.el.dataset.raised = "false";
+      };
       c.el.addEventListener("pointerenter", h);
       c.el.addEventListener("focus", h);
-      hoverBound.push([c.el, h]);
+      c.el.addEventListener("pointerenter", raise);
+      c.el.addEventListener("focus", raise);
+      c.el.addEventListener("pointerleave", lower);
+      c.el.addEventListener("blur", lower);
+      hoverBound.push(
+        [c.el, "pointerenter", h],
+        [c.el, "focus", h],
+        [c.el, "pointerenter", raise],
+        [c.el, "focus", raise],
+        [c.el, "pointerleave", lower],
+        [c.el, "blur", lower],
+      );
     }
 
     wake();
@@ -527,9 +548,8 @@ export function ScanSweepStats({
       io.disconnect();
       mo.disconnect();
       document.removeEventListener("visibilitychange", onVis);
-      for (const [el, h] of hoverBound) {
-        el.removeEventListener("pointerenter", h);
-        el.removeEventListener("focus", h);
+      for (const [el, type, h] of hoverBound) {
+        el.removeEventListener(type, h);
       }
       wakeRef.current = null;
     };
@@ -552,7 +572,7 @@ export function ScanSweepStats({
         onClick={togglePause}
         aria-pressed={paused}
         aria-label={paused ? "Resume radar sweep" : "Pause radar sweep"}
-        className="absolute left-3.5 top-3.5 z-20 flex h-5 w-5 items-center justify-center rounded-full border border-border bg-surface text-muted transition-colors duration-200 hover:border-foreground/25 hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground/40"
+        className="absolute left-3.5 top-3.5 z-20 flex h-5 w-5 items-center justify-center rounded-full border border-border bg-surface text-muted transition-colors duration-200 hover:border-foreground/25 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/70"
       >
         {paused ? (
           <span aria-hidden className="flex gap-[3px]">
@@ -591,12 +611,15 @@ export function ScanSweepStats({
               aria-label={`${s.label}: ${(s.format ?? defaultFormat)(s.value)}${
                 s.delta ? `, ${s.delta}` : ""
               }`}
-              className="group relative rounded-md border border-border bg-surface p-4 outline-none focus-visible:ring-1 focus-visible:ring-foreground/40"
+              className="group relative rounded-md border border-border bg-surface p-4 outline-none focus-visible:ring-2 focus-visible:ring-foreground/70"
             >
-              {/* surface-step raise on hover/focus — token-relative, no accent */}
+              {/* surface-step raise on hover/focus — token-relative, no accent
+                  (`data-raised` mirrors group-hover/group-focus-visible so this
+                  overlay also responds to the site's synthetic autoplay driver,
+                  which never moves Chromium's real :hover state machine) */}
               <div
                 aria-hidden
-                className="pointer-events-none absolute inset-0 rounded-md bg-foreground/[0.045] opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100"
+                className="pointer-events-none absolute inset-0 rounded-md bg-foreground/[0.045] opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100 group-data-[raised=true]:opacity-100"
               />
               <div className="relative">
                 <div className="flex items-center gap-1.5 text-muted">

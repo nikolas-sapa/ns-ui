@@ -407,6 +407,8 @@ export function FrostbiteSwitch({
     const drops: Drop[] = [];
     let growCount = 0;
     let glassLevel = 0;
+    let glistenPhase = 0; // per-cycle random offset so the breathing isn't a locked metronome
+    let glistenPeriodS = 4; // jittered 3.4-4.6s, reseeded each freeze cycle
     let thumbX = current ? TRAVEL : 0;
     let thumbV = 0;
     let target = thumbX;
@@ -553,6 +555,8 @@ export function FrostbiteSwitch({
         return;
       }
       const rand = mulberry32(0x9e3779b9 ^ (growCount++ * 101));
+      glistenPhase = rand() * Math.PI * 2;
+      glistenPeriodS = 3.4 + rand() * 1.2;
       crystal = buildCrystal(rand, w, h);
     };
 
@@ -678,7 +682,9 @@ export function FrostbiteSwitch({
         if (visible && !document.hidden && !disabledRef.current && !reduced) {
           sparkCanvas.style.opacity = (
             base() *
-            (0.62 + 0.38 * Math.sin((now / 1000) * Math.PI * 2 * 0.25))
+            (0.62 +
+              0.38 *
+                Math.sin((now / 1000) * ((Math.PI * 2) / glistenPeriodS) + glistenPhase))
           ).toFixed(3);
           active = true;
         }
@@ -760,6 +766,7 @@ export function FrostbiteSwitch({
     const setDisabledFn = (d: boolean) => {
       canvas.style.opacity = d ? "0.4" : "1";
       sparkCanvas.style.opacity = d ? "0.4" : "1";
+      thumb.style.opacity = d ? "0.4" : "1";
       setGlass(glassLevel);
       if (!d) wake(); // glisten resumes
     };
@@ -841,12 +848,10 @@ export function FrostbiteSwitch({
       onClick={toggle}
       className={`relative h-[30px] w-[52px] shrink-0 overflow-hidden rounded-full border outline-none transition-[background-color,border-color,box-shadow] duration-200 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:transition-none ${
         isChecked
-          ? "border-accent/40 bg-accent shadow-[0_0_14px_-2px] shadow-accent/60 delay-150"
+          ? "border-accent/40 bg-accent delay-150"
           : "border-foreground/10 bg-border delay-0"
       } ${
-        disabled
-          ? "cursor-not-allowed opacity-60"
-          : "cursor-pointer hover:border-foreground/25"
+        disabled ? "cursor-not-allowed" : "cursor-pointer hover:border-foreground/25"
       } ${className}`}
     >
       <span

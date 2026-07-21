@@ -153,6 +153,8 @@ export function RuleSparkline({
   const dataRef = useRef(data);
   const formatRef = useRef(formatValue);
   formatRef.current = formatValue;
+  const ariaLabelRef = useRef(ariaLabel);
+  ariaLabelRef.current = ariaLabel;
   const engineRef = useRef<{ setData: (d: number[]) => void } | null>(null);
 
   useEffect(() => {
@@ -378,7 +380,9 @@ export function RuleSparkline({
       const show = targetAlpha > 0 && ai >= 0 && ai < cur.length;
       if (show && (readoutAi !== ai || !readoutShown)) {
         readoutAi = ai;
-        readout.textContent = formatRef.current(cur[ai] ?? 0, ai);
+        const val = formatRef.current(cur[ai] ?? 0, ai);
+        readout.textContent = val;
+        root.setAttribute("aria-label", `${ariaLabelRef.current}, ${val}`);
         const rw = readout.offsetWidth;
         const x = Math.max(0, Math.min(w - rw, (xs[ai] ?? 0) - rw / 2));
         readout.style.transform = `translateX(${x.toFixed(1)}px)`;
@@ -386,6 +390,7 @@ export function RuleSparkline({
       if (show !== readoutShown) {
         readoutShown = show;
         readout.style.opacity = show ? "1" : "0";
+        if (!show) root.setAttribute("aria-label", ariaLabelRef.current);
       }
     };
 
@@ -554,11 +559,11 @@ export function RuleSparkline({
   return (
     <div
       ref={rootRef}
-      role="img"
+      role="group"
       aria-label={ariaLabel}
       tabIndex={0}
       style={{ touchAction: "pan-y" }}
-      className={`relative w-full cursor-crosshair overflow-hidden rounded-sm outline-none transition-colors duration-200 hover:bg-foreground/[0.03] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${className}`}
+      className={`relative w-full cursor-crosshair overflow-hidden rounded-sm outline-none transition-colors duration-200 hover:bg-foreground/[0.03] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${className}`}
     >
       <canvas
         ref={canvasRef}
@@ -567,7 +572,9 @@ export function RuleSparkline({
       />
       <div
         ref={readoutRef}
-        aria-hidden
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
         className="pointer-events-none absolute left-0 top-0.5 rounded-sm border border-border bg-surface px-1.5 py-0.5 font-mono text-[10px] tabular-nums text-foreground opacity-0 transition-opacity duration-150"
       />
     </div>

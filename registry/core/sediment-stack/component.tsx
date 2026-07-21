@@ -123,31 +123,6 @@ const ICONS: Record<SedimentSeverity, ReactNode> = {
   ),
 };
 
-function parseColor(raw: string): { r: number; g: number; b: number } | null {
-  const v = raw.trim();
-  if (v.startsWith("#")) {
-    const hex = v.slice(1);
-    if (hex.length === 3) {
-      const r = parseInt(hex[0] + hex[0], 16);
-      const g = parseInt(hex[1] + hex[1], 16);
-      const b = parseInt(hex[2] + hex[2], 16);
-      if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)) return null;
-      return { r, g, b };
-    }
-    if (hex.length >= 6) {
-      const r = parseInt(hex.slice(0, 2), 16);
-      const g = parseInt(hex.slice(2, 4), 16);
-      const b = parseInt(hex.slice(4, 6), 16);
-      if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)) return null;
-      return { r, g, b };
-    }
-    return null;
-  }
-  const m = v.match(/rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)/);
-  if (m) return { r: Number(m[1]), g: Number(m[2]), b: Number(m[3]) };
-  return null;
-}
-
 function CardInner({
   toast,
   onDismiss,
@@ -276,27 +251,14 @@ export const SedimentStack = forwardRef<
     return () => mq.removeEventListener("change", update);
   }, []);
 
-  // hover-lift + resting shadows both tint from the --foreground token so
-  // they read in both themes; re-derived live when the theme class flips on
-  // <html>. Resting shadow is a subtle version applied to every settled card
-  // so the pile reads as sitting under real weight, not flat cutouts.
-  useEffect(() => {
-    const rootEl = document.documentElement;
-    const derive = () => {
-      const fg = getComputedStyle(rootEl).getPropertyValue("--foreground");
-      const rgb = parseColor(fg) ?? { r: 0, g: 0, b: 0 };
-      shadowRef.current = `0 10px 24px -10px rgba(${rgb.r},${rgb.g},${rgb.b},0.28)`;
-      restShadowRef.current = `0 3px 10px -6px rgba(${rgb.r},${rgb.g},${rgb.b},0.3)`;
-      for (const b of bodiesRef.current.values()) {
-        if (b.dead) continue;
-        b.el.style.boxShadow = b.hovered ? shadowRef.current : restShadowRef.current;
-      }
-    };
-    derive();
-    const mo = new MutationObserver(derive);
-    mo.observe(rootEl, { attributes: true, attributeFilter: ["class"] });
-    return () => mo.disconnect();
-  }, []);
+  // hover-lift + resting shadows are tinted from a fixed dark "ink" (always
+  // rgba(0,0,0,...)), not a theme token — a shadow needs to stay dark in
+  // both themes, unlike --foreground which flips to near-white in dark mode
+  // and would otherwise paint a light halo around every card. Resting shadow
+  // is a subtle version applied to every settled card so the pile reads as
+  // sitting under real weight, not flat cutouts. shadowRef/restShadowRef are
+  // already seeded with these constants at declaration, so no derive effect
+  // is needed here.
 
   // oldest layers fade toward 0.55 as newer sediment lands on top
   const recomputeDepth = useCallback(() => {

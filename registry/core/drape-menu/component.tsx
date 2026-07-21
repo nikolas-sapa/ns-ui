@@ -160,6 +160,14 @@ export function DrapeMenu({
   onSelectRef.current = onSelect;
   const reducedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Keyed on a content signature rather than the `items` reference itself:
+  // consumers commonly pass an inline array literal (`<DrapeMenu items={[...]} />`),
+  // which gets a fresh identity on every parent re-render. Keying on `items`
+  // directly would tear down and reinit the live cloth sim (see the physics
+  // effect below, which depends on `entries`) on every unrelated re-render.
+  const itemsSig = items
+    .map((it) => `${it.id}|${it.label}|${it.shortcut ?? ""}|${it.separatorBefore ? 1 : 0}`)
+    .join("");
   const { list: entries, clothH } = useMemo(() => {
     const list: Entry[] = [];
     let y = PAD_TOP;
@@ -172,7 +180,8 @@ export function DrapeMenu({
       y += ITEM_H;
     }
     return { list, clothH: y + PAD_BOT };
-  }, [items]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- itemsSig is the intended dependency
+  }, [itemsSig]);
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -601,7 +610,12 @@ export function DrapeMenu({
         }
         updateEntries(dt, now);
         draw();
-        if (maxDp < SLEEP_EPS) sleep = true;
+        // Hard elapsed-time cap: the drape is visually at rest well before the
+        // velocity epsilon trips (documented drape time is 380-500ms), but
+        // sub-visual verlet jitter can keep the loop at 60fps for several extra
+        // seconds. Force-sleep with margin past that so we're not burning
+        // frames on imperceptible motion.
+        if (maxDp < SLEEP_EPS || now - openStartRef.current > 1200) sleep = true;
       } else {
         // retract: every vertex on a critically damped spring to the trigger
         const tx = g.tw / 2;

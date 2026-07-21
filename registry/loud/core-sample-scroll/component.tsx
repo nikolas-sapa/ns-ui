@@ -159,6 +159,7 @@ const CHIP_BATCH = 12; // particles per emission
 const CHIP_CAP = 120;
 const EMIT_EVERY = 0.09; // s between 12-particle batches while cutting
 const VEL_MIN = 2; // px/s — below this the bit is "parked", no spray
+const MIN_TIP = 16; // scene px — resting sliver so the bit tip clears the top edge at rest
 
 type Chip = { x: number; y: number; vx: number; vy: number; born: number };
 
@@ -384,25 +385,28 @@ export function CoreSampleScroll({
         ctx.stroke();
       }
 
-      // drill string + mono-weight chevron bit, center-left column
+      // drill string + mono-weight chevron bit, center-left column. Rendered
+      // at max(tip, MIN_TIP) so the bit tip always clears the top edge at
+      // rest (mount has tip=0) — physics/HUD still track the real `tip`.
       const dx = Math.round(w * 0.34);
+      const drawTip = Math.max(MIN_TIP, tip);
       ctx.strokeStyle = css(fg);
       ctx.lineCap = "butt";
       ctx.lineJoin = "miter";
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(dx, -h);
-      ctx.lineTo(dx, tip - 9);
+      ctx.lineTo(dx, drawTip - 9);
       ctx.stroke();
       ctx.beginPath();
-      ctx.moveTo(dx - 7, tip - 10);
-      ctx.lineTo(dx, tip);
-      ctx.lineTo(dx + 7, tip - 10);
+      ctx.moveTo(dx - 7, drawTip - 10);
+      ctx.lineTo(dx, drawTip);
+      ctx.lineTo(dx + 7, drawTip - 10);
       ctx.stroke();
       // depth ticks along the drilled hole
       ctx.globalAlpha = 0.3;
       ctx.lineWidth = 1;
-      for (let y = 56; y < tip - 12; y += 56) {
+      for (let y = 56; y < drawTip - 12; y += 56) {
         ctx.beginPath();
         ctx.moveTo(dx - 5, y + 0.5);
         ctx.lineTo(dx + 5, y + 0.5);

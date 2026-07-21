@@ -351,16 +351,21 @@ export function CausticCoverflow({
       const alpha = clamp(0.18 + (k / 6) * 0.55, 0, 0.85);
       ctx.lineWidth = 1.25;
       ctx.globalCompositeOperation = dark ? "lighter" : "source-over";
+      // fixed minimum-saturation floor on the split channel: a pure
+      // channel-split off a near-black --foreground (light theme) degrades
+      // to a gray smudge, not a color, without a floor to keep it visible
+      const redV = Math.max(fg.r, 190);
+      const blueV = Math.max(fg.b, 190);
       ctx.save();
       ctx.translate(-k, 0);
       rrectPath(ctx, 1, 1, cw - 2, ch - 2, 11);
-      ctx.strokeStyle = `rgba(${fg.r},0,0,${alpha})`;
+      ctx.strokeStyle = `rgba(${redV},0,0,${alpha})`;
       ctx.stroke();
       ctx.restore();
       ctx.save();
       ctx.translate(k, 0);
       rrectPath(ctx, 1, 1, cw - 2, ch - 2, 11);
-      ctx.strokeStyle = `rgba(0,0,${fg.b},${alpha})`;
+      ctx.strokeStyle = `rgba(0,0,${blueV},${alpha})`;
       ctx.stroke();
       ctx.restore();
       ctx.globalCompositeOperation = "source-over";
@@ -380,7 +385,7 @@ export function CausticCoverflow({
     let tweenDur = 250;
     let aberK = 0;
     let aberDeadline = 0;
-    let lastAberIdx = -1;
+    let lastWindow: number[] = [];
     let ambient = 0.5; // pool amplitude scale: 0.5 idle ↔ 1 interacting
     let raf = 0;
     let running = false;
@@ -493,16 +498,21 @@ export function CausticCoverflow({
           lastCaustic = now;
           const t = now / 1000;
           // only the focused card and its two neighbors run live caustics
-          for (let i = Math.max(0, a - 1); i <= Math.min(n - 1, a + 1); i++)
-            drawCaustics(i, t, ambient);
-          if (aberK >= 0.02) {
-            drawAberration(a, aberK);
-            lastAberIdx = a;
-          } else if (lastAberIdx >= 0 && lastAberIdx !== a) {
-            // wipe a stale fringe if focus jumped multiple cards in a frame
-            drawCaustics(lastAberIdx, t, ambient);
-            lastAberIdx = -1;
+          const winStart = Math.max(0, a - 1);
+          const winEnd = Math.min(n - 1, a + 1);
+          // unconditionally wipe any index the live window left behind —
+          // e.g. a fast multi-card navigate tween where `a` jumps 2+ cards
+          // in one frame — regardless of aberK's decay state, so a stale
+          // aberration fringe can never strand on an unattended card
+          for (const idx of lastWindow) {
+            if (idx < winStart || idx > winEnd) drawCaustics(idx, t, ambient);
           }
+          lastWindow = [];
+          for (let i = winStart; i <= winEnd; i++) {
+            drawCaustics(i, t, ambient);
+            lastWindow.push(i);
+          }
+          if (aberK >= 0.02) drawAberration(a, aberK);
         }
       }
 
@@ -732,7 +742,7 @@ export function CausticCoverflow({
         aria-roledescription="carousel"
         aria-label={ariaLabel}
         tabIndex={0}
-        className="relative w-full touch-pan-y select-none overflow-hidden rounded-md outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+        className="relative w-full touch-pan-y select-none overflow-hidden rounded-md outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
         style={{
           height: cardHeight + 48,
           perspective: "1200px",
