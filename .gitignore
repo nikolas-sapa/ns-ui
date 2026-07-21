@@ -5,3 +5,14 @@ next-env.d.ts
 *.tsbuildinfo
 .DS_Store
 .vercel
+
+# Generated from meta.json sidecars by `npm run registry:build`.
+# Not committed: two branches adding components would otherwise conflict in files
+# nobody hand-wrote. Regenerated automatically before dev/typecheck/verify/build,
+# and by Vercel on deploy.
+registry.json
+registry/index.tsx
+lib/autoplay.generated.json
+lib/card-frame.generated.json
+public/llms.txt
+public/llms-full.txt

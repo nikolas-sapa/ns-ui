@@ -6,11 +6,15 @@
     "dev": "next dev",
     "build": "npm run registry:build && next build",
     "start": "next start",
-    "registry:build": "node scripts/build-registry.ts && node scripts/build-llms.ts && node scripts/build-autoplay.ts",
+    "registry:build": "node scripts/build-index.ts && node scripts/build-registry.ts && node scripts/build-llms.ts && node scripts/build-autoplay.ts",
     "autoplay:build": "node scripts/build-autoplay.ts",
     "llms:build": "node scripts/build-llms.ts",
     "typecheck": "tsc --noEmit",
-    "verify": "node scripts/verify.ts"
+    "verify": "node scripts/verify.ts",
+    "index:build": "node scripts/build-index.ts",
+    "pretypecheck": "npm run registry:build",
+    "predev": "npm run registry:build",
+    "preverify": "npm run registry:build"
   },
   "dependencies": {
     "@react-three/fiber": "9.6.1",

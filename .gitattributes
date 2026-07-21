@@ -1,0 +1,11 @@
+# Screenshots are binary — never attempt a textual merge.
+*.png binary
+*.jpg binary
+
+# Build artifacts, regenerated from meta.json sidecars by `npm run registry:build`.
+# Collapsed in diffs and reviews; they are outputs, not source.
+registry.json            linguist-generated=true
+registry/index.tsx       linguist-generated=true
+lib/*.generated.json     linguist-generated=true
+public/llms.txt          linguist-generated=true
+public/llms-full.txt     linguist-generated=true
