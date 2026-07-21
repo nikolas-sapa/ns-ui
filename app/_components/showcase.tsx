@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CopyButton } from "./copy-button";
 import { PreviewCard, type RegistryEntry } from "./preview-card";
+import { ThemeToggle } from "./theme-toggle";
 import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
 
 const installFor = (name: string) =>
@@ -57,9 +58,12 @@ export function Showcase({ items }: { items: RegistryEntry[] }) {
     <main className="mx-auto w-full max-w-[1600px] px-6 pb-32 sm:px-10">
       <header className="grid gap-10 pt-20 sm:pt-28 lg:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] lg:items-end lg:gap-16">
         <div>
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">
-            ns-ui
-          </p>
+          <div className="flex items-center justify-between gap-4">
+            <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">
+              ns-ui
+            </p>
+            <ThemeToggle />
+          </div>
           <h1 className="mt-5 max-w-3xl text-3xl font-semibold leading-[1.15] tracking-tight sm:text-4xl">
             A personal registry of {items.length} React components.
           </h1>
