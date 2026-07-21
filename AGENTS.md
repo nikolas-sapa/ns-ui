@@ -149,6 +149,44 @@ npm run verify           # requires dev server running; screenshots every compon
 A component (or a change to one) isn't done until `npm run verify` passes and the idle/default-state
 screenshot has actually been looked at — that's the state the owner judges first and hardest.
 
+### What the gate actually checks
+
+Per component × theme: console errors, blank render, hover differs from default, keyboard focus
+differs from an unfocused baseline, dark and light not byte-identical. Plus, once per component:
+a DOM/ARIA audit derived from the rendered markup — every exposed, non-disabled interactive control
+must have an accessible name; `role=switch|checkbox|radio` must carry `aria-checked`; a visible
+dialog must have an accessible name; and if the component renders any control at all, Tab must
+reach something. Display-only components (skeletons, charts, canvas heroes) render no controls and
+are skipped by that last rule rather than fudged past it. `aria-hidden` subtrees are exempt — a
+visually hidden proxy `<input type=file>` behind a real button is correct, not a finding.
+
+Per-element tabbability is deliberately *not* asserted: roving-tabindex chips and spinner buttons
+whose `<input>` owns the keyboard are legitimate and would false-fail.
+
+### `gate` — verifying the open/expanded/armed state
+
+By default the gate only ever sees the **resting** state. That is how a popover clipped invisible by
+an ancestor's `overflow-hidden` shipped green. A component with a characteristic non-resting state
+declares how to reach it under an optional `gate` key in its `meta.json`:
+
+```jsonc
+"gate": {
+  "openBy": "button[aria-haspopup=menu]",  // CSS selector: click this (first match)
+  "expect": "[role=menuitem]"              // CSS selector: this must then be visible AND hittable
+}
+```
+
+The gate clicks `openBy`, waits, then requires `expect` to be genuinely on screen: non-zero box, not
+`visibility:hidden`/transparent, and `document.elementFromPoint()` at its centre resolving to it or
+something inside it. A non-zero box alone proves nothing — that is exactly what an ancestor's
+`overflow:hidden` leaves behind. It also writes a `<theme>-open.png` screenshot, so the open state
+is finally something the owner can look at.
+
+**Point `expect` at the thing that must be seen, not at a wrapper.** drape-menu's `[role=menu]`
+container measures 0×0 (its items are absolutely positioned), so `expect` there is `[role=menuitem]`.
+Both keys are required if the key is present; the key is optional, and a component without one is
+verified exactly as before.
+
 ## Prop-signature extraction (`scripts/build-llms.ts`)
 
 `build-llms.ts` scans each `component.tsx` for its exported prop shape using bracket-balanced text

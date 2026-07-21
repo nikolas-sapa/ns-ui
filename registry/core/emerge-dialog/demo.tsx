@@ -10,6 +10,22 @@ import { EmergeDialog } from "./component";
 // reopens after a beat so the card keeps showing the return-to-origin morph.
 const REOPEN_MS = 1600;
 
+// Deliberately taller than one viewport, with real scrollable rows behind the
+// dialog, so a regression in the background scroll-lock (the dialog stays
+// `open` but the page keeps scrolling under it) is visible to a screenshot
+// gate instead of being hidden by a page that happens to be exactly one
+// viewport tall.
+const OTHER_DRAFTS = [
+  "q1-retro.md",
+  "onboarding-copy.md",
+  "pricing-faq.md",
+  "changelog-draft.md",
+  "roadmap-notes.md",
+  "support-macros.md",
+  "release-checklist.md",
+  "brand-voice.md",
+];
+
 export default function EmergeDialogDemo() {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const reopenRef = useRef(0);
@@ -25,7 +41,7 @@ export default function EmergeDialogDemo() {
   };
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-between gap-10 px-8 py-24">
+    <div className="relative flex min-h-[150vh] flex-col items-center justify-between gap-10 px-8 py-24">
       <EmergeDialog
         open={open}
         onOpenChange={handleOpenChange}
@@ -91,6 +107,21 @@ export default function EmergeDialogDemo() {
         >
           Delete draft
         </button>
+      </div>
+
+      {/* Filler content, not part of the component demo — see OTHER_DRAFTS above. */}
+      <div className="flex w-full max-w-md flex-col gap-3">
+        {OTHER_DRAFTS.map((name) => (
+          <div
+            key={name}
+            className="flex items-center justify-between gap-6 rounded-md border border-border bg-surface px-4 py-3"
+          >
+            <span className="min-w-0 truncate font-mono text-xs text-muted">{name}</span>
+            <span className="shrink-0 rounded-sm border border-border bg-background px-3 py-1.5 text-xs font-medium text-muted">
+              Draft
+            </span>
+          </div>
+        ))}
       </div>
     </div>
   );

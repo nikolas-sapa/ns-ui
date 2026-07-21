@@ -10,6 +10,7 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
   type ReactNode,
 } from "react";
+import { createPortal } from "react-dom";
 
 // A breadcrumb that gives way from the middle. When the trail can't fit, the
 // root and the last two levels survive and everything between them folds into
@@ -86,6 +87,11 @@ export function WornPath({
   const [hidden, setHidden] = useState<number[]>([]);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
+  // viewport coords for the portaled menu — the "…" trigger lives inside an
+  // overflow-hidden <ol> (that clip is load-bearing: it's what keeps the
+  // collapsing trail from flashing wide before a resize settles), so the menu
+  // itself renders through a portal into <body> instead of being clipped with it
+  const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null);
 
   // read inside callbacks that must not churn on every parent render
   const itemsRef = useRef(items);
@@ -188,12 +194,41 @@ export function WornPath({
     return () => document.removeEventListener("pointerdown", onPointerDown, true);
   }, [open]);
 
-  // roving tabindex: exactly one menuitem is tabbable and it holds focus
+  // the menu is portaled to <body> (see menuPos comment above), so its
+  // position has to be read off the trigger explicitly instead of relying on
+  // CSS `absolute` + a positioned ancestor
+  useEffect(() => {
+    if (!open) {
+      setMenuPos(null);
+      return;
+    }
+    const place = () => {
+      const rect = moreBtnRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      setMenuPos({ top: rect.bottom + 8, left: rect.left });
+    };
+    place();
+    window.addEventListener("resize", place);
+    document.addEventListener("scroll", place, true);
+    return () => {
+      window.removeEventListener("resize", place);
+      document.removeEventListener("scroll", place, true);
+    };
+  }, [open]);
+
+  // roving tabindex: exactly one menuitem is tabbable and it holds focus.
+  // The menu now mounts a tick after `open` flips true (menuPos arrives via
+  // its own effect, see above), so menuRef is still null on the render this
+  // effect first sees — `menuReady` (a boolean, not the menuPos object) is
+  // what re-fires it once the menu is actually in the DOM. Using menuPos
+  // itself here would refire on every scroll/resize reposition and yank
+  // focus back to item 0 mid-scroll.
+  const menuReady = menuPos !== null;
   useEffect(() => {
     if (!open) return;
     const el = menuRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]')[active];
     el?.focus();
-  }, [open, active]);
+  }, [open, active, menuReady]);
 
   const closeMenu = useCallback((restoreFocus: boolean) => {
     setOpen(false);
@@ -262,7 +297,7 @@ export function WornPath({
       if (moreEmitted) return;
       moreEmitted = true;
       row.push(
-        <li key="ns-wp-more" className="relative flex items-center">
+        <li key="ns-wp-more" className="flex items-center">
           <button
             ref={moreBtnRef}
             type="button"
@@ -289,47 +324,51 @@ export function WornPath({
           >
             …
           </button>
-          {open && hiddenItems.length > 0 ? (
-            <div
-              ref={menuRef}
-              id={menuId}
-              role="menu"
-              aria-label="Hidden levels"
-              onKeyDown={onMenuKeyDown}
-              className={[
-                "ns-wp-menu absolute left-0 top-full z-50 mt-2 min-w-[11rem] rounded-md",
-                "border border-border bg-surface p-1 shadow-lg",
-              ].join(" ")}
-            >
-              {hiddenItems.map(({ item: hiddenItem, i }, pos) => {
-                const itemCls = [
-                  "block w-full rounded-sm px-2 py-1.5 text-left text-sm text-muted",
-                  "transition-colors duration-150 ease-out",
-                  "hover:bg-background hover:text-foreground",
-                  "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent",
-                ].join(" ");
-                const common = {
-                  role: "menuitem" as const,
-                  tabIndex: pos === active ? 0 : -1,
-                  className: itemCls,
-                  onFocus: () => setActive(pos),
-                  onClick: () => {
-                    navigate(hiddenItem, i);
-                    closeMenu(true);
-                  },
-                };
-                return hiddenItem.href ? (
-                  <a key={hiddenItem.id} href={hiddenItem.href} {...common}>
-                    {hiddenItem.label}
-                  </a>
-                ) : (
-                  <button key={hiddenItem.id} type="button" {...common}>
-                    {hiddenItem.label}
-                  </button>
-                );
-              })}
-            </div>
-          ) : null}
+          {open && hiddenItems.length > 0 && menuPos && typeof document !== "undefined"
+            ? createPortal(
+                <div
+                  ref={menuRef}
+                  id={menuId}
+                  role="menu"
+                  aria-label="Hidden levels"
+                  onKeyDown={onMenuKeyDown}
+                  style={{ top: menuPos.top, left: menuPos.left }}
+                  className={[
+                    "ns-wp-menu fixed z-50 min-w-[11rem] rounded-md",
+                    "border border-border bg-surface p-1 shadow-lg",
+                  ].join(" ")}
+                >
+                  {hiddenItems.map(({ item: hiddenItem, i }, pos) => {
+                    const itemCls = [
+                      "block w-full rounded-sm px-2 py-1.5 text-left text-sm text-muted",
+                      "transition-colors duration-150 ease-out",
+                      "hover:bg-background hover:text-foreground",
+                      "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent",
+                    ].join(" ");
+                    const common = {
+                      role: "menuitem" as const,
+                      tabIndex: pos === active ? 0 : -1,
+                      className: itemCls,
+                      onFocus: () => setActive(pos),
+                      onClick: () => {
+                        navigate(hiddenItem, i);
+                        closeMenu(true);
+                      },
+                    };
+                    return hiddenItem.href ? (
+                      <a key={hiddenItem.id} href={hiddenItem.href} {...common}>
+                        {hiddenItem.label}
+                      </a>
+                    ) : (
+                      <button key={hiddenItem.id} type="button" {...common}>
+                        {hiddenItem.label}
+                      </button>
+                    );
+                  })}
+                </div>,
+                document.body
+              )
+            : null}
         </li>
       );
       return;

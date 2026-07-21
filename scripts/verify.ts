@@ -38,10 +38,16 @@ function componentDir(name: string): string {
   throw new Error(`no registry folder found for ${name}`);
 }
 
-function checkMeta(name: string, dir: string) {
+type Gate = { openBy?: string; expect?: string };
+type Meta = { gate?: Gate } & Record<string, unknown>;
+
+function checkMeta(name: string, dir: string): Meta {
   const metaPath = join(dir, "meta.json");
-  if (!existsSync(metaPath)) return fail(`${name}: meta.json missing`);
-  const meta = JSON.parse(readFileSync(metaPath, "utf8"));
+  if (!existsSync(metaPath)) {
+    fail(`${name}: meta.json missing`);
+    return {};
+  }
+  const meta: Meta = JSON.parse(readFileSync(metaPath, "utf8"));
   for (const field of META_FIELDS) {
     if (meta[field] === undefined || meta[field] === "") {
       fail(`${name}: meta.json missing field "${field}"`);
@@ -50,13 +56,106 @@ function checkMeta(name: string, dir: string) {
   if (Array.isArray(meta.tags) && meta.tags.length === 0) {
     fail(`${name}: meta.json tags empty`);
   }
+  if (meta.gate) {
+    const { openBy, expect } = meta.gate;
+    if (!openBy || !expect) fail(`${name}: meta.json "gate" needs both "openBy" and "expect" selectors`);
+  }
+  return meta;
+}
+
+// Ran in-page. Derives what to assert from the rendered DOM rather than a
+// per-component list, so it can't rot when a component changes shape.
+// Deliberately NOT asserting per-element tabbability: roving-tabindex chips and
+// spinner buttons whose input owns the keyboard are legitimate and would
+// false-fail. Page-level reachability (below) is the honest version of that rule.
+function auditA11y() {
+  const CONTROLS =
+    "button, a[href], input:not([type=hidden]), select, textarea, [role=button], [role=switch]," +
+    " [role=checkbox], [role=radio], [role=tab], [role=slider], [role=menuitem], [role=option]," +
+    " [role=link], [role=combobox], [role=spinbutton]";
+  const txt = (s: string | null | undefined) => (s ?? "").trim();
+  const visible = (el: Element) => {
+    const r = el.getBoundingClientRect();
+    if (r.width <= 0 || r.height <= 0) return false;
+    const cs = getComputedStyle(el);
+    return cs.visibility !== "hidden" && Number(cs.opacity) > 0.01;
+  };
+  // aria-hidden subtrees are, by definition, not in the a11y tree — a visually
+  // hidden proxy <input type=file> behind a real button is correct, not a bug.
+  const exposed = (el: Element) => visible(el) && !el.closest('[aria-hidden="true"]');
+  const disabled = (el: Element) =>
+    (el as HTMLButtonElement).disabled === true || el.getAttribute("aria-disabled") === "true";
+  const named = (el: Element) => {
+    if (txt(el.getAttribute("aria-label"))) return true;
+    const by = el.getAttribute("aria-labelledby");
+    if (by && by.split(/\s+/).some((id) => txt(document.getElementById(id)?.textContent))) return true;
+    if (txt(el.getAttribute("title"))) return true;
+    const labels = (el as HTMLInputElement).labels;
+    if (labels?.length && Array.from(labels).some((l) => txt(l.textContent))) return true;
+    if (txt(el.getAttribute("placeholder"))) return true;
+    if (txt(el.getAttribute("alt"))) return true;
+    if (txt(el.textContent)) return true;
+    if (txt(el.querySelector("img[alt]")?.getAttribute("alt"))) return true;
+    if (txt(el.querySelector("svg title")?.textContent)) return true;
+    const input = el as HTMLInputElement;
+    if (el.tagName === "INPUT" && ["submit", "button", "reset"].includes(input.type) && txt(input.value)) return true;
+    return false;
+  };
+  const desc = (el: Element) => {
+    const role = el.getAttribute("role");
+    const cls = String((el as HTMLElement).className || "").split(/\s+/)[0];
+    return el.tagName.toLowerCase() + (role ? `[role=${role}]` : "") + (cls ? `.${cls}` : "");
+  };
+
+  const controls = Array.from(document.querySelectorAll(CONTROLS)).filter(exposed);
+  const live = controls.filter((el) => !disabled(el));
+  const problems: string[] = [];
+
+  for (const el of live) {
+    if (!named(el)) problems.push(`control has no accessible name: ${desc(el)}`);
+  }
+  for (const el of controls) {
+    const role = el.getAttribute("role");
+    if (role && ["switch", "checkbox", "radio"].includes(role) && !el.hasAttribute("aria-checked")) {
+      problems.push(`role=${role} without aria-checked: ${desc(el)}`);
+    }
+  }
+  for (const d of Array.from(document.querySelectorAll("[role=dialog], [role=alertdialog], dialog")).filter(exposed)) {
+    if (!named(d)) problems.push(`dialog has no accessible name: ${desc(d)}`);
+  }
+  return { controls: controls.length, problems };
+}
+
+// Is the element's own centre actually hittable? A non-zero box proves nothing:
+// an ancestor's overflow:hidden clips it, or something paints over it, and it is
+// invisible while still measuring fine. elementFromPoint is the honest test.
+// null = centre is off-viewport, which is also a fail.
+function hittable(selector: string) {
+  const el = document.querySelector(selector);
+  if (!el) return { ok: false, why: "no element matches" };
+  const r = el.getBoundingClientRect();
+  if (r.width <= 0 || r.height <= 0) return { ok: false, why: `zero box (${r.width}x${r.height})` };
+  const cs = getComputedStyle(el);
+  if (cs.visibility === "hidden" || Number(cs.opacity) < 0.01) {
+    return { ok: false, why: `visibility:${cs.visibility} opacity:${cs.opacity}` };
+  }
+  const x = r.left + r.width / 2;
+  const y = r.top + r.height / 2;
+  const hit = document.elementFromPoint(x, y);
+  if (!hit) return { ok: false, why: `centre (${Math.round(x)},${Math.round(y)}) is outside the viewport` };
+  // only the element itself or something inside it counts — an ANCESTOR at the
+  // centre means the element is clipped away or covered at that point.
+  if (hit !== el && !el.contains(hit)) {
+    return { ok: false, why: `centre hits <${hit.tagName.toLowerCase()}> instead — clipped or covered` };
+  }
+  return { ok: true, why: "" };
 }
 
 async function shoot(page: Page, dir: string, theme: string, state: string) {
   await page.screenshot({ path: join(dir, "screenshots", `${theme}-${state}.png`) });
 }
 
-async function verifyComponent(page: Page, name: string, dir: string) {
+async function verifyComponent(page: Page, name: string, dir: string, meta: Meta) {
   mkdirSync(join(dir, "screenshots"), { recursive: true });
 
   for (const theme of ["dark", "light"] as const) {
@@ -99,6 +198,32 @@ async function verifyComponent(page: Page, name: string, dir: string) {
 
     await shoot(page, dir, theme, "default");
 
+    // DOM/ARIA audit — theme-independent, so run it once (dark pass) rather
+    // than reporting every real violation twice.
+    if (theme === "dark") {
+      const { controls, problems } = await page.evaluate(auditA11y);
+      for (const p of problems) fail(`${name}: a11y — ${p}`);
+
+      // Page-level keyboard reachability: if the component renders any control
+      // at all, Tab from a blurred body must land on something. A display-only
+      // component (skeleton, chart, canvas hero) has no controls and is skipped.
+      if (controls > 0) {
+        await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+        let landed: string | null = null;
+        for (let i = 0; i < 12 && !landed; i++) {
+          await page.keyboard.press("Tab");
+          landed = await page.evaluate(() => {
+            const a = document.activeElement;
+            return a && a !== document.body && a !== document.documentElement ? a.tagName : null;
+          });
+        }
+        if (!landed) {
+          fail(`${name}: a11y — ${controls} interactive control(s) but nothing is reachable by Tab`);
+        }
+        await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+      }
+    }
+
     // interaction states: first VISIBLE interactive element, if any
     const interactive = page
       .locator("button, a, [role=button]")
@@ -119,10 +244,34 @@ async function verifyComponent(page: Page, name: string, dir: string) {
       await shoot(page, dir, theme, "press");
       await page.mouse.up();
 
+      // Focus, honestly. The press above already focused the element via
+      // mouse.down, so the old explicit .focus() fired no transition and the
+      // focus shot could never differ — it manufactured false findings against
+      // components that were fine. Blur first, take the unfocused baseline HERE
+      // (not the pre-click `default`: that click may have toggled state, and the
+      // diff would then pass on state change rather than on a focus ring), then
+      // drive focus by keyboard so :focus-visible applies the way a user sees it.
       await page.mouse.move(0, 0);
-      await interactive.focus();
-      await page.waitForTimeout(250);
+      await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+      await page.waitForTimeout(300);
+      await shoot(page, dir, theme, "unfocused");
+      let focused = false;
+      for (let i = 0; i < 12 && !focused; i++) {
+        await page.keyboard.press("Tab");
+        focused = await page.evaluate(() => {
+          const a = document.activeElement;
+          return !!a && a !== document.body && a !== document.documentElement;
+        });
+      }
+      await page.waitForTimeout(300);
       await shoot(page, dir, theme, "focus");
+      const [unf, foc] = ["unfocused", "focus"].map((s) =>
+        readFileSync(join(dir, "screenshots", `${theme}-${s}.png`))
+      );
+      if (focused && unf.equals(foc)) {
+        fail(`${name} [${theme}]: keyboard focus renders no visible focus state`);
+      }
+      await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
       await page.keyboard.press("Escape");
     }
 
@@ -135,6 +284,29 @@ async function verifyComponent(page: Page, name: string, dir: string) {
       await page.waitForTimeout(600);
       await shoot(page, dir, theme, "scroll");
       await page.evaluate(() => window.scrollTo(0, 0));
+    }
+
+    // Characteristic state — the open/expanded/armed one. Optional: a component
+    // declares it in meta.json as { "gate": { "openBy": "...", "expect": "..." } }.
+    // Without this the gate only ever sees the resting state, which is how a
+    // popover clipped invisible by an ancestor's overflow-hidden shipped green.
+    const gate = meta.gate;
+    if (gate?.openBy && gate.expect) {
+      const opener = page.locator(gate.openBy).first();
+      if (!(await opener.count())) {
+        fail(`${name} [${theme}]: gate.openBy "${gate.openBy}" matches nothing`);
+      } else {
+        await opener.click({ timeout: 5000 });
+        await page.waitForTimeout(700);
+        await page.mouse.move(0, 0);
+        const hit = await page.evaluate(hittable, gate.expect);
+        if (!hit.ok) {
+          fail(`${name} [${theme}]: gate.expect "${gate.expect}" not visible — ${hit.why}`);
+        }
+        await shoot(page, dir, theme, "open");
+        await page.keyboard.press("Escape");
+        await page.waitForTimeout(300);
+      }
     }
 
     if (consoleErrors.length) {
@@ -164,8 +336,8 @@ const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
 for (const item of items) {
   console.log(`verifying ${item.name}`);
   const dir = componentDir(item.name);
-  checkMeta(item.name, dir);
-  await verifyComponent(page, item.name, dir);
+  const meta = checkMeta(item.name, dir);
+  await verifyComponent(page, item.name, dir, meta);
 }
 
 await browser.close();

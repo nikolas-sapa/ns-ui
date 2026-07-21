@@ -574,7 +574,7 @@ export function QuickKey({
           border-radius: 16px;
           background: var(--surface);
           color: var(--foreground);
-          box-shadow: 0 24px 60px -20px color-mix(in oklab, var(--foreground) 30%, transparent);
+          box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.45);
           animation: ns-qk-panel-in 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
         }
         .ns-qk[data-closing] { animation: ns-qk-panel-out 150ms ease-in both; }

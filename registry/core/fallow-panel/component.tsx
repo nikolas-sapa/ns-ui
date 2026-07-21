@@ -36,7 +36,9 @@ export function FallowPanel({
 }: FallowPanelProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLButtonElement>(null);
-  const [near, setNear] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const near = hovered || focused;
   // origin of the contraction, in % of the panel box — measured, not assumed,
   // because the CTA sits wherever the copy above it pushes it
   const [origin, setOrigin] = useState("50% 72%");
@@ -110,15 +112,15 @@ export function FallowPanel({
             ref={ctaRef}
             type="button"
             onClick={onAction}
-            onPointerEnter={() => setNear(true)}
-            onPointerLeave={() => setNear(false)}
-            onFocus={() => setNear(true)}
-            onBlur={() => setNear(false)}
+            onPointerEnter={() => setHovered(true)}
+            onPointerLeave={() => setHovered(false)}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
             className={[
               "mt-6 inline-flex items-center justify-center rounded-sm bg-accent px-4 py-2",
               "text-sm font-medium text-white",
               "transition-[background-color,transform,box-shadow] duration-200 ease-out",
-              "hover:-translate-y-px hover:bg-accent-hover hover:shadow-[0_6px_16px_-6px_var(--accent)]",
+              "hover:-translate-y-px hover:bg-accent-hover hover:shadow-[0_0_0_1px_var(--accent)]",
               "active:translate-y-0 active:bg-accent-hover",
               "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
             ].join(" ")}

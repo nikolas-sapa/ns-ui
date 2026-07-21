@@ -2,9 +2,13 @@
 
 import { useCallback, useEffect, useId, useRef, type ReactNode, type RefObject } from "react";
 
-// A modal on the native <dialog> element: focus trap, background inertness,
-// Escape-to-close, top-layer stacking and ::backdrop all come from the
-// platform, so none of it is reimplemented here. The twist is the entrance —
+// A modal on the native <dialog> element: focus trap, background inertness to
+// pointer and focus, Escape-to-close, top-layer stacking and ::backdrop all
+// come from the platform, so none of that is reimplemented here. showModal()
+// does NOT stop the page behind it from scrolling, though, so that one piece
+// of inertness is hand-rolled: body scroll is locked for the duration the
+// dialog is open and the scrollbar's width is compensated with padding so the
+// page doesn't jump when the scrollbar disappears. The twist is the entrance —
 // the panel emerges from the control that opened it. The trigger's bounding
 // rect is measured at open time (not at mount; it moves on scroll and resize),
 // inverted into one transform, and played out to identity (FLIP: no layout
@@ -54,6 +58,10 @@ export function EmergeDialog({
   const timerRef = useRef(0);
   const titleId = useId();
   const descId = useId();
+  // Captured inline body styles from just before the lock was applied, so
+  // close/unmount restores whatever a host page had set rather than clobbering
+  // it. Null means "not currently locked".
+  const scrollLockRef = useRef<{ overflow: string; paddingRight: string } | null>(null);
 
   // read in listeners that are bound once, so their deps stay empty
   const openRef = useRef(open);
@@ -107,6 +115,32 @@ export function EmergeDialog({
   const reduced = () =>
     typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // showModal() and CSS inertness stop pointer and focus from reaching the
+  // background, but the page itself keeps scrolling under it. Lock it here;
+  // the scrollbar's width is added back as body padding so the page doesn't
+  // reflow/jump when the scrollbar disappears. Idempotent: a re-open landing
+  // mid-close finds it already locked and no-ops.
+  const lockScroll = useCallback(() => {
+    if (scrollLockRef.current) return;
+    const body = document.body;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    scrollLockRef.current = { overflow: body.style.overflow, paddingRight: body.style.paddingRight };
+    body.style.overflow = "hidden";
+    if (scrollbarWidth > 0) {
+      const currentPadding = parseFloat(window.getComputedStyle(body).paddingRight) || 0;
+      body.style.paddingRight = `${currentPadding + scrollbarWidth}px`;
+    }
+  }, []);
+
+  const unlockScroll = useCallback(() => {
+    const saved = scrollLockRef.current;
+    if (!saved) return;
+    const body = document.body;
+    body.style.overflow = saved.overflow;
+    body.style.paddingRight = saved.paddingRight;
+    scrollLockRef.current = null;
+  }, []);
+
   const openNow = useCallback(() => {
     const dlg = dialogRef.current;
     const panel = panelRef.current;
@@ -117,6 +151,7 @@ export function EmergeDialog({
     clearTimeout(timerRef.current);
     cancelAnimationFrame(rafRef.current);
     reset();
+    lockScroll();
     if (!dlg.open) dlg.showModal();
     if (reduced()) return;
 
@@ -142,7 +177,7 @@ export function EmergeDialog({
         panel.style.transform = "translateY(0px)";
       }
     });
-  }, [invert, reset]);
+  }, [invert, reset, lockScroll]);
 
   const closeNow = useCallback(() => {
     const dlg = dialogRef.current;
@@ -185,8 +220,13 @@ export function EmergeDialog({
       e.preventDefault();
       onOpenChangeRef.current(false);
     };
-    // anything that closed the dialog without going through the prop
+    // anything that closed the dialog without going through the prop. The
+    // native `close` event fires for every path the dialog can close through
+    // (our own dlg.close() calls included), so it's the single place the
+    // scroll lock is released rather than duplicating that call at every
+    // dlg.close() site.
     const onClose = () => {
+      unlockScroll();
       if (openRef.current) onOpenChangeRef.current(false);
     };
     // a click on the backdrop targets the dialog itself; the panel covers the rest
@@ -201,14 +241,17 @@ export function EmergeDialog({
       dlg.removeEventListener("close", onClose);
       dlg.removeEventListener("click", onClick);
     };
-  }, []);
+  }, [unlockScroll]);
 
   useEffect(
     () => () => {
       clearTimeout(timerRef.current);
       cancelAnimationFrame(rafRef.current);
+      // Unmounting mid-animation (before the close timer fires dlg.close())
+      // must not strand the page scroll-locked forever.
+      unlockScroll();
     },
-    []
+    [unlockScroll]
   );
 
   return (
