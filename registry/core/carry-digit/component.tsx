@@ -141,7 +141,7 @@ function DigitCell({ col, armed }: { col: Col; armed: boolean }) {
     <span
       aria-hidden
       className="relative inline-block w-[1ch] shrink-0 overflow-hidden align-baseline"
-      style={{ height: ROW }}
+      style={{ height: ROW, lineHeight: ROW }}
     >
       {/* Invisible in-flow glyph, same char/metrics as the idle cells. The
           sliding track right below is the only OTHER child and it's
@@ -149,10 +149,19 @@ function DigitCell({ col, armed }: { col: Col; armed: boolean }) {
           container hunts for an item's baseline, so without this the flip
           cell has no in-flow baseline content and the browser synthesizes
           its bottom margin edge as the baseline instead of the text
-          baseline every idle/enter/exit cell uses. That mismatch is what
-          made the whole `items-baseline` row (and the card around it) hop
-          vertically every time a column was mid-flip; this anchor keeps the
-          flip cell's baseline identical to its resting siblings. */}
+          baseline every idle/enter/exit cell uses.
+          `lineHeight: ROW` on THIS outer span (not just the anchor below) is
+          just as load-bearing: an inline-block's own flex-baseline is struck
+          from its own computed line-height, inherited as "normal" here if
+          unset, not from a descendant's. With only the anchor carrying ROW,
+          the anchor's line box and the outer box's own strut disagreed by a
+          few px (measured ~3px at text-3xl/Geist Mono) — invisible on a
+          lone flip next to nothing, but every simultaneously-flipping
+          column in a big carry (e.g. 999->1000, all four columns at once)
+          carried the same offset, so the whole readout visibly hopped
+          vertically together, snapping back at settle. Both this span's own
+          `lineHeight` and the anchor's must be ROW for the flip cell's
+          baseline to land exactly where idle/enter/exit put theirs. */}
       <span className="invisible" style={{ lineHeight: ROW }}>
         {col.char}
       </span>

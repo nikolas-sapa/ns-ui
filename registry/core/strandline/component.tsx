@@ -892,7 +892,7 @@ export function Strandline({
             className="group block rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground/60"
             style={{ transform: "scale(0.6)" }}
           >
-            <span className="flex h-6 w-6 items-center justify-center rounded-full border border-border bg-surface text-muted transition duration-200 group-hover:-translate-y-0.5 group-hover:border-foreground group-hover:text-foreground group-focus-visible:border-foreground group-focus-visible:text-foreground">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full border border-border bg-surface text-muted transition-colors duration-200 group-hover:border-foreground group-hover:text-foreground group-focus-visible:border-foreground group-focus-visible:text-foreground">
               <svg viewBox="0 0 10 10" className="h-2.5 w-2.5" aria-hidden>
                 <circle
                   cx="5"

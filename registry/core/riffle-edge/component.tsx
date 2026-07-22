@@ -8,17 +8,17 @@ import { useEffect, useRef, useState } from "react";
 // (one 1px --border line per card, the current one recolored --foreground),
 // running down the side of the top card like the exposed page-edge of a
 // book. Dragging that stripe riffles cards past: each step change kicks the
-// top card with a 220ms rotateY(9deg) + translateX(20px) flip-past (deter-
+// top card with a 220ms rotateY(5deg) + translateX(11px) flip-past (deter-
 // ministic per-index vertical jitter, so no two steps land identically),
-// settling on a spring-out ease that overshoots slightly past identity
-// before landing — release settles the arrival with the same kick. The two
-// decorative depth layers behind the top card (its permanently-visible
-// stacked-thickness read) kick too, on the same commit, at deliberately
-// large amplitude (16px/6deg then 9px/3deg, reduced with depth): an
-// opposite-leaning translate+rotate that eases back to their resting offset
-// a beat after the top card, each layer lagging the one in front of it —
-// so a step reads as the whole deck visibly reshuffling and restacking, not
-// a subtle 3px nudge. Scrub
+// settling on a smooth ease-out with no overshoot — release settles the
+// arrival with the same kick. The two decorative depth layers behind the
+// top card (its permanently-visible stacked-thickness read) kick too, on
+// the same commit, at a subtler amplitude (9px/3deg then 5px/2deg, reduced
+// with depth): an opposite-leaning translate+rotate that eases back to
+// their resting offset a beat after the top card, each layer lagging the
+// one in front of it — so a step reads as the whole deck visibly
+// reshuffling and restacking, cleanly, not a subtle 3px nudge and not a
+// glitchy overshoot. Scrub
 // velocity governs which: slow drags step discretely (a kick per card), fast
 // drags blur the top card through a CSS filter transition instead of
 // chattering through kicks — the exposed edge itself carries both roles at
@@ -67,13 +67,13 @@ const BLUR_TRANSITION_MS = 140;
 const MAX_BLUR = 5;
 const FAST_VELOCITY = 14; // idx/s — at or above this, blur-through instead of a kick
 const VELOCITY_FOR_MAX_BLUR = 46; // idx/s mapped to MAX_BLUR
-const KICK_ROTATE_DEG = 9;
-const KICK_TRANSLATE_X = 20;
-// spring-out settle: overshoots slightly past identity/rest before easing
-// back, so the return half of every kick reads as a satisfying snap rather
-// than a linear decay — applied to the top card's flip-past and both back
+const KICK_ROTATE_DEG = 5;
+const KICK_TRANSLATE_X = 11;
+// clean settle: smooth ease-out with no bounce/overshoot past identity/rest,
+// so the return half of every kick reads as a deliberate riffle rather than
+// a springy glitch — applied to the top card's flip-past and both back
 // layers' restack alike
-const SETTLE_EASE = "cubic-bezier(0.34, 1.56, 0.64, 1)";
+const SETTLE_EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
 const PERSPECTIVE_PX = 720;
 // decorative back-layer rest offsets, in rem — matches the original
 // translate-x-1.5/translate-y-1.5 and translate-x-3/translate-y-3 Tailwind
@@ -83,13 +83,13 @@ const BACK1_REST_REM = 0.375;
 const BACK2_REST_REM = 0.75;
 // shuffle nudge applied on top of the rest offset during a kick — smaller
 // than the top card's own kick, and smaller again for the second layer, so
-// depth reads as reduced amplitude the further back a layer sits. Large
-// enough now that the whole deck visibly cascades on every step, not just
-// the top card.
-const BACK1_SHIFT_PX = 16;
-const BACK2_SHIFT_PX = 9;
-const BACK1_ROTATE_DEG = 6;
-const BACK2_ROTATE_DEG = 3;
+// depth reads as reduced amplitude the further back a layer sits. Scaled
+// down proportionally with the top card's own kick so the whole deck still
+// visibly cascades on every step, without reading as a broken animation.
+const BACK1_SHIFT_PX = 9;
+const BACK2_SHIFT_PX = 5;
+const BACK1_ROTATE_DEG = 3;
+const BACK2_ROTATE_DEG = 2;
 const BACK_STAGGER_MS = 90; // each back layer settles this much later than the one in front
 const WHEEL_STEP_PX = 36; // deltaY accumulated before a wheel/trackpad tick steps a card
 const WHEEL_COOLDOWN_MS = 260; // >= KICK_MS, so each step's kick reads before the next fires
