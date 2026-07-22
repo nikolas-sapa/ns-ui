@@ -1,0 +1,34 @@
+{
+  "name": "tumbler-gate",
+  "title": "Tumbler Gate",
+  "description": "Destructive-action confirm gated on precision, not patience: rotate an SVG dial's notch to within 3deg of a fixed index, hold it there 400ms, and the dial snaps home and arms the confirm button — overshoot and it springs back like a slipping safe tumbler.",
+  "collection": "core",
+  "tags": [
+    "dial",
+    "confirm",
+    "destructive",
+    "slider",
+    "physics",
+    "accessibility",
+    "confirmation"
+  ],
+  "useWhen": "a destructive confirm gated on fine-motor ACCURACY — rotate a dial notch within 3deg of the index and hold the dwell, or it springs back like a slipping tumbler; pick hold-to-confirm for a time-based press-and-hold with no precision component, slide-to-shatter for a distance-based drag confirm, or moire-dial when the dial itself is the deliverable (a value/message to tune into) rather than a gate in front of a separate destructive action.",
+  "instruction": "A destructive-action confirm built on precision rather than patience or distance: a 176px SVG dial (an outer ring in --border, a rotating notch group, and a fixed index tick at 12 o'clock) must be turned by pointer drag, mouse wheel, or arrow keys until the notch sits within 3deg of the index and is HELD there for a 400ms dwell. Drag maps pointer-angle delta around the dial's center to rotation damped by a 0.6 friction factor (a raw 1:1 turn would feel twitchy at this tolerance); wheel and arrow keys step exactly 2deg via a visually-hidden native input[type=range] (role=slider, min -180 max 180, step 2) that also carries a live aria-valuetext like '12 degrees from unlocked' (or 'Unlocked' once armed) so screen-reader users get the same continuous feedback sighted users get from the notch's position. Leaving the 3deg band before the 400ms dwell completes is a failed catch: the dial springs out to a fixed +8deg stop under a stiff, lightly underdamped spring (k=380, zeta=0.55) — a deliberate 'give' read as a safe tumbler that almost caught and slipped, visually and mechanically distinct from a plain rubber-band snap-back. Completing the dwell cancels the timer, spring-snaps the notch to exact zero (k=260, zeta=0.85, one small overshoot), thickens both the notch and index ticks from --border to --foreground, and arms the destructive button, which is the component's one legitimate use of --accent (a border that appears only once the precision test is actually passed). Because a fine-motor precision gate is inherently hostile to motor-impaired users, an always-visible 'Type to confirm instead' native <details>/<summary> disclosure offers an equal alternate path — typing the configured word (default 'delete', case-insensitive) arms the button exactly like a successful dwell; after two failed dial catches that disclosure auto-expands (aria-live announces it) so the escape hatch is offered, not just available. Every alignment success or fallback match announces politely via aria-live ('Aligned, delete enabled.' / 'Confirmed, delete enabled.'). All physics run on direct-DOM refs (dial transform, slider value/aria-valuetext, spring loops) with React state reserved for the rare armed/confirmed/failed-count/fallback-open transitions. Once armed the dial locks (further drag/wheel/keys are ignored) since a caught tumbler has nothing left to prove. Under prefers-reduced-motion the slip and snap springs are replaced by instant jumps to the same end angles — no oscillation — while drag, wheel, and keyboard stepping behave identically either way.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "drag",
+    "target": ".tumbler-knob",
+    "from": [0.2, 0.32],
+    "to": [0.8, 0.28],
+    "period": 4600,
+    "delay": 700
+  },
+  "gate": {
+    "openBy": "[data-tumbler-toggle]",
+    "expect": "[data-tumbler-confirm-input]"
+  },
+  "card": {
+    "focus": ".max-w-md",
+    "padding": 0.16
+  }
+}
