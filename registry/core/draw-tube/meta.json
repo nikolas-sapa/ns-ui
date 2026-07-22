@@ -1,0 +1,27 @@
+{
+  "name": "draw-tube",
+  "title": "Draw Tube",
+  "description": "Breadcrumbs that collapse like a spyglass's draw tubes: middle crumbs telescope into 2px slivers of their own border instead of a dead ellipsis, and a hover or focus pulls the whole trail back out with a staggered spring.",
+  "collection": "core",
+  "tags": [
+    "breadcrumb",
+    "navigation",
+    "nav",
+    "overflow",
+    "accessibility",
+    "micro-interaction"
+  ],
+  "autoplay": {
+    "mode": "pointer-path",
+    "path": "sweep",
+    "target": "nav[aria-label=\"Breadcrumb\"]",
+    "inset": 0.1,
+    "period": 2600
+  },
+  "gate": {
+    "openBy": "nav[aria-label=\"Breadcrumb\"] a",
+    "expect": "li[data-collapsed=\"true\"] a"
+  },
+  "instruction": "A breadcrumb trail that solves the perennial 'seven levels, 400px' overflow problem without an information-destroying ellipsis. Takes `items: { id, label, href? }[]` ordered root -> current (the LAST item renders as the current page, non-link, aria-current=page); an optional `onNavigate(id, event)` fires on click of any non-current crumb and, when provided, prevents that click's default navigation so the same click can drive SPA routing. RENDER: `nav[aria-label=\"Breadcrumb\"] > ol[role=list]` of flex-item `li`s, each a real DOM node forever — never display:none, so a screen reader hears the complete trail whether it reads as a tidy row or a stack of collapsed slivers. MEASUREMENT: a second, aria-hidden clone of the identical markup sits absolutely positioned off-screen so ResizeObserver can read each crumb's true natural width even while its visible twin is locked to a collapsed 2px — a second ResizeObserver on the visible container supplies the width actually available. COLLAPSE: root (index 0) and the current page (last index) are never candidates; when the sum of natural widths exceeds the available width, crumbs collapse from innermost-middle outward — the crumb adjacent to the current page first, then progressively toward the root — exactly like a real telescope closing tip-first, until the trail fits or every middle crumb is collapsed. A collapsing crumb's own `max-width` eases from its measured natural width down to 2px on ease-out-expo (cubic-bezier(0.19,1,0.22,1)), staggered 40ms per level starting from the one nearest the current page, while its inner label slides -14px and fades to 0.35 opacity underneath — the remaining 2px IS that crumb's own `--border` right-edge, an honest sliver proving a level is still there rather than an erased '…'. EXPAND: hovering or keyboard-focusing anywhere in the trail (`:hover` / `:focus-within` on the root wrapper — no JS state needed for this half) reverses every collapsed crumb back to its measured natural width on a per-segment spring (cubic-bezier(0.34, 1.5 + rank*0.12, 0.64, 1)) staggered 40ms per level starting from the crumb nearest the root, so later (deeper) segments arrive a beat after and land with slightly more overshoot, like the last snap of an antenna extending. Because focus-within — not a click handler — drives the expansion, focusing any collapsed link (Tab, or a screen reader's virtual cursor) auto-extends the whole tube before that link is ever read or activated; nothing is ever focus-trapped invisible. INK: current-page text is `--foreground` at medium weight; ancestor links are `--muted`, brightening to `--foreground` on hover and gaining a `--accent` focus-visible ring; the collapse divider between every crumb is a 2px `--border` right-edge. prefers-reduced-motion drops every transition on both the collapse and expand paths — the resting and expanded states are unchanged, just not eased into. Zero dependencies; DOM + CSS only, no canvas or SVG. Distinct from bedrock-trace: bedrock-trace is a per-sentence grounding-coverage instrument for a RAG answer with no path/breadcrumb concept at all; draw-tube is breadcrumb navigation, and the only thing it shares with a trace is the word 'trace' never appearing in either.",
+  "dependencies": []
+}

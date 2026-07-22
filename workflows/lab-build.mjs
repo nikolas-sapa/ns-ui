@@ -14,15 +14,14 @@ export const meta = {
 //   port (number, this worktree's dev port), existing (string[] of taken slugs),
 //   count (how many to build, default 10), canvasAllowed (bool)
 // }
-// ponytail: tolerate args arriving as a JSON string (harness stringifies sometimes)
-const _args = typeof args === 'string' ? JSON.parse(args) : args
-if (!_args || !_args.laneKey) throw new Error('lab-build needs args.laneKey — invoke via Workflow({scriptPath, args})')
-const LANE = _args.laneName || _args.laneKey
-const BRIEF = _args.laneBrief || ''
-const PORT = _args.port || 3460
-const EXISTING = Array.isArray(_args.existing) ? _args.existing.join(' ') : String(_args.existing || '')
-const COUNT = Math.max(4, Math.min(16, _args.count || 10))
-const CANVAS_OK = !!_args.canvasAllowed
+const A = typeof args === 'string' ? JSON.parse(args) : args
+if (!args || !A.laneKey) throw new Error('lab-build needs A.laneKey — invoke via Workflow({scriptPath, args})')
+const LANE = A.laneName || A.laneKey
+const BRIEF = A.laneBrief || ''
+const PORT = A.port || 3460
+const EXISTING = Array.isArray(A.existing) ? A.existing.join(' ') : String(A.existing || '')
+const COUNT = Math.max(4, Math.min(16, A.count || 10))
+const CANVAS_OK = !!A.canvasAllowed
 
 const HOUSE = `ns-ui house style: near-black restrained "Geist-dark" surfaces; a small "loud" collection is deliberately flashier. Colors come ONLY from CSS custom properties --background --foreground --muted --border --accent; --accent (#006bff blue) is interaction only, never decoration. Geist Sans for text, Geist Mono for data/code. Generous whitespace, thin borders, physics easing (spring / ease-out-expo), radius rhythm 6/12/16/full, 4px spacing base. Naming is two evocative words that name the MECHANISM not the widget (worn-path, loose-thread, kerf-caret, penumbra-tip). BANNED: gradient washes, neon, purple/blue backgrounds, orange, emoji (use inline SVG), heavy 3D. For any CORE component: no <canvas>, no WebGL — DOM+SVG+CSS only (a canvas draw path cannot inherit the color tokens; it broke the light theme once). Loud components MAY use canvas but must still read colors from the tokens via getComputedStyle at mount and on theme change.`
 
@@ -75,7 +74,7 @@ ALREADY TAKEN (never duplicate one of these in IDEA, not just in name):
 ${EXISTING}
 
 Generate 8-10 concepts. For each: name the single idea vividly, the real job it does, the nearest existing component and how yours differs, the concrete mechanism (the actual motion/visual technique), and an honest a11y_note (keyboard + screen reader story). Set canvas_needed truthfully — a core daily driver must be false; only a loud showpiece may need canvas${CANVAS_OK ? '' : ', and this lane should prefer core'}. Push past restyled native controls — those are not concepts.`,
-      { label: `ideate:${_args.laneKey}:${posture.k}`, phase: 'Ideate', model: 'fable', schema: IDEA_SCHEMA }
+      { label: `ideate:${A.laneKey}:${posture.k}`, phase: 'Ideate', model: 'fable', schema: IDEA_SCHEMA }
     )
   )
 )
@@ -131,7 +130,7 @@ ${JSON.stringify(concepts, null, 2)}
 Judge each on: self-explains at rest, distinct (not already in the taken set and not a common pattern), buildable with honest accessibility, and house-fit (monochrome tokens; or genuinely earns a loud slot). Then SELECT the ${COUNT} strongest that are all distinct from each other and from the taken set, spread across jobs (do not pick six sliders). ${CANVAS_OK ? 'This lane may include loud/canvas showpieces where they are the strongest swings.' : 'Prefer core daily-drivers; only include a loud showpiece if it is clearly outstanding.'} You may refine a slug (house style: two mechanism words) or tighten an idea.
 
 Write each brief as 5-8 sentences a builder needs no other context for: the idea, the job, the exact mechanism, the a11y requirements, how it must differ from the named nearest existing component, and whether canvas is allowed (only for loud). Return exactly ${COUNT} in build.`,
-  { label: `judge:${_args.laneKey}`, phase: 'Judge', model: 'opus', effort: 'high', schema: SEL_SCHEMA }
+  { label: `judge:${A.laneKey}`, phase: 'Judge', model: 'opus', effort: 'high', schema: SEL_SCHEMA }
 )
 
 const BUILD = (selection.build ?? []).slice(0, COUNT)
@@ -210,7 +209,7 @@ Read AGENTS.md in full. The token rule and no-canvas-for-core rule are absolute.
 Do NOT run git and do NOT deploy — the chat owns the commit boundary. You MAY run git status/git diff.
 
 Report per component: pass/fail, what you fixed, screenshot observations (call out what a resting screenshot cannot verify), and anything removed.`,
-  { label: `gate:${_args.laneKey}`, phase: 'Gate', model: 'opus', effort: 'high' }
+  { label: `gate:${A.laneKey}`, phase: 'Gate', model: 'opus', effort: 'high' }
 )
 
 return {

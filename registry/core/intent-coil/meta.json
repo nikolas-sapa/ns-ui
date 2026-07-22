@@ -1,0 +1,22 @@
+{
+  "name": "intent-coil",
+  "title": "Intent Coil",
+  "description": "A hover-card trigger that has to be wound before it opens: a hairline arc coils clockwise around a 5px dot while the pointer dwells, and drifting away mid-wind visibly unwinds it back instead of firing.",
+  "collection": "core",
+  "tags": ["hover-card", "popover", "link-preview", "dwell", "svg", "gesture", "accessibility"],
+  "useWhen": "Reach for IntentCoil when the popover's failure mode you're solving is opening when the user didn't mean to hover there — link previews, profile cards, definition popovers — and you want the hover delay itself made visible as a charging gate rather than a hidden setTimeout. Its trigger is a real link with aria-haspopup=\"dialog\" that has to be wound (~350ms of continuous dwell, visibly, via the coiling arc) before the card opens, and un-winds back with nothing shown if the pointer leaves early. Reach for PenumbraTip instead when the thing you're building is a plain tooltip that should always fire on hover/focus (no gate, no refusal) and the interesting problem is arrival — resolving from the trigger's own edge with delay-group handoff between siblings — not intent-gating.",
+  "autoplay": {
+    "mode": "pointer-path",
+    "path": "sweep",
+    "target": "a[aria-haspopup=\"dialog\"]",
+    "inset": 0.12,
+    "period": 4200,
+    "delay": 600
+  },
+  "gate": {
+    "openBy": "a[aria-haspopup=\"dialog\"]",
+    "expect": ".ns-intent-coil-card"
+  },
+  "instruction": "Build a hover-card trigger whose gate you can see charging: a hairline SVG arc (circle, r=5, 1px stroke, --muted, pathLength=1 so stroke-dashoffset is normalized 0..1 with no circumference math) coils clockwise around a small 5px filled dot appended right after the trigger link's label. Drive the arc's progress with dwell time on a single rAF loop, not a CSS transition — the wind has to be interruptible mid-frame. On pointerenter of the trigger, progress ramps 0 to 1 over 350ms (dashoffset = 1 - progress, so 1 = empty/hidden and 0 = the full ring drawn; rotate the circle -90deg so the sweep starts at 12 o'clock and reads clockwise). Reaching progress 1 opens the card — a plain --background surface, 12px radius, 1px --border, positioned directly below the trigger in normal DOM flow (no portal) so its content simply falls into the tab order in document position rather than needing to be spliced into it — with a spring-style scale-in from 0.95 (a bouncy cubic-bezier(0.34, 1.56, 0.64, 1) over ~220ms reads as 'springs open' without needing real spring physics), while the now-fully-wound arc plays a release: a fast ~117ms (350/3) ease-out-expo transition back to dashoffset 1, the visual discharge of the intent that just fired. If the pointer leaves the trigger before progress reaches 1, the same rAF loop reverses direction and unwinds progress back to 0 at 2x the winding rate — the arc visibly retreats — and the card never mounts at all: no flicker, no half-open state. Hovering the open card itself (not just the trigger) keeps it open, with a short ~160ms grace after leaving either one before it actually closes, so crossing the small gap between trigger and card doesn't flicker-close. Keyboard gets no coil at all: focusing the trigger arms a plain 300ms dwell timer that opens the card with zero arc animation (a keyboard user already stated intent by tabbing here — gating them behind the same visual charge a mouse gets would be a real accessibility bug), and pressing Enter — or a decisive click, since aria-haspopup=\"dialog\" means this link's primary action is to invoke the popover rather than navigate — skips even that timer and opens immediately; both are idempotent against an already-open card rather than toggling it shut. Escape closes the card from anywhere (focus may already be inside it) and returns focus to the trigger. Every color is a token (--background --foreground --muted --border --accent) with zero dependencies and no canvas — DOM and SVG only. Under prefers-reduced-motion the coil is hidden entirely and the release skipped; hovering opens the card after the same 350ms dwell window via a plain opacity fade instead of the scale-spring, so the timing stays consistent but nothing is rendered mid-motion.",
+  "dependencies": []
+}

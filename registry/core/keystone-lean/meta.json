@@ -1,0 +1,28 @@
+{
+  "name": "keystone-lean",
+  "title": "Keystone Lean",
+  "description": "A dependency-aware list rendered as stones in an arch — hovering an ordinary item's delete control previews the exact post-delete layout, while a load-bearing keystone's control tremors its dependents and refuses to close, replacing the 'are you sure, 3 things depend on this' modal with spatial pre-commitment.",
+  "collection": "core",
+  "tags": [
+    "list",
+    "delete",
+    "dependency",
+    "confirmation",
+    "preview",
+    "accessibility",
+    "layout"
+  ],
+  "autoplay": {
+    "mode": "press",
+    "target": "[data-kl-delete=\"blocked\"]",
+    "hold": 900,
+    "period": 4000
+  },
+  "gate": {
+    "openBy": "[data-kl-delete=\"safe\"]",
+    "expect": "[data-kl-caption]"
+  },
+  "useWhen": "deleting from a list where some rows are load-bearing (env vars, pipeline stages, linked records) and the interesting moment is BEFORE the click — the delete control itself previews or refuses the removal spatially. Pick assay-gate instead when the decision is approve/deny on a whole proposed action with editable arguments, not a per-row delete with dependents.",
+  "instruction": "Renders a list of items as stones standing in a shallow arch (a subtle per-item baseline lift + tilt computed from its position across the row, crown at center, springers at the edges — pure CSS transform, no canvas). Each item optionally declares `dependents`: ids of other items in the same list that rely on it existing. An item with one or more dependents is a keystone; everything else is ordinary. Every item's delete control is a real button with a permanent aria-describedby reading exactly 'safe to delete' or 'blocked: N items depend on this: A, B, C' — that text never depends on hover state, so a screen reader user gets the full answer the moment they reach the control, hover/focus is only the sighted reinforcement layered on top. Hovering OR focusing an ORDINARY item's delete control arms a preview: every other stone within two positions of the gap leans 1.5deg (immediate neighbor) or 0.6deg (second neighbor) toward the gap and translates 30%/12% of the way closed, staged with a 40ms outward stagger per step, using the armed item's OWN measured width so the preview is proportionally honest, not a guess. The preview holds for as long as EITHER hover or keyboard focus is active (tracked as two independent booleans — a mouse leaving a keyboard-focused control does not drop the preview, and vice versa) and spring-reverts (cubic-bezier(0.34,1.56,0.64,1), an overshoot-then-settle) the moment both are gone. Hovering or focusing a KEYSTONE's delete control instead runs a single shared 300ms decaying tremor (translateX +-1px over three cycles) through every one of its dependent stones, wherever they sit in the list, while its own control shows a --muted border and an inline-SVG strike-through-circle glyph instead of the ordinary X — permanently, not just while armed, so the blocked state is legible at rest too. Nothing leans and nothing closes: nothing is being removed, so there is no gap to preview. Clicking an ordinary control commits: a FLIP capture/measure/invert/play runs so the animation is a continuation of whatever the preview had already reached, completing to the true post-removal layout (the arch's remaining stones recomputed for one fewer item) over ~400ms ease-out-expo; the item is then actually gone, an aria-live region announces 'Removed {label}.', and focus moves to the neighbor that took its place (or the list itself if none remain). Clicking a keystone's control is a guarded no-op — aria-disabled is set but the button stays focusable and in tab order, since aria-disabled controls are exempt from the accessible-name/interactivity assumptions a fully disabled button would carry. Under prefers-reduced-motion every transform is replaced by a static 2px outline in --border on exactly the same set of affected stones (leaning neighbors, or a keystone's dependents) — the same information, spatially anchored, with nothing animating. Zero dependencies, tokens only (--background, --foreground, --surface, --border, --muted, --accent for focus rings), DOM + inline SVG + CSS, no canvas.",
+  "dependencies": []
+}
