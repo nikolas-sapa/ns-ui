@@ -143,6 +143,19 @@ function DigitCell({ col, armed }: { col: Col; armed: boolean }) {
       className="relative inline-block w-[1ch] shrink-0 overflow-hidden align-baseline"
       style={{ height: ROW }}
     >
+      {/* Invisible in-flow glyph, same char/metrics as the idle cells. The
+          sliding track right below is the only OTHER child and it's
+          position:absolute — out-of-flow children are skipped when a flex
+          container hunts for an item's baseline, so without this the flip
+          cell has no in-flow baseline content and the browser synthesizes
+          its bottom margin edge as the baseline instead of the text
+          baseline every idle/enter/exit cell uses. That mismatch is what
+          made the whole `items-baseline` row (and the card around it) hop
+          vertically every time a column was mid-flip; this anchor keeps the
+          flip cell's baseline identical to its resting siblings. */}
+      <span className="invisible" style={{ lineHeight: ROW }}>
+        {col.char}
+      </span>
       <span
         className="absolute inset-x-0 top-0 flex flex-col will-change-transform"
         style={{

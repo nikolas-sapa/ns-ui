@@ -3,14 +3,15 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 // Streaming LLM text where the still-provisional tail visibly hasn't dried
-// yet. Each new token starts light — variable-font weight down at 300,
-// opacity .55, a hair of blur — then rides the weight axis up to 400 with
-// opacity 1 and no blur over ~600ms, ease-out-expo. Because it's the weight
-// axis (not a font swap or a scale/transform), Geist Sans barely changes
-// glyph width between 300 and 400, so there's no reflow jitter as tokens
-// dry; the registered "GeistSans Fallback" metric-matched font has no
-// variable axis at all, so if the variable face hasn't loaded yet tokens
-// just render at a locked weight, never mid-thin.
+// yet. Each new token starts light — opacity .55, a hair of blur — then
+// rides up to opacity 1 and no blur over ~600ms, ease-out-expo. font-weight
+// is locked to 400 for the token's entire life (never part of the
+// animation): interpolating the variable-font weight axis mid-flight
+// changes glyph advance widths frame by frame, and because tokens arrive
+// faster than one token's dry time, several spans would be mid-ramp at
+// once — the trailing settled text would visibly compact as their widths
+// crept. Keeping weight constant and animating only opacity/blur (neither
+// affects layout) means arrival never reflows already-rendered text.
 //
 // Every token is a real, pure-CSS `animation: ... both` — arrival IS the
 // stagger, nothing is scheduled or replayed from JS, and because tokens is
@@ -158,8 +159,8 @@ const CSS = `
   animation:ns-wet-ink-dry var(--ns-wet-ink-dry-ms,600ms) cubic-bezier(.16,1,.3,1) both;
 }
 @keyframes ns-wet-ink-dry{
-  from{font-weight:300;font-variation-settings:'wght' 300;opacity:.55;filter:blur(.4px)}
-  to{font-weight:400;font-variation-settings:'wght' 400;opacity:1;filter:blur(0)}
+  from{opacity:.55;filter:blur(.4px)}
+  to{opacity:1;filter:blur(0)}
 }
 @media (prefers-reduced-motion: reduce){
   .ns-wet-ink-token{animation:none;font-weight:400;font-variation-settings:'wght' 400;opacity:1;filter:none}

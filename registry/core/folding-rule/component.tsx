@@ -239,15 +239,23 @@ function Branch({
                     : "transform 200ms cubic-bezier(0.55, 0, 0.85, 0.4), opacity 160ms ease-in",
               }}
             >
-              {/* hinge pivot + segment edge rule */}
+              {/* hinge pivot + segment edge rule — z-10 + pointer-events-none:
+                  each child row below sits in its own transform stacking
+                  context (for the row-stagger animation), which the transform
+                  spec promotes to an implicit z-index:0. Left at z-index:auto
+                  these decorative spans tied for that same paint layer and
+                  lost the DOM-order tiebreak to the (later) row wrappers, so
+                  a hovered row's opaque bg-surface painted over the line and
+                  visually severed it. Explicit z-index lifts them into the
+                  next paint layer, above every row's hover/selected fill. */}
               <span
                 aria-hidden="true"
-                className="absolute bottom-1 top-0 w-px bg-border"
+                className="absolute bottom-1 top-0 z-10 w-px bg-border pointer-events-none"
                 style={{ left: `${13 + depth * 20 + 8}px` }}
               />
               <span
                 aria-hidden="true"
-                className="absolute top-0.5 h-[5px] w-[5px] rounded-full border border-muted bg-surface"
+                className="absolute top-0.5 z-10 h-[5px] w-[5px] rounded-full border border-muted bg-surface pointer-events-none"
                 style={{ left: `${13 + depth * 20 + 6}px` }}
               />
               {node.children!.map((child, i) => (

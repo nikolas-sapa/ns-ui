@@ -139,6 +139,12 @@ export function TearTab({
   const timersRef = useRef(new Set<ReturnType<typeof setTimeout>>());
   const rafRef = useRef(0);
   const jitterTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  // window-level pointermove/up/cancel handlers, kept fresh via refs so a
+  // single mount-time listener never goes stale — see the drag effect below
+  // for why this has to live on window instead of the chip element.
+  const onWindowPointerMoveRef = useRef<(e: PointerEvent) => void>(() => {});
+  const onWindowPointerUpRef = useRef<(e: PointerEvent) => void>(() => {});
+  const onWindowPointerCancelRef = useRef<(e: PointerEvent) => void>(() => {});
 
   const reducedRef = useRef(
     typeof window !== "undefined" &&
@@ -317,17 +323,47 @@ export function TearTab({
     e.preventDefault();
   };
 
-  const onChipPointerMove = (tag: string) => (e: React.PointerEvent<HTMLLIElement>) => {
-    if (dragIdRef.current !== tag) return;
-    const dy = Math.max(0, e.clientY - dragStartYRef.current);
-    applyProgress(clamp(dy / TEAR_DISTANCE, 0, 1));
-  };
+  // Drag tracking lives on window, not the chip: a chip-scoped pointermove
+  // only fires while the pointer stays over the chip's own box (or, for a
+  // real mouse, while setPointerCapture is honored — which it isn't for the
+  // synthetic pointer events the registry's autoplay preview dispatches).
+  // Once the cursor crosses the chip's bottom edge mid-tear, a chip-scoped
+  // listener stops receiving events and progress sticks at its last value.
+  // Listening on window guarantees delivery regardless of where the pointer
+  // physically is, for both real and synthetic pointers. The handlers are
+  // kept fresh via refs (updated every render, no dependency array) and
+  // wired to window exactly once on mount, so the listener identity never
+  // changes and no event is ever dropped between remove/re-add.
+  useEffect(() => {
+    onWindowPointerMoveRef.current = (e: PointerEvent) => {
+      if (!dragIdRef.current) return;
+      const dy = Math.max(0, e.clientY - dragStartYRef.current);
+      applyProgress(clamp(dy / TEAR_DISTANCE, 0, 1));
+    };
+    onWindowPointerUpRef.current = () => {
+      const tag = dragIdRef.current;
+      if (!tag) return;
+      if (dragProgressRef.current >= RELEASE_AT) commitDrop(tag);
+      else springBack();
+    };
+    onWindowPointerCancelRef.current = () => {
+      if (dragIdRef.current) springBack();
+    };
+  });
 
-  const endDrag = (tag: string) => () => {
-    if (dragIdRef.current !== tag) return;
-    if (dragProgressRef.current >= RELEASE_AT) commitDrop(tag);
-    else springBack();
-  };
+  useEffect(() => {
+    const move = (e: PointerEvent) => onWindowPointerMoveRef.current(e);
+    const up = (e: PointerEvent) => onWindowPointerUpRef.current(e);
+    const cancel = (e: PointerEvent) => onWindowPointerCancelRef.current(e);
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+    window.addEventListener("pointercancel", cancel);
+    return () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      window.removeEventListener("pointercancel", cancel);
+    };
+  }, []);
 
   const undo = () => {
     const entry = undoStackRef.current.pop();
@@ -456,11 +492,6 @@ export function TearTab({
                 tabIndex={isFocused ? 0 : -1}
                 onFocus={() => setFocusedTag(tag)}
                 onPointerDown={onChipPointerDown(tag)}
-                onPointerMove={onChipPointerMove(tag)}
-                onPointerUp={endDrag(tag)}
-                onPointerCancel={() => {
-                  if (dragIdRef.current === tag) springBack();
-                }}
                 onKeyDown={onChipKeyDown(tag)}
                 data-tear-first={chipIndex(tag) === 0 || undefined}
                 className={[

@@ -55,7 +55,9 @@ export default function RiffleEdgeDemo() {
           Onboarding
         </p>
         <RiffleEdge items={STEPS} defaultIndex={0} aria-label="Onboarding steps" />
-        <p className="mt-3 text-xs text-muted">Drag the edge on the right, or focus it and use arrow keys.</p>
+        <p className="mt-3 text-xs text-muted">
+          Drag the edge on the right, scroll over it, or focus it and use arrow keys.
+        </p>
       </div>
     </div>
   );

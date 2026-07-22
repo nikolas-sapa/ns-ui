@@ -23,6 +23,16 @@ import { useEffect, useRef, useState } from "react";
 // by the caller for blur. `prefers-reduced-motion` drops both: no rotateY,
 // no perspective, no blur ever — steps crossfade via opacity instead.
 //
+// The stripe's *drawn* thickness is deliberately compressed (down to a
+// 1.5px-per-card pitch) so a small deck visibly reads thinner than a large
+// one — but the drag range is NOT tied to that compressed thickness: it's
+// a `travel` distance matched to the card's own measured height, a
+// full-height rail beside the card rather than a sliver a couple of
+// cards wide. Wheel/trackpad scroll over the stripe steps one card per
+// tick too (accumulated deltaY, cooldown-gated so a single fling can't
+// blow through several kicks at once) — dragging, wheeling and the
+// keyboard all land on the same commit+kick path.
+//
 // A11y: root is role="group" (aria-label + a nested aria-live="polite" span
 // announcing "Card N of total" on every committed change); the stripe itself
 // is role="slider" (vertical, aria-valuemax = count-1) and owns the keyboard
@@ -47,6 +57,8 @@ const VELOCITY_FOR_MAX_BLUR = 46; // idx/s mapped to MAX_BLUR
 const KICK_ROTATE_DEG = 4;
 const KICK_TRANSLATE_X = 6;
 const PERSPECTIVE_PX = 720;
+const WHEEL_STEP_PX = 36; // deltaY accumulated before a wheel/trackpad tick steps a card
+const WHEEL_COOLDOWN_MS = 140; // >= KICK_MS, so each step's kick reads before the next fires
 
 function clamp(v: number, lo: number, hi: number) {
   return Math.min(hi, Math.max(lo, v));
@@ -116,6 +128,7 @@ export function RiffleEdge({
     vel: number;
     lastDir: number;
   } | null>(null);
+  const wheelRef = useRef({ accum: 0, lastT: 0 });
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -198,14 +211,25 @@ export function RiffleEdge({
     cardHeight > 0 ? clamp(cardHeight / count, MIN_PITCH, NATURAL_PITCH) : NATURAL_PITCH;
   const runHeight = count > 1 ? (count - 1) * pitch + 2 : 2;
 
-  // maps to the drawn line run itself (inset by STRIPE_PAD on each side),
-  // not the padded hit box — so the scrub position always coincides with
-  // where the highlighted line visually sits, whatever the pad is for
+  // `runHeight` is deliberately compressed (down to a 1.5px pitch) so the
+  // drawn line-stack reads as the deck's actual physical thickness. Mapping
+  // pointer position over THAT span, though, made the drag range as small as
+  // ~20px for a handful of cards — a couple of stray pixels would skip
+  // several cards, and the stripe itself rendered as a sliver next to a much
+  // taller card. `travel` is the interactive range: it matches the card's
+  // own measured height (a full-height rail beside it, like a scrollbar),
+  // independent of how compact the visual pitch is. The thin lines still
+  // draw at `runHeight`/`pitch` (centered inside the taller stripe via the
+  // stripe's own `items-center`) — only the hit box and the drag mapping grow.
+  const travel = cardHeight > 0 ? Math.max(runHeight, cardHeight - STRIPE_PAD * 2) : runHeight;
+
+  // maps clientY across `travel` (inset by STRIPE_PAD on each side, which is
+  // now genuinely just headroom past the ends, not the whole usable range)
   const rawFromClientY = (clientY: number) => {
     const stripe = stripeRef.current;
     if (!stripe) return posRef.current;
     const rect = stripe.getBoundingClientRect();
-    const frac = clamp((clientY - rect.top - STRIPE_PAD) / Math.max(1, runHeight), 0, 1);
+    const frac = clamp((clientY - rect.top - STRIPE_PAD) / Math.max(1, travel), 0, 1);
     return frac * (count - 1);
   };
 
@@ -303,6 +327,43 @@ export function RiffleEdge({
     }
   };
 
+  // wheel/trackpad: accumulate deltaY and step one card per WHEEL_STEP worth
+  // of scroll, gated by a cooldown so a fast trackpad fling doesn't blow
+  // through several cards' kicks in one continuous gesture — mirrors the
+  // discrete feel of a slow drag or a keyboard step, never a blur-through.
+  // Attached natively (not React's onWheel) with { passive: false }: a
+  // passive listener would make preventDefault() a silent no-op (the page
+  // scrolls out from under the stripe) and can warn in the console, which
+  // the verify gate treats as a failure.
+  useEffect(() => {
+    const stripe = stripeRef.current;
+    if (!stripe) return;
+    const handler = (e: WheelEvent) => {
+      e.preventDefault();
+      const w = wheelRef.current;
+      w.accum += e.deltaY;
+      const now = performance.now();
+      if (now - w.lastT < WHEEL_COOLDOWN_MS) return;
+      if (Math.abs(w.accum) < WHEEL_STEP_PX) return;
+      const dir = Math.sign(w.accum);
+      w.accum = 0;
+      w.lastT = now;
+      const cur = posRef.current;
+      const clamped = clampIndex(cur + dir);
+      if (clamped !== cur) {
+        commit(clamped);
+        kick(dir, clamped);
+      }
+    };
+    stripe.addEventListener("wheel", handler, { passive: false });
+    return () => stripe.removeEventListener("wheel", handler);
+    // re-bound every render (cheap: one addEventListener/removeEventListener
+    // pair) rather than a narrow deps array — `handler` closes over `commit`/
+    // `kick`, which themselves close over props like `onIndexChange`, so a
+    // stale closure here would silently call an old callback after a parent
+    // re-render, exactly the class of bug a trimmed deps array would hide.
+  });
+
   const item = items[current] ?? items[0];
 
   return (
@@ -361,8 +422,8 @@ export function RiffleEdge({
           onPointerUp={endDrag}
           onPointerCancel={onPointerCancel}
           onKeyDown={onKeyDown}
-          style={{ height: runHeight + STRIPE_PAD * 2 }}
-          className="group relative flex w-6 shrink-0 cursor-row-resize touch-none select-none flex-col items-center justify-center rounded-sm outline-none transition-colors duration-200 hover:bg-border/10 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          style={{ height: travel + STRIPE_PAD * 2 }}
+          className="group relative flex w-8 shrink-0 cursor-row-resize touch-none select-none flex-col items-center justify-center rounded-sm outline-none transition-colors duration-200 hover:bg-border/10 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           <div className="relative" style={{ height: runHeight, width: 14 }}>
             {items.map((it, i) => {

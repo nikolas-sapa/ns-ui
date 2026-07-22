@@ -17,9 +17,12 @@ import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 // the fill and the shimmer *are* the gauge.
 //
 // Past a duty cycle (h >= 1.0) it "soaks": the flag latches (hysteresis —
-// re-arms only once h decays back to <= 0.7, so it never flickers at either
-// boundary), the fill grows a diagonal hazard hatch and breathes gently — a
-// distinct, unmissable "dead" read, not just the same warm tone held longer —
+// re-arms only once h decays back to <= 0.05, i.e. genuinely cooled, not
+// merely below the limit again, so one press right after re-arming can't
+// instantly punch it back over SOAK_AT and the lockout holds for the whole
+// cooldown, not a sliver of it), the fill grows a diagonal hazard hatch and
+// breathes gently — a distinct, unmissable "dead" read, not just the same
+// warm tone held longer —
 // and the label itself dims toward --muted. Further presses no-op the actual
 // action, instead getting a flat, dead 1px translateY dip that eases back
 // with no spring overshoot — an "overdamped" non-response, not a bigger
@@ -37,7 +40,7 @@ import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 // that filled up on the way to the limit is the same gauge visibly emptying
 // back out afterward.
 //
-// The countdown text recomputes from the live decay math (t = ln(h/0.7)/k)
+// The countdown text recomputes from the live decay math (t = ln(h/REARM_AT)/k)
 // but only commits to the DOM at most once a second, per the brief — the
 // `--heat` variable itself still updates every rAF frame underneath it, so
 // the visual swelling stays smooth while the words update at a sane pace.
@@ -58,7 +61,14 @@ const HEAT_PER_PRESS = 0.34;
 const HALF_LIFE_S = 2.5;
 const DECAY_K = Math.LN2 / HALF_LIFE_S; // per second
 const SOAK_AT = 1.0;
-const REARM_AT = 0.7;
+// Re-arm near fully cooled, not near the limit: at 0.7 a single subsequent
+// press (+0.34) instantly punched back over SOAK_AT, so the lockout was
+// only ever honored for ~1.4s of an ~11s decay — a click "during cooldown"
+// looked like it refilled because functionally it did. 0.05 forces the
+// button to actually finish cooling (and keeps showing the soaked/hazard
+// visual the whole time, since that reads off the same flag) before a press
+// can do anything again.
+const REARM_AT = 0.05;
 const DIP_FALL_S = 0.18; // linear, no bounce — "overdamped"
 const CAPTION_MIN_INTERVAL_MS = 1000;
 
@@ -195,10 +205,13 @@ export function HeatSoak({ children, onPress, className = "" }: HeatSoakProps) {
       <style>{`
 .ns-heat-soak-btn{
   --h: min(var(--heat, 0), 1);
-  /* warmup ramp: 0 until h=0.7, 0->1 across 0.7-1.0, pinned at 1 through the
-     whole soak (h stays >=0.7 down to the re-arm edge) — the same scalar
-     drives the shimmer intensity and the fill's hottest tone whether it is
-     climbing toward the limit or draining back down through it. */
+  /* warmup ramp: 0 until h=0.7, 0->1 across 0.7-1.0 — a "near the limit"
+     glow, independent of the (much lower) re-arm point below. It fades out
+     partway through the soak as h keeps decaying past 0.7; the hazard hatch
+     and dimmed label (gated on aria-disabled, not --warm) are what stay on
+     for the full lockout. Same scalar drives the shimmer intensity and the
+     fill's hottest tone whether climbing toward the limit or draining
+     through it. */
   --warm: max(0, min(1, calc((var(--heat, 0) - 0.7) * 3.3333)));
   position: relative;
   overflow: hidden;

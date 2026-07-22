@@ -11,7 +11,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 // (the gap is drawn, not omitted), and a diagonal hatch where a source
 // actively contradicts the claim. Grounded/contradicted/unsupported is
 // shape-and-pattern encoded — solid / absent / hatched — never color, so it
-// survives grayscale and color-blindness.
+// survives grayscale and color-blindness. A static text legend ("Grounded /
+// Unsupported / Contradicted", each next to its own always-rendered swatch)
+// sits above the track so the encoding reads at rest, before anyone hovers,
+// focuses, or clicks a segment — the marks alone were review feedback
+// (twice) as illegible without that key.
 //
 // Every segment is a real <button>, labeled "Sentence N: supported by
 // Source B" / "no source" / "contradicted by Source C". Hovering OR
@@ -64,7 +68,13 @@ export interface BedrockTraceProps {
 
 const REVEAL_LAG_MS = 300;
 const STAGGER_MS = 220;
-const HATCH_TEETH = 5;
+const HATCH_TEETH = 4;
+
+const LEGEND: { status: TraceStatus; label: string }[] = [
+  { status: "grounded", label: "Grounded" },
+  { status: "unsupported", label: "Unsupported" },
+  { status: "contradicted", label: "Contradicted" },
+];
 
 function clamp(n: number, min: number, max: number) {
   return Math.min(max, Math.max(min, n));
@@ -142,7 +152,7 @@ function TraceMark({ status, revealed }: { status: TraceStatus; revealed: boolea
           strokeDasharray={1}
           strokeDashoffset={revealed ? 0 : 1}
           stroke="currentColor"
-          strokeWidth="1.4"
+          strokeWidth="2.1"
           strokeLinecap="round"
           style={{ transitionDelay: `${i * 40}ms` }}
           className="ns-bedrock-mark text-foreground transition-[stroke-dashoffset] duration-300 ease-out"
@@ -161,6 +171,18 @@ function TraceMark({ status, revealed }: { status: TraceStatus; revealed: boolea
     <svg viewBox="0 0 100 3" preserveAspectRatio="none" className="absolute inset-0 h-full w-full" aria-hidden>
       {baseline}
     </svg>
+  );
+}
+
+// Static reference swatch for the legend — always in its "revealed" end
+// state (no dash-in animation; it's a key, not a data point) so the shape
+// that maps to each word is legible the instant the component paints,
+// before any per-sentence reveal timer has fired.
+function LegendSwatch({ status }: { status: TraceStatus }) {
+  return (
+    <span className="ns-bedrock-legend-mark relative inline-block h-3 w-7 shrink-0 align-middle">
+      <TraceMark status={status} revealed />
+    </span>
   );
 }
 
@@ -264,6 +286,7 @@ export function BedrockTrace({ sentences, sources = [], streaming = false, class
       <style>{`
 .ns-bedrock-trace .ns-bedrock-highlight{box-shadow:none;transition:box-shadow 200ms ease-out}
 .ns-bedrock-trace .ns-bedrock-highlight[data-active="true"]{box-shadow:inset 0 -2px 0 0 var(--accent)}
+.ns-bedrock-trace .ns-bedrock-legend-mark .ns-bedrock-mark{transition:none !important}
 @media (prefers-reduced-motion: reduce){
   .ns-bedrock-trace .ns-bedrock-mark,
   .ns-bedrock-trace .ns-bedrock-highlight,
@@ -292,7 +315,16 @@ export function BedrockTrace({ sentences, sources = [], streaming = false, class
         ))}
       </p>
 
-      <div role="group" aria-label="Grounding trace" className="mt-3 flex h-4 items-stretch gap-[3px]">
+      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[10px] uppercase tracking-[0.08em] text-muted">
+        {LEGEND.map(({ status, label }) => (
+          <span key={status} className="inline-flex items-center gap-1.5">
+            <LegendSwatch status={status} />
+            {label}
+          </span>
+        ))}
+      </div>
+
+      <div role="group" aria-label="Grounding trace" className="mt-1.5 flex h-5 items-stretch gap-[3px]">
         {sentences.map((s, i) => {
           const source = s.sourceId ? sourceById.get(s.sourceId) : undefined;
           const isActive = activeId === s.id;

@@ -193,7 +193,18 @@ export function LooseType({ tokens, className = "" }: LooseTypeProps) {
         )
       );
     });
-    return () => cancelAnimationFrame(raf);
+    // If this rAF gets cancelled (e.g. the sibling "removing" measurement
+    // effect fires a synchronous setItems in the same layout-effect flush,
+    // before the browser ever paints a frame), the flip never actually
+    // happened — un-mark these ids so the next effect pass retries them.
+    // Without this, a token that entered in the same tick a correction was
+    // ghosted (exactly the provisional-correction seam) got permanently
+    // stuck at opacity:0/transition:none: never animated in, never fired
+    // the transitionend that settles it — invisible forever.
+    return () => {
+      cancelAnimationFrame(raf);
+      for (const it of pending) flippedRef.current.delete(it.id);
+    };
   }, [items, setItems]);
 
   // Removing tokens: measure the natural width first (so the collapse has a

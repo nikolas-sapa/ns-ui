@@ -122,7 +122,6 @@ export function SashWeight({
     let deadline = 0;
     let raf = 0;
     let last = 0;
-    let visible = true;
     let fadeTimer = 0;
 
     // drag bookkeeping
@@ -190,7 +189,7 @@ export function SashWeight({
     };
 
     const wake = () => {
-      if (!raf && sized && mode !== 0 && visible && !document.hidden) {
+      if (!raf && sized && mode !== 0 && !document.hidden) {
         last = 0;
         raf = requestAnimationFrame(loop);
       }
@@ -204,7 +203,7 @@ export function SashWeight({
 
     const loop = (now: number) => {
       raf = 0;
-      if (!visible || document.hidden || mode === 0) {
+      if (document.hidden || mode === 0) {
         last = 0;
         return;
       }
@@ -368,15 +367,19 @@ export function SashWeight({
 
     const ro = new ResizeObserver(resize);
     ro.observe(dlg);
-    const io = new IntersectionObserver((entries) => {
-      visible = entries[0]?.isIntersecting ?? true;
-      if (visible) wake();
-      else {
-        cancelAnimationFrame(raf);
-        raf = 0;
-      }
-    });
-    io.observe(dlg);
+    // Deliberately no IntersectionObserver here: this dialog is
+    // position:fixed (viewport-relative, unaffected by page scroll), and the
+    // *only* thing that ever changes its on-/off-screen intersection is its
+    // own open/close transform — so gating the rAF loop on "currently
+    // intersecting" would gate the animation on its own output. A close
+    // settles with the panel translated fully off-screen (non-intersecting)
+    // in the same frame the spring reaches its target; an IO callback firing
+    // on that same closed frame would latch a `visible=false` that nothing
+    // could ever clear (the panel can only become intersecting again by
+    // running the very animation the flag blocks), silently swallowing or
+    // cutting off the next open/close request — which reads as the panel
+    // popping partway open/closed and resetting, over and over. Tab
+    // backgrounding is still covered, correctly, by `document.hidden` below.
     const onVis = () => {
       if (!document.hidden) wake();
     };
@@ -398,7 +401,6 @@ export function SashWeight({
       rail.removeEventListener("pointerup", releaseDrag);
       rail.removeEventListener("pointercancel", releaseDrag);
       ro.disconnect();
-      io.disconnect();
       document.removeEventListener("visibilitychange", onVis);
       engineRef.current = null;
     };

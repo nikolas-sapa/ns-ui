@@ -45,6 +45,7 @@ const DAMP_MATCHED = 0.9;
 const DAMP_FALL = 0.995;
 const MAX_GRAINS = 4000;
 const LOW_POWER_THRESHOLD_MS = 45;
+const EDGE_FADE_PX = 24; // px band, inside the canvas, over which a grain dissolves before it would reach the container's edge — matches the layout's own p-6 padding
 
 function smoothstep(t: number) {
   const c = Math.min(1, Math.max(0, t));
@@ -318,9 +319,17 @@ export function ScreePour({
       for (const g of grains) {
         const gElapsed = elapsed - g.delay;
         if (gElapsed < 0) {
-          // not yet released: sits at its spawn point, still solid
-          ctx.fillStyle = `rgba(${g.rgb},${g.baseAlpha.toFixed(3)})`;
-          ctx.fillRect(g.x - g.size / 2, g.y - g.size / 2, g.size, g.size);
+          // not yet released: sits at its spawn point, still solid (still
+          // subject to the edge fade below — a region tagged right at the
+          // container's edge shouldn't spawn a hard-edged dot either)
+          const spawnEdge = smoothstep(
+            clamp01(Math.min(g.x, w - g.x, g.y, h - g.y) / EDGE_FADE_PX)
+          );
+          const spawnAlpha = g.baseAlpha * spawnEdge;
+          if (spawnAlpha > 0.01) {
+            ctx.fillStyle = `rgba(${g.rgb},${spawnAlpha.toFixed(3)})`;
+            ctx.fillRect(g.x - g.size / 2, g.y - g.size / 2, g.size, g.size);
+          }
           continue;
         }
         const localT = clamp01(gElapsed / g.localSpan);
@@ -350,6 +359,18 @@ export function ScreePour({
           const fadeT = clamp01((localT - 0.5) / 0.5);
           alpha = g.baseAlpha * (1 - smoothstep(fadeT));
         }
+        // Fade by proximity to the canvas bounds, not just elapsed time.
+        // Time-based fade alone lets a falling (unmatched) grain reach the
+        // bottom edge at near-full alpha — gravity gets it there in ~350-450ms,
+        // right as its own fade window (localT > 0.5/0.6) has barely started —
+        // so a bright, undecayed mass arrives at the boundary together and
+        // then hard-clips at the canvas edge, reading as a wall of litter at
+        // the edges instead of a dissolve. This tapers alpha to 0 over the
+        // last EDGE_FADE_PX (matches the layout's own p-6 padding, so settled
+        // matched content — which lives inside that padding — is never
+        // touched by it) before a grain would ever reach the boundary.
+        const distToEdge = Math.min(g.x, w - g.x, g.y, h - g.y);
+        alpha *= smoothstep(clamp01(distToEdge / EDGE_FADE_PX));
         if (alpha <= 0.01) continue;
         ctx.fillStyle = `rgba(${g.rgb},${alpha.toFixed(3)})`;
         ctx.fillRect(g.x - g.size / 2, g.y - g.size / 2, g.size, g.size);

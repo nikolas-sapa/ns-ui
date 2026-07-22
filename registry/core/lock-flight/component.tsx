@@ -216,7 +216,7 @@ export function LockFlight({
       `}</style>
 
       <nav aria-label={ariaLabel} className="border-b border-border">
-        <div className="relative isolate">
+        <div className="relative isolate overflow-hidden">
           <ol onKeyDown={onNavKeyDown} className="flex items-stretch">
             {steps.map((s, i) => {
               const reached = i <= current;
@@ -345,7 +345,13 @@ export function LockFlight({
               chamber. -z-10 (inside this div's `isolate` stacking context) keeps it
               painted behind every chamber button, which are themselves `relative`
               (z-index:auto) and would otherwise win paint order simply by coming
-              later in the DOM as it slides past them mid-transit. */}
+              later in the DOM as it slides past them mid-transit. Its width/transform
+              are plain percentages of THIS div, computed independently of how flex
+              actually rounds each chamber's pixel width — for step counts that don't
+              divide 100 evenly (3, 6, 7...) that drift compounds toward the two ends,
+              so `overflow-hidden` on this div is the hard guarantee: the track can
+              never render past the first chamber's left edge or the last chamber's
+              right edge, whatever the rounding did. */}
           <span
             aria-hidden
             className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-[2px] bg-accent"

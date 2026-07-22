@@ -27,16 +27,25 @@ const INITIAL: OxbowTurnItem[] = [
     turns: [turnEntry(3), turnEntry(4), turnEntry(5), turnEntry(6), turnEntry(7), turnEntry(8), turnEntry(9)],
     summary: SUMMARIES[0],
     tokenCount: 1840,
+    compactedAgo: "6 minutes ago",
+  },
+  ...seedTurns(10, 13),
+  {
+    kind: "compaction",
+    id: "c2",
+    turns: [turnEntry(14), turnEntry(15), turnEntry(16)],
+    summary: SUMMARIES[1],
+    tokenCount: 940,
     compactedAgo: "2 minutes ago",
   },
-  ...seedTurns(10, 16),
+  ...seedTurns(17, 20),
 ];
 
 export default function OxbowTurnDemo() {
   const [items, setItems] = useState<OxbowTurnItem[]>(INITIAL);
-  const [status, setStatus] = useState("session live · 9 turns in channel, 1 oxbow settled");
-  const nextTurnRef = useRef(17);
-  const nextCompactionRef = useRef(2);
+  const [status, setStatus] = useState("session live · 10 turns in channel, 2 oxbows settled");
+  const nextTurnRef = useRef(21);
+  const nextCompactionRef = useRef(3);
 
   const addTurn = useCallback(() => {
     const n = nextTurnRef.current++;
@@ -87,8 +96,8 @@ export default function OxbowTurnDemo() {
 
   const reset = useCallback(() => {
     setItems(INITIAL);
-    nextTurnRef.current = 17;
-    nextCompactionRef.current = 2;
+    nextTurnRef.current = 21;
+    nextCompactionRef.current = 3;
     setStatus("session reset · baseline restored");
   }, []);
 

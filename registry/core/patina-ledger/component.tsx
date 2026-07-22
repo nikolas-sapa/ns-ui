@@ -281,11 +281,12 @@ export function PatinaLedger({
 @keyframes ns-patina-wipe-out{from{opacity:1}to{opacity:0}}
 .ns-patina-dot{width:0;height:4px;border-radius:9999px;background:var(--foreground);opacity:0;transition:width 200ms ease-out,opacity 200ms ease-out}
 .ns-patina-dot[data-visible="true"]{width:4px;opacity:1}
-.ns-patina-btn{display:inline-flex;height:22px;width:22px;align-items:center;justify-content:center;border-radius:6px;color:var(--muted);transition:background-color 150ms ease-out,color 150ms ease-out}
+.ns-patina-btn{display:inline-flex;height:22px;width:22px;align-items:center;justify-content:center;border-radius:6px;color:var(--muted);transition:background-color 150ms ease-out,color 150ms ease-out,box-shadow 150ms ease-out}
 .ns-patina-btn:hover{background:color-mix(in srgb, var(--foreground) 8%, transparent);color:var(--foreground)}
 .ns-patina-btn:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .ns-patina-btn[data-active="true"]{color:var(--foreground)}
-.ns-patina-btn[data-armed="true"]{background:color-mix(in srgb, var(--foreground) 14%, transparent);color:var(--foreground)}
+.ns-patina-btn[data-armed="true"]{background:color-mix(in srgb, var(--accent) 18%, transparent);color:var(--accent);box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--accent) 55%, transparent)}
+.ns-patina-btn[data-armed="true"]:hover{background:color-mix(in srgb, var(--accent) 26%, transparent)}
 .ns-patina-dormant-btn{color:var(--muted);transition:color 150ms ease-out}
 .ns-patina-dormant-btn:hover{color:var(--foreground)}
 .ns-patina-dormant-btn:focus-visible{outline:2px solid var(--accent);outline-offset:-1px;border-radius:6px}

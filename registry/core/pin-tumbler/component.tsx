@@ -163,16 +163,43 @@ export function PinTumbler({
   );
 
   // --- pin animation ---------------------------------------------------
-  const prevIndexRef = useRef(committedIndex);
+  // `restIndex` is the single source of truth for "where the pin is
+  // actually rendered right now" — it only ever advances in `onfinish`,
+  // i.e. once a travel has genuinely completed. Deriving `prev` from it
+  // (rather than a separately-tracked ref updated eagerly at effect start)
+  // matters the moment a row is re-selected before the in-flight travel
+  // finishes: cancelling the live Animation reverts the element to its
+  // underlying inline style, which is exactly `rowOffsets[restIndex]` —
+  // so the next leg's start keyframe is guaranteed to match what's on
+  // screen at that instant. An eagerly-updated ref would already point at
+  // the (unfinished) target, so the new leg would start its first
+  // keyframe from a row the pin never actually reached, and the browser
+  // renders that as an instant teleport before reversing back toward the
+  // real new target — visible as a jarring step mid-glide on fast
+  // re-selection (rapid clicks or held arrow-key roving).
   const [restIndex, setRestIndex] = useState(committedIndex);
   const animRef = useRef<Animation | null>(null);
   const timeoutsRef = useRef<number[]>([]);
   const [tickSet, setTickSet] = useState<Set<number>>(() => new Set());
 
   useLayoutEffect(() => {
-    const prev = prevIndexRef.current;
+    const prev = restIndex;
     if (committedIndex === prev) return;
-    prevIndexRef.current = committedIndex;
+
+    const pin = pinRef.current;
+    // Start the new leg from the pin's LIVE on-screen Y — read the computed
+    // transform *before* cancelling the in-flight animation. cancel() reverts
+    // the element to its inline style (rowOffsets[restIndex]), but restIndex
+    // still points at the row this travel started from (it only advances in
+    // onfinish), so seeding fromY = rowOffsets[prev] snaps the pin all the way
+    // back to the origin row on any mid-travel re-selection (fast clicks / held
+    // arrow roving) — a visible ~150px teleport. Reading getComputedStyle first
+    // lets the interrupt leg begin from wherever the pin actually is.
+    let fromY = rowOffsets[prev];
+    if (pin && animRef.current) {
+      const t = getComputedStyle(pin).transform;
+      if (t && t !== "none") fromY = new DOMMatrixReadOnly(t).m42;
+    }
 
     timeoutsRef.current.forEach((id) => window.clearTimeout(id));
     timeoutsRef.current = [];
@@ -180,8 +207,6 @@ export function PinTumbler({
     animRef.current = null;
     setTickSet(new Set());
 
-    const pin = pinRef.current;
-    const fromY = rowOffsets[prev];
     const toY = rowOffsets[committedIndex];
 
     if (
@@ -233,9 +258,17 @@ export function PinTumbler({
     );
     animRef.current = anim;
     anim.onfinish = () => {
+      // Deliberately not cancelling here: the animation's `fill: "forwards"`
+      // holds the exact final keyframe (translate3d to `toY`), which is the
+      // same value `restIndex` now resolves to via the resting inline style.
+      // Cancelling immediately would strip the animation's held effect
+      // before this `setRestIndex` has actually re-rendered, snapping the
+      // element back to the *previous* underlying style for one frame — a
+      // visible flash/step right at the end of every single travel. Leaving
+      // the finished animation in place keeps the on-screen value continuous;
+      // it's reclaimed for free by the `animRef.current?.cancel()` at the
+      // top of this effect the next time a travel actually starts.
       setRestIndex(committedIndex);
-      animRef.current?.cancel();
-      animRef.current = null;
     };
 
     const dir = committedIndex > prev ? 1 : -1;
@@ -255,7 +288,10 @@ export function PinTumbler({
       }, t + TICK_MS);
       timeoutsRef.current.push(onId, offId);
     }
-  }, [committedIndex, reducedMotion, rowOffsets]);
+    // `restIndex` is read (as `prev`) above; adding it here is safe — once
+    // `onfinish` advances it to `committedIndex`, this effect reruns, sees
+    // `committedIndex === prev`, and bails on the very first line.
+  }, [committedIndex, reducedMotion, rowOffsets, restIndex]);
 
   useEffect(() => {
     return () => {

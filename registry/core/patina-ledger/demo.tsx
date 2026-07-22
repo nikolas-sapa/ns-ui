@@ -33,11 +33,9 @@ export default function PatinaLedgerDemo() {
   }
 
   function agentCites(id: string) {
-    setTurn((t) => {
-      const nextTurn = t + 1;
-      setMemories((prev) => prev.map((m) => (m.id === id ? { ...m, lastUsedTurn: nextTurn } : m)));
-      return nextTurn;
-    });
+    const nextTurn = turn + 1;
+    setTurn(nextTurn);
+    setMemories((prev) => prev.map((m) => (m.id === id ? { ...m, lastUsedTurn: nextTurn } : m)));
   }
 
   return (

@@ -477,10 +477,21 @@ function TreeItem({
 
       {mounted && hasChildren && (
         <div ref={blockRef} role="group" className="relative">
+          {/* z-10: each child row's own wrapper carries a non-"none" transform
+              (the reveal translateY, even at rest it's translateY(0)) which
+              promotes it into its own stacking context — without an explicit
+              z-index here this absolutely-positioned guide would paint BEHIND
+              those row wrappers in DOM order, so a selected/hovered row's
+              opaque background (drawn by its own row div, full row width)
+              would cover the stem segment running down to the NEXT sibling's
+              elbow, which physically passes through this row's box. Raising
+              the guide above the rows (still pointer-events-none, so clicks
+              pass straight through to the row beneath) keeps the line
+              continuous instead of getting cut by whichever row is selected. */}
           <svg
             aria-hidden="true"
             focusable="false"
-            className="pointer-events-none absolute inset-0 h-full w-full"
+            className="pointer-events-none absolute inset-0 z-10 h-full w-full"
           >
             <path
               d={geometry.stemD}
