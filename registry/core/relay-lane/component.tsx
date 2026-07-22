@@ -21,11 +21,12 @@ import { useEffect, useMemo, useState } from "react";
 // starts at or after it ends (small slack for real-world event jitter) —
 // i.e. a genuine baton pass, not two turns that happen to overlap. One
 // finished turn can feed more than one connector (a fan-out reads as one
-// source splitting into two stepped lines). Labels/elbows alternate above
-// and below the rail by arrival order, and a handoff is greedily flipped to
-// the other band if the previous same-band label sits closer than
-// LABEL_MIN_SEP_PCT — the documented answer to "two handoffs close in time
-// must not overlap illegibly."
+// source splitting into two stepped lines). Labels are packed against real
+// collisions, not just parity-staggered: walking left→right, each label
+// drops into the lowest stacking level whose last-placed label sits at
+// least LABEL_MIN_SEP_PCT away in x (even levels above the rail, odd below,
+// each extra pair stepping one row further out), so three or more handoffs
+// close together in x fan into that many legible rows instead of one smear.
 //
 // Beyond MAX_LANES agents the extra rows collapse into one aggregate "+N
 // more" lane that brightens with a live count badge when any of them are
@@ -93,6 +94,8 @@ interface Handoff {
   y2: number;
   durationMs: number;
   band: "above" | "below";
+  /** how many stagger rows out from the rail this label sits, per its band */
+  tier: number;
 }
 
 export function RelayLane({
@@ -170,17 +173,35 @@ export function RelayLane({
       });
     }
 
-    const lastXByBand: Record<"above" | "below", number> = {
-      above: -Infinity,
-      below: -Infinity,
-    };
+    // Real de-overlap, not a parity stagger: three or more handoffs whose
+    // labels land close together in x (a fan-out from one source is exactly
+    // this shape) all overprinted when the only escape was a single above/
+    // below flip. Instead, walk the labels left→right and drop each into the
+    // lowest stacking LEVEL whose most-recently-placed label is at least
+    // LABEL_MIN_SEP_PCT away in x — the classic occupied-range packer. Even
+    // levels ride above the rail, odd below; every additional pair of levels
+    // (its `tier`) steps one row further out, so N coincident labels fan into
+    // N legible rows instead of a single smear.
+    const lastXByLevel: number[] = [];
+    const levelByIndex = new Map<number, number>();
+    [...raw.keys()]
+      .sort((a, b) => raw[a]!.midX - raw[b]!.midX)
+      .forEach((idx) => {
+        let level = 0;
+        while (
+          lastXByLevel[level] !== undefined &&
+          raw[idx]!.midX - lastXByLevel[level]! < LABEL_MIN_SEP_PCT
+        ) {
+          level++;
+        }
+        lastXByLevel[level] = raw[idx]!.midX;
+        levelByIndex.set(idx, level);
+      });
 
     return raw.map((h, i): Handoff => {
-      let band: "above" | "below" = i % 2 === 0 ? "above" : "below";
-      if (Math.abs(h.midX - lastXByBand[band]) < LABEL_MIN_SEP_PCT) {
-        band = band === "above" ? "below" : "above";
-      }
-      lastXByBand[band] = h.midX;
+      const level = levelByIndex.get(i) ?? 0;
+      const band: "above" | "below" = level % 2 === 0 ? "above" : "below";
+      const tier = Math.floor(level / 2);
 
       const fromRow = rowIndex.get(h.from.agentId)!;
       const toRow = rowIndex.get(h.to.agentId)!;
@@ -195,6 +216,7 @@ export function RelayLane({
         y2: toRow * ROW_PITCH + ROW_PITCH / 2,
         durationMs: h.from.end! - h.from.start,
         band,
+        tier,
       };
     });
   }, [turns, rowIndex, windowStart, windowMs]);
@@ -358,10 +380,13 @@ export function RelayLane({
             const midX = (h.x1 + h.x2) / 2;
             const yTop = Math.min(h.y1, h.y2);
             const yBottom = Math.max(h.y1, h.y2);
+            // each extra tier steps the label one 15px row further from the
+            // rail, in its band's direction, so stacked labels never overlap
+            const TIER_STEP = 18;
             const rawChipTop =
               h.band === "above"
-                ? Math.min(h.y1, h.y2) - 20
-                : Math.max(h.y1, h.y2) + 8;
+                ? Math.min(h.y1, h.y2) - 20 - h.tier * TIER_STEP
+                : Math.max(h.y1, h.y2) + 8 + h.tier * TIER_STEP;
             // clamp inside the (now overflow-hidden) track box so a handoff
             // touching the first or last lane never clips its own label
             const chipTop = Math.min(

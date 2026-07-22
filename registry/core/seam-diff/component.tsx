@@ -352,7 +352,7 @@ function UnifiedLine({ entry }: { entry: LineEntry }) {
   const rail = railStyle(entry.type);
   const wash = washClass(entry.type);
   return (
-    <div className="grid grid-cols-[3px_4ch_4ch_1.5ch_1fr] items-stretch leading-5">
+    <div className="grid grid-cols-[3px_4ch_4ch_1.5ch_1fr] items-stretch leading-5 transition-colors hover:bg-foreground/[0.05]">
       <span aria-hidden className={rail.className} style={rail.style} />
       <span className={`select-none py-[3px] pr-2 text-right font-mono text-[12px] tabular-nums text-muted ${wash}`}>
         {entry.oldNo ?? ""}
@@ -404,7 +404,7 @@ function renderUnified(
 function SplitHalf({ entry, side }: { entry: LineEntry | undefined; side: "old" | "new" }) {
   if (!entry) {
     return (
-      <div className="grid grid-cols-[3px_4ch_1.5ch_1fr] items-stretch bg-foreground/[0.015] leading-5">
+      <div className="grid grid-cols-[3px_4ch_1.5ch_1fr] items-stretch bg-foreground/[0.015] leading-5 transition-colors group-hover:bg-foreground/[0.05]">
         <span aria-hidden />
         <span />
         <span />
@@ -416,7 +416,7 @@ function SplitHalf({ entry, side }: { entry: LineEntry | undefined; side: "old" 
   const wash = washClass(entry.type);
   const num = side === "old" ? entry.oldNo : entry.newNo;
   return (
-    <div className="grid grid-cols-[3px_4ch_1.5ch_1fr] items-stretch leading-5">
+    <div className="grid grid-cols-[3px_4ch_1.5ch_1fr] items-stretch leading-5 transition-colors group-hover:bg-foreground/[0.05]">
       <span aria-hidden className={rail.className} style={rail.style} />
       <span className={`select-none py-[3px] pr-2 text-right font-mono text-[12px] tabular-nums text-muted ${wash}`}>
         {num ?? ""}
@@ -454,7 +454,7 @@ function renderSplit(
     const oldWidget = widgetFor(item.old, widgets);
     const newWidget = item.new !== item.old ? widgetFor(item.new, widgets) : undefined;
     out.push(
-      <div key={key++} className="grid grid-cols-2">
+      <div key={key++} className="group grid grid-cols-2">
         <SplitHalf entry={item.old} side="old" />
         <div className="border-l border-border">
           <SplitHalf entry={item.new} side="new" />

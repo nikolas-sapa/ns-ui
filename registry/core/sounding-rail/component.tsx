@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from "react";
 
 // A collapsible agent-reasoning timeline. Status lives entirely in the node
 // glyph strung on a 1px vertical rail — no colored badges, no status pills:
-// a hollow ring is pending, a pulsing dot is running, a filled dot is done,
-// and a stroked diamond with a cross is failed (a distinct FORM, not a
+// a hollow ring is pending, a half-filled disc is running, a filled dot is
+// done, and a stroked diamond with a cross is failed (a distinct FORM, not a
 // color — --accent stays reserved for the fold affordance and focus rings).
 // Steps stream in over time as the `steps` array grows; the currently
 // running step (or, once nothing is running, the most recent step) stays
@@ -80,13 +80,33 @@ function StepGlyph({ status }: { status: SoundingRailStatus }) {
       // Running needs a resting FORM, not only a resting animation. The ping
       // halo spends most of its cycle fully transparent, so a bare dot inside
       // it screenshots as — and, glanced at, reads as — the plain solid dot
-      // that means "done". The static concentric ring is the actual signal:
-      // a dot held inside a ring, distinct from pending's empty ring and from
-      // done's filled dot whether or not anything is moving.
-      <span className="relative flex h-[10px] w-[10px] items-center justify-center">
-        <span className="absolute inline-flex h-full w-full rounded-full border border-foreground/50" />
-        <span className="absolute inline-flex h-full w-full rounded-full border border-foreground/60 motion-safe:animate-ping" />
-        <span className="relative h-[4px] w-[4px] rounded-full bg-foreground" />
+      // that means "done". The resting signal is a HALF-FILLED disc (a 50%
+      // pie): a full --foreground ring with one half painted solid. It reads
+      // as "in progress" at any scale and is unmistakable against pending's
+      // empty ring, done's fully solid dot, and failed's crossed diamond,
+      // whether or not the ping halo happens to be mid-cycle.
+      <span className="relative inline-flex h-[10px] w-[10px] items-center justify-center">
+        <span
+          aria-hidden="true"
+          className="absolute inline-flex h-full w-full rounded-full border border-foreground/50 motion-safe:animate-ping"
+        />
+        <svg
+          width="10"
+          height="10"
+          viewBox="0 0 10 10"
+          aria-hidden="true"
+          className="relative"
+        >
+          <circle
+            cx="5"
+            cy="5"
+            r="4"
+            fill="var(--surface)"
+            stroke="var(--foreground)"
+            strokeWidth="1.3"
+          />
+          <path d="M5 1 A4 4 0 0 1 5 9 Z" fill="var(--foreground)" />
+        </svg>
       </span>
     );
   }

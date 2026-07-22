@@ -71,6 +71,17 @@ export default function BallastContextDemo() {
     setStatus(`context compacted · history ${fmt(before)} → ${fmt(after)} tok`);
   }, [ctx.history]);
 
+  // Jump straight to the near-capacity band. The ambient interval reaches it
+  // on its own after a couple of minutes, but that is far past any screenshot
+  // — this makes the warning state (pulsing ring, bold readout + triangle,
+  // hazard hatch on the sliver of free space) reachable in one click, so the
+  // gate can capture and prove it. Usage lands ~96%, above the auto-grow
+  // ceiling, so it holds until COMPACT or RESET.
+  const fillWindow = useCallback(() => {
+    setCtx({ tools: 4_200, history: 179_600, turn: 4_800 });
+    setStatus("near capacity · compact before the window fills");
+  }, []);
+
   const reset = useCallback(() => {
     setCtx(INITIAL);
     setStatus("session reset · baseline restored");
@@ -126,6 +137,14 @@ export default function BallastContextDemo() {
               className={buttonClass}
             >
               COMPACT CONTEXT
+            </button>
+            <button
+              type="button"
+              onClick={fillWindow}
+              data-ballast-fill
+              className={buttonClass}
+            >
+              FILL WINDOW
             </button>
             <button type="button" onClick={reset} className={buttonClass}>
               RESET SESSION

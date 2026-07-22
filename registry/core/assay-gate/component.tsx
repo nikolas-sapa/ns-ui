@@ -319,7 +319,17 @@ export function AssayGate({
                   timestamp (ml-auto yields nothing once the row is full) */}
               <span className="min-w-0 truncate text-muted">{toolName}</span>
               <span className="shrink-0 text-muted">·</span>
-              <span className="shrink-0 text-muted">{decision.actor}</span>
+              {/* the actor is variable-length too (a console handle can be an
+                  email or a long service identity): like the tool name it
+                  gives rather than shoving the timestamp/payload off the row,
+                  and the full string stays available on hover and in the
+                  expanded payload's own header row below */}
+              <span
+                className="min-w-0 truncate text-muted"
+                title={decision.actor}
+              >
+                {decision.actor}
+              </span>
               <span className="shrink-0 text-muted">·</span>
               {/* shrink-0 + nowrap: without it flex squeezed the stamp until
                   "4:33:04 PM" wrapped onto a second line and got clipped by the
@@ -336,6 +346,17 @@ export function AssayGate({
               data-assay-payload
               className="space-y-1.5 border-t border-border px-3 py-2.5"
             >
+              {/* the two identifiers that truncate on the collapsed receipt
+                  line (the tool and the decider) are repeated here in full, so
+                  ellipsizing them above never loses information */}
+              <div className="flex gap-2 font-mono text-xs">
+                <span className="shrink-0 text-muted">tool</span>
+                <span className="break-all text-foreground">{toolName}</span>
+              </div>
+              <div className="flex gap-2 font-mono text-xs">
+                <span className="shrink-0 text-muted">decided by</span>
+                <span className="break-all text-foreground">{decision.actor}</span>
+              </div>
               {fields.map((f) => (
                 <div key={f.key} className="flex gap-2 font-mono text-xs">
                   <span className="shrink-0 text-muted">{f.label}</span>
