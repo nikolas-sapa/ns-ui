@@ -62,6 +62,11 @@ const NATURAL_PITCH = 3; // px: 1px line + 2px gap, the "natural" edge rhythm
 const MIN_PITCH = 1.5;
 const STRIPE_PAD = 16; // px hit-area padding above/below the drawn lines
 const KICK_MS = 220;
+// phase 1 of every kick: the card visibly travels OUT to the kicked pose
+// before settling back — without this the pose was snapped on instantly and
+// the viewer only ever saw the settle half, so no shuffle read at all
+const KICK_OUT_MS = 130;
+const KICK_OUT_EASE = "cubic-bezier(0.25, 0.46, 0.45, 0.94)"; // plain ease-out, no overshoot
 const CROSSFADE_MS = 120;
 const BLUR_TRANSITION_MS = 140;
 const MAX_BLUR = 5;
@@ -92,7 +97,7 @@ const BACK1_ROTATE_DEG = 3;
 const BACK2_ROTATE_DEG = 2;
 const BACK_STAGGER_MS = 90; // each back layer settles this much later than the one in front
 const WHEEL_STEP_PX = 36; // deltaY accumulated before a wheel/trackpad tick steps a card
-const WHEEL_COOLDOWN_MS = 260; // >= KICK_MS, so each step's kick reads before the next fires
+const WHEEL_COOLDOWN_MS = 360; // >= KICK_OUT_MS + KICK_MS, so each step's out-and-back reads before the next fires
 
 function clamp(v: number, lo: number, hi: number) {
   return Math.min(hi, Math.max(lo, v));
@@ -165,6 +170,13 @@ export function RiffleEdge({
     lastDir: number;
   } | null>(null);
   const wheelRef = useRef({ accum: 0, lastT: 0 });
+  const settleTimerRef = useRef<number | null>(null);
+  useEffect(
+    () => () => {
+      if (settleTimerRef.current !== null) window.clearTimeout(settleTimerRef.current);
+    },
+    []
+  );
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -214,31 +226,34 @@ export function RiffleEdge({
       return;
     }
     const j = jitterFor(targetIndex);
-    card.style.transition = "none";
-    card.style.transform = `perspective(${PERSPECTIVE_PX}px) rotateY(${dir * KICK_ROTATE_DEG}deg) translateX(${(-dir * KICK_TRANSLATE_X).toFixed(2)}px) translateY(${j.toFixed(2)}px)`;
-    requestAnimationFrame(() => {
-      card.style.transition = `transform ${KICK_MS}ms ${SETTLE_EASE}`;
-      card.style.transform = `perspective(${PERSPECTIVE_PX}px) rotateY(0deg) translateX(0px) translateY(0px)`;
-    });
-
-    // the deck's decorative depth layers shuffle along with the top card —
-    // a smaller, opposite-leaning nudge per layer (reduced amplitude with
-    // depth) that eases back to its rem-based rest offset a beat after the
-    // layer in front of it settles, so a step reads as the whole stack
-    // restacking rather than only the top card swapping
     const j1 = jitterFor(targetIndex + 1) * 0.5;
     const j2 = jitterFor(targetIndex + 2) * 0.3;
     const back1 = back1Ref.current;
+    const back2 = back2Ref.current;
+    if (settleTimerRef.current !== null) window.clearTimeout(settleTimerRef.current);
+
+    // phase 1: animate OUT to the kicked pose — the visible half of the
+    // shuffle. The deck's decorative depth layers travel with the top card,
+    // a smaller opposite-leaning nudge per layer (reduced amplitude with
+    // depth), so a step reads as the whole stack restacking rather than
+    // only the top card swapping.
+    card.style.transition = `transform ${KICK_OUT_MS}ms ${KICK_OUT_EASE}`;
+    card.style.transform = `perspective(${PERSPECTIVE_PX}px) rotateY(${dir * KICK_ROTATE_DEG}deg) translateX(${(-dir * KICK_TRANSLATE_X).toFixed(2)}px) translateY(${j.toFixed(2)}px)`;
     if (back1) {
-      back1.style.transition = "none";
+      back1.style.transition = `transform ${KICK_OUT_MS}ms ${KICK_OUT_EASE}`;
       back1.style.transform = `translate(calc(${BACK1_REST_REM}rem + ${(dir * BACK1_SHIFT_PX).toFixed(2)}px), calc(${BACK1_REST_REM}rem + ${j1.toFixed(2)}px)) rotate(${(dir * BACK1_ROTATE_DEG).toFixed(2)}deg)`;
     }
-    const back2 = back2Ref.current;
     if (back2) {
-      back2.style.transition = "none";
+      back2.style.transition = `transform ${KICK_OUT_MS}ms ${KICK_OUT_EASE}`;
       back2.style.transform = `translate(calc(${BACK2_REST_REM}rem + ${(dir * BACK2_SHIFT_PX).toFixed(2)}px), calc(${BACK2_REST_REM}rem + ${j2.toFixed(2)}px)) rotate(${(dir * BACK2_ROTATE_DEG).toFixed(2)}deg)`;
     }
-    requestAnimationFrame(() => {
+
+    // phase 2: once the out-travel lands, settle everything back to rest —
+    // each back layer a beat after the layer in front of it, no overshoot
+    settleTimerRef.current = window.setTimeout(() => {
+      settleTimerRef.current = null;
+      card.style.transition = `transform ${KICK_MS}ms ${SETTLE_EASE}`;
+      card.style.transform = `perspective(${PERSPECTIVE_PX}px) rotateY(0deg) translateX(0px) translateY(0px)`;
       if (back1) {
         back1.style.transition = `transform ${KICK_MS + BACK_STAGGER_MS}ms ${SETTLE_EASE}`;
         back1.style.transform = `translate(${BACK1_REST_REM}rem, ${BACK1_REST_REM}rem) rotate(0deg)`;
@@ -247,7 +262,7 @@ export function RiffleEdge({
         back2.style.transition = `transform ${KICK_MS + BACK_STAGGER_MS * 2}ms ${SETTLE_EASE}`;
         back2.style.transform = `translate(${BACK2_REST_REM}rem, ${BACK2_REST_REM}rem) rotate(0deg)`;
       }
-    });
+    }, KICK_OUT_MS);
   };
 
   const setBlur = (velAbs: number) => {
