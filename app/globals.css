@@ -13,6 +13,9 @@
   --muted: #4d4d4d;
   --accent: #006bff;
   --accent-hover: #0059d1;
+  /* Semantic status red — several components reference var(--error) with this
+     same hex as fallback; defining it here makes it a real themed token. */
+  --error: #ea001d;
 }
 
 .dark {

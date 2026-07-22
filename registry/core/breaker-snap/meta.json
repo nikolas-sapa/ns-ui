@@ -1,0 +1,33 @@
+{
+  "name": "breaker-snap",
+  "title": "Breaker Snap",
+  "description": "A switch built like an electrical breaker: the lever lags the pointer under stiff resistance, passes a dead point, then snaps the rest of the way on its own with a mechanical thunk — and the fieldset it governs de-energizes in one abrupt 60ms cut, not a fade.",
+  "collection": "core",
+  "tags": [
+    "switch",
+    "toggle",
+    "form",
+    "confirmation",
+    "svg",
+    "micro-interaction",
+    "accessibility"
+  ],
+  "autoplay": {
+    "mode": "press",
+    "target": "[data-breaker-switch]",
+    "hold": 200,
+    "period": 1400
+  },
+  "gate": {
+    "openBy": "[data-breaker-switch]",
+    "expect": "[data-breaker-led][data-powered=true]"
+  },
+  "useWhen": "a high-consequence toggle where the commitment itself should feel physical — the lever resists, passes a dead point, and only snaps on its own past that mark, with no stable middle; pick hold-to-confirm instead when the gate should be TIME (hold N ms), not travel, and frostbite-switch instead for a thermal surface treatment on an ordinary flick switch with no governed fieldset.",
+  "instruction": "A role=switch built as a physical breaker, not an iOS-style flick. The visible control is an SVG paddle lever (-30..+30deg) pivoting at the base of a recessed housing slot, dragged horizontally: a critically-damped spring (k=900 s^-2, zeta=1) chases a pointer-derived target angle, producing a visible lag that reads as resistance through the first 60% of the home-to-opposite travel — a span that always crosses the vertical 0deg dead point partway through. Past that 60% mark the gesture locks: onCheckedChange fires immediately and the spring keeps closing on its own regardless of further pointer movement, arriving with an explicit one-frame overshoot (3deg past the resting angle) and a 2px translateY mechanical thunk applied to the whole housing via a remounted, key-driven CSS keyframe. Release the pointer before the 60% mark and the lever was never locked — it just relaxes back to the rest angle it started from; there is no stable middle position. A plain tap or click (pointer travel under 4px) and Space/Enter both commit instantly, skipping the resistance phase entirely, since that phase is a pointer-commitment device for deliberate drags, not an accessibility gate — keyboard and tap users get the full snap animation without needing to out-travel anything. The component also renders the <fieldset> it powers: closing the breaker flips a real `disabled` attribute and a `data-powered` attribute in one 60ms linear-timed cut (not an eased fade, and roughly a third the duration of a typical UI transition, so it reads as a cut rather than a dim), plus a tiny two-stroke SVG spark — two short accent-colored strokes staggered 40ms apart, each a 90ms fade — flashing at the lever's contact point, but only when closing (never on open, real breakers don't arc on break the way they do on make). An aria-live=\"polite\" region announces the result by name, e.g. 'API access on — 4 controls enabled', counted live off the fieldset's own descendants so it never drifts from what's actually rendered inside it. Governed controls get the browser's real disabled cascade from the fieldset, not a manual dim. Under prefers-reduced-motion the lever still obeys the same lock/release decision but jumps straight to its resting angle with no spring, no overshoot, no thunk, and no spark; the fieldset's 60ms cut is skipped to 0ms via motion-reduce. Colors are token-only (--background --foreground --muted --border --accent --surface); no canvas.",
+  "dependencies": [],
+  "card": {
+    "focus": ".max-w-md",
+    "padding": 0.15,
+    "maxZoom": 2.2
+  }
+}
