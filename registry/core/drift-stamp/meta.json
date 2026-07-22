@@ -1,0 +1,20 @@
+{
+  "name": "drift-stamp",
+  "title": "Drift Stamp",
+  "description": "A relative timestamp whose type visibly ages — variable-font weight, letter-spacing and ink drift from --foreground toward --muted as the moment recedes; hover or focus crossfades to the exact ISO instant.",
+  "collection": "core",
+  "tags": ["time", "typography", "variable-font", "data-display", "hover", "accessibility"],
+  "instruction": "A semantic <time datetime> that renders a moment's age typographically instead of just numerically: 'just now' sits at full variable-font weight (650) with zero letter-spacing in --foreground; as the moment recedes the weight steps down through four discrete buckets (~650 -> 500 -> 400 -> 300, matched to the minute/hour/day/date thresholds a relative-time label already crosses), letter-spacing opens from 0 to 0.04em, and ink steps from --foreground toward --muted via color-mix — the drift is felt in the glyphs before the digits are read. Label text itself follows the usual relative-time ladder: 'just now' under 45s, '<n>m' under an hour, '<n>h' under a day, then a short date ('Mar 3', or 'Mar 3, 2024' once the year differs) beyond that. A recursive setTimeout (not setInterval) re-evaluates the age and reschedules itself at a delay that grows with the age — 1s while fresh, 15s through the minutes bucket, 5min through the hours bucket, 1hr once it reads as a date — so a feed or table full of these costs almost nothing once its rows have aged. All ticking writes go straight to the DOM (textContent, style, attributes) with no React state on the hot path. Hovering or focusing the stamp crossfades (150ms, ease-out-expo) from the relative label to the exact ISO instant in Geist Mono ('2026-07-22 14:32:07Z'); both layers sit in the same CSS grid cell so the reveal never reflows the surrounding layout, and tabular-nums keeps every periodic digit swap at a fixed width too. The whole thing is one focusable node (tabIndex=0) — there is no separate button. Accessibility: the rendered relative text IS the accessible name (aria-label mirrors it exactly on every tick) and the absolute instant lives in aria-description, so both are always in the accessibility tree regardless of what's currently painted; the weight/tracking/color drift is presentational only and never carries information the text doesn't already carry. prefers-reduced-motion swaps the 150ms crossfade for an instant opacity flip and drops the weight/tracking/color transition entirely, staying fully legible either way. DOM+SVG+CSS only, zero dependencies, no canvas. Differs from terminator-date-field: that component is a date ENTRY control (a masked input plus a calendar popover with canvas moon-phase decoration) — DriftStamp has no input and no popover, it is a pure display where elapsed time itself is the typographic variable, meant for the 'updated 3m ago' spot in tables, feeds and cards.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "pointer-path",
+    "path": "sweep",
+    "target": "[data-drift-target]",
+    "inset": -0.2,
+    "period": 3800
+  },
+  "gate": {
+    "openBy": "[data-drift-stamp]",
+    "expect": "[data-drift-face=exact]"
+  }
+}
