@@ -1,0 +1,26 @@
+{
+  "name": "burr-chip",
+  "title": "Burr Chip",
+  "description": "A tag/token input whose chips attach like burrs — hooked, not glued. Removing one takes a deliberate pull: it stretches at the trailing edge, pops free, and the row exhales closed behind it with a staggered ripple toward the caret.",
+  "collection": "core",
+  "tags": [
+    "tag-input",
+    "token-input",
+    "chip",
+    "listbox",
+    "form",
+    "removal",
+    "drag",
+    "micro-interaction",
+    "aria-live"
+  ],
+  "autoplay": {
+    "mode": "press",
+    "target": "[data-burr-chip-remove]",
+    "period": 4200,
+    "delay": 700,
+    "hold": 1000
+  },
+  "instruction": "A tag/token input (real DOM chips in a flex-wrap row, role=group over the whole cluster) whose removal mechanic is the whole point: chips are hooked, not glued, so taking one out costs a deliberate, visible pull rather than a flat delete. Three ways to remove a chip all funnel through the same two-phase animation: clicking its × button, focusing the chip's × button and pressing Backspace/Delete, or pointer-dragging the chip body itself past a 64px threshold. Phase one, stretch: the chip's trailing (right) edge is fixed as the transform-origin and it scaleX-stretches to 1.15 over 90ms (an eased-out curve, not a spring) — the hook visibly holding under load. Phase two, detach: the chip translates 14px and fades to opacity 0 over 140ms on a fast ease-in curve, reading as a quick pop-free rather than a fade-out. Only after both phases finish does the tag actually leave the array (state update + aria-live announcement), so the two phases are the felt cost of deletion, not cosmetic filler in front of an instant removal. Once the DOM updates, every surviving chip that shifted to close the gap is caught with FLIP (bounding rects captured before the removal, inverse transform applied instantly after, then eased to zero) on a 220ms ease-out-expo curve, with each chip's transition delayed 40ms per position past the vacated slot — the close reads as a ripple travelling from the gap toward the text input's caret, not a snap-together. Pointer-drag removal maps |dx| directly onto the same 0→1.15 stretch in real time (no easing while dragging, 1:1 tracking) anchored at the same trailing edge regardless of drag direction; releasing past the 64px threshold continues straight into the detach phase from whatever stretch the drag already reached, releasing under threshold eases the chip back to scaleX 1 over 140ms on a single curve — elastic, deliberately no spring overshoot or oscillation either way. Accessibility: chips are a roving-tabindex group — real DOM focus moves between each chip's × button (a genuine <button aria-label=\"Remove {tag}\">, never a synthetic listbox option) and the text input at either end via Left/Right (Home/End jump to the first/last chip); Backspace/Delete on a focused chip removes it and moves focus onto whichever chip took its slot, or back to the input if the list emptied; Backspace in an empty input is also a shorthand for removing the last chip, and Enter or comma commits the current input text as a new tag. Every removal — from any of the three trigger paths — is announced through a visually-hidden aria-live=\"polite\" status region as \"Removed tag {name}, {n} remaining\". prefers-reduced-motion drops straight to the end state: the tag list updates immediately with no stretch, no detach, no ripple, and no per-frame drag scaling, but the announcement and focus-management behavior are unchanged. Controlled/uncontrolled via value/defaultValue/onChange (string arrays; duplicate values are ignored on add). disabled greys the whole control and blocks add/remove/drag. Zero dependencies, pure DOM + CSS transforms — no canvas.",
+  "dependencies": []
+}
