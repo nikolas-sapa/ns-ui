@@ -48,8 +48,13 @@ export interface ShimFitProps {
   "aria-label"?: string;
 }
 
-const MIN_ROW_PX = 8;
-const HAIRLINE_PX = 16;
+// Floor a row at 16px, not 8px: an 8px row cannot contain its own ~14px label,
+// so a thin row (e.g. a 120-token message) let its centered text bleed past the
+// row and — being the last row, flush at the frame's clipped bottom edge — get
+// severed by the frame's overflow-hidden. 16px holds the (hairline-sized) label
+// cleanly; the stack still fits with clearance to spare.
+const MIN_ROW_PX = 16;
+const HAIRLINE_PX = 18;
 const COMPRESS_MS = 120;
 const FLIP_MS = 320;
 const FLIP_EASE = "cubic-bezier(0.22,1,0.36,1)";
@@ -71,6 +76,20 @@ const DEFAULT_CANDIDATES: ShimSection[] = [
 
 function fmt(n: number): string {
   return Math.round(n).toLocaleString("en-US");
+}
+
+// sum of rect heights (measured at drag start, heights don't change mid-drag)
+// for every id preceding `id` in `order` — used to cancel out the dragged
+// row's own DOM-flow shift when it swaps past a neighbor, so the transform
+// keeps tracking the pointer instead of jumping by the neighbor's height.
+function cumHeightBefore(order: string[], id: string, rects: Map<string, DOMRect>): number {
+  let sum = 0;
+  for (const oid of order) {
+    if (oid === id) break;
+    const r = rects.get(oid);
+    if (r) sum += r.height;
+  }
+  return sum;
 }
 
 function useReducedMotion(): boolean {
@@ -111,7 +130,11 @@ type DragState = {
   startClientY: number;
   startRects: Map<string, DOMRect>;
   order: string[];
+  /** live order as currently displayed; updates whenever a swap commits */
+  currentOrder: string[];
   currentOrderKey: string;
+  /** cumHeightBefore(order, id, startRects) at drag start — the zero-drift baseline */
+  baseCum: number;
 };
 
 export function ShimFit({
@@ -329,13 +352,16 @@ export function ShimFit({
         const el = rowElsRef.current.get(s.id);
         if (el) startRects.set(s.id, el.getBoundingClientRect());
       }
+      const order = stackRef.current.map((s) => s.id);
       dragRef.current = {
         id,
         pointerId: e.pointerId,
         startClientY: e.clientY,
         startRects,
-        order: stackRef.current.map((s) => s.id),
-        currentOrderKey: stackRef.current.map((s) => s.id).join(","),
+        order,
+        currentOrder: order,
+        currentOrderKey: order.join(","),
+        baseCum: cumHeightBefore(order, id, startRects),
       };
       setLiftedId(id);
       const el = rowElsRef.current.get(id);
@@ -353,11 +379,9 @@ export function ShimFit({
     if (!drag || e.pointerId !== drag.pointerId) return;
     const el = rowElsRef.current.get(drag.id);
     if (!el) return;
-    const deltaY = e.clientY - drag.startClientY;
-    el.style.transform = `translateY(${deltaY}px)`;
-
     const startRect = drag.startRects.get(drag.id);
     if (!startRect) return;
+    const deltaY = e.clientY - drag.startClientY;
     const draggedCenter = startRect.top + startRect.height / 2 + deltaY;
     const others = drag.order.filter((x) => x !== drag.id);
     let targetIndex = others.length;
@@ -371,15 +395,23 @@ export function ShimFit({
     }
     const newOrder = [...others.slice(0, targetIndex), drag.id, ...others.slice(targetIndex)];
     const key = newOrder.join(",");
-    if (key === drag.currentOrderKey) return;
-    drag.currentOrderKey = key;
+    if (key !== drag.currentOrderKey) {
+      drag.currentOrderKey = key;
+      drag.currentOrder = newOrder;
+      const prevRects = captureRects(drag.id);
+      pendingFlipRef.current = { prevRects, skip: drag.id };
+      setStack((prev) => {
+        const byId = new Map(prev.map((s) => [s.id, s]));
+        return newOrder.map((oid) => byId.get(oid)!).filter(Boolean);
+      });
+    }
 
-    const prevRects = captureRects(drag.id);
-    pendingFlipRef.current = { prevRects, skip: drag.id };
-    setStack((prev) => {
-      const byId = new Map(prev.map((s) => [s.id, s]));
-      return newOrder.map((oid) => byId.get(oid)!).filter(Boolean);
-    });
+    // the dragged row's own natural (untransformed) top shifts by however
+    // much it has swapped past its neighbors so far — cancel that drift out
+    // so the row keeps tracking the pointer 1:1 instead of jumping by the
+    // swapped neighbor's height every time the order commits.
+    const drift = cumHeightBefore(drag.currentOrder, drag.id, drag.startRects) - drag.baseCum;
+    el.style.transform = `translateY(${deltaY - drift}px)`;
   }, [captureRects]);
 
   const endDrag = useCallback(() => {
@@ -534,7 +566,7 @@ export function ShimFit({
         </span>
       </div>
 
-      <div className="rounded-md border border-border" style={{ height: frameHeight }}>
+      <div className="overflow-hidden rounded-md border border-border" style={{ height: frameHeight }}>
         {/* clearance: the genuinely empty part of the gap, drawn as real space */}
         <div
           aria-hidden
@@ -584,7 +616,8 @@ export function ShimFit({
               >
                 <div
                   aria-hidden="true"
-                  className="flex shrink-0 cursor-grab touch-none items-center justify-center self-stretch px-0.5 text-muted/60 active:cursor-grabbing"
+                  className="flex shrink-0 cursor-grab touch-none items-center justify-center self-stretch overflow-hidden px-0.5 text-muted/60 active:cursor-grabbing"
+                  style={hairline ? { transform: `scale(${Math.min(1, Math.max(0.5, h / 14))})` } : undefined}
                   onPointerDown={(e) => beginDrag(s.id, e)}
                   onPointerMove={moveDrag}
                   onPointerUp={endDrag}

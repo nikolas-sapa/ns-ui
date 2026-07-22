@@ -167,6 +167,7 @@ export function CarryDigit({ value, decimals = 0, label, className = "" }: Carry
   const prevValueRef = useRef<number | null>(null);
   const mountedRef = useRef(false);
   const settleTimer = useRef<number | undefined>(undefined);
+  const armRaf = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     window.clearTimeout(settleTimer.current);
@@ -228,7 +229,18 @@ export function CarryDigit({ value, decimals = 0, label, className = "" }: Carry
 
     setCols(nextCols);
     setArmed(false);
-    const raf = requestAnimationFrame(() => setArmed(true));
+    // Nest two rAFs: setCols/setArmed(false) above haven't painted yet when
+    // this effect runs, so a single rAF fires on the SAME upcoming frame as
+    // that reset commit and can flip `armed` to true before the browser ever
+    // paints the "at rest" (width:0 / transform:restY, transition:none)
+    // frame — the reset and the animated target collapse into one frame and
+    // the transition never plays (columns pop straight to their final state
+    // instead of growing/flipping). Waiting a full extra frame guarantees the
+    // reset actually painted before we arm the transition.
+    if (armRaf.current !== undefined) cancelAnimationFrame(armRaf.current);
+    armRaf.current = requestAnimationFrame(() => {
+      armRaf.current = requestAnimationFrame(() => setArmed(true));
+    });
 
     const maxDelay = nextCols.reduce((m, c) => Math.max(m, c.delay), 0);
     settleTimer.current = window.setTimeout(() => {
@@ -238,11 +250,19 @@ export function CarryDigit({ value, decimals = 0, label, className = "" }: Carry
       setArmed(false);
     }, maxDelay + DURATION + 30);
 
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      if (armRaf.current !== undefined) cancelAnimationFrame(armRaf.current);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, decimals]);
 
-  useEffect(() => () => window.clearTimeout(settleTimer.current), []);
+  useEffect(
+    () => () => {
+      window.clearTimeout(settleTimer.current);
+      if (armRaf.current !== undefined) cancelAnimationFrame(armRaf.current);
+    },
+    []
+  );
 
   // debounced aria-live text: rapid ticks only announce the settled value
   const [announced, setAnnounced] = useState(() => srText(value, decimals, label));

@@ -72,7 +72,7 @@ function SettingSwitch({
       >
         <span
           className={[
-            "inline-block h-2.5 w-2.5 rounded-full bg-background transition-transform duration-150 ease-out",
+            "inline-block h-2.5 w-2.5 rounded-full bg-foreground transition-transform duration-150 ease-out",
             checked ? "translate-x-3.5" : "translate-x-0.5",
           ].join(" ")}
         />

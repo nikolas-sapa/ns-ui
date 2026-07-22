@@ -6,10 +6,11 @@ import { useEffect, useId, useRef, useState } from "react";
 // BimetalTrip — a data-driven threshold indicator built like a thermostat's
 // bimetallic strip. One SVG quadratic-bezier path is fixed at two mounting
 // posts; only its control point moves, offset upward as `value` climbs
-// toward `tripAt` — straight at the bottom of the range, peak bow exactly at
-// the trip point, where the strip's tip closes a visible contact gap against
-// a fixed pad above it. That crossing LATCHES: the strip stays pinned at
-// full bow (heavier --foreground stroke, filled contact pad — never
+// toward `tripAt` — straight at the bottom of the range, closing in on (but
+// deliberately never quite touching) the contact pad as it nears the trip
+// point, so there is always a real gap left for the latch to snap shut. That
+// crossing LATCHES: the strip stays pinned at full bow (heavier --foreground
+// stroke, filled contact pad — never
 // --accent, latching is data state, not interaction) regardless of value
 // wobbling anywhere between `clearAt` and `tripAt`. It only relaxes back
 // once value falls below `clearAt`, the lower re-arm mark — that gap between
@@ -59,6 +60,10 @@ const PAD_H = 5;
 const BAND_Y = 112;
 const BAND_H = 6;
 const TICK_H = 10;
+// the unlatched approach curve's ceiling — kept below 1 (full/latched bow) so
+// there is always a real geometric gap left against the contact pad for the
+// latch's snap to close; see the bowFrac comment below for why this matters.
+const UNLATCHED_BOW_CEILING = 0.75;
 
 type TransitionKind = "climb" | "snap" | "rearm";
 
@@ -147,8 +152,20 @@ export function BimetalTrip({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, tripAt, clearAt]);
 
+  // BUG FIX: bowFrac must never let the *unlatched* approach curve reach the
+  // same numeric value as the *latched* pinned bow (1). It used to — clamp()
+  // saturated the unlatched formula to exactly 1 the instant value reached
+  // tripAt, which is the same value the latch pins to, so by the time the
+  // `latched` effect actually flipped (one tick later) the path's `d` hadn't
+  // changed at all: no delta for the CSS transition to animate, so the
+  // signature 320ms back-out "snap into contact" never played — the strip
+  // just silently arrived already fully bowed. Capping the unlatched
+  // approach short of 1 keeps a real, persistent gap against the contact pad
+  // (matching "closes a visible gap" below) so crossing tripAt always leaves
+  // genuine distance for the snap to close, regardless of step size.
   const safeTripAt = tripAt > min ? tripAt : min + 1e-6;
-  const bowFrac = latched ? 1 : clamp((value - min) / (safeTripAt - min), 0, 1);
+  const approachFrac = clamp((value - min) / (safeTripAt - min), 0, 1);
+  const bowFrac = latched ? 1 : approachFrac * UNLATCHED_BOW_CEILING;
   const controlY = BASE_Y - bowFrac * MAX_CONTROL_OFFSET;
   const stripD = `M ${ANCHOR_L_X} ${BASE_Y} Q ${MID_X} ${controlY} ${ANCHOR_R_X} ${BASE_Y}`;
   const stripStyle = transitionStyle(transitionKind, reduced);

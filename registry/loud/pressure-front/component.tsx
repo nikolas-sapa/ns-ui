@@ -11,6 +11,14 @@ import { useEffect, useRef } from "react";
 // and both themes repaint for free — no getComputedStyle color parsing at
 // all. Line DENSITY (radial spacing that compresses near the CTA) is the
 // hierarchy device, not color or a gradient fill.
+//
+// The field is genuinely alive at rest, not just on interaction: a
+// continuous drift rotates the wobble, an independent faster breathing
+// pulse swells/contracts the low-pressure centre, and it leans toward the
+// pointer wherever it roams over the hero (not only when hovering the CTA).
+// All three are additive perturbations on top of the same closed-form
+// radius, never a point-attractor toward absolute coordinates — that keeps
+// ~30 nested closed curves from ever converging into each other.
 // ---------------------------------------------------------------------------
 
 const RINGS = 30;
@@ -18,9 +26,13 @@ const ANGLES = 56; // vertices per ring — smooth at 1px stroke, cheap to redra
 const COMPRESSION = 2.15; // >1 bunches inner rings tightly, spreads outer ones
 const ELLIPSE_X = 1.28; // rings are gently wide, matching a landscape hero
 const PULL_PX = 8; // max inward pull on CTA hover/focus (deepening low)
-const FRAME_INTERVAL = 1000 / 14; // throttled redraw rate — isobars drift slow
+const FRAME_INTERVAL = 1000 / 20; // throttled redraw rate — isobars drift slow, but smooth enough to read the pointer lean
 const SPRING_K = 90;
 const SPRING_ZETA = 0.8;
+const BREATH_MS = 7000; // independent, faster period so the low visibly pulses instead of only slowly rotating
+const BREATH_FRAC = 0.22; // +/- fraction minR itself swells by — a single global scalar, see drawRings for why
+const POINTER_PULL_PX = 30; // max outward lean toward the pointer — stronger than the CTA's isotropic pull
+const POINTER_GAP_CLAMP = 0.5; // never lean a ring past this fraction of its gap to the next ring; kept well under 1 because the existing wobble term already consumes part of that gap on its own
 
 // Deterministic low-frequency harmonic sum standing in for 2D noise: it's
 // exactly periodic in theta so every ring closes without a seam at 0/2π,
@@ -55,7 +67,7 @@ export interface PressureFrontProps {
   secondaryCta?: PressureFrontCta;
   /** number of contour rings. default 30 */
   rings?: number;
-  /** ms for one full drift loop of the noise phase. default 40000 */
+  /** ms for one full drift loop of the noise phase. default 20000 */
   driftMs?: number;
   className?: string;
 }
@@ -67,7 +79,7 @@ export function PressureFront({
   primaryCta,
   secondaryCta,
   rings = RINGS,
-  driftMs = 40000,
+  driftMs = 20000,
   className = "",
 }: PressureFrontProps) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -103,29 +115,98 @@ export function PressureFront({
     measure();
 
     // -- geometry: recomputed and written directly to each <path d> --------
-    const drawRings = (phase: number, pullPx: number) => {
+    // `breathPhase` runs on its own faster clock so the low-pressure centre
+    // visibly pulses instead of only slowly rotating with the drift. Pointer
+    // deformation is deliberately RADIAL and per-ring (never "toward a fixed
+    // point in screen space"): each ring only ever swells along its own
+    // center-relative radius, one-sided toward the cursor's bearing, clamped
+    // to a fraction of its actual gap to the next ring. That keeps neighbor
+    // rings moving in parallel — a point-attractor on ~30 nested closed
+    // curves would make rings near the cursor's radius converge and cross.
+    const drawRings = (
+      phase: number,
+      pullPx: number,
+      breathPhase: number,
+      pointerX: number,
+      pointerY: number,
+      pointerStrength: number
+    ) => {
       const { w, h } = dimsRef.current;
       if (w < 1 || h < 1) return;
       const { x: ctaX, y: ctaY } = ctaCenterRef.current;
       const maxR = Math.max(w, h) * 0.92;
       const minR = Math.min(28, maxR * 0.05);
+
+      // Breathing modulates minR as ONE global scalar, not a per-ring term —
+      // deliberately, because the innermost rings are already packed within
+      // a fraction of a px of each other (t^2.15 is nearly flat near t=0), so
+      // any independent per-ring perturbation there risks flipping their
+      // order. Folding the pulse into minR instead keeps every ring's radius
+      // exactly (maxR - minRBreath) * t^COMPRESSION + minRBreath: the gap
+      // between any two rings is (maxR - minRBreath) * (t_i^C - t_(i-1)^C),
+      // always positive since maxR always exceeds minRBreath by construction
+      // (BREATH_FRAC is a small fraction) — so the pulse can never cross
+      // rings, only grow/shrink the whole low in lockstep, tapering to zero
+      // at the outer edge for free via the same (1 - t^C) the compression
+      // curve already has.
+      const minRBreath = minR * (1 + BREATH_FRAC * Math.sin(breathPhase));
+
+      // Pass 1: centers + base radii for every ring, so pass 2 can clamp the
+      // pointer lean against each ring's *real* (post-breathing) neighbor gap.
+      const centers: { x: number; y: number }[] = new Array(rings);
+      const baseRs: number[] = new Array(rings);
+      for (let i = 0; i < rings; i++) {
+        const t = i / (rings - 1);
+        const driftR = minR * 0.9;
+        centers[i] = {
+          x: ctaX + driftR * Math.cos(phase * 0.5 + i * 0.05),
+          y: ctaY + driftR * 0.6 * Math.sin(phase * 0.5 + i * 0.05),
+        };
+        baseRs[i] = minRBreath + (maxR - minRBreath) * Math.pow(t, COMPRESSION);
+      }
+
       for (let i = 0; i < rings; i++) {
         const el = pathRefs.current[i];
         if (!el) continue;
         const t = i / (rings - 1);
-        const baseR = minR + (maxR - minR) * Math.pow(t, COMPRESSION);
+        const { x: cx, y: cy } = centers[i];
+        const baseR = baseRs[i];
         const amp = (maxR - minR) * 0.045 * (0.35 + 0.65 * t);
         const seed = i * 0.53;
         const ringPhase = phase + i * 0.045;
-        const driftR = minR * 0.9;
-        const cx = ctaX + driftR * Math.cos(phase * 0.5 + i * 0.05);
-        const cy = ctaY + driftR * 0.6 * Math.sin(phase * 0.5 + i * 0.05);
         const pullHere = pullPx * (1 - t);
+
+        // How much (and toward what bearing) this ring leans toward the
+        // pointer: gaussian in RADIUS-space (how close the pointer's distance
+        // from this ring's own center is to this ring's own radius), not
+        // screen-space distance to a point — so the lean is inherently a
+        // per-ring radial swell, not a convergent pull.
+        let pointerAmp = 0;
+        let pointerAngle = 0;
+        if (pointerStrength > 0.001) {
+          const dxp = pointerX - cx;
+          const dyp = pointerY - cy;
+          const distToCenter = Math.hypot(dxp, dyp);
+          pointerAngle = Math.atan2(dyp, dxp);
+          const distToRing = distToCenter - baseR;
+          const sigma = Math.max(24, (maxR - minR) * 0.09);
+          const ringFalloff = Math.exp(-(distToRing * distToRing) / (2 * sigma * sigma));
+          const gapPrev = i > 0 ? Math.abs((baseRs[i] ?? baseR) - (baseRs[i - 1] ?? baseR)) : Math.abs((baseRs[1] ?? baseR) - (baseRs[0] ?? baseR));
+          const gapNext = i < rings - 1 ? Math.abs((baseRs[i + 1] ?? baseR) - (baseRs[i] ?? baseR)) : gapPrev;
+          const localGap = Math.min(gapPrev, gapNext);
+          pointerAmp = Math.min(POINTER_PULL_PX, localGap * POINTER_GAP_CLAMP) * pointerStrength * ringFalloff;
+        }
+
         let d = "";
         for (let k = 0; k < ANGLES; k++) {
           const theta = (k / ANGLES) * Math.PI * 2;
           const wob = amp * ringWobble(theta, ringPhase, seed);
-          const r = Math.max(4, baseR + wob - pullHere);
+          let r = baseR + wob - pullHere;
+          if (pointerAmp > 0.01) {
+            const align = Math.max(0, Math.cos(theta - pointerAngle));
+            r += pointerAmp * align * align; // one-sided swell on the cursor-facing arc only
+          }
+          r = Math.max(4, r);
           const x = cx + r * Math.cos(theta) * ELLIPSE_X;
           const y = cy + r * Math.sin(theta);
           d += k === 0 ? `M${x.toFixed(1)},${y.toFixed(1)}` : `L${x.toFixed(1)},${y.toFixed(1)}`;
@@ -139,15 +220,19 @@ export function PressureFront({
       // Static density gradient only: no phase drift, no continuous spring —
       // this is the strongest reduced-motion story in the set, since the
       // hierarchy is encoded structurally (ring spacing), not by motion.
+      // No root-wide pointer tracking here on purpose — a redraw on every
+      // pointermove is exactly the continuous motion prefers-reduced-motion
+      // opts out of. Only the CTA's own enter/leave/focus/blur still toggles
+      // a single static redraw, same as before.
       let staticPull = 0;
-      drawRings(0, 0);
+      drawRings(0, 0, 0, 0, 0, 0);
       const onEnter = () => {
         staticPull = PULL_PX;
-        drawRings(0, staticPull);
+        drawRings(0, staticPull, 0, 0, 0, 0);
       };
       const onLeave = () => {
         staticPull = 0;
-        drawRings(0, staticPull);
+        drawRings(0, staticPull, 0, 0, 0, 0);
       };
       cta.addEventListener("pointerenter", onEnter);
       cta.addEventListener("pointerleave", onLeave);
@@ -155,12 +240,12 @@ export function PressureFront({
       cta.addEventListener("blur", onLeave);
       const ro = new ResizeObserver(() => {
         measure();
-        drawRings(0, staticPull);
+        drawRings(0, staticPull, 0, 0, 0, 0);
       });
       ro.observe(root);
       const ctaRo = new ResizeObserver(() => {
         measure();
-        drawRings(0, staticPull);
+        drawRings(0, staticPull, 0, 0, 0, 0);
       });
       ctaRo.observe(cta);
       return () => {
@@ -173,7 +258,8 @@ export function PressureFront({
       };
     }
 
-    // -- full loop: ambient drift + damped-spring hover pull ----------------
+    // -- full loop: ambient drift + breathing + damped-spring hover pull +
+    // pointer-follow lean -----------------------------------------------
     let raf = 0;
     let elVisible = true;
     let pageVisible = document.visibilityState === "visible";
@@ -184,6 +270,20 @@ export function PressureFront({
     let lastDraw = 0;
     let pull = 0;
     let pullVel = 0;
+
+    // Pointer follow: raw target from the event, a smoothed trailing
+    // position (framerate-normalized lerp, same idiom as signal-terrain),
+    // and a spring-eased 0..1 strength so entering/leaving ramps rather than
+    // snaps. Snaps straight to the raw position on the frame pointer
+    // tracking (re)starts, so it doesn't sweep in from wherever it last was.
+    let pointerRawX = 0;
+    let pointerRawY = 0;
+    let pointerX = 0;
+    let pointerY = 0;
+    let pointerActive = false;
+    let pointerTracking = false;
+    let pointerStrength = 0;
+    let pointerStrengthVel = 0;
 
     const tick = (now: number) => {
       if (!startTime) startTime = now;
@@ -200,10 +300,34 @@ export function PressureFront({
         pullVel = 0;
       }
 
+      if (pointerActive) {
+        if (!pointerTracking) {
+          pointerX = pointerRawX;
+          pointerY = pointerRawY;
+          pointerTracking = true;
+        } else {
+          const k = 1 - Math.pow(0.88, dt * 60);
+          pointerX += (pointerRawX - pointerX) * k;
+          pointerY += (pointerRawY - pointerY) * k;
+        }
+      } else {
+        pointerTracking = false;
+      }
+      const pointerTarget = pointerActive ? 1 : 0;
+      const cp = 2 * SPRING_ZETA * Math.sqrt(SPRING_K);
+      const accelP = -SPRING_K * (pointerStrength - pointerTarget) - cp * pointerStrengthVel;
+      pointerStrengthVel += accelP * dt;
+      pointerStrength += pointerStrengthVel * dt;
+      if (Math.abs(pointerStrength - pointerTarget) < 0.002 && Math.abs(pointerStrengthVel) < 0.002) {
+        pointerStrength = pointerTarget;
+        pointerStrengthVel = 0;
+      }
+
       if (now - lastDraw >= FRAME_INTERVAL) {
         lastDraw = now;
         const phase = ((now - startTime) / driftMs) * Math.PI * 2;
-        drawRings(phase, pull);
+        const breathPhase = ((now - startTime) / BREATH_MS) * Math.PI * 2;
+        drawRings(phase, pull, breathPhase, pointerX, pointerY, pointerStrength);
       }
       raf = visible ? requestAnimationFrame(tick) : 0;
     };
@@ -223,6 +347,27 @@ export function PressureFront({
     cta.addEventListener("pointerleave", onCtaOff);
     cta.addEventListener("focus", onCtaOn);
     cta.addEventListener("blur", onCtaOff);
+
+    // Whole-hero pointer tracking — the field leans toward the cursor
+    // wherever it is, not just when hovering the CTA. Mouse/pen only: touch
+    // has no hover state and pointermove-during-scroll would read as jitter.
+    // rect is re-measured on every move (matching signal-terrain's idiom)
+    // rather than cached, so page scroll never throws the coordinates off.
+    const onRootMove = (e: PointerEvent) => {
+      if (e.pointerType === "touch") return;
+      const rect = root.getBoundingClientRect();
+      pointerRawX = e.clientX - rect.left;
+      pointerRawY = e.clientY - rect.top;
+      pointerActive = true;
+      wake();
+    };
+    const onRootLeave = (e: PointerEvent) => {
+      if (e.pointerType === "touch") return;
+      pointerActive = false;
+      wake();
+    };
+    root.addEventListener("pointermove", onRootMove);
+    root.addEventListener("pointerleave", onRootLeave);
 
     const ro = new ResizeObserver(measure);
     ro.observe(root);
@@ -255,6 +400,8 @@ export function PressureFront({
       cta.removeEventListener("pointerleave", onCtaOff);
       cta.removeEventListener("focus", onCtaOn);
       cta.removeEventListener("blur", onCtaOff);
+      root.removeEventListener("pointermove", onRootMove);
+      root.removeEventListener("pointerleave", onRootLeave);
     };
   }, [rings, driftMs]);
 

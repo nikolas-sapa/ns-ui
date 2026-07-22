@@ -216,7 +216,7 @@ export function LockFlight({
       `}</style>
 
       <nav aria-label={ariaLabel} className="border-b border-border">
-        <div className="relative">
+        <div className="relative isolate">
           <ol onKeyDown={onNavKeyDown} className="flex items-stretch">
             {steps.map((s, i) => {
               const reached = i <= current;
@@ -341,10 +341,14 @@ export function LockFlight({
             })}
           </ol>
 
-          {/* active highlight — glides underneath, through the gate, into the new chamber */}
+          {/* active highlight — glides underneath, through the gate, into the new
+              chamber. -z-10 (inside this div's `isolate` stacking context) keeps it
+              painted behind every chamber button, which are themselves `relative`
+              (z-index:auto) and would otherwise win paint order simply by coming
+              later in the DOM as it slides past them mid-transit. */}
           <span
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-[2px] bg-accent"
+            className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-[2px] bg-accent"
             style={{
               width: `${100 / Math.max(n, 1)}%`,
               transform: `translateX(${current * 100}%)`,

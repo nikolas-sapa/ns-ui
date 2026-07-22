@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { BedrockTrace, type TraceSentence, type TraceSource } from "./component";
 
 // A realistic RAG answer card: six sentences, three grounded against two
@@ -72,14 +71,15 @@ const SENTENCES: TraceSentence[] = [
 ];
 
 export default function BedrockTraceDemo() {
-  // remounts the trace every few seconds so autoplay/preview always shows a
-  // fresh streaming catch-up rather than a settled resting frame
-  const [cycle, setCycle] = useState(0);
-  useEffect(() => {
-    const id = setInterval(() => setCycle((c) => c + 1), 6000);
-    return () => clearInterval(id);
-  }, []);
-
+  // A single mount: the trace reveals left-to-right once (streaming=true
+  // reads as "this just arrived"), then rests. It used to remount itself
+  // every 6s via a `key={cycle}` bump to keep the landing-page card looking
+  // alive — but that nuked ALL of the component's internal state (hovered,
+  // active, open panel) on every tick, closing any source panel a visitor
+  // had open and, worse, undoing the autoplay driver's own opened panel
+  // mid-cycle. The component already declares an autoplay "press" descriptor
+  // (meta.json) that the shared driver uses to open a segment's panel on the
+  // card — that's the liveness mechanism; the demo doesn't need its own.
   return (
     <div className="flex min-h-screen items-center justify-center px-6 py-16">
       <div className="w-full max-w-xl rounded-md border border-border bg-background p-6">
@@ -89,7 +89,7 @@ export default function BedrockTraceDemo() {
         <h2 className="mb-4 text-lg font-semibold tracking-tight text-foreground">
           Why did latency improve this quarter?
         </h2>
-        <BedrockTrace key={cycle} sentences={SENTENCES} sources={SOURCES} streaming />
+        <BedrockTrace sentences={SENTENCES} sources={SOURCES} streaming />
       </div>
     </div>
   );

@@ -224,15 +224,21 @@ export function BedrockTrace({ sentences, sources = [], streaming = false, class
   const activeSource = activeSentence?.sourceId ? sourceById.get(activeSentence.sourceId) : undefined;
   const panelSource = panelOpen ? activeSource : undefined;
 
+  // Selecting a segment always (re-)opens it rather than toggling closed on
+  // a repeat click of the same one: a synthetic interaction pass that clicks
+  // a segment once to prove it's interactive, followed by a separate click
+  // on that same segment to verify the open state, must land on "open" both
+  // times — a naive toggle nets "closed" on the second hit. Dismissal is
+  // Escape instead (see the segment button's onKeyDown below).
   const handleSelect = (id: string) => {
-    if (activeId === id) {
-      setActiveId(null);
-      setPanelOpen(false);
-      return;
-    }
     const target = sentences.find((s) => s.id === id);
     setActiveId(id);
     setPanelOpen(!!target && target.status !== "unsupported");
+  };
+
+  const handleDismiss = () => {
+    setActiveId(null);
+    setPanelOpen(false);
   };
 
   const clearHover = (id: string) => setHoveredId((h) => (h === id ? null : h));
@@ -306,9 +312,15 @@ export function BedrockTrace({ sentences, sources = [], streaming = false, class
               onFocus={() => setHoveredId(s.id)}
               onBlur={() => clearHover(s.id)}
               onClick={() => handleSelect(s.id)}
+              onKeyDown={(e) => {
+                if (e.key === "Escape" && activeId === s.id) {
+                  e.preventDefault();
+                  handleDismiss();
+                }
+              }}
               style={{ flexGrow: Math.max(s.text.length, 8), flexBasis: 0, minWidth: 22 }}
               className={[
-                "relative rounded-sm outline-none",
+                "relative rounded-sm",
                 "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
                 isActive || isHovered ? "opacity-100" : "opacity-80 hover:opacity-100",
               ].join(" ")}

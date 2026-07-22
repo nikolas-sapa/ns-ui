@@ -6,23 +6,36 @@ import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 // HeatSoak — a rate-limited button whose own body is the thermometer. A
 // scalar `h` ("heat") accumulates +0.34 per press and decays exponentially
 // (half-life 2.5s) in a single rAF loop, written straight onto the button as
-// a `--heat` CSS custom property. Three `calc()`/`color-mix()` expressions —
-// letter-spacing, scale, border-color — all read that one property, clamped
-// to 1 via CSS `min()`, so the button visibly dilates under repeated presses
-// and relaxes on its own the moment they stop. No progress bar, no digit: the
-// swelling and the border brightening toward --foreground *are* the gauge.
+// a `--heat` CSS custom property. All visual layers read that one property
+// (clamped to 1 via CSS `min()` as `--h`, plus a `--warm` ramp that's 0 below
+// h=0.7 and climbs 0->1 across 0.7-1.0): letter-spacing, scale and
+// border-color dilate the button itself; a bottom-up fill layer reads --h
+// directly so the accumulated heat has an actual gauge to point at, not just
+// a swelling border; a soft haze band sweeps the surface at an opacity gated
+// to --warm, so it's only visible once the button is genuinely close to (or
+// still cooling from) the limit — never at rest. No progress bar, no digit:
+// the fill and the shimmer *are* the gauge.
 //
 // Past a duty cycle (h >= 1.0) it "soaks": the flag latches (hysteresis —
 // re-arms only once h decays back to <= 0.7, so it never flickers at either
-// boundary) and further presses no-op the actual action, instead getting a
-// flat, dead 1px translateY dip that eases back with no spring overshoot —
-// an "overdamped" non-response, not a bigger animation. aria-disabled (never
-// the native `disabled` attribute) keeps the button in the tab order and
-// clickable the whole time; a visible Geist Mono caption under the button
-// duplicates every thermal cue in words ("heat 62%", then "cooling down,
-// ready in about 4s") so nothing here rides on motion alone, and a separate
-// sr-only aria-live=polite span announces only the two discrete transitions
-// (entered soak / re-armed) rather than re-reading a ticking countdown.
+// boundary), the fill grows a diagonal hazard hatch and breathes gently — a
+// distinct, unmissable "dead" read, not just the same warm tone held longer —
+// and the label itself dims toward --muted. Further presses no-op the actual
+// action, instead getting a flat, dead 1px translateY dip that eases back
+// with no spring overshoot — an "overdamped" non-response, not a bigger
+// animation (the hazard breathing is a separate, deliberately ambient loop,
+// not the dip's feedback). aria-disabled (never the native `disabled`
+// attribute) keeps the button in the tab order and clickable the whole time;
+// a visible Geist Mono caption under the button duplicates every thermal cue
+// in words ("heat 62%", then "cooling down, ready in about 4s") so nothing
+// here rides on motion alone, and a separate sr-only aria-live=polite span
+// announces only the two discrete transitions (entered soak / re-armed)
+// rather than re-reading a ticking countdown.
+//
+// The same fill and haze double as the cooldown display: nothing resets when
+// soak ends, --h and --warm just keep draining as h decays, so the gauge
+// that filled up on the way to the limit is the same gauge visibly emptying
+// back out afterward.
 //
 // The countdown text recomputes from the live decay math (t = ln(h/0.7)/k)
 // but only commits to the DOM at most once a second, per the brief — the
@@ -30,12 +43,15 @@ import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 // the visual swelling stays smooth while the words update at a sane pace.
 //
 // Reduced motion is a pure CSS override (`transform: none`, `letter-spacing:
-// 0` under the media query, `!important`) — synchronous at first paint, no
-// JS race with a `matchMedia` effect. The caption and aria-live text are
-// identical either way, already the non-motion channel for this state.
+// 0`, haze `display: none`, hazard breathing frozen at full opacity, all
+// under the media query, `!important`) — synchronous at first paint, no JS
+// race with a `matchMedia` effect. The fill and border stay fully legible
+// without any motion; the caption and aria-live text are identical either
+// way, already the non-motion channel for this state.
 //
-// Every color is a token: --border and --foreground only, mixed with
-// `color-mix()` — no hex, no canvas. DOM+CSS only.
+// Every color is a token: --border, --foreground and --muted only, mixed
+// with `color-mix()` — never --accent (interaction-only, reserved for the
+// focus ring), no hex, no canvas. DOM+CSS only.
 // ---------------------------------------------------------------------------
 
 const HEAT_PER_PRESS = 0.34;
@@ -178,17 +194,93 @@ export function HeatSoak({ children, onPress, className = "" }: HeatSoakProps) {
     <div className={className}>
       <style>{`
 .ns-heat-soak-btn{
-  transform: translateY(calc(var(--dip, 0) * 1px)) scale(calc(1 + 0.02 * min(var(--heat, 0), 1)));
-  border-color: color-mix(in srgb, var(--border), var(--foreground) calc(min(var(--heat, 0), 1) * 100%));
+  --h: min(var(--heat, 0), 1);
+  /* warmup ramp: 0 until h=0.7, 0->1 across 0.7-1.0, pinned at 1 through the
+     whole soak (h stays >=0.7 down to the re-arm edge) — the same scalar
+     drives the shimmer intensity and the fill's hottest tone whether it is
+     climbing toward the limit or draining back down through it. */
+  --warm: max(0, min(1, calc((var(--heat, 0) - 0.7) * 3.3333)));
+  position: relative;
+  overflow: hidden;
+  transform: translateY(calc(var(--dip, 0) * 1px)) scale(calc(1 + 0.02 * var(--h)));
+  border-color: color-mix(in srgb, var(--border), var(--foreground) calc(var(--h) * 100%));
 }
 .ns-heat-soak-btn:hover{ background-color: color-mix(in srgb, var(--background), var(--foreground) 6%); }
 .ns-heat-soak-btn[aria-disabled="true"]{ cursor: not-allowed; }
-.ns-heat-soak-label{
-  letter-spacing: calc(min(var(--heat, 0), 1) * 0.06em);
+
+/* accumulated-heat fill: a bottom-up band reading the same --h the border
+   and scale already use, so the gauge is legible even where the swelling
+   is subtle. Tone shifts from --muted (cool) toward --foreground (hot) as
+   --warm rises, never toward --accent — thermal state, not an affordance. */
+.ns-heat-soak-fill{
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(to top,
+    color-mix(in srgb, var(--muted), var(--foreground) calc(var(--warm) * 45%)) 0%,
+    color-mix(in srgb, var(--muted), var(--foreground) calc(var(--warm) * 45%)) calc(var(--h) * 100%),
+    transparent calc(var(--h) * 100%),
+    transparent 100%);
+  opacity: calc(0.16 + var(--warm) * 0.16);
+  transition: opacity 200ms ease-out;
 }
+/* soaked (over-limit): the fill grows a hazard hatch and breathes — a
+   distinct, unmissable "dead" read, still no color outside the palette. */
+.ns-heat-soak-btn[aria-disabled="true"] .ns-heat-soak-fill{
+  background-image:
+    repeating-linear-gradient(135deg,
+      color-mix(in srgb, var(--foreground) 22%, transparent) 0 1px,
+      transparent 1px 6px),
+    linear-gradient(to top,
+      color-mix(in srgb, var(--muted), var(--foreground) 45%) 0%,
+      color-mix(in srgb, var(--muted), var(--foreground) 45%) calc(var(--h) * 100%),
+      transparent calc(var(--h) * 100%),
+      transparent 100%);
+  animation: ns-heat-soak-hazard 1.6s ease-in-out infinite;
+}
+.ns-heat-soak-btn[aria-disabled="true"] .ns-heat-soak-label{
+  color: color-mix(in srgb, var(--foreground), var(--muted) 35%);
+}
+
+/* heat shimmer/haze: a soft band sweeping the surface, opacity gated to
+   --warm so it's invisible until the button is genuinely close to (or
+   still cooling from) the limit — never at rest, never mid-warmup. */
+.ns-heat-soak-haze{
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(100deg,
+    transparent 30%,
+    color-mix(in srgb, var(--muted), var(--foreground) 30%) 50%,
+    transparent 70%);
+  background-size: 220% 100%;
+  opacity: calc(var(--warm) * 0.35);
+  animation: ns-heat-soak-shimmer 2.4s linear infinite;
+}
+
+.ns-heat-soak-label{
+  position: relative;
+  z-index: 1;
+  letter-spacing: calc(var(--h) * 0.06em);
+  transition: color 200ms ease-out;
+}
+
+@keyframes ns-heat-soak-shimmer{
+  0%{ background-position: 130% 0; }
+  100%{ background-position: -30% 0; }
+}
+@keyframes ns-heat-soak-hazard{
+  0%, 100%{ opacity: 0.6; }
+  50%{ opacity: 1; }
+}
+
 @media (prefers-reduced-motion: reduce){
   .ns-heat-soak-btn{ transform: none !important; }
-  .ns-heat-soak-label{ letter-spacing: 0 !important; }
+  .ns-heat-soak-label{ letter-spacing: 0 !important; transition: none !important; }
+  .ns-heat-soak-fill{ transition: none !important; }
+  .ns-heat-soak-haze{ display: none !important; }
+  .ns-heat-soak-btn[aria-disabled="true"] .ns-heat-soak-fill{
+    animation: none !important;
+    opacity: 1 !important;
+  }
 }
 `}</style>
 
@@ -200,6 +292,8 @@ export function HeatSoak({ children, onPress, className = "" }: HeatSoakProps) {
         onClick={handleClick}
         className="ns-heat-soak-btn inline-flex items-center justify-center rounded-sm border bg-background px-5 py-2.5 text-sm font-medium text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
       >
+        <span aria-hidden="true" className="ns-heat-soak-fill" />
+        <span aria-hidden="true" className="ns-heat-soak-haze" />
         <span className="ns-heat-soak-label">{children}</span>
       </button>
 

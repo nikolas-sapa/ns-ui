@@ -71,14 +71,9 @@ function roundedRectPath(x: number, y: number, w: number, h: number, radius: num
   },${y + h} H${x + r} A${r},${r} 0 0 1 ${x},${y + h - r} V${y + r} A${r},${r} 0 0 1 ${x + r},${y} Z`;
 }
 
-function roundedRectPerimeter(w: number, h: number, radius: number): number {
-  const r = Math.max(0, Math.min(radius, w / 2, h / 2));
-  return 2 * (w - 2 * r) + 2 * (h - 2 * r) + 2 * Math.PI * r;
-}
-
 const CSS = `
 @keyframes ns-stake-drop{from{opacity:0;transform:translateY(-6px) scale(.85)}to{opacity:1;transform:translateY(0) scale(1)}}
-@keyframes ns-stake-reveal{from{stroke-dashoffset:var(--ns-len)}to{stroke-dashoffset:0}}
+@keyframes ns-stake-reveal{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
 @keyframes ns-stake-loop-in{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
 `;
 
@@ -139,21 +134,17 @@ export function StakeLine({
   const connectorMaskId = `ns-stake-con-${uid}`;
 
   let silhouetteD = "";
-  let silhouetteLen = 0;
   let corners: { x: number; y: number; dx: number; dy: number }[] = [];
   let restD = "";
   let tugD = "";
   let loopD = "";
-  let connectorLen = 0;
 
   if (boxes) {
     const { outer, cells, cta } = boxes;
     silhouetteD = roundedRectPath(outer.x, outer.y, outer.w, outer.h, OUTER_RADIUS);
-    silhouetteLen = roundedRectPerimeter(outer.w, outer.h, OUTER_RADIUS);
 
     for (const cell of cells) {
       silhouetteD += ` ${roundedRectPath(cell.x, cell.y, cell.w, cell.h, CELL_RADIUS)}`;
-      silhouetteLen += roundedRectPerimeter(cell.w, cell.h, CELL_RADIUS);
     }
 
     if (shape.kind === "chart" && outer.w > 24 && outer.h > 24) {
@@ -162,7 +153,6 @@ export function StakeLine({
         outer.x + outer.w - inset
       }`;
       silhouetteD += ` ${axisD}`;
-      silhouetteLen += outer.h - 2 * inset + (outer.w - 2 * inset);
     }
 
     corners = [
@@ -180,7 +170,6 @@ export function StakeLine({
     // hover reads as a pluck rather than a no-op collinear shift
     tugD = `M${start.x},${start.y} Q${mid.x + 3},${mid.y} ${end.x},${end.y}`;
     loopD = `M${end.x - 4},${end.y} a4,3 0 1,0 8,0 a4,3 0 1,0 -8,0`;
-    connectorLen = Math.hypot(end.x - start.x, end.y - start.y);
   }
 
   return (
@@ -248,36 +237,32 @@ export function StakeLine({
               <mask id={silhouetteMaskId} maskUnits="userSpaceOnUse">
                 <path
                   d={silhouetteD}
+                  pathLength={1}
                   stroke="#fff"
                   strokeWidth={10}
                   strokeLinecap="round"
                   fill="none"
-                  strokeDasharray={reduced ? undefined : `${silhouetteLen} ${silhouetteLen}`}
+                  strokeDasharray={reduced ? undefined : 1}
                   style={
                     reduced
                       ? undefined
-                      : ({
-                          "--ns-len": silhouetteLen,
-                          animation: "ns-stake-reveal 650ms cubic-bezier(.16,1,.3,1) 520ms both",
-                        } as CSSProperties)
+                      : { animation: "ns-stake-reveal 650ms cubic-bezier(.16,1,.3,1) 520ms both" }
                   }
                 />
               </mask>
               <mask id={connectorMaskId} maskUnits="userSpaceOnUse">
                 <path
                   d={restD}
+                  pathLength={1}
                   stroke="#fff"
                   strokeWidth={10}
                   strokeLinecap="round"
                   fill="none"
-                  strokeDasharray={reduced ? undefined : `${connectorLen} ${connectorLen}`}
+                  strokeDasharray={reduced ? undefined : 1}
                   style={
                     reduced
                       ? undefined
-                      : ({
-                          "--ns-len": connectorLen,
-                          animation: "ns-stake-reveal 220ms cubic-bezier(.16,1,.3,1) 1180ms both",
-                        } as CSSProperties)
+                      : { animation: "ns-stake-reveal 220ms cubic-bezier(.16,1,.3,1) 1180ms both" }
                   }
                 />
               </mask>

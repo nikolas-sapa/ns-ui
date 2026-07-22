@@ -339,7 +339,7 @@ export function DovetailRun({
       <div className="ns-dove-root rounded-md border border-border bg-background p-4">
         {/* the rail — decorative summary of the joined run; a real list, but
             no interactive control lives inside it, so Tab never enters it */}
-        <ol aria-label="Steps" className="mb-5 flex gap-1.5 overflow-x-auto pb-1">
+        <ol aria-label="Steps" className="mb-5 flex gap-0 overflow-x-auto pb-1">
           {steps.map((s, i) => (
             <RailSlot
               key={s.id}

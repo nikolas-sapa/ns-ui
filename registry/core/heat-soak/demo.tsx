@@ -16,9 +16,11 @@ export default function HeatSoakDemo() {
           Verification email
         </h1>
         <p className="mt-1 text-sm leading-relaxed text-muted">
-          Press repeatedly — the button itself swells, its letters spread and
-          its border brightens with every send. Push it past its duty cycle
-          and it soaks: presses go dead until it visibly cools back down.
+          Press repeatedly — heat fills the button from the bottom, its
+          letters spread, its border brightens and a haze shimmers across
+          the surface as it nears the limit. Push it past its duty cycle
+          and it soaks: a hazard hatch pulses, presses go dead, and the
+          fill visibly drains back down as it cools.
         </p>
 
         <div className="mt-5 rounded-md border border-border bg-background p-5">
