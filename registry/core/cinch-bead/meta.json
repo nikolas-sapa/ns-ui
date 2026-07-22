@@ -1,0 +1,27 @@
+{
+  "name": "cinch-bead",
+  "title": "Cinch Bead",
+  "description": "Tag input as beads threaded onto a cord: committing a tag cinches a bead into place with one overshoot squeeze while its knot draws on; Backspace on an empty input unravels the last bead with a drop-and-twist. Duplicate commits shudder the existing bead instead of re-threading it.",
+  "collection": "core",
+  "tags": [
+    "tag-input",
+    "chips",
+    "input",
+    "form",
+    "svg",
+    "micro-interaction"
+  ],
+  "instruction": "Build a tag input whose chips read as beads on a wire. STRUCTURE: a click-to-focus bg-surface field (cursor-text, focus-within border shift to muted) laid out as a wrapping flex row: a short cord stub (1px-tall bg-border span), then per tag a pill chip followed by a 12px cord segment, then the flex-1 text input — the h-px segments between pills are what makes the row read as one threaded cord, and they wrap naturally with the chips. Each chip is a rounded-full bg-background bordered pill holding a 10px SVG knot (circle, stroke var(--muted), pathLength 1), the truncated tag text, and a 16px remove button (inline SVG x, aria-label 'Remove {tag}', hover bg-border, focus-visible accent outline). MOTION, all CSS keyframes scoped in a <style> tag: entry 'cinch-in' slides the chip from translateX(18px) scaleX(1.1) through a -2px/0.97 overshoot at 62% into rest (280ms ease-out-back cubic-bezier(0.22,1,0.36,1), fill backwards) while the knot circle draws on via stroke-dashoffset 1->0 delayed 120ms; exit 'cinch-unravel' drops translateY(12px) rotate(8deg) to opacity 0 over 240ms ease-in (fill forwards) — the tag is parked in a 'leaving' list and removed by a setTimeout matching the animation, all timers tracked in a Set and cleared on unmount; duplicate commit fires 'cinch-shudder', a +-3px decaying x-shake on the EXISTING bead, instead of adding. INTERACTION: Enter or comma commits (preventDefault so the comma never lands in the value), trims, ignores empty; Backspace on an empty input unravels the newest non-leaving bead; each remove button unravels its own. onChange fires with the new tag array on every add/remove; a visually-hidden aria-live span announces the count. maxTags caps additions silently. Reduced motion: a media query kills all four animations and the leaving-park executes synchronously. INK: tokens only (background, surface, border, muted, foreground, accent for focus rings); no canvas, no observers.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "type",
+    "text": "flaky,",
+    "cps": 4,
+    "hold": 1800,
+    "target": "input[type=\"text\"]"
+  },
+  "card": {
+    "focus": ".max-w-md",
+    "padding": 0.12
+  }
+}
