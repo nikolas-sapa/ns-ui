@@ -11,7 +11,7 @@
     "target": "[role=\"slider\"]",
     "from": [0.5, 0.12],
     "to": [0.5, 0.88],
-    "period": 7000,
+    "period": 12000,
     "delay": 600
   }
 }

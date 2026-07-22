@@ -67,8 +67,8 @@ const BLUR_TRANSITION_MS = 140;
 const MAX_BLUR = 5;
 const FAST_VELOCITY = 14; // idx/s — at or above this, blur-through instead of a kick
 const VELOCITY_FOR_MAX_BLUR = 46; // idx/s mapped to MAX_BLUR
-const KICK_ROTATE_DEG = 5;
-const KICK_TRANSLATE_X = 11;
+const KICK_ROTATE_DEG = 7;
+const KICK_TRANSLATE_X = 15;
 // clean settle: smooth ease-out with no bounce/overshoot past identity/rest,
 // so the return half of every kick reads as a deliberate riffle rather than
 // a springy glitch — applied to the top card's flip-past and both back
