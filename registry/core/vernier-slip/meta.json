@@ -1,0 +1,27 @@
+{
+  "name": "vernier-slip",
+  "title": "Vernier Slip",
+  "description": "Numeric input built as a true vernier caliper: a fixed coarse tick row over a sliding fine row at 0.9x pitch, where the accent-lit fine tick physically lines up with a main tick to spell the last digit — drag the body for fast absolute moves, drag the vernier scale itself for one-step-per-tick precision.",
+  "collection": "core",
+  "tags": [
+    "slider",
+    "input",
+    "numeric",
+    "precision",
+    "svg",
+    "drag",
+    "form",
+    "micro-interaction"
+  ],
+  "useWhen": "a numeric field whose last significant digit deserves ceremony — dosages, gain trims, calibration offsets — where the value is set by dragging against a real vernier scale (coarse row for whole units, sliding fine row for the exact final digit) and precision is the point; pick loupe-slider instead when the value is approximate and the magnified-tick reading is just flavor, or needle-stepper when discrete +/- stepping with an adjustment history matters more than drag precision.",
+  "instruction": "Build a numeric input as a working vernier caliper, not a decorated slider. GEOMETRY: a fixed coarse tick row (one tick per 10*step) sits above a sliding fine row of 11 ticks whose pitch is exactly 0.9x the coarse pitch. For quantized value v, totalSteps = round((v-min)/step), fineIdx = totalSteps mod 10, coarseIdx = (totalSteps-fineIdx)/10; the real caliper identity is that fine tick #fineIdx coincides with MAIN tick #(coarseIdx+fineIdx) — not #coarseIdx — so the coincidence point drifts down the fixed scale as the reading grows, exactly like the physical instrument. The matching fine tick and its coincidence partner both light --accent, joined by a dashed accent hairline redrawn every frame; render 9 extra padding ticks past the domain max so the coincidence always has a partner to land on. INTERACTION: one track, two drag zones split at half height — the upper half maps pointer position to value ABSOLUTELY (fast, spans the whole range), the lower half (the vernier row itself) maps pointer DELTA at one step per fine-tick-width (slow, precise); both commit through the same quantize(step) pipeline so the split changes sensitivity, never resolution. While dragging, the fine group tracks the pointer 1:1 (raw, unquantized) so the user visibly chases the coincidence into alignment; on release, keyboard nav, or external value change, the visual eases to the settled quantized position on a 260ms ease-out-expo tween. The tween is direct-DOM rAF writing transform/x attributes to refs (sleeps when settled, cancelled on unmount); tick highlighting is ordinary React state since it only changes at quantized-value granularity. prefers-reduced-motion snaps to the settled position with no tween. Pointer capture on the track; a faint full-height guide line tracks the raw pointer. ACCESSIBILITY: the track is role=slider tabIndex=0 with aria-valuemin/max/now and aria-valuetext (formatValue override supported), ArrowLeft/Right/Up/Down step by step, PageUp/Down by 10*step, Home/End to the rails; the SVG is aria-hidden and the big mono readout (last digit tinted --accent to mirror the vernier) is aria-hidden too, since the slider itself carries the value. LAYOUT: coarse pitch auto-fits the container via ResizeObserver (clamped 18-56px, labels drop below 22px, label stride widens as pitch shrinks), overflowing domains fall back to horizontal scroll. INK: everything is currentColor via token utility classes (text-foreground/70, text-border, text-accent, fill-muted) — no canvas, no hex.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "drag",
+    "target": "[data-vernier-track]",
+    "from": [0.18, 0.28],
+    "to": [0.72, 0.28],
+    "period": 5200,
+    "delay": 700
+  }
+}
