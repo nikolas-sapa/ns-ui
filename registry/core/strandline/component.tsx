@@ -744,8 +744,18 @@ export function Strandline({
       },
       hoverIn: (i: number) => {
         showCard(i);
-        // replay the swash once — no new residue ring
-        if (!reduced && i < strandedCount && !replayWave && sized) {
+        // replay the swash from THIS dot — no new residue ring. If a swash
+        // from a previously-hovered dot is still traveling/receding, it must
+        // be replaced now, not left to finish: otherwise moving the pointer
+        // from dot A to dot B before A's ~700ms wave settles leaves A's arc
+        // on screen while B is what's hovered, so the arrow appears to start
+        // from the wrong origin. Same-target re-hover is left alone.
+        if (
+          !reduced &&
+          i < strandedCount &&
+          sized &&
+          (!replayWave || replayWave.target !== i)
+        ) {
           replayWave = makeWave(i, false);
           wake();
         }

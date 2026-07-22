@@ -8,14 +8,17 @@ import { useEffect, useRef, useState } from "react";
 // (one 1px --border line per card, the current one recolored --foreground),
 // running down the side of the top card like the exposed page-edge of a
 // book. Dragging that stripe riffles cards past: each step change kicks the
-// top card with a 90ms rotateY(4deg) + translateX flip-past (deterministic
-// per-index vertical jitter, so no two steps land identically), release
-// settles the arrival with the same kick. The two decorative depth layers
-// behind the top card (its permanently-visible stacked-thickness read) kick
-// too, on the same commit: a smaller opposite-leaning translate+rotate that
-// eases back to their resting offset a beat after the top card, each layer
-// lagging the one in front of it — so a step reads as the whole deck
-// reshuffling and restacking, not just the top card swapping out. Scrub
+// top card with a 220ms rotateY(9deg) + translateX(20px) flip-past (deter-
+// ministic per-index vertical jitter, so no two steps land identically),
+// settling on a spring-out ease that overshoots slightly past identity
+// before landing — release settles the arrival with the same kick. The two
+// decorative depth layers behind the top card (its permanently-visible
+// stacked-thickness read) kick too, on the same commit, at deliberately
+// large amplitude (16px/6deg then 9px/3deg, reduced with depth): an
+// opposite-leaning translate+rotate that eases back to their resting offset
+// a beat after the top card, each layer lagging the one in front of it —
+// so a step reads as the whole deck visibly reshuffling and restacking, not
+// a subtle 3px nudge. Scrub
 // velocity governs which: slow drags step discretely (a kick per card), fast
 // drags blur the top card through a CSS filter transition instead of
 // chattering through kicks — the exposed edge itself carries both roles at
@@ -58,14 +61,19 @@ import { useEffect, useRef, useState } from "react";
 const NATURAL_PITCH = 3; // px: 1px line + 2px gap, the "natural" edge rhythm
 const MIN_PITCH = 1.5;
 const STRIPE_PAD = 16; // px hit-area padding above/below the drawn lines
-const KICK_MS = 90;
+const KICK_MS = 220;
 const CROSSFADE_MS = 120;
 const BLUR_TRANSITION_MS = 140;
 const MAX_BLUR = 5;
 const FAST_VELOCITY = 14; // idx/s — at or above this, blur-through instead of a kick
 const VELOCITY_FOR_MAX_BLUR = 46; // idx/s mapped to MAX_BLUR
-const KICK_ROTATE_DEG = 4;
-const KICK_TRANSLATE_X = 6;
+const KICK_ROTATE_DEG = 9;
+const KICK_TRANSLATE_X = 20;
+// spring-out settle: overshoots slightly past identity/rest before easing
+// back, so the return half of every kick reads as a satisfying snap rather
+// than a linear decay — applied to the top card's flip-past and both back
+// layers' restack alike
+const SETTLE_EASE = "cubic-bezier(0.34, 1.56, 0.64, 1)";
 const PERSPECTIVE_PX = 720;
 // decorative back-layer rest offsets, in rem — matches the original
 // translate-x-1.5/translate-y-1.5 and translate-x-3/translate-y-3 Tailwind
@@ -75,14 +83,16 @@ const BACK1_REST_REM = 0.375;
 const BACK2_REST_REM = 0.75;
 // shuffle nudge applied on top of the rest offset during a kick — smaller
 // than the top card's own kick, and smaller again for the second layer, so
-// depth reads as reduced amplitude the further back a layer sits
-const BACK1_SHIFT_PX = 3;
-const BACK2_SHIFT_PX = 1.5;
-const BACK1_ROTATE_DEG = 1.5;
-const BACK2_ROTATE_DEG = 0.75;
-const BACK_STAGGER_MS = 50; // each back layer settles this much later than the one in front
+// depth reads as reduced amplitude the further back a layer sits. Large
+// enough now that the whole deck visibly cascades on every step, not just
+// the top card.
+const BACK1_SHIFT_PX = 16;
+const BACK2_SHIFT_PX = 9;
+const BACK1_ROTATE_DEG = 6;
+const BACK2_ROTATE_DEG = 3;
+const BACK_STAGGER_MS = 90; // each back layer settles this much later than the one in front
 const WHEEL_STEP_PX = 36; // deltaY accumulated before a wheel/trackpad tick steps a card
-const WHEEL_COOLDOWN_MS = 140; // >= KICK_MS, so each step's kick reads before the next fires
+const WHEEL_COOLDOWN_MS = 260; // >= KICK_MS, so each step's kick reads before the next fires
 
 function clamp(v: number, lo: number, hi: number) {
   return Math.min(hi, Math.max(lo, v));
@@ -207,7 +217,7 @@ export function RiffleEdge({
     card.style.transition = "none";
     card.style.transform = `perspective(${PERSPECTIVE_PX}px) rotateY(${dir * KICK_ROTATE_DEG}deg) translateX(${(-dir * KICK_TRANSLATE_X).toFixed(2)}px) translateY(${j.toFixed(2)}px)`;
     requestAnimationFrame(() => {
-      card.style.transition = `transform ${KICK_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`;
+      card.style.transition = `transform ${KICK_MS}ms ${SETTLE_EASE}`;
       card.style.transform = `perspective(${PERSPECTIVE_PX}px) rotateY(0deg) translateX(0px) translateY(0px)`;
     });
 
@@ -230,11 +240,11 @@ export function RiffleEdge({
     }
     requestAnimationFrame(() => {
       if (back1) {
-        back1.style.transition = `transform ${KICK_MS + BACK_STAGGER_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`;
+        back1.style.transition = `transform ${KICK_MS + BACK_STAGGER_MS}ms ${SETTLE_EASE}`;
         back1.style.transform = `translate(${BACK1_REST_REM}rem, ${BACK1_REST_REM}rem) rotate(0deg)`;
       }
       if (back2) {
-        back2.style.transition = `transform ${KICK_MS + BACK_STAGGER_MS * 2}ms cubic-bezier(0.22, 1, 0.36, 1)`;
+        back2.style.transition = `transform ${KICK_MS + BACK_STAGGER_MS * 2}ms ${SETTLE_EASE}`;
         back2.style.transform = `translate(${BACK2_REST_REM}rem, ${BACK2_REST_REM}rem) rotate(0deg)`;
       }
     });
