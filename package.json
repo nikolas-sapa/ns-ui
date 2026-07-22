@@ -14,7 +14,8 @@
     "index:build": "node scripts/build-index.ts",
     "pretypecheck": "npm run registry:build",
     "predev": "npm run registry:build",
-    "preverify": "npm run registry:build"
+    "preverify": "npm run registry:build",
+    "order:build": "tsx scripts/build-order.ts"
   },
   "dependencies": {
     "@react-three/fiber": "9.6.1",

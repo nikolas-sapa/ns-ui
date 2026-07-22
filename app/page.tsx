@@ -1,6 +1,14 @@
 import registry from "@/registry.json";
 import { loadUseWhen } from "@/lib/use-when";
+import order from "@/lib/component-order.json";
 import { Showcase, type ShowcaseEntry } from "./_components/showcase";
+
+// Newest first. `component-order.json` is the slug list sorted by git creation
+// date (regenerate with `npm run order:build` after adding components).
+// A slug missing from the snapshot sorts last, so a freshly-added component is
+// visible rather than hidden until the order is regenerated.
+const rank = new Map((order as string[]).map((name, i) => [name, i]));
+const recency = (name: string) => rank.get(name) ?? Number.MAX_SAFE_INTEGER;
 
 /** The lead sentence carries the component's job; the rest is build detail. */
 const firstSentence = (text: string) => text.split(/(?<=\.)\s/, 1)[0] ?? "";
@@ -29,7 +37,10 @@ const items: ShowcaseEntry[] = registry.items
       `${useWhen[item.name] ?? ""} ${firstSentence(item.meta?.instruction ?? "")}`,
     ).trim(),
   }))
-  .sort((a, b) => a.title.localeCompare(b.title));
+  .sort(
+    (a, b) =>
+      recency(a.name) - recency(b.name) || a.title.localeCompare(b.title),
+  );
 
 export default function Home() {
   return <Showcase items={items} />;
