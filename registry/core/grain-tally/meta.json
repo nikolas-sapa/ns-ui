@@ -1,0 +1,16 @@
+{
+  "name": "grain-tally",
+  "title": "Grain Tally",
+  "description": "Live distribution instrument where the histogram IS the samples: each arrival falls as a grain into its bin and stacks, the heap visibly re-settles as the rolling window slides, and P50/P90 fences ride the same scale.",
+  "collection": "core",
+  "tags": ["data-viz", "histogram", "distribution", "live", "latency", "percentile", "monitoring", "accessibility"],
+  "instruction": "A live histogram built grain-by-grain instead of bar-by-bar: the `samples` prop is a rolling window of `{ id, value }` objects, and every sample renders as one small rounded rect keyed by its stable id. A new arrival mounts 14px above the frame and falls to the top of its bin's stack on a 500ms transform transition with a slightly-overshooting cubic-bezier(0.3,1.25,0.5,1), so it lands with a settle rather than teleporting; when the window slides and old samples leave, every grain above them re-computes its stack position and rides the SAME transition downward — the heap visibly re-settles, which is the honest visual for 'old data aged out'. The DOMAIN IS FIXED by `min`/`max` props (never auto-ranged: a live instrument whose scale moves on every arrival makes everything else move too), values are clamped into it, and grain height adapts (5px down to 1.5px) as the tallest bin grows so the heap compresses before it ever clips. Each grain carries a deterministic per-id alpha (FNV-1a hash → 0.5–0.9 of --foreground) so the heap has granular texture rather than flat fill; only the newest grain renders at full opacity. PERCENTILE FENCES: P50 and P90 are computed from the current window (linear-interpolated quantiles) and drawn as 1px vertical hairlines with mono labels that translate along the scale on a 500ms ease-out — a latency burst visibly drags the P90 fence right, then it creeps back as the burst ages out of the window. INSPECTION: pointer movement over the frame highlights the bin under the cursor with a tokened wash and swaps the footer readout to that bin's range and count ('340–360ms · 6 samples'); the frame is a focusable role=group with an accessible name, ArrowLeft/ArrowRight step the inspected bin from the keyboard, Escape clears it, and focus shows a visible accent outline (the only place --accent appears). Header shows the label and the latest value in tabular-nums mono; footer shows min/max domain labels and a p50/p90/n summary when nothing is inspected. A visually-hidden role=status region announces median/P90/count every 4 seconds — throttled deliberately, because announcing every arrival is noise, not signal. REDUCED MOTION: fall, re-settle and fence transitions all drop via motion-reduce so grains and fences place instantly; the instrument stays fully readable and inspectable. All color is tokens (--foreground grains and fences, --border frame and baseline, --muted labels, --background frame fill); no canvas, pure DOM/CSS with one ResizeObserver for the frame width, zero dependencies.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "pointer-path",
+    "target": "[role=\"group\"]",
+    "path": "sweep",
+    "period": 5000,
+    "delay": 800
+  }
+}

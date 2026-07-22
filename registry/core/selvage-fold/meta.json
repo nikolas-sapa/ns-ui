@@ -1,0 +1,19 @@
+{
+  "name": "selvage-fold",
+  "title": "Selvage Fold",
+  "description": "Line-clamp that tells the truth: the fold control states the exact measured word count it hides ('+ 42 words'), the cut edge is a dashed selvage rule with a soft fade, and unfolding is an in-place height ease.",
+  "collection": "core",
+  "tags": ["typography", "truncation", "clamp", "expand", "read-more", "text", "accessibility"],
+  "instruction": "A truncation primitive for prose where the cut is measured, not guessed. Every word renders in its own span, and after layout the component finds the first span whose offsetTop lands at or past the fold line (lines × computed line-height, with a fontSize×1.5 fallback when line-height is 'normal') — everything from that word on is the hidden remainder, so the control can state exactly '+ 42 words' instead of an ellipsis that admits something was cut but not how much. The measurement re-runs through a ResizeObserver, so reflowing the container (resize, font swap) keeps the count honest rather than stale. THE FOLD EDGE: when folded, the clip is a max-height with a mask-image fade over the last 1.5em (alpha-only mask, theme-independent) so the final visible line visibly runs out rather than guillotines, and the control row draws a dashed hairline rule — the selvage, the finished edge of the cut, thread-ends showing — leading into a mono '+ N words' button with a chevron. UNFOLD: activating the button eases max-height from the clamp height to the measured full height over 400ms ease-out (an in-place reflow of the same paragraph, never a jump or a remount), flips the chevron, and swaps the label to 'fold'; folding back is the same motion reversed. The button carries aria-expanded and a full-sentence accessible name ('Unfold 42 more words' / 'Fold text back'). HONESTY GUARANTEES: text that fits its clamp renders with no mask, no rule, and no control at all — a read-more that appears on nothing-to-read is decoration; and the full text stays in the DOM in both states, so assistive tech, find-in-page and copy always see everything — the fold is visual, never informational. REDUCED MOTION: the height ease and chevron rotation drop via motion-reduce, folding and unfolding become instant, nothing else changes. Colors are tokens only (--border for the selvage rule, --muted/--foreground for the control, --accent only as the focus ring). Pure DOM/CSS, zero dependencies, no canvas.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "press",
+    "target": "button[aria-expanded]",
+    "period": 4600,
+    "delay": 800
+  },
+  "gate": {
+    "openBy": "button[aria-expanded=\"false\"]",
+    "expect": "button[aria-expanded=\"true\"]"
+  }
+}
