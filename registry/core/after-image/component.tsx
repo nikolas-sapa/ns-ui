@@ -150,9 +150,17 @@ function GhostRow({
 
     if (reduced) return; // static: no clock to race, dismiss button finalizes instead
 
+    // Collapse in 1px increments rather than continuously: a smooth sub-pixel
+    // height animation reflows every sibling row on every single frame, so a
+    // list mid-collapse never presents a layout-stable click target (breaks
+    // pointer actionability and any automated interaction). Stepping to whole
+    // pixels leaves the box static for ~ghostMs/full ms between steps — the
+    // remaining-time-as-remaining-height read is unchanged, the 1px stair is
+    // imperceptible at this cadence, but siblings now hold still between steps.
+    const steps = Math.max(1, Math.round(full));
     const anim = el.animate(
       [{ height: `${full}px` }, { height: "0px" }],
-      { duration: ghostMs, easing: "linear", fill: "forwards" }
+      { duration: ghostMs, easing: `steps(${steps}, end)`, fill: "forwards" }
     );
     animRef.current = anim;
     anim.onfinish = () => {

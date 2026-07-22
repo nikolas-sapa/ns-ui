@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { BedrockTrace, type TraceSentence, type TraceSource } from "./component";
 
 // A realistic RAG answer card: six sentences, three grounded against two
@@ -72,14 +71,9 @@ const SENTENCES: TraceSentence[] = [
 ];
 
 export default function BedrockTraceDemo() {
-  // remounts the trace every few seconds so autoplay/preview always shows a
-  // fresh streaming catch-up rather than a settled resting frame
-  const [cycle, setCycle] = useState(0);
-  useEffect(() => {
-    const id = setInterval(() => setCycle((c) => c + 1), 6000);
-    return () => clearInterval(id);
-  }, []);
-
+  // streaming reveal plays once on mount (and replays whenever the preview
+  // iframe remounts on scroll-in). No forced remount timer: it would reset an
+  // open detail panel out from under the reader every few seconds.
   return (
     <div className="flex min-h-screen items-center justify-center px-6 py-16">
       <div className="w-full max-w-xl rounded-md border border-border bg-background p-6">
@@ -89,7 +83,7 @@ export default function BedrockTraceDemo() {
         <h2 className="mb-4 text-lg font-semibold tracking-tight text-foreground">
           Why did latency improve this quarter?
         </h2>
-        <BedrockTrace key={cycle} sentences={SENTENCES} sources={SOURCES} streaming />
+        <BedrockTrace sentences={SENTENCES} sources={SOURCES} streaming />
       </div>
     </div>
   );
