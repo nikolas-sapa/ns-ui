@@ -9,3 +9,6 @@ registry/index.tsx       linguist-generated=true
 lib/*.generated.json     linguist-generated=true
 public/llms.txt          linguist-generated=true
 public/llms-full.txt     linguist-generated=true
+
+# Wiki index merge driver
+**/_index.md merge=wiki
