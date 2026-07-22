@@ -1,0 +1,29 @@
+{
+  "name": "ridge-walk",
+  "title": "Ridge Walk",
+  "description": "Model picker rendered as a live cost/latency/quality Pareto frontier: models are 2px cairns walking a single SVG ridgeline, dominated models sit honestly below it in --muted (still selectable), and a mono line under the ridge prints the concrete tradeoff delta once per snap, not per pixel.",
+  "collection": "core",
+  "tags": [
+    "picker",
+    "radiogroup",
+    "svg",
+    "pareto",
+    "comparison",
+    "decision",
+    "form",
+    "accessibility"
+  ],
+  "instruction": "A model picker that replaces the dropdown-of-marketing-names with the actual decision: a point on a cost/latency/quality curve. Given a models[] prop of {id, name, cost, latency, score}, it computes the real Pareto frontier by pairwise dominance (a model dominates another if it is no worse on cost AND latency AND score, strictly better on at least one) independent of any display mode, then plots every model at x = a weighted blend of normalized cost and normalized latency (the blend ratio is the only thing the speed/balance/quality toggle changes) and y = normalized quality score, higher score sitting higher on the ridge. Frontier models are connected by a single inline SVG polyline (the ridgeline) and marked with 2px cairns (vector-effect=non-scaling-stroke so they stay 2px regardless of container size); dominated models render as shorter --muted cairns at their own honest position, visibly below the line, never hidden or filtered out, and remain fully selectable. SELECTION: implemented as a real role=radiogroup of role=radio buttons, one per model (frontier and dominated alike), roving tabindex, Arrow keys move AND commit in frontier x-order (Home/End jump to the ends) — arrow-key order is recomputed from the CURRENT axis mode so keyboard traversal always matches what's visually left-to-right. A drag anywhere on the ridge computes the pointer's x-fraction and snaps to the nearest cairn by 1D distance (a Voronoi partition of the x-axis into per-cairn zones) and commits on every zone crossing, so dragging reads as walking a thumb from cairn to cairn, never a pointer echoing freely between them. TRADEOFF READOUT: a fixed Geist Mono line beneath the ridge prints the concrete delta versus whichever model was previously selected ('+2.1s p50 · +$0.14/1k · +4 quality') and only updates on a committed snap, never mid-drag, so it reads calm instead of jittery; a separate visually-hidden aria-live=polite region announces the same change in words on every focus/commit change ('2.1 seconds slower, 14 cents more expensive per thousand, 4 points higher quality'), and a selection that lands on a dominated model appends who dominates it and what's available instead at the same cost and latency. AXIS TOGGLE: a small speed/balance/quality segmented control (its own role=radiogroup) re-weights the cost/latency blend that produces x; every cairn's x, the thumb, and the ridge path's `d` attribute transition together on an ease-out-expo curve (cubic-bezier(0.16,1,0.3,1), 450ms) — the frontier's point count and order never change between modes, only their x, so the path's command sequence stays interpolation-safe. COLORS: --foreground for the ridge line and unselected frontier cairns, --muted for dominated cairns and captions, --border for the baseline, --accent only for the selected cairn and the thumb dot — accent appears nowhere else. REDUCED MOTION: every transition (cairn position, thumb, path d) is skipped outright — positions snap directly to their target, and the axis-toggle morph happens with no interpolation. No canvas: the ridge is one aria-hidden decorative SVG plus real DOM buttons layered on top at the same coordinates for hit-testing and accessible names; all data lives in each radio's aria-label, never in the SVG.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "drag",
+    "target": "[data-rw-ridge]",
+    "from": [0.08, 0.5],
+    "to": [0.92, 0.5],
+    "period": 4600
+  },
+  "card": {
+    "focus": ".ns-rw-root",
+    "padding": 0.1
+  }
+}
