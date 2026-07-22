@@ -14,7 +14,7 @@
     "delay": 700
   },
   "gate": {
-    "openBy": "button.ns-underink",
-    "expect": "button.ns-underink[aria-pressed=\"true\"] [data-underink-text]"
+    "openBy": "button.ns-underink:last-of-type",
+    "expect": "button.ns-underink:last-of-type[aria-pressed=\"true\"] [data-underink-text]"
   }
 }

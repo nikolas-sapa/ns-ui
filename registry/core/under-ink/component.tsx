@@ -125,8 +125,14 @@ export function UnderInk({ children, label, resealMs = 900, className = "" }: Un
         aria-hidden
         className="ns-underink-bar absolute inset-0 z-10 rounded-[3px] bg-foreground"
       >
-        {label && !revealed && (
-          <span className="flex h-full items-center justify-center overflow-hidden px-1 font-mono text-[9px] uppercase tracking-[0.18em] text-background/80">
+        {label && (
+          // stays mounted; hidden by opacity when revealed. Unmounting it on
+          // reveal removed the exact node under a centred click between
+          // pointerdown and pointerup, so the browser fired no `click` and the
+          // latch never happened.
+          <span
+            className={`flex h-full items-center justify-center overflow-hidden px-1 font-mono text-[9px] uppercase tracking-[0.18em] text-background/80 ${revealed ? "opacity-0" : "opacity-100"}`}
+          >
             {label}
           </span>
         )}
