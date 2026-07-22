@@ -1,0 +1,30 @@
+{
+  "name": "tack-peel",
+  "title": "Tack Peel",
+  "description": "Dismissible notification card that peels off like something taped down — drag a corner and it lifts on a sqrt resistance curve, rotating from the anchored corner to reveal a paler underside, until it flings free or re-tacks.",
+  "collection": "core",
+  "tags": [
+    "card",
+    "notification",
+    "dismiss",
+    "undo",
+    "drag",
+    "physics",
+    "clip-path",
+    "micro-interaction"
+  ],
+  "instruction": "A dismissible notification card built from two stacked same-size rounded-[12px] layers: a paler 'underside' behind (color-mix of --muted into --background) and the card face in front (--surface, --border, title + optional description, a real dismiss button top-right with an inline SVG x). Dragging anywhere on the face except the button reads pointer travel through a sqrt resistance curve — raw distance is (dx-dy) clamped against a width-derived max (so both rightward and upward motion, the natural direction of lifting the top-right corner away from a bottom-left anchor, add to it) normalized to [0,1], then peel progress p = sqrt(raw). That mapping is the whole 'real peel resistance' feel: the first few pixels of drag buy a lot of p, later pixels buy less, because sqrt rises fast near 0 and flattens as it approaches 1. p drives three things every pointermove, written directly to the DOM with zero React state on the hot path: a clip-path polygon on the front layer that notches its top-right corner open (0% at rest, up to 82% of the card's width/height at p=1) so the underside shows through exactly where the face has lifted; a rotation of the face around a bottom-left transform-origin, up to 8deg, with no 3D transform anywhere; and a box-shadow that grows and offsets toward the lifted corner as p rises, selling the lift with light alone. Once p reaches 0.55 — just past half stuck — resistance inverts: further pointer input is ignored, the peel is frozen fully open, and the whole card is thrown off with a Web Animations ease-in (translate + rotate + fade, 380ms, cubic-bezier(0.55,0,1,1)) — deliberately harder to feel than to complete, like the last of an adhesive giving way all at once. Released below that line, an rAF spring (stiffness 420, zeta 0.9 — heavily damped, no bounce) pulls p back to 0: a fast, clean re-tack. Either dismissal path — the drag fling, or clicking/Enter-ing the always-present dismiss button, which instead does a plain 220ms opacity fade regardless of any drag in progress — lands in the same 'dismissed' state: the card is replaced by a slim dashed-border row with a real Undo button, and a polite live region announces exactly 'Notification dismissed, Undo available'. Undo restores the card outright; left alone for undoMs (default 5000), it's removed for good and onRemove fires. prefers-reduced-motion disables the drag gesture entirely — no pointer handlers attach, so the button is the only path to dismiss — and the button's fade collapses to effectively instant while remaining a real, announced transition. Colors only from --background, --foreground, --muted, --border and --accent (color-mix blends of those, never a literal), both themes render correctly, zero dependencies, DOM+CSS only — no canvas, no perforation or fracture, the identity here is adhesion: corner-pivot rotation and resistance that grows with how much area is still stuck, not a tear line.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "drag",
+    "target": ".ns-tackpeel-autoplay-target",
+    "from": [0.55, 0.55],
+    "to": [0.72, 0.32],
+    "period": 4600,
+    "delay": 600
+  },
+  "gate": {
+    "openBy": "[data-tackpeel-dismiss]",
+    "expect": "[data-tackpeel-undo]"
+  }
+}
