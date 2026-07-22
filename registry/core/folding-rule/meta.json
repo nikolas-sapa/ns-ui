@@ -1,0 +1,19 @@
+{
+  "name": "folding-rule",
+  "title": "Folding Rule",
+  "description": "Tree view whose branches unfold like a carpenter's folding rule — each child group is a hinged segment that swings open around a visible pivot, rows unfolding in sequence, and snaps shut faster than it opens.",
+  "collection": "core",
+  "tags": ["tree", "navigation", "hierarchy", "fold", "hinge", "keyboard"],
+  "instruction": "Build a tree view where expanding a node reads as a carpenter's folding rule swinging open a hinged segment. Each child group sits inside a grid-template-rows 0fr/1fr wrapper (transitioned 360 ms open / 200 ms close with ease-out-quint) so layout height animates for free, and the group itself lives under a 700px perspective and rotates from rotateX(-58deg) at transform-origin top to flat, with an overshooting back-out cubic-bezier(0.34, 1.4, 0.64, 1) so the segment lands with a slight bounce; individual child rows carry their own smaller rotateX(-28deg) staggered ~45 ms apart down the segment, so the branch unfolds row by row rather than as one slab. Collapse is deliberately asymmetric: faster (200 ms), ease-in, no stagger — a rule folds shut quicker than it opens. Each open segment draws its hinge as a small bordered pivot dot at the joint plus a 1px vertical rule down the segment's spine, positioned per depth so nesting reads as jointed segments, and leaf rows carry a 1px dot bullet instead of a chevron; the chevron rotates 90 degrees on expand. Full tree semantics: role=tree with an aria-label, role=treeitem rows carrying aria-expanded (only when the node has children) and aria-selected, children inside role=group, roving tabindex with ArrowUp/ArrowDown over the visible flattened order, ArrowRight expands then dives to first child, ArrowLeft collapses then climbs to the parent, Home/End jump the ends, Enter/Space toggles and selects. Selection is a token bg-surface fill with foreground text; hover matches; focus is a token accent outline. All colors from theme tokens only. Under prefers-reduced-motion every rotation and height transition is disabled — groups simply appear and disappear.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "press",
+    "target": "[data-rule-id=\"src\"]",
+    "hold": 250,
+    "period": 2600
+  },
+  "gate": {
+    "openBy": "[data-rule-id=\"scripts\"]",
+    "expect": "[data-rule-id=\"build\"]"
+  }
+}
