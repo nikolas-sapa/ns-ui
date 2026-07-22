@@ -1,0 +1,21 @@
+{
+  "name": "stake-line",
+  "title": "Stake Line",
+  "description": "First-run empty state as a surveyor's staked plot: corner stakes drop in, then dashed strings tauten around the future layout and tie off at the CTA.",
+  "collection": "core",
+  "tags": ["empty-state", "onboarding", "first-run", "svg", "cta", "dashboard"],
+  "useWhen": "Pick this over fallow-panel when the empty region has a real shape worth teaching — a table, a card grid, or a chart plot — and you want the layout itself pre-taught: it measures a hidden template of that actual layout, drives in corner stakes, then draws dashed strings around every row or card individually and down to the CTA, tying the one action to the specific thing missing. Reach for fallow-panel instead for a plain undifferentiated empty box where a single drifting dashed boundary that contracts toward the CTA on hover is enough — no per-row or per-card silhouette to trace.",
+  "autoplay": {
+    "mode": "pointer-path",
+    "path": "sweep",
+    "target": "button",
+    "inset": -0.3,
+    "period": 4200
+  },
+  "instruction": "An empty state for a list, board, or dashboard that has nothing in it yet, staged as a plot of land marked out and not yet built on: <StakeLine title description actionLabel onAction shape />. `shape` is one of `{ kind: 'table', rows? }`, `{ kind: 'cards', count?, columns? }` or `{ kind: 'chart' }` and describes the real silhouette of the content that will eventually live here. That silhouette is never guessed at — a template of the real layout (rows stacked full-width, or a CSS grid of card cells, or a plain plot box) is rendered with `visibility:hidden` so it occupies genuine layout space without painting anything, then measured with getBoundingClientRect (and re-measured on resize via a ResizeObserver) so the SVG overlay drawn on top always matches the actual slots, not a fixed illustration. On mount, four short SVG tick marks land at the plot's outer corners one by one (40ms stagger, translateY(-6px) into a back-eased spring settle, stroke in --muted) — literal surveyor's stakes. Once they've settled, dashed string paths (a static 4-3 dash pattern in --border) draw themselves in via stroke-dashoffset on an ease-out-expo curve, outlining the plot's outer boundary plus every future row or card individually, so the emptiness reads as 'planned', not 'loading'. The last string doesn't stop at the plot: it continues down and terminates at the CTA's top border, closing in a small tied-off loop, so the one thing to do is physically wired to the thing that's missing rather than just sitting nearby. Hovering or keyboard-focusing the CTA nudges that connector's control point ~3px sideways — a gentle tug on the string, not a state change — via a CSS `d` transition, and releases back on blur/leave. The whole intro runs about 1.5 seconds; after that every stake and string is inert and the component does nothing until the CTA is used. Unlike develop-skeleton (and every other skeleton loader), which imitates content that is imminently arriving with grey placeholder blocks and offers no action, stake-line is explicitly provisional — surveyor's marks mean 'planned', not 'loading' — and it always ships exactly one CTA that the layout points to, never a silent promise of data. The survey graphic (template + SVG overlay) is entirely `aria-hidden`; the accessible content is an ordinary heading, one sentence of body copy, and a real `<button>`, the only focusable element in the region. Colors are strictly --background, --foreground, --muted, --border and --accent (via the button's existing token classes) — no hex, no canvas, DOM+SVG+CSS only. `prefers-reduced-motion` renders every stake and string already in its settled, fully-drawn state with no draw-in, and the hover tug snaps instead of easing.",
+  "dependencies": [],
+  "card": {
+    "focus": "button",
+    "padding": 1.6
+  }
+}

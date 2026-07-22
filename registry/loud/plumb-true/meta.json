@@ -1,0 +1,20 @@
+{
+  "name": "plumb-true",
+  "title": "Plumb True",
+  "description": "A success moment built on a plumb bob instead of confetti or a checkmark — the bob drops, overshoots into a damped pendulum swing, and the instant it settles collinear with a fixed datum line, a level line draws outward from its tip and the success text rises onto it.",
+  "collection": "loud",
+  "tags": ["success", "confirmation", "svg", "physics", "instrument", "status"],
+  "useWhen": "a success/confirmation moment that reads as a quiet, checked instrument rather than a celebration — a plumb bob drops, overshoots and swings with honest damped decay, and only once it settles collinear with a fixed datum line does a level line draw outward and the success text set onto it; the coincidence of string and datum IS the proof, not a separate checkmark symbol. Distinct from hold-to-confirm (that's the press gesture BEFORE commit, destructive-action ink fill); plumb-true starts AFTER the event already happened (payment confirmed, deploy finished) and only visualizes verification of an outcome already decided.",
+  "autoplay": {
+    "mode": "press",
+    "target": "button",
+    "hold": 500,
+    "period": 4600
+  },
+  "gate": {
+    "openBy": "button",
+    "expect": "[data-plumb-success]"
+  },
+  "instruction": "A self-contained success card whose identity is a plumb bob coming to rest, not a confetti burst or a Lottie checkmark draw. It renders a pending state (order copy + a single button) and owns its own irreversible confirm/settle state machine — one press decides it, later presses on the same button (while mid-swing) are inert, and once settled the same button's label and handler swap to a real next action. The instant the button is pressed: the accessible event fires in full and immediately — a role=status/aria-live=polite region (always mounted, sr-only, text set on press) announces the success message and an onConfirm callback runs — neither is ever gated on the animation that follows. Visually: an SVG instrument (aria-hidden, all colors read as css var(--background|--foreground|--muted|--border|--accent) tokens directly in SVG attributes, nothing to re-derive on theme change since no canvas is used) shows a bob dropping straight down a fine 1px --muted string from a fixed anchor via an ease-in gravity curve with a hard stop at full string length (no bounce in the length itself); the sudden stop kicks it into a pendulum swing — rotation about the anchor computed every frame from a closed-form damped cosine (amplitude 15deg at the stop, ~330ms period, ~260ms decay time-constant, no keyframe list) that runs for slightly under a second, giving a handful of honestly diminishing oscillations before settling dead vertical. A second, fixed vertical datum line (etched: 1px --border, fine dash, tick marks at both ends) sits at the same x as the anchor for the whole card's life; while swinging, the rotating string visibly diverges from it, and the moment the decay settles to zero the two are collinear again — that coincidence is the entire proof, there is no separate checkmark glyph. Two faint ghost copies of the string+bob (color-mix(in srgb, var(--foreground|--muted) 20%, transparent), never a hex literal) trail the motion at a small time-lag and fade out over the first ~500ms of the swing as an optional motion-blur read; they carry no meaning on their own. Only once settled: a level line (var(--foreground), 1px) draws outward from the bob's tip in both directions at once via stroke-dashoffset on cubic-bezier(0.16,1,0.3,1) (~260ms, an ease-out-expo shape), and real (non-decorative, never aria-hidden) success text fades in and rises 8px to sit visually just above that line in Geist Sans 600 (~300ms). Focus moves onto the same button (now the next action) once settled, so a keyboard user lands exactly where the flow expects. prefers-reduced-motion skips the drop, swing and ghost echoes entirely and snaps straight to the settled pose in one paint — level line already drawn, text already in place, focus still moves — the component stays fully usable, it just stops narrating how it got there.",
+  "dependencies": []
+}

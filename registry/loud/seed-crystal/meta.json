@@ -1,0 +1,33 @@
+{
+  "name": "seed-crystal",
+  "title": "Seed Crystal",
+  "description": "A payment/deploy/publish success moment built on supercooling: pending is a canvas particle field in faint restless Brownian shimmer, and the instant it resolves a nucleation flash fires at the exact point pressed and dendritic crystal growth races outward, freezing the shimmer solid in ~700ms under a now-calm confirmation line.",
+  "collection": "loud",
+  "tags": [
+    "confirmation",
+    "success",
+    "payment",
+    "canvas",
+    "particles",
+    "phase-change",
+    "micro-interaction",
+    "aria-live"
+  ],
+  "autoplay": {
+    "mode": "press",
+    "hold": 200,
+    "period": 4200
+  },
+  "gate": {
+    "openBy": "button",
+    "expect": "[data-seed-status]"
+  },
+  "useWhen": "the pending-to-done transition itself needs to carry weight — a payment, deploy, or publish confirming, where holding visible tension (a canvas particle field in restless Brownian shimmer) and releasing it all at once from the exact point pressed (nucleation flash, dendritic crystal racing outward, shimmer locking solid) IS the feedback; pick hold-to-confirm instead for a press-and-hold gesture with no async wait to dramatize, or frostbite-switch for an ice-themed persistent toggle rather than a one-shot success moment.",
+  "instruction": "A self-contained success-moment card: a canvas layer sits behind a small panel's content, transparent over --background, and a real <button> (default label 'Confirm payment') drives a three-state machine — idle, pending, success — that is never re-enterable once past idle (a status guard, not a disabled attribute, so the button stays clickable and focusable throughout and never blocks anything). Clicking calls the optional onConfirm callback; if it returns a Promise, the pending shimmer holds until that Promise settles (success on resolve, a silent revert to idle on reject), otherwise a fallback pendingMs (default 900) simulates the wait — this is how a consumer wires a real payment/deploy/publish call into the moment. PENDING: ~800 points scattered across the panel each do a damped Ornstein-Uhlenbeck random walk (spring pulling back toward its own origin, velocity damping, small continuous noise) around a roughly 1px amplitude, drawn as sub-pixel dots in --muted — a faint, restless shimmer that reads as holding more energy than a settled surface should. SUCCESS: the moment the pending action resolves, React state flips to 'success' synchronously (independent of anything canvas-side) and a role=status aria-live=assertive line mounts immediately announcing confirmedText (default 'Payment confirmed') — the announcement is never gated behind the animation. On the canvas, the exact clientX/clientY of the triggering click (or, for a keyboard-fired click reporting (0,0), the button's own centre) becomes the nucleation point: a radial flash blooms there over ~180ms in --foreground, and a whole dendritic pattern — 5-6 primary arms radiating outward with gentle per-step curvature, throwing side branches at a randomized ~55-65deg with depth-decaying probability (mulberry32-seeded fresh per success) — is precomputed synchronously as a flat list of needle segments, each carrying a baked-in birth time. Every frame from then on simply draws every segment whose birth has passed, in --foreground, tapering by branch depth; the whole pattern finishes within growMs (default 700). In the same one-time build, every ambient particle is matched to its nearest needle endpoint (within a small lock radius) and inherits that segment's birth as its own lock time; a particle whose crystal front hasn't reached it keeps shimmering right up until it does, then eases onto the needle over a short spring-eased settle window, its color interpolating from --muted to --foreground as it commits — the visible read of shimmer 'locking solid' as the front passes. A particle the crystal never reaches simply stops moving in place once the pane freezes. Once every particle has finished settling the animation loop cancels itself outright — a real stopped rAF, not merely a slow one — and a MutationObserver watching documentElement class changes repaints that exact frozen frame with fresh colors on every theme flip, whether mid-growth or long settled. The confirmation line fades in gently (a 320ms entrance) below the button, calm on the now-still crystal. Colors are read once at mount via getComputedStyle(--muted, --foreground) and re-derived on the same MutationObserver; the canvas paints no background of its own. Reduced motion swaps the entire canvas for one static, seeded-once dendritic texture at low opacity — no shimmer, no growth, the same status text and state machine, just no motion. IntersectionObserver pauses the rAF loop offscreen and ResizeObserver keeps the backing store correct; canvas is aria-hidden + role=presentation throughout. Props: label, pendingLabel, confirmedText, onConfirm, pendingMs, growMs, className.",
+  "dependencies": [],
+  "card": {
+    "focus": "[data-seed-panel]",
+    "padding": 0.08,
+    "maxZoom": 2
+  }
+}
