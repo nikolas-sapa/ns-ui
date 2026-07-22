@@ -1,0 +1,25 @@
+{
+  "name": "short-fuse",
+  "title": "Short Fuse",
+  "description": "Undo toast whose remaining lifetime is a literal fuse — a hairline along the bottom edge burns right-to-left with an ember at the front, answering \"when does this go away\" without a numeric countdown.",
+  "collection": "core",
+  "tags": [
+    "toast",
+    "notification",
+    "undo",
+    "timer",
+    "svg",
+    "spring",
+    "micro-interaction",
+    "feedback"
+  ],
+  "useWhen": "Reach for short-fuse when the job is a single timed, undo-able notification and the timer itself should read as physical rather than numeric — the border is the countdown, hover or focus visibly pinches it to a pause, and Undo reverses the burn instead of just canceling a number. It shares the \"toast\" role with sediment-stack, which is the pick instead when the job is a multi-toast feed with gravity, stacking and severity sorting — sediment-stack's individual cards do not carry their own depleting timer chrome the way short-fuse's does.",
+  "instruction": "A single undo toast (role=status, aria-live=polite, aria-atomic) whose remaining lifetime is rendered as its own bottom border rather than a digit. The border is a full-width SVG <line> with pathLength=100 so stroke-dasharray/stroke-dashoffset are resolution-independent; a Web Animations API animation drives stroke-dashoffset linearly from 0 to 100 over `duration` (default 6000ms), which shortens the visible (unburnt, --border colored) segment from the right edge toward the left as time elapses. A sibling absolutely-positioned span is the 3px ember — --foreground colored, 1:1 vertically centered on the line — animated via a mirrored `left` WAAPI animation (100% to 0%) so it always sits exactly at the current burn front. Both animations are created once at mount and never restarted by prop identity churn (onUndo/onDismiss are read through refs); pausing is `.pause()` on both Animation objects, which freezes `.currentTime` for free, so the accessible description (a visually-hidden span bound via aria-describedby) can read genuine remaining seconds off the animation clock instead of a separate drifting interval. Hovering the toast or focusing it (Tab reaches the toast itself before the Undo button, and it is a real focus target, not a visual-only affordance) pauses both animations and springs the ember's scale down to 0.45 with an underdamped 1D spring (k=300 s^-2, zeta=0.7, rAF-driven, sleeps once settled) — the pause is a physical pinch of the fuse, not an invisible timer stopping somewhere off-screen. Undo is a real <button> (--accent text, the only place --accent appears); clicking it reads the current burn progress off the forward animation's currentTime, cancels both forward animations, and plays a reverse pair back to the unburnt state at 4x speed (duration/4, floored at 140ms) with ease-out-expo, then runs a 180ms exit translate/fade before calling onUndo. Escape, or the fuse simply running out, skips the reverse and runs the same exit before calling onDismiss. The toast surface is --background with a 1px --border and 12px radius; overflow-hidden lets the corner radius clip the hairline's ends cleanly. prefers-reduced-motion: the line animation switches to stepped easing (steps(8, end)) so it depletes in discrete jumps instead of a continuous sweep, the ember is not rendered or animated at all, hover/focus pausing is disabled (nothing to pause), and Undo snaps back to unburnt in a single frame instead of replaying the reverse-burn — the toast stays fully usable, just without any of the physical motion. Props: message (required), actionLabel (default \"Undo\"), duration, onUndo, onDismiss. Zero dependencies beyond React.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "press",
+    "target": "[data-short-fuse-undo]",
+    "hold": 500,
+    "period": 4200
+  }
+}
