@@ -336,8 +336,22 @@ const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
 for (const item of items) {
   console.log(`verifying ${item.name}`);
   const dir = componentDir(item.name);
-  const meta = checkMeta(item.name, dir);
-  await verifyComponent(page, item.name, dir, meta);
+  // One component's thrown exception (a Playwright click timeout on a never-
+  // stable animated element, a page crash) must fail THAT component, not abort
+  // the whole sweep — otherwise a single bad gate leaves the other 185
+  // unverifiable in one pass. Record it and reset the page for the next one.
+  try {
+    const meta = checkMeta(item.name, dir);
+    await verifyComponent(page, item.name, dir, meta);
+  } catch (err) {
+    const first = err instanceof Error ? err.message.split("\n")[0] : String(err);
+    failures.push(`${item.name}: verify threw — ${first}`);
+    try {
+      await page.goto("about:blank");
+    } catch {
+      /* page unrecoverable — next iteration's goto will surface it */
+    }
+  }
 }
 
 await browser.close();
