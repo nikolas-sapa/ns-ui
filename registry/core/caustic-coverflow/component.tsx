@@ -767,8 +767,22 @@ export function CausticCoverflow({
               }}
             >
               {/* hover lift + border shift on an inner wrapper so the rAF
-                  loop's 3D transform on the outer node is never fought */}
-              <div className="relative h-full w-full overflow-hidden rounded-md border border-border bg-surface transition-[translate,border-color] duration-200 hover:-translate-y-0.5 hover:border-foreground/25">
+                  loop's 3D transform on the outer node is never fought.
+                  clip-path (not just overflow-hidden+rounded-md) contains the
+                  backdrop-filter pane and canvases: this wrapper sits inside
+                  an ancestor that's both will-change:transform'd and
+                  rotateY/translateZ'd for the coverflow pose, and on that
+                  combination Chromium/WebKit can rasterize a border-radius +
+                  overflow:hidden clip as its full rectangular layer bounds
+                  instead of the rounded mask — a rectangular box behind the
+                  center card, sharp corner wedges poking past the radius on
+                  the rotated side cards. clip-path is evaluated as its own
+                  mask primitive every paint and doesn't share that failure
+                  mode, so it stays authoritative regardless of compositing. */}
+              <div
+                className="relative h-full w-full overflow-hidden rounded-md border border-border bg-surface transition-[translate,border-color] duration-200 hover:-translate-y-0.5 hover:border-foreground/25"
+                style={{ clipPath: "inset(0 round var(--radius-md))" }}
+              >
                 <canvas
                   ref={(el) => {
                     thumbRefs.current[i] = el;

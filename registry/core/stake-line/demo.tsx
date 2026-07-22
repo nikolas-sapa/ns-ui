@@ -5,6 +5,9 @@ import { StakeLine } from "./component";
 
 const CSS = `
 @keyframes ns-stake-demo-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+@media (prefers-reduced-motion: reduce) {
+  .ns-stake-demo-card { animation: none !important; opacity: 1; transform: none; }
+}
 `;
 
 export default function StakeLineDemo() {
@@ -19,15 +22,15 @@ export default function StakeLineDemo() {
 
       <div className="w-full max-w-[560px] rounded-md border border-border bg-surface p-8">
         {created ? (
-          <div
-            role="status"
-            className="grid grid-cols-3 gap-3"
-            style={{ animation: "ns-stake-demo-in 320ms cubic-bezier(.16,1,.3,1) both" }}
-          >
+          <div role="status" className="grid grid-cols-3 gap-3">
             {Array.from({ length: 6 }, (_, i) => (
               <div
                 key={i}
-                className="flex aspect-[4/3] flex-col justify-between rounded-md border border-border p-3"
+                className="ns-stake-demo-card flex aspect-[4/3] flex-col justify-between rounded-md border border-border p-3"
+                style={{
+                  animation: "ns-stake-demo-in 320ms cubic-bezier(.16,1,.3,1) both",
+                  animationDelay: `${i * 70}ms`,
+                }}
               >
                 <span className="text-xs font-medium text-foreground">Project {i + 1}</span>
                 <span className="text-[11px] text-muted">Updated just now</span>

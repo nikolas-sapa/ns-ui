@@ -60,10 +60,14 @@ export default function PawlLiftDemo() {
       </div>
 
       <p className="max-w-sm text-center text-xs text-muted">
-        Click + to add — instant, no resistance. Press and hold − — the pawl
-        rotates clear over a quarter second before it starts giving anything
-        back, then runs at 6 steps/s while held. Focus the number and use
-        Arrow Up/Down: both directions step immediately, no hold required.
+        Press + to add — instant, no arm delay, and holding it repeats,
+        accelerating from 400ms toward 60ms between steps. Press and hold −
+        instead: the pawl rotates clear over a quarter second before it
+        starts giving anything back, then repeats on that same accelerating
+        schedule. Both work with mouse or touch, and each step pulses a
+        quick vibration where the device supports it (a no-op on this Mac).
+        Focus the number and use Arrow Up/Down: both directions step
+        immediately, no hold required.
       </p>
     </div>
   );

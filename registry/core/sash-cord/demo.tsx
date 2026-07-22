@@ -1,24 +1,42 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { SashWeight } from "./component";
 
-// Rests OPEN, like the sash-window counterweight it's named for: a closed
-// drawer hides the entire point of the component (the weight's resting
-// position IS the state indicator), so the idle screenshot needs to be the
-// interesting one. Closing it (via the verifier's press pass, a real click,
-// Escape, or the backdrop) reopens after a beat so the card keeps demonstrating
-// the weight-drop on a loop rather than going stone-still. The <dialog> is
-// rendered before the trigger in the component's own markup, so the first
-// visible interactive control resolves to something live inside the open
-// panel (the close button) rather than the trigger sitting inert behind the
-// top-layer backdrop.
+// Rest state is gated on the same `embed=1&autoplay=1` pair as the reopen
+// loop below. The honest `/preview/sash-cord` reference rests CLOSED — the
+// drawer opens only on deliberate interaction (the Filters trigger, Escape,
+// a drag) and stays closed once closed, which is exactly what the owner
+// asked for ("open only on deliberate interaction"). Only the landing-page
+// *autoplay card* rests OPEN, because a closed drawer hides the entire point
+// of the component (the weight's resting position IS the state indicator) and
+// the card has no real cursor to open it with; its `press` autoplay closes
+// the drawer and the gated timer reopens it, so the weight-drop keeps
+// demonstrating on a loop rather than going stone-still.
+//
+// That reopen must only fire for the landing-page card. Same bug as
+// respire-field's autoplay-only seed value (see its demo.tsx comment): this
+// component's own local demo state was reopening the drawer unconditionally,
+// including on the plain `/preview/sash-cord` reference with no query params
+// at all — the honest, fully-interactive view every real owner/consumer
+// actually uses. Closing the drawer there (Apply, the close button, Escape,
+// backdrop, or a drag-release toward closed) got silently undone ~1.8s later,
+// which reads exactly like "the filter drawer always reopens / can't be
+// closed" — because, unconditionally, it was. Gating on the same
+// `embed=1&autoplay=1` pair page.tsx uses to decide whether the driver even
+// mounts (see app/preview/[name]/page.tsx) confines the loop to the one
+// context it's meant to demonstrate.
 const REOPEN_MS = 1800;
 
 const CATEGORIES = ["Lighting", "Seating", "Storage", "Textiles", "Outdoor"];
 
 export default function SashWeightDemo() {
-  const [open, setOpen] = useState(true);
+  const searchParams = useSearchParams();
+  const autoplaying =
+    searchParams.get("embed") === "1" && searchParams.get("autoplay") === "1";
+
+  const [open, setOpen] = useState(autoplaying);
   const [checked, setChecked] = useState<Record<string, boolean>>({
     Lighting: true,
     Seating: true,
@@ -31,7 +49,9 @@ export default function SashWeightDemo() {
   const handleOpenChange = (next: boolean) => {
     window.clearTimeout(reopenRef.current);
     setOpen(next);
-    if (!next) reopenRef.current = window.setTimeout(() => setOpen(true), REOPEN_MS);
+    if (!next && autoplaying) {
+      reopenRef.current = window.setTimeout(() => setOpen(true), REOPEN_MS);
+    }
   };
 
   const toggle = (label: string) =>

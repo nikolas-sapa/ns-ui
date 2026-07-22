@@ -153,6 +153,7 @@ export function OxbowTurn({
   const triggerRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
   const pathElRef = useRef<SVGPathElement | null>(null);
   const dotElsRef = useRef<Map<string, SVGCircleElement>>(new Map());
+  const dotWrapElsRef = useRef<Map<string, HTMLDivElement>>(new Map());
   const posRef = useRef<Map<string, Pt>>(new Map());
   const prevCompactionIdsRef = useRef<Set<string>>(new Set());
   const cleanupsRef = useRef<Array<() => void>>([]);
@@ -188,6 +189,11 @@ export function OxbowTurn({
         const el = dotElsRef.current.get(t.id);
         el?.setAttribute("cx", String(t.x));
         el?.setAttribute("cy", String(t.y));
+        const wrapEl = dotWrapElsRef.current.get(t.id);
+        if (wrapEl) {
+          wrapEl.style.left = `${t.x}px`;
+          wrapEl.style.top = `${t.y}px`;
+        }
       }
       pathElRef.current?.setAttribute("d", smoothPath(turnTargets.map((t) => ({ x: t.x, y: t.y }))));
       return;
@@ -207,6 +213,11 @@ export function OxbowTurn({
         const el = dotElsRef.current.get(t.id);
         el?.setAttribute("cx", String(nx));
         el?.setAttribute("cy", String(ny));
+        const wrapEl = dotWrapElsRef.current.get(t.id);
+        if (wrapEl) {
+          wrapEl.style.left = `${nx}px`;
+          wrapEl.style.top = `${ny}px`;
+        }
       }
       pathElRef.current?.setAttribute("d", smoothPath(pts));
       if (moving) raf = requestAnimationFrame(step);
@@ -347,6 +358,9 @@ export function OxbowTurn({
 .ns-oxbow-lake-anim[data-state="entering"],.ns-oxbow-chip-wrap[data-state="entering"]{transform:translateX(0);opacity:0}
 .ns-oxbow-lake-anim[data-state="settled"],.ns-oxbow-chip-wrap[data-state="settled"]{transform:translateX(${OFFSET}px);opacity:1}
 .ns-oxbow-lake-anim[data-state="exiting"],.ns-oxbow-chip-wrap[data-state="exiting"]{transform:translateX(0);opacity:0;transition:transform 240ms cubic-bezier(.4,0,.9,.4),opacity 200ms ease-in}
+.ns-oxbow-chip-tip,.ns-oxbow-turn-tip{opacity:0;transition:opacity 150ms ease-out}
+[data-oxbow-trigger]:hover+.ns-oxbow-chip-tip,[data-oxbow-trigger]:focus+.ns-oxbow-chip-tip,[data-oxbow-trigger]:focus-visible+.ns-oxbow-chip-tip{opacity:1}
+[data-oxbow-turn-btn]:hover+.ns-oxbow-turn-tip,[data-oxbow-turn-btn]:focus+.ns-oxbow-turn-tip,[data-oxbow-turn-btn]:focus-visible+.ns-oxbow-turn-tip{opacity:1}
 @keyframes ns-oxbow-dot-in{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:scale(1)}}
 @keyframes ns-oxbow-breathe{0%,100%{opacity:.75}50%{opacity:1}}
 @keyframes ns-oxbow-snap{0%{stroke-width:1.5}35%{stroke-width:2.6}100%{stroke-width:1.5}}
@@ -356,6 +370,7 @@ export function OxbowTurn({
   .ns-oxbow-lake-anim,.ns-oxbow-chip-wrap{transition:opacity 160ms ease-out !important;transform:translateX(${OFFSET}px) !important}
   .ns-oxbow-lake-anim[data-state="entering"],.ns-oxbow-chip-wrap[data-state="entering"]{opacity:0 !important}
   .ns-oxbow-lake-anim[data-state="exiting"],.ns-oxbow-chip-wrap[data-state="exiting"]{opacity:0 !important}
+  .ns-oxbow-chip-tip,.ns-oxbow-turn-tip{transition:none !important}
 }
 `}</style>
 
@@ -430,10 +445,55 @@ export function OxbowTurn({
           ))}
         </svg>
 
+        {/* real interactive targets for the (decorative, aria-hidden) turn dots above:
+            positioned by the same rAF loop that drives the SVG circles (dotWrapElsRef),
+            so the hit target and its tooltip track the easing motion instead of a
+            React-controlled left/top that would snap ahead of the circle it sits on */}
+        {turnTargets.map((t) => {
+          const turnTipId = `${fid}-turn-tip-${t.id}`;
+          const hasPreview = Boolean(t.preview);
+          const accName = hasPreview ? `Turn ${t.label}: ${t.preview}` : `Turn ${t.label}`;
+          return (
+            <div
+              key={t.id}
+              ref={(el) => {
+                if (el) {
+                  dotWrapElsRef.current.set(t.id, el);
+                  const cur = posRef.current.get(t.id) ?? { x: t.x, y: t.y };
+                  el.style.left = `${cur.x}px`;
+                  el.style.top = `${cur.y}px`;
+                } else {
+                  dotWrapElsRef.current.delete(t.id);
+                }
+              }}
+              className="absolute -translate-x-1/2 -translate-y-1/2"
+            >
+              <button
+                type="button"
+                data-oxbow-turn-btn
+                aria-label={accName}
+                aria-describedby={hasPreview ? turnTipId : undefined}
+                className="block h-4 w-4 cursor-default rounded-full bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              />
+              {hasPreview && (
+                <span
+                  id={turnTipId}
+                  role="tooltip"
+                  className="ns-oxbow-turn-tip pointer-events-none absolute left-[calc(100%+8px)] top-1/2 z-20 block w-max max-w-[200px] -translate-y-1/2 whitespace-normal rounded-md border border-border px-2 py-1 font-mono text-[10px] leading-relaxed text-foreground shadow-lg"
+                  style={{ background: "color-mix(in srgb, var(--foreground) 4%, var(--background))" }}
+                >
+                  Turn {t.label}: {t.preview}
+                </span>
+              )}
+            </div>
+          );
+        })}
+
         {lakeRows.map((l) => {
           const state = exitingIds[l.id] ? "exiting" : enterState[l.id] === "start" ? "entering" : "settled";
           const isOpen = openId === l.id;
           const menuId = `${fid}-menu-${l.id}`;
+          const tipId = `${fid}-tip-${l.id}`;
           return (
             <div
               key={l.id}
@@ -451,6 +511,7 @@ export function OxbowTurn({
                 aria-haspopup="menu"
                 aria-expanded={isOpen}
                 aria-controls={isOpen ? menuId : undefined}
+                aria-describedby={!isOpen ? tipId : undefined}
                 aria-label={`Compacted ${turnsLabel(l.item.turns)}, ${formatTok(l.item.tokenCount)} tokens. Open summary and re-inject.`}
                 onClick={() => setOpenId(l.id)}
                 onKeyDown={onTriggerKeyDown(l)}
@@ -460,6 +521,17 @@ export function OxbowTurn({
                 <span aria-hidden>{l.item.turns.length}↩</span>
                 <span aria-hidden>{formatTok(l.item.tokenCount)} tok</span>
               </button>
+
+              {!isOpen && (
+                <span
+                  id={tipId}
+                  role="tooltip"
+                  className="ns-oxbow-chip-tip pointer-events-none absolute bottom-[calc(100%+8px)] left-0 z-20 block w-max max-w-[220px] whitespace-normal rounded-md border border-border px-2 py-1 font-mono text-[10px] leading-relaxed text-foreground shadow-lg"
+                  style={{ background: "color-mix(in srgb, var(--foreground) 4%, var(--background))" }}
+                >
+                  {turnsLabel(l.item.turns)} pinched off the channel · re-injectable
+                </span>
+              )}
 
               {isOpen && (
                 <div

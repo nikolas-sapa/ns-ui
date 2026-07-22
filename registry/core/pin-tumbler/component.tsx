@@ -11,38 +11,42 @@ import {
 
 // ---------------------------------------------------------------------------
 // PinTumbler — a vertical radio group whose single choice is embodied by
-// exactly one pin: a small --foreground bar seated in the checked option's
-// notch. Re-selecting lifts the pin out of its notch, carries it along a
-// hairline rail past every intermediate option (ticking each notch as it
-// passes), and drops it into the new notch with a short seat-and-settle
-// overshoot. Distance traveled reads as how far apart the options are in
-// the list — reorder the options and the pin's trip changes with them.
+// exactly one indicator: a short --foreground line sitting beside the
+// checked option. Re-selecting slides that line to the new row, stretching
+// toward it while it travels and settling back to its resting length once
+// it arrives — a directional grow-then-settle, never a spring past the
+// target. Distance traveled reads as how far apart the options are in the
+// list — reorder the options and the trip's duration changes with them.
 //
-// MECHANISM: the pin is one absolutely-positioned element, driven in three
-// phases via the Web Animations API against measured row centers (a
-// ResizeObserver keeps those centers correct across re-layout): lift
-// (4px translateX off the rail), travel (translateY eased through the
-// distance, duration scales with how many rows are crossed), seat (drop
-// back onto the rail with an 8%-of-distance overshoot past the target
-// before settling). Passing an intermediate notch schedules a brief
-// opacity/scale "tick" on that notch, timed proportionally to where the
-// pin is along the travel phase. All transforms — no layout thrash, and
-// nothing here fights the underlying DOM state.
+// MECHANISM: the line is one absolutely-positioned element whose `top` and
+// `height` (not a scale transform) are driven via the Web Animations API
+// against measured row centers (a ResizeObserver keeps those centers
+// correct across re-layout): its leading edge eases straight to the new
+// row's center while its trailing edge stays put, so the line visibly
+// elongates across whatever sits between old and new; then, in a second
+// phase, the trailing edge eases up to meet it, shrinking the line back to
+// its resting length exactly where it stopped. Both phases use a single
+// no-overshoot ease-out curve (control points never exceed the endpoint) —
+// the line's edges move monotonically toward their targets and stop, they
+// never overshoot past the destination and bounce back. Passing an
+// intermediate notch schedules a brief opacity/scale "tick" on that notch,
+// timed proportionally to where the line's leading edge is along the
+// travel phase.
 //
 // STRUCTURE: real native `<input type="radio">` per row, visually hidden
 // but present and focusable — roving arrow keys, form participation, and
 // checked-state announcements all come free from the browser, nothing is
 // reimplemented. aria-checked is inherent to `<input type=radio>` and
-// flips the instant the browser commits the change; the pin animation is
+// flips the instant the browser commits the change; the line animation is
 // a trailing, aria-hidden visual layer on top of that, never a gate on it.
 // Each row is a full-width `<label>` (min 44px tall) so the hit area
 // covers the whole row, not just the hidden input.
 //
-// Reduced motion: the pin's position updates with no animation — straight
-// teleport to the new notch, still fully legible and functional.
+// Reduced motion: the line's position and length update with no animation —
+// straight teleport to the new row, still fully legible and functional.
 //
 // Pure DOM/CSS, no canvas. Ink is token-relative only: --foreground for
-// the pin, --border for notches and the rail, --muted for resting label
+// the line, --border for notches and the rail, --muted for resting label
 // text, --accent solely for the keyboard focus ring.
 //
 // Distinct from fling-segment: fling-segment is a horizontal segmented
@@ -53,15 +57,17 @@ import {
 // rail, so the trip itself communicates list distance.
 // ---------------------------------------------------------------------------
 
-const LIFT_MS = 90;
+// Single no-overshoot ease-out: both control points' y stays at the 1.0
+// endpoint, so the curve decelerates hard into its target and never swings
+// past it — no spring, no bounce, on either the line's position or length.
+const TRAVEL_EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
 const PER_ROW_MS = 65;
 const MIN_TRAVEL_MS = 90;
-const SEAT_MS = 200;
+const SETTLE_MS = 160;
 const TICK_MS = 220;
-const OVERSHOOT_FRACTION = 0.08;
 
-const PIN_W = 14;
-const PIN_H = 6;
+const PIN_W = 3;
+const PIN_H = 16;
 const RAIL_COL = 28;
 
 export interface PinTumblerOption {
@@ -187,18 +193,29 @@ export function PinTumbler({
     if (committedIndex === prev) return;
 
     const pin = pinRef.current;
-    // Start the new leg from the pin's LIVE on-screen Y — read the computed
-    // transform *before* cancelling the in-flight animation. cancel() reverts
-    // the element to its inline style (rowOffsets[restIndex]), but restIndex
-    // still points at the row this travel started from (it only advances in
-    // onfinish), so seeding fromY = rowOffsets[prev] snaps the pin all the way
-    // back to the origin row on any mid-travel re-selection (fast clicks / held
-    // arrow roving) — a visible ~150px teleport. Reading getComputedStyle first
-    // lets the interrupt leg begin from wherever the pin actually is.
-    let fromY = rowOffsets[prev];
+    const fromCenterY = rowOffsets[prev];
+    const toCenterY = rowOffsets[committedIndex];
+
+    // Start the new leg from the line's LIVE on-screen box — read its
+    // computed `top`/`height` *before* cancelling the in-flight animation.
+    // cancel() reverts the element to its inline style (rowOffsets[restIndex]
+    // at the resting PIN_H), but restIndex still points at the row this
+    // travel started from (it only advances in onfinish), so seeding the new
+    // leg from rowOffsets[prev]'s resting box on every re-selection would
+    // snap the line back to fully-rested even mid-stretch — a visible jump.
+    // Reading getComputedStyle first lets the interrupt leg begin from
+    // whatever box the line actually is right now, mid-stretch or at rest.
+    let fromTop =
+      fromCenterY !== undefined ? fromCenterY - PIN_H / 2 : undefined;
+    let fromHeight = PIN_H;
     if (pin && animRef.current) {
-      const t = getComputedStyle(pin).transform;
-      if (t && t !== "none") fromY = new DOMMatrixReadOnly(t).m42;
+      const cs = getComputedStyle(pin);
+      const liveTop = parseFloat(cs.top);
+      const liveHeight = parseFloat(cs.height);
+      if (!Number.isNaN(liveTop) && !Number.isNaN(liveHeight)) {
+        fromTop = liveTop;
+        fromHeight = liveHeight;
+      }
     }
 
     timeoutsRef.current.forEach((id) => window.clearTimeout(id));
@@ -207,74 +224,72 @@ export function PinTumbler({
     animRef.current = null;
     setTickSet(new Set());
 
-    const toY = rowOffsets[committedIndex];
-
     if (
       reducedMotion ||
       !pin ||
       typeof pin.animate !== "function" ||
-      fromY === undefined ||
-      toY === undefined
+      fromTop === undefined ||
+      fromCenterY === undefined ||
+      toCenterY === undefined
     ) {
       setRestIndex(committedIndex);
       return;
     }
 
+    const toTop = toCenterY - PIN_H / 2;
+    // The line's leading edge reaches the destination first; its trailing
+    // edge stays anchored at the far end of [fromCenterY, toCenterY] until
+    // the settle phase catches it up. That single box — spanning exactly the
+    // two row centers plus the line's own half-caps — is what "the line
+    // stretches toward where it's going" means geometrically. No keyframe
+    // here ever positions an edge past its own destination, so there is
+    // nothing to bounce back from.
+    const bridgeTop = Math.min(fromCenterY, toCenterY) - PIN_H / 2;
+    const bridgeHeight = Math.abs(toCenterY - fromCenterY) + PIN_H;
+
     const dist = Math.abs(committedIndex - prev);
     const travelMs = Math.max(MIN_TRAVEL_MS, dist * PER_ROW_MS);
-    const total = LIFT_MS + travelMs + SEAT_MS;
-    const dy = toY - fromY;
-    const overshootY = toY + dy * OVERSHOOT_FRACTION;
-
-    const liftAt = LIFT_MS / total;
-    const arriveAt = (LIFT_MS + travelMs) / total;
-    const overshootAt = (LIFT_MS + travelMs + SEAT_MS * 0.65) / total;
+    const total = travelMs + SETTLE_MS;
+    const arriveAt = travelMs / total;
 
     const anim = pin.animate(
       [
         {
-          transform: `translate3d(0px, ${fromY}px, 0)`,
+          top: `${fromTop}px`,
+          height: `${fromHeight}px`,
           offset: 0,
-          easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+          easing: TRAVEL_EASE,
         },
         {
-          transform: `translate3d(4px, ${fromY}px, 0)`,
-          offset: liftAt,
-          easing: "cubic-bezier(0.65, 0, 0.35, 1)",
-        },
-        {
-          transform: `translate3d(4px, ${toY}px, 0)`,
+          top: `${bridgeTop}px`,
+          height: `${bridgeHeight}px`,
           offset: arriveAt,
-          easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+          easing: TRAVEL_EASE,
         },
-        {
-          transform: `translate3d(0px, ${overshootY.toFixed(2)}px, 0)`,
-          offset: overshootAt,
-          easing: "cubic-bezier(0.22, 1, 0.36, 1)",
-        },
-        { transform: `translate3d(0px, ${toY}px, 0)`, offset: 1 },
+        { top: `${toTop}px`, height: `${PIN_H}px`, offset: 1 },
       ],
       { duration: total, fill: "forwards" }
     );
     animRef.current = anim;
     anim.onfinish = () => {
       // Deliberately not cancelling here: the animation's `fill: "forwards"`
-      // holds the exact final keyframe (translate3d to `toY`), which is the
-      // same value `restIndex` now resolves to via the resting inline style.
-      // Cancelling immediately would strip the animation's held effect
-      // before this `setRestIndex` has actually re-rendered, snapping the
-      // element back to the *previous* underlying style for one frame — a
-      // visible flash/step right at the end of every single travel. Leaving
-      // the finished animation in place keeps the on-screen value continuous;
-      // it's reclaimed for free by the `animRef.current?.cancel()` at the
-      // top of this effect the next time a travel actually starts.
+      // holds the exact final keyframe (the resting box at `toTop`/`PIN_H`),
+      // which is the same value `restIndex` now resolves to via the resting
+      // inline style. Cancelling immediately would strip the animation's
+      // held effect before this `setRestIndex` has actually re-rendered,
+      // snapping the element back to the *previous* underlying style for one
+      // frame — a visible flash/step right at the end of every single
+      // travel. Leaving the finished animation in place keeps the on-screen
+      // value continuous; it's reclaimed for free by the
+      // `animRef.current?.cancel()` at the top of this effect the next time
+      // a travel actually starts.
       setRestIndex(committedIndex);
     };
 
     const dir = committedIndex > prev ? 1 : -1;
     for (let idx = prev + dir; idx !== committedIndex; idx += dir) {
       const frac = Math.abs(idx - prev) / dist;
-      const t = LIFT_MS + frac * travelMs;
+      const t = frac * travelMs;
       const onId = window.setTimeout(() => {
         setTickSet((s) => new Set(s).add(idx));
       }, t);
@@ -303,7 +318,7 @@ export function PinTumbler({
   const measured = rowOffsets.length === options.length && options.length > 0;
   const railTop = measured ? rowOffsets[0] : 0;
   const railHeight = measured ? rowOffsets[rowOffsets.length - 1] - railTop : 0;
-  const pinY = rowOffsets[restIndex] ?? 0;
+  const pinTop = (rowOffsets[restIndex] ?? 0) - PIN_H / 2;
 
   return (
     <div className={`ns-pt-wrap ${className}`}>
@@ -317,7 +332,6 @@ export function PinTumbler({
           {
             "--pt-rail-col": `${RAIL_COL}px`,
             "--pt-pin-w": `${PIN_W}px`,
-            "--pt-pin-h": `${PIN_H}px`,
           } as Vars
         }
       >
@@ -373,7 +387,8 @@ export function PinTumbler({
           aria-hidden="true"
           className="ns-pt-pin"
           style={{
-            transform: `translate3d(0px, ${pinY}px, 0)`,
+            top: pinTop,
+            height: PIN_H,
             opacity: measured ? 1 : 0,
           }}
         />
@@ -470,14 +485,11 @@ export function PinTumbler({
         }
         .ns-pt-pin {
           position: absolute;
-          top: calc(-1 * var(--pt-pin-h) / 2);
           left: calc(var(--pt-rail-col) / 2 - var(--pt-pin-w) / 2);
           width: var(--pt-pin-w);
-          height: var(--pt-pin-h);
-          border-radius: 3px;
+          border-radius: 9999px;
           background: var(--foreground);
           pointer-events: none;
-          will-change: transform;
         }
 
         .ns-pt-group[data-reduced] .ns-pt-notch,

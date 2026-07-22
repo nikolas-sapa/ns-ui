@@ -5,18 +5,27 @@ import { useEffect, useRef, useState } from "react";
 // ---------------------------------------------------------------------------
 // PawlLift — a bounded numeric spinbutton rendered as a ratchet-and-pawl with
 // DIRECTION-DEPENDENT friction. Incrementing is the ratchet's free direction:
-// one press advances the toothed rack one detent (ease-out-expo translateX)
+// a press advances the toothed rack one detent (ease-out-expo translateX)
 // and the pawl gives a quick 80ms kick-and-reseat as it rides over the new
-// tooth. Decrementing runs against the ratchet: holding the decrement control
-// rotates the pawl 35deg clear over 250ms before anything moves; only once
-// armed does the rack start stepping backward, at 6 steps/s for as long as
-// the hold continues; releasing snaps the pawl home on a spring curve. The
-// 250ms arm delay is a POINTER-ONLY affordance — keyboard ArrowDown always
-// steps immediately, matching ArrowUp, so keyboard users are never slower.
-// Rack/pawl motion is direct-DOM (imperative ref styles), no React state on
-// the animation hot path; prefers-reduced-motion drops the tween/kick/snap
-// entirely but keeps the arm timing and every step instant. Pure DOM + SVG +
-// CSS, tokens only, no canvas.
+// tooth; holding the button repeats that same step-and-kick, accelerating
+// from 400ms up to 60ms between steps. Decrementing runs against the
+// ratchet: holding the decrement control rotates the pawl 35deg clear over
+// 250ms before anything moves; only once armed does the rack start stepping
+// backward, on the same 400ms-to-60ms accelerating schedule for as long as
+// the hold continues; releasing at any point (pointerup, pointercancel,
+// pointerleave, or blur) clears the repeat and snaps the pawl home on a
+// spring curve. Both directions hold with mouse and touch alike (pointer
+// events, not mouse-specific ones). The 250ms arm delay is a POINTER-ONLY
+// affordance — keyboard ArrowDown always steps immediately, matching
+// ArrowUp, so keyboard users are never slower. Every committed step (click,
+// key, or held repeat, either direction) fires a short navigator.vibrate()
+// pulse where the platform actually supports it — guarded behind a feature
+// check, since it's a real no-op on desktop browsers and on macOS
+// specifically (no web API reaches trackpad/Force-Touch or keyboard
+// haptics). Rack/pawl motion is direct-DOM (imperative ref styles), no
+// React state on the animation hot path; prefers-reduced-motion drops the
+// tween/kick/snap entirely but keeps the arm timing and every step instant.
+// Pure DOM + SVG + CSS, tokens only, no canvas.
 // ---------------------------------------------------------------------------
 
 const TOOTH = 20; // px per detent, in the rack SVG's own coordinate units
@@ -29,9 +38,11 @@ const PAWL_TIP_Y = RAIL_Y - TOOTH_H; // pawl tip rests at the tooth peak line
 
 const RACK_MS = 160;
 const RACK_EASE = "cubic-bezier(0.16, 1, 0.3, 1)"; // ease-out-expo
-const ARM_MS = 250; // pointer-only hold-to-arm threshold
+const ARM_MS = 250; // pointer-only hold-to-arm threshold, decrement only
 const ARM_DEG = 35;
-const REPEAT_MS = 1000 / 6; // held-repeat rate once armed
+const REPEAT_START_MS = 400; // delay before the first held-repeat step
+const REPEAT_MIN_MS = 60; // floor the repeat cadence accelerates toward
+const REPEAT_ACCEL = 0.78; // multiplier applied to the delay after each repeat
 const SNAP_MS = 260;
 const SPRING_EASE = "cubic-bezier(0.34, 1.56, 0.64, 1)"; // one-shot overshoot
 const KICK_DEG = 14;
@@ -114,7 +125,7 @@ export function PawlLift({
   const pawlRef = useRef<SVGGElement>(null);
   const railOffsetRef = useRef(0);
   const armTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const repeatIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const repeatTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const kickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [decHover, setDecHover] = useState(false);
@@ -135,7 +146,7 @@ export function PawlLift({
   useEffect(
     () => () => {
       if (armTimeoutRef.current) clearTimeout(armTimeoutRef.current);
-      if (repeatIntervalRef.current) clearInterval(repeatIntervalRef.current);
+      if (repeatTimeoutRef.current) clearTimeout(repeatTimeoutRef.current);
       if (kickTimeoutRef.current) clearTimeout(kickTimeoutRef.current);
     },
     []
@@ -185,11 +196,22 @@ export function PawlLift({
     }, KICK_UP_MS);
   };
 
+  // haptic feedback on real hardware; guarded because it's a no-op on every
+  // desktop browser and specifically on macOS — there is no web API that
+  // reaches trackpad/Force-Touch or keyboard haptics, only mobile vibration
+  // motors respond to this at all
+  const vibrateStep = () => {
+    if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
+      navigator.vibrate(10);
+    }
+  };
+
   // ---- value commit: shared by every path (click, keys, held repeat) ------
   const commitValue = (next: number) => {
     if (!isControlled) setInternal(next);
     if (next !== valueRef.current) onValueChange?.(next);
     valueRef.current = next;
+    vibrateStep();
   };
 
   // clamped step: returns false (no-op) at a bound so the rack never
@@ -204,38 +226,67 @@ export function PawlLift({
     return true;
   };
 
-  const clearDecTimers = () => {
+  const clearHoldTimers = () => {
     if (armTimeoutRef.current) {
       clearTimeout(armTimeoutRef.current);
       armTimeoutRef.current = null;
     }
-    if (repeatIntervalRef.current) {
-      clearInterval(repeatIntervalRef.current);
-      repeatIntervalRef.current = null;
+    if (repeatTimeoutRef.current) {
+      clearTimeout(repeatTimeoutRef.current);
+      repeatTimeoutRef.current = null;
     }
+  };
+
+  // ---- held-repeat schedule: shared by both directions. Recursive
+  // setTimeout (not setInterval) so each tick can shorten the next delay —
+  // starts at REPEAT_START_MS and accelerates toward REPEAT_MIN_MS. Stops
+  // itself the moment the value reaches the relevant bound. Increment kicks
+  // on every repeated step (the free direction always re-seats over a
+  // tooth); decrement never kicks during repeat (the pawl stays lifted
+  // clear for the whole hold, per the arm/spring above and below it). -----
+  const scheduleRepeat = (dir: number, delay: number) => {
+    repeatTimeoutRef.current = setTimeout(() => {
+      repeatTimeoutRef.current = null;
+      const atBound =
+        dir < 0
+          ? valueRef.current <= boundsRef.current.min
+          : valueRef.current >= boundsRef.current.max;
+      if (atBound) return;
+      stepCore(dir, dir > 0);
+      scheduleRepeat(dir, Math.max(REPEAT_MIN_MS, delay * REPEAT_ACCEL));
+    }, delay);
+  };
+
+  const startIncHold = (e: React.PointerEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if (disabledRef.current) return;
+    clearHoldTimers();
+    setIncPress(true);
+    // free direction: no arm, first step fires right on press
+    const stepped = stepCore(1, true);
+    if (stepped) scheduleRepeat(1, REPEAT_START_MS);
+  };
+
+  const endIncHold = () => {
+    clearHoldTimers();
+    setIncPress(false);
   };
 
   const startDecHold = (e: React.PointerEvent<HTMLButtonElement>) => {
     e.preventDefault(); // keep focus where it was, no text selection
     if (disabledRef.current) return;
-    clearDecTimers();
+    clearHoldTimers();
     setDecPress(true);
     setPawlAngle(ARM_DEG, ARM_MS, "linear");
     armTimeoutRef.current = setTimeout(() => {
       armTimeoutRef.current = null;
-      stepCore(-1, false); // pawl is already lifted clear — no kick
-      repeatIntervalRef.current = setInterval(() => {
-        if (valueRef.current <= boundsRef.current.min) {
-          clearDecTimers();
-          return;
-        }
-        stepCore(-1, false);
-      }, REPEAT_MS);
+      const stepped = stepCore(-1, false); // pawl is already lifted clear — no kick
+      if (stepped) scheduleRepeat(-1, REPEAT_START_MS);
     }, ARM_MS);
   };
 
   const endDecHold = () => {
-    clearDecTimers();
+    clearHoldTimers();
     setDecPress(false);
     setPawlAngle(0, SNAP_MS, SPRING_EASE);
   };
@@ -360,15 +411,12 @@ export function PawlLift({
           onPointerEnter={() => setIncHover(true)}
           onPointerLeave={() => {
             setIncHover(false);
-            setIncPress(false);
+            endIncHold();
           }}
-          onPointerDown={() => setIncPress(true)}
-          onPointerUp={() => setIncPress(false)}
-          onPointerCancel={() => setIncPress(false)}
-          onClick={() => {
-            if (disabled || atMax) return;
-            stepCore(1, true);
-          }}
+          onPointerDown={startIncHold}
+          onPointerUp={endIncHold}
+          onPointerCancel={endIncHold}
+          onBlur={endIncHold}
           data-hover={incHover}
           data-press={incPress}
           className={`${btnBase} ${disabled || atMax ? btnDead : btnLive}`}

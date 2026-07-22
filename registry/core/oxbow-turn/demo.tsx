@@ -9,13 +9,30 @@ const SUMMARIES = [
   "User pasted a stack trace from the billing webhook; assistant identified a missing idempotency key and added a migration to backfill it.",
 ];
 
+// one short "what happened" line per turn — this is what the hover/focus tooltip
+// on each turn dot reveals, so the demo's dots have something real to show.
+const TURN_PREVIEWS = [
+  "asked to add rate limiting to the public API",
+  "shared a screenshot of the failing dashboard chart",
+  "requested a summary of last night's deploy log",
+  "asked whether the auth migration is reversible",
+  "pasted a new error boundary component for review",
+  "asked to bump the Node engine to 20",
+  "requested a diff of the last three commits",
+  "asked for a rollback plan before the release",
+];
+
+function previewFor(n: number): string {
+  return TURN_PREVIEWS[(n - 1) % TURN_PREVIEWS.length] ?? TURN_PREVIEWS[0]!;
+}
+
 function turnEntry(n: number) {
   return { id: `t${n}`, label: String(n) };
 }
 
 function seedTurns(from: number, to: number): OxbowTurnItem[] {
   const out: OxbowTurnItem[] = [];
-  for (let n = from; n <= to; n++) out.push({ kind: "turn", id: `t${n}`, label: String(n) });
+  for (let n = from; n <= to; n++) out.push({ kind: "turn", id: `t${n}`, label: String(n), preview: previewFor(n) });
   return out;
 }
 
@@ -49,7 +66,7 @@ export default function OxbowTurnDemo() {
 
   const addTurn = useCallback(() => {
     const n = nextTurnRef.current++;
-    setItems((prev) => [...prev, { kind: "turn", id: `t${n}`, label: String(n) }]);
+    setItems((prev) => [...prev, { kind: "turn", id: `t${n}`, label: String(n), preview: previewFor(n) }]);
     setStatus(`turn ${n} streamed into the channel`);
   }, []);
 
@@ -86,7 +103,12 @@ export default function OxbowTurnDemo() {
       if (idx === -1) return prev;
       const c = prev[idx];
       if (!c || c.kind !== "compaction") return prev;
-      const restored: OxbowTurnItem[] = c.turns.map((t) => ({ kind: "turn", id: t.id, label: t.label }));
+      const restored: OxbowTurnItem[] = c.turns.map((t) => ({
+        kind: "turn",
+        id: t.id,
+        label: t.label,
+        preview: previewFor(Number(t.label)),
+      }));
       const next = [...prev];
       next.splice(idx, 1, ...restored);
       return next;
