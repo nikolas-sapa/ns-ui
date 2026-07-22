@@ -6,7 +6,7 @@ import { PhaseSwing } from "./component";
 // Both cards are fully self-driven (timers only, no pointer/keyboard input)
 // so the demo is genuinely ambient — exactly what autoplay:none records.
 
-const PERIOD_MS = 8000;
+const PERIOD_MS = 10000;
 const RUN_MS = PERIOD_MS + 3400; // a little past one full sync-chaos-sync arc
 const DONE_MS = 3200;
 

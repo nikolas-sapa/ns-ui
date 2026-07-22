@@ -67,9 +67,10 @@ export default function PinTumblerDemo() {
       </p>
 
       <p className="max-w-md text-center text-xs text-muted">
-        Click a row, or focus the group and use arrow keys. The line
-        stretches toward whatever row you pick, then settles back to its
-        resting length — no bounce. Reduced motion teleports it.
+        Click a row, or focus the group and use arrow keys. The dot
+        elongates into a line while it travels to whatever row you pick,
+        then contracts back into a dot — no bounce. Reduced motion
+        teleports it.
       </p>
     </div>
   );

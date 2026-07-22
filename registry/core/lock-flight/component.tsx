@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
 
 // ---------------------------------------------------------------------------
 // LockFlight — a wizard stepper built as a flight of canal locks. Each step is
@@ -9,19 +9,33 @@ import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 // line — climbs to meet it: on a valid attempt it climbs the full way over
 // ~600ms ease-out-expo, then (only once the two levels have visibly
 // equalized) the shared gate — the chamber's left border, split into two
-// halves — parts 4px up/down with a small spring overshoot, and an accent
-// highlight glides underneath, through the opening, into the new chamber.
-// On an INVALID attempt the level still climbs, but only to the step's own
-// validation progress, stalling short of the gate line — the stall itself is
-// the explanation, no toast required; a modest inline status line (kept
-// permanently mounted for reliable aria-live, invisible until it has
-// something to say) carries the same reason to anyone who can't see the
-// water. Going back drains the chambers ahead of the new position and reseals
-// their gates with a slower, heavier ease-in — no spring, no highlight glide.
-// Only the immediately-next chamber ever runs the equalization mechanism;
-// steps further out are always locked until the flight is worked one gate at
-// a time. Reduced motion: levels snap instantly, the gate split and spring
-// are skipped, plain dividers stand in their place.
+// halves — parts 4px up/down with a small spring overshoot, and the active
+// highlight glides through the opening into the new chamber. That highlight
+// is not a straight bar: it's a single SVG route (see buildConnectorPath)
+// threaded along the bottom of the whole flight, one continuous --border
+// path that dips into a shallow rounded notch at every internal gate and
+// curls up around the outer border at the flight's own two ends — Team's
+// left edge, Review's right edge — instead of terminating in a flat clipped
+// stub. A second copy of that same path, stroked --accent and windowed to
+// roughly one chamber's length via stroke-dasharray/dashoffset (normalized
+// with pathLength=1), is the actual "you are here" marker: it slides along
+// the route exactly one window per step, so at rest it never covers more
+// than about one chamber's stretch of pipe — accent stays the sparing,
+// current-position signal, --border carries the route's shape everywhere
+// else. The whole shape is bounded by its own viewBox (plus an explicit
+// overflow-hidden on the <svg> itself), not by a wrapper clipping an
+// over-wide rectangle. On an INVALID attempt the level still climbs, but
+// only to the step's own validation progress, stalling short of the gate
+// line — the stall itself is the explanation, no toast required; a modest
+// inline status line (kept permanently mounted for reliable aria-live,
+// invisible until it has something to say) carries the same reason to
+// anyone who can't see the water. Going back drains the chambers ahead of
+// the new position and reseals their gates with a slower, heavier ease-in —
+// no spring, no highlight glide. Only the immediately-next chamber ever runs
+// the equalization mechanism; steps further out are always locked until the
+// flight is worked one gate at a time. Reduced motion: levels snap
+// instantly, the gate split and spring are skipped, plain dividers stand in
+// their place, and the highlight window jumps with no delay.
 // ---------------------------------------------------------------------------
 
 const FILL_MS = 600; // ease-out-expo climb, forward or stall
@@ -36,6 +50,53 @@ const HIGHLIGHT_MS = 460;
 const HIGHLIGHT_DELAY = 560; // glides through just after the gate parts
 const DENY_MS = 420;
 const DEFAULT_STALL = 0.35;
+
+// connector route geometry, SVG viewBox units. VBH mirrors the chamber's
+// real 64px height 1:1 (h-16), so every y-value below is already a real
+// pixel offset; VBW is an arbitrary wide basis for x (percent-of-row-width
+// math, same spirit as the old translateX(current * 100%)) — preserveAspectRatio
+// "none" stretches it to the row's actual width, whatever that is.
+const CONNECTOR_VBW = 1000;
+const CONNECTOR_VBH = 64;
+const CONNECTOR_BASE_Y = 60; // resting baseline, hugging the bottom edge
+const CONNECTOR_GATE_Y = 48; // shallow rise into an internal gate's notch
+const CONNECTOR_HOOK_Y = 38; // deeper rise for the two outer border-curls
+const CONNECTOR_GATE_RUN = 20; // half-width of a gate notch's rounded run
+const CONNECTOR_HOOK_RUN = 36; // half-width of an outer curl's rounded run
+
+/**
+ * One continuous path for the whole row: starts curling up the LEFT border
+ * of chamber 0, runs the baseline, dips into a rounded notch at every
+ * internal gate boundary (echoing that gate's own split-border position),
+ * then curls up the RIGHT border of the last chamber. Every point is
+ * clamped to stay strictly between the two curls and never cross a
+ * neighboring boundary, so the shape is bounded by construction for any
+ * step count — no wrapper overflow-hidden is doing that work.
+ */
+function buildConnectorPath(n: number): string {
+  const steps = Math.max(n, 1);
+  const w = CONNECTOR_VBW;
+  const bx = (i: number) => (w * i) / steps;
+  const half = bx(1) / 2;
+  const hookRun = Math.max(4, Math.min(CONNECTOR_HOOK_RUN, half));
+  const gateRun = Math.max(3, Math.min(CONNECTOR_GATE_RUN, half - 2, hookRun));
+
+  const d: string[] = [
+    `M 0 ${CONNECTOR_HOOK_Y}`,
+    `Q 0 ${CONNECTOR_BASE_Y} ${hookRun} ${CONNECTOR_BASE_Y}`,
+  ];
+
+  for (let i = 1; i < steps; i++) {
+    const x = bx(i);
+    d.push(`L ${x - gateRun} ${CONNECTOR_BASE_Y}`);
+    d.push(`Q ${x} ${CONNECTOR_BASE_Y} ${x} ${CONNECTOR_GATE_Y}`);
+    d.push(`Q ${x} ${CONNECTOR_BASE_Y} ${x + gateRun} ${CONNECTOR_BASE_Y}`);
+  }
+
+  d.push(`L ${w - hookRun} ${CONNECTOR_BASE_Y}`);
+  d.push(`Q ${w} ${CONNECTOR_BASE_Y} ${w} ${CONNECTOR_HOOK_Y}`);
+  return d.join(" ");
+}
 
 export interface LockFlightStep {
   id: string;
@@ -201,6 +262,27 @@ export function LockFlight({
   const step = steps[current];
   const isLast = current === n - 1;
 
+  // connector: one route for the whole row (memoized on step count only —
+  // its shape never depends on `current`), plus the accent window's
+  // position/length along it. `unit` is 1/n of the route's *normalized*
+  // length (pathLength=1), so the window's nominal start always lands
+  // exactly on a chamber boundary. The nominal length is padded 20% so a
+  // curl or notch never reads as a stub cut short mid-curve — but padding
+  // only ever pushes the window's start EARLIER (never its end past 1):
+  // the dasharray period equals the path's full normalized length, so
+  // letting the end run past 1 would wrap the pattern and light a stray
+  // sliver back at the path's start. Clamping the end and re-deriving the
+  // start from it means the last chamber's window bites a little further
+  // back into the previous straight run instead — same harmless bleed,
+  // just anchored the other way at the one boundary where it matters.
+  const connectorPath = useMemo(() => buildConnectorPath(n), [n]);
+  const connectorUnit = 1 / Math.max(n, 1);
+  const nominalWindow = n <= 1 ? 1 : connectorUnit * 1.2;
+  const windowEnd = Math.min(1, current * connectorUnit + nominalWindow);
+  const windowStart = Math.max(0, windowEnd - nominalWindow);
+  const connectorWindow = windowEnd - windowStart;
+  const connectorOffset = -windowStart;
+
   return (
     <div className={`w-full rounded-md border border-border bg-surface ${className}`}>
       <style>{`
@@ -216,7 +298,7 @@ export function LockFlight({
       `}</style>
 
       <nav aria-label={ariaLabel} className="border-b border-border">
-        <div className="relative isolate overflow-hidden">
+        <div className="relative isolate">
           <ol onKeyDown={onNavKeyDown} className="flex items-stretch">
             {steps.map((s, i) => {
               const reached = i <= current;
@@ -341,29 +423,53 @@ export function LockFlight({
             })}
           </ol>
 
-          {/* active highlight — glides underneath, through the gate, into the new
-              chamber. -z-10 (inside this div's `isolate` stacking context) keeps it
-              painted behind every chamber button, which are themselves `relative`
-              (z-index:auto) and would otherwise win paint order simply by coming
-              later in the DOM as it slides past them mid-transit. Its width/transform
-              are plain percentages of THIS div, computed independently of how flex
-              actually rounds each chamber's pixel width — for step counts that don't
-              divide 100 evenly (3, 6, 7...) that drift compounds toward the two ends,
-              so `overflow-hidden` on this div is the hard guarantee: the track can
-              never render past the first chamber's left edge or the last chamber's
-              right edge, whatever the rounding did. */}
-          <span
+          {/* the connector: a real route, not a bar. -z-10 (inside this div's
+              `isolate` stacking context) keeps both paths painted behind every
+              chamber button, which are themselves `relative` (z-index:auto) and
+              would otherwise win paint order simply by coming later in the DOM.
+              The svg's own viewBox + explicit overflow-hidden bound the shape —
+              no ancestor clip is doing that work. vectorEffect="non-scaling-stroke"
+              keeps both strokes a crisp, undistorted 2px on screen regardless of
+              preserveAspectRatio="none" stretching x and y by different factors. */}
+          <svg
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-[2px] bg-accent"
-            style={{
-              width: `${100 / Math.max(n, 1)}%`,
-              transform: `translateX(${current * 100}%)`,
-              transitionProperty: "transform",
-              transitionDuration: `${reduced ? 0 : HIGHLIGHT_MS}ms`,
-              transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
-              transitionDelay: `${reduced || direction !== "forward" ? 0 : HIGHLIGHT_DELAY}ms`,
-            }}
-          />
+            focusable="false"
+            viewBox={`0 0 ${CONNECTOR_VBW} ${CONNECTOR_VBH}`}
+            preserveAspectRatio="none"
+            className="pointer-events-none absolute inset-0 -z-10 h-full w-full overflow-hidden"
+          >
+            {/* the route itself: always fully drawn, --border, the pipe every
+                chamber shares whether or not you've reached it yet */}
+            <path
+              d={connectorPath}
+              fill="none"
+              vectorEffect="non-scaling-stroke"
+              strokeWidth={2}
+              strokeLinecap="round"
+              className="stroke-current text-border"
+            />
+            {/* the "you are here" marker: --accent, windowed to ~one chamber's
+                length of the SAME route via a normalized (pathLength=1)
+                dasharray/dashoffset, so it slides along the curls and notches
+                instead of jumping between flat rectangles */}
+            <path
+              d={connectorPath}
+              fill="none"
+              vectorEffect="non-scaling-stroke"
+              strokeWidth={2}
+              strokeLinecap="round"
+              pathLength={1}
+              strokeDasharray={`${connectorWindow} ${Math.max(0, 1 - connectorWindow)}`}
+              strokeDashoffset={connectorOffset}
+              className="stroke-current text-accent"
+              style={{
+                transitionProperty: "stroke-dashoffset",
+                transitionDuration: `${reduced ? 0 : HIGHLIGHT_MS}ms`,
+                transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
+                transitionDelay: `${reduced || direction !== "forward" ? 0 : HIGHLIGHT_DELAY}ms`,
+              }}
+            />
+          </svg>
         </div>
       </nav>
 

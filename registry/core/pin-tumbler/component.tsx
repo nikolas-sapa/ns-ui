@@ -11,23 +11,32 @@ import {
 
 // ---------------------------------------------------------------------------
 // PinTumbler — a vertical radio group whose single choice is embodied by
-// exactly one indicator: a short --foreground line sitting beside the
-// checked option. Re-selecting slides that line to the new row, stretching
-// toward it while it travels and settling back to its resting length once
-// it arrives — a directional grow-then-settle, never a spring past the
-// target. Distance traveled reads as how far apart the options are in the
-// list — reorder the options and the trip's duration changes with them.
+// exactly one indicator: a --foreground DOT sitting on the checked row's
+// notch. It only ever looks like a line while it is actually in transit —
+// re-selecting elongates it into a thin traveling pill that stretches
+// toward the new row, then contracts back down to a dot once it arrives.
+// At rest it is never a line: rest state and travel state are visually
+// distinct on purpose, so a glance at a settled control shows a dot, never
+// mid-motion residue. Distance traveled (both the trip duration and how
+// far it stretches) reads as how far apart the options are in the list —
+// reorder the options and the trip's duration changes with them.
 //
-// MECHANISM: the line is one absolutely-positioned element whose `top` and
-// `height` (not a scale transform) are driven via the Web Animations API
-// against measured row centers (a ResizeObserver keeps those centers
-// correct across re-layout): its leading edge eases straight to the new
-// row's center while its trailing edge stays put, so the line visibly
-// elongates across whatever sits between old and new; then, in a second
-// phase, the trailing edge eases up to meet it, shrinking the line back to
-// its resting length exactly where it stopped. Both phases use a single
-// no-overshoot ease-out curve (control points never exceed the endpoint) —
-// the line's edges move monotonically toward their targets and stop, they
+// MECHANISM: the indicator is one absolutely-positioned element whose
+// `top`, `height` AND `width` (not a scale transform) are driven together
+// via the Web Animations API against measured row centers (a
+// ResizeObserver keeps those centers correct across re-layout): in the
+// stretch phase, its leading edge eases straight to the new row's center
+// while its trailing edge stays put and its width narrows from the dot's
+// diameter down to the thin traveling thickness, so it visibly elongates
+// into a line across whatever sits between old and new; then, in the
+// settle phase, the trailing edge eases up to meet the leading one while
+// the width widens back out, contracting the line back into a dot exactly
+// where it stopped. Horizontal centering never needs its own keyframe —
+// the element sits at the rail column's horizontal center with a permanent
+// `translateX(-50%)`, so as WAAPI mutates its inline width every frame the
+// browser recenters it for free. Both phases use a single no-overshoot
+// ease-out curve (control points never exceed the endpoint) — the edges
+// and the width move monotonically toward their targets and stop, they
 // never overshoot past the destination and bounce back. Passing an
 // intermediate notch schedules a brief opacity/scale "tick" on that notch,
 // timed proportionally to where the line's leading edge is along the
@@ -37,17 +46,18 @@ import {
 // but present and focusable — roving arrow keys, form participation, and
 // checked-state announcements all come free from the browser, nothing is
 // reimplemented. aria-checked is inherent to `<input type=radio>` and
-// flips the instant the browser commits the change; the line animation is
-// a trailing, aria-hidden visual layer on top of that, never a gate on it.
-// Each row is a full-width `<label>` (min 44px tall) so the hit area
+// flips the instant the browser commits the change; the dot/line animation
+// is a trailing, aria-hidden visual layer on top of that, never a gate on
+// it. Each row is a full-width `<label>` (min 44px tall) so the hit area
 // covers the whole row, not just the hidden input.
 //
-// Reduced motion: the line's position and length update with no animation —
-// straight teleport to the new row, still fully legible and functional.
+// Reduced motion: the indicator's position, height and width update with
+// no animation — straight teleport to the new row as a dot, still fully
+// legible and functional.
 //
 // Pure DOM/CSS, no canvas. Ink is token-relative only: --foreground for
-// the line, --border for notches and the rail, --muted for resting label
-// text, --accent solely for the keyboard focus ring.
+// the dot/line, --border for notches and the rail, --muted for resting
+// label text, --accent solely for the keyboard focus ring.
 //
 // Distinct from fling-segment: fling-segment is a horizontal segmented
 // control with a draggable, flingable pill and release-velocity physics.
@@ -59,15 +69,23 @@ import {
 
 // Single no-overshoot ease-out: both control points' y stays at the 1.0
 // endpoint, so the curve decelerates hard into its target and never swings
-// past it — no spring, no bounce, on either the line's position or length.
+// past it — no spring, no bounce, on any of the indicator's position,
+// length or width.
 const TRAVEL_EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
 const PER_ROW_MS = 65;
 const MIN_TRAVEL_MS = 90;
 const SETTLE_MS = 160;
 const TICK_MS = 220;
 
-const PIN_W = 3;
-const PIN_H = 16;
+// Rest shape: a DOT_SIZE x DOT_SIZE circle (border-radius: full), sized to
+// match the notch's own 10px footprint so the checked row reads as "its
+// notch, filled in" rather than a second, differently-shaped glyph. While
+// traveling the indicator narrows to LINE_W — a thin pill — for the
+// duration of the trip only; DOT_SIZE is also what the bridge span's cap
+// is measured in (see bridgeTop/bridgeHeight below), so the line's start
+// and end land exactly on the outer edges of the dot boxes it grew out of.
+const DOT_SIZE = 10;
+const LINE_W = 3;
 const RAIL_COL = 28;
 
 export interface PinTumblerOption {
@@ -196,25 +214,33 @@ export function PinTumbler({
     const fromCenterY = rowOffsets[prev];
     const toCenterY = rowOffsets[committedIndex];
 
-    // Start the new leg from the line's LIVE on-screen box — read its
-    // computed `top`/`height` *before* cancelling the in-flight animation.
-    // cancel() reverts the element to its inline style (rowOffsets[restIndex]
-    // at the resting PIN_H), but restIndex still points at the row this
-    // travel started from (it only advances in onfinish), so seeding the new
-    // leg from rowOffsets[prev]'s resting box on every re-selection would
-    // snap the line back to fully-rested even mid-stretch — a visible jump.
-    // Reading getComputedStyle first lets the interrupt leg begin from
-    // whatever box the line actually is right now, mid-stretch or at rest.
+    // Start the new leg from the indicator's LIVE on-screen box — read its
+    // computed `top`/`height`/`width` *before* cancelling the in-flight
+    // animation. cancel() reverts the element to its inline style
+    // (rowOffsets[restIndex] at the resting DOT_SIZE box), but restIndex
+    // still points at the row this travel started from (it only advances in
+    // onfinish), so seeding the new leg from rowOffsets[prev]'s resting dot
+    // on every re-selection would snap the indicator back to a fully-formed
+    // dot even mid-stretch — a visible jump. Reading getComputedStyle first
+    // lets the interrupt leg begin from whatever box it actually is right
+    // now — a dot, a mid-morph pill, or anything between.
     let fromTop =
-      fromCenterY !== undefined ? fromCenterY - PIN_H / 2 : undefined;
-    let fromHeight = PIN_H;
+      fromCenterY !== undefined ? fromCenterY - DOT_SIZE / 2 : undefined;
+    let fromHeight = DOT_SIZE;
+    let fromWidth = DOT_SIZE;
     if (pin && animRef.current) {
       const cs = getComputedStyle(pin);
       const liveTop = parseFloat(cs.top);
       const liveHeight = parseFloat(cs.height);
-      if (!Number.isNaN(liveTop) && !Number.isNaN(liveHeight)) {
+      const liveWidth = parseFloat(cs.width);
+      if (
+        !Number.isNaN(liveTop) &&
+        !Number.isNaN(liveHeight) &&
+        !Number.isNaN(liveWidth)
+      ) {
         fromTop = liveTop;
         fromHeight = liveHeight;
+        fromWidth = liveWidth;
       }
     }
 
@@ -236,16 +262,18 @@ export function PinTumbler({
       return;
     }
 
-    const toTop = toCenterY - PIN_H / 2;
+    const toTop = toCenterY - DOT_SIZE / 2;
     // The line's leading edge reaches the destination first; its trailing
     // edge stays anchored at the far end of [fromCenterY, toCenterY] until
     // the settle phase catches it up. That single box — spanning exactly the
-    // two row centers plus the line's own half-caps — is what "the line
-    // stretches toward where it's going" means geometrically. No keyframe
-    // here ever positions an edge past its own destination, so there is
-    // nothing to bounce back from.
-    const bridgeTop = Math.min(fromCenterY, toCenterY) - PIN_H / 2;
-    const bridgeHeight = Math.abs(toCenterY - fromCenterY) + PIN_H;
+    // two row centers plus the *dot's* own half-caps, i.e. the union of the
+    // two rest-dot boxes at fromCenterY and toCenterY — is what "the line
+    // stretches toward where it's going" means geometrically: it never
+    // reaches further than where the dot's own edge would already sit at
+    // either end. No keyframe here ever positions an edge past its own
+    // destination, so there is nothing to bounce back from.
+    const bridgeTop = Math.min(fromCenterY, toCenterY) - DOT_SIZE / 2;
+    const bridgeHeight = Math.abs(toCenterY - fromCenterY) + DOT_SIZE;
 
     const dist = Math.abs(committedIndex - prev);
     const travelMs = Math.max(MIN_TRAVEL_MS, dist * PER_ROW_MS);
@@ -257,29 +285,37 @@ export function PinTumbler({
         {
           top: `${fromTop}px`,
           height: `${fromHeight}px`,
+          width: `${fromWidth}px`,
           offset: 0,
           easing: TRAVEL_EASE,
         },
         {
           top: `${bridgeTop}px`,
           height: `${bridgeHeight}px`,
+          width: `${LINE_W}px`,
           offset: arriveAt,
           easing: TRAVEL_EASE,
         },
-        { top: `${toTop}px`, height: `${PIN_H}px`, offset: 1 },
+        {
+          top: `${toTop}px`,
+          height: `${DOT_SIZE}px`,
+          width: `${DOT_SIZE}px`,
+          offset: 1,
+        },
       ],
       { duration: total, fill: "forwards" }
     );
     animRef.current = anim;
     anim.onfinish = () => {
       // Deliberately not cancelling here: the animation's `fill: "forwards"`
-      // holds the exact final keyframe (the resting box at `toTop`/`PIN_H`),
-      // which is the same value `restIndex` now resolves to via the resting
-      // inline style. Cancelling immediately would strip the animation's
-      // held effect before this `setRestIndex` has actually re-rendered,
-      // snapping the element back to the *previous* underlying style for one
-      // frame — a visible flash/step right at the end of every single
-      // travel. Leaving the finished animation in place keeps the on-screen
+      // holds the exact final keyframe (the resting dot box at
+      // `toTop`/`DOT_SIZE`/`DOT_SIZE`), which is the same value `restIndex`
+      // now resolves to via the resting inline style. Cancelling immediately
+      // would strip the animation's held effect before this `setRestIndex`
+      // has actually re-rendered, snapping the element back to the
+      // *previous* underlying style for one frame — a visible flash/step
+      // right at the end of every single travel. Leaving the finished
+      // animation in place keeps the on-screen
       // value continuous; it's reclaimed for free by the
       // `animRef.current?.cancel()` at the top of this effect the next time
       // a travel actually starts.
@@ -318,7 +354,7 @@ export function PinTumbler({
   const measured = rowOffsets.length === options.length && options.length > 0;
   const railTop = measured ? rowOffsets[0] : 0;
   const railHeight = measured ? rowOffsets[rowOffsets.length - 1] - railTop : 0;
-  const pinTop = (rowOffsets[restIndex] ?? 0) - PIN_H / 2;
+  const pinTop = (rowOffsets[restIndex] ?? 0) - DOT_SIZE / 2;
 
   return (
     <div className={`ns-pt-wrap ${className}`}>
@@ -331,7 +367,6 @@ export function PinTumbler({
         style={
           {
             "--pt-rail-col": `${RAIL_COL}px`,
-            "--pt-pin-w": `${PIN_W}px`,
           } as Vars
         }
       >
@@ -388,7 +423,8 @@ export function PinTumbler({
           className="ns-pt-pin"
           style={{
             top: pinTop,
-            height: PIN_H,
+            height: DOT_SIZE,
+            width: DOT_SIZE,
             opacity: measured ? 1 : 0,
           }}
         />
@@ -484,9 +520,13 @@ export function PinTumbler({
           color: var(--muted);
         }
         .ns-pt-pin {
+          /* left sits at the rail column's center and stays there via a
+             permanent translateX(-50%) — width is animated (dot <-> thin
+             traveling pill) straight through JS/WAAPI inline styles, so
+             centering can't be a fixed calc() against a constant width. */
           position: absolute;
-          left: calc(var(--pt-rail-col) / 2 - var(--pt-pin-w) / 2);
-          width: var(--pt-pin-w);
+          left: calc(var(--pt-rail-col) / 2);
+          transform: translateX(-50%);
           border-radius: 9999px;
           background: var(--foreground);
           pointer-events: none;

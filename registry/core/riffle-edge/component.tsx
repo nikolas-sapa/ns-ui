@@ -10,18 +10,28 @@ import { useEffect, useRef, useState } from "react";
 // book. Dragging that stripe riffles cards past: each step change kicks the
 // top card with a 90ms rotateY(4deg) + translateX flip-past (deterministic
 // per-index vertical jitter, so no two steps land identically), release
-// settles the arrival with the same kick. Scrub velocity governs which:
-// slow drags step discretely (a kick per card), fast drags blur the top card
-// through a CSS filter transition instead of chattering through kicks —
-// the exposed edge itself carries both roles at once, never a separate
-// dot-row or progress bar.
+// settles the arrival with the same kick. The two decorative depth layers
+// behind the top card (its permanently-visible stacked-thickness read) kick
+// too, on the same commit: a smaller opposite-leaning translate+rotate that
+// eases back to their resting offset a beat after the top card, each layer
+// lagging the one in front of it — so a step reads as the whole deck
+// reshuffling and restacking, not just the top card swapping out. Scrub
+// velocity governs which: slow drags step discretely (a kick per card), fast
+// drags blur the top card through a CSS filter transition instead of
+// chattering through kicks — the exposed edge itself carries both roles at
+// once, never a separate dot-row or progress bar.
 //
 // Direct DOM writes (transform/filter) on committed index changes only — no
 // per-frame rAF loop. Motion is entirely CSS-transition-driven: a one-off
-// double-write (snap to a kicked pose, then rAF back to identity so the
-// transition eases the return) for the flip, and a filter transition ramped
-// by the caller for blur. `prefers-reduced-motion` drops both: no rotateY,
-// no perspective, no blur ever — steps crossfade via opacity instead.
+// double-write (snap to a kicked pose, then rAF back to identity/rest so the
+// transition eases the return) for the flip and the two back-layer nudges,
+// and a filter transition ramped by the caller for blur. The back layers'
+// resting offset is expressed in rem (matching their Tailwind translate
+// utility at rest) with the kick's extra nudge layered on top via calc(), so
+// the shuffle scales with root font size the same way the static pose
+// already did. `prefers-reduced-motion` drops all of it: no rotateY, no
+// perspective, no back-layer nudge, no blur ever — steps crossfade via
+// opacity instead.
 //
 // The stripe's *drawn* thickness is deliberately compressed (down to a
 // 1.5px-per-card pitch) so a small deck visibly reads thinner than a large
@@ -57,6 +67,20 @@ const VELOCITY_FOR_MAX_BLUR = 46; // idx/s mapped to MAX_BLUR
 const KICK_ROTATE_DEG = 4;
 const KICK_TRANSLATE_X = 6;
 const PERSPECTIVE_PX = 720;
+// decorative back-layer rest offsets, in rem — matches the original
+// translate-x-1.5/translate-y-1.5 and translate-x-3/translate-y-3 Tailwind
+// utilities exactly (1 spacing unit = 0.25rem), so switching them to
+// JS-driven inline transforms doesn't change their resting appearance.
+const BACK1_REST_REM = 0.375;
+const BACK2_REST_REM = 0.75;
+// shuffle nudge applied on top of the rest offset during a kick — smaller
+// than the top card's own kick, and smaller again for the second layer, so
+// depth reads as reduced amplitude the further back a layer sits
+const BACK1_SHIFT_PX = 3;
+const BACK2_SHIFT_PX = 1.5;
+const BACK1_ROTATE_DEG = 1.5;
+const BACK2_ROTATE_DEG = 0.75;
+const BACK_STAGGER_MS = 50; // each back layer settles this much later than the one in front
 const WHEEL_STEP_PX = 36; // deltaY accumulated before a wheel/trackpad tick steps a card
 const WHEEL_COOLDOWN_MS = 140; // >= KICK_MS, so each step's kick reads before the next fires
 
@@ -119,6 +143,8 @@ export function RiffleEdge({
 
   const stripeRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
+  const back1Ref = useRef<HTMLDivElement>(null);
+  const back2Ref = useRef<HTMLDivElement>(null);
   const liveRef = useRef<HTMLSpanElement>(null);
 
   const dragRef = useRef<{
@@ -183,6 +209,34 @@ export function RiffleEdge({
     requestAnimationFrame(() => {
       card.style.transition = `transform ${KICK_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`;
       card.style.transform = `perspective(${PERSPECTIVE_PX}px) rotateY(0deg) translateX(0px) translateY(0px)`;
+    });
+
+    // the deck's decorative depth layers shuffle along with the top card —
+    // a smaller, opposite-leaning nudge per layer (reduced amplitude with
+    // depth) that eases back to its rem-based rest offset a beat after the
+    // layer in front of it settles, so a step reads as the whole stack
+    // restacking rather than only the top card swapping
+    const j1 = jitterFor(targetIndex + 1) * 0.5;
+    const j2 = jitterFor(targetIndex + 2) * 0.3;
+    const back1 = back1Ref.current;
+    if (back1) {
+      back1.style.transition = "none";
+      back1.style.transform = `translate(calc(${BACK1_REST_REM}rem + ${(dir * BACK1_SHIFT_PX).toFixed(2)}px), calc(${BACK1_REST_REM}rem + ${j1.toFixed(2)}px)) rotate(${(dir * BACK1_ROTATE_DEG).toFixed(2)}deg)`;
+    }
+    const back2 = back2Ref.current;
+    if (back2) {
+      back2.style.transition = "none";
+      back2.style.transform = `translate(calc(${BACK2_REST_REM}rem + ${(dir * BACK2_SHIFT_PX).toFixed(2)}px), calc(${BACK2_REST_REM}rem + ${j2.toFixed(2)}px)) rotate(${(dir * BACK2_ROTATE_DEG).toFixed(2)}deg)`;
+    }
+    requestAnimationFrame(() => {
+      if (back1) {
+        back1.style.transition = `transform ${KICK_MS + BACK_STAGGER_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`;
+        back1.style.transform = `translate(${BACK1_REST_REM}rem, ${BACK1_REST_REM}rem) rotate(0deg)`;
+      }
+      if (back2) {
+        back2.style.transition = `transform ${KICK_MS + BACK_STAGGER_MS * 2}ms cubic-bezier(0.22, 1, 0.36, 1)`;
+        back2.style.transform = `translate(${BACK2_REST_REM}rem, ${BACK2_REST_REM}rem) rotate(0deg)`;
+      }
     });
   };
 
@@ -370,14 +424,23 @@ export function RiffleEdge({
     <div className={`w-full ${className}`} role="group" aria-label={ariaLabel}>
       <div className="flex items-center gap-3">
         <div className="relative min-h-[200px] flex-1" style={{ perspective: `${PERSPECTIVE_PX}px` }}>
-          {/* decorative stack depth — the physical thickness read, behind the top card */}
+          {/* decorative stack depth — the physical thickness read, behind the
+              top card. Rest transform set inline (rem, matching the original
+              translate-x-1.5/translate-y-1.5 and translate-x-3/translate-y-3
+              utilities) rather than via Tailwind classes, so `kick` can nudge
+              and ease it back with the same imperative double-write it uses
+              on the top card. */}
           <div
+            ref={back1Ref}
             aria-hidden
-            className="absolute inset-0 translate-x-1.5 translate-y-1.5 rounded-md border border-border bg-surface opacity-60"
+            className="absolute inset-0 rounded-md border border-border bg-surface opacity-60"
+            style={{ transform: `translate(${BACK1_REST_REM}rem, ${BACK1_REST_REM}rem)`, willChange: "transform" }}
           />
           <div
+            ref={back2Ref}
             aria-hidden
-            className="absolute inset-0 translate-x-3 translate-y-3 rounded-md border border-border bg-surface opacity-35"
+            className="absolute inset-0 rounded-md border border-border bg-surface opacity-35"
+            style={{ transform: `translate(${BACK2_REST_REM}rem, ${BACK2_REST_REM}rem)`, willChange: "transform" }}
           />
           {item ? (
             <div

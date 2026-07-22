@@ -154,7 +154,7 @@ export function PhaseSwing({
   doneLabel = "Build complete",
   value,
   done = false,
-  periodMs = 8000,
+  periodMs = 10000,
   count = 13,
   amplitudeDeg = 26,
   className = "",
