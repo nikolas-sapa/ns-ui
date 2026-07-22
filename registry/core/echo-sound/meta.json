@@ -1,0 +1,21 @@
+{
+  "name": "echo-sound",
+  "title": "Echo Sound",
+  "description": "An empty state that pings like sonar every 6-8s to actively demonstrate emptiness, then freezes and grows skeleton rows outward the instant real results interrupt it.",
+  "collection": "core",
+  "tags": [
+    "empty-state",
+    "skeleton",
+    "loading",
+    "list",
+    "search",
+    "svg",
+    "aria-live",
+    "sonar"
+  ],
+  "autoplay": {
+    "mode": "none"
+  },
+  "instruction": "A list/search result region, `<EchoSound items={items} query={query} .../>`, that unifies empty, loading and loaded into one continuous vocabulary instead of an illustration empty state handing off jarringly to an unrelated skeleton loader. `items` is the whole state machine: `null` means nothing has resolved yet and the region probes; a non-empty array means results landed. While probing, a single SVG circle (stroked in --border, fill none, vector-effect non-scaling-stroke) sits centered in a stage sized to the expected row count, and CSS keyframes alone (no rAF) grow its `r` from 3 to 47 and fade its stroke-opacity from .85 to 0 over a per-mount randomized 6-8s cycle, restarting forever — calm and continuous, never a quick blip. The stage's SVG uses preserveAspectRatio=none against a 0-100 viewBox, so the ring reads as a probe reaching toward the stage's real proportions rather than a decorative fixed icon. The instant `items` flips from empty to populated, the SAME ring is interrupted: its current mid-flight radius and stroke-opacity are read once via getComputedStyle and re-applied inline (so nothing jumps), the keyframe class is dropped, and a single CSS transition carries it to the exact radius that reaches row one's vertical center — a radius computed analytically from rowHeight/rowGap/stageRows, no DOM measurement needed. The ring holds there while skeleton rows (flat --border bars) scale in from their own center point one at a time at a 60ms stagger with ease-out-expo, each row then crossfading its skeleton bar to the real rendered item over 240ms once every row has appeared and settled briefly. That is the entire mechanism: two timeline handoffs (ping-to-contact, contact-to-resolved) driven by a handful of setTimeouts, zero per-frame JS, zero canvas. If items empties again (a new, zero-result search) the region resets straight back to probing with no reverse animation; if items changes while already loaded, the new batch swaps in place without replaying the reveal. Accessibility: the region carries aria-labelledby pointing at a single persistent paragraph that visibly reads 'No results for \"{query}\"' while probing and becomes the sr-only accessible name once loaded (same node throughout, so the region's name is always literally the empty-state text or its resolved successor); the ring is aria-hidden; skeleton bars are permanently aria-hidden and the row's real content is aria-hidden until the crossfade completes so nothing is announced early; arrival fires exactly one polite aria-live announcement, 'N results loaded', at the moment data lands, not per row; focus is never moved automatically. Under prefers-reduced-motion the ring never renders and the reveal never plays — the empty paragraph is simply replaced by the resolved list the instant items arrive, no ping, no stagger. Differs from beacon-cadence: that is a 20-64px inline status lamp whose cadence blinks forever to encode a state; this is a full content region where the ring is a spatial probe that the arriving data itself interrupts and answers, and the reveal choreography is the same SVG object as the empty state, not a swapped-in skeleton loader.",
+  "dependencies": []
+}
