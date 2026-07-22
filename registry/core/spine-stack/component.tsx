@@ -301,15 +301,6 @@ export const SpineStack = forwardRef<SpineStackHandle, SpineStackProps>(function
                 onBlur={() => setFocusedId((f) => (f === level.id ? null : f))}
                 style={{
                   opacity: isActive ? 0 : 1,
-                  // hidden (not just transparent) while this level is the active
-                  // page: the spine-face sits under the active-face in paint
-                  // order, so an opacity-0-but-visible button would still be a
-                  // pointer/hit-test target covered by the active-face. visibility
-                  // is delayed one transition so the crossfade still plays.
-                  visibility: isActive ? "hidden" : "visible",
-                  transition: isActive
-                    ? `opacity ${TRANSITION_MS}ms ease-out, visibility 0s linear ${TRANSITION_MS}ms`
-                    : `opacity ${TRANSITION_MS}ms ease-out`,
                   boxShadow: "inset -1px 0 0 0 color-mix(in srgb, var(--foreground) 22%, transparent)",
                 }}
                 className="ns-spine-face absolute inset-0 outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
@@ -339,20 +330,7 @@ export const SpineStack = forwardRef<SpineStackHandle, SpineStackProps>(function
                   swapping to a freshly-mounted pane. */}
               <div
                 inert={isActive ? undefined : true}
-                data-active-page={isActive ? "" : undefined}
-                style={{
-                  opacity: isActive ? 1 : 0,
-                  pointerEvents: isActive ? undefined : "none",
-                  // hide (not just fade) a non-active page: its controls stay
-                  // mounted for the re-inflate animation, but while collapsed
-                  // into a spine they must not be visible/hittable targets
-                  // sitting under the spine-face. visibility is delayed one
-                  // transition so the crossfade still plays on push.
-                  visibility: isActive ? "visible" : "hidden",
-                  transition: isActive
-                    ? `opacity ${TRANSITION_MS}ms ease-out`
-                    : `opacity ${TRANSITION_MS}ms ease-out, visibility 0s linear ${TRANSITION_MS}ms`,
-                }}
+                style={{ opacity: isActive ? 1 : 0, pointerEvents: isActive ? undefined : "none" }}
                 className="ns-active-face absolute inset-0 overflow-auto bg-background"
               >
                 <div className="flex h-full flex-col p-4">
