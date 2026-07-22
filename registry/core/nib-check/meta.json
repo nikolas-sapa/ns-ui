@@ -1,0 +1,25 @@
+{
+  "name": "nib-check",
+  "title": "Nib Check",
+  "description": "A checkbox and its tri-state select-all cousin whose mark is inked on by a variable-width calligraphic pen stroke — thin entry, thick corner flick, a hair of overshoot at the tip — so checked, unchecked and indeterminate read as three distinct pen gestures.",
+  "collection": "core",
+  "tags": [
+    "checkbox",
+    "tri-state",
+    "indeterminate",
+    "select-all",
+    "form",
+    "svg",
+    "micro-interaction",
+    "calligraphy"
+  ],
+  "autoplay": {
+    "mode": "press",
+    "target": "input[type=\"checkbox\"]",
+    "hold": 260,
+    "period": 3000,
+    "delay": 500
+  },
+  "instruction": "A checkbox primitive and its tri-state select-all/nested-settings cousin, built around one signature idea: the checkmark is not a static glyph, it is ink laid down by a pen with pressure. GEOMETRY: the check is a single filled ribbon path, built once at module load by offsetting a hand-placed spine polyline (entry -> corner -> tip, with a small geometric overshoot past the corner's natural stopping point baked into the tip coordinate) with a per-point half-width that starts thin at the entry, peaks widest right at the corner, and tapers back down through the flick to a hairline at the overshoot tip — a small offset-polyline helper (buildRibbon) averages each interior point's two adjacent segment normals so the taper reads smooth, and the sharp direction reversal at the corner naturally bulges on the convex side and pinches on the concave one, exactly like ink pooling as a pen changes direction. Indeterminate does not reuse or shrink this path — it draws a separate, simpler fat rounded dash, so a settings list scans as genuinely three different marks, not a check, a smaller check, and a minus. REVEAL: both ink shapes sit under a CSS clip-path (inset, fill-box, left-anchored) that transitions from fully clipped to fully revealed over ~220ms ease-out-expo, so the mark appears to draw itself left-to-right — entry, corner, tip — rather than fade or pop in. Unchecking transitions the same clip-path back to its clipped state, which reads as the ink retracting toward the entry edge; once retraction finishes, a small dot pops in at the entry point and fades over ~320ms, like the very last bead of ink lifting off the page. The box's own corner radius relaxes from 4px to 6px on check (so a list of checked settings scans faster as a group), with a brief ~4% scale settle-pop standing in for the flick's overshoot — restarted via an imperative class toggle rather than a remount, so an already-focused input never loses focus mid-interaction. STATE MODEL: value is `boolean | \"indeterminate\"`, controlled or uncontrolled (checked/defaultChecked/onCheckedChange), matching the common tri-state-checkbox convention — the underlying DOM value is always a real boolean; \"indeterminate\" is applied imperatively as the native `.indeterminate` DOM property (never an HTML attribute) each time the resolved state changes, which is what gives it real native AT announcement as a mixed state rather than a custom aria hack. A demo composes one plain labelled checkbox and one select-all header wired to three child checkboxes via ordinary parent state (all-on -> checked, all-off -> unchecked, mixed -> indeterminate), showing both the everyday control and the nested-settings pattern from the same primitive. A11Y: a real `input[type=checkbox]` carries checked, the imperative indeterminate property, and disabled, and owns every native keyboard and screen-reader interaction; it is visually hidden (opacity 0, sized to exactly cover the box) but stays in the tab order, keeps real focus, and is never aria-hidden or tabIndex -1. Passing `label` wraps the input in a native `<label>` for a real accessible name; omitting it falls back to an `aria-label` (default \"Checkbox\") so the control is never nameless. The SVG ink layer is aria-hidden throughout. Colors are token-only: ink is --foreground, the box border is --border in every state (states are told apart by the ink's shape, never by tinting the box), and --accent appears nowhere but the peer-focus-visible ring — no fill/background color ever marks a checked state. Both themes render identically in structure since nothing but token references are used. REDUCED MOTION: every transition and animation here (clip-path reveal/retraction, radius relax, settle-pop, entry dot) is disabled under prefers-reduced-motion, so the ink for the current state is simply present or absent immediately, still fully legible and usable — the dot is skipped entirely rather than left stranded on screen. Zero dependencies beyond React; no canvas, no requestAnimationFrame, no timers.",
+  "dependencies": []
+}
