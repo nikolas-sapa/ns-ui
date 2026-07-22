@@ -1,0 +1,37 @@
+{
+  "name": "patina-ledger",
+  "title": "Patina Ledger",
+  "description": "Session memory that visibly patinates: each remembered fact steps its ink from --foreground toward --muted the longer it goes unused, snaps back and underlines when the agent rehearses it, and is governed by real pin/evict controls.",
+  "collection": "core",
+  "tags": [
+    "memory",
+    "agent",
+    "ledger",
+    "list",
+    "decay",
+    "pin",
+    "evict",
+    "mono",
+    "aria-live",
+    "accessibility",
+    "governance"
+  ],
+  "useWhen": "the panel showing what a long-running agent currently remembers about the user, where each fact visibly ages toward --muted if unreferenced and snaps back to --foreground the turn it's actually cited in a reply — a time-decay-with-rehearsal ledger the user can pin or evict, not a load meter (ballast-context) or an unused-space treatment (fallow-panel).",
+  "autoplay": {
+    "mode": "press",
+    "target": "[data-dormant-toggle=\"true\"]",
+    "hold": 180,
+    "period": 3600,
+    "delay": 700
+  },
+  "gate": {
+    "openBy": "[data-dormant-toggle=\"true\"]",
+    "expect": "[aria-label=\"Dormant memories\"] li"
+  },
+  "instruction": "A per-item time-decay-with-rehearsal ledger for agent session memory: one 32px row per remembered fact, 13px Geist Mono, inside a 12px-radius rail (rounded-xl border border-border bg-background). Each row's ink is `turn - lastUsedTurn` (both plain controlled props — the component derives age, holds no memory model of its own) mapped through a four-stop ramp via a `data-age` attribute (0 fresh / 1 aging / 2 fading / 3 dormant, plus a separate 'pinned' value) into a color-mix() interpolation from --foreground toward --muted (68% and 36% foreground at the middle two stops, pure --muted at dormant), transitioned over 600ms so each turn's aging step is perceptible rather than a silent jump. The moment a row is actually cited — its lastUsedTurn increases, detected by diffing the incoming memories array against the previous render's snapshot, not merely re-derived from `turn` — its color transition is suppressed for that one commit (a discontinuous snap to --foreground reads as 'revived right now', which a slow brighten wouldn't) and a 1px --foreground underline wipes left-to-right under the text over 300ms before fading, plus a single aria-live=polite announcement ('Rehearsed: <text> — turn N'). Users govern the ledger with two real per-row buttons: pin toggles aria-pressed, stamps a 4px --foreground lacquer dot, and permanently exempts the row from aging (data-age becomes 'pinned', frozen at full ink regardless of turns unused); evict is a genuine two-step confirm — the first press arms the row (both the button's accessible name and its visual state switch to 'confirm'), a second press (or a second Enter/Space on the still-focused button, since native buttons already get Enter/Space activation for free) collapses it via grid-template-rows 1fr->0fr plus an opacity drop over 250ms and only then calls onEvict so the caller removes it from the array; losing focus disarms without evicting. Rows that are both unpinned and fully dormant leave the main list and fold into an 'N dormant' disclosure row at the bottom (a real aria-expanded button with aria-controls pointing at the drawer's id) that expands, via the same grid-template-rows trick on the drawer itself, into a second bordered list holding those rows inline with fully working pin/evict — pinning a dormant row rescues it back into the main list for free on the next render, since visibility is just a derived filter over pinned/stop, never a separate 'rescued' flag to keep in sync. Because color-fade alone is invisible to screen readers and low-vision users, every row's `aria-label` spells its age out in words ('Remembers: prefers metric units — fading, 6 turns unused'; pinned rows read '— pinned'), independent of and in addition to the pin/evict buttons' own distinct accessible names. Props: `memories` (`{id, text, lastUsedTurn, pinned?}[]`), `turn` (current turn index), `ageThresholds` (`[number,number,number]`, default `[1,4,9]` turns-unused boundaries), `onPinToggle`, `onEvict`, `ariaLabel` (default 'Session memory'), `className`. prefers-reduced-motion removes every transition, the wipe animation, and the collapse/expand easing — pin, evict-confirm, rehearsal and the dormant drawer all still work, they just change state instantly instead of animating, and the evict removal timeout collapses to 0ms rather than waiting out a transition nothing will play. Pure DOM + CSS + inline SVG glyphs — no canvas. Demo: an 8-row session (one pinned, several at different ages, four already dormant so the '4 dormant' disclosure is visible at rest) with an 'Advance turn' button that ages everything a turn, and two 'Agent cites: <fact>' buttons that rehearse a specific row so the snap-and-wipe is directly reachable rather than only inferred from a live agent.",
+  "dependencies": [],
+  "card": {
+    "focus": ".ns-patina",
+    "padding": 1.4
+  }
+}
