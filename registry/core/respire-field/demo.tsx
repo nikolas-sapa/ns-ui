@@ -75,7 +75,7 @@ export default function RespireFieldDemo() {
           <div className="mt-5 flex items-center justify-between gap-4">
             <p
               className={`text-xs ${
-                error ? "text-[#ea001d]" : "text-muted"
+                error ? "text-[var(--error)]" : "text-muted"
               }`}
               aria-live="polite"
             >

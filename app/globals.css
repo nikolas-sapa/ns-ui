@@ -16,6 +16,10 @@
   /* Semantic status red — several components reference var(--error) with this
      same hex as fallback; defining it here makes it a real themed token. */
   --error: #ea001d;
+  /* Semantic status green / amber — status-only, never brand accents. Defined
+     as real tokens so status badges stop hardcoding the hex. */
+  --success: #47a447;
+  --warning: #f5a623;
 }
 
 .dark {

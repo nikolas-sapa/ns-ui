@@ -358,6 +358,7 @@ await browser.close();
 
 if (failures.length) {
   console.error(`\nverify FAILED: ${failures.length} problem(s)`);
+  for (const f of failures) console.error(`  - ${f}`);
   process.exit(1);
 }
 console.log(`\nverify passed: ${items.length} component(s), screenshots written`);
