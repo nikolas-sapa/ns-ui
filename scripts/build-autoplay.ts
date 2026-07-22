@@ -58,6 +58,11 @@ for (const collection of ["core", "loud"]) {
       bad++;
       continue;
     }
+    if (spec.mode === "type" && !(typeof spec.text === "string" && spec.text.length > 0)) {
+      console.error(`  ! ${name}: meta.json autoplay.text must be a non-empty string for mode "type"`);
+      bad++;
+      continue;
+    }
     if (spec.mode === "none") continue; // explicit "ambient, needs nothing"
     map[meta.name] = spec;
   }

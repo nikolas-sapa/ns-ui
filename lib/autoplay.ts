@@ -13,7 +13,7 @@
  * component's API. See `scripts/build-autoplay.ts`.
  */
 
-export const AUTOPLAY_MODES = ["pointer-path", "scroll", "press", "drag", "none"] as const;
+export const AUTOPLAY_MODES = ["pointer-path", "scroll", "press", "drag", "type", "none"] as const;
 export type AutoplayMode = (typeof AUTOPLAY_MODES)[number];
 
 export const AUTOPLAY_PATHS = ["sweep", "orbit", "figure8"] as const;
@@ -35,6 +35,11 @@ export type AutoplaySpec = {
    * `pointer-path`/`drag`: the box the path runs over is the *union* of every
    * match, so `"button"` over a row of nine items gives exactly that row.
    * `press`: the control to press — first match only (default `button`).
+   * `type`: the input(s) to type into (default `input, textarea,
+   * [contenteditable]`). When the selector matches *several* elements — a
+   * multi-box OTP, one `<input>` per digit — character k is dispatched to the
+   * k-th match, because the demo is `inert` and its internal focus-advance is
+   * a no-op. When it matches one, the whole string goes to that element.
    */
   target?: string;
 
@@ -54,9 +59,25 @@ export type AutoplaySpec = {
   /** Fractions of the scrollable range to travel between. Default `[0, 1]`. */
   range?: [number, number];
 
-  // --- press --------------------------------------------------------------
-  /** How long the pointer stays down, in ms. Default 900. */
+  // --- press / type -------------------------------------------------------
+  /**
+   * `press`: how long the pointer stays down, in ms (default 900).
+   * `type`: how long the fully-typed string rests before it clears and the
+   * loop repeats, in ms (default 1600).
+   */
   hold?: number;
+
+  // --- type ---------------------------------------------------------------
+  /**
+   * The string typed into the target on a loop, one character per keystroke.
+   * Required for `type` — a descriptor without it does nothing.
+   */
+  text?: string;
+  /**
+   * Characters per second. Default 3. Keep it low (2-3) for components whose
+   * per-key animation is the point, so each keystroke is legible.
+   */
+  cps?: number;
 
   // --- drag ---------------------------------------------------------------
   /** Grab point, normalized in the target box. Default `[0.2, 0.5]`. */

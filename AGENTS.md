@@ -62,7 +62,7 @@ describes the card, not the component's API, and a consumer must never see it as
 
 ```jsonc
 "autoplay": {
-  "mode": "pointer-path" | "scroll" | "press" | "drag" | "none",  // required
+  "mode": "pointer-path" | "scroll" | "press" | "drag" | "type" | "none",  // required
   "period": 4000,   // ms for one full cycle including its rest beat. default 4000, min 400
   "delay": 600,     // ms after mount before the first cycle. default 600
   "target": "button" // CSS selector, queried inside the demo root. see per-mode meaning below
@@ -79,6 +79,7 @@ are normalized to the resolved box, `[0,0]` = its top-left. Absent key, or `"mod
 | `scroll` | `scroller`: CSS selector (default: the embed document)<br>`range`: `[from, to]` fractions (default `[0, 1]`) | Eases the scroll position from `from`→`to`→`from` across one period. Contained to the iframe; the host page never moves. |
 | `press` | `hold`: ms held down (default 900) | `pointerenter` → `pointerdown` on `target` (default `button`) → hold → `pointerup` + `click`, then rests for `period − hold`. `target` is re-queried each cycle, so a demo that remounts its control after confirming still works. Set `hold` *above* the component's own threshold (hold-to-confirm's `holdMs` is 1200, so it uses 1500). |
 | `drag` | `from`, `to`: normalized `[x, y]` (defaults `[0.2,0.5]` → `[0.8,0.5]`)<br>`inset` (default 0) | `pointerdown` at `from`, eased move to `to` and back, `pointerup`. For sliders, split/compare handles, draggable stages. |
+| `type` | `text`: string to type (**required**)<br>`cps`: characters/sec (default 3; use 2 when the per-key motion is the point)<br>`hold`: ms the full string rests before it clears and loops (default 1600)<br>`target`: input selector (default `input, textarea, [contenteditable]`) | Types `text` into the target, one real key sequence per character — cancelable `keydown`, then (only if the component did **not** `preventDefault` it) `beforeinput` + native-setter value write + `input`, then `keyup`. That fork drives both keyboard-first controls that own `keydown` (cipher-reel-otp) and ordinary controlled inputs. When `target` matches **several** elements (a per-box OTP), character k goes to match k — the demo is `inert`, so the component's own focus-advance is a no-op and every key would otherwise pile into box 1. Wakes anything that only animates on keystroke. Note: a demo that self-completes on the typed value (cipher-reel-otp verifies on `481632` and disables) types in once and rests, replaying when the card remounts, rather than looping. |
 | `none` | — | Explicitly ambient. Same effect as omitting the key; use it to record that the question was asked. |
 
 For `pointer-path` and `drag`, the box is the **union of every element matching `target`** — the
