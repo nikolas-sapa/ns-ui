@@ -1,0 +1,34 @@
+{
+  "name": "barrel-bolt",
+  "title": "Barrel Bolt",
+  "description": "Tool-permission consent as a sliding barrel bolt: Once, This session and Always sit at proportionally longer, heavier drags along a notched track, so the size of a grant is the length of a deliberate act, not a click you can make by muscle memory.",
+  "collection": "core",
+  "tags": [
+    "slider",
+    "consent",
+    "permission",
+    "form",
+    "physics",
+    "accessibility",
+    "micro-interaction"
+  ],
+  "autoplay": {
+    "mode": "drag",
+    "target": "[data-barrel-track]",
+    "from": [0.02, 0.5],
+    "to": [1.3, 0.5],
+    "period": 4800,
+    "delay": 700
+  },
+  "gate": {
+    "openBy": "[data-barrel-deny]",
+    "expect": "[data-barrel-receipt]"
+  },
+  "useWhen": "a tool-permission consent control where the SCOPE of the grant (once / this session / always) is encoded as increasing physical drag distance and resistance, so a bigger grant is a deliberately longer act — reach for hold-to-confirm instead when there is only one action to gate by press duration, or fling-segment when the options are equally-weighted view choices rather than an escalating scope.",
+  "instruction": "Renders a tool-permission consent row for one requested capability (a plain-language string, e.g. 'run shell command', plus an optional secondary context line like 'requested by build-agent-07'): a horizontal bolt track — 6px-radius groove, 1px --border, three catch notches painted as 2px gaps in the top border — with a 24px circular handle and three labeled detents underneath: Once, This session, Always. Catch positions sit at fractions 0, 0.4 and 1 of the track's travel range, so the Session->Always gap is 1.5x the Once->Session gap on its own; dragging the handle (pointer capture on the track, so a grab can start anywhere along it and always moves the handle incrementally from wherever it currently sits, never teleporting to the press point) additionally runs through a position-dependent friction field — factor 1 between Once and Session, 0.7 between Session and Always, 0.3 beyond either end as a rubber-band — so reaching Always takes roughly 3x the raw pointer travel of reaching Once: consequence lives in the geometry AND the resistance, not a color or a warning label. Releasing snaps the handle to the nearest catch on a critically-tuned underdamped spring (k=340, zeta=0.82, chosen so a step response overshoots ~1px regardless of distance); landing on Always seats the handle a further 3px into a permanently-visible keeper outline drawn just past that catch, and the Always label's font-weight bumps to 600 the moment the live position reaches it. A sub-label under the track states the current meaning in plain words the whole time you're dragging ('Will ask again next time.' / 'Remembered for this session.' / \"Always allowed — won't ask again.\"). A grant is never implicit: after a real drag-release the spring settles and then, 150ms later, the settled catch commits via onDecide({outcome:'granted', scope}) — a fresh grab within that window cancels the pending commit, so an overshoot is always recoverable for a beat. Deny is a separate plain outlined button living outside the track entirely, before it in both DOM and visual order, so refusal is a deliberate, unambiguous act rather than a slider position a drag could overshoot into; its click handler is idempotent (a repeat click once already decided is a harmless no-op) and it is never disabled, so it always remains a real, focusable, clickable control. Once any decision lands — grant or deny — it is terminal: the track dims to 60% opacity and stops responding to pointer or keys, and the sub-label is replaced by a role=status receipt line ('Denied — will ask again next time.' / 'Granted — Always: won't ask again.' etc.) that mounts fresh so it is reliably announced. Keyboard: the handle itself carries role=slider, aria-valuemin/max=0/2, aria-valuenow the discrete index, aria-valuetext the full phrase ('Allow once', 'Allow this session', 'Always allow'), and aria-orientation=horizontal; ArrowLeft/Right/Up/Down and Home/End move the focused value one catch at a time on a critically-damped glide (k=260, zeta=1, no overshoot — friction is a pointer-only concept and never applies to keys) without granting anything; Enter commits the currently-focused catch immediately, which is the only way a keyboard user can grant — navigation alone can never do it. prefers-reduced-motion removes the release spring's overshoot and the keyboard glide's animation (both snap instantly) but keeps the 150ms commit grace, since that is a safety debounce, not motion. All ink is token-relative (--background/--foreground/--muted/--border/--accent, --accent only as the focus ring) with zero canvas; ResizeObserver keeps catch positions correct on resize, IntersectionObserver and a document.hidden check pause the rAF loop offscreen, and every observer/listener/timer is torn down on unmount.",
+  "dependencies": [],
+  "card": {
+    "focus": ".max-w-md",
+    "padding": 0.12
+  }
+}

@@ -14,14 +14,15 @@ export const meta = {
 //   port (number, this worktree's dev port), existing (string[] of taken slugs),
 //   count (how many to build, default 10), canvasAllowed (bool)
 // }
-const A = typeof args === 'string' ? JSON.parse(args) : args
-if (!args || !A.laneKey) throw new Error('lab-build needs A.laneKey — invoke via Workflow({scriptPath, args})')
-const LANE = A.laneName || A.laneKey
-const BRIEF = A.laneBrief || ''
-const PORT = A.port || 3460
-const EXISTING = Array.isArray(A.existing) ? A.existing.join(' ') : String(A.existing || '')
-const COUNT = Math.max(4, Math.min(16, A.count || 10))
-const CANVAS_OK = !!A.canvasAllowed
+// ponytail: some harnesses deliver args as a JSON string — tolerate both
+if (typeof args === 'string') { try { args = JSON.parse(args) } catch {} }
+if (!args || !args.laneKey) throw new Error('lab-build needs args.laneKey — invoke via Workflow({scriptPath, args})')
+const LANE = args.laneName || args.laneKey
+const BRIEF = args.laneBrief || ''
+const PORT = args.port || 3460
+const EXISTING = Array.isArray(args.existing) ? args.existing.join(' ') : String(args.existing || '')
+const COUNT = Math.max(4, Math.min(16, args.count || 10))
+const CANVAS_OK = !!args.canvasAllowed
 
 const HOUSE = `ns-ui house style: near-black restrained "Geist-dark" surfaces; a small "loud" collection is deliberately flashier. Colors come ONLY from CSS custom properties --background --foreground --muted --border --accent; --accent (#006bff blue) is interaction only, never decoration. Geist Sans for text, Geist Mono for data/code. Generous whitespace, thin borders, physics easing (spring / ease-out-expo), radius rhythm 6/12/16/full, 4px spacing base. Naming is two evocative words that name the MECHANISM not the widget (worn-path, loose-thread, kerf-caret, penumbra-tip). BANNED: gradient washes, neon, purple/blue backgrounds, orange, emoji (use inline SVG), heavy 3D. For any CORE component: no <canvas>, no WebGL — DOM+SVG+CSS only (a canvas draw path cannot inherit the color tokens; it broke the light theme once). Loud components MAY use canvas but must still read colors from the tokens via getComputedStyle at mount and on theme change.`
 
