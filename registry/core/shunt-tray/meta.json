@@ -1,0 +1,21 @@
+{
+  "name": "shunt-tray",
+  "title": "Shunt Tray",
+  "description": "Nested menus as telescoping card-catalog trays: opening a submenu shunts the parent back and dims it instead of spawning a flyout, leaving a 12px clickable edge per ancestor as a live breadcrumb of depth.",
+  "collection": "core",
+  "tags": ["menu", "nested", "navigation", "breadcrumb", "mobile", "context-menu", "accessibility"],
+  "useWhen": "Use when nested content is genuinely a menu — role=menu/menuitem rows, ArrowRight/Enter to drill in, ArrowLeft/Escape to back out — and you want every ancestor level to stay physically on screen as a scaled-down, dimmed, directly-clickable 12px edge so depth is always visible and any level is one click away, which is what makes it suit deep context menus and mobile-width nested navigation where cascading flyovers would overflow or miss diagonal hovers. Pick spine-stack instead for full-page drill-down navigation (nav landmark, real page content per level) where history compresses into vertical book-spines rather than menu semantics.",
+  "autoplay": {
+    "mode": "press",
+    "target": "[data-item-id=\"share\"]",
+    "hold": 900,
+    "period": 4200,
+    "delay": 700
+  },
+  "gate": {
+    "openBy": "[data-item-id=\"share\"]",
+    "expect": "[data-shunt-level=\"1\"] [role=\"menuitem\"]"
+  },
+  "instruction": "Build a nested menu whose submenus render as absolutely positioned, full-size trays stacked in the same box rather than floating flyouts. Each level's resting transform depends only on its own index d in the open path: translateX(d * 12px) scale(1) when it is the current top tray, or scale(0.97^k) (k = levels deeper than it that are currently open) with the same translateX(d * 12px) when it becomes an ancestor — scale's transform-origin is the tray's own left edge — the exposed rail — so the sliver's screen position is scale-independent and only the tray's body recedes away behind the child, not the rail itself. Because each level's offset is fixed to its own index rather than recomputed relative to the currently open depth, and scale pivots on that same left edge instead of moving it, the stack always exposes exactly a 12px sliver of every ancestor's own left edge between its offset and the next level's, at any depth, with no extra bookkeeping. Opening a level pushes it into the path, mounts its tray at translateX(100%), and on the next two animation frames animates it to its resting translateX(d * 12px) over 280ms on an ease-out-expo curve (cubic-bezier(0.16,1,0.3,1)); the tray it covers gets a --muted-tinted overlay (bg-muted at ~20% via a decorative absolutely-positioned div, never --accent) crossfading in over 150ms and simultaneously receives aria-hidden and the inert attribute, so focus and hit-testing can never land on it while it's covered. Every ancestor's own left edge is covered by a separate, real <button> positioned outside the inert tray's subtree — at left: index*12px, width 12px, full tray height — labeled 'Back to {level name}'; clicking it shunts back to that level in one action, animating every tray deeper than the target back to translateX(100%) simultaneously, staggered 30ms apart starting with the deepest (most recently opened) tray, unmounting once the cascade settles. role=menu on each tray, role=menuitem on each row; ArrowRight or Enter on a row that owns a submenu opens it and moves focus to its first item, Enter on a leaf row fires selection instead, ArrowLeft or Escape shunts back exactly one level and restores focus to the row that had opened the level being left, and ArrowUp/ArrowDown move focus among the current tray's own rows. A visually-hidden aria-live=\"polite\" region announces the active level's name once a shunt settles. prefers-reduced-motion drops the slide/scale/stagger choreography entirely — path changes commit synchronously and only the ancestor dim film still crossfades, over 100ms — while the edge buttons keep rendering exactly as before, since depth recovery must not depend on motion. Colors only from --background, --foreground, --muted, --border and --accent (plus their standard opacity variants); zero dependencies, DOM and CSS only, no canvas.",
+  "dependencies": []
+}
