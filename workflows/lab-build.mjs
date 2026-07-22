@@ -14,6 +14,7 @@ export const meta = {
 //   port (number, this worktree's dev port), existing (string[] of taken slugs),
 //   count (how many to build, default 10), canvasAllowed (bool)
 // }
+if (typeof args === 'string') { try { args = JSON.parse(args) } catch {} } // ponytail: some harnesses deliver args stringified
 if (!args || !args.laneKey) throw new Error('lab-build needs args.laneKey — invoke via Workflow({scriptPath, args})')
 const LANE = args.laneName || args.laneKey
 const BRIEF = args.laneBrief || ''
