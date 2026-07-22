@@ -1,0 +1,26 @@
+{
+  "name": "bedrock-trace",
+  "title": "Bedrock Trace",
+  "description": "A per-sentence grounding trace under an AI answer: solid where a source backs the claim, a bare hairline where the model is inferring alone, diagonal hatch where a source contradicts it — shape-encoded, never color, with a click-to-raise source panel.",
+  "collection": "core",
+  "tags": [
+    "rag",
+    "trust",
+    "citation",
+    "grounding",
+    "trace",
+    "chart",
+    "accessibility",
+    "ai"
+  ],
+  "autoplay": {
+    "mode": "press",
+    "target": "button[data-status=\"grounded\"]"
+  },
+  "gate": {
+    "openBy": "button[data-status=\"grounded\"]",
+    "expect": "[role=\"region\"]"
+  },
+  "instruction": "A grounding-coverage instrument for a RAG (retrieval-augmented generation) answer, answering 'how much of this is actually supported' at a glance instead of leaving that question to per-claim citation pills, which only ever show where a source WAS attached and silently skip the unsupported middle. Takes `sentences: { id, text, status: 'grounded'|'unsupported'|'contradicted', sourceId? }[]` and `sources: { id, label, excerpt, match?: [start,end] }[]`. Renders the answer prose with each sentence in a plain (non-interactive) span, and below it a single 3px core-sample track cut into one segment per sentence, each a real `<button>`: a thick solid bar for `grounded`, a bare 1px hairline for `unsupported` (the absence of grounding is drawn, not omitted — the track never just goes blank), and a diagonal 5-tooth hatch for `contradicted`. The three states are shape-and-pattern encoded — solid / absent / hatched — deliberately never color-coded, so the map still reads under grayscale or color-blindness; every color in the component is a token (`--background --foreground --muted --border --accent`), with `--accent` appearing only on focus rings and the two click-triggered highlights below, never as decoration. Segments draw in left-to-right via SVG `stroke-dashoffset` (each line carries `pathLength={1}`, so no pixel-length measurement is needed), starting ~300ms after a given sentence id first appears in the `sentences` array and staggering across a same-render batch when `streaming` is true — the trace visibly catches up to prose that's still arriving rather than snapping in whole. Hovering OR focusing a segment brightens its matching sentence in the prose above via a shared `data-sentence-id` (and vice versa — hovering the sentence text brightens its segment), so the sentence<->evidence link works for keyboard users exactly as it does for mouse users, not just on :hover. Clicking a `grounded` or `contradicted` segment raises an inline glass detail panel (a CSS `grid-template-rows` 0fr->1fr expand, not a portal — nothing to clip) showing that source's label, a Supports/Contradicts tag, and its excerpt with the matching span (`source.match`) underlined in accent; the same accent underline lands on the sentence itself at the same time, so the claim and its evidence highlight together, both ways. Clicking an `unsupported` segment does not raise the panel (there is nothing to show) but still selects it, surfacing a one-line explanation ('Unsupported — the model is inferring, no retrieved source backs this claim.') below the track. Every segment button carries a descriptive `aria-label` ('Sentence 3: supported by Source B' / 'Sentence 4: no source' / 'Sentence 5: contradicted by Source C'), and a visible summary line above the panel ('4 of 6 sentences grounded, 1 contradiction') is `aria-live=polite` and IS the sighted digest, not a separate hidden echo of it, so streamed updates announce themselves through the exact text on screen. Zero dependencies; DOM+SVG+CSS only, no canvas; `prefers-reduced-motion` drops every transition (the dash reveal, the highlight underline, the panel expand) via a scoped CSS media query — the final state is identical, just not eased into. Distinct from margin-cite: margin-cite attaches a citation pill beside one claim and opens a per-source stepper card; bedrock-trace makes the coverage map itself the subject, one continuous instrument strip across the whole answer that foregrounds the unsupported gaps and contradictions citation pills never draw at all — reach for margin-cite to cite a specific claim, reach for bedrock-trace to audit an entire answer's trustworthiness at a glance.",
+  "dependencies": []
+}
