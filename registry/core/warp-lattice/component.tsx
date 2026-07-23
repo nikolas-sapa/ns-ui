@@ -298,7 +298,7 @@ export function WarpLattice({
         const prev = items[litIdx];
         if (prev) prev.style.borderColor = "";
         const next = items[nearest];
-        if (next) next.style.borderColor = "#006bff";
+        if (next) next.style.borderColor = "var(--accent)";
         litIdx = nearest;
       }
 

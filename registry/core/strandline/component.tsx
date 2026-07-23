@@ -306,16 +306,26 @@ export function Strandline({
       let x0: number;
       let y0: number;
       let lift: number;
+      let x1End: number;
+      let y1End: number;
       if (deposits) {
         x0 = w + 10;
         y0 = axisY + 12;
         lift = Math.min(h * 0.3, 26 + (x0 - x1) * 0.14);
+        x1End = x1;
+        y1End = axisY;
       } else {
-        x0 = Math.min(w + 6, x1 + 110);
-        y0 = axisY + 6;
+        // hover/focus replay: the swash originates AT the stranded dot and
+        // washes a short distance further up-strand (left, away from the
+        // water) before receding back to it — the dot is the start, not
+        // the destination.
+        x0 = x1;
+        y0 = axisY;
         lift = 26;
+        x1End = Math.max(6, x1 - 110);
+        y1End = axisY;
       }
-      const arc = buildArc(x0, y0, (x0 + x1) / 2, axisY - lift, x1, axisY);
+      const arc = buildArc(x0, y0, (x0 + x1End) / 2, axisY - lift, x1End, y1End);
       const segs = deposits ? CREST_SEGS : 28;
       const win = deposits ? CREST_WINDOW : 34;
       const segD = new Float32Array(segs);
@@ -589,7 +599,8 @@ export function Strandline({
         ctx.lineTo(pt.x, pt.y);
         ctx.stroke();
       } else {
-        // recede: the wetted arc dries back toward the now edge
+        // recede: the wetted arc dries back toward the arc's start — the
+        // now edge for a real wave, the dot itself for a hover replay
         const e = 1 - easeOutQuad(wv.recedeP);
         trail(wv, wv.len * e, 0.1 * (1 - wv.recedeP));
       }
@@ -597,8 +608,13 @@ export function Strandline({
 
     // -- update --------------------------------------------------------------
     const breakWave = (wv: Wave, now: number) => {
-      const bx = xs[wv.target]!;
-      spawnFlecks(bx, axisY, wv.deposits ? 24 : 8, now);
+      // break point is wherever this arc actually ends — the target dot for
+      // a real deposit, but the far end of the up-strand swash for a replay
+      // (which now starts at the dot rather than ending there).
+      const lastI = wv.pts.length - 2;
+      const bx = wv.deposits ? xs[wv.target]! : wv.pts[lastI]!;
+      const by = wv.deposits ? axisY : wv.pts[lastI + 1]!;
+      spawnFlecks(bx, by, wv.deposits ? 24 : 8, now);
       if (wv.deposits) {
         depositMarker(wv.target, now);
         wv.deposited = true;
@@ -728,8 +744,18 @@ export function Strandline({
       },
       hoverIn: (i: number) => {
         showCard(i);
-        // replay the swash once — no new residue ring
-        if (!reduced && i < strandedCount && !replayWave && sized) {
+        // replay the swash from THIS dot — no new residue ring. If a swash
+        // from a previously-hovered dot is still traveling/receding, it must
+        // be replaced now, not left to finish: otherwise moving the pointer
+        // from dot A to dot B before A's ~700ms wave settles leaves A's arc
+        // on screen while B is what's hovered, so the arrow appears to start
+        // from the wrong origin. Same-target re-hover is left alone.
+        if (
+          !reduced &&
+          i < strandedCount &&
+          sized &&
+          (!replayWave || replayWave.target !== i)
+        ) {
           replayWave = makeWave(i, false);
           wake();
         }
@@ -866,7 +892,7 @@ export function Strandline({
             className="group block rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground/60"
             style={{ transform: "scale(0.6)" }}
           >
-            <span className="flex h-6 w-6 items-center justify-center rounded-full border border-border bg-surface text-muted transition duration-200 group-hover:-translate-y-0.5 group-hover:border-foreground group-hover:text-foreground group-focus-visible:border-foreground group-focus-visible:text-foreground">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full border border-border bg-surface text-muted transition-colors duration-200 group-hover:border-foreground group-hover:text-foreground group-focus-visible:border-foreground group-focus-visible:text-foreground">
               <svg viewBox="0 0 10 10" className="h-2.5 w-2.5" aria-hidden>
                 <circle
                   cx="5"

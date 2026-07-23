@@ -1,0 +1,21 @@
+{
+  "name": "bellows-crumb",
+  "title": "Bellows Crumb",
+  "description": "A breadcrumb that folds like a camera bellows — ancestor segments rest pleated into narrow slivers and the current page sits fully extended, with hover or focus inflating any sliver back to natural width as its neighbours redistribute the fixed total width.",
+  "collection": "core",
+  "tags": ["breadcrumb", "navigation", "hierarchy", "overflow", "accessibility"],
+  "useWhen": "Pick bellows-crumb over worn-path when every ancestor must stay individually reachable at all times — deep file paths, org trees, nested categories — because nothing is ever folded into a menu; the trail redistributes a fixed total width instead of hiding levels. Pick worn-path instead when the hierarchy is so deep that even a compressed sliver per level would still overflow, and an ellipsis-menu fallback for the middle is acceptable.",
+  "autoplay": {
+    "mode": "pointer-path",
+    "path": "sweep",
+    "target": "[data-bellows-seg]",
+    "period": 4200,
+    "delay": 700
+  },
+  "gate": {
+    "openBy": "[data-bellows-seg=\"2\"]",
+    "expect": "[data-bellows-seg=\"2\"][data-state=\"expanded\"]"
+  },
+  "instruction": "A breadcrumb for deep hierarchies (file paths, org trees, nested categories) that fits an unbounded number of levels into a fixed horizontal budget without ever hiding one behind an ellipsis menu. At rest, every ancestor segment is compressed to a narrow 20px pleat — its label clipped by overflow plus a mask-image fade on the trailing edge, three 1px vertical fold lines in --border marking the pleat — while the current (last) segment sits at its full measured width. Hovering or focusing any segment, ancestor or current, retargets it to its natural width; every other segment redistributes the remaining budget proportionally to its own natural width, floored at the 20px pleat. The redistribution is exact and jitter-free without a physics loop: every segment's flex-basis transitions on the identical CSS duration and easing curve, so at any instant during the spring all segments sit at start_i + (end_i − start_i) × the same eased fraction — since the start widths and the end widths both sum to the container's available width by construction, the row's total width is a mathematical invariant of that shared fraction and never wobbles mid-motion, overshoot included. Natural widths are read once from a hidden, absolutely positioned ghost copy of the full trail (out of flow, nowrap, same padding as the live row) so measuring never feeds back on the already-clipped visible list, and widths are re-measured on ResizeObserver and once on document.fonts.ready. Separator chevrons are small aria-hidden SVGs in --muted, rotating about 15 degrees toward whichever side currently holds the expanded segment. Unlike a folding tree (which articulates each branch open around a hinge) or an ellipsis-menu breadcrumb (which deletes the middle of the trail into a popover), no level is ever removed from the DOM or from view — constant-total-width redistribution among always-visible pleats is the mechanism itself, not a fallback for when truncation fails. Markup is nav[aria-label=Breadcrumb] > ol > li > a or button, aria-current=\"page\" on the last segment; every compressed segment keeps its full label as real text content — only a CSS clip, never a truncated string — so its accessible name is always complete. Tab order is plain document order and keyboard focus expands a pleat exactly like hover does, so every level is readable without a mouse. prefers-reduced-motion snaps widths directly to their target instead of springing.",
+  "dependencies": []
+}

@@ -1,0 +1,25 @@
+{
+  "name": "margin-cite",
+  "title": "Margin Cite",
+  "description": "An inline citation pill (hostname + source count, Geist Mono) that opens one bordered card with a title, excerpt and a 1/N stepper, instead of a popover per source.",
+  "collection": "core",
+  "tags": [
+    "citation",
+    "footnote",
+    "popover",
+    "stepper",
+    "reference",
+    "accessibility",
+    "typography"
+  ],
+  "autoplay": {
+    "mode": "press",
+    "target": "button[aria-haspopup=\"dialog\"]"
+  },
+  "gate": {
+    "openBy": "button[aria-haspopup=\"dialog\"]",
+    "expect": "[role=\"dialog\"]"
+  },
+  "instruction": "An inline citation primitive for attributing a claim to one or more sources, taking a single `sources` array prop (`{ id, title, excerpt, url }[]`). The trigger is one monochrome superscript pill sitting in the text flow — the hostname of the first source in Geist Mono, raised and shrunk like a footnote marker, with a small `·N` suffix appended when more than one source backs the claim. Activating it (click, or Enter/Space since it's a real button) opens a single bordered card rather than one popover per source: a header row shows a `1 / N` mono readout plus Previous/Next chevron buttons (only rendered when N>1) and a close button, and the body shows the current source's title, a 3-line-clamped excerpt, and a hostname link that opens the source in a new tab. Paging through sources updates a visually-hidden `role=status aria-live=polite` region with 'Source 2 of 3' on every step, so the position change is announced to assistive tech exactly like the visible '2 / 3' readout is to sighted users. The card is rendered through a portal into `document.body` and positioned with `position: fixed`, coordinates read from the trigger's `getBoundingClientRect()` on open, on every step (the excerpt's length can change the card's height) and on scroll/resize — not laid out as a plain `absolute` child of the trigger, which is what lets an ordinary ancestor with `overflow-hidden` (a bordered content panel, a card, a table cell) silently clip it. It also flips above the trigger when there isn't room below and clamps horizontally to stay inside the viewport. Fully keyboard-operable: opening moves focus into the card so Tab reaches Previous, Next and the source link in visible order; Left/Right arrow keys step through sources without leaving the keyboard; Escape closes the card and returns focus to the trigger from anywhere on the page, not only while focus happens to sit inside the card — a non-modal popover that survives Escape because focus drifted is a real keyboard trap. An outside pointerdown closes it, and so does focus leaving the card entirely (moving *within* the card, between the stepper buttons and the source link, is not a leave), so the card never sits floating over the prose while the reader is somewhere else. The card is `role=\"dialog\"` with `aria-labelledby` pointing at the title, so it always carries an accessible name. Hostnames are derived from each source's `url` via the `URL` constructor with a `www.` strip, falling back to a best-effort string strip for a non-absolute URL rather than throwing. Zero dependencies beyond react-dom's `createPortal`; no canvas; every color is a token (`--background --foreground --muted --border --accent`) so both themes render correctly, and `--accent` only shows up on hover/focus states, never as decoration. Under `prefers-reduced-motion` the card's entrance animation is dropped via a CSS media query — it still opens instantly and is fully operable, nothing is lost.",
+  "dependencies": []
+}

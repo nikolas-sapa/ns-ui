@@ -1,0 +1,28 @@
+{
+  "name": "lamp-black",
+  "title": "Lamp Black",
+  "description": "A consent surface that shows instead of tells: a live sentence templated from the user's own record, where each sharing scope is a real switch and toggling it sweeps a felt-pen redaction bar over exactly the tokens that scope withholds.",
+  "collection": "core",
+  "tags": [
+    "consent",
+    "privacy",
+    "redaction",
+    "switch",
+    "toggle",
+    "scope",
+    "form",
+    "accessibility"
+  ],
+  "autoplay": {
+    "mode": "press",
+    "target": "[data-lampblack-switch=\"contact\"]",
+    "period": 4200,
+    "delay": 700
+  },
+  "gate": {
+    "openBy": "[data-lampblack-switch=\"contact\"]",
+    "expect": "[data-lampblack-bar=\"contact\"][data-withheld=\"true\"]"
+  },
+  "instruction": "`<LampBlack scopes={LampBlackScope[]} record={LampBlackPart[]} />` renders one consent card that is simultaneously the consent document and the UI: `record` is an ordered array of literal strings and scope-tagged tokens (`{ text, scope, kind? }`) templated into a running sentence — the user's own data, not placeholder copy — and `scopes` is the list of sharing switches that control it, each `{ id, label, hint?, defaultShared? }`. Every token whose `scope` matches a switch's `id` is wrapped in an inline-block span sized by its own text (never a fixed width, so the redaction can't lie about length); the wrapper stays in flow so the sentence never reflows regardless of which scopes are on or off. MECHANISM: on scope-off, an aria-hidden bar (background --foreground, 2px radius) scales X from 0 to 1 with transform-origin left over 260ms on a felt-pen ease (`cubic-bezier(0.16, 1, 0.3, 1)`, fast-start/dry-out-finish — quick to lay down ink, slow to finish the stroke) while the token's own text color transitions to transparent underneath on the same timing, keeping its box width so the line holds still; scope-on reverses the same transform back to scaleX(0). Each bar carries a small deterministic +/-0.3deg rotation (derived from its text and stagger index, not Math.random, so it's stable across renders) for a hand-laid, not-quite-ruler-straight feel. Tokens sharing one scope (e.g. an email and a phone number both gated by 'Contact info') stagger their bars 40ms apart in document order, so a multi-token scope reads as one dip of a pen crossing the line rather than a single instant mask. ACCESSIBILITY IS THE CONTRACT, not a coat of paint: each scope is a real `role=switch` button (`aria-checked` tracks shared/withheld, `aria-labelledby` points at its visible label — no separate aria-label duplicating it) so a screen reader user drives the exact same consent as a sighted one. A withheld token's real text is `aria-hidden` and is replaced in the accessibility tree by a visually-hidden `[withheld: kind]` string (kind defaults to the scope id, e.g. 'email', 'city', 'amount') — the content is never silently removed and never left readable through hidden pixels, it is explicitly announced as withheld. A plain-text summary line beneath the switches ('Sharing Contact info. Withholding Location, Payment amount.') states the same fact in prose and sits in an `aria-live=polite` region so toggling a switch is announced without the user having to re-read the whole card. REDUCED MOTION drops all four transitions (bar sweep, glyph color, switch thumb, switch track) to instant swaps via `prefers-reduced-motion: reduce` — every state is still reachable, nothing is stuck mid-animation. Colors are tokens only (`--background --foreground --muted --border --accent`), --accent appears solely as the switch's on-state track fill and the focus ring, never as decoration; DOM+CSS only, zero dependencies, no canvas. Differs from a chaff/noise-separation pattern: lamp-black doesn't sort content from clutter, it binds each control to token-level redaction of one real record with the bar itself as the only feedback the user needs — the redacted sentence is the permission grant, not a description of one. Also distinct from under-ink (a single hold-to-peek redaction primitive with no switch behind it, meant for one inline reveal in running prose): lamp-black is a multi-scope consent surface where several real switches each own a named group of tokens across one shared sentence.",
+  "dependencies": []
+}

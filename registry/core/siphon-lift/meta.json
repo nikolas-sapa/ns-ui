@@ -1,0 +1,29 @@
+{
+  "name": "siphon-lift",
+  "title": "Siphon Lift",
+  "description": "Multi-select a source list, drag just one selected item into the destination to prime the siphon, and the rest of the selection flows through a live SVG tube one bead at a time until it drains or you break the seal.",
+  "collection": "core",
+  "tags": [
+    "listbox",
+    "multi-select",
+    "drag-and-drop",
+    "transfer-list",
+    "bulk-action",
+    "svg",
+    "accessibility",
+    "input"
+  ],
+  "autoplay": {
+    "mode": "drag",
+    "from": [0.16, 0.42],
+    "to": [0.82, 0.42],
+    "period": 4200,
+    "delay": 700
+  },
+  "gate": {
+    "openBy": "button[data-sl-move]",
+    "expect": "button[data-sl-stop]"
+  },
+  "instruction": "A bulk transfer control for moving many items between two lists (assign members, move files) as an inspectable, interruptible stream instead of N separate drags or an opaque 'Move 14 items' button. Props: `items: { id, label, hint? }[]` the full pool, `defaultDestinationIds?`/`defaultSelectedIds?` seed which start on the destination side and pre-selected, `sourceLabel?`/`destinationLabel?` panel headings, `onTransfer?(ids)` fires once when a flow drains successfully with the ids that made it across in order. STRUCTURE: the source panel is a real listbox (`role=listbox aria-multiselectable=true`, options `role=option aria-selected`, roving tabindex, Arrow/Home/End navigation, Space or Enter toggles the focused option) so ordinary click-to-toggle, Ctrl-less multi-select, and full keyboard operation all work before any drag happens; a 'Select all'/'Clear selection' toggle button sits in the source panel's header, above the listbox, for selecting a pool too long to click through row by row; the destination panel is a plain display list. MECHANISM: dragging any source row (auto-selecting it if it wasn't already) toward the destination panel tracks the pointer via native pointer capture on that row, so movement is followed even once the pointer leaves the row; dropping inside the destination panel's bounds PRIMES the flow — a cubic-bezier `d` string is built once from the dragged row's edge to the drop point (control points bowed upward, `stroke-width:1` var(--border)) and set on a single persistent `<path>`, and `path.getTotalLength()`/`getPointAtLength()` on that same path drive every subsequent bead, so the tube is a fixed physical conduit for the rest of the transfer, not recomputed per item. Dropping outside the destination silently cancels the drag — nothing was ever selected away, nothing to undo. An identical 'Move selected to {destination}' button primes the exact same state machine with no drag at all: keyboard users reach the identical primed flow, not a lesser substitute. FLOW: item ids queue in drag order (dragged item first, then the rest of the pre-existing selection); every ~100ms (44ms under reduced motion) the next item's source row gets a `data-departing` flag — CSS grid-template-rows springs its height 1fr->0fr on ease-out-expo while its own bead (a plain SVG `<circle r=4 class=sl-bead>` filled var(--foreground)) is created and driven every animation frame by `path.getPointAtLength(easeInOutCubic(t) * length)`, t running 0->1 over 640ms — ease-in off the source, ease-out into the destination, one continuous cubic. On arrival the bead is removed, the item is spliced from the source array and pushed onto the destination array with a `data-entering` flag that plays a forwards-filled `grid-template-rows:0fr->1fr` keyframe once, and the aria-live caption/announcement updates. INTERRUPTION: while flowing, a small real `<button aria-label=\"Stop transfer\">` rides at the tube's midpoint (computed from the same path at prime time) — clicking or Enter/Space-ing it (it is a genuine focusable button, reachable by Tab, not a click-only affordance) breaks the seal: no further items are dequeued, the path plays a one-shot stroke-width/opacity recoil keyframe, and every bead currently mid-flight reverses along the identical path at matching speed back to t=0, at which point its source row's `data-departing` flag simply clears (the item was never actually removed from the source array while in flight, so 'returning' is just clearing that flag) — items that hadn't yet had their turn were never touched and stay put. A11y: progress is a polite aria-live region throttled to at most one update per second while flowing, with the final 'Moved N of N' (or, if stopped, 'Transfer stopped, X moved, Y returned') always delivered regardless of throttle. ENGINE: one requestAnimationFrame loop owns bead creation/motion/removal via direct DOM attribute writes on the SVG circles (not React state) so the hot path never re-renders; React state only tracks which rows are mid-collapse/mid-grow, the delivered/total counters (polled off the engine every 120ms for the caption, not per frame), and the live-region string. prefers-reduced-motion: the same state machine runs but each bead resolves on its scheduled turn with no per-frame travel and every CSS transition/keyframe is disabled, so items still arrive in the same staggered sequence a screen reader's narration can follow, just instantly. Distinct from updraft-dropzone, which is a canvas-particle thermal dropzone reacting to a hover/drop point with no multi-select or sustained per-item stream at all, and from fling-segment, whose drag produces one ballistic object's release-velocity coast to a single detent — siphon-lift's drag only PRIMES a continuous, cancellable, many-item flow that keeps running with zero further pointer input, and the tube itself is the progress indicator for that whole run, not a settling animation for one thing. Zero dependencies; DOM + SVG + CSS only, no canvas.",
+  "dependencies": []
+}

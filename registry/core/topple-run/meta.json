@@ -1,0 +1,21 @@
+{
+  "name": "topple-run",
+  "title": "Topple Run",
+  "description": "Select-all where the change propagates like a domino run: flip the master and a wavefront tips down the list, each row's checkbox flipping and shoving the next — click any row mid-run to halt the wave there, leaving the rest untouched.",
+  "collection": "core",
+  "tags": ["checkbox", "select-all", "bulk-action", "list", "form", "micro-interaction"],
+  "useWhen": "a bulk select-all/mark-all-read/enable-all over a visible list, where users routinely want 'all except a few' — clicking any row mid-run halts the propagating wave there, leaving rows beyond it untouched, so there's no all-then-undo. Prefer a plain checked-count select-all when the list is never long enough for mid-toggle interruption to matter; prefer this when it is.",
+  "instruction": "A select-all/toggle-all whose change propagates like a domino run rather than a cosmetic stagger: flipping the master checkbox (real input[type=checkbox], aria-controls pointing at the row list's id) releases an rAF-driven wavefront index that advances at a fixed 14 rows/sec. As the front reaches row i, that row's own checkbox commits its new checked state (a 120ms CSS transition on fill/border with a slight spring overshoot, cubic-bezier(0.34,1.56,0.64,1)) and the row's <li> takes a transient translateY(2px) lean toward row i+1, held for roughly one row-interval plus a 40ms overlap so consecutive leans read as continuous handed-off contact rather than independent bumps. A thin 2px --foreground tick travels down the list's left edge on the same rAF loop, marking the front's live position. State commits per row the instant the front passes it — nothing is staged or rolled back, so stopping the run costs nothing. INTERRUPTION IS FIRST-CLASS: every row stays a fully operable native checkbox for the run's entire duration; activating ANY row, by pointer or keyboard, or pressing Escape, halts the wave immediately. Rows the front already passed keep their committed state; rows beyond the front are simply never touched, standing exactly as they were — this is the 'all except a few' path, no undo needed because nothing past that point was ever touched. A11Y: a polite live region announces once at the start ('Enabling all…'/'Disabling all…') and once at the end or halt ('Enabled 34 of 40, stopped at row 35.'), throttled to those two moments only — not per row. Every row and the master are real input[type=checkbox] elements with native label association for their accessible name; the master's own live counter is aria-hidden decoration, not part of its name. REDUCED MOTION: there is no wave to catch, so interruption is replaced by a plain safety net — the master flips every row's state in a single frame (no wavefront, no lean, no tick) and a 5s Undo affordance appears beneath the list, reverting the whole batch if pressed in time. TOKENS: --foreground for the checkbox fill and the traveling tick, --border for hairlines between rows, --muted for secondary row text and the counter, --accent for the focus ring only. Pure DOM/CSS — no canvas, no SVG filters.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "press",
+    "target": "input[aria-controls]",
+    "hold": 200,
+    "period": 4000,
+    "delay": 600
+  },
+  "card": {
+    "focus": ".max-w-md",
+    "padding": 0.15
+  }
+}

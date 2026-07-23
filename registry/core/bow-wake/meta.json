@@ -1,0 +1,21 @@
+{
+  "name": "bow-wake",
+  "title": "Bow Wake",
+  "description": "Drag-to-reorder where the dragged row pushes a continuous falloff field through its neighbors — they shoulder sideways and the gap ahead widens before the card ever arrives, instead of a hard placeholder line.",
+  "collection": "core",
+  "tags": ["drag-reorder", "list", "kanban", "spring", "physics", "keyboard", "reorder", "micro-interaction"],
+  "instruction": "A vertical drag-to-reorder list for task lists or a kanban lane's cards. RENDERING: absolutely-positioned DOM rows inside one relatively-positioned container (no canvas); every row's transform is written per-frame on a refs-only rAF loop, never React state on the hot path. MECHANISM: picking up a row's grip button and moving the pointer past a 4px threshold starts a live drag — the dragged row tracks the pointer 1:1 on Y (pinned to X=0, scale ramping to 1.01). Every OTHER row is pushed by a continuous field centered on the dragged row's live position: translateY reflows it into the slot the card would occupy if dropped right now (computed by splicing the dragged id into its base order at the pointer-derived insertion index, so the gap between two rows is always exactly the width of one settled row, reading as the drop target before the card arrives — no separate placeholder line); translateX shoulders it up to 10px sideways, sign set by which side of the drag point it sits on, magnitude a smoothstep falloff over 1.5 row-heights (~96px) of distance to the drag point, so a neighbor's push grows and fades continuously as the field sweeps past rather than snapping on or off. Both axes are damped springs (k=220, zeta=0.92) so entering and leaving the field is always continuous, even under fast pointer motion. The dragged card's own shadow deepens with instantaneous drag velocity (a fixed dark rgba ink, not a theme token, so it never inverts to a light halo in dark mode — the same reasoning sediment-stack's shadow uses). DROP: the underlying order commits immediately; neighbors are already converging on their final slots so the wake collapses inward first via the same near-critical spring, while the dragged card itself holds for 90ms and then springs the rest of the way (k=170, zeta=0.58 — one clear overshoot) so it visibly settles last, after the water has closed behind it. Escape while dragging cancels: the card springs back to its pre-pickup slot and the order never commits. A11Y: every row exposes a grip button (`aria-label` names the item and its live position); a click or Space/Enter arms discrete keyboard-reorder mode instead of a live drag (`aria-pressed` on the handle, an `aria-live=\"polite\"` region announces 'Grabbed <item>. Now at position N of M.'); Arrow Up/Down step the armed row through the same slots with a 'now at position N of M' announcement; Space or clicking the handle again drops it and announces the final position; Escape restores the pre-pickup order and announces the restore. Escape is a global document listener (not scoped to focus) since the operation is 'in flight' regardless of where focus sits. REDUCED MOTION: the field is off entirely — rows reflow with an instant snap (no spring, no lateral shoulder) and a plain dashed placeholder box marks the slot the card would drop into while dragging, replacing the wake as the anticipatory cue. Distinct from flock-stack: nothing here trails a leader on a shared boids sim — every neighbor reacts independently and continuously to a falloff field around one dragged card, and the insertion point is legible before the card lands, not after a leader settles.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "drag",
+    "target": "[data-bow-handle]",
+    "from": [0.5, 0.08],
+    "to": [0.5, 0.5],
+    "period": 4200,
+    "delay": 600
+  },
+  "gate": {
+    "openBy": "[data-bow-handle][data-bow-row=\"1\"]",
+    "expect": "[data-bow-handle][aria-pressed=\"true\"]"
+  }
+}

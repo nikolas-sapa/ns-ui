@@ -1,0 +1,28 @@
+{
+  "name": "proof-rise",
+  "title": "Proof Rise",
+  "description": "An autosize textarea that grows like dough proofing instead of reflowing like a spreadsheet cell: ordinary typing raises it line by line with a soft 180ms swell, a large paste breathes open over 400ms in one continuous motion instead of popping, and deleting text back down is slower still (320ms) so the surface never snaps under the cursor.",
+  "collection": "core",
+  "tags": [
+    "textarea",
+    "input",
+    "form",
+    "autosize",
+    "comment-box",
+    "chat-composer",
+    "micro-interaction",
+    "accessibility"
+  ],
+  "useWhen": "any multi-line text input that should grow with its content — comment boxes, descriptions, chat composers — where the growth itself should read as organic and asymmetric (slower to shrink than to grow, a big paste breathing open rather than popping) instead of the ecosystem-default instant reflow of react-textarea-autosize.",
+  "instruction": "Build a real, fully native <textarea> (focus, selection, IME composition, undo history, screen reader behavior all untouched — nothing is a fake contenteditable) wrapped in a div whose height is the animated surface. A visually hidden, aria-hidden mirror <div> sits in the same wrapper sharing the textarea's exact font, padding, width and box-sizing (white-space: pre-wrap, overflow-wrap: break-word, height: auto so its scrollHeight is never clipped by the wrapper's own overflow). On every native `input` event the mirror's innerHTML is rebuilt from the textarea's value split at the caret (selectionStart, with an end-of-value fallback for input types that refuse the selection API), each half HTML-escaped and newlines converted to <br/>, with a zero-width-space <span data-caret> marker spliced in at the caret position — this single rebuild yields both the total target content height (mirror.scrollHeight, clamped to a minRows/maxRows-derived min/max computed from one measured line height) and the caret's own line bottom (the marker's offsetTop + offsetHeight) in one DOM write. The live textarea's own height is set to the target instantly and unanimated, with overflow hidden — it never internally scrolls and the caret is never blocked by its own content clipping. The wrapper's height is driven by a `--proof-h` custom property registered via CSS.registerProperty (syntax '<length>') so the browser interpolates it directly as a length, with `transition-property: --proof-h, border-color` and `transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1)` (ease-out-expo shaped) fixed in a stylesheet, while `transition-duration` and the target value are both set imperatively per input event so a single declaration can carry three different weights: growing sets 180ms, shrinking (target below the wrapper's current live height, read via getComputedStyle so an in-flight transition is measured mid-flight rather than assumed settled) sets 320ms, and a paste-originated growth (armed by a `paste` listener consumed on the very next `input` event) whose delta exceeds 40px stretches to 400ms so a large paste reads as one continuous breath instead of a multi-line pop. Before committing a new rise, the caret's line bottom (from the mirror) is compared against the wrapper's current live height: if a fast edit or an interrupted prior transition has left the caret's own line below that clipped height by more than one line, the wrapper first snaps instantly (0ms, forced reflow via a synchronous offsetHeight read) to just behind the caret's line, then the real transition runs from there — this is what keeps the caret's line inside the animating viewport at the very start of every rise instead of trusting the prior animation to have already caught up. A hairline border (1px, --border at rest) brightens to --muted for the duration of a rise via a class toggle removed on a matching timeout, and separately shows --accent on :focus-within — three states, three tokens, no canvas, no SVG, DOM and CSS only. Reduced motion: the exact same measurement and instant-height-set logic runs every time (nothing about correctness depends on the animation), a media query simply zeroes the transition duration and the JS path also skips the rising-border class, so the field still resizes correctly, just as a snap rather than a swell — the ecosystem's standard instant-reflow autosize behavior, not a degraded version of this component. Zero dependencies; Geist tokens only (--background, --foreground, --muted, --border, --accent), radius 12px, font-sans body text.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "type",
+    "target": "textarea",
+    "text": "Great point —\nlet me think\nabout that.",
+    "cps": 6,
+    "hold": 1800,
+    "period": 4200,
+    "delay": 600
+  }
+}

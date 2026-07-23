@@ -98,6 +98,136 @@ const MOUSE_MIRROR: Record<string, string | undefined> = {
   pointerleave: "mouseleave",
 };
 
+// ---------------------------------------------------------------------------
+// keyboard synthesis (the `type` mode)
+// ---------------------------------------------------------------------------
+
+/**
+ * A synthetic keystroke has to emulate a real browser closely enough to drive
+ * BOTH kinds of keyboard component:
+ *
+ *  - keyboard-first controls (cipher-reel-otp) `preventDefault()` the digit
+ *    `keydown` and drive themselves from `event.key`, never letting the value
+ *    change natively — so no `input` must follow;
+ *  - ordinary controlled inputs let the `keydown` through and update from the
+ *    `input` event React listens to via `onChange` — so the value must be set
+ *    (through the native setter, or React's value tracking swallows it) and an
+ *    `input` event fired.
+ *
+ * The browser resolves that fork with `defaultPrevented`: if the `keydown` was
+ * cancelled, it inserts nothing. We do exactly the same — dispatch a
+ * *cancelable* `keydown` (required, or `defaultPrevented` never flips and both
+ * paths run, double-driving the field), and only synthesise the value change +
+ * `input` when it was NOT prevented. React runs `onKeyDown` synchronously
+ * inside `dispatchEvent`, so the flag is accurate the instant dispatch returns.
+ *
+ * Focus is irrelevant to whether these land — React delegates from the root
+ * container, so a bubbling event reaches `onKeyDown`/`onChange` without the
+ * element being `document.activeElement`. That is what lets the `type` mode
+ * work under `inert`, where focus cannot move at all.
+ */
+
+function describeKey(ch: string): { key: string; code: string; keyCode: number } {
+  if (/[0-9]/.test(ch)) return { key: ch, code: `Digit${ch}`, keyCode: ch.charCodeAt(0) };
+  if (/[a-z]/i.test(ch)) {
+    const u = ch.toUpperCase();
+    return { key: ch, code: `Key${u}`, keyCode: u.charCodeAt(0) };
+  }
+  if (ch === " ") return { key: " ", code: "Space", keyCode: 32 };
+  return { key: ch, code: "", keyCode: ch.charCodeAt(0) };
+}
+
+/** dispatchEvent returns false iff a cancelable event was `preventDefault()`ed. */
+function fireKey(el: Element, type: string, k: ReturnType<typeof describeKey>, cancelable: boolean) {
+  return el.dispatchEvent(
+    new KeyboardEvent(type, {
+      key: k.key,
+      code: k.code,
+      keyCode: k.keyCode,
+      which: k.keyCode,
+      bubbles: true,
+      cancelable,
+      composed: true,
+      view: window,
+    }),
+  );
+}
+
+function isTextField(el: Element): el is HTMLInputElement | HTMLTextAreaElement {
+  return el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement;
+}
+
+/** Bypass React's value tracking so a controlled input actually re-renders. */
+function setNativeValue(el: HTMLInputElement | HTMLTextAreaElement, value: string) {
+  const proto = el instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
+  const setter = Object.getOwnPropertyDescriptor(proto, "value")?.set;
+  if (setter) setter.call(el, value);
+  else el.value = value;
+}
+
+function typeChar(el: HTMLElement, ch: string) {
+  try {
+    (el as HTMLElement).focus?.();
+  } catch {
+    /* inert — focus is a no-op, events still land */
+  }
+  const k = describeKey(ch);
+  const notPrevented = fireKey(el, "keydown", k, true);
+  if (notPrevented && isTextField(el)) {
+    el.dispatchEvent(
+      new InputEvent("beforeinput", { bubbles: true, cancelable: true, composed: true, inputType: "insertText", data: ch }),
+    );
+    setNativeValue(el, (el.value ?? "") + ch);
+    el.dispatchEvent(new InputEvent("input", { bubbles: true, composed: true, inputType: "insertText", data: ch }));
+  }
+  fireKey(el, "keyup", k, false);
+}
+
+function backspaceKey(el: HTMLElement) {
+  try {
+    (el as HTMLElement).focus?.();
+  } catch {
+    /* inert */
+  }
+  const k = { key: "Backspace", code: "Backspace", keyCode: 8 };
+  const notPrevented = fireKey(el, "keydown", k, true);
+  if (notPrevented && isTextField(el)) {
+    el.dispatchEvent(
+      new InputEvent("beforeinput", { bubbles: true, cancelable: true, composed: true, inputType: "deleteContentBackward", data: null }),
+    );
+    setNativeValue(el, (el.value ?? "").slice(0, -1));
+    el.dispatchEvent(new InputEvent("input", { bubbles: true, composed: true, inputType: "deleteContentBackward", data: null }));
+  }
+  fireKey(el, "keyup", k, false);
+}
+
+/**
+ * The input(s) the `type` mode drives. Several matches ⇒ a per-box control
+ * (an OTP with one `<input>` per digit): character k is dispatched to match k,
+ * because the demo is `inert` and the component's own focus-advance is a no-op,
+ * so every keystroke would otherwise pile into the first box. One match ⇒ the
+ * whole string goes there. No match ⇒ the demo root, so it never throws.
+ */
+function resolveInputs(root: HTMLElement, selector: string | undefined): HTMLElement[] {
+  const sel = selector ?? "input, textarea, [contenteditable]";
+  const all = Array.from(root.querySelectorAll<HTMLElement>(sel)).filter((el) => {
+    const r = el.getBoundingClientRect();
+    return r.width > 0 && r.height > 0;
+  });
+  return all.length ? all : [root];
+}
+
+const pickEl = (els: HTMLElement[], k: number) =>
+  els.length > 1 ? els[Math.min(k, els.length - 1)] : els[0];
+
+function clearAll(els: HTMLElement[], len: number) {
+  if (els.length > 1) {
+    for (let i = els.length - 1; i >= 0; i--) backspaceKey(els[i]);
+  } else {
+    for (let i = 0; i < len; i++) backspaceKey(els[0]);
+  }
+}
+
 /**
  * Deepest element containing the point, walking down from `root`.
  * Replaces `document.elementFromPoint`, which is useless here: `inert` takes
@@ -254,9 +384,21 @@ function resolveTarget(root: HTMLElement, selector: string | undefined, fallback
 const ACTIVE = 0.86;
 /** Pointer work is throttled to ~30Hz — 60Hz buys nothing and costs 12x here. */
 const STEP_MS = 33;
+/** `type`: quiet beat after a cleared string, before the loop re-types it. */
+const TYPE_CLEAR_REST = 900;
 
 function start(root: HTMLElement, spec: AutoplaySpec): () => void {
-  const period = Math.max(400, spec.period ?? 4000);
+  // `type` has no fixed period: one cycle is text/cps + the rest beat + a clear
+  // pause, computed from the descriptor rather than read off `period`.
+  const period =
+    spec.mode === "type"
+      ? Math.max(
+          400,
+          (spec.text ?? "").length * (1000 / Math.max(0.5, spec.cps ?? 3)) +
+            Math.max(0, spec.hold ?? 1600) +
+            TYPE_CLEAR_REST,
+        )
+      : Math.max(400, spec.period ?? 4000);
   const delay = Math.max(0, spec.delay ?? 600);
   const hover = new Hover(root);
 
@@ -284,6 +426,10 @@ function start(root: HTMLElement, spec: AutoplaySpec): () => void {
   let lastStep = -Infinity;
   let down: { at: Pt; el: HTMLElement } | null = null;
   let cycle = -1;
+  // `type` state, reset each cycle in the `fresh` branch below.
+  let typed = 0;
+  let typeCleared = false;
+  let typeEls: HTMLElement[] = [];
 
   const release = (p: Pt) => {
     if (!down) return;
@@ -370,6 +516,37 @@ function start(root: HTMLElement, spec: AutoplaySpec): () => void {
         } else if (down) {
           release(z);
           hover.clear(z);
+        }
+        break;
+      }
+
+      case "type": {
+        const text = spec.text ?? "";
+        if (!text) break;
+        const charMs = 1000 / Math.max(0.5, spec.cps ?? 3);
+        const holdMs = Math.max(0, spec.hold ?? 1600);
+        const typePhaseEnd = text.length * charMs;
+        const inCycle = t * period;
+        if (fresh) {
+          typed = 0;
+          typeCleared = false;
+          typeEls = resolveInputs(root, spec.target);
+        }
+        // Type each character as its scheduled moment passes. The `while` also
+        // catches up any keystroke a throttled frame stepped over, so the full
+        // string always lands even at low frame budgets.
+        const want =
+          inCycle < typePhaseEnd
+            ? Math.min(text.length, Math.floor(inCycle / charMs) + 1)
+            : text.length;
+        while (typed < want) {
+          typeChar(pickEl(typeEls, typed), text[typed]);
+          typed++;
+        }
+        // After the string rests for `hold`, clear it once so the loop repeats.
+        if (!typeCleared && inCycle >= typePhaseEnd + holdMs) {
+          clearAll(typeEls, text.length);
+          typeCleared = true;
         }
         break;
       }

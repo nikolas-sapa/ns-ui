@@ -35,8 +35,8 @@ function ruleInfo(data: number[]): { rule: number; cv: number } {
 function DeltaPill({ pct, invert = false }: { pct: number; invert?: boolean }) {
   const good = invert ? pct <= 0 : pct >= 0;
   const cls = good
-    ? "border-[#47a447]/25 bg-[#47a447]/10 text-[#47a447]"
-    : "border-[#ea001d]/25 bg-[#ea001d]/10 text-[#ea001d]";
+    ? "border-[var(--success)]/25 bg-[var(--success)]/10 text-[var(--success)]"
+    : "border-[var(--error)]/25 bg-[var(--error)]/10 text-[var(--error)]";
   return (
     <span
       className={`rounded-full border px-2 py-0.5 font-mono text-[11px] tabular-nums ${cls}`}

@@ -16,3 +16,6 @@ lib/autoplay.generated.json
 lib/card-frame.generated.json
 public/llms.txt
 public/llms-full.txt
+
+# debug scratch from agent sessions — never commit
+.scratch-dbg/

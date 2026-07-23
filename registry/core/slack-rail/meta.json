@@ -1,0 +1,21 @@
+{
+  "name": "slack-rail",
+  "title": "Slack Rail",
+  "description": "Classic tabs whose active-indicator is a single SVG path drawn as a slack cable instead of a rigid bar: it sags mid-jump proportional to distance, tautens flat with a small spring snap, and previews the destination with a 3px tug when you hover a neighboring tab.",
+  "collection": "core",
+  "tags": ["tabs", "navigation", "svg", "spring", "physics", "accessibility"],
+  "useWhen": "ordinary tabbed navigation where the transition itself should read as physical motion under tension — the cable's sag communicates how far you jumped and its taut settle confirms arrival, with a hover-tug preview of where a click would land. Pick fling-segment instead for a segmented control choosing between a small fixed set of mutually exclusive views via a solid thrown thumb the user directly grabs and flings — slack-rail's mechanism is a deforming line reacting to selection, never a draggable filled block.",
+  "instruction": "A full WAI-ARIA tabs widget (role=tablist/tab/tabpanel, roving tabindex, automatic activation on ArrowLeft/ArrowRight/Home/End) whose selection indicator is one aria-hidden SVG <path> under the tab row instead of a CSS-transitioned bar. At rest the path is a flat 2px --foreground stroke spanning exactly the active tab's measured left/right edges. On selection change both endpoints are independently driven by a damped spring (stiffness 220 s^-2, damping 26.4, integrated semi-implicit-Euler on a single rAF loop with zero React state on the hot path) toward the new tab's edges; the spring's effective mass is 1 + travelDistance/260, where travelDistance is the old-to-new active-tab center jump measured once at transition start — so a short hop between adjacent tabs stays near-critically damped while a long jump across the row accelerates and settles more slowly and with a touch more overshoot, reading as heavier. Each frame the path is rebuilt as a quadratic Bezier: the control point's y drops below the flat baseline by min(travelDistance/8, 6)px scaled by how much of the total travel the slower endpoint still has left (1 at the instant the jump starts, 0 once both endpoints arrive), so the cable visibly pays out and sags mid-flight and flattens back to a straight line exactly as it arrives, with the spring's own slight overshoot read as the small snap into place. Hovering a non-active tab (pointerenter/pointerleave) nudges whichever endpoint sits spatially nearest that tab 3px in its direction, eased in with an exponential ease-toward (tau 90ms, the ease-out-expo family) and eased back to 0 on pointerleave — a preview of where the cable would travel, never committing selection. A ResizeObserver keeps the SVG's viewBox locked 1:1 to the tablist's pixel width and re-snaps the rail instantly (no animation) on layout change, e.g. font load or container resize. Tab labels are --muted at rest, --foreground with a hover transition when active or hovered; focus uses focus-visible:outline-accent, never paired with a base outline-none. Panels are real DOM nodes linked by aria-controls/aria-labelledby and kept mounted with the hidden attribute so ids always resolve. prefers-reduced-motion collapses the whole spring/sag mechanism: a selection change snaps both endpoints straight to the destination with zero sag, the hover tug is disabled outright, and the path instead plays a 120ms opacity crossfade so the reposition still reads as a change rather than a silent jump. Pure DOM + SVG + CSS — no canvas anywhere.",
+  "dependencies": [],
+  "card": {
+    "focus": ".max-w-lg",
+    "padding": 0.1
+  },
+  "autoplay": {
+    "mode": "press",
+    "target": "[role=\"tab\"]:not([aria-selected=\"true\"])",
+    "hold": 150,
+    "period": 3000,
+    "delay": 600
+  }
+}

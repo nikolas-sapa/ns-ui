@@ -3,6 +3,27 @@
 Single source of truth for the /changelog page. Each entry is a `## vX.Y.Z - YYYY-MM-DD`
 heading, a `###` title, then one paragraph of body. Newest first.
 
+## v0.10.0 - 2026-07-22
+
+### The registry roughly tripled, built in parallel
+
+Six git worktrees, each its own branch and dev port, ran the same ideate-judge-build-gate
+workflow across a different lane of the design space, then merged back conflict-free because
+every component is a self-contained folder and the registration index is generated, not
+hand-edited. The registry crossed 185 components spanning inputs, data instruments, typography,
+feedback, motion, agent surfaces and loud showpieces, with slug collisions prevented by a
+cross-branch check rather than coordination.
+
+## v0.9.0 - 2026-07-22
+
+### An agent-UI category, and typing that demonstrates itself
+
+A first set of AI and agent-interface primitives landed: a thinking-state glyph that encodes
+its state through motion rather than colour, a streaming-text renderer, a reasoning timeline, a
+tool-call approval row, a context-window budget meter and more. The autoplay driver learned a
+`type` mode, so keyboard-first components like the OTP reels now type their own demo in the grid
+instead of resting on a still frame.
+
 ## v0.8.0 - 2026-07-21
 
 ### Search, a runnable install command, and this page
