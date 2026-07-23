@@ -326,14 +326,14 @@ export function Strandline({
         x1End = x1;
         y1End = axisY;
       } else {
-        // hover/focus replay: the swash originates AT the stranded dot and
-        // washes a short distance further up-strand (left, away from the
-        // water) before receding back to it — the dot is the start, not
-        // the destination.
-        x0 = x1;
-        y0 = axisY;
-        lift = 26;
-        x1End = Math.max(6, x1 - 110);
+        // hover/focus replay: a short local lap that breaks AT the dot — a
+        // few px of incoming water from the seaward side, no long excursion.
+        // (A 110px up-strand arc here read as "an arrow appears and goes
+        // forward" on hover; the replay must stay anchored to the dot.)
+        x0 = Math.min(w - 2, x1 + 14);
+        y0 = axisY + 4;
+        lift = 10;
+        x1End = x1;
         y1End = axisY;
       }
       const arc = buildArc(x0, y0, (x0 + x1End) / 2, axisY - lift, x1End, y1End);
@@ -605,17 +605,21 @@ export function Strandline({
           ctx.lineTo(ox + pt.tx * half, oy + pt.ty * half);
           ctx.stroke();
         }
-        // leading 1px accent line — the ONLY accent ink: active incoming crest
-        posTan(wv, Math.max(0, wv.sTip - 10), pt);
-        const lx = pt.x;
-        const ly = pt.y;
-        posTan(wv, wv.sTip, pt);
-        ctx.strokeStyle = rgba(accentC, 0.95);
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(lx, ly);
-        ctx.lineTo(pt.x, pt.y);
-        ctx.stroke();
+        // leading 1px accent line — the ONLY accent ink: active incoming
+        // crest of a REAL wave. Hover replays skip it: a traveling accent
+        // tick on hover reads as an arrow advancing, not a swash.
+        if (wv.deposits) {
+          posTan(wv, Math.max(0, wv.sTip - 10), pt);
+          const lx = pt.x;
+          const ly = pt.y;
+          posTan(wv, wv.sTip, pt);
+          ctx.strokeStyle = rgba(accentC, 0.95);
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(lx, ly);
+          ctx.lineTo(pt.x, pt.y);
+          ctx.stroke();
+        }
       } else {
         // recede: the wetted arc dries back toward the arc's start — the
         // now edge for a real wave, the dot itself for a hover replay
@@ -774,12 +778,11 @@ export function Strandline({
       },
       hoverIn: (i: number) => {
         showCard(i);
-        // replay the swash from THIS dot — no new residue ring. If a swash
-        // from a previously-hovered dot is still traveling/receding, it must
-        // be replaced now, not left to finish: otherwise moving the pointer
-        // from dot A to dot B before A's ~700ms wave settles leaves A's arc
-        // on screen while B is what's hovered, so the arrow appears to start
-        // from the wrong origin. Same-target re-hover is left alone.
+        // replay the swash AT this dot — no new residue ring. If a swash
+        // from a previously-hovered dot is still lapping/receding, replace
+        // it now rather than letting it finish: otherwise moving the pointer
+        // from dot A to dot B leaves A's lap on screen while B is what's
+        // hovered. Same-target re-hover is left alone.
         if (
           !reduced &&
           i < strandedCount &&
