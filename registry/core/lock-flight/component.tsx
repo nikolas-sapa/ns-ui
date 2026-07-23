@@ -284,6 +284,11 @@ export function LockFlight({
                     className={[
                       "relative block h-16 w-full overflow-hidden text-left outline-none transition-colors",
                       "hover:bg-foreground/[0.03] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent",
+                      // outer chambers clip with the container's rounded
+                      // corner (11px = 12px radius - 1px border) so the water
+                      // never pokes square into the curve
+                      i === 0 ? "rounded-tl-[11px]" : "",
+                      i === n - 1 ? "rounded-tr-[11px]" : "",
                     ].join(" ")}
                   >
                     {/* chamber water: fill body + 1px meniscus, driven purely by translateY */}
@@ -298,7 +303,25 @@ export function LockFlight({
                       }}
                     >
                       <span className="absolute inset-x-0 top-0 bottom-[-100%] bg-foreground/[0.06]" />
-                      <span className="absolute inset-x-0 top-0 h-px bg-foreground/50" />
+                      {/* meniscus: flat 1px line, except at the flight's two
+                          outer corners where a full chamber's line must curve
+                          down with the container radius — an 11px-tall element
+                          whose height equals the corner radius draws that as a
+                          border: the top border is the line, the outer side
+                          border is consumed entirely by the quarter arc.
+                          Stalled/partial levels sit mid-chamber (never
+                          `reached`), so they keep the square-ended line. */}
+                      {reached && (i === 0 || i === n - 1) ? (
+                        <span
+                          className={[
+                            "absolute inset-x-0 top-0 h-[11px] border-t border-foreground/50",
+                            i === 0 ? "rounded-tl-[11px] border-l" : "",
+                            i === n - 1 ? "rounded-tr-[11px] border-r" : "",
+                          ].join(" ")}
+                        />
+                      ) : (
+                        <span className="absolute inset-x-0 top-0 h-px bg-foreground/50" />
+                      )}
                       {isStalling ? (
                         <span
                           key={denyKey}
