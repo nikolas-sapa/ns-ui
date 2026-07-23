@@ -356,6 +356,16 @@ export function LockFlight({
             })}
           </ol>
 
+          {/* the top rail: the route's second line, along the top of the
+              chamber row. Same 2px --border weight as the bottom track, but
+              at the flight's two OUTER edges it curves down around the
+              container's rounded corners — a plain div with top/left/right
+              borders and rounded top corners (11px: the container's 12px
+              radius minus its 1px border) draws exactly that rail, no SVG. */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-3.5 rounded-t-[11px] border-2 border-b-0 border-border"
+          />
           {/* the connector: a straight 2px line at the nav's bottom. -z-10
               (inside this div's `isolate` stacking context) keeps both layers
               painted behind every chamber button, which are themselves

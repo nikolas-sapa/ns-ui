@@ -10,9 +10,10 @@ import { useEffect, useRef } from "react";
 // wash past earlier markers, adding rings — ring density reads as history.
 // Canvas 2D behind DOM markers; residue rings live in pruned per-marker
 // segment lists re-stroked after a full clear every frame (never
-// destination-in decay). Direct-DOM rAF hot path; the loop sleeps when no
-// crest is traveling, the fleck array is empty, and all marker springs have
-// settled.
+// destination-in decay). Waves launch on a short stagger and travel
+// concurrently, so a long history strands quickly instead of one dot at a
+// time. Direct-DOM rAF hot path; the loop sleeps when no crest is traveling,
+// the fleck array is empty, and all marker springs have settled.
 // ---------------------------------------------------------------------------
 
 export interface StrandlineEvent {
@@ -109,6 +110,12 @@ const easeOutQuad = (t: number) => 1 - (1 - t) * (1 - t);
 
 const WAVE_SPEED = 420; // px/s along the arc
 const RECEDE_MS = 550;
+// waves overlap: a new one launches this long after the previous, instead of
+// waiting for a full travel+recede cycle — with many events (the changelog
+// has 10) a strictly sequential tide took ~12s, and mid-intro the strand read
+// as a clump of dots at the now edge instead of a distributed timeline
+const LAUNCH_STAGGER_MS = 160;
+const TRAIL_ALPHA = 0.26; // wetted-arc ink — 0.1 read as a faint disconnected curve
 const CREST_SEGS = 48; // 40-60 short stroked segments
 const CREST_WINDOW = 60; // px of arc the foam comb trails over
 const FLECK_LIFE = 600; // ms
@@ -216,13 +223,17 @@ export function Strandline({
     let raf = 0;
     let last = 0;
     let visible = true;
-    let mainWave: Wave | null = null;
+    const waves: Wave[] = []; // concurrent depositing waves, launch-staggered
+    let lastLaunch = -Infinity;
     let replayWave: Wave | null = null;
-    // true only while a wave is still in flight and hasn't landed yet — once
+    // counts only waves still in flight that haven't landed yet — once
     // breakWave() fires, the marker is already stranded so it must not be
     // double-counted as "reserved" for the rest of the recede tail.
-    const reserved = (wv: Wave | null): wv is Wave =>
-      wv !== null && wv.deposits && !wv.deposited;
+    const reservedCount = () => {
+      let c = 0;
+      for (const wv of waves) if (wv.deposits && !wv.deposited) c++;
+      return c;
+    };
     const queue: number[] = [];
     const flecks: Fleck[] = [];
     let strandedCount = 0;
@@ -416,8 +427,7 @@ export function Strandline({
     };
 
     const syncControls = () => {
-      const launched =
-        strandedCount + queue.length + (reserved(mainWave) ? 1 : 0);
+      const launched = strandedCount + queue.length + reservedCount();
       if (counterRef.current)
         counterRef.current.textContent = `${reduced ? n : strandedCount} / ${n}`;
       if (nextRef.current) nextRef.current.disabled = reduced || launched >= n;
@@ -464,8 +474,16 @@ export function Strandline({
       if (cardMetaRef.current)
         cardMetaRef.current.textContent = `${ev.version} · ${ev.date}`;
       if (cardBodyRef.current) cardBodyRef.current.textContent = ev.body;
-      const cx = Math.min(w - 118, Math.max(118, xs[i]!));
-      const tf = `translate3d(${cx}px, ${axisY - 26}px, 0) translate(-50%, -100%)`;
+      // anchor to the dot: centered on it, clamped only enough to stay inside
+      // the root (half the w-56 card + a small margin). Vertically the card's
+      // bottom sits just above the dot — but real release bodies can be long,
+      // so measure the card AFTER the text is set and, if it would poke past
+      // the root's top (overflow-hidden clips it there), slide it down until
+      // it fits rather than letting the top get cut off.
+      const halfW = card.offsetWidth / 2 || 112;
+      const cx = Math.min(w - halfW - 6, Math.max(halfW + 6, xs[i]!));
+      const bottomY = Math.max(axisY - 26, card.offsetHeight + 6);
+      const tf = `translate3d(${cx}px, ${bottomY}px, 0) translate(-50%, -100%)`;
       if (!cardVisible) {
         // first show: no fly-in from the previous transform
         card.style.transition = "none";
@@ -532,7 +550,7 @@ export function Strandline({
       ctx.stroke();
 
       // active waves
-      if (mainWave) renderWave(mainWave);
+      for (const wv of waves) renderWave(wv);
       if (replayWave) renderWave(replayWave);
 
       // foam flecks
@@ -569,7 +587,7 @@ export function Strandline({
 
     const renderWave = (wv: Wave) => {
       if (wv.phase === "travel") {
-        trail(wv, wv.sTip, 0.1); // glowing wetted arc behind the crest
+        trail(wv, wv.sTip, TRAIL_ALPHA); // glowing wetted arc behind the crest
         // crest comb — short segments jittered perpendicular to the arc
         ctx.lineWidth = 1;
         for (let k = 0; k < wv.segD.length; k++) {
@@ -602,7 +620,7 @@ export function Strandline({
         // recede: the wetted arc dries back toward the arc's start — the
         // now edge for a real wave, the dot itself for a hover replay
         const e = 1 - easeOutQuad(wv.recedeP);
-        trail(wv, wv.len * e, 0.1 * (1 - wv.recedeP));
+        trail(wv, wv.len * e, TRAIL_ALPHA * (1 - wv.recedeP));
       }
     };
 
@@ -642,12 +660,16 @@ export function Strandline({
     let springsActive = false;
 
     const update = (now: number, dt: number) => {
-      if (!mainWave && queue.length > 0) {
-        mainWave = makeWave(queue.shift()!, true);
+      if (
+        queue.length > 0 &&
+        (waves.length === 0 || now - lastLaunch >= LAUNCH_STAGGER_MS)
+      ) {
+        waves.push(makeWave(queue.shift()!, true));
+        lastLaunch = now;
       }
-      if (mainWave) {
-        stepWave(mainWave, now);
-        if (mainWave.done) mainWave = null;
+      for (let i = waves.length - 1; i >= 0; i--) {
+        stepWave(waves[i]!, now);
+        if (waves[i]!.done) waves.splice(i, 1);
       }
       if (replayWave) {
         stepWave(replayWave, now);
@@ -688,7 +710,7 @@ export function Strandline({
     };
 
     const needsFrame = () =>
-      mainWave !== null ||
+      waves.length > 0 ||
       replayWave !== null ||
       queue.length > 0 ||
       flecks.length > 0 ||
@@ -719,8 +741,7 @@ export function Strandline({
     apiRef.current = {
       advance: () => {
         if (reduced) return;
-        const launched =
-          strandedCount + queue.length + (reserved(mainWave) ? 1 : 0);
+        const launched = strandedCount + queue.length + reservedCount();
         if (launched >= n) return;
         queue.push(launched);
         syncControls();
@@ -728,14 +749,23 @@ export function Strandline({
       },
       retreat: () => {
         if (reduced) return;
+        let cancelled: Wave | null = null;
+        // cancel the most recently launched still-incoming wave, if any
+        for (let i = waves.length - 1; i >= 0; i--) {
+          const wv = waves[i]!;
+          if (wv.deposits && !wv.deposited) {
+            cancelled = wv;
+            break;
+          }
+        }
         if (queue.length > 0) queue.pop();
-        else if (reserved(mainWave)) {
+        else if (cancelled) {
           // cancel the incoming wave: it recedes without depositing
-          mainWave.deposits = false;
-          if (mainWave.phase === "travel") {
-            mainWave.phase = "recede";
-            mainWave.rt0 = performance.now();
-            mainWave.recedeP = 0;
+          cancelled.deposits = false;
+          if (cancelled.phase === "travel") {
+            cancelled.phase = "recede";
+            cancelled.rt0 = performance.now();
+            cancelled.recedeP = 0;
           }
         } else if (strandedCount > 0) undeposit();
         syncControls();
@@ -941,9 +971,11 @@ export function Strandline({
           ref={cardTitleRef}
           className="mt-1 text-xs font-medium text-foreground"
         />
+        {/* real release bodies run long — clamp so the card always fits in
+            the strip above the strand instead of clipping at the root's top */}
         <p
           ref={cardBodyRef}
-          className="mt-1 text-[11px] leading-relaxed text-muted"
+          className="mt-1 line-clamp-4 text-[11px] leading-relaxed text-muted"
         />
       </div>
 
