@@ -1,0 +1,29 @@
+{
+  "name": "stipple-year",
+  "title": "Stipple Year",
+  "description": "A GitHub-style year activity calendar where intensity is stipple density, not color — every day cell holds a handful of deterministically jittered ink dots, denser for more activity, like an engraved print. Hover or arrow-key through days for a 2x loupe and exact count.",
+  "collection": "core",
+  "tags": [
+    "calendar",
+    "activity",
+    "heatmap",
+    "svg",
+    "keyboard-navigation",
+    "tooltip",
+    "accessibility",
+    "data-visualization"
+  ],
+  "autoplay": {
+    "mode": "pointer-path",
+    "target": "rect[role=\"button\"]",
+    "path": "sweep",
+    "period": 5000,
+    "delay": 700
+  },
+  "card": {
+    "focus": ".max-w-3xl",
+    "padding": 0.16
+  },
+  "instruction": "Build a GitHub-style year contribution calendar where activity intensity is communicated by STIPPLE DENSITY rather than color — a monochrome ink-on-paper engraving metaphor using only var(--foreground) dots on var(--background). Layout: a week-columns x weekday-rows grid (Sunday-aligned like GitHub, 10px cells, 2px gaps), built from a `values` prop (Record<ISO date string, activity count>) and an `endDate` prop (defaults to today) covering the trailing ~365 days rounded out to full weeks (so 52-53 columns depending on alignment). Render everything in one SVG for the whole grid: month abbreviations in Geist Mono above the column where each new month's first week starts, and 'Mon'/'Wed'/'Fri' row labels to the left (GitHub's convention of skipping Sun/Tue/Thu/Sat labels). Each day's dot count is derived from its value via `count = value<=0 ? 0 : min(8, 1 + round((value/max)*7))` where max is the largest value in the visible range. Dot POSITIONS are generated in normalized [0,1] space by a small deterministic PRNG (an FNV-1a-style string hash of the ISO date feeding a mulberry32 generator) — same date always produces the same pattern — and only scaled to actual pixel coordinates at render time (position = margin + unit * (cellSize - 2*margin)). This normalized-first design is what lets the loupe be a literal zoomed copy: it re-renders the SAME normalized units at a larger cell size (44px vs 10px) rather than regenerating a new pattern. Every day cell is a focusable SVG rect (role=\"button\", roving tabindex — exactly one cell has tabIndex 0 at a time, matching whichever cell is currently 'active'; every other cell is -1) with an aria-label stating the fact directly as text: 'N contributions, Mon D' (or 'No contributions, Mon D' style pluralization for 0/1). Arrow keys move the active cell and call .focus() on the new one: Left/Right jump a full week (±7 cells in the flat index), Up/Down move a weekday within the same week (±1), both clamped to the valid date range and to cells that actually exist (no wrapping onto out-of-range trailing cells in the final partial week). Hovering OR focusing a cell opens a small fixed loupe panel (pinned to a corner of the component, not following the cursor, to avoid viewport-overflow math) showing that day's stipple pattern at 2x scale plus a Geist Mono caption reading '14 contributions - Mar 4' (or the exact singular/plural + date for whatever cell is active). The loupe's entrance is a real animation — scale 0.55->1 and opacity 0->1 over 160ms with an ease-out-expo-style curve, replayed on every new cell via a React `key` keyed to the date so the keyframe restarts each time. Hovered/focused cells also get a slightly heavier cell-border stroke than the resting hairline var(--border), and keyboard focus additionally gets a var(--accent) focus-visible outline distinct from the hover stroke. prefers-reduced-motion removes the loupe's entrance animation entirely (it simply appears, no keyframe) but keeps everything else — the stipple pattern itself was never animated to begin with, only the loupe's appearance was. No color scale anywhere, no canvas — pure SVG, zero dependencies.",
+  "dependencies": []
+}

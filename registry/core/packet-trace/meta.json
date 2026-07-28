@@ -1,0 +1,29 @@
+{
+  "name": "packet-trace",
+  "title": "Packet Trace",
+  "description": "A small hairline node/edge network where data pulses branch across random routes, easing along each edge with a fading tail — idle traffic, dense active traffic, or an error state where packets queue up at a congested hub node.",
+  "collection": "core",
+  "tags": [
+    "network",
+    "status",
+    "visualization",
+    "svg",
+    "animation",
+    "tooltip",
+    "accessibility",
+    "activity"
+  ],
+  "autoplay": {
+    "mode": "pointer-path",
+    "target": "circle[role=\"button\"]",
+    "path": "sweep",
+    "period": 4200,
+    "delay": 700
+  },
+  "card": {
+    "focus": ".max-w-md",
+    "padding": 0.16
+  },
+  "instruction": "Build an activity/status visualization as a small fixed node network: 9 SVG nodes at hand-placed (not grid-aligned) coordinates inside a 320x180 viewBox, joined by 13 hairline edges (var(--border), ~1px stroke, round linecap) forming a graph with several cycles so routes actually branch rather than forming a single tree. One node (the highest-degree node in the graph, acting as a hub) is the designated congestion point. A `state` prop (idle | active | error, default idle) drives a rAF-based particle simulation: pulses are small circles (2px radius head + a 3-segment fading tail, all var(--foreground), tail opacity stepping down ~0.3 per segment) that travel along the graph via random walks — from a random start node, hop to a random neighbor (avoiding immediate backtrack unless at a dead end) for 3-6 hops, then despawn and eventually respawn elsewhere. idle keeps ~3 pulses concurrently alive with slow (900-1800ms) spawn spacing; active keeps ~10 alive with fast (150-400ms) spacing. In error, every new pulse's route is instead the shortest path (BFS over the adjacency graph) to the hub node; on arrival it does NOT despawn — it parks there, stacking visually above the node (each queued pulse offset a few px higher than the last, newest on top), capped at 6 concurrent queued pulses with the oldest evicted once the cap is exceeded so the stack keeps turning over. While `state===\"error\"` the hub node itself blinks between full opacity and 35% opacity using a CSS keyframe animation (not JS per-frame) tinted var(--error). All per-frame position writes (pulse head/tail cx/cy, opacity) are direct DOM writes via refs to pre-mounted SVG circle elements inside one requestAnimationFrame loop — never React state per frame. React state is reserved for the cheap, infrequent stuff: which node is hovered/focused (used to brighten every edge incident to that node to var(--foreground) at a heavier stroke-width and enlarge the node's radius), and the tooltip's open/closed state. Each node is a focusable SVG circle (role=\"button\", tabIndex=0, aria-label naming it e.g. \"Network node 3\", plus \", congested\" appended when it's the error-state hub) so both pointer hover and keyboard focus open the same highlight + a Geist Mono tooltip (role=\"tooltip\", aria-live=\"off\", positioned via percentage offsets derived from the node's viewBox coordinates) reading \"Node N — K routed\", where K is a running per-node visit counter incremented in the simulation loop every time a pulse's hop advances onto that node (a real live count, refreshed every 500ms while a tooltip is open via a small interval driving a re-render, not a decorative number). A dedicated sr-only span (role=\"status\", aria-live=\"polite\", aria-atomic=\"true\") announces the traffic mode in plain language on every `state` change (e.g. \"Network error — packets queuing at node 7.\"), separate from the tooltip and node elements so it can't pick up their text on an atomic re-read. prefers-reduced-motion removes the entire pulse layer: instead each edge's stroke-width is set from a fixed per-edge weight table (edges touching the hub render heavier) so the static picture still communicates which routes matter most, and the error state renders three small static stacked dots above the hub instead of an animated queue. No canvas anywhere — pure SVG + rAF. Zero dependencies.",
+  "dependencies": []
+}

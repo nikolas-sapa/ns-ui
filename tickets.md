@@ -105,3 +105,19 @@ All: strict TS, verify gate (slide-to-shatter needed a thumb hover fix), contact
 - [x] moire-dial, vapor-countdown, crack-compare, cardio-baseline, chronicle-bar, ligature-melt, respire-field, warp-lattice (core)
 - [x] erosion-trail, frost-scrub (loud)
 - [x] 10/10 strict TS + verify gate first try; contact-sheet judged mid-interaction
+
+## Round-4 harvest batch (parallel child builders, 2026-07-28) — DONE
+
+6 themed builders + 2 reserve builders (sonnet, disjoint folder ownership) → 28 components,
+merged and centrally re-gated (registry:build 198, typecheck, verify.ts x24 + spot-check).
+- [x] instruments (core): gnomon-set, packet-trace, solder-bridge, stipple-year
+- [x] mechanisms (core): solari-flap, hasp-fold, folio-turn, clapper-bell
+- [x] inputs (core): deed-stroke, detent-swipe, emboss-plate, mat-crop
+- [x] chrome (core): jack-knife, leading-light, scroll-island, umbra-toggle
+- [x] media: bourse-tape, sprocket-scrub (core); stitch-pick, bolt-unfurl (loud)
+- [x] physics (loud): vortex-street, decal-peel, spark-gap, signet-drop
+- [x] gauges (core): plimsoll-gauge · tactile: ballot-drop, sieve-facets (core), mesh-text-drag (loud)
+- [x] Central fixes: bolt-unfurl sheen CSS `position:relative` collapsed the absolute strips
+  wrapper to height 0 after first settle (blank box) — removed; demo cost cut (14 strips,
+  480px texture) to clear verify's 30s goto ceiling under headless software rendering.
+- [x] 28/28 verify green; screenshots judged both themes (core restraint / loud flash)

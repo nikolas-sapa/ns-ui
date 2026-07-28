@@ -1,0 +1,30 @@
+{
+  "name": "gnomon-set",
+  "title": "Gnomon Set",
+  "description": "A time-of-day picker as a flat sundial — drag the outer ring to set the hour and the inner ring for 5-minute detents, while a soft blurred gnomon shadow points at the hour and lengthens from a short AM wedge into a long PM one as you keep dragging past noon.",
+  "collection": "core",
+  "tags": [
+    "time-picker",
+    "slider",
+    "dial",
+    "svg",
+    "drag",
+    "keyboard-navigation",
+    "accessibility",
+    "sundial"
+  ],
+  "autoplay": {
+    "mode": "drag",
+    "target": ".ns-gs-dial",
+    "from": [0.82, 0.5],
+    "to": [0.2, 0.7],
+    "period": 3200,
+    "delay": 700
+  },
+  "card": {
+    "focus": ".rounded-\\[12px\\]",
+    "padding": 0.18
+  },
+  "instruction": "Build a time-of-day picker shaped like a flat sundial: a 160x160 SVG dial with two concentric draggable rings. The OUTER ring (radius ~62, a wide invisible hit band using stroke=\"transparent\" strokeWidth=18 and pointer-events=\"stroke\" so only the ring band — not the interior — captures pointer events) sets the HOUR as an internal 0-23 value; 12 hairline tick marks plus Geist Mono numerals (12 at top, 1-11 clockwise) sit just inside it, matching standard clock-face placement (angle = -90 + hourOf12*30 degrees, hourOf12 = hour24 % 12, so 0/12/24-equivalent sits at the top). The INNER ring (radius ~34, hit band width 12) sets MINUTES in 5-minute detents via 12 finer tick marks at the same angular spacing, no numerals. A gnomon shadow — a soft, blurred (feGaussianBlur stdDeviation ~1.6) triangular wedge polygon from the dial center out to the current hour's angle, var(--foreground) at ~0.3 opacity — is the picker's headline feature: its length is SHORT (32 of the 80-unit radius) when hour24 < 12 (AM, 'high sun') and LONG (58) when hour24 >= 12 (PM), so continuing to drag the hour ring clockwise past the 12-o'clock mark doesn't just wrap the numeral back to 1 — it visibly lengthens the shadow, reading as morning turning into afternoon. A small Geist Mono 'AM'/'PM' caption sits just below the dial's center hub, updating live with the same condition. Both rings are role=\"slider\" (aria-valuemin/max/now/valuetext, e.g. \"3 o'clock PM\" / \"35 minutes\"), keyboard-operable with ArrowUp/ArrowRight to step +1 (hour or 5-minute unit) and ArrowLeft/ArrowDown to step -1, Home jumping to the reference minimum (hour ring: midnight, 00:00; minute ring: :00) and End jumping to the reference maximum (hour ring: noon, 12:00; minute ring: :55). Dragging is the animation hot path: pointerdown captures the pointer and starts accumulating a floating-point hour (or minute) value in a ref from the signed angular delta between successive pointermove events (delta/30 degrees per hour, or per 5 minutes for the inner ring) — NOT from an absolute snap-to-nearest-tick each event, which is what makes continuous multi-revolution dragging (and the AM/PM rollover) feel natural. Every pointermove writes the wedge polygon's `points`, both ring handles' cx/cy, the AM/PM caption's textContent, the big readout's textContent, and both rings' aria-valuenow/aria-valuetext directly via refs (setAttribute/textContent) — no React state during the drag. Only on pointerup does the final rounded value get committed through React state (or the controlled `onChange` callback) once. A separate hover affordance — independent of dragging, tracked via a lightweight pointermove-over-the-dial handler that also writes directly to a ref'd line element rather than React state — draws a faint short radial tick at the exact (unsnapped) angle under the pointer, and the shadow wedge's opacity rises slightly on hover via a plain CSS `:hover` rule (a legitimate CSS transition, not JS, since it's cosmetic and not per-drag-frame). The chosen time reads out large (text-3xl) in Geist Mono tabular-nums below the dial as 'HH:MM AM/PM'. A dedicated sr-only span (role=\"status\", aria-live=\"polite\", aria-atomic=\"true\") announces the same readout string whenever a value is committed (drag release or keyboard step) — not during the live drag itself, to avoid spamming. prefers-reduced-motion doesn't change the interaction model (there was never a continuous tween on hour/minute changes to begin with — the wedge always jumps directly to its new angle, whether via drag-follow or a keyboard step) but does drop the hover-opacity and hover-tick CSS transitions to instant. Props: hour/minute (controlled, 0-23 / 0-59), defaultHour/defaultMinute (uncontrolled default), onChange(hour, minute), className. Zero dependencies.",
+  "dependencies": []
+}

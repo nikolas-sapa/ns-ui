@@ -1,0 +1,29 @@
+{
+  "name": "clapper-bell",
+  "title": "Clapper Bell",
+  "description": "A notification bell whose clapper physically rings — arrivals add an impulse to a damped harmonic oscillator swinging the clapper and recoiling the bell body, bursts read as one cumulative swing rather than N separate dings, and opening the tray damps the bell to rest and drains the badge.",
+  "collection": "core",
+  "tags": [
+    "notifications",
+    "bell",
+    "badge",
+    "spring-physics",
+    "popover",
+    "focus-trap",
+    "aria-live",
+    "svg"
+  ],
+  "autoplay": {
+    "mode": "none"
+  },
+  "gate": {
+    "openBy": "[aria-haspopup=\"true\"]",
+    "expect": "[role=\"dialog\"]"
+  },
+  "card": {
+    "focus": ".ns-cb-root",
+    "padding": 0.3
+  },
+  "instruction": "Build a notification bell (`items: {id, message}[]`, append-only — an id not seen on the previous render is an 'arrival') whose clapper physically swings instead of a badge just ticking up. Model the swing as a real damped harmonic oscillator on a single angle value: `accel = -K*angle - C*velocity` (K≈90 stiffness, C≈6.4 damping), integrated every frame with `velocity += accel*dt; angle += velocity*dt` and clamped to +-34deg, written straight to two SVG `<g>` refs via `style.transform = 'rotate(Ndeg)'` — the clapper (a short line + circle) gets the full angle, the bell body gets `-angle * 0.22` (a smaller, opposite recoil, since a struck bell rocks against the strike, not with it). This is a genuine rAF hot path: no React state inside the loop, and the loop only keeps running while `|angle|` or `|velocity|` stay above a small epsilon, stopping itself (canceling the frame) once the system is at rest so an idle bell costs nothing. Each new arrival does NOT start a fresh swing animation; it ADDS a fixed impulse to the existing `velocity` and ensures the loop is running — so a burst of several arrivals in the same tick reads as one increasingly wild swing that then damps out, not overlapping independent dings. The badge count increments immediately when an arrival's impulse lands (not on a literal physics zero-crossing, which isn't worth detecting for this) and gets a one-frame CSS scale-squash (`scale(1) -> scale(1.5,0.7) -> scale(0.85,1.15) -> scale(1)`, ~340ms) retriggered via a forced `offsetWidth` reflow so repeat arrivals in a burst each still visibly pulse the badge even though they share one physical swing. Badge styling inverts like this registry's other ink components: `background: var(--foreground)`, `color: var(--background)`, a small mono pill, count capped to '9+' display. Hovering the bell button tracks pointer X relative to the button's center and tilts the bell BODY (not the clapper) up to +-2deg toward the cursor via a direct ref write — skipped while the physics loop is actively running so it can't fight the swing, restored to 0deg on pointer-leave. Clicking the bell toggles a tray: a NON-modal anchored popover (`role=\"dialog\"`, positioned absolutely below-right of the trigger) with a hand-rolled focus trap — Tab/Shift+Tab cycle between the tray's first and last focusable elements, Escape closes and returns focus to the trigger button, and a `pointerdown` outside both the tray and the trigger also closes it (no native `<dialog>`, since a notification tray shouldn't dim or inert the rest of the page the way a true modal does). Opening the tray immediately (before render) cancels any in-flight rAF loop and snaps the oscillator's angle/velocity to exactly 0 (via the same `applyPose` used every frame, called once), and zeroes the badge count — the visual 'drain'. A dedicated `role=status aria-live=polite aria-atomic=true` sr-only span announces \"N new notification(s)\" for whatever arrived, throttled: repeated arrivals within a 4-second window accumulate into one pending count and reset the timer, so a burst produces exactly one announcement, not one per item. `prefers-reduced-motion: reduce` skips the physics loop entirely (arrivals still increment the badge and mark the tray, but the clapper/body never visibly move) and swaps the badge's squash keyframes for a single opacity dip-and-recover pulse instead. Zero dependencies, no canvas, no dash-based SVG tricks (the bell outline is a single static hairline path, nothing animates via stroke-dasharray).",
+  "dependencies": []
+}
