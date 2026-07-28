@@ -1,0 +1,30 @@
+# Agent worktrees (git internal) — ~245k files
+.worktrees/
+
+# Fractal tool state
+.fractal/
+
+# Build caches and dependencies
+.next/
+node_modules/
+
+# Local Vercel CLI config
+.vercel/
+
+# Demo recordings
+recordings/
+
+# Debug scratch from agent sessions
+.scratch-dbg/
+
+# Generated files (recreated during build via npm run registry:build)
+public/r/
+registry.json
+registry/index.tsx
+lib/autoplay.generated.json
+lib/card-frame.generated.json
+public/llms.txt
+public/llms-full.txt
+
+# Internal documentation (not needed for deployment)
+wiki/
