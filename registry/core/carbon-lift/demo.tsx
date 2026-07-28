@@ -14,7 +14,10 @@ export default function CarbonLiftDemo() {
           <p className="mb-1.5 text-[13px] font-medium text-foreground">
             API key
           </p>
-          <div className="flex items-center justify-between gap-3 rounded-sm border border-border bg-background px-3 py-2">
+          <div
+            data-ns-cl-focus
+            className="flex items-center justify-between gap-3 rounded-sm border border-border bg-background px-3 py-2"
+          >
             <CarbonLift
               value="ns_demo_51Hb2c9k3f8G4mZ2qX7wA1p"
               description="API key"

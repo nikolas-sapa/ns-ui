@@ -167,8 +167,14 @@ export function UmbraToggle({
     pointerDownRef.current = false;
     trackRef.current?.releasePointerCapture(e.pointerId);
     const next = movedRef.current ? dragFractionRef.current >= 0.5 : !value;
-    applyFrame(occluderRef.current, trackRef.current, coronaRef.current, next ? 1 : 0, !reducedRef.current);
+    // Only paint the guessed `next` state when it's actually going to become
+    // `value` — a controlled parent can ignore `onCheckedChange` and leave
+    // `value` unchanged, and painting the guess anyway would desync the
+    // visible disc from aria-checked. When `next` isn't adopted (or a drag
+    // released back on the side it started from, so `[value]` never refires),
+    // settle back to the real current value instead.
     if (next !== value) commit(next);
+    else applyFrame(occluderRef.current, trackRef.current, coronaRef.current, value ? 1 : 0, !reducedRef.current);
   };
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {

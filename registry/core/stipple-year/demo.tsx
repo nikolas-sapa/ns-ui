@@ -70,7 +70,7 @@ export default function StippleYearDemo() {
         ns-ui / stipple-year
       </p>
 
-      <div className="w-full max-w-3xl rounded-[12px] border border-border bg-background p-6">
+      <div className="inline-block rounded-[12px] border border-border bg-background p-6">
         <StippleYear values={values} endDate={END_DATE} />
       </div>
 

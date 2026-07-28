@@ -27,15 +27,15 @@ export interface StippleYearProps {
   className?: string;
 }
 
-const CELL = 10;
-const GAP = 2;
+const CELL = 13;
+const GAP = 3;
 const STEP = CELL + GAP;
-const MARGIN = 1.3;
+const MARGIN = 1.6;
 const MAX_DOTS = 8;
-const DOT_R = 0.55;
-const LOUPE_CELL = 44;
-const LOUPE_MARGIN = 4;
-const LOUPE_DOT_R = 1.7;
+const DOT_R = 1.1;
+const LOUPE_CELL = 56;
+const LOUPE_MARGIN = 5;
+const LOUPE_DOT_R = 2.6;
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const WEEKDAY_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""];
@@ -152,16 +152,16 @@ export function StippleYear({ values = {}, endDate, className = "" }: StippleYea
     return `${v} ${noun}, ${MONTHS[c.date.getMonth()]} ${c.date.getDate()}`;
   };
 
-  const LEFT_LABEL_W = 20;
-  const TOP_LABEL_H = 14;
+  const LEFT_LABEL_W = 26;
+  const TOP_LABEL_H = 18;
   const viewW = LEFT_LABEL_W + weeks * STEP;
   const viewH = TOP_LABEL_H + 7 * STEP;
 
   return (
-    <div className={`relative inline-block ${className}`}>
+    <div className={`ns-sy-grid relative inline-block ${className}`}>
       <style>{CSS}</style>
-      <svg viewBox={`0 0 ${viewW} ${viewH}`} width="100%" style={{ maxWidth: viewW }} focusable="false">
-        <g aria-hidden="true" className="font-mono" style={{ fontSize: 6 }}>
+      <svg viewBox={`0 0 ${viewW} ${viewH}`} width={viewW} style={{ maxWidth: "100%" }} focusable="false">
+        <g aria-hidden="true" className="font-mono" style={{ fontSize: 7.5 }}>
           {monthLabels.map((m, i) => (
             <text key={i} x={LEFT_LABEL_W + m.col * STEP} y={TOP_LABEL_H - 4} fill="var(--muted)">
               {m.text}
@@ -198,10 +198,10 @@ export function StippleYear({ values = {}, endDate, className = "" }: StippleYea
                 y={y}
                 width={CELL}
                 height={CELL}
-                rx={1.5}
+                rx={2}
                 fill="transparent"
                 stroke={isHovered ? "var(--foreground)" : "var(--border)"}
-                strokeWidth={isHovered ? 1 : 0.75}
+                strokeWidth={isHovered ? 1.25 : 0.9}
                 strokeOpacity={isHovered ? 0.7 : 0.6}
                 className="ns-sy-cell"
                 style={{ outlineOffset: 1 }}

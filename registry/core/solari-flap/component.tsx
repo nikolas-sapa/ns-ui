@@ -30,7 +30,7 @@ import { useEffect, useRef, useState } from "react";
 // Hover (mouse only, this is a status display, not a control): entering
 // the board pauses further step-scheduling for every cell (in-flight
 // steps still finish, but no new ones start) until the pointer leaves;
-// entering one cell additionally lifts that cell's flap 15deg on its
+// entering one cell additionally lifts that cell's flap 22deg on its
 // hinge, exposing the static "under" plate behind it as a peek at an
 // upcoming glyph. Cells are real <button> elements (so a plain pointer
 // hover is genuinely detectable and the lift is a real, testable state
@@ -50,9 +50,9 @@ export interface SolariFlapProps {
   value: string;
   /** Glyphs cycled through mid-flip and used for the hover-peek plate. */
   charset?: string;
-  /** Cell width in px. Default 30. */
+  /** Cell width in px. Default 34. */
   cellWidth?: number;
-  /** Cell height in px. Default 44. */
+  /** Cell height in px. Default 50. */
   cellHeight?: number;
   className?: string;
 }
@@ -64,7 +64,7 @@ const MIN_STEPS = 3;
 const MAX_STEPS = 6;
 const STAGGER_MIN_MS = 20;
 const STAGGER_MAX_MS = 40;
-const HOVER_LIFT_DEG = 15;
+const HOVER_LIFT_DEG = 22;
 const HOVER_MS = 160;
 const FLIP_EASE = "cubic-bezier(0.61, 0, 0.4, 1)";
 const HOVER_EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
@@ -100,8 +100,8 @@ function makeCell(ch: string): CellHandle {
 export function SolariFlap({
   value,
   charset = DEFAULT_CHARSET,
-  cellWidth = 30,
-  cellHeight = 44,
+  cellWidth = 34,
+  cellHeight = 50,
   className = "",
 }: SolariFlapProps) {
   const chars = value.split("");
@@ -215,10 +215,10 @@ export function SolariFlap({
     if (!cell.leaf) return;
     cell.leaf.style.transition = `transform ${HOVER_MS}ms ${HOVER_EASE}, box-shadow ${HOVER_MS}ms ${HOVER_EASE}`;
     cell.leaf.style.transform = hovering ? `rotateX(${HOVER_LIFT_DEG}deg)` : "rotateX(0deg)";
-    // The rotation alone is a subtle 15deg tilt on a ~20px leaf; a growing
+    // The rotation alone is a 22deg tilt on a ~25px leaf; a growing
     // cast shadow underneath is the legible "lifted off the plate" cue a
     // real gap between flap and plate would throw.
-    cell.leaf.style.boxShadow = hovering ? "0 3px 5px -1px rgba(0,0,0,0.45)" : "none";
+    cell.leaf.style.boxShadow = hovering ? "0 5px 8px -1px rgba(0,0,0,0.55)" : "none";
   };
 
   return (
@@ -328,7 +328,7 @@ const CSS = `
   bottom:0;
   align-items:flex-end;
   border-top:1px solid var(--background);
-  box-shadow:inset 0 3px 4px -3px rgba(0,0,0,0.55);
+  box-shadow:inset 0 5px 6px -3px color-mix(in srgb, var(--background) 60%, transparent);
 }
 .ns-sf-leaf{
   position:absolute;
@@ -357,8 +357,8 @@ const CSS = `
   backface-visibility:hidden;
   -webkit-backface-visibility:hidden;
 }
-.ns-sf-face-front{ box-shadow:inset 0 -3px 4px -2px rgba(0,0,0,0.5); }
-.ns-sf-face-back{ transform:rotateX(180deg); box-shadow:inset 0 3px 4px -2px rgba(0,0,0,0.5); }
+.ns-sf-face-front{ box-shadow:inset 0 -5px 6px -2px color-mix(in srgb, var(--background) 50%, transparent); }
+.ns-sf-face-back{ transform:rotateX(180deg); box-shadow:inset 0 5px 6px -2px color-mix(in srgb, var(--background) 50%, transparent); }
 @media (prefers-reduced-motion: reduce){
   .ns-sf-leaf{ transition:none !important; }
 }

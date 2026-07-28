@@ -4,22 +4,26 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 // ---------------------------------------------------------------------------
 // CarbonLift — a copy-to-clipboard button that shows WHAT it copied, not just
-// that something happened. On click, a translucent duplicate of the source
-// text (first ~24 chars) peels up off the source line and drifts a short
-// 12px toward the button's clipboard glyph while fading and tightening its
-// letter-spacing, and the glyph gives one small settle bounce as it "catches"
-// the duplicate. The label ticks Copy -> Copied in Geist Mono at the same
-// moment. This is a duplicate rising UP and traveling with the real content
-// as the moving element — distinct from a stamp pressing an impression DOWN.
+// that something happened. On click, a duplicate of the source text peels up
+// off the source line and travels most of the real distance to the button's
+// clipboard glyph over 720ms — the actual measured gap between source and
+// icon, not a token nudge — fading and tightening its letter-spacing as it
+// goes, arriving right as the glyph gives one small settle bounce, as if it
+// just "caught" the duplicate. The label ticks Copy -> Copied in Geist Mono
+// at the same moment. This is a duplicate rising UP and traveling with the
+// real content as the moving element — distinct from a stamp pressing an
+// impression DOWN.
 //
 // MECHANISM: on click, the visible source node and the button's icon are
 // measured with getBoundingClientRect(); a clone span is absolutely
-// positioned at the source's exact box (same font, --muted at 60% opacity)
-// inside a shared relative container, then animated via a CSS custom
-// property translate + opacity + letter-spacing over 400ms ease-out-expo.
-// If the source is scrolled off-screen the measurement is skipped and the
-// component falls back to a plain label swap — the same thing reduced
-// motion always does.
+// positioned at the source's exact box (same font, --foreground) inside a
+// shared relative container, then animated via a CSS custom property
+// translate + opacity + letter-spacing over 720ms ease-out-expo: it holds
+// near-full opacity through the first half of the flight so the two-line
+// duplication actually registers, then fades over the second half as it
+// nears the glyph. If the source is scrolled off-screen the measurement is
+// skipped and the component falls back to a plain label swap — the same
+// thing reduced motion always does.
 //
 // A11Y: a real <button> with an aria-label naming exactly what it copies.
 // Success is announced through a visually-hidden aria-live=polite region
@@ -28,14 +32,24 @@ import { useCallback, useEffect, useRef, useState } from "react";
 // behave identically to a click (native button semantics, no custom key
 // handling needed). The label + icon revert to the resting state after 2s.
 //
-// Tokens only: --foreground for ink, --muted for the ghost and secondary
+// Tokens only: --foreground for ink and the ghost, --muted for secondary
 // text, --border for the frame, --accent for the keyboard focus ring only.
 // Pure DOM/SVG/CSS — no canvas.
 // ---------------------------------------------------------------------------
 
-const GHOST_MS = 400;
+const GHOST_MS = 720;
+const BOUNCE_MS = 260;
+// The glyph's settle bounce should land as the duplicate arrives, not
+// partway through its flight — so its delay is derived from the flight
+// duration rather than hardcoded against a different number.
+const BOUNCE_DELAY_MS = Math.max(0, GHOST_MS - BOUNCE_MS - 40);
 const REVERT_MS = 2000;
-const DRIFT_PX = 12;
+// Floor on how far the duplicate travels even if source and icon happen to
+// sit right on top of each other; in practice the measured delta (usually
+// 150-300px in the demo) dominates this.
+const DRIFT_FLOOR_PX = 12;
+const TRAVEL_FRACTION = 0.82;
+const PEEL_PX = 8;
 const GHOST_CHARS = 24;
 
 export interface CarbonLiftProps {
@@ -170,9 +184,13 @@ export function CarbonLift({
     const dx = iconCx - sourceCx;
     const dy = iconCy - sourceCy;
     const dist = Math.hypot(dx, dy) || 1;
-    const tx = (dx / dist) * DRIFT_PX;
+    // Travel most of the real gap to the glyph, not a fixed token nudge —
+    // otherwise a duplicate spawned 250px from its destination only ever
+    // covers 12px of that distance and never visibly leaves the source.
+    const travel = Math.max(dist * TRAVEL_FRACTION, DRIFT_FLOOR_PX);
+    const tx = (dx / dist) * travel;
     // Peel "up" in addition to drifting toward the icon.
-    const ty = (dy / dist) * DRIFT_PX - 6;
+    const ty = (dy / dist) * travel - PEEL_PX;
 
     const style = window.getComputedStyle(source);
     const text =
@@ -359,8 +377,8 @@ export function CarbonLift({
           color: var(--foreground);
         }
         .ns-cl-icon[data-bounce] {
-          animation: ns-cl-bounce 260ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
-          animation-delay: 300ms;
+          animation: ns-cl-bounce ${BOUNCE_MS}ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+          animation-delay: ${BOUNCE_DELAY_MS}ms;
         }
 
         .ns-cl-label {
@@ -377,23 +395,31 @@ export function CarbonLift({
           overflow: hidden;
           white-space: nowrap;
           pointer-events: none;
-          color: var(--muted);
-          opacity: 0.6;
+          color: var(--foreground);
+          opacity: 0.85;
           letter-spacing: 0;
           transform: translate(0, 0);
           animation: ns-cl-lift ${GHOST_MS}ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
+        /* Holds near-full opacity through the first half of the flight —
+           the duplicate needs to visibly separate from the source before it
+           starts fading, or the two overlapping copies read as one string
+           that never moved. Fade and letter-spacing crimp happen entirely
+           in the second half, timed to finish as it reaches the glyph. */
         @keyframes ns-cl-lift {
-          from {
+          0% {
             transform: translate(0, 0);
-            opacity: 0.6;
+            opacity: 0.85;
             letter-spacing: 0em;
           }
-          to {
+          45% {
+            opacity: 0.85;
+          }
+          100% {
             transform: translate(var(--cl-tx), var(--cl-ty));
             opacity: 0;
-            letter-spacing: -0.02em;
+            letter-spacing: -0.03em;
           }
         }
         @keyframes ns-cl-bounce {
