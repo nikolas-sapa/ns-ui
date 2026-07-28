@@ -23,5 +23,6 @@
     "focus": ".max-w-md",
     "padding": 0.1,
     "maxZoom": 2.4
-  }
+  },
+  "review": true
 }

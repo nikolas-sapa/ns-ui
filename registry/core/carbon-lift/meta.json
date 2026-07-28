@@ -3,7 +3,13 @@
   "title": "Carbon Lift",
   "description": "Copy-to-clipboard button whose confirmation shows what got copied: a translucent duplicate of the source text peels up and drifts toward the clipboard glyph as the label ticks to \"Copied\".",
   "collection": "core",
-  "tags": ["button", "copy", "clipboard", "micro-interaction", "form"],
+  "tags": [
+    "button",
+    "copy",
+    "clipboard",
+    "micro-interaction",
+    "form"
+  ],
   "useWhen": "copying API keys, code snippets, install commands or share links, where the confirmation should visibly carry the actual copied text so the user can eyeball that the right value left — pick chop-press instead for a rating/level input, unrelated to clipboard actions.",
   "autoplay": {
     "mode": "press",
@@ -16,5 +22,6 @@
     "expect": "[data-state='copied']"
   },
   "instruction": "A copy-to-clipboard row: a monospace source string (truncated with an ellipsis if it overflows) next to a real <button> that copies it. On click, writeText runs (with a hidden-textarea/execCommand fallback for insecure or sandboxed contexts, wrapped so it never throws), the button's aria-label already names exactly what it copies (\"Copy {description}\", or a truncated preview of the value if no description is given), and the visible label ticks from \"Copy\" to \"Copied\" in Geist Mono. Simultaneously — unless prefers-reduced-motion or the source is scrolled off-screen, in which case it's a plain label swap only — a translucent clone of the source text (its first ~24 characters, same font, --muted at 60% opacity) is measured via getBoundingClientRect and absolutely positioned exactly over the source, then animated over 400ms ease-out-expo: it drifts a short 12px toward the button's clipboard glyph (plus a slight upward peel), fades to 0 opacity, and tightens its letter-spacing slightly, reading as a carbon copy lifting off the page and traveling into the button. The clipboard glyph itself gives one small spring-eased settle bounce (scale 1 -> 1.06 -> 1) timed to when the duplicate arrives, as if it just received it. Success is also announced through a visually-hidden aria-live=polite status region (\"Copied to clipboard\") so screen reader users get the confirmation without seeing the animation; the flying duplicate and the icon are aria-hidden, and nothing about the outcome exists only in the animation — the label swap and the live region both carry it on their own. The button reverts to its resting label and icon after 2 seconds. It is a single native <button>: Enter and Space behave exactly like a click, with no custom key handling required, and a visible focus ring in --accent. This is deliberately the inverse of a stamp-style confirmation: nothing presses down or leaves an impression here, a duplicate of the real content rises up and travels to where it landed.",
-  "dependencies": []
+  "dependencies": [],
+  "review": true
 }

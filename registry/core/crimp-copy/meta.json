@@ -24,5 +24,6 @@
   "card": {
     "focus": "button",
     "padding": 1.6
-  }
+  },
+  "review": true
 }

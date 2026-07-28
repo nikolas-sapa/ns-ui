@@ -29,7 +29,15 @@ for (const collection of ["core", "loud"]) {
         },
       ],
       dependencies: meta.dependencies,
-      meta: { collection: meta.collection, tags: meta.tags, instruction: meta.instruction },
+      // `review` is a temporary flag for a one-off audit pass — remove this
+      // whitelist entry along with the "Review" chip in showcase.tsx once
+      // that pass is done.
+      meta: {
+        collection: meta.collection,
+        tags: meta.tags,
+        instruction: meta.instruction,
+        review: meta.review,
+      },
     });
   }
 }

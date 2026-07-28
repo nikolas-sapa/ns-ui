@@ -3,7 +3,15 @@
   "title": "Under Ink",
   "description": "Inline redaction bar sized by the real text beneath it — hold to peek and the ink flows back after release, click to latch it open; the lifted bar stays hovering as a thin overline so the redaction never disappears.",
   "collection": "core",
-  "tags": ["redaction", "typography", "privacy", "reveal", "hold", "inline", "accessibility"],
+  "tags": [
+    "redaction",
+    "typography",
+    "privacy",
+    "reveal",
+    "hold",
+    "inline",
+    "accessibility"
+  ],
   "instruction": "An inline redaction primitive: `<UnderInk label=\"email\">p.raghavan@…</UnderInk>` drops into running prose. The bar is drawn OVER the real text, which stays in flow and sets the width — a fixed-width bar lies about the hidden content's length and reads as fake; this one cannot. An optional `label` renders as a tiny uppercase mono tag centered on the ink ('NAME', 'AMOUNT'), naming what is hidden without revealing it, so a redacted document self-explains at rest. TWO WAYS IN, one control: press-and-hold (≥280ms) lifts the ink for a peek — on release the text stays exposed for `resealMs` (default 900) and then the ink flows back, because real ink takes a moment to pool; a short press, plain click, or keyboard Enter/Space latches the reveal open until activated again (e.detail===0 keyboard clicks always toggle). The pointer paths are disambiguated by press duration with a suppressed synthetic click after a genuine hold, and pointercancel/pointerleave end a peek safely, so a drag off the bar never wedges it open. THE LIFT: revealing doesn't delete the bar — it scales to a 14%-height overline hovering above the text (scaleY transform, transform-origin top, 240ms cubic-bezier(0.22,1,0.36,1)), so what was redacted remains visibly marked as redacted even while exposed, and re-sealing is the same motion reversed. The text beneath fades in 60ms behind the lift so ink and ink-shadow never show doubled. ACCESSIBILITY: the whole thing is one real <button> with aria-pressed tracking exposure and an accessible name that states both the label and the interaction contract ('Reveal redacted email — hold to peek, click to keep open'); the hidden text is aria-hidden while sealed so assistive tech cannot read through the ink, and un-hidden the moment it is exposed. Focus shows a visible accent outline ring; --accent appears nowhere else. Escape is the panic key: while anything is exposed a document-level listener re-seals it instantly, latched or mid-peek. REDUCED MOTION: lift and fade transitions drop to instant toggles — every state still reachable, nothing hidden. Colors are tokens only: the ink is --foreground, the tag text is --background over it, so the bar is true black-on-white and white-on-black in the two themes with zero hue. Pure DOM/CSS, zero dependencies, no canvas.",
   "dependencies": [],
   "autoplay": {
@@ -16,5 +24,6 @@
   "gate": {
     "openBy": "button.ns-underink:last-of-type",
     "expect": "button.ns-underink:last-of-type[aria-pressed=\"true\"] [data-underink-text]"
-  }
+  },
+  "review": true
 }

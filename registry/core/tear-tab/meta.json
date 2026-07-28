@@ -18,13 +18,20 @@
   "autoplay": {
     "mode": "drag",
     "target": "[data-tear-first]",
-    "from": [0.5, 0.1],
-    "to": [0.5, 1.8],
+    "from": [
+      0.5,
+      0.1
+    ],
+    "to": [
+      0.5,
+      1.8
+    ],
     "period": 4200,
     "delay": 700
   },
   "card": {
     "focus": ".max-w-md",
     "padding": 0.12
-  }
+  },
+  "review": true
 }

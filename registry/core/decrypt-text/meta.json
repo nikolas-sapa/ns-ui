@@ -3,7 +3,12 @@
   "title": "Decrypt Text",
   "description": "Scramble-to-decode text reveal with left-to-right character locking.",
   "collection": "core",
-  "tags": ["text", "reveal", "mono", "micro-interaction"],
+  "tags": [
+    "text",
+    "reveal",
+    "mono",
+    "micro-interaction"
+  ],
   "useWhen": "the classic scramble-to-decode reveal — monospace glyphs churn and lock into the final string left to right; use for a one-shot on-mount/on-trigger reveal, not a persistent cursor-driven effect.",
   "autoplay": {
     "mode": "press",
@@ -12,5 +17,6 @@
     "period": 1800
   },
   "instruction": "A scramble-to-decode text reveal: monospace glyphs churn randomly and lock into the final string left to right with a per-character stagger, the currently resolving character brightened, unresolved characters dimmed. No layout jitter (mono charset), final text exposed via aria-label with churning spans aria-hidden, instant render under prefers-reduced-motion.",
-  "dependencies": []
+  "dependencies": [],
+  "review": true
 }

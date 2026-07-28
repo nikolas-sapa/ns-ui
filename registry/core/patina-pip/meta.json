@@ -24,5 +24,6 @@
   "card": {
     "focus": "nav",
     "padding": 1.4
-  }
+  },
+  "review": true
 }

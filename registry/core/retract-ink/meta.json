@@ -3,7 +3,15 @@
   "title": "Retract Ink",
   "description": "Streaming-text renderer for models that take words back: a retraction strikes through mid-sentence, evaporates, and leaves a notched scar tick that reopens the revision inline.",
   "collection": "core",
-  "tags": ["streaming", "typography", "correction", "ai", "text", "revision", "accessibility"],
+  "tags": [
+    "streaming",
+    "typography",
+    "correction",
+    "ai",
+    "text",
+    "revision",
+    "accessibility"
+  ],
   "instruction": "Renders an append-only op log — `{ type: 'append', text }` / `{ type: 'retract', chars }` — the exact shape a self-correcting stream produces (guardrail rewrites, constrained decoding, tool-output patching), instead of a final string that hides the revision or a snapshot diff that re-animates settled text. REPLAY: ops are folded into segments where consecutive appends merge into one text run keyed by its immutable character offset, so text that has already arrived keeps the same React key forever and never re-renders or re-animates; a retract pulls characters off the trailing text runs only (scars are zero-width in the live text, so a retraction can never un-retract a previous one) and deposits a scar segment at the exact inline position it happened. SCAR LIFECYCLE: a scar born after mount plays a three-beat exit on the retracted text — a 1px strike line sweeps left-to-right across it (background-size animation on a currentColor gradient, not text-decoration, which cannot sweep), the struck text holds legible for a beat, then evaporates to opacity 0 — and only then is it swapped for the settled form, so the paragraph reflow happens on invisible text and reads as evaporation rather than a jump. Scars present in the op log at mount render settled instantly: a page of historical corrections must not all strike at once on load. THE SCAR TICK: the settled form is a 7px-wide notched tick (a rounded mark with a 1px background-colored kerf cut through its middle — the mark of something excised) rendered as a real <button> with aria-expanded and an accessible name that states the word count removed ('Show retracted text (2 words removed)'); activating it reopens the retracted text inline — muted, line-through, on a surface chip — and toggles closed again. STREAMING CHROME: while `streaming` is true a muted block caret blinks at the trailing edge (steps() timing, like a terminal); a visually-hidden role=status aria-live=polite region reports generating/complete and the running self-correction count, so retractions are announced, not silent. REDUCED MOTION: the strike sweep and caret blink are dropped via media query — struck text simply dims, the timeline is unchanged, and every scar stays fully operable. Colors are tokens only (--background --foreground --muted --border --accent, surface for the ghost chip); --accent appears solely on the tick's focus ring. Pure DOM/CSS, zero dependencies, no canvas.",
   "dependencies": [],
   "autoplay": {
@@ -15,5 +23,6 @@
   "gate": {
     "openBy": "button[data-scar]",
     "expect": "[data-retract-ghost]"
-  }
+  },
+  "review": true
 }

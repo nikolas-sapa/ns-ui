@@ -21,5 +21,6 @@
     "hold": 1400,
     "period": 3600,
     "delay": 700
-  }
+  },
+  "review": true
 }

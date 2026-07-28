@@ -3,7 +3,15 @@
   "title": "Carbon Flimsy",
   "description": "A primary field with a slugified 'carbon copy' stacked underneath it, offset like a duplicate sheet peeking out from beneath a receipt. Every keystroke stamps its transformed counterpart onto the flimsy with a tiny pressure jitter; editing the flimsy directly tears it off the coupling until a real Relink button re-stamps it.",
   "collection": "core",
-  "tags": ["field", "slug", "derived-field", "form", "carbon-copy", "typography", "micro-interaction"],
+  "tags": [
+    "field",
+    "slug",
+    "derived-field",
+    "form",
+    "carbon-copy",
+    "typography",
+    "micro-interaction"
+  ],
   "autoplay": {
     "mode": "type",
     "text": "Weekend Trip Planner",
@@ -17,5 +25,6 @@
   "card": {
     "focus": ".ns-cf-root",
     "padding": 0.3
-  }
+  },
+  "review": true
 }

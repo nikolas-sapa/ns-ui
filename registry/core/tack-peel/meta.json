@@ -18,13 +18,20 @@
   "autoplay": {
     "mode": "drag",
     "target": ".ns-tackpeel-autoplay-target",
-    "from": [0.55, 0.55],
-    "to": [0.72, 0.32],
+    "from": [
+      0.55,
+      0.55
+    ],
+    "to": [
+      0.72,
+      0.32
+    ],
     "period": 4600,
     "delay": 600
   },
   "gate": {
     "openBy": "[data-tackpeel-dismiss]",
     "expect": "[data-tackpeel-undo]"
-  }
+  },
+  "review": true
 }
