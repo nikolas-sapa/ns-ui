@@ -24,6 +24,5 @@
   "gate": {
     "openBy": "button.ns-underink:last-of-type",
     "expect": "button.ns-underink:last-of-type[aria-pressed=\"true\"] [data-underink-text]"
-  },
-  "review": true
+  }
 }

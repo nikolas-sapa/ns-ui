@@ -1,8 +1,0 @@
-{
-  "naming": {
-    "validate": [
-      "ascii",
-      "identifier"
-    ]
-  }
-}

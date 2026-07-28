@@ -23,6 +23,5 @@
   "gate": {
     "openBy": "button[data-scar]",
     "expect": "[data-retract-ghost]"
-  },
-  "review": true
+  }
 }

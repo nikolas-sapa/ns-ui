@@ -1,0 +1,65 @@
+name: Bug report
+description: A component renders wrong, throws, or behaves incorrectly.
+labels: [bug]
+body:
+  - type: input
+    id: component
+    attributes:
+      label: Component
+      description: The registry name, as used in the install command.
+      placeholder: caustic-coverflow
+    validations:
+      required: true
+
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where did you see it?
+      options:
+        - The live preview site (design.helpmarq.com)
+        - My own project, after `npx shadcn add`
+        - Running this repo locally
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected, and what happened instead
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Install the component
+        2. Hover the ...
+        3. Console shows ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: console
+    attributes:
+      label: Console output
+      description: Paste any errors or warnings. Rendered as code, no backticks needed.
+      render: text
+
+  - type: checkboxes
+    id: themes
+    attributes:
+      label: Themes affected
+      options:
+        - label: Dark
+        - label: Light
+
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      placeholder: |
+        Browser: Chrome 141
+        OS: macOS 15.2
+        React / Next versions:

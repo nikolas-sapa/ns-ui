@@ -121,7 +121,12 @@ export default function SedimentStackDemo() {
             <button type="button" onClick={() => pushRandom("warning")} className={buttonClass}>
               PUSH WARNING
             </button>
-            <button type="button" onClick={() => pushRandom("error")} className={buttonClass}>
+            <button
+              type="button"
+              data-sediment-push="error"
+              onClick={() => pushRandom("error")}
+              className={buttonClass}
+            >
               PUSH ERROR
             </button>
             <button type="button" onClick={replay} className={`${buttonClass} ml-auto`}>

@@ -22,12 +22,6 @@ export type ShowcaseEntry = RegistryEntry & {
   tags: string[];
   /** useWhen + the instruction's lead sentence — the plainest-spoken copy. */
   prose: string;
-  /**
-   * Temporary audit flag for a one-off weak/redundant review pass. Remove
-   * this field, the "review" filter tab below, and the whitelist entry in
-   * scripts/build-registry.ts once the pass is done.
-   */
-  review: boolean;
 };
 
 const FOOTER_LINK =
@@ -49,7 +43,7 @@ const MOUNT_CAP = 12;
 /** Mount a demo this far outside the viewport so it has run a beat before seen. */
 const PRELOAD_MARGIN = 600;
 
-type Filter = "all" | "core" | "loud" | "review";
+type Filter = "all" | "core" | "loud";
 
 /**
  * Words a newcomer can click when nothing matched. Each is a real query that
@@ -72,13 +66,11 @@ export function Showcase({ items }: { items: ShowcaseEntry[] }) {
   const counts = useMemo(() => {
     let core = 0;
     let loud = 0;
-    let review = 0;
     for (const i of items) {
       if (i.collection === "loud") loud += 1;
       else core += 1;
-      if (i.review) review += 1;
     }
-    return { all: items.length, core, loud, review };
+    return { all: items.length, core, loud };
   }, [items]);
 
   /** name -> category ids, computed once from the components' own tags. */
@@ -119,8 +111,7 @@ export function Showcase({ items }: { items: ShowcaseEntry[] }) {
     const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
     const inScope = items.filter(
       (i) =>
-        (filter === "all" ||
-          (filter === "review" ? i.review : i.collection === filter)) &&
+        (filter === "all" || i.collection === filter) &&
         (!category || memberships.get(i.name)?.includes(category)),
     );
     if (terms.length === 0) return { visibleItems: inScope, loose: false };
@@ -164,14 +155,6 @@ export function Showcase({ items }: { items: ShowcaseEntry[] }) {
     { key: "core", label: "Core" },
     { key: "loud", label: "Loud" },
   ];
-
-  // Temporary audit tab — amber, not the blue accent, so it reads as
-  // scaffolding rather than a permanent part of the collection filter.
-  // Remove alongside the `review` field once the audit pass is done.
-  const reviewTab: { key: Filter; label: string } = {
-    key: "review",
-    label: "Review",
-  };
 
   return (
     <main className="mx-auto w-full max-w-[1600px] px-6 pb-32 sm:px-10">
@@ -247,27 +230,6 @@ export function Showcase({ items }: { items: ShowcaseEntry[] }) {
                 </button>
               );
             })}
-            {counts.review > 0 ? (
-              <button
-                key={reviewTab.key}
-                role="tab"
-                type="button"
-                aria-selected={filter === reviewTab.key}
-                onClick={() =>
-                  setFilter(filter === reviewTab.key ? "all" : reviewTab.key)
-                }
-                className={`ml-1 rounded-sm border px-2.5 py-1 text-sm outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-[#f5a623] ${
-                  filter === reviewTab.key
-                    ? "border-[#f5a623] bg-[#f5a623]/15 font-medium text-[#f5a623]"
-                    : "border-dashed border-[#f5a623]/40 text-muted hover:border-[#f5a623] hover:text-[#f5a623]"
-                }`}
-              >
-                {reviewTab.label}
-                <span className="ml-1.5 font-mono text-xs opacity-70">
-                  {counts.review}
-                </span>
-              </button>
-            ) : null}
           </div>
           <div className="flex min-w-0 items-center gap-3">
             <label htmlFor="component-search" className="sr-only">

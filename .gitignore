@@ -20,3 +20,15 @@ public/llms-full.txt
 # debug scratch from agent sessions — never commit
 .scratch-dbg/
 recordings/
+
+# Local-only working material: research inventories, session notes, ad-hoc
+# debug scripts, agent prompts. Kept on disk, deliberately out of the repo.
+/.internal/
+/noreg.mjs
+/sss.mjs
+/PARALLEL-SESSION-PROMPT.md
+/RESUME.md
+/tickets.md
+/workflows/
+/wiki/.wiki/
+/.worktrees/

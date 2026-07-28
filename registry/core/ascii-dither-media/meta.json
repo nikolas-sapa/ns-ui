@@ -11,6 +11,5 @@
     "cursor"
   ],
   "instruction": "A full-bleed canvas engine that maps a source (animated flowing noise by default, or an image) to a luminance-driven monochrome glyph grid with three modes: ASCII characters in a density ramp, 4x4 Bayer-matrix dithered pixels, and dot-matrix circles sized by brightness. The cursor brightens and resolves nearby cells with a Gaussian falloff and eased trailing. Direct-DOM rAF loop with no React state, theme-aware glyph color, single static frame under prefers-reduced-motion. Window resize is debounced (150ms) so dragging a window edge doesn't spam the grid recompute or (in image mode) refetch/redecode the source on every event; a generation counter discards any image decode superseded by a newer resize before it can write stale-sized data.",
-  "dependencies": [],
-  "review": true
+  "dependencies": []
 }

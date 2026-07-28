@@ -22,8 +22,7 @@
   "instruction": "A copyable value field rendered in Geist Mono inside a 6px-radius bordered button that fills as the whole control: clicking anywhere on the value (or activating it by keyboard) copies the real value via navigator.clipboard with an execCommand fallback for insecure contexts, and the confirmation happens inside the type itself. Each character is its own span carrying a `--cc-delay` custom property; on copy, an origin character index is computed — nearest to the pointer's clientX for a mouse click, or the string's start for keyboard activation (detected via the native click event's `detail === 0`) — and every character's delay becomes its distance from that origin times ~18ms. A CSS keyframe then plays per character at its own delay: letter-spacing animates 0 to -0.06em and back to 0 with a hair of positive overshoot on the way out, so the string visibly crimps shut in a wave radiating from the touched point and springs back open, like a wire getting a ferrule. Characters remount on every activation (keyed by an incrementing run id) so the wave always replays from its start on repeat clicks. Once the wave finishes sweeping outward, a small inline SVG check stroked in --foreground scales into the icon slot (which idles as a muted copy glyph) with an ease-out-expo curve, holds for 1.2s, then fades back to the idle glyph — the icon slot is reserved space, so nothing shifts layout and there is no toast or color flash anywhere else on screen. A visually-hidden aria-live=polite region announces \"Copied\" on each successful copy (reset and re-set per activation so repeat copies re-announce); the button's accessible name is an explicit aria-label derived from the optional `label` prop (default \"Copy value\"), never from the value itself, and both the character spans and icons are aria-hidden, so a `masked` field (bullets in place of characters, real value still copied) never leaks the secret into the accessible name either way. prefers-reduced-motion drops the letter-spacing wave and shortens the icon's fade/scale transitions to near-instant, but the check still appears and holds — the confirmation still reads, it just isn't animated.",
   "dependencies": [],
   "card": {
-    "focus": "button",
-    "padding": 1.6
-  },
-  "review": true
+    "focus": "[data-ns-cc-focus]",
+    "padding": 0.3
+  }
 }

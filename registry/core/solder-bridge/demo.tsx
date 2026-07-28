@@ -23,18 +23,20 @@ export default function SolderBridgeDemo() {
         ns-ui / solder-bridge
       </p>
 
-      <div className="flex flex-col items-center gap-3">
-        <SolderBridge checked={checked} aria-label="Route traffic to secondary" />
-        <p className="font-mono text-[11px] uppercase tracking-wide text-muted">
-          {checked ? "on — 90% routed right" : "off — 90% routed left"}
-        </p>
-      </div>
+      <div className="flex flex-col items-center gap-8">
+        <div className="flex flex-col items-center gap-3">
+          <SolderBridge checked={checked} aria-label="Route traffic to secondary" />
+          <p className="font-mono text-[11px] uppercase tracking-wide text-muted">
+            {checked ? "on — 90% routed right" : "off — 90% routed left"}
+          </p>
+        </div>
 
-      <div className="flex flex-col items-center gap-3">
-        <SolderBridge ratio={0.35} aria-label="Cache allocation" />
-        <p className="font-mono text-[11px] uppercase tracking-wide text-muted">
-          ratio=0.35 — partial allocation
-        </p>
+        <div className="flex flex-col items-center gap-3">
+          <SolderBridge ratio={0.35} aria-label="Cache allocation" />
+          <p className="font-mono text-[11px] uppercase tracking-wide text-muted">
+            ratio=0.35 — partial allocation
+          </p>
+        </div>
       </div>
 
       <p className="max-w-md text-center text-xs text-muted">

@@ -1,0 +1,56 @@
+name: Component request
+description: Propose a component for the registry.
+labels: [component request]
+body:
+  - type: markdown
+    attributes:
+      value: >
+        The registry is curated rather than exhaustive. A proposal lands best
+        when it names an interaction that does not already exist here, not a
+        category. Browse https://design.helpmarq.com first.
+
+  - type: input
+    id: name
+    attributes:
+      label: Proposed name
+      description: Lowercase, hyphenated, evocative rather than descriptive.
+      placeholder: mercury-minimap
+    validations:
+      required: true
+
+  - type: dropdown
+    id: collection
+    attributes:
+      label: Collection
+      description: >
+        core is restrained and production-facing. loud is a deliberately
+        flashy showcase.
+      options:
+        - core
+        - loud
+    validations:
+      required: true
+
+  - type: textarea
+    id: behavior
+    attributes:
+      label: What it does
+      description: >
+        Describe the behavior, especially what happens on input. A component
+        that only looks a certain way at rest is usually not enough.
+    validations:
+      required: true
+
+  - type: textarea
+    id: distinct
+    attributes:
+      label: Why it is not covered by something already in the registry
+      description: Name the closest existing component and the difference.
+    validations:
+      required: true
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Links, videos, or prior art that show the idea.

@@ -8,7 +8,7 @@ export default function CrimpCopyDemo() {
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
         ns-ui / crimp-copy — click the value to copy
       </p>
-      <div className="flex w-full max-w-sm flex-col gap-6">
+      <div data-ns-cc-focus className="flex w-full max-w-sm flex-col gap-6">
         <CrimpCopy label="API key" value="ns_51N7f2KcQ9mXG4dP3vB7hT2q0e8f" />
         <CrimpCopy label="Webhook secret" value="8f2a1c9d7b4e6f0a3c5d2e1b9a7c3f0e" masked />
       </div>

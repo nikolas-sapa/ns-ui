@@ -3,6 +3,10 @@
   "title": "Sieve Facets",
   "description": "Faceted filter chips as a sieve — active facets read as taut, bright threads in a hairline mesh fanned from a hub above the chip row, hovering a chip visibly tightens its own thread, and deselecting one opens a gap that shakes a few result particles through as the count sifts to its new value.",
   "collection": "core",
+  "card": {
+    "focus": ".max-w-md",
+    "padding": 0.3
+  },
   "tags": ["filter", "facets", "chips", "toggle", "mesh", "set-membership", "svg"],
   "useWhen": "a faceted filter bar (product listings, search refinement) where the active facet set itself deserves a visible structure, not a plain row of pills; this is set-membership (which facets are ON), not an event counter — for tallying discrete events over time, use grain-tally instead.",
   "dependencies": [],

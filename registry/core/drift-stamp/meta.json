@@ -23,6 +23,5 @@
   "gate": {
     "openBy": "[data-drift-stamp]",
     "expect": "[data-drift-face=exact]"
-  },
-  "review": true
+  }
 }

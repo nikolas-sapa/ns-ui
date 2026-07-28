@@ -32,6 +32,5 @@
   "card": {
     "focus": ".max-w-md",
     "padding": 0.12
-  },
-  "review": true
+  }
 }

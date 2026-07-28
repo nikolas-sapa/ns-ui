@@ -25,6 +25,5 @@
   "card": {
     "focus": ".ns-cf-root",
     "padding": 0.3
-  },
-  "review": true
+  }
 }

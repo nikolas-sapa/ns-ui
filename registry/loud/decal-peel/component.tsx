@@ -755,8 +755,8 @@ const CSS = `
 .ns-dp-flap{
   position:absolute;inset:0;border-radius:16px;opacity:0;
   background:linear-gradient(var(--dp-flap-angle,135deg),
-    color-mix(in srgb, var(--foreground) 62%, var(--accent)) 0%,
-    color-mix(in srgb, var(--foreground) 28%, var(--accent)) 55%,
+    color-mix(in srgb, white 25%, var(--accent)) 0%,
+    color-mix(in srgb, white 55%, var(--accent)) 55%,
     color-mix(in srgb, var(--background) 90%, var(--foreground)) 100%);
   box-shadow:inset 0 0 14px rgba(0,0,0,0.18);
   will-change:transform,clip-path;

@@ -31,8 +31,6 @@ const items: ShowcaseEntry[] = registry.items
     collection: item.meta?.collection ?? "core",
     // Search matches tags too, so the projection carries them to the client.
     tags: item.meta?.tags ?? [],
-    // Temporary audit flag — see the whitelist comment in build-registry.ts.
-    review: item.meta?.review ?? false,
     // …and the two plainest-spoken fields the registry has, so a descriptive
     // query ("reacts to the cursor") finds something.
     prose: dropNegatives(

@@ -24,6 +24,5 @@
   "card": {
     "focus": "[data-ns-patina-focus]",
     "padding": 0.5
-  },
-  "review": true
+  }
 }

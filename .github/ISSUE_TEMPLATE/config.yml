@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Browse the registry
+    url: https://design.helpmarq.com
+    about: Live previews of every component, with install commands.
+  - name: Catalog for agents
+    url: https://design.helpmarq.com/llms.txt
+    about: The whole registry as plain text, in one fetch.

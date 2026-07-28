@@ -1,54 +1,97 @@
 # ns-ui
 
-Personal registry of high-craft components. Two collections: `core` (Geist-dark restraint) and `loud` (flashy showcase). Spec: `docs/superpowers/specs/2026-07-17-component-library-design.md`.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Live registry](https://img.shields.io/badge/registry-design.helpmarq.com-006bff)](https://design.helpmarq.com)
+[![CI](https://github.com/nikolas-sapa/ns-ui/actions/workflows/ci.yml/badge.svg)](https://github.com/nikolas-sapa/ns-ui/actions/workflows/ci.yml)
 
-## Use it
+197 React components you install by URL, no package to depend on. Every one is
+built around a single interaction and gated by a Playwright suite that refuses
+to pass a component whose hover looks identical to its resting state.
 
-Install any component into a shadcn-configured project, zero config:
+Two collections. `core` (169) is restrained and production-facing, Geist-dark.
+`loud` (28) is a deliberately flashy showcase.
+
+Browse them live at **[design.helpmarq.com](https://design.helpmarq.com)**.
+
+|  |  |
+|---|---|
+| ![particle-hero](https://raw.githubusercontent.com/nikolas-sapa/ns-ui/main/registry/core/particle-hero/screenshots/dark-default.png) | ![pressure-front](https://raw.githubusercontent.com/nikolas-sapa/ns-ui/main/registry/loud/pressure-front/screenshots/dark-default.png) |
+| **particle-hero** — a field that answers the cursor | **pressure-front** — contour lines that bunch toward the CTA |
+| ![caustic-coverflow](https://raw.githubusercontent.com/nikolas-sapa/ns-ui/main/registry/core/caustic-coverflow/screenshots/dark-default.png) | ![ridge-walk](https://raw.githubusercontent.com/nikolas-sapa/ns-ui/main/registry/core/ridge-walk/screenshots/dark-default.png) |
+| **caustic-coverflow** — drag to scrub, flick for momentum | **ridge-walk** — pick a point on a pareto frontier |
+| ![crack-compare](https://raw.githubusercontent.com/nikolas-sapa/ns-ui/main/registry/core/crack-compare/screenshots/dark-default.png) | ![knockout-404](https://raw.githubusercontent.com/nikolas-sapa/ns-ui/main/registry/loud/knockout-404/screenshots/dark-default.png) |
+| **crack-compare** — the before/after divider is a fracture | **knockout-404** — type carved out of the surface |
+
+## Install
+
+Any shadcn-configured project, zero config:
 
 ```bash
 npx shadcn add https://design.helpmarq.com/r/<name>.json
 ```
 
-**For AI agents:** `GET https://design.helpmarq.com/llms.txt` — the whole catalog (props, use-cases,
-install commands) as plain text, one fetch, no MCP server required. Full behavioral detail per
-component: `https://design.helpmarq.com/llms-full.txt`.
+That drops the source at `components/ui/<name>.tsx` and installs the
+component's npm dependencies. There is no `ns-ui` package and nothing to keep
+in sync. The code is yours to edit.
 
-## Run
+New project:
+
+```bash
+npx shadcn init -d
+npx shadcn add https://design.helpmarq.com/r/caustic-coverflow.json
+```
+
+## For agents
+
+```
+GET https://design.helpmarq.com/llms.txt
+```
+
+One fetch returns the whole catalog as plain text: every component, its props,
+the situation it suits, and its exact install command. No MCP server, no tool
+definitions, no pagination. An agent that can make an HTTP request can pick the
+right component and install it in two steps.
+
+`llms-full.txt` at the same origin adds the full behavioral description per
+component, hand-written rather than derived from tags, for the cases where
+several components share a UI role and a model has to tell them apart.
+
+`/registry.json` serves the standard shadcn registry index for tools that
+expect it.
+
+## The gate
+
+`scripts/verify.ts` is why the registry stays small. It drives every component
+through headless Chromium, screenshots each state against each theme, and
+hard-fails on:
+
+- a console error, or a blank render
+- hover byte-identical to default, or focus identical to an unfocused baseline
+  (an interaction that does not actually interact)
+- dark and light byte-identical (a component that ignored the theme)
+- an interactive control with no accessible name, `role=switch|checkbox|radio`
+  without `aria-checked`, a visible dialog with no accessible name, or controls
+  Tab cannot reach
+- a popover or menu that opens but lands clipped invisible behind an ancestor's
+  `overflow: hidden`, caught by hit-testing the opened element rather than
+  measuring its box
+
+The screenshots it produces are committed, so the claims above are auditable in
+the repo rather than asserted here.
+
+## Run it locally
 
 ```bash
 npm install
-npm run dev            # preview site — / lists components, /preview/<name> renders one
+npm run dev            # / lists components, /preview/<name> renders one
+npm run verify         # the gate, in another shell, with dev running
 ```
 
-## Verify (quality gate)
+Node 22.18 or newer. Adding a component means creating a folder with
+`component.tsx`, `demo.tsx` and `meta.json`; registration is automatic. See
+[CONTRIBUTING.md](CONTRIBUTING.md), and [AGENTS.md](AGENTS.md) if you are an
+agent working inside this repo.
 
-Dev server must be running.
+## License
 
-```bash
-npm run verify                          # all components
-node scripts/verify.ts glass-button     # one component
-BASE_URL=http://localhost:3001 npm run verify   # non-default port
-```
-
-Renders every component headlessly, screenshots states (default/hover/scroll) × themes (dark/light) into `registry/<collection>/<name>/screenshots/`, fails on console errors, blank renders, or invalid `meta.json`.
-
-## Add a component
-
-1. Create `registry/<collection>/<name>/` with `component.tsx`, `demo.tsx`, `meta.json` (name, collection, tags, instruction, dependencies).
-2. Register the demo in `registry/index.tsx` (one line).
-3. Add the item to `registry.json`.
-4. `npm run registry:build` → emits `public/r/<name>.json`.
-5. `npm run verify` — component is done only when it passes and survives the screenshot-judge loop.
-
-## Install into another project
-
-From any Next.js + Tailwind project with shadcn configured (`npx shadcn init -d`):
-
-```bash
-npx shadcn add http://localhost:3000/r/glass-button.json
-```
-
-Drops the source at `components/ui/<name>.tsx` and installs its npm deps. After a public deploy, swap localhost for the deployed URL.
-
-> Machine note: this machine's `~/.npmrc` sets `minimum-release-age`, which breaks `npx shadcn@latest` with `npm error Invalid Version`. Workaround: `npm i -D shadcn` in the consumer project and use `npx shadcn` (local resolution).
+MIT. See [LICENSE](LICENSE).

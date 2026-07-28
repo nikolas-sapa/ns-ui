@@ -20,8 +20,7 @@
   "instruction": "A breadcrumb navigation trail for paths deep enough to outgrow their container. When the trail cannot fit, it gives way from the middle rather than the tail: the first crumb and the last two always survive (both counts are props) and everything between them folds into a single ellipsis button that opens a menu of the hidden levels, so no level is ever lost to keyboard or assistive tech — it just moves. Every width in the fit calculation is read from a second, hidden copy of the full uncollapsed trail rendered out of flow, never from the visible list; measuring the visible list is what turns this pattern into a feedback loop where collapsing shrinks the content, which says it fits, which expands, which overflows, and shows up as permanent jitter at any container width near the threshold. The ellipsis chip's own width is part of the budget, candidates are dropped from the centre outward until the row fits, re-expanding demands 24px of extra room so a container resting on the threshold settles, an identical result never calls setState, and everything is remeasured once on document.fonts.ready because a webfont swap invalidates every number. The current level is a plain span with aria-current=\"page\" carrying a 2px accent rule that sweeps from zero to the exact text width whenever the last crumb's id changes, instead of a static bold treatment. Markup is nav > ol > li with real links or buttons in natural tab order; the ellipsis is aria-haspopup=\"menu\" with a labelled count, and its role=\"menu\" popover has roving tabindex, wrapping Arrow Up/Down, Home/End, Escape to close and restore focus, and Tab to close and move on. Zero dependencies, no canvas, colors entirely from --accent, --muted, --foreground, --surface and --border so both themes read correctly, and prefers-reduced-motion renders the rule at full width with no sweep and mounts the menu with no fade.",
   "dependencies": [],
   "card": {
-    "focus": "nav",
-    "padding": 1.5
-  },
-  "review": true
+    "focus": ".max-w-2xl",
+    "padding": 0.3
+  }
 }

@@ -26,6 +26,5 @@
   "card": {
     "focus": "[data-ns-cl-focus]",
     "padding": 0.6
-  },
-  "review": true
+  }
 }

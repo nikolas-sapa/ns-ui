@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    env:
+      # The `playwright` package downloads browsers on install. CI only needs
+      # to typecheck and build; `npm run verify` is a local gate that requires
+      # a running server, so skip the ~400MB download.
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # The build scripts are TypeScript run directly by node
+          # (`node scripts/build-index.ts`), which needs Node's native type
+          # stripping. That is on by default from Node 22.18 / 24.x.
+          node-version: 24
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Build registry
+        run: npm run registry:build
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build site
+        run: npm run build
