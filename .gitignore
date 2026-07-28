@@ -19,3 +19,4 @@ public/llms-full.txt
 
 # debug scratch from agent sessions — never commit
 .scratch-dbg/
+recordings/
