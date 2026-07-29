@@ -399,8 +399,13 @@ export const SedimentStack = forwardRef<
         return;
       }
       if (existing) {
+        // Only a genuinely new node (real remount) should wake the sim —
+        // the churn case above reattaches this exact same element on every
+        // unrelated re-render of the list, and waking on every one of those
+        // resets the settle deadline continuously, so the sim never parks.
+        const isNewNode = existing.el !== el;
         existing.el = el;
-        wakeRef.current();
+        if (isNewNode) wakeRef.current();
         return;
       }
       const root = containerRef.current;
@@ -794,6 +799,8 @@ export const SedimentStack = forwardRef<
     };
     // full physics wake — support or geometry changed (spawn/dismiss/resize)
     const wake = () => {
+      // eslint-disable-next-line no-console
+      console.log("[sediment-debug] wake() called");
       for (const b of bodiesRef.current.values()) {
         if (b.dead || b.dragging) continue;
         if (b.asleep) {
