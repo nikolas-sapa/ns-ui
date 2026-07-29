@@ -4,11 +4,11 @@
 [![Live registry](https://img.shields.io/badge/registry-design.helpmarq.com-006bff)](https://design.helpmarq.com)
 [![CI](https://github.com/nikolas-sapa/ns-ui/actions/workflows/ci.yml/badge.svg)](https://github.com/nikolas-sapa/ns-ui/actions/workflows/ci.yml)
 
-197 React components you install by URL, no package to depend on. Every one is
+206 React components you install by URL, no package to depend on. Every one is
 built around a single interaction and gated by a Playwright suite that refuses
 to pass a component whose hover looks identical to its resting state.
 
-Two collections. `core` (169) is restrained and production-facing, Geist-dark.
+Two collections. `core` (178) is restrained and production-facing, Geist-dark.
 `loud` (28) is a deliberately flashy showcase.
 
 Browse them live at **[design.helpmarq.com](https://design.helpmarq.com)**.
@@ -87,7 +87,21 @@ npm run dev            # / lists components, /preview/<name> renders one
 npm run verify         # the gate, in another shell, with dev running
 ```
 
-Node 22.18 or newer. Adding a component means creating a folder with
+Node 22.18 or newer.
+
+### Environment variables
+
+Copy `.env.example` to `.env` and fill in what you need. Everything is
+optional locally — the app still runs and the email form still renders, it
+just returns an error on submit if the EmailOctopus vars are unset.
+
+| Variable | Purpose |
+|---|---|
+| `NEXT_PUBLIC_REGISTRY_ORIGIN` | Overrides the public origin install commands and `llms.txt` resolve against. Defaults to `https://design.helpmarq.com`. |
+| `EMAILOCTOPUS_API_KEY` | Bearer key for the EmailOctopus v2 API, used by the email capture form (`lib/actions/subscribe.ts`). Server-only, never exposed to the client. |
+| `EMAILOCTOPUS_LIST_ID` | The EmailOctopus list contacts are added to. |
+
+Adding a component means creating a folder with
 `component.tsx`, `demo.tsx` and `meta.json`; registration is automatic. See
 [CONTRIBUTING.md](CONTRIBUTING.md), and [AGENTS.md](AGENTS.md) if you are an
 agent working inside this repo.

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CatalogControls, type Filter, type Sort } from "./catalog-controls";
 import { CopyButton } from "./copy-button";
+import { EmailCapture } from "./email-capture";
 import { FeaturedCard } from "./featured-card";
 import { GitHubStarButton } from "./github-star-button";
 import { PreviewCard, type RegistryEntry } from "./preview-card";
@@ -388,6 +389,10 @@ export function Showcase({
         <GitHubStarButton variant="quiet" />
       </div>
 
+      <div className="mt-14 flex flex-col items-center border-t border-border pt-14 text-center">
+        <EmailCapture />
+      </div>
+
       <JumpToTop />
 
       <footer className="mt-16 flex flex-wrap items-baseline justify-between gap-x-8 gap-y-3 border-t border-border pt-6 font-mono text-xs text-muted">
@@ -404,6 +409,10 @@ export function Showcase({
         <p>
           <a href="/changelog" className={FOOTER_LINK}>
             Changelog
+          </a>{" "}
+          ·{" "}
+          <a href="/writing" className={FOOTER_LINK}>
+            Writing
           </a>{" "}
           ·{" "}
           <a href="https://github.com/nikolas-sapa/ns-ui" className={FOOTER_LINK}>

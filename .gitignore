@@ -6,6 +6,11 @@ next-env.d.ts
 .DS_Store
 .vercel
 
+# Secrets — .env.example is the committed template, real values never are.
+.env
+.env.local
+.env*.local
+
 # Generated from meta.json sidecars by `npm run registry:build`.
 # Not committed: two branches adding components would otherwise conflict in files
 # nobody hand-wrote. Regenerated automatically before dev/typecheck/verify/build,
