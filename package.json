@@ -42,6 +42,8 @@
   },
   "dependencies": {
     "@react-three/fiber": "9.6.1",
+    "@vercel/analytics": "2.0.1",
+    "@vercel/speed-insights": "2.0.0",
     "geist": "1.7.2",
     "motion": "12.42.2",
     "next": "16.2.10",

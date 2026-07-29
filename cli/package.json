@@ -1,0 +1,36 @@
+{
+  "name": "@nikolas.sapa/ns-ui",
+  "version": "0.1.0",
+  "description": "CLI for the ns-ui component registry: shorter install command for shadcn-compatible components.",
+  "keywords": [
+    "shadcn",
+    "registry",
+    "cli",
+    "react",
+    "tailwind",
+    "component-library"
+  ],
+  "homepage": "https://design.helpmarq.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nikolas-sapa/ns-ui.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nikolas-sapa/ns-ui/issues"
+  },
+  "author": "Nikolas Sapalidis",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "ns-ui": "bin/ns-ui.js"
+  },
+  "files": [
+    "bin"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
