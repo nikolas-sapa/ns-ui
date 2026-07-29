@@ -1,8 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { CatalogControls, type Filter, type Sort } from "./catalog-controls";
 import { CopyButton } from "./copy-button";
 import { FeaturedCard } from "./featured-card";
+import { GitHubStarButton } from "./github-star-button";
 import { PreviewCard, type RegistryEntry } from "./preview-card";
 import { ThemeToggle } from "./theme-toggle";
 import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
@@ -47,13 +49,6 @@ const MOUNT_CAP = 12;
 /** Mount a demo this far outside the viewport so it has run a beat before seen. */
 const PRELOAD_MARGIN = 600;
 
-type Filter = "all" | "core" | "loud";
-type Sort = "featured" | "newest" | "oldest";
-const SORTS: { key: Sort; label: string }[] = [
-  { key: "featured", label: "Featured" },
-  { key: "newest", label: "Newest" },
-  { key: "oldest", label: "Oldest" },
-];
 const SORT_PARAM = "sort";
 
 /**
@@ -125,8 +120,8 @@ export function Showcase({
   );
 
   /**
-   * One lowercase string per component to match against. 50 items, so this is
-   * a plain substring scan on every keystroke — no index, no debounce.
+   * One lowercase string per component to match against. 206 items, so this
+   * is a plain substring scan on every keystroke — no index, no debounce.
    *
    * The synonym words are folded in here rather than matched separately, so a
    * multi-word plain query ("file upload") still works term by term against
@@ -218,21 +213,18 @@ export function Showcase({
     [featured, byName],
   );
 
-  const tabs: { key: Filter; label: string }[] = [
-    { key: "all", label: "All" },
-    { key: "core", label: "Core" },
-    { key: "loud", label: "Loud" },
-  ];
-
   return (
     <main className="mx-auto w-full max-w-[1600px] px-6 pb-32 sm:px-10">
       <header className="grid gap-10 pt-20 sm:pt-28 lg:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] lg:items-end lg:gap-16">
         <div>
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center justify-between gap-3">
             <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">
               ns-ui
             </p>
-            <ThemeToggle />
+            <div className="flex items-center gap-3">
+              <GitHubStarButton />
+              <ThemeToggle />
+            </div>
           </div>
           <h1 className="mt-5 max-w-3xl text-3xl font-semibold leading-[1.15] tracking-tight sm:text-4xl">
             A personal registry of {items.length} React components.
@@ -269,137 +261,22 @@ export function Showcase({
         </div>
       </header>
 
-      <div className="sticky top-0 z-30 -mx-6 mt-14 border-b border-border bg-background/85 px-6 py-3 backdrop-blur sm:-mx-10 sm:px-10">
-        <div className="flex items-center justify-between gap-4">
-          <div
-            role="tablist"
-            aria-label="Filter by collection"
-            className="flex items-center gap-1"
-          >
-            {tabs.map((t) => {
-              const selected = filter === t.key;
-              return (
-                <button
-                  key={t.key}
-                  role="tab"
-                  type="button"
-                  aria-selected={selected}
-                  onClick={() => setFilter(t.key)}
-                  className={`rounded-sm px-2.5 py-1 text-sm outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-accent ${
-                    selected
-                      ? "bg-surface font-medium text-foreground"
-                      : "text-muted hover:text-foreground"
-                  }`}
-                >
-                  {t.label}
-                  <span className="ml-1.5 font-mono text-xs text-muted">
-                    {counts[t.key]}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-          <div className="flex min-w-0 items-center gap-3">
-            <label htmlFor="component-search" className="sr-only">
-              Search components
-            </label>
-            <input
-              id="component-search"
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search"
-              autoComplete="off"
-              spellCheck={false}
-              className="w-28 min-w-0 rounded-sm border border-border bg-surface px-2 py-1 text-sm text-foreground outline-none transition-colors placeholder:text-muted focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none sm:w-56 sm:px-2.5"
-            />
-            <p
-              aria-live="polite"
-              className="shrink-0 font-mono text-[11px] text-muted sm:text-xs"
-            >
-              {visibleItems.length} shown
-            </p>
-          </div>
-        </div>
-
-        {/* Newest-first review, per the owner's own request — Featured is a
-            curated order, Newest/Oldest are pure recency off
-            component-order.json. Survives filtering and search, and the
-            choice round-trips through `?sort=` on the URL. */}
-        <div
-          role="group"
-          aria-label="Sort order"
-          className="mt-2.5 flex items-center gap-1.5"
-        >
-          <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
-            Sort
-          </span>
-          {SORTS.map((s) => {
-            const on = sort === s.key;
-            return (
-              <button
-                key={s.key}
-                type="button"
-                aria-pressed={on}
-                onClick={() => setSort(s.key)}
-                className={`shrink-0 rounded-full border px-2.5 py-1 text-xs outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-accent ${
-                  on
-                    ? "border-accent bg-accent text-white"
-                    : "border-border text-muted hover:border-muted hover:text-foreground"
-                }`}
-              >
-                {s.label}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* What is this for? — the row a newcomer uses instead of guessing the
-            house vocabulary. Roles, not tags: 166 tags, 128 of them singletons,
-            would be noise. */}
-        <div className="mt-2.5 flex items-center gap-2">
-          <div
-            role="group"
-            aria-label="Filter by what the component is for"
-            className="-mb-1 flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto pb-1"
-          >
-            {categories.map((c) => {
-              const on = category === c.id;
-              return (
-                <button
-                  key={c.id}
-                  type="button"
-                  aria-pressed={on}
-                  onClick={() => setCategory(on ? null : c.id)}
-                  className={`shrink-0 rounded-full border px-2.5 py-1 text-xs outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-accent ${
-                    on
-                      ? "border-accent bg-accent text-white"
-                      : "border-border text-muted hover:border-muted hover:text-foreground"
-                  }`}
-                >
-                  {c.label}
-                  <span
-                    className={`ml-1.5 font-mono text-[11px] ${
-                      on ? "text-white/70" : "text-muted"
-                    }`}
-                  >
-                    {c.count}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-          {filtered ? (
-            <button
-              type="button"
-              onClick={clearAll}
-              className="shrink-0 rounded-sm px-1.5 py-1 text-xs text-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
-            >
-              Clear
-            </button>
-          ) : null}
-        </div>
-      </div>
+      <CatalogControls
+        filter={filter}
+        onFilter={setFilter}
+        counts={counts}
+        query={query}
+        onQuery={setQuery}
+        sort={sort}
+        onSort={setSort}
+        categories={categories}
+        category={category}
+        onCategory={setCategory}
+        visibleCount={visibleItems.length}
+        totalCount={items.length}
+        filtered={filtered}
+        onClearAll={clearAll}
+      />
 
       {/* Featured rail: a small, genuinely-curated set, live and directly
           interactive rather than an autoplaying thumbnail. Hidden the moment
@@ -502,7 +379,18 @@ export function Showcase({
         ))}
       </div>
 
-      <footer className="mt-24 flex flex-wrap items-baseline justify-between gap-x-8 gap-y-3 border-t border-border pt-6 font-mono text-xs text-muted">
+      {/* Second CTA placement for anyone who scrolled past the hero without
+          noticing the first one. Plain bordered link, not a second
+          LiquidCollar — one WebGL context for the CTA is enough, and a
+          repeated animated treatment would start reading as an ad. */}
+      <div className="mt-24 flex flex-col items-center gap-3 border-t border-border pt-14 text-center">
+        <p className="text-sm text-muted">If any of this was useful, a star helps others find it.</p>
+        <GitHubStarButton variant="quiet" />
+      </div>
+
+      <JumpToTop />
+
+      <footer className="mt-16 flex flex-wrap items-baseline justify-between gap-x-8 gap-y-3 border-t border-border pt-6 font-mono text-xs text-muted">
         <p>
           For AI agents:{" "}
           <a href="/llms.txt" className={FOOTER_LINK}>
@@ -518,9 +406,6 @@ export function Showcase({
             Changelog
           </a>{" "}
           ·{" "}
-          {/* Owner's call to keep this live: the repo is public, MIT and pushed —
-              it 404s only because of an account-level GitHub flag pending appeal.
-              Expected to resolve itself when the flag lifts. */}
           <a href="https://github.com/nikolas-sapa/ns-ui" className={FOOTER_LINK}>
             GitHub
           </a>{" "}
@@ -532,6 +417,57 @@ export function Showcase({
         <p className="mt-2">Built with love for developers, with Claude Code.</p>
       </footer>
     </main>
+  );
+}
+
+/** How far down the page before the jump-to-top control appears. */
+const JUMP_THRESHOLD = 1200;
+
+/**
+ * Quiet floating "back to top" — the catalog runs long (206 cards), and the
+ * sticky filter bar is the only other fixed landmark, so this is the one
+ * cheap way back without a mouse-wheel marathon. Rendered once, opacity/
+ * pointer-events toggled rather than mounted/unmounted, so it never steals
+ * focus by appearing mid-tab.
+ */
+function JumpToTop() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setVisible(window.scrollY > JUMP_THRESHOLD);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const scrollUp = useCallback(() => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
+  }, []);
+
+  return (
+    <button
+      type="button"
+      onClick={scrollUp}
+      aria-label="Back to top"
+      tabIndex={visible ? 0 : -1}
+      className={`fixed bottom-6 right-6 z-30 flex size-10 items-center justify-center rounded-full border border-border bg-surface text-muted shadow-sm outline-none transition-[opacity,transform] duration-200 ease-out hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none sm:bottom-8 sm:right-8 ${
+        visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-2 opacity-0"
+      }`}
+    >
+      <svg
+        viewBox="0 0 16 16"
+        className="size-4"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden
+      >
+        <path d="M8 12.5v-9M4 7l4-4 4 4" />
+      </svg>
+    </button>
   );
 }
 

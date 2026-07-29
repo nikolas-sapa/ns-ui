@@ -350,17 +350,31 @@ export function LiquidCollar({
     };
     readColors();
 
+    // compile()/linking can throw or fail without an exception; either way
+    // setup() must resolve to a clean false (children still render sans
+    // ring) rather than an uncaught throw, which would skip the `if
+    // (!setup()) return;` early-return below and leave the effect's cleanup
+    // never registered — a permanent GL leak on a bad driver.
     const setup = (): boolean => {
       gl = canvas.getContext("webgl", { alpha: true, premultipliedAlpha: true }) as WebGLRenderingContext | null;
       if (!gl) return false;
-      vShader = compile(gl, gl.VERTEX_SHADER, VERT_SRC);
-      fShader = compile(gl, gl.FRAGMENT_SHADER, FRAG_SRC);
-      program = gl.createProgram();
-      if (!program) return false;
-      gl.attachShader(program, vShader);
-      gl.attachShader(program, fShader);
-      gl.linkProgram(program);
-      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      try {
+        vShader = compile(gl, gl.VERTEX_SHADER, VERT_SRC);
+        fShader = compile(gl, gl.FRAGMENT_SHADER, FRAG_SRC);
+        program = gl.createProgram();
+        if (!program) {
+          teardown();
+          return false;
+        }
+        gl.attachShader(program, vShader);
+        gl.attachShader(program, fShader);
+        gl.linkProgram(program);
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+          teardown();
+          return false;
+        }
+      } catch {
+        teardown();
         return false;
       }
       gl.useProgram(program);
@@ -502,7 +516,11 @@ export function LiquidCollar({
     const onPointerDown = (e: PointerEvent) => {
       pressTarget = 1;
       pressAngle = angleFromEvent(e);
-      wake();
+      // only (re)start the loop if animation is actually allowed — under
+      // prefers-reduced-motion/paused, staticMode holds the loop stopped and
+      // a press should still redraw the one frozen frame, not spin up rAF
+      if (!staticMode) wake();
+      else draw(performance.now());
     };
     const onPointerUp = (e: PointerEvent) => {
       if (pressTarget) {
