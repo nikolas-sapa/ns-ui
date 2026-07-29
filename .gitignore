@@ -39,3 +39,5 @@ recordings/
 /.worktrees/
 .scratch-audit/
 *.tmp.mjs
+__audit_tmp*
+*_tmp.mjs

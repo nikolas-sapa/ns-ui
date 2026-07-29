@@ -65,6 +65,10 @@ const STOPWORDS = new Set([
   "some", "that", "the", "this", "to", "use", "want", "when", "with", "you",
 ]);
 
+const FILTER_PARAM = "collection";
+const CATEGORY_PARAM = "category";
+const QUERY_PARAM = "q";
+
 export function Showcase({
   items,
   featured,
@@ -73,29 +77,71 @@ export function Showcase({
   /** Curated slugs, already filtered to ones that exist — see lib/featured.ts. */
   featured: string[];
 }) {
-  const [filter, setFilter] = useState<Filter>("all");
-  const [category, setCategory] = useState<string | null>(null);
-  const [query, setQuery] = useState("");
+  const [filter, setFilterState] = useState<Filter>("all");
+  const [category, setCategoryState] = useState<string | null>(null);
+  const [query, setQueryState] = useState("");
 
-  // Starts at the server-rendered default and syncs from `?sort=` once
+  // Starts at the server-rendered default and syncs from the URL once
   // mounted — same mounted-gate pattern as ThemeToggle, so there is nothing
   // for hydration to disagree about. Kept in the URL (plain history API, not
   // useSearchParams — that needs a Suspense boundary this page doesn't have)
-  // so a click into a component's playground and back doesn't reset it.
+  // so a click into a component's playground and back doesn't reset it, and
+  // so a filtered view is a link someone can actually share.
   const [sort, setSortState] = useState<Sort>("featured");
   useEffect(() => {
-    const fromUrl = new URLSearchParams(window.location.search).get(SORT_PARAM);
+    const params = new URLSearchParams(window.location.search);
+    const fromUrl = params.get(SORT_PARAM);
     if (fromUrl === "newest" || fromUrl === "oldest" || fromUrl === "featured") {
       setSortState(fromUrl);
     }
+    const filterFromUrl = params.get(FILTER_PARAM);
+    if (filterFromUrl === "core" || filterFromUrl === "loud") {
+      setFilterState(filterFromUrl);
+    }
+    const categoryFromUrl = params.get(CATEGORY_PARAM);
+    if (categoryFromUrl) setCategoryState(categoryFromUrl);
+    const queryFromUrl = params.get(QUERY_PARAM);
+    if (queryFromUrl) setQueryState(queryFromUrl);
   }, []);
-  const setSort = useCallback((next: Sort) => {
-    setSortState(next);
+
+  /** Writes one param, dropping it entirely at its default value so the URL
+   *  stays clean when nothing is filtered. `replaceState`, same as sort —
+   *  keystroke-driven search would otherwise spam history on every character. */
+  const setParam = useCallback((key: string, value: string | null) => {
     const url = new URL(window.location.href);
-    if (next === "featured") url.searchParams.delete(SORT_PARAM);
-    else url.searchParams.set(SORT_PARAM, next);
+    if (value === null || value === "") url.searchParams.delete(key);
+    else url.searchParams.set(key, value);
     window.history.replaceState(null, "", url);
   }, []);
+
+  const setSort = useCallback(
+    (next: Sort) => {
+      setSortState(next);
+      setParam(SORT_PARAM, next === "featured" ? null : next);
+    },
+    [setParam],
+  );
+  const setFilter = useCallback(
+    (next: Filter) => {
+      setFilterState(next);
+      setParam(FILTER_PARAM, next === "all" ? null : next);
+    },
+    [setParam],
+  );
+  const setCategory = useCallback(
+    (next: string | null) => {
+      setCategoryState(next);
+      setParam(CATEGORY_PARAM, next);
+    },
+    [setParam],
+  );
+  const setQuery = useCallback(
+    (next: string) => {
+      setQueryState(next);
+      setParam(QUERY_PARAM, next);
+    },
+    [setParam],
+  );
 
   const counts = useMemo(() => {
     let core = 0;
@@ -216,6 +262,17 @@ export function Showcase({
 
   return (
     <main className="mx-auto w-full max-w-[1600px] px-6 pb-32 sm:px-10">
+      {/* First focusable element on the page. Lands past the header, install
+          box and the whole filter/sort/category cluster (20 tab stops) and
+          straight onto the first component — the entry point most keyboard
+          and screen reader visitors actually want. */}
+      <a
+        href="#catalog"
+        className="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:left-4 focus-visible:top-4 focus-visible:z-50 focus-visible:rounded-sm focus-visible:bg-accent focus-visible:px-3 focus-visible:py-2 focus-visible:text-sm focus-visible:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-hover"
+      >
+        Skip to components
+      </a>
+
       <header className="grid gap-10 pt-20 sm:pt-28 lg:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] lg:items-end lg:gap-16">
         <div>
           <div className="flex items-center justify-between gap-3">
@@ -285,31 +342,38 @@ export function Showcase({
           already answer "show me X"; a curated rail only makes sense as the
           entry point into the full catalog, and it competes with an explicit
           Newest/Oldest request rather than serving it. */}
+      {/* Skip-link target: id lands here regardless of whether the Featured
+          rail is showing, so "Skip to components" always works. tabIndex=-1
+          makes it focusable via fragment navigation without adding a tab
+          stop of its own. */}
+      <div id="catalog" tabIndex={-1} className="outline-none" />
+
       {!filtered && sort === "featured" && featuredItems.length > 0 ? (
-        <section className="mt-14">
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">
+        <section className="mt-14" aria-labelledby="featured-heading">
+          <h2
+            id="featured-heading"
+            className="font-mono text-xs font-normal uppercase tracking-[0.18em] text-muted"
+          >
             Featured
-          </p>
+          </h2>
           <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">
             A curated set, live. Click any preview to open it full size and
             play with it.
           </p>
-          <div className="mt-6 grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-2">
+          <ul className="mt-6 grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-2">
             {featuredItems.map((entry) => (
-              <FeaturedCard
-                key={entry.name}
-                entry={entry}
-                installCommand={installFor(entry.name)}
-              />
+              <li key={entry.name}>
+                <FeaturedCard entry={entry} installCommand={installFor(entry.name)} />
+              </li>
             ))}
-          </div>
+          </ul>
         </section>
       ) : null}
 
       {!filtered && sort === "featured" && featuredItems.length > 0 ? (
-        <p className="mt-24 font-mono text-xs uppercase tracking-[0.18em] text-muted">
+        <h2 className="mt-24 font-mono text-xs font-normal uppercase tracking-[0.18em] text-muted">
           All components
-        </p>
+        </h2>
       ) : null}
 
       {/* Two columns up to 2xl: the demos are full-viewport designs, so a
@@ -368,17 +432,21 @@ export function Showcase({
         </p>
       ) : null}
 
-      <div className="mt-10 grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-2 2xl:grid-cols-3">
+      <ul
+        aria-label={`${visibleItems.length} component${visibleItems.length === 1 ? "" : "s"}`}
+        className="mt-10 grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-2 2xl:grid-cols-3"
+      >
         {visibleItems.map((entry) => (
-          <PreviewCard
-            key={entry.name}
-            entry={entry}
-            active={isActive(entry.name)}
-            registerRef={registerRef}
-            installCommand={installFor(entry.name)}
-          />
+          <li key={entry.name}>
+            <PreviewCard
+              entry={entry}
+              active={isActive(entry.name)}
+              registerRef={registerRef}
+              installCommand={installFor(entry.name)}
+            />
+          </li>
         ))}
-      </div>
+      </ul>
 
       {/* Second CTA placement for anyone who scrolled past the hero without
           noticing the first one. Plain bordered link, not a second
@@ -460,7 +528,7 @@ function JumpToTop() {
       onClick={scrollUp}
       aria-label="Back to top"
       tabIndex={visible ? 0 : -1}
-      className={`fixed bottom-6 right-6 z-30 flex size-10 items-center justify-center rounded-full border border-border bg-surface text-muted shadow-sm outline-none transition-[opacity,transform] duration-200 ease-out hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none sm:bottom-8 sm:right-8 ${
+      className={`fixed bottom-6 right-6 z-30 flex size-11 items-center justify-center rounded-full border border-border bg-surface text-muted shadow-sm outline-none transition-[opacity,transform] duration-200 ease-out hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none sm:size-10 sm:bottom-8 sm:right-8 ${
         visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-2 opacity-0"
       }`}
     >

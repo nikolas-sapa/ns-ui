@@ -84,17 +84,20 @@ export function CatalogControls({
   return (
     <div className="sticky top-0 z-30 -mx-6 mt-14 border-b border-border bg-background/85 px-6 py-3 backdrop-blur sm:-mx-10 sm:px-10">
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2.5">
-        <div role="tablist" aria-label="Filter by collection" className="flex items-center gap-1">
+        {/* Plain toggle buttons, not an ARIA tablist — there's no associated
+            tabpanel and no arrow-key navigation, so `role="tab"` promised a
+            keyboard pattern this never implemented. `aria-pressed` matches
+            how the category chips below already announce their state. */}
+        <div role="group" aria-label="Filter by collection" className="flex items-center gap-1">
           {TABS.map((t) => {
             const selected = filter === t.key;
             return (
               <button
                 key={t.key}
-                role="tab"
                 type="button"
-                aria-selected={selected}
+                aria-pressed={selected}
                 onClick={() => onFilter(t.key)}
-                className={`rounded-sm px-2.5 py-1 text-sm outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-accent ${
+                className={`min-h-11 rounded-sm px-2.5 py-1 text-sm outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-accent sm:min-h-0 ${
                   selected
                     ? "bg-surface font-medium text-foreground"
                     : "text-muted hover:text-foreground"
@@ -127,7 +130,7 @@ export function CatalogControls({
               placeholder="Search"
               autoComplete="off"
               spellCheck={false}
-              className="w-28 min-w-0 rounded-sm border border-border bg-surface py-1 pl-2 pr-6 text-sm text-foreground outline-none transition-colors placeholder:text-muted focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none sm:w-56 sm:pl-2.5"
+              className="min-h-11 w-28 min-w-0 rounded-sm border border-border bg-surface py-1 pl-2 pr-6 text-sm text-foreground outline-none transition-colors placeholder:text-muted focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none sm:min-h-0 sm:w-56 sm:pl-2.5"
             />
             {/* Hidden until search is unfocused-and-empty, so the "/" hint
                 doesn't overlap the caret once someone's actually typing. */}
@@ -150,7 +153,7 @@ export function CatalogControls({
             id="sort-order"
             value={sort}
             onChange={(e) => onSort(e.target.value as Sort)}
-            className="shrink-0 rounded-sm border border-border bg-surface px-1.5 py-1 text-xs text-muted outline-none transition-colors focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none hover:text-foreground"
+            className="min-h-11 shrink-0 rounded-sm border border-border bg-surface px-1.5 py-1 text-xs text-muted outline-none transition-colors focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none hover:text-foreground sm:min-h-0"
           >
             {SORTS.map((s) => (
               <option key={s.key} value={s.key}>
@@ -175,7 +178,7 @@ export function CatalogControls({
                 type="button"
                 aria-pressed={on}
                 onClick={() => onCategory(on ? null : c.id)}
-                className={`shrink-0 rounded-full border px-2.5 py-1 text-xs outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-accent ${
+                className={`flex min-h-11 shrink-0 items-center rounded-full border px-2.5 py-1 text-xs outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-accent sm:min-h-0 ${
                   on
                     ? "border-accent bg-accent text-white"
                     : "border-border text-muted hover:border-muted hover:text-foreground"
@@ -201,7 +204,7 @@ export function CatalogControls({
           <button
             type="button"
             onClick={onClearAll}
-            className="shrink-0 rounded-sm px-1.5 py-1 text-xs text-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+            className="flex min-h-11 shrink-0 items-center rounded-sm px-1.5 py-1 text-xs text-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent sm:min-h-0"
           >
             Clear
           </button>
