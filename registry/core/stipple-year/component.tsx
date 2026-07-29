@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 
 // ---------------------------------------------------------------------------
 // StippleYear — a GitHub-style year activity calendar where intensity is
@@ -44,18 +45,19 @@ const LOUPE_PANEL_W = 172;
 const LEFT_LABEL_W = 30;
 const TOP_LABEL_H = 20;
 
-/** Cursor-proximity dot displacement — an "iron filings" push: dots within
- *  DISPLACE_RADIUS of the pointer nudge radially outward, strongest at the
- *  cursor and falling off to nothing at the edge (quadratic falloff, so the
- *  disturbed patch has no visible hard boundary). Only the dot cluster
- *  moves, never the cell's hit-target rect, so hover detection stays rock
- *  solid under its own motion. Radius spans several cells and the max
- *  offset is a large fraction of a cell so the parting is obvious at a
- *  glance — a wave through the texture, not a couple of nudged pixels —
- *  while the falloff keeps it reading as disturbed stipple, not a
- *  scatter/explosion effect. */
-const DISPLACE_RADIUS = 90;
-const DISPLACE_MAX = 9;
+/** Loupe ink-settle — every time a new cell is magnified into the loupe,
+ *  its dots don't just appear: each one starts flung a short distance from
+ *  its resting position (offset derived from the same per-dot mulberry32
+ *  stream that placed it, so it's deterministic and replays identically for
+ *  a given date, never Math.random()) and springs into place on an
+ *  ease-out-expo curve, staggered a few ms apart per dot so the settle
+ *  reads as ink landing on paper rather than one uniform pop. Kept well
+ *  clear of the loupe's own 160ms zoom-in (LOUPE_SETTLE_MS is longer and
+ *  starts from the same frame) so the two read as two distinct events, not
+ *  one blurred bloom. */
+const LOUPE_SETTLE_MS = 460;
+const LOUPE_SETTLE_MAX = 22;
+const LOUPE_SETTLE_STAGGER = 18;
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const WEEKDAY_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""];
@@ -106,6 +108,18 @@ function stippleUnits(iso: string, count: number): { x: number; y: number }[] {
   return Array.from({ length: count }, () => ({ x: rng(), y: rng() }));
 }
 
+/** Per-dot starting offset for the loupe's ink-settle entrance — a distinct
+ *  PRNG stream (own hash suffix) so it never correlates with the dot's own
+ *  resting position, but is still fully deterministic for a given date. */
+function loupeSettleOffsets(iso: string, count: number): { dx: number; dy: number }[] {
+  const rng = mulberry32(hashStr(`${iso}:settle`));
+  return Array.from({ length: count }, () => {
+    const angle = rng() * Math.PI * 2;
+    const dist = LOUPE_SETTLE_MAX * (0.4 + rng() * 0.6);
+    return { dx: Math.cos(angle) * dist, dy: Math.sin(angle) * dist };
+  });
+}
+
 interface DayCell {
   date: Date;
   iso: string;
@@ -116,6 +130,7 @@ interface DayCell {
 
 export function StippleYear({ values = {}, endDate, className = "" }: StippleYearProps) {
   const today = useMemo(() => startOfDay(endDate ?? new Date()), [endDate]);
+  const loupeClipId = useId();
 
   const { cells, weeks, monthLabels } = useMemo(() => {
     const roughStart = addDays(today, -364);
@@ -150,55 +165,7 @@ export function StippleYear({ values = {}, endDate, className = "" }: StippleYea
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const cellRefs = useRef<(SVGRectElement | null)[]>([]);
 
-  // Dot-displacement plumbing — direct DOM writes, no React state, so
-  // hovering never triggers a re-render of ~370 cells. See DISPLACE_RADIUS.
-  const svgRef = useRef<SVGSVGElement | null>(null);
-  const dotGroupRefs = useRef<(SVGGElement | null)[]>([]);
-  const activeDisplacedRef = useRef<Set<number>>(new Set());
-  const pointerSvgRef = useRef<{ x: number; y: number } | null>(null);
-  const rafPendingRef = useRef(false);
   const reducedMotionRef = useRef(false);
-  const applyDisplacementRef = useRef<(x: number, y: number) => void>(() => {});
-
-  // Reassigned every render (cheap closure swap) so the effect below — which
-  // attaches its listeners once — always reads the current cells/weeks
-  // without needing to re-subscribe on every data change.
-  applyDisplacementRef.current = (x: number, y: number) => {
-    const minCol = Math.max(0, Math.floor((x - DISPLACE_RADIUS - LEFT_LABEL_W) / STEP));
-    const maxCol = Math.min(weeks - 1, Math.ceil((x + DISPLACE_RADIUS - LEFT_LABEL_W) / STEP));
-    const minRow = Math.max(0, Math.floor((y - DISPLACE_RADIUS - TOP_LABEL_H) / STEP));
-    const maxRow = Math.min(6, Math.ceil((y + DISPLACE_RADIUS - TOP_LABEL_H) / STEP));
-    const nextActive = new Set<number>();
-    for (let col = minCol; col <= maxCol; col++) {
-      for (let row = minRow; row <= maxRow; row++) {
-        const idx = col * 7 + row;
-        if (!cells[idx]?.inRange) continue;
-        const cx = LEFT_LABEL_W + col * STEP + CELL / 2;
-        const cy = TOP_LABEL_H + row * STEP + CELL / 2;
-        const dx = cx - x;
-        const dy = cy - y;
-        const dist = Math.hypot(dx, dy);
-        if (dist >= DISPLACE_RADIUS) continue;
-        const falloff = dist < 0.01 ? 1 : (1 - dist / DISPLACE_RADIUS) ** 2;
-        const nx = dist < 0.01 ? 0 : dx / dist;
-        const ny = dist < 0.01 ? 0 : dy / dist;
-        const el = dotGroupRefs.current[idx];
-        if (el) {
-          const tx = (nx * DISPLACE_MAX * falloff).toFixed(2);
-          const ty = (ny * DISPLACE_MAX * falloff).toFixed(2);
-          el.style.transform = `translate(${tx}px, ${ty}px)`;
-        }
-        nextActive.add(idx);
-      }
-    }
-    for (const idx of activeDisplacedRef.current) {
-      if (!nextActive.has(idx)) {
-        const el = dotGroupRefs.current[idx];
-        if (el) el.style.transform = "";
-      }
-    }
-    activeDisplacedRef.current = nextActive;
-  };
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -208,45 +175,6 @@ export function StippleYear({ values = {}, endDate, className = "" }: StippleYea
     sync();
     mq.addEventListener("change", sync);
     return () => mq.removeEventListener("change", sync);
-  }, []);
-
-  useEffect(() => {
-    const svg = svgRef.current;
-    if (!svg) return;
-    const release = () => {
-      for (const idx of activeDisplacedRef.current) {
-        const el = dotGroupRefs.current[idx];
-        if (el) el.style.transform = "";
-      }
-      activeDisplacedRef.current.clear();
-    };
-    const onMove = (e: PointerEvent) => {
-      if (reducedMotionRef.current) return;
-      const rect = svg.getBoundingClientRect();
-      const vb = svg.viewBox.baseVal;
-      if (!rect.width || !rect.height) return;
-      pointerSvgRef.current = {
-        x: (e.clientX - rect.left) * (vb.width / rect.width),
-        y: (e.clientY - rect.top) * (vb.height / rect.height),
-      };
-      if (rafPendingRef.current) return;
-      rafPendingRef.current = true;
-      requestAnimationFrame(() => {
-        rafPendingRef.current = false;
-        if (pointerSvgRef.current) applyDisplacementRef.current(pointerSvgRef.current.x, pointerSvgRef.current.y);
-      });
-    };
-    const onLeave = () => {
-      pointerSvgRef.current = null;
-      release();
-    };
-    svg.addEventListener("pointermove", onMove, { passive: true });
-    svg.addEventListener("pointerleave", onLeave, { passive: true });
-    return () => {
-      svg.removeEventListener("pointermove", onMove);
-      svg.removeEventListener("pointerleave", onLeave);
-      release();
-    };
   }, []);
 
   // Column/row-aware, not flat-index ±1/±7 — at a row boundary (top/bottom
@@ -264,6 +192,7 @@ export function StippleYear({ values = {}, endDate, className = "" }: StippleYea
   const loupeCell = loupeIdx !== null ? cells[loupeIdx] : null;
   const loupeValue = loupeCell ? (values[loupeCell.iso] ?? 0) : 0;
   const loupeUnits = loupeCell ? stippleUnits(loupeCell.iso, dotCountFor(loupeValue, maxValue)) : [];
+  const loupeSettle = loupeCell ? loupeSettleOffsets(loupeCell.iso, loupeUnits.length) : [];
 
   const labelFor = (c: DayCell) => {
     const v = values[c.iso] ?? 0;
@@ -278,7 +207,6 @@ export function StippleYear({ values = {}, endDate, className = "" }: StippleYea
     <div className={`ns-sy-grid inline-flex items-start gap-3 ${className}`}>
       <style>{CSS}</style>
       <svg
-        ref={svgRef}
         className="ns-sy-canvas"
         viewBox={`0 0 ${viewW} ${viewH}`}
         width={viewW}
@@ -352,12 +280,7 @@ export function StippleYear({ values = {}, endDate, className = "" }: StippleYea
                   }
                 }}
               />
-              <g
-                ref={(el) => {
-                  dotGroupRefs.current[i] = el;
-                }}
-                className="ns-sy-dots"
-              >
+              <g className="ns-sy-dots">
                 {units.map((u, k) => (
                   <circle
                     key={k}
@@ -392,16 +315,34 @@ export function StippleYear({ values = {}, endDate, className = "" }: StippleYea
               className="ns-sy-loupe"
               aria-hidden="true"
             >
+              <defs>
+                <clipPath id={loupeClipId}>
+                  <rect x={1} y={1} width={LOUPE_CELL - 2} height={LOUPE_CELL - 2} rx={4} />
+                </clipPath>
+              </defs>
               <rect x={0} y={0} width={LOUPE_CELL} height={LOUPE_CELL} rx={4} fill="var(--background)" stroke="var(--border)" strokeWidth={1} />
-              {loupeUnits.map((u, k) => (
-                <circle
-                  key={k}
-                  cx={LOUPE_MARGIN + u.x * (LOUPE_CELL - 2 * LOUPE_MARGIN)}
-                  cy={LOUPE_MARGIN + u.y * (LOUPE_CELL - 2 * LOUPE_MARGIN)}
-                  r={LOUPE_DOT_R}
-                  fill="var(--foreground)"
-                />
-              ))}
+              <g clipPath={`url(#${loupeClipId})`}>
+                {loupeUnits.map((u, k) => {
+                  const settle = loupeSettle[k] ?? { dx: 0, dy: 0 };
+                  return (
+                    <circle
+                      key={k}
+                      cx={LOUPE_MARGIN + u.x * (LOUPE_CELL - 2 * LOUPE_MARGIN)}
+                      cy={LOUPE_MARGIN + u.y * (LOUPE_CELL - 2 * LOUPE_MARGIN)}
+                      r={LOUPE_DOT_R}
+                      fill="var(--foreground)"
+                      className="ns-sy-loupe-dot"
+                      style={
+                        {
+                          "--sx": `${settle.dx.toFixed(2)}px`,
+                          "--sy": `${settle.dy.toFixed(2)}px`,
+                          animationDelay: `${k * LOUPE_SETTLE_STAGGER}ms`,
+                        } as CSSProperties
+                      }
+                    />
+                  );
+                })}
+              </g>
             </svg>
             <span className="whitespace-nowrap font-mono text-[10px] text-foreground">
               {loupeValue} {loupeValue === 1 ? "contribution" : "contributions"} - {MONTHS[loupeCell.date.getMonth()]}{" "}
@@ -417,12 +358,16 @@ export function StippleYear({ values = {}, endDate, className = "" }: StippleYea
 const CSS = `
 .ns-sy-cell { cursor: pointer; outline: none; transition: stroke 120ms ease-out; }
 .ns-sy-cell:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-.ns-sy-dots { transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1); }
 @keyframes ns-sy-zoom-in { from { transform: scale(0.55); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 .ns-sy-loupe { transform-origin: center; animation: ns-sy-zoom-in 160ms cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes ns-sy-ink-settle {
+  from { transform: translate(var(--sx), var(--sy)); opacity: 0.15; }
+  to { transform: translate(0, 0); opacity: 1; }
+}
+.ns-sy-loupe-dot { animation: ns-sy-ink-settle ${LOUPE_SETTLE_MS}ms cubic-bezier(0.16, 1, 0.3, 1) backwards; }
 @media (prefers-reduced-motion: reduce) {
   .ns-sy-cell { transition: none; }
   .ns-sy-loupe { animation: none; }
-  .ns-sy-dots { transition: none; }
+  .ns-sy-loupe-dot { animation: none; }
 }
 `;
