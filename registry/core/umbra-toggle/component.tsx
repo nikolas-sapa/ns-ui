@@ -69,6 +69,12 @@ function applyFrame(
     trackEl.style.setProperty("--umbra-tint", tint);
   }
   if (coronaEl) {
+    // A running `breathe` keyframe animation outranks this opacity write in
+    // the cascade (animations win over the specified/inline value for the
+    // property they animate) — without cancelling it first, a toggle that
+    // lands mid-breathe keeps the corona visibly pulsing on the "off" sun
+    // for the rest of the 900ms, instead of fading out immediately.
+    coronaEl.style.animation = "none";
     const coronaOpacity = Math.max(0, (fraction - 0.72) / 0.28);
     coronaEl.style.transition = transition ? `opacity ${TRANSITION_MS}ms linear` : "none";
     coronaEl.style.opacity = String(coronaOpacity);
@@ -177,7 +183,18 @@ export function UmbraToggle({
     else applyFrame(occluderRef.current, trackRef.current, coronaRef.current, value ? 1 : 0, !reducedRef.current);
   };
 
+  // A cancelled gesture (browser-initiated scroll takeover, stylus lift,
+  // system interruption) is not a release — nothing was decided, so it must
+  // never commit. Just disarm and repaint from the real value.
+  const onPointerCancel = (e: React.PointerEvent<HTMLButtonElement>) => {
+    if (!pointerDownRef.current) return;
+    pointerDownRef.current = false;
+    trackRef.current?.releasePointerCapture(e.pointerId);
+    applyFrame(occluderRef.current, trackRef.current, coronaRef.current, value ? 1 : 0, !reducedRef.current);
+  };
+
   const onKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (e.repeat) return; // holding the key shouldn't machine-gun the toggle
     if (e.key === " " || e.key === "Enter") {
       e.preventDefault();
       toggle();
@@ -213,10 +230,10 @@ export function UmbraToggle({
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
+        onPointerCancel={onPointerCancel}
         onKeyDown={onKeyDown}
         onMouseEnter={breathe}
-        className="relative shrink-0 rounded-full border border-border transition-colors hover:border-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        className="ns-umbra-track relative shrink-0 rounded-full border border-border transition-colors hover:border-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         style={{
           width: TRACK_W,
           height: TRACK_H,
@@ -230,9 +247,16 @@ export function UmbraToggle({
           aria-hidden="true"
           className="pointer-events-none absolute inset-0"
         >
-          {/* corona halo, behind the sun */}
+          {/* corona halo, behind the sun. Stroke color is themed via CSS
+              (.ns-umbra-corona below) rather than a bare var(--foreground)
+              attribute: --foreground flips polarity between themes while the
+              occluder's ambient tint always darkens toward black, so a
+              foreground-stroked ring is bright-on-dark (high contrast) in
+              dark theme but dark-on-mid-gray (low contrast) in light theme.
+              The attribute here is just the dark-theme value as a fallback. */}
           <circle
             ref={coronaRef}
+            className="ns-umbra-corona"
             cx={INSET}
             cy={TRACK_H / 2}
             r={SUN_R + 3}
@@ -275,7 +299,13 @@ const CSS = `
   40% { opacity: 0.35; }
   100% { opacity: 1; }
 }
+/* Corona stroke: var(--background) in light theme (white, the brightest
+   token available, against the mid-gray tint the occluder darkens toward)
+   and var(--foreground) in dark theme (unchanged from before — already
+   high-contrast against the near-black tint there). */
+.ns-umbra-track .ns-umbra-corona { stroke: var(--background); }
+.dark .ns-umbra-track .ns-umbra-corona { stroke: var(--foreground); }
 @media (prefers-reduced-motion: reduce) {
-  button[role="switch"] svg circle { transition: none !important; animation: none !important; }
+  button.ns-umbra-track svg circle { transition: none !important; animation: none !important; }
 }
 `;

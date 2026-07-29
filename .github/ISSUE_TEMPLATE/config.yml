@@ -1,5 +1,8 @@
 blank_issues_enabled: true
 contact_links:
+  - name: Ask or propose in Discussions
+    url: https://github.com/nikolas-sapa/ns-ui/discussions
+    about: Questions, half-formed component ideas, and anything not yet a bug.
   - name: Browse the registry
     url: https://design.helpmarq.com
     about: Live previews of every component, with install commands.

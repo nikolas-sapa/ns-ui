@@ -3,6 +3,52 @@
 Single source of truth for the /changelog page. Each entry is a `## vX.Y.Z - YYYY-MM-DD`
 heading, a `###` title, then one paragraph of body. Newest first.
 
+## v0.14.0 - 2026-07-29
+
+### Open to contributions
+
+The repo got the scaffolding a public project needs: CI running the registry build, typecheck
+and production build on every pull request, issue templates for bugs and component requests, a
+pull request template, a code of conduct, a security policy, and a contributing guide that walks
+an outside contributor from an empty folder to a passing verify gate. The README was rewritten
+around what the registry is for rather than how it was made, and the agent-only scaffolding used
+to build it started coming out of the tree.
+
+## v0.13.0 - 2026-07-29
+
+### Every component checked in both themes, and at card size
+
+Two defect classes only show up where nobody looks. One is a component that reads correctly in
+dark and collapses in light. The other is a grid thumbnail framed on the wrong element, cropping
+away the very thing the component exists to show. All 197 were swept for both. Ten card-crop
+cases were fixed by giving each a `card.focus` selector aimed at the element the component is
+actually about, checked on the homepage grid rather than on the full preview route where the
+defect is invisible.
+
+## v0.12.0 - 2026-07-28
+
+### A fourth build round, and the components that needed a second look
+
+Twenty-eight components merged from a fourth parallel round, 21 core and 7 loud, among them a
+Solari departures board, a peelable decal, a plimsoll gauge and a vortex street. That took the
+registry to 198, and tack-peel came out for good, leaving 197. Several older components got the
+second look they needed: umbra-toggle's controlled state had drifted out of sync and its demo
+was inert, decal-peel inverted its gradient in the light theme, carbon-lift's ghost duplicate
+travelled a fixed 12px regardless of how far it actually had to go, solari-flap grew from one row
+to a four-row board, and patina-pip and stipple-year were made legible at card size.
+
+## v0.11.0 - 2026-07-22
+
+### Fifteen cut, and four rounds of owner review
+
+The parallel round produced more than it deserved to keep. Fifteen slop and duplicate components
+were removed, taking the registry from 185 to 170, and one that a merge resurrected had to be cut
+twice. What remained went through four rounds of owner review: ten flagged components repaired,
+then 17 interaction bugs, then 8 more including reworks of earlier fixes, then a ridge-walk
+redesign and six more reworks. Three hardcoded hexes were found and killed. The verifier stopped
+aborting the whole sweep when a single component threw, and started printing every failure rather
+than only the first.
+
 ## v0.10.0 - 2026-07-22
 
 ### The registry roughly tripled, built in parallel

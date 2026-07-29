@@ -55,18 +55,82 @@ fits. Then:
    - `meta.json` — the source of truth: `name`, `title`, `description`,
      `collection`, `tags`, `instruction` (a rich paragraph describing behavior,
      read by `scripts/build-llms.ts` into `llms-full.txt`), and `dependencies`.
-     Optionally `autoplay`, `gate` and `useWhen`, all documented in
-     [AGENTS.md](AGENTS.md).
+     Optionally `card`, `autoplay`, `gate` and `useWhen`. The last three are
+     documented in [AGENTS.md](AGENTS.md); `card` is below.
 
    `<collection>` is `core` (restrained, production-facing) or `loud`
    (deliberately flashy showcase). It is decided at creation time and drives
    folder placement, not a runtime flag.
 
+   A fourth directory, `screenshots/`, appears on its own. You do not author
+   it; `verify` writes it and you commit what it produced.
+
 2. `npm run registry:build`. Registration is automatic, derived from the folder
    structure. There is no central index to edit.
 
-3. `npm run verify` (see below), and look at the resting-state screenshots in
-   both themes before calling it done.
+3. `npm run typecheck`. It must be clean, and it reruns `registry:build`, so it
+   also catches a malformed `meta.json`.
+
+4. Run the gate on your component alone, with a server up:
+
+   ```bash
+   npm run dev                                    # in another shell
+   node scripts/verify.ts <name>
+   BASE_URL=http://localhost:3001 node scripts/verify.ts <name>   # other port
+   ```
+
+5. Look at it yourself, in both themes and at both sizes. The gate catches a
+   lot, but not everything, and the two things it misses are the two that have
+   cost this registry the most:
+
+   - **Both themes, not just yours.** A component can read perfectly in dark
+     and fall apart in light: a gradient that inverts, ink that vanishes into
+     the background, a shadow that becomes a smear. The gate only fails a
+     component whose two themes are byte-identical, so a light theme that is
+     merely *wrong* sails straight through. Toggle the theme on
+     `/preview/<name>` and look.
+   - **The card, not just the preview.** The homepage renders your component
+     live, at a real 1440x900 viewport scaled down to a card roughly 660px
+     wide. A demo that reads fine at full size can arrive in the grid as a
+     speck of interface adrift in empty background, or with the interesting
+     part outside the frame. Open `/`, find your card, and ask whether someone
+     who has never seen the component could tell what it does. If not, set a
+     `card.focus` selector (below). `/preview/<name>` renders unscaled and
+     uncropped, so it will never surface this.
+
+## Framing the card
+
+`meta.json` may carry a `card` object that tells the homepage grid what to
+frame on:
+
+```json
+"card": {
+  "focus": "[role=radiogroup]",
+  "padding": 0.4,
+  "maxZoom": 2
+}
+```
+
+- `focus` (required once `card` is present) — a CSS selector queried inside the
+  preview document. The first match's border box becomes the subject, and the
+  card scales and translates so that box fills it. Pick a selector that matches
+  exactly the element the component is about, and prefer a stable hook (a
+  `role`, a `data-` attribute) over a structural selector a refactor will
+  quietly break.
+- `padding` — breathing room around the subject, as a fraction of its own box
+  on every side. `0` crops flush, `0.4` leaves 40 percent of its own size as
+  context. Defaults to `0.15`.
+- `maxZoom` — ceiling on the zoom applied over the card's base scale, so a
+  24px icon is not blown up to fill the card. Defaults to `4`.
+
+`registry:build` rejects a `card` with a missing or empty `focus`, or a
+non-numeric `padding` or `maxZoom`. It cannot check that the selector matches
+anything: a selector that hits nothing falls back silently to the unframed
+full-viewport card. That is exactly why you look at the homepage card yourself.
+
+Framing is site-only metadata. It never reaches `registry.json`, `public/r/*`
+or `llms.txt`, and it changes nothing about the component, the demo, or
+`/preview/<name>`.
 
 ## The token rule
 
@@ -129,7 +193,8 @@ catastrophic component bug.
 ## Pull requests
 
 Keep the diff to one component or one concern. Include the dark and light
-resting-state screenshots. Confirm `typecheck` and `verify` are clean, and that
+resting-state screenshots. Confirm `typecheck` and `verify` are clean, that you
+have looked at the component in both themes and on the homepage card, and that
 no generated file is in the diff. CI runs `registry:build`, `typecheck` and
 `build` on every PR; `verify` stays local because it needs a server.
 

@@ -27,15 +27,20 @@ export interface StippleYearProps {
   className?: string;
 }
 
-const CELL = 13;
-const GAP = 3;
+const CELL = 16;
+const GAP = 4;
 const STEP = CELL + GAP;
-const MARGIN = 1.6;
+const MARGIN = 1.9;
 const MAX_DOTS = 8;
-const DOT_R = 1.1;
-const LOUPE_CELL = 56;
-const LOUPE_MARGIN = 5;
-const LOUPE_DOT_R = 2.6;
+const DOT_R = 1.35;
+const LOUPE_CELL = 68;
+const LOUPE_MARGIN = 6;
+const LOUPE_DOT_R = 3.2;
+/** Fixed footprint of the side panel that holds the loupe — always reserved
+ *  (even when nothing is hovered) so it never overlaps the grid's own cells
+ *  and never shifts the component's box on hover. Wide enough for the
+ *  longest realistic one-line caption ("20 contributions - Dec 25"). */
+const LOUPE_PANEL_W = 172;
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const WEEKDAY_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""];
@@ -152,16 +157,22 @@ export function StippleYear({ values = {}, endDate, className = "" }: StippleYea
     return `${v} ${noun}, ${MONTHS[c.date.getMonth()]} ${c.date.getDate()}`;
   };
 
-  const LEFT_LABEL_W = 26;
-  const TOP_LABEL_H = 18;
+  const LEFT_LABEL_W = 30;
+  const TOP_LABEL_H = 20;
   const viewW = LEFT_LABEL_W + weeks * STEP;
   const viewH = TOP_LABEL_H + 7 * STEP;
 
   return (
-    <div className={`ns-sy-grid relative inline-block ${className}`}>
+    <div className={`ns-sy-grid inline-flex items-start gap-3 ${className}`}>
       <style>{CSS}</style>
-      <svg viewBox={`0 0 ${viewW} ${viewH}`} width={viewW} style={{ maxWidth: "100%" }} focusable="false">
-        <g aria-hidden="true" className="font-mono" style={{ fontSize: 7.5 }}>
+      <svg
+        className="ns-sy-canvas"
+        viewBox={`0 0 ${viewW} ${viewH}`}
+        width={viewW}
+        style={{ maxWidth: "100%" }}
+        focusable="false"
+      >
+        <g aria-hidden="true" className="font-mono" style={{ fontSize: 8.5 }}>
           {monthLabels.map((m, i) => (
             <text key={i} x={LEFT_LABEL_W + m.col * STEP} y={TOP_LABEL_H - 4} fill="var(--muted)">
               {m.text}
@@ -243,33 +254,42 @@ export function StippleYear({ values = {}, endDate, className = "" }: StippleYea
         })}
       </svg>
 
-      {loupeCell && (
-        <div className="pointer-events-none absolute right-0 top-0 z-10 flex flex-col items-center gap-1 rounded-[6px] border border-border bg-background p-1.5 shadow-sm">
-          <svg
-            key={loupeCell.iso}
-            viewBox={`0 0 ${LOUPE_CELL} ${LOUPE_CELL}`}
-            width={LOUPE_CELL}
-            height={LOUPE_CELL}
-            className="ns-sy-loupe"
-            aria-hidden="true"
-          >
-            <rect x={0} y={0} width={LOUPE_CELL} height={LOUPE_CELL} rx={4} fill="var(--background)" stroke="var(--border)" strokeWidth={1} />
-            {loupeUnits.map((u, k) => (
-              <circle
-                key={k}
-                cx={LOUPE_MARGIN + u.x * (LOUPE_CELL - 2 * LOUPE_MARGIN)}
-                cy={LOUPE_MARGIN + u.y * (LOUPE_CELL - 2 * LOUPE_MARGIN)}
-                r={LOUPE_DOT_R}
-                fill="var(--foreground)"
-              />
-            ))}
-          </svg>
-          <span className="whitespace-nowrap font-mono text-[10px] text-foreground">
-            {loupeValue} {loupeValue === 1 ? "contribution" : "contributions"} - {MONTHS[loupeCell.date.getMonth()]}{" "}
-            {loupeCell.date.getDate()}
-          </span>
-        </div>
-      )}
+      {/* Fixed-footprint side panel, always rendered so the component's own
+          box never resizes on hover — only its contents toggle. It sits
+          beside the grid (not layered on top), so it can never occlude the
+          cell that's actually being hovered. */}
+      <div
+        className="pointer-events-none flex shrink-0 flex-col items-center justify-center gap-1 rounded-[6px] border border-border bg-background p-1.5 shadow-sm"
+        style={{ width: LOUPE_PANEL_W, height: viewH, visibility: loupeCell ? "visible" : "hidden" }}
+      >
+        {loupeCell && (
+          <>
+            <svg
+              key={loupeCell.iso}
+              viewBox={`0 0 ${LOUPE_CELL} ${LOUPE_CELL}`}
+              width={LOUPE_CELL}
+              height={LOUPE_CELL}
+              className="ns-sy-loupe"
+              aria-hidden="true"
+            >
+              <rect x={0} y={0} width={LOUPE_CELL} height={LOUPE_CELL} rx={4} fill="var(--background)" stroke="var(--border)" strokeWidth={1} />
+              {loupeUnits.map((u, k) => (
+                <circle
+                  key={k}
+                  cx={LOUPE_MARGIN + u.x * (LOUPE_CELL - 2 * LOUPE_MARGIN)}
+                  cy={LOUPE_MARGIN + u.y * (LOUPE_CELL - 2 * LOUPE_MARGIN)}
+                  r={LOUPE_DOT_R}
+                  fill="var(--foreground)"
+                />
+              ))}
+            </svg>
+            <span className="whitespace-nowrap font-mono text-[10px] text-foreground">
+              {loupeValue} {loupeValue === 1 ? "contribution" : "contributions"} - {MONTHS[loupeCell.date.getMonth()]}{" "}
+              {loupeCell.date.getDate()}
+            </span>
+          </>
+        )}
+      </div>
     </div>
   );
 }

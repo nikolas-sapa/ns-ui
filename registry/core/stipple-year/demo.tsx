@@ -51,17 +51,38 @@ export default function StippleYearDemo() {
 
   // Self-driving: periodically move focus across a few cells so the loupe
   // and focus ring are visible mid-interaction, not just on a static frame.
+  // Paused while a real pointer is resting inside the component — otherwise
+  // the synthetic focus() steals hoverIndex out from under a genuine hover
+  // (via the cell's own onFocus handler) and the loupe appears to jump to an
+  // unrelated day a second and a half later.
   useEffect(() => {
-    const cells = () => Array.from(rootRef.current?.querySelectorAll<HTMLElement>('[role="button"]') ?? []);
+    const root = rootRef.current;
+    if (!root) return;
+    let pointerInside = false;
+    const onEnter = () => {
+      pointerInside = true;
+    };
+    const onLeave = () => {
+      pointerInside = false;
+    };
+    root.addEventListener("pointerenter", onEnter);
+    root.addEventListener("pointerleave", onLeave);
+
+    const cells = () => Array.from(root.querySelectorAll<HTMLElement>('[role="button"]'));
     let i = 0;
     const id = setInterval(() => {
+      if (pointerInside) return;
       const list = cells();
       if (!list.length) return;
       const target = list[Math.floor((i * 37) % list.length)];
       target?.focus();
       i += 1;
     }, 1500);
-    return () => clearInterval(id);
+    return () => {
+      clearInterval(id);
+      root.removeEventListener("pointerenter", onEnter);
+      root.removeEventListener("pointerleave", onLeave);
+    };
   }, []);
 
   return (

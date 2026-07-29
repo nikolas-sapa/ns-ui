@@ -1,6 +1,6 @@
 name: Component request
 description: Propose a component for the registry.
-labels: [component request]
+labels: [new component]
 body:
   - type: markdown
     attributes:

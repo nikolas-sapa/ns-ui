@@ -264,28 +264,30 @@ export function SolariFlap({
             >
               {ch}
             </span>
-            <div
-              className="ns-sf-leaf"
-              ref={(el) => {
-                if (cellsRef.current[i]) cellsRef.current[i]!.leaf = el;
-              }}
-            >
-              <span
-                className="ns-sf-face ns-sf-face-front"
+            <div className="ns-sf-leaf-clip">
+              <div
+                className="ns-sf-leaf"
                 ref={(el) => {
-                  if (cellsRef.current[i]) cellsRef.current[i]!.front = el;
+                  if (cellsRef.current[i]) cellsRef.current[i]!.leaf = el;
                 }}
               >
-                {ch}
-              </span>
-              <span
-                className="ns-sf-face ns-sf-face-back"
-                ref={(el) => {
-                  if (cellsRef.current[i]) cellsRef.current[i]!.back = el;
-                }}
-              >
-                {ch}
-              </span>
+                <span
+                  className="ns-sf-face ns-sf-face-front"
+                  ref={(el) => {
+                    if (cellsRef.current[i]) cellsRef.current[i]!.front = el;
+                  }}
+                >
+                  {ch}
+                </span>
+                <span
+                  className="ns-sf-face ns-sf-face-back"
+                  ref={(el) => {
+                    if (cellsRef.current[i]) cellsRef.current[i]!.back = el;
+                  }}
+                >
+                  {ch}
+                </span>
+              </div>
             </div>
           </button>
         ))}
@@ -330,17 +332,24 @@ const CSS = `
   border-top:1px solid var(--background);
   box-shadow:inset 0 5px 6px -3px color-mix(in srgb, var(--background) 60%, transparent);
 }
-.ns-sf-leaf{
+.ns-sf-leaf-clip{
   position:absolute;
   top:0;
   left:0;
   width:100%;
   height:50%;
   overflow:hidden;
+  z-index:2;
+}
+.ns-sf-leaf{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
   transform-style:preserve-3d;
   transform-origin:bottom center;
   transform:rotateX(0deg);
-  z-index:2;
 }
 .ns-sf-face{
   position:absolute;

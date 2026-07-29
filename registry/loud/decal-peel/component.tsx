@@ -718,6 +718,7 @@ const CSS = `
   user-select:none;
   -webkit-user-select:none;
   perspective:900px;
+  overflow:hidden;
   transition:border-color .18s ease, box-shadow .18s ease, transform .18s cubic-bezier(0.16,1,0.3,1);
 }
 .ns-dp-root:hover{
