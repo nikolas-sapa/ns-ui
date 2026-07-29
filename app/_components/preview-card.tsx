@@ -11,6 +11,8 @@ export type RegistryEntry = {
   title: string;
   description: string;
   collection: string;
+  /** True for the NEW_COUNT most recently added components — see app/page.tsx. */
+  isNew: boolean;
 };
 
 /**
@@ -221,12 +223,17 @@ export function PreviewCard({
                 above that overlay so the copy stays selectable. */}
             <h3 className="truncate text-sm font-medium tracking-tight">
               <Link
-                href={`/preview/${entry.name}`}
+                href={`/preview/${entry.name}/play`}
                 className="rounded-sm outline-none after:absolute after:inset-0 after:rounded-md focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {entry.title}
               </Link>
             </h3>
+            {entry.isNew ? (
+              <span className="shrink-0 rounded-sm border border-border px-1.5 py-px font-mono text-[10px] uppercase tracking-wider text-foreground">
+                new
+              </span>
+            ) : null}
             {entry.collection === "loud" ? (
               <span className="shrink-0 rounded-sm border border-border px-1.5 py-px font-mono text-[10px] uppercase tracking-wider text-muted">
                 loud

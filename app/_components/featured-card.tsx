@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { CopyButton } from "./copy-button";
 import type { RegistryEntry } from "./preview-card";
 
@@ -19,15 +19,12 @@ const PRELOAD_MARGIN = 400;
 
 /**
  * A featured card is the honest reference page (`/preview/<name>`) run
- * inside an iframe, exactly like a catalog card — but it starts in the same
- * autoplaying, inert state a catalog card would, and a deliberate click
- * promotes it to genuinely interactive.
- *
- * The click-to-activate gesture (rather than interactive-from-load) is what
- * keeps a mount-time `focus()` inside some future component from stealing
- * scroll from the host page: `inert` only lifts after the visitor has
- * already brought the frame on screen and asked for it, so there is nothing
- * for the browser to scroll into view. See `app/preview/[name]/page.tsx`.
+ * inside an iframe, exactly like a catalog card — autoplaying and inert, a
+ * live thumbnail rather than something to drive in place. Genuine
+ * interaction lives one click away, at the dedicated playground page
+ * (`/preview/<name>/play`): the whole card is a real link there (same
+ * stretched-hit-area pattern as `preview-card.tsx`), so middle-click,
+ * cmd-click and copy-link all work.
  */
 export function FeaturedCard({
   entry,
@@ -40,7 +37,6 @@ export function FeaturedCard({
   const frameRef = useRef<HTMLIFrameElement | null>(null);
   const [inView, setInView] = useState(false);
   const [loaded, setLoaded] = useState(false);
-  const [live, setLive] = useState(false);
   const [scale, setScale] = useState<number | null>(null);
 
   useEffect(() => {
@@ -69,18 +65,7 @@ export function FeaturedCard({
     return () => ro.disconnect();
   }, []);
 
-  const activate = useCallback(() => {
-    setLive(true);
-    // Reload with `interactive=1` rather than mutating the running document —
-    // autoplay state (rAF loops, synthetic pointer state) doesn't stop
-    // cleanly mid-flight, so a fresh non-inert mount is simpler than trying
-    // to unwind it in place.
-    setLoaded(false);
-  }, []);
-
-  const src = `/preview/${entry.name}?embed=1${
-    live ? "&interactive=1" : "&autoplay=1"
-  }`;
+  const src = `/preview/${entry.name}?embed=1&autoplay=1`;
 
   return (
     <article className="group relative flex flex-col">
@@ -99,13 +84,11 @@ export function FeaturedCard({
             src={src}
             title={`${entry.title} preview`}
             loading="lazy"
-            tabIndex={live ? 0 : -1}
-            inert={!live}
-            aria-hidden={!live}
+            tabIndex={-1}
+            inert
+            aria-hidden
             onLoad={() => setLoaded(true)}
-            className={`absolute left-0 top-0 origin-top-left border-0 bg-transparent transition-opacity duration-300 ease-out motion-reduce:transition-none ${
-              live ? "" : "pointer-events-none"
-            }`}
+            className="pointer-events-none absolute left-0 top-0 origin-top-left border-0 bg-transparent transition-opacity duration-300 ease-out motion-reduce:transition-none"
             style={{
               width: FRAME_W,
               height: FRAME_H,
@@ -114,51 +97,43 @@ export function FeaturedCard({
             }}
           />
         ) : null}
-
-        {!live ? (
-          <button
-            type="button"
-            onClick={activate}
-            className="absolute inset-0 flex items-end justify-start p-4 outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-inset"
-            aria-label={`Interact with ${entry.title}`}
-          >
-            <span className="rounded-full border border-border bg-background/90 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.08em] text-foreground opacity-0 backdrop-blur transition-opacity duration-200 motion-reduce:transition-none group-hover:opacity-100 group-focus-visible:opacity-100">
-              Click to interact
-            </span>
-          </button>
-        ) : null}
-
-        {live ? (
-          <span className="pointer-events-none absolute right-3 top-3 rounded-full border border-border bg-background/90 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-muted backdrop-blur">
-            Live
-          </span>
-        ) : null}
       </div>
 
       <div className="mt-3 flex items-start gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline gap-2">
             <h3 className="truncate text-sm font-medium tracking-tight">
+              {/* `after:inset-0` stretches the hit area over the whole card —
+                  same pattern as preview-card.tsx — so the entire featured
+                  card is a real link to the playground, not just the title. */}
               <Link
-                href={`/preview/${entry.name}`}
-                className="rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                href={`/preview/${entry.name}/play`}
+                className="rounded-sm outline-none after:absolute after:inset-0 after:rounded-md focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {entry.title}
               </Link>
             </h3>
+            {entry.isNew ? (
+              <span className="shrink-0 rounded-sm border border-border px-1.5 py-px font-mono text-[10px] uppercase tracking-wider text-foreground">
+                new
+              </span>
+            ) : null}
             {entry.collection === "loud" ? (
               <span className="shrink-0 rounded-sm border border-border px-1.5 py-px font-mono text-[10px] uppercase tracking-wider text-muted">
                 loud
               </span>
             ) : null}
           </div>
-          <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted">
+          {/* Lifted above the title link's after:inset-0 overlay, same as
+              preview-card.tsx, so this copy stays selectable. */}
+          <p className="relative z-10 mt-1 line-clamp-2 text-xs leading-relaxed text-muted">
             {entry.description}
           </p>
         </div>
         <CopyButton
           value={installCommand}
           label={`Copy install command for ${entry.name}`}
+          className="relative z-20"
         />
       </div>
     </article>

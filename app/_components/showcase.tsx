@@ -23,6 +23,9 @@ export type ShowcaseEntry = RegistryEntry & {
   tags: string[];
   /** useWhen + the instruction's lead sentence — the plainest-spoken copy. */
   prose: string;
+  /** Recency rank from lib/component-order.json — 0 is newest. Missing
+   *  components (not yet in the committed snapshot) sort last. */
+  order: number;
 };
 
 const FOOTER_LINK =
@@ -45,6 +48,13 @@ const MOUNT_CAP = 12;
 const PRELOAD_MARGIN = 600;
 
 type Filter = "all" | "core" | "loud";
+type Sort = "featured" | "newest" | "oldest";
+const SORTS: { key: Sort; label: string }[] = [
+  { key: "featured", label: "Featured" },
+  { key: "newest", label: "Newest" },
+  { key: "oldest", label: "Oldest" },
+];
+const SORT_PARAM = "sort";
 
 /**
  * Words a newcomer can click when nothing matched. Each is a real query that
@@ -70,6 +80,26 @@ export function Showcase({
   const [filter, setFilter] = useState<Filter>("all");
   const [category, setCategory] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+
+  // Starts at the server-rendered default and syncs from `?sort=` once
+  // mounted — same mounted-gate pattern as ThemeToggle, so there is nothing
+  // for hydration to disagree about. Kept in the URL (plain history API, not
+  // useSearchParams — that needs a Suspense boundary this page doesn't have)
+  // so a click into a component's playground and back doesn't reset it.
+  const [sort, setSortState] = useState<Sort>("featured");
+  useEffect(() => {
+    const fromUrl = new URLSearchParams(window.location.search).get(SORT_PARAM);
+    if (fromUrl === "newest" || fromUrl === "oldest" || fromUrl === "featured") {
+      setSortState(fromUrl);
+    }
+  }, []);
+  const setSort = useCallback((next: Sort) => {
+    setSortState(next);
+    const url = new URL(window.location.href);
+    if (next === "featured") url.searchParams.delete(SORT_PARAM);
+    else url.searchParams.set(SORT_PARAM, next);
+    window.history.replaceState(null, "", url);
+  }, []);
 
   const counts = useMemo(() => {
     let core = 0;
@@ -115,7 +145,7 @@ export function Showcase({
     return map;
   }, [items]);
 
-  const { visibleItems, loose } = useMemo(() => {
+  const { visibleItems: filteredItems, loose } = useMemo(() => {
     const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
     const inScope = items.filter(
       (i) =>
@@ -147,6 +177,30 @@ export function Showcase({
       loose: scored.length > 0,
     };
   }, [items, filter, category, query, haystacks, memberships]);
+
+  // Applied on top of the filter/search result, independent of it, so the
+  // sort survives filtering and search (owner requirement). "Featured" is a
+  // no-op — `filteredItems` already carries the server's featured-first,
+  // then-recency order. Newest/Oldest ignore that entirely and re-order by
+  // `order` (recency rank, 0 = newest), so the relevance ranking a loose
+  // search fallback produces is intentionally overridden when a sort other
+  // than Featured is active — an explicit sort choice outranks it.
+  const visibleItems = useMemo(() => {
+    if (sort === "featured") return filteredItems;
+    const dir = sort === "newest" ? 1 : -1;
+    return [...filteredItems].sort((a, b) => {
+      // `order` is Number.MAX_SAFE_INTEGER for a component missing from
+      // lib/component-order.json's committed snapshot (freshly added, order
+      // not yet regenerated — see app/page.tsx). Newest already sorts that to
+      // the bottom for free; Oldest, reversed naively, would put it at the
+      // TOP — falsely presenting a just-added component as the most ancient
+      // one in the registry. Unknown recency sorts last in both directions.
+      const aKnown = a.order !== Number.MAX_SAFE_INTEGER;
+      const bKnown = b.order !== Number.MAX_SAFE_INTEGER;
+      if (aKnown !== bKnown) return aKnown ? -1 : 1;
+      return dir * (a.order - b.order);
+    });
+  }, [filteredItems, sort]);
 
   const activeCategory = categories.find((c) => c.id === category);
   const filtered = filter !== "all" || category !== null || query !== "";
@@ -268,6 +322,38 @@ export function Showcase({
           </div>
         </div>
 
+        {/* Newest-first review, per the owner's own request — Featured is a
+            curated order, Newest/Oldest are pure recency off
+            component-order.json. Survives filtering and search, and the
+            choice round-trips through `?sort=` on the URL. */}
+        <div
+          role="group"
+          aria-label="Sort order"
+          className="mt-2.5 flex items-center gap-1.5"
+        >
+          <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
+            Sort
+          </span>
+          {SORTS.map((s) => {
+            const on = sort === s.key;
+            return (
+              <button
+                key={s.key}
+                type="button"
+                aria-pressed={on}
+                onClick={() => setSort(s.key)}
+                className={`shrink-0 rounded-full border px-2.5 py-1 text-xs outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-accent ${
+                  on
+                    ? "border-accent bg-accent text-white"
+                    : "border-border text-muted hover:border-muted hover:text-foreground"
+                }`}
+              >
+                {s.label}
+              </button>
+            );
+          })}
+        </div>
+
         {/* What is this for? — the row a newcomer uses instead of guessing the
             house vocabulary. Roles, not tags: 166 tags, 128 of them singletons,
             would be noise. */}
@@ -317,16 +403,18 @@ export function Showcase({
 
       {/* Featured rail: a small, genuinely-curated set, live and directly
           interactive rather than an autoplaying thumbnail. Hidden the moment
-          a visitor filters or searches — those states already answer "show
-          me X"; a curated rail is only useful as an entry point into the
-          full 197. */}
-      {!filtered && featuredItems.length > 0 ? (
+          a visitor filters, searches, or picks a recency sort — those states
+          already answer "show me X"; a curated rail only makes sense as the
+          entry point into the full catalog, and it competes with an explicit
+          Newest/Oldest request rather than serving it. */}
+      {!filtered && sort === "featured" && featuredItems.length > 0 ? (
         <section className="mt-14">
           <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">
             Featured
           </p>
           <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">
-            A curated set, live. Click any preview to drive it directly.
+            A curated set, live. Click any preview to open it full size and
+            play with it.
           </p>
           <div className="mt-6 grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-2">
             {featuredItems.map((entry) => (
@@ -340,7 +428,7 @@ export function Showcase({
         </section>
       ) : null}
 
-      {!filtered && featuredItems.length > 0 ? (
+      {!filtered && sort === "featured" && featuredItems.length > 0 ? (
         <p className="mt-24 font-mono text-xs uppercase tracking-[0.18em] text-muted">
           All components
         </p>
@@ -395,7 +483,10 @@ export function Showcase({
         <p className="mt-10 text-xs text-muted">
           Nothing matches every word of{" "}
           <span className="font-mono text-foreground">{query}</span> — showing
-          the closest, best first.
+          the closest matches
+          {/* "best first" only describes the relevance ranking loose search
+              produces — Newest/Oldest deliberately override it below. */}
+          {sort === "featured" ? ", best first" : ""}.
         </p>
       ) : null}
 

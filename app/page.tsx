@@ -11,6 +11,13 @@ import { Showcase, type ShowcaseEntry } from "./_components/showcase";
 const rank = new Map((order as string[]).map((name, i) => [name, i]));
 const recency = (name: string) => rank.get(name) ?? Number.MAX_SAFE_INTEGER;
 
+// "New" badge + the Newest/Oldest sort both need this same recency number on
+// the client, so it travels with each entry rather than being re-derived
+// there. `component-order.json` holds no timestamps (build-order.ts computes
+// them, then drops them before writing the flat slug array) — so "new" is
+// defined by position, not by age: the NEW_COUNT most recently added slugs.
+const NEW_COUNT = 10;
+
 // Curated slugs, filtered against what actually exists so a rename or
 // removal in `registry/` (owned by sibling agents) degrades quietly instead
 // of leaving a dead slug in the featured rail.
@@ -47,6 +54,8 @@ const items: ShowcaseEntry[] = registry.items
     prose: dropNegatives(
       `${useWhen[item.name] ?? ""} ${firstSentence(item.meta?.instruction ?? "")}`,
     ).trim(),
+    order: recency(item.name),
+    isNew: recency(item.name) < NEW_COUNT,
   }))
   .sort(
     (a, b) =>
