@@ -8,8 +8,8 @@
 built around a single interaction and gated by a Playwright suite that refuses
 to pass a component whose hover looks identical to its resting state.
 
-Two collections. `core` (178) is restrained and production-facing, Geist-dark.
-`loud` (28) is a deliberately flashy showcase.
+Two collections. `core` (174) is restrained and production-facing, Geist-dark.
+`loud` (32) is a deliberately flashy showcase.
 
 Browse them live at **[design.helpmarq.com](https://design.helpmarq.com)**.
 

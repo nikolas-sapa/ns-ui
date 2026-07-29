@@ -25,24 +25,34 @@ Examples:
 `;
 
 async function fetchRegistry() {
+  const registry = await tryFetchRegistry();
+  if (registry === null) {
+    process.exit(1);
+  }
+  return registry;
+}
+
+// Like fetchRegistry, but returns null on failure instead of exiting, so
+// callers that can proceed without validation (e.g. `add`) may choose to.
+async function tryFetchRegistry() {
   let res;
   try {
     res = await fetch(REGISTRY_URL);
   } catch (err) {
     console.error(`Failed to reach the registry at ${REGISTRY_URL}`);
     console.error(err.message);
-    process.exit(1);
+    return null;
   }
   if (!res.ok) {
     console.error(`Registry request failed: ${res.status} ${res.statusText}`);
-    process.exit(1);
+    return null;
   }
   try {
     return await res.json();
   } catch (err) {
     console.error("Registry response was not valid JSON.");
     console.error(err.message);
-    process.exit(1);
+    return null;
   }
 }
 
@@ -59,14 +69,17 @@ async function cmdAdd(names) {
     process.exit(1);
   }
 
-  const registry = await fetchRegistry();
-  const known = new Set(registry.items.map((item) => item.name));
-
-  for (const name of names) {
-    if (!known.has(name)) {
-      console.error(`Unknown component "${name}".`);
-      console.error(`Run \`npx @nikolas.sapa/ns-ui search ${name}\` to find the right name.`);
-      process.exit(1);
+  const registry = await tryFetchRegistry();
+  if (registry === null) {
+    console.error("Could not reach the registry to validate names, continuing anyway.");
+  } else {
+    const known = new Set(registry.items.map((item) => item.name));
+    for (const name of names) {
+      if (!known.has(name)) {
+        console.error(`Unknown component "${name}".`);
+        console.error(`Run \`npx @nikolas.sapa/ns-ui search ${name}\` to find the right name.`);
+        process.exit(1);
+      }
     }
   }
 
@@ -167,7 +180,7 @@ async function main() {
   }
 
   if (command === "search") {
-    await cmdSearch(rest[0]);
+    await cmdSearch(rest.join(" "));
     return;
   }
 
