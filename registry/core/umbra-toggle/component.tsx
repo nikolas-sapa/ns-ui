@@ -51,7 +51,9 @@ function applyFrame(
     // it — same center, larger radius — when on (fraction 1), so "off"
     // shows the bare sun and "on" is a total eclipse with the corona
     const cx = lerp(INSET + TRAVEL, INSET, fraction);
-    occluderEl.style.transition = transition ? `cx ${TRANSITION_MS}ms cubic-bezier(0.16,1,0.3,1)` : "none";
+    occluderEl.style.transition = transition
+      ? `cx ${TRANSITION_MS}ms cubic-bezier(0.16,1,0.3,1), fill ${TRANSITION_MS}ms linear`
+      : "none";
     occluderEl.setAttribute("cx", String(cx));
   }
   if (trackEl) {
@@ -67,6 +69,20 @@ function applyFrame(
       : "none";
     trackEl.style.backgroundColor = tint;
     trackEl.style.setProperty("--umbra-tint", tint);
+    // Near full occlusion (the same fade window the corona uses) the
+    // occluder is otherwise painted in the exact tint the track background
+    // was just set to, so the "moon" reads as a hole rather than a disc —
+    // in light theme especially, where the tint never gets dark enough for
+    // the blurred corona ring alone to read against it. Mix a sliver of the
+    // themed --umbra-bright token (always the *light* token for the current
+    // theme, same trick the corona stroke already uses) into the occluder's
+    // own fill so it stays a legible disc instead of disappearing into the
+    // background it's built from. At fraction <= 0.72 this is a 0% mix, i.e.
+    // exactly `tint` — unchanged from before.
+    const moonMix = Math.max(0, (fraction - 0.72) / 0.28) * 22;
+    const moon =
+      moonMix > 0 ? `color-mix(in srgb, ${tint} ${100 - moonMix}%, var(--umbra-bright) ${moonMix}%)` : tint;
+    trackEl.style.setProperty("--umbra-moon", moon);
   }
   if (coronaEl) {
     // A running `breathe` keyframe animation outranks this opacity write in
@@ -233,7 +249,7 @@ export function UmbraToggle({
         onPointerCancel={onPointerCancel}
         onKeyDown={onKeyDown}
         onMouseEnter={breathe}
-        className="ns-umbra-track relative shrink-0 rounded-full border border-border transition-colors hover:border-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        className="ns-umbra-track relative shrink-0 overflow-hidden rounded-full border border-border transition-colors hover:border-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         style={{
           width: TRACK_W,
           height: TRACK_H,
@@ -270,13 +286,16 @@ export function UmbraToggle({
           <circle cx={INSET} cy={TRACK_H / 2} r={SUN_R} fill="var(--foreground)" />
           {/* occluder — slides across, painted in the track's own resting
               color so it reads as "cutting into" the sun via plain paint
-              order rather than a mask */}
+              order rather than a mask. Near full occlusion --umbra-moon
+              (set in applyFrame) blends in a themed highlight so the
+              eclipsed disc stays legible instead of vanishing into the tint
+              it's otherwise identical to. */}
           <circle
             ref={occluderRef}
             cx={value ? INSET : INSET + TRAVEL}
             cy={TRACK_H / 2}
             r={OCCLUDER_R}
-            fill="var(--umbra-tint, var(--border))"
+            fill="var(--umbra-moon, var(--umbra-tint, var(--border)))"
           />
         </svg>
       </button>
@@ -305,6 +324,11 @@ const CSS = `
    high-contrast against the near-black tint there). */
 .ns-umbra-track .ns-umbra-corona { stroke: var(--background); }
 .dark .ns-umbra-track .ns-umbra-corona { stroke: var(--foreground); }
+/* Same "always the bright token for this theme" trick, exposed as a custom
+   property the occluder's near-full-occlusion highlight (--umbra-moon,
+   set in applyFrame) mixes into its own fill. */
+.ns-umbra-track { --umbra-bright: var(--background); }
+.dark .ns-umbra-track { --umbra-bright: var(--foreground); }
 @media (prefers-reduced-motion: reduce) {
   button.ns-umbra-track svg circle { transition: none !important; animation: none !important; }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 // ---------------------------------------------------------------------------
 // StippleYear — a GitHub-style year activity calendar where intensity is
@@ -41,6 +41,21 @@ const LOUPE_DOT_R = 3.2;
  *  and never shifts the component's box on hover. Wide enough for the
  *  longest realistic one-line caption ("20 contributions - Dec 25"). */
 const LOUPE_PANEL_W = 172;
+const LEFT_LABEL_W = 30;
+const TOP_LABEL_H = 20;
+
+/** Cursor-proximity dot displacement — an "iron filings" push: dots within
+ *  DISPLACE_RADIUS of the pointer nudge radially outward, strongest at the
+ *  cursor and falling off to nothing at the edge (quadratic falloff, so the
+ *  disturbed patch has no visible hard boundary). Only the dot cluster
+ *  moves, never the cell's hit-target rect, so hover detection stays rock
+ *  solid under its own motion. Radius spans several cells and the max
+ *  offset is a large fraction of a cell so the parting is obvious at a
+ *  glance — a wave through the texture, not a couple of nudged pixels —
+ *  while the falloff keeps it reading as disturbed stipple, not a
+ *  scatter/explosion effect. */
+const DISPLACE_RADIUS = 90;
+const DISPLACE_MAX = 9;
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const WEEKDAY_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""];
@@ -135,6 +150,105 @@ export function StippleYear({ values = {}, endDate, className = "" }: StippleYea
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const cellRefs = useRef<(SVGRectElement | null)[]>([]);
 
+  // Dot-displacement plumbing — direct DOM writes, no React state, so
+  // hovering never triggers a re-render of ~370 cells. See DISPLACE_RADIUS.
+  const svgRef = useRef<SVGSVGElement | null>(null);
+  const dotGroupRefs = useRef<(SVGGElement | null)[]>([]);
+  const activeDisplacedRef = useRef<Set<number>>(new Set());
+  const pointerSvgRef = useRef<{ x: number; y: number } | null>(null);
+  const rafPendingRef = useRef(false);
+  const reducedMotionRef = useRef(false);
+  const applyDisplacementRef = useRef<(x: number, y: number) => void>(() => {});
+
+  // Reassigned every render (cheap closure swap) so the effect below — which
+  // attaches its listeners once — always reads the current cells/weeks
+  // without needing to re-subscribe on every data change.
+  applyDisplacementRef.current = (x: number, y: number) => {
+    const minCol = Math.max(0, Math.floor((x - DISPLACE_RADIUS - LEFT_LABEL_W) / STEP));
+    const maxCol = Math.min(weeks - 1, Math.ceil((x + DISPLACE_RADIUS - LEFT_LABEL_W) / STEP));
+    const minRow = Math.max(0, Math.floor((y - DISPLACE_RADIUS - TOP_LABEL_H) / STEP));
+    const maxRow = Math.min(6, Math.ceil((y + DISPLACE_RADIUS - TOP_LABEL_H) / STEP));
+    const nextActive = new Set<number>();
+    for (let col = minCol; col <= maxCol; col++) {
+      for (let row = minRow; row <= maxRow; row++) {
+        const idx = col * 7 + row;
+        if (!cells[idx]?.inRange) continue;
+        const cx = LEFT_LABEL_W + col * STEP + CELL / 2;
+        const cy = TOP_LABEL_H + row * STEP + CELL / 2;
+        const dx = cx - x;
+        const dy = cy - y;
+        const dist = Math.hypot(dx, dy);
+        if (dist >= DISPLACE_RADIUS) continue;
+        const falloff = dist < 0.01 ? 1 : (1 - dist / DISPLACE_RADIUS) ** 2;
+        const nx = dist < 0.01 ? 0 : dx / dist;
+        const ny = dist < 0.01 ? 0 : dy / dist;
+        const el = dotGroupRefs.current[idx];
+        if (el) {
+          const tx = (nx * DISPLACE_MAX * falloff).toFixed(2);
+          const ty = (ny * DISPLACE_MAX * falloff).toFixed(2);
+          el.style.transform = `translate(${tx}px, ${ty}px)`;
+        }
+        nextActive.add(idx);
+      }
+    }
+    for (const idx of activeDisplacedRef.current) {
+      if (!nextActive.has(idx)) {
+        const el = dotGroupRefs.current[idx];
+        if (el) el.style.transform = "";
+      }
+    }
+    activeDisplacedRef.current = nextActive;
+  };
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => {
+      reducedMotionRef.current = mq.matches;
+    };
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const release = () => {
+      for (const idx of activeDisplacedRef.current) {
+        const el = dotGroupRefs.current[idx];
+        if (el) el.style.transform = "";
+      }
+      activeDisplacedRef.current.clear();
+    };
+    const onMove = (e: PointerEvent) => {
+      if (reducedMotionRef.current) return;
+      const rect = svg.getBoundingClientRect();
+      const vb = svg.viewBox.baseVal;
+      if (!rect.width || !rect.height) return;
+      pointerSvgRef.current = {
+        x: (e.clientX - rect.left) * (vb.width / rect.width),
+        y: (e.clientY - rect.top) * (vb.height / rect.height),
+      };
+      if (rafPendingRef.current) return;
+      rafPendingRef.current = true;
+      requestAnimationFrame(() => {
+        rafPendingRef.current = false;
+        if (pointerSvgRef.current) applyDisplacementRef.current(pointerSvgRef.current.x, pointerSvgRef.current.y);
+      });
+    };
+    const onLeave = () => {
+      pointerSvgRef.current = null;
+      release();
+    };
+    svg.addEventListener("pointermove", onMove, { passive: true });
+    svg.addEventListener("pointerleave", onLeave, { passive: true });
+    return () => {
+      svg.removeEventListener("pointermove", onMove);
+      svg.removeEventListener("pointerleave", onLeave);
+      release();
+    };
+  }, []);
+
   // Column/row-aware, not flat-index ±1/±7 — at a row boundary (top/bottom
   // of a week column) a flat index just wraps into the adjacent week's
   // opposite row, which reads as a diagonal jump instead of stopping.
@@ -157,8 +271,6 @@ export function StippleYear({ values = {}, endDate, className = "" }: StippleYea
     return `${v} ${noun}, ${MONTHS[c.date.getMonth()]} ${c.date.getDate()}`;
   };
 
-  const LEFT_LABEL_W = 30;
-  const TOP_LABEL_H = 20;
   const viewW = LEFT_LABEL_W + weeks * STEP;
   const viewH = TOP_LABEL_H + 7 * STEP;
 
@@ -166,6 +278,7 @@ export function StippleYear({ values = {}, endDate, className = "" }: StippleYea
     <div className={`ns-sy-grid inline-flex items-start gap-3 ${className}`}>
       <style>{CSS}</style>
       <svg
+        ref={svgRef}
         className="ns-sy-canvas"
         viewBox={`0 0 ${viewW} ${viewH}`}
         width={viewW}
@@ -239,16 +352,23 @@ export function StippleYear({ values = {}, endDate, className = "" }: StippleYea
                   }
                 }}
               />
-              {units.map((u, k) => (
-                <circle
-                  key={k}
-                  cx={x + MARGIN + u.x * (CELL - 2 * MARGIN)}
-                  cy={y + MARGIN + u.y * (CELL - 2 * MARGIN)}
-                  r={DOT_R}
-                  fill="var(--foreground)"
-                  aria-hidden="true"
-                />
-              ))}
+              <g
+                ref={(el) => {
+                  dotGroupRefs.current[i] = el;
+                }}
+                className="ns-sy-dots"
+              >
+                {units.map((u, k) => (
+                  <circle
+                    key={k}
+                    cx={x + MARGIN + u.x * (CELL - 2 * MARGIN)}
+                    cy={y + MARGIN + u.y * (CELL - 2 * MARGIN)}
+                    r={DOT_R}
+                    fill="var(--foreground)"
+                    aria-hidden="true"
+                  />
+                ))}
+              </g>
             </g>
           );
         })}
@@ -297,10 +417,12 @@ export function StippleYear({ values = {}, endDate, className = "" }: StippleYea
 const CSS = `
 .ns-sy-cell { cursor: pointer; outline: none; transition: stroke 120ms ease-out; }
 .ns-sy-cell:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.ns-sy-dots { transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1); }
 @keyframes ns-sy-zoom-in { from { transform: scale(0.55); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 .ns-sy-loupe { transform-origin: center; animation: ns-sy-zoom-in 160ms cubic-bezier(0.16, 1, 0.3, 1); }
 @media (prefers-reduced-motion: reduce) {
   .ns-sy-cell { transition: none; }
   .ns-sy-loupe { animation: none; }
+  .ns-sy-dots { transition: none; }
 }
 `;
