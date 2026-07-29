@@ -5,7 +5,9 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { ThemeSync } from "./_components/theme-sync";
+import { SiteShell } from "./_components/site-shell";
 import { NO_FLASH_SCRIPT } from "@/lib/theme";
+import { navGroups } from "@/lib/nav-data";
 import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
 
 const title = "ns-ui";
@@ -53,7 +55,9 @@ export default function RootLayout({
       </head>
       <body className="bg-background font-sans text-foreground antialiased">
         <ThemeSync />
-        {children}
+        {/* Nav data is computed on the server once per build; the shell is a
+            client component only because it needs the active pathname. */}
+        <SiteShell groups={navGroups()}>{children}</SiteShell>
         {/* Vercel Web Analytics and Speed Insights. Both no-op outside a
             Vercel deployment, so local dev is unaffected. */}
         <Analytics />
