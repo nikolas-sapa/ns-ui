@@ -32,3 +32,4 @@ recordings/
 /workflows/
 /wiki/.wiki/
 /.worktrees/
+.scratch-audit/
