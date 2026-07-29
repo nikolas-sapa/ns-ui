@@ -1,6 +1,7 @@
 import registry from "@/registry.json";
 import { loadUseWhen } from "@/lib/use-when";
 import order from "@/lib/component-order.json";
+import { FEATURED } from "@/lib/featured";
 import { Showcase, type ShowcaseEntry } from "./_components/showcase";
 
 // Newest first. `component-order.json` is the slug list sorted by git creation
@@ -9,6 +10,16 @@ import { Showcase, type ShowcaseEntry } from "./_components/showcase";
 // visible rather than hidden until the order is regenerated.
 const rank = new Map((order as string[]).map((name, i) => [name, i]));
 const recency = (name: string) => rank.get(name) ?? Number.MAX_SAFE_INTEGER;
+
+// Curated slugs, filtered against what actually exists so a rename or
+// removal in `registry/` (owned by sibling agents) degrades quietly instead
+// of leaving a dead slug in the featured rail.
+const registryNames = new Set(registry.items.map((i) => i.name));
+const featuredOrder = new Map(
+  FEATURED.filter((name) => registryNames.has(name)).map((name, i) => [name, i]),
+);
+const featuredRank = (name: string) =>
+  featuredOrder.get(name) ?? Number.MAX_SAFE_INTEGER;
 
 /** The lead sentence carries the component's job; the rest is build detail. */
 const firstSentence = (text: string) => text.split(/(?<=\.)\s/, 1)[0] ?? "";
@@ -39,9 +50,13 @@ const items: ShowcaseEntry[] = registry.items
   }))
   .sort(
     (a, b) =>
-      recency(a.name) - recency(b.name) || a.title.localeCompare(b.title),
+      featuredRank(a.name) - featuredRank(b.name) ||
+      recency(a.name) - recency(b.name) ||
+      a.title.localeCompare(b.title),
   );
 
+const featured = [...featuredOrder.keys()];
+
 export default function Home() {
-  return <Showcase items={items} />;
+  return <Showcase items={items} featured={featured} />;
 }

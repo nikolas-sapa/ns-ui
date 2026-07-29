@@ -1,0 +1,18 @@
+{
+  "name": "gantry-run",
+  "title": "Gantry Run",
+  "description": "A scroll-scrubbed, infinitely-looping 3D card gallery — cards hang off a receding gantry track using real CSS perspective/preserve-3d, the whole tray tilts toward the pointer like a specimen table, and whichever card sits nearest the camera (by depth, not mouse distance) gets a procedural focus highlight and its title pushed to a live readout.",
+  "collection": "loud",
+  "tags": ["scroll", "3d", "gallery", "gantry", "perspective", "parallax", "cursor"],
+  "useWhen": "a scroll-driven receding 3D card gallery that loops seamlessly and highlights whichever card is nearest the virtual camera; reach for particle-tunnel-scrub instead for a scroll flythrough of unlabeled particles with fixed-depth text callouts, not a catalog of discrete labeled items.",
+  "instruction": "Build a 400vh section with a sticky full-viewport inner div. Cards are laid out along a 'gantry track': item i sits at world position (i*34px lateral, i*-16px vertical rise, i*260px depth), and the item list is rendered TWICE back to back (a loop buffer) so a duplicate of the first card is already approaching as the last real card recedes out of frame. A real CSS perspective (1400px, origin 50% 45%) on the viewport wrapper plus transform-style: preserve-3d on the track and every card lets the browser do the actual projection — each card's transform (translate3d + a fixed rotateY(-6deg) + a small in-focus scale bump) is written directly to its ref every frame, not through React state. Scroll progress is read from the section's getBoundingClientRect in a passive scroll listener (0 at the section's top edge reaching the viewport, 1 once its bottom edge does), mapped to camera depth camZ = progress * (item count * 260px) — since that span equals exactly the depth of ONE set of the duplicated pair, the pass reads as a single continuous, closed loop: at progress 1 the camera is back at the seam. Independently of scroll, the pointer tilts the whole track (not any individual card) toward itself: pointer offset from viewport center maps to a target rotateX/rotateY on the track wrapper, eased in at a fixed 0.1 lerp factor per frame, so the tray reads as a tilting specimen table rather than N cards each springing at the mouse. Every frame the card whose depth (|world Z - camZ|) is smallest is the 'focus' card: it gets `data-focused=\"true\"\" (styled via a plain Tailwind data-attribute variant into an --accent border and a raised shadow, both transitioning over 200ms) and its title is written directly into a small mono readout above the scroll hint via textContent, so attention follows camera depth, not cursor proximity. Cards more than 1.5 track-steps behind the camera or past the loop's far edge are set to opacity 0 to bound the DOM work; visible cards fade out gradually as they approach either edge of the visible window. Default items render as token-styled specimen cards (id, a diagonal-hatch swatch built from a `repeating-linear-gradient` of `var(--border)`, title, caption) rather than photographic images, so the component has no network dependency and stays theme-reactive by construction. prefers-reduced-motion replaces the entire scroll-scrubbed 3D experience with a plain static grid of the same cards and tokens — no scroll listener, no tilt, no receding track — rather than merely slowing the scrub down. Props: items (id/title/caption), className. Zero dependencies.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "scroll",
+    "period": 4600
+  },
+  "card": {
+    "focus": "[data-gantry-stage]",
+    "padding": 0.08
+  }
+}

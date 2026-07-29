@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CopyButton } from "./copy-button";
+import { FeaturedCard } from "./featured-card";
 import { PreviewCard, type RegistryEntry } from "./preview-card";
 import { ThemeToggle } from "./theme-toggle";
 import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
@@ -58,7 +59,14 @@ const STOPWORDS = new Set([
   "some", "that", "the", "this", "to", "use", "want", "when", "with", "you",
 ]);
 
-export function Showcase({ items }: { items: ShowcaseEntry[] }) {
+export function Showcase({
+  items,
+  featured,
+}: {
+  items: ShowcaseEntry[];
+  /** Curated slugs, already filtered to ones that exist — see lib/featured.ts. */
+  featured: string[];
+}) {
   const [filter, setFilter] = useState<Filter>("all");
   const [category, setCategory] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -149,6 +157,12 @@ export function Showcase({ items }: { items: ShowcaseEntry[] }) {
   };
 
   const { registerRef, isActive } = useMountManager();
+
+  const byName = useMemo(() => new Map(items.map((i) => [i.name, i])), [items]);
+  const featuredItems = useMemo(
+    () => featured.map((name) => byName.get(name)).filter((i): i is ShowcaseEntry => !!i),
+    [featured, byName],
+  );
 
   const tabs: { key: Filter; label: string }[] = [
     { key: "all", label: "All" },
@@ -300,6 +314,37 @@ export function Showcase({ items }: { items: ShowcaseEntry[] }) {
           ) : null}
         </div>
       </div>
+
+      {/* Featured rail: a small, genuinely-curated set, live and directly
+          interactive rather than an autoplaying thumbnail. Hidden the moment
+          a visitor filters or searches — those states already answer "show
+          me X"; a curated rail is only useful as an entry point into the
+          full 197. */}
+      {!filtered && featuredItems.length > 0 ? (
+        <section className="mt-14">
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">
+            Featured
+          </p>
+          <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">
+            A curated set, live. Click any preview to drive it directly.
+          </p>
+          <div className="mt-6 grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-2">
+            {featuredItems.map((entry) => (
+              <FeaturedCard
+                key={entry.name}
+                entry={entry}
+                installCommand={installFor(entry.name)}
+              />
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {!filtered && featuredItems.length > 0 ? (
+        <p className="mt-24 font-mono text-xs uppercase tracking-[0.18em] text-muted">
+          All components
+        </p>
+      ) : null}
 
       {/* Two columns up to 2xl: the demos are full-viewport designs, so a
           wider card is the difference between reading as a component and

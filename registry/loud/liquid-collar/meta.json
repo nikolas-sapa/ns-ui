@@ -1,0 +1,13 @@
+{
+  "name": "liquid-collar",
+  "title": "Liquid Collar",
+  "description": "Wraps any element in a thin band of animated liquid metal — a WebGL shader signs a rounded-rect (or circular) distance field, keeps only the ring around it, and fills that ring with a domain-warped noise flow through a three-stop accent ramp plus a specular streak that orbits like light on a rotating metal surface.",
+  "collection": "loud",
+  "tags": ["webgl", "shader", "metal", "ring", "border", "decorative", "avatar", "button"],
+  "instruction": "A wrapper component (children prop) that surrounds its content with an animated liquid-metal band roughly `ringWidth` (default 5) CSS px wide. One WebGL canvas per instance is sized to the wrapper's full box; the fragment shader computes a rounded-rect signed distance field (radius = min(12, min(w,h)/2) for variant='pill', min(w,h)/2 for variant='circle') and keeps only a smoothstep-feathered band around the zero crossing. Inside the band, fragment position feeds a two-pass domain-warped value-noise fbm (own hash constants, 5 octaves) whose scalar output drives a linear three-stop color ramp: --accent, --accent lightened 65% toward white, and --background lightened 8%. A specular term — two rotating pow(cos(angle - time), n) lobes at different speeds and exponents — adds bright highlights that sweep around the ring like light catching a curved metal surface. `strength` (0..1, default 1) scales final alpha and is read from a ref so it updates without recreating the GL context; `paused` freezes the shader on its current frame via a lightweight 120ms poll rather than a full context teardown. Colors are read via getComputedStyle(document.documentElement) at mount and re-read on a MutationObserver watching documentElement's class attribute, repainting one frame immediately so a theme flip is never stale. The rAF loop pauses on document visibilitychange and under prefers-reduced-motion (draws one static frame instead, still theme-reactive). Backing store is dpr-clamped to 2, resizes via ResizeObserver with a zero-size guard, and the canvas listens for webglcontextlost (cancels the loop, prevents default) and webglcontextrestored (recreates the program and resumes) so a lost context never leaves a dead loop or a permanently blank ring. On GL init failure the component still renders its children with no ring rather than crashing. Program, both shaders and the vertex buffer are deleted on unmount and on context loss. variant='pill' follows the wrapper's own rounded-md corner; variant='circle' forces a true disc, intended for wrapping an avatar or icon button.",
+  "dependencies": [],
+  "card": {
+    "focus": ".card-focus",
+    "padding": 0.3
+  }
+}

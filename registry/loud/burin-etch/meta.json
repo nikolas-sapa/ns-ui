@@ -1,0 +1,21 @@
+{
+  "name": "burin-etch",
+  "title": "Burin Etch",
+  "description": "ASCII rendered as a real engraving — glyph density traces concentric contour bands through an orbiting metaball field instead of mapping brightness straight to weight, so the plate reads as ridged hatch linework over a soft rounded subject, with a pointer-driven polish trail and a self-healing burin-slip glitch.",
+  "collection": "loud",
+  "tags": ["ascii", "canvas", "generative", "engraving", "cursor", "glitch", "monochrome"],
+  "useWhen": "a generative full-bleed ASCII/glyph canvas where the text density traces literal contour hatching over an evolving 3D-ish form and the pointer visibly polishes a trail into it; reach for ascii-dither-media instead for a luminance-to-glyph renderer of an actual image or flowing noise field with a cursor-brightness halo, and cloud-chamber for a particle-trail generative piece with no glyphs at all.",
+  "instruction": "Build a full-bleed Canvas 2D engraving effect. A scalar field is the sum of four metaballs (v = r^2/(dist^2+1) per ball) whose centers orbit slowly around fixed anchors near the canvas center at different radii, speeds and phases, sized relative to min(width,height) so the composition scales with the container. Density is NOT luminance — for each grid cell (default 11px), compute the field value v, fade cells below v=0.16 to fully transparent and reach full opacity by v=0.42 (a soft plate edge), then take cycle = v * ringDensity (default 0.09) and phase = fract(cycle): if phase exceeds ringWidth (default 0.4) the cell is a gap between hatch lines and draws nothing, otherwise it draws a glyph from a 9-step density ramp ' ·-+=*#%@' chosen by how close phase sits to the ring's center, at alpha scaled by both the plate-edge fade and the ring-center closeness. This produces true concentric contour hatching across the metaball surface rather than a brightness photograph rendered in text. A per-cell polish buffer (Float32Array) decays by 0.965 every frame and gets set to max(current, 1 - distance/polishRadius) for any cell within polishRadius (default 130px) of the live pointer position; that value multiplies into ringDensity locally (up to +85% by default), so a cell the cursor has recently crossed hatches measurably finer for about a second before relaxing back to the ambient coarseness — a burnished trail, not an instant halo. Independently, on a jittered interval (default ~2600ms), a burin-slip glitch picks one or two random rows and offsets only the x position glyphs are drawn at (not the field sample) by a random few cells for roughly 90-200ms before self-healing, reading as the plate momentarily slipping under the tool. Direct-DOM rAF loop, zero React state on the hot path; the metaball centers still animate under prefers-reduced-motion in the sense that a single frame is drawn at t=0 with no orbit, no polish decay, and no glitch scheduling. Glyph ink is `canvas.style.color` (the live --foreground token via a `text-foreground` class), re-read on every <html> class mutation through a MutationObserver so a theme toggle repaints the static reduced-motion frame correctly without a remount. A ResizeObserver drives the resize/regrid path. Props: cellSize, ringDensity, ringWidth, polishRadius, polishStrength, glitchIntervalMs (0 disables the slip). Decorative canvas, aria-hidden, no dependencies.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "pointer-path",
+    "path": "orbit",
+    "target": "[data-burin-etch]",
+    "period": 4200,
+    "delay": 500
+  },
+  "card": {
+    "focus": "[data-burin-etch]",
+    "padding": 0.05
+  }
+}
