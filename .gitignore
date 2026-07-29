@@ -33,3 +33,4 @@ recordings/
 /wiki/.wiki/
 /.worktrees/
 .scratch-audit/
+*.tmp.mjs
