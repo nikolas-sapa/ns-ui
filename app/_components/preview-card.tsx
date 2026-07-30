@@ -231,6 +231,12 @@ export function PreviewCard({
             <h3 className="truncate text-sm font-medium tracking-tight">
               <Link
                 href={`/preview/${entry.name}/play`}
+                // 222 cards, one link each. Next prefetches every link near the
+                // viewport, so the default fired ~147 RSC requests on a single
+                // homepage load (measured) for playgrounds the visitor will
+                // open at most one of. The route is prerendered and CDN-cached,
+                // so the click is fast without paying for 221 unused fetches.
+                prefetch={false}
                 className="rounded-sm outline-none after:absolute after:inset-0 after:rounded-md focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {entry.title}

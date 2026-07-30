@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { CopyButton } from "./copy-button";
 import type { RegistryEntry } from "./preview-card";
 
@@ -18,26 +19,72 @@ const FRAME_H = 900;
 const PRELOAD_MARGIN = 400;
 
 /**
- * A featured card is the honest reference page (`/preview/<name>`) run
- * inside an iframe, exactly like a catalog card — autoplaying and inert, a
- * live thumbnail rather than something to drive in place. Genuine
- * interaction lives one click away, at the dedicated playground page
+ * A featured card is the honest reference page (`/preview/<name>`) run inside
+ * an iframe — autoplaying and inert, a live thumbnail rather than something to
+ * drive in place. Genuine interaction lives one click away at the playground
  * (`/preview/<name>/play`): the whole card is a real link there (same
  * stretched-hit-area pattern as `preview-card.tsx`), so middle-click,
  * cmd-click and copy-link all work.
+ *
+ * It no longer runs that iframe at rest, because doing so was the entire cost
+ * of the homepage. Measured, same build and machine, back to back: with the
+ * featured iframes rendered the main thread blocked ~3.6s per 10s indefinitely
+ * on an idle page; with them not rendered, 0ms — while each of these components
+ * measures 0ms on its own at a full viewport. It was never the components. A
+ * continuously repainting 1440x900 document being CSS-scaled to ~26% is
+ * expensive to composite whatever is inside it, and each frame also
+ * re-downloaded the Next runtime, React, the stylesheet and the fonts into its
+ * own document.
+ *
+ * A still alone fixed the cost and broke the page: a rail of frozen thumbnails
+ * reads as broken, and needing to move the cursor before anything happens is
+ * worse than the problem it solved. So the resting state is a silent looping
+ * recording (scripts/build-previews.ts). Video decode is GPU work that never
+ * touches the main thread, so the card moves at rest and still measures 0ms.
+ *
+ * Three layers, cheapest first, each replacing the one under it:
+ *   1. the still — the screenshot the quality gate already generates, so there
+ *      is no second source of truth. Paints immediately and is the LCP element.
+ *   2. the loop — fetched only once the card is near the viewport, faded in
+ *      when it actually has frames, so there is no flash of empty video.
+ *   3. the real component — mounted on pointer-enter or focus, for anyone who
+ *      wants to confirm the card is not a marketing video. One-way on purpose:
+ *      once a card is live it stays live, so moving the pointer away does not
+ *      yank a running demo back to a recording.
  */
 export function FeaturedCard({
   entry,
   installCommand,
+  priority = false,
 }: {
   entry: RegistryEntry;
   installCommand: string;
+  /** True for the first row, whose posters are the page's LCP candidates. */
+  priority?: boolean;
 }) {
   const boxRef = useRef<HTMLDivElement | null>(null);
   const frameRef = useRef<HTMLIFrameElement | null>(null);
   const [inView, setInView] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [scale, setScale] = useState<number | null>(null);
+  // Set once, never cleared — see the note above about not yanking a running
+  // demo back to a recording when the pointer leaves.
+  const [hot, setHot] = useState(false);
+  // Flipped on the video's own `playing` event rather than on mount, so the
+  // still stays up until there is a real frame to show instead of cross-fading
+  // to a black box on a slow connection.
+  const [rolling, setRolling] = useState(false);
+  // Which recording to fetch. Null until the client has read the theme: the
+  // server cannot know it (the no-flash script sets `.dark` from localStorage
+  // and the media query), and rendering both variants so CSS could hide one
+  // would download two videos to show one. The still covers this gap — it is
+  // theme-correct at first paint via a plain `dark:` class, with no JS.
+  const [theme, setTheme] = useState<"light" | "dark" | null>(null);
+  // Reduced motion has to gate the *element*, not just its visibility. Hiding
+  // the video in CSS still downloads it — measured: 4 files fetched for a
+  // visitor who never sees a frame. Null until read on the client, same reason
+  // as `theme`.
+  const [calm, setCalm] = useState<boolean | null>(null);
 
   useEffect(() => {
     const box = boxRef.current;
@@ -50,6 +97,31 @@ export function FeaturedCard({
     );
     observer.observe(box);
     return () => observer.disconnect();
+  }, []);
+
+  // Track `.dark` on <html> rather than the media query: the theme toggle sets
+  // that class directly, so a visitor flipping themes gets the matching
+  // recording without a reload. `rolling` resets so the still covers the swap
+  // instead of showing one frame of the wrong palette.
+  useEffect(() => {
+    const read = () =>
+      setTheme(document.documentElement.classList.contains("dark") ? "dark" : "light");
+    read();
+    const mo = new MutationObserver(() => {
+      setRolling(false);
+      read();
+    });
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const onCalm = () => setCalm(mq.matches);
+    onCalm();
+    mq.addEventListener("change", onCalm);
+
+    return () => {
+      mo.disconnect();
+      mq.removeEventListener("change", onCalm);
+    };
   }, []);
 
   useLayoutEffect(() => {
@@ -69,7 +141,20 @@ export function FeaturedCard({
   const src = `/preview/${entry.name}/embed`;
 
   return (
-    <article className="group relative flex flex-col">
+    <article
+      // Pointer OR keyboard focus wakes the demo, so a keyboard visitor
+      // reaching the card by tab gets what a mouse visitor gets.
+      //
+      // These live on the <article>, not on the preview box, because the title
+      // link stretches an `after:inset-0` overlay across the whole card (so the
+      // entire card is clickable). That overlay is a sibling of the box, not a
+      // descendant, so it sits between the pointer and the box and `pointerenter`
+      // — which does not bubble — never reached it. Measured: hovering produced
+      // no iframe at all until the handler moved up here.
+      onPointerEnter={() => setHot(true)}
+      onFocusCapture={() => setHot(true)}
+      className="group relative flex flex-col"
+    >
       <div
         ref={boxRef}
         className="relative aspect-[16/10] w-full overflow-hidden rounded-md border border-border bg-surface transition-colors duration-200 group-hover:border-muted/40 motion-reduce:transition-none"
@@ -79,7 +164,61 @@ export function FeaturedCard({
           className="absolute inset-0 [background-image:radial-gradient(circle,var(--color-border)_1px,transparent_1px)] [background-size:16px_16px] motion-safe:animate-pulse"
           style={{ opacity: loaded ? 0 : 1 }}
         />
-        {inView && scale !== null ? (
+        {/* The still. Two files rather than one theme-aware source because the
+            screenshots are per-theme already; `.dark` is on <html>, set by the
+            pre-hydration script, so the right one is correct at first paint
+            with no JS. Sized to the card, not the 1440px source — next/image
+            re-encodes to AVIF/WebP at that width, which is what makes the
+            ~120KB PNG on disk cost a fraction of that on the wire.
+            `priority` on the first row only: these are the LCP candidates. */}
+        {!hot ? (
+          <>
+            <Image
+              src={`/posters/${entry.name}-light.png`}
+              alt=""
+              aria-hidden
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              className="object-cover dark:hidden"
+              priority={priority}
+            />
+            <Image
+              src={`/posters/${entry.name}-dark.png`}
+              alt=""
+              aria-hidden
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              className="hidden object-cover dark:block"
+              priority={priority}
+            />
+            {/* `inView` gates the fetch so a rail of 36 does not pull 36 files
+                on load. `calm === false` keeps it out of the tree entirely for
+                anyone who asked for less motion — the loop is decoration and
+                the still says the same thing, so there is no reason to spend
+                their bandwidth on it. `muted` + `playsInline` are what make
+                autoplay legal on iOS and under Chrome's policy; without both it
+                silently never starts. */}
+            {inView && theme && calm === false ? (
+              <video
+                // Keyed so a theme flip swaps the source instead of leaving the
+                // element holding a stale first frame.
+                key={theme}
+                src={`/previews/${entry.name}-${theme}.mp4`}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                tabIndex={-1}
+                aria-hidden
+                onPlaying={() => setRolling(true)}
+                className="absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-out"
+                style={{ opacity: rolling ? 1 : 0 }}
+              />
+            ) : null}
+          </>
+        ) : null}
+        {hot && inView && scale !== null ? (
           <iframe
             ref={frameRef}
             src={src}
@@ -109,6 +248,10 @@ export function FeaturedCard({
                   card is a real link to the playground, not just the title. */}
               <Link
                 href={`/preview/${entry.name}/play`}
+                // Same reasoning as preview-card.tsx: the playground is
+                // prerendered and CDN-cached, so prefetching every card's is
+                // spend without a payoff.
+                prefetch={false}
                 className="rounded-sm outline-none after:absolute after:inset-0 after:rounded-md focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {entry.title}

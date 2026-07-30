@@ -158,6 +158,14 @@ export function SiteShell({
                       <Link
                         ref={on ? activeRef : undefined}
                         href={`/preview/${i.name}/play`}
+                        // This sidebar lists every component, so the default
+                        // fired ~126 RSC prefetches on every page load — for a
+                        // list the visitor picks at most one item from. Before
+                        // these routes were made cacheable that was ~126
+                        // uncached function invocations per visit; now it is
+                        // merely 126 wasted CDN round trips. The target is
+                        // prerendered, so the click is fast without them.
+                        prefetch={false}
                         aria-current={on ? "page" : undefined}
                         className={`${LINK} ${
                           on
