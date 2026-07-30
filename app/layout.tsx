@@ -11,7 +11,13 @@ import { navGroups } from "@/lib/nav-data";
 import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
 
 const title = "ns-ui";
-const description = "Personal component registry";
+// Shown only in the unfurl card, not in the browser tab: `title` stays bare so
+// the tab and `siteName` read as the project, not as a pitch. No component
+// count on purpose — the card outlives the number, and a stale figure in a
+// cached unfurl is worse than no figure.
+const socialTitle = "ns-ui: React components, one interaction each";
+const description =
+  "React components you install by URL. Each is built around a single interaction, and a screenshot suite fails any component whose hover looks identical to its resting state.";
 
 export const metadata: Metadata = {
   // Resolves every relative URL in this metadata object (including the
@@ -22,14 +28,14 @@ export const metadata: Metadata = {
   title,
   description,
   openGraph: {
-    title,
+    title: socialTitle,
     description,
     siteName: title,
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title,
+    title: socialTitle,
     description,
   },
 };

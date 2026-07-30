@@ -37,7 +37,7 @@
     "pretypecheck": "npm run registry:build",
     "predev": "npm run registry:build",
     "preverify": "npm run registry:build",
-    "order:build": "tsx scripts/build-order.ts",
+    "order:build": "node scripts/build-order.ts",
     "record": "node scripts/record.ts"
   },
   "dependencies": {
