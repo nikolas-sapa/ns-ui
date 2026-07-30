@@ -20,9 +20,12 @@ const TABS: { key: Filter; label: string }[] = [
 /**
  * The sticky filter/sort/search cluster, pulled out of Showcase so that
  * component stays the state owner and this one stays a pure props-in,
- * callbacks-out view. Two rows at every width: tabs + search + sort share
- * row one, category chips + result state share row two — down from three,
- * which was crowding the 375px viewport.
+ * callbacks-out view. Tabs + search + sort share row one; category chips
+ * + result state share row two, with the chips wrapping onto extra lines
+ * (instead of scrolling off-screen) once they don't fit one line — the
+ * chip count outgrew a single row a while back and a horizontal-scroll
+ * region just clipped the last chip mid-label with no affordance to
+ * reveal the rest.
  *
  * Sort deliberately does NOT use the accent-filled pill treatment the
  * category chips use — accent is reserved for chips because those are a
@@ -164,11 +167,11 @@ export function CatalogControls({
         </div>
       </div>
 
-      <div className="mt-2.5 flex items-center gap-2">
+      <div className="mt-2.5 flex items-start gap-2">
         <div
           role="group"
           aria-label="Filter by what the component is for"
-          className="-mb-1 flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto pb-1"
+          className="flex min-w-0 flex-1 flex-wrap items-center gap-x-1.5 gap-y-2"
         >
           {categories.map((c) => {
             const on = category === c.id;
@@ -195,7 +198,7 @@ export function CatalogControls({
 
         {/* Single live region for the result count — was previously
             duplicated with a second "n shown" readout in row one. */}
-        <p aria-live="polite" className="shrink-0 whitespace-nowrap font-mono text-[11px] text-muted sm:text-xs">
+        <p aria-live="polite" className="shrink-0 whitespace-nowrap py-1 font-mono text-[11px] text-muted sm:text-xs">
           {filtered ? `${visibleCount} of ${totalCount}` : `${totalCount} shown`}
           {activeCategory ? ` · ${activeCategory.label}` : ""}
         </p>
