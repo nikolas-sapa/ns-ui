@@ -1,0 +1,15 @@
+{
+  "name": "hatch-fill",
+  "title": "Hatch Fill",
+  "description": "Engineering-drawing progress meter: a light hatch track and a dense shade-ramp fill with a dithered leading edge, an inline right-aligned numeric readout, and a box-drawing ruler of ticks below.",
+  "collection": "core",
+  "tags": ["progress", "meter", "ascii", "hatch", "mono", "engineering"],
+  "useWhen": "a progress meter drawn as a blueprint-style hatch ruler — a dithered ░▒▓█ leading edge instead of a flat fill boundary, a numeric readout printed into the same character grid rather than overlaid, and a labelled box-drawing tick ruler underneath. Pick chronicle-bar instead for a bar that narrates named phases, or braille-spin for per-dot rather than per-character resolution.",
+  "autoplay": { "mode": "none" },
+  "instruction": "A determinate progress meter in the engineering-drawing register, three stacked monospace lines: the bar itself, a box-drawing tick ruler, and a label row. The bar's track is a run of the single light hatch glyph ░; the filled run is solid █; between them is a fixed-width (4 column) dithered edge where each column's fill level is decided not by a smooth density ramp but by comparing that column's local position through the edge against its own entry in an 8-value ordered-dither sequence — a 1D analogue of the Bayer matrix used in ascii-dither-media elsewhere in this suite — so the boundary reads as grain/texture rather than a flat cut or a clean gradient. The numeric readout is not a floating overlay: it is printed directly into the same character array, right-aligned, overwriting whatever hatch or fill glyphs would otherwise occupy those trailing cells, at a fixed 4-column width (' 37%' / '100%') so the grid never jitters as the digit count changes. Below the bar, a second line draws a box-drawing ruler (├──┬──┬──┬──┤) with a ┬ at each `marks` percentage (default 0/25/50/75/100) and a third line centers that mark's number underneath, clipped to the grid bounds at the ends. `value` (0-100, controlled) glides toward its target over a fixed 420ms ease-out-cubic via a single direct-DOM rAF loop that rebuilds the bar row string each frame and writes it straight to a ref's textContent — never per-frame React state — and sleeps once the ease settles; the tick/label lines are static per render and need no loop. `role=progressbar` with aria-valuemin/max/now sits on the bar line itself, aria-label supplied by the caller. Colors are `text-foreground` for the bar, `text-border` for the tick ruler and `text-muted` for labels — no hardcoded hex, so both themes render correctly. prefers-reduced-motion (read live via matchMedia on mount and on every value change) skips the glide and paints the exact frame implied by `value` immediately. The container is sized to `${totalChars}ch` with an explicit line-height so the character grid holds its width regardless of font metrics, and stays legible at small sizes because the hatch ramp only has four density levels rather than a continuous gradient.",
+  "dependencies": [],
+  "card": {
+    "focus": "[data-hatch-card]",
+    "padding": 0.15
+  }
+}

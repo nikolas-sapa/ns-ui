@@ -1,0 +1,17 @@
+{
+  "name": "roll-crawl",
+  "title": "Roll Crawl",
+  "description": "Character-quantised teleprinter crawl: a fixed row of monospace cells advances one full cell per beat via content substitution, never a subpixel slide.",
+  "collection": "core",
+  "tags": ["ticker", "marquee", "ascii", "mono", "teleprinter"],
+  "useWhen": "a self-driving ambient status line where the mechanical, one-cell-at-a-time advance and per-character settle-in are themselves the point. Reach for bourse-tape instead when the content is discrete data rows that need keyboard navigation and a visible append/splice moment — roll-crawl has no roving focus and is meant to be looked at, not tabbed through.",
+  "autoplay": {
+    "mode": "none"
+  },
+  "instruction": "Build <RollCrawl items separator? beatMs? className?> where `items: string[]` is joined with ` ${separator} ` (default separator \"•\") and a trailing ` ${separator} ` appended so the loop seam reads identically to every other item boundary. IMPLEMENTATION: the row is NOT translated. A fixed set of DOM cell spans exists at fixed positions (count derived from container width divided by a measured 1-character cell width, recomputed via ResizeObserver), and every `beatMs` (default 110) the whole row is rewritten by walking the tape string one index further — this content substitution, not a CSS transform, is what makes the motion character-quantised rather than a sliding marquee. A cell's distance from the right edge is fixed per DOM position and doubles as that position's age since the character now shown there arrived: the rightmost cell is always the just-arrived character and is scrambled to a random glyph from a noise charset on every beat and again on an intermediate flicker tick roughly 2.4x per beat, so an incoming character visibly churns through 2-3 glyphs; once a position's age reaches 3 beats it always shows the true tape character. HOVER: pointerenter (and focus-within, via focusin/focusout) sets a paused flag that stops the beat/flicker timers, but also force-settles every cell to its true character immediately — this is what makes the pause land cleanly on a cell boundary instead of freezing mid-flicker on a scrambled glyph. Accessible name is the plain comma-joined item list on a role=\"text\" wrapper; every visual cell is aria-hidden. prefers-reduced-motion renders one static settled frame (no timers, no listeners beyond a resize observer) rather than a crash or a blank strip. Direct-DOM rAF loop, canceled on unmount; zero React state on the animation path.",
+  "dependencies": [],
+  "card": {
+    "focus": "[data-ns-roll-focus]",
+    "padding": 0.5
+  }
+}

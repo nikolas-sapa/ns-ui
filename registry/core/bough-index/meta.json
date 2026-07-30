@@ -1,0 +1,25 @@
+{
+  "name": "bough-index",
+  "title": "Bough Index",
+  "description": "File/directory tree drawn with real box-drawing connectors, whose glyphs redraw themselves as folders expand and collapse instead of static per-level guides.",
+  "collection": "core",
+  "tags": ["tree", "navigation", "file-tree", "hierarchy", "ascii", "keyboard", "sidebar"],
+  "useWhen": "a tree whose connector glyphs (├── └── │) are the medium itself, drawn in monospace with a bottom-up retract sequence that flips a sibling's ├── into └── the instant its neighbor's row vanishes; pick taproot-trace instead for an SVG-drawn indent guide with a continuous root-system animation.",
+  "autoplay": {
+    "mode": "press",
+    "target": "[data-bough-row=\"components\"]",
+    "hold": 500,
+    "period": 3600,
+    "delay": 600
+  },
+  "gate": {
+    "openBy": "[data-bough-row=\"src\"]",
+    "expect": "[data-bough-row=\"components\"]"
+  },
+  "instruction": "A file/directory tree rendered entirely in monospace box-drawing characters (├── └── │   ), the way the `tree` command prints, where expanding or collapsing a folder redraws the connectors rather than just toggling row visibility. Data is a plain recursive `{ id, label, children? }` array passed as `nodes`; expand state is uncontrolled via `defaultExpandedIds`. Every row's connector prefix is computed as a pure function of its ancestor chain (`│   ` for an ancestor that still has siblings below it in the visible list, four spaces for one that was last), with the row's own connector `├── ` or `└── ` depending on its position among its current siblings — nothing is ever hand-toggled per row. The collapse sequence is the differentiator: on collapse, the toggled folder's currently-visible descendant rows are snapshotted and retracted one at a time, bottom row first, via a single rAF loop stepping through the reversed list at a fixed ~42ms cadence and writing opacity/max-height directly onto each row's DOM node through a ref map (no per-frame React state, no re-render mid-sequence). The instant a direct child's own row is the one being hidden, the loop also reaches into the previous still-mounted sibling's connector `<span>` and rewrites its textContent from `├── ` to `└── ` in place — that sibling has just become the last visible child on screen, so the glyph above it changes to say so, live, mid-retraction. Expansion is the simpler direction: new rows mount at their final, already-correct connectors and reveal top to bottom over the same cadence, since there is no 'which child is last' ambiguity to fix up on the way in, only removal creates that moving target. React only commits the settled expanded/collapsed Set once a sequence finishes; the rendered shape during a collapse is the union of the settled Set and the in-flight node so the old rows stay mounted long enough to animate out. Full WAI-ARIA tree pattern: role=tree with an aria-label, role=treeitem rows carrying aria-expanded (only when the node has children), aria-selected and aria-level. The focusable, clickable surface is a real button spanning the row (not a decorative disclosure triangle) so the accessible name is the row's own label; a container-level roving tabindex plus a single keydown handler on the tree root drives ArrowDown/ArrowUp to move focus over the flattened visible order, ArrowRight to open a closed folder or dive into an already-open one's first child, ArrowLeft to close an open folder in place or climb to its parent, and Home/End to jump to the first/last visible row. Connector glyphs are `text-border`, the row label is `text-muted` at rest and `text-foreground` when selected against a `bg-surface` chip, so the tree reads correctly against either theme without a single hardcoded hex. prefers-reduced-motion (read live via matchMedia) skips the retract/reveal sequence entirely — toggles resolve to their settled row set on the next paint with no animation frame ever scheduled.",
+  "dependencies": [],
+  "card": {
+    "focus": "[role=tree]",
+    "padding": 0.3
+  }
+}
