@@ -16,7 +16,7 @@ const recency = (name: string) => rank.get(name) ?? Number.MAX_SAFE_INTEGER;
 // there. `component-order.json` holds no timestamps (build-order.ts computes
 // them, then drops them before writing the flat slug array) — so "new" is
 // defined by position, not by age: the NEW_COUNT most recently added slugs.
-const NEW_COUNT = 10;
+const NEW_COUNT = 12;
 
 // Curated slugs, filtered against what actually exists so a rename or
 // removal in `registry/` (owned by sibling agents) degrades quietly instead
