@@ -26,21 +26,21 @@ const PRELOAD_MARGIN = 400;
  * stretched-hit-area pattern as `preview-card.tsx`), so middle-click,
  * cmd-click and copy-link all work.
  *
- * It now starts as a still and goes live when you point at it, because the
- * live-at-rest version was the entire cost of the homepage. Measured, same
- * build and machine, back to back: with the featured iframes rendered the main
- * thread blocks ~5-6s per 10s indefinitely on an idle page; with them not
- * rendered it measures 0ms — while each of these components measures 0ms on
- * its own at a full viewport. It is not the components. A continuously
- * repainting 1440x900 document being CSS-scaled to ~26% is expensive to
- * composite no matter what is inside it, and each frame also re-downloads the
- * Next runtime, React, the stylesheet and the fonts into its own document.
+ * It no longer runs that iframe at rest, because doing so was the entire cost
+ * of the homepage. Measured, same build and machine, back to back: with the
+ * featured iframes rendered the main thread blocked ~3.6s per 10s indefinitely
+ * on an idle page; with them not rendered, 0ms — while each of these components
+ * measures 0ms on its own at a full viewport. It was never the components. A
+ * continuously repainting 1440x900 document being CSS-scaled to ~26% is
+ * expensive to composite whatever is inside it, and each frame also
+ * re-downloaded the Next runtime, React, the stylesheet and the fonts into its
+ * own document.
  *
  * A still alone fixed the cost and broke the page: a rail of frozen thumbnails
- * reads as broken, and the whole pitch is that these things move. So the
- * resting state is a silent looping recording (scripts/build-previews.ts).
- * Video decode is GPU work that never touches the main thread, so the card
- * moves at rest and still measures ~0ms.
+ * reads as broken, and needing to move the cursor before anything happens is
+ * worse than the problem it solved. So the resting state is a silent looping
+ * recording (scripts/build-previews.ts). Video decode is GPU work that never
+ * touches the main thread, so the card moves at rest and still measures 0ms.
  *
  * Three layers, cheapest first, each replacing the one under it:
  *   1. the still — the screenshot the quality gate already generates, so there
@@ -74,6 +74,17 @@ export function FeaturedCard({
   // still stays up until there is a real frame to show instead of cross-fading
   // to a black box on a slow connection.
   const [rolling, setRolling] = useState(false);
+  // Which recording to fetch. Null until the client has read the theme: the
+  // server cannot know it (the no-flash script sets `.dark` from localStorage
+  // and the media query), and rendering both variants so CSS could hide one
+  // would download two videos to show one. The still covers this gap — it is
+  // theme-correct at first paint via a plain `dark:` class, with no JS.
+  const [theme, setTheme] = useState<"light" | "dark" | null>(null);
+  // Reduced motion has to gate the *element*, not just its visibility. Hiding
+  // the video in CSS still downloads it — measured: 4 files fetched for a
+  // visitor who never sees a frame. Null until read on the client, same reason
+  // as `theme`.
+  const [calm, setCalm] = useState<boolean | null>(null);
 
   useEffect(() => {
     const box = boxRef.current;
@@ -86,6 +97,31 @@ export function FeaturedCard({
     );
     observer.observe(box);
     return () => observer.disconnect();
+  }, []);
+
+  // Track `.dark` on <html> rather than the media query: the theme toggle sets
+  // that class directly, so a visitor flipping themes gets the matching
+  // recording without a reload. `rolling` resets so the still covers the swap
+  // instead of showing one frame of the wrong palette.
+  useEffect(() => {
+    const read = () =>
+      setTheme(document.documentElement.classList.contains("dark") ? "dark" : "light");
+    read();
+    const mo = new MutationObserver(() => {
+      setRolling(false);
+      read();
+    });
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const onCalm = () => setCalm(mq.matches);
+    onCalm();
+    mq.addEventListener("change", onCalm);
+
+    return () => {
+      mo.disconnect();
+      mq.removeEventListener("change", onCalm);
+    };
   }, []);
 
   useLayoutEffect(() => {
@@ -156,14 +192,18 @@ export function FeaturedCard({
               priority={priority}
             />
             {/* `inView` gates the fetch so a rail of 36 does not pull 36 files
-                on load. `muted` + `playsInline` are what make autoplay legal on
-                iOS and in Chrome's policy; without both this silently never
-                starts. `motion-reduce:hidden` leaves the still in place for
-                anyone who asked for less motion — the loop is decoration, and
-                the still says the same thing. */}
-            {inView ? (
+                on load. `calm === false` keeps it out of the tree entirely for
+                anyone who asked for less motion — the loop is decoration and
+                the still says the same thing, so there is no reason to spend
+                their bandwidth on it. `muted` + `playsInline` are what make
+                autoplay legal on iOS and under Chrome's policy; without both it
+                silently never starts. */}
+            {inView && theme && calm === false ? (
               <video
-                src={`/previews/${entry.name}.mp4`}
+                // Keyed so a theme flip swaps the source instead of leaving the
+                // element holding a stale first frame.
+                key={theme}
+                src={`/previews/${entry.name}-${theme}.mp4`}
                 autoPlay
                 muted
                 loop
@@ -172,7 +212,7 @@ export function FeaturedCard({
                 tabIndex={-1}
                 aria-hidden
                 onPlaying={() => setRolling(true)}
-                className="absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-out motion-reduce:hidden motion-reduce:opacity-0"
+                className="absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-out"
                 style={{ opacity: rolling ? 1 : 0 }}
               />
             ) : null}

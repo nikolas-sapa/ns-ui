@@ -64,44 +64,49 @@ const browser = await chromium.launch();
 let done = 0;
 const failed: string[] = [];
 
+// Both themes. Components are themed by CSS tokens, so a light recording
+// dropped into dark mode is a white rectangle on a black page — which is
+// exactly what shipping one variant looked like.
+const THEMES = ["light", "dark"] as const;
+
 for (const name of names) {
-  const stage = path.join(RAW, name);
-  mkdirSync(stage, { recursive: true });
-  try {
-    const ctx = await browser.newContext({
-      viewport: SIZE,
-      recordVideo: { dir: stage, size: SIZE },
-      // Recording the light theme: the card shows the light poster/video in
-      // light mode, and the dark variant is handled by the still behind it.
-      // One video per component keeps the payload honest — a second theme would
-      // double it for a surface that is in motion and rarely stared at.
-      colorScheme: "light",
-    });
-    const page = await ctx.newPage();
-    await page.goto(`${BASE_URL}/preview/${name}/embed`, { waitUntil: "load", timeout: 60_000 });
-    await page.waitForTimeout((SETTLE + LOOP + 0.5) * 1000);
-    await ctx.close(); // flushes the webm
+  for (const theme of THEMES) {
+    const stage = path.join(RAW, `${name}-${theme}`);
+    mkdirSync(stage, { recursive: true });
+    try {
+      const ctx = await browser.newContext({
+        viewport: SIZE,
+        recordVideo: { dir: stage, size: SIZE },
+        // The no-flash script in the root layout reads this and puts `.dark` on
+        // <html> before first paint, so the recording is themed from frame one.
+        colorScheme: theme,
+      });
+      const page = await ctx.newPage();
+      await page.goto(`${BASE_URL}/preview/${name}/embed`, { waitUntil: "load", timeout: 60_000 });
+      await page.waitForTimeout((SETTLE + LOOP + 0.5) * 1000);
+      await ctx.close(); // flushes the webm
 
-    const raw = readdirSync(stage).find((f) => f.endsWith(".webm"));
-    if (!raw) throw new Error("no video produced");
+      const raw = readdirSync(stage).find((f) => f.endsWith(".webm"));
+      if (!raw) throw new Error("no video produced");
 
-    execFileSync(
-      "ffmpeg",
-      ["-y", "-loglevel", "error",
-       "-ss", String(SETTLE), "-i", path.join(stage, raw), "-t", String(LOOP),
-       "-vf", `scale=${WIDTH}:-2,fps=${FPS}`,
-       "-c:v", "libx264", "-crf", String(CRF), "-preset", "veryfast",
-       "-pix_fmt", "yuv420p", "-movflags", "+faststart", "-an",
-       path.join(OUT, `${name}.mp4`)],
-      { stdio: "pipe" },
-    );
-    done++;
-  } catch (e) {
-    failed.push(name);
-  } finally {
-    rmSync(stage, { recursive: true, force: true });
+      execFileSync(
+        "ffmpeg",
+        ["-y", "-loglevel", "error",
+         "-ss", String(SETTLE), "-i", path.join(stage, raw), "-t", String(LOOP),
+         "-vf", `scale=${WIDTH}:-2,fps=${FPS}`,
+         "-c:v", "libx264", "-crf", String(CRF), "-preset", "veryfast",
+         "-pix_fmt", "yuv420p", "-movflags", "+faststart", "-an",
+         path.join(OUT, `${name}-${theme}.mp4`)],
+        { stdio: "pipe" },
+      );
+      done++;
+    } catch {
+      failed.push(`${name}/${theme}`);
+    } finally {
+      rmSync(stage, { recursive: true, force: true });
+    }
   }
-  if (done % 6 === 0) console.log(`previews: ${done}/${names.length}`);
+  if (done % 12 === 0) console.log(`previews: ${done}/${names.length * 2}`);
 }
 
 await browser.close();
