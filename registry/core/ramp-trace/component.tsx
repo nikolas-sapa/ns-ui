@@ -1,13 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 
 // 8 sub-row block-fraction glyphs, 1/8 full to 8/8 full
 const BLOCKS = ["▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"];
 const ROWS = 8;
 const COL_W = 1; // ch, one glyph per column
 const COL_GAP = 0.6; // ch, whitespace between columns
-const PITCH = COL_W + COL_GAP;
 
 export interface RampTraceProps {
   /** the series to plot; needs at least one value */
@@ -35,6 +34,32 @@ export function RampTrace({
   const [focusIdx, setFocusIdx] = useState<number | null>(null);
   const activeIdx = hoverIdx ?? focusIdx;
   const colRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  // the readout is centered on the active column's own measured position,
+  // not a parallel `ch`-based pitch calculation: the readout row and the
+  // bar row can differ in font-size (e.g. text-xs vs the ambient size),
+  // which makes `ch` resolve to different px in each row and drift
+  // linearly with column index. Measuring the real element sidesteps
+  // that entirely.
+  const [readoutCenter, setReadoutCenter] = useState<number | null>(null);
+
+  useLayoutEffect(() => {
+    if (activeIdx === null) {
+      setReadoutCenter(null);
+      return;
+    }
+    const update = () => {
+      const col = colRefs.current[activeIdx];
+      const container = containerRef.current;
+      if (!col || !container) return;
+      const colRect = col.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      setReadoutCenter(colRect.left - containerRect.left + colRect.width / 2);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, [activeIdx]);
 
   const moveFocus = (i: number) => {
     const clamped = Math.min(series.length - 1, Math.max(0, i));
@@ -87,13 +112,13 @@ export function RampTrace({
   };
 
   return (
-    <div className={`font-mono ${className}`}>
+    <div ref={containerRef} className={`font-mono ${className}`}>
       <div className="relative h-[1.1em] text-xs" style={{ lineHeight: "1.1em" }}>
-        {activeIdx !== null ? (
+        {activeIdx !== null && readoutCenter !== null ? (
           <span
             aria-hidden
-            className="absolute bottom-0 whitespace-nowrap text-accent"
-            style={{ left: `${activeIdx * PITCH}ch` }}
+            className="absolute bottom-0 -translate-x-1/2 whitespace-nowrap text-accent"
+            style={{ left: `${readoutCenter}px` }}
           >
             {valueFormat(series[activeIdx])}
           </span>

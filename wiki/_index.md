@@ -11,6 +11,8 @@ updated: 2026-07-28T16:20:53Z
 
 [[inline_style_overrides_tailwind_position|inline_style_overrides_tailwind_position]]: A component-scoped <style> rule at equal specificity beats Tailwind utilities by source order — never re-declare position (or other box-critical props) on an element that already carries a Tailwind position utility; an absolute inset-0 wrapper silently flipped to relative collapses to height 0 when all its children are absolute.
 
+[[mono_glyph_family_baseline_mismatch|mono_glyph_family_baseline_mismatch]]: Box-drawing glyphs render centred in the em box while block-fraction glyphs sit flush to the baseline — the two families cannot be aligned in one monospace character grid by row arithmetic, no matter how correct the row index is.
+
 [[raf_negative_delta_first_frame|raf_negative_delta_first_frame]]: A rAF callback's timestamp can read marginally behind a performance.now() sample taken just before requestAnimationFrame was scheduled — clamp raw = now - lastSample to >= 0 or a fresh animation's first frame computes a tiny negative delta and poisons anything downstream (eased progress going negative, negative radii, etc).
 
 [[svg_dasharray_non_scaling_stroke|svg_dasharray_non_scaling_stroke]]: Chromium ignores pathLength for stroke-dasharray when vectorEffect="non-scaling-stroke" is set — never combine them; use divs for straight indicator lines.
