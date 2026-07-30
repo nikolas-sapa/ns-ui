@@ -14,6 +14,17 @@ import { useEffect, useRef } from "react";
 // reads as pushed outward, like dragging a finger through liquid, and settles
 // back on its own once the cursor stops. Canvas 2D, direct-DOM rAF, no React
 // state on the hot path, char+alpha-bucket buffers reused every frame.
+//
+// Pass 1's per-cell field sample is the hot spot: fieldValue() is 7 Math.sin
+// calls, and away from the cursor 6 of its 7 sine arguments only ever depend
+// on x, on y, on (x-y), or on (x+y) individually — never on x and y mixed
+// with different weights. So for the idle (unwarped) grid those 6 terms are
+// hoisted into 1-D tables built once per frame (O(cols+rows) sines) and
+// pass 1 becomes table lookups + adds; only the true xy-cross term
+// (0.29x + 0.24y) and the warp-perturbed cells near the cursor still call
+// fieldValue() directly. Same operand order as fieldValue() throughout, so
+// output is bit-identical. Pass 2 walks only the lit cells bucketed in pass
+// 1 instead of rescanning the full grid once per alpha bucket.
 // ---------------------------------------------------------------------------
 
 const RAMP = " .'`,:-=+*#%@";
@@ -69,13 +80,24 @@ export function GlyphTide({ cellSize = 12, className = "" }: GlyphTideProps) {
     let rows = 0;
     let dpr = 1;
     let charBuf = new Uint8Array(0);
-    let bucketBuf = new Uint8Array(0);
+    // per-bucket lists of lit cell indices, rebuilt each frame in pass 1 and
+    // walked once each in pass 2 — replaces a full grid rescan per bucket
+    const bucketLists: number[][] = Array.from({ length: ALPHA_BUCKETS }, () => []);
     let sized = false;
     let ready = false;
     let disposed = false;
     let raf = 0;
     let last = 0;
     let t = 0;
+
+    // 1-D sine tables for the idle-grid fast path in pass 1 — sized on
+    // resize, refilled every frame in draw() (values depend on t)
+    let sinAx = new Float64Array(0); // sin(x*0.045 + t*0.16), indexed by gx
+    let sinAy = new Float64Array(0); // sin(y*0.05 - t*0.12), indexed by gy
+    let sinAxy = new Float64Array(0); // sin((x-y)*0.03 + t*0.07), indexed by (gx-gy)+rows-1
+    let sinBx = new Float64Array(0); // sin(x*0.13 - t*0.34), indexed by gx
+    let sinBy = new Float64Array(0); // sin(y*0.11 + t*0.27), indexed by gy
+    let sinCxy = new Float64Array(0); // sin((x+y)*0.34 - t*1.05), indexed by gx+gy
 
     const cursor = { x: -1e5, y: -1e5, tx: -1e5, ty: -1e5, energy: 0 };
 
@@ -113,7 +135,12 @@ export function GlyphTide({ cellSize = 12, className = "" }: GlyphTideProps) {
       cols = Math.max(1, Math.floor(width / cellW));
       rows = Math.max(1, Math.floor(height / cellH));
       charBuf = new Uint8Array(cols * rows);
-      bucketBuf = new Uint8Array(cols * rows);
+      sinAx = new Float64Array(cols);
+      sinBx = new Float64Array(cols);
+      sinAy = new Float64Array(rows);
+      sinBy = new Float64Array(rows);
+      sinAxy = new Float64Array(cols + rows - 1);
+      sinCxy = new Float64Array(cols + rows - 1);
       sized = true;
     };
 
@@ -132,18 +159,36 @@ export function GlyphTide({ cellSize = 12, className = "" }: GlyphTideProps) {
       const w = cols * cellW;
       const h = rows * cellH;
       ctx.clearRect(0, 0, w, h);
-      ctx.fillStyle = fg;
 
       const cgx = cursor.x / cellW;
       const cgy = cursor.y / cellH;
       const r2 = WARP_RADIUS * WARP_RADIUS;
       const energy = cursor.energy;
 
+      for (let b = 0; b < ALPHA_BUCKETS; b++) bucketLists[b].length = 0;
+
+      // fill the 1-D tables for this frame's t — same operand order as
+      // fieldValue() so the idle-path sum below is bit-identical to it
+      const rowOff = rows - 1; // offset so (gx-gy) never indexes negative
+      for (let gx = 0; gx < cols; gx++) {
+        sinAx[gx] = Math.sin(gx * 0.045 + t * 0.16);
+        sinBx[gx] = Math.sin(gx * 0.13 - t * 0.34);
+      }
+      for (let gy = 0; gy < rows; gy++) {
+        sinAy[gy] = Math.sin(gy * 0.05 - t * 0.12);
+        sinBy[gy] = Math.sin(gy * 0.11 + t * 0.27);
+      }
+      for (let n = 0; n < cols + rows - 1; n++) {
+        sinAxy[n] = Math.sin((n - rowOff) * 0.03 + t * 0.07); // n-rowOff = gx-gy
+        sinCxy[n] = Math.sin(n * 0.34 - t * 1.05); // n = gx+gy
+      }
+
       let i = 0;
       for (let gy = 0; gy < rows; gy++) {
         for (let gx = 0; gx < cols; gx++, i++) {
           let sx = gx;
           let sy = gy;
+          let warped = false;
           if (energy > 0.002) {
             const dx = gx - cgx;
             const dy = gy - cgy;
@@ -154,9 +199,20 @@ export function GlyphTide({ cellSize = 12, className = "" }: GlyphTideProps) {
               const dist = Math.sqrt(d2) || 1e-4;
               sx = gx + (dx / dist) * push;
               sy = gy + (dy / dist) * push;
+              warped = true;
             }
           }
-          let v = fieldValue(sx, sy, t);
+          let v: number;
+          if (warped) {
+            v = fieldValue(sx, sy, t);
+          } else {
+            // idle grid: gx/gy are integers, so every table lookup below is
+            // exactly the sine term it replaces from fieldValue()
+            const a = sinAx[gx] + sinAy[gy] + sinAxy[gx - gy + rowOff];
+            const b = sinBx[gx] + sinBy[gy];
+            const c = Math.sin(gx * 0.29 + gy * 0.24 + t * 0.85) + sinCxy[gx + gy];
+            v = (a * 0.42 + b * 0.34 + c * 0.24) / 5 + 0.5;
+          }
           v = v < 0 ? 0 : v > 1 ? 1 : v;
           const lum = Math.pow(v, 1.6); // gamma: deepens the floor, crests pop
           const bucket = Math.min(
@@ -164,25 +220,26 @@ export function GlyphTide({ cellSize = 12, className = "" }: GlyphTideProps) {
             Math.floor(lum * ALPHA_BUCKETS)
           );
           const ci = Math.floor(lum * (RAMP.length - 1));
-          bucketBuf[i] = bucket;
-          charBuf[i] = RAMP[ci] === " " ? 0 : ci;
+          charBuf[i] = ci; // ci === 0 is RAMP[0] === " " — skipped below
+          if (ci !== 0) bucketLists[bucket].push(i);
         }
       }
 
-      // one globalAlpha set per bucket instead of per glyph
+      // pass 2 only walks the lit cells collected per bucket above, instead
+      // of rescanning the full grid once per alpha bucket
+      ctx.fillStyle = fg;
       for (let b = 0; b < ALPHA_BUCKETS; b++) {
-        const alpha = 0.18 + (b / (ALPHA_BUCKETS - 1)) * 0.82;
-        ctx.globalAlpha = alpha;
-        let j = 0;
-        for (let gy = 0; gy < rows; gy++) {
-          for (let gx = 0; gx < cols; gx++, j++) {
-            if (charBuf[j] === 0 || bucketBuf[j] !== b) continue;
-            ctx.fillText(
-              RAMP[charBuf[j]],
-              gx * cellW + cellW / 2,
-              gy * cellH + cellH / 2
-            );
-          }
+        const list = bucketLists[b];
+        ctx.globalAlpha = 0.18 + (b / (ALPHA_BUCKETS - 1)) * 0.82;
+        for (let k = 0; k < list.length; k++) {
+          const idx = list[k];
+          const gx = idx % cols;
+          const gy = (idx - gx) / cols;
+          ctx.fillText(
+            RAMP[charBuf[idx]],
+            gx * cellW + cellW / 2,
+            gy * cellH + cellH / 2
+          );
         }
       }
       ctx.globalAlpha = 1;

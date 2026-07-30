@@ -10,14 +10,19 @@ import type { NavGroup } from "@/lib/nav-data";
  * the quality gate:
  *
  * `/preview/<name>` (the BARE route, no `/play`) is what `scripts/verify.ts`
- * and `scripts/record.ts` screenshot, and what every catalog card and the
- * playground embed in an iframe. It must stay a naked component page — the
- * gate grabs "the first visible interactive element" for its hover/press/focus
- * diff, and a sidebar full of links would hand it a nav link instead. So that
- * one shape renders children with no chrome at all.
+ * and `scripts/record.ts` screenshot, and what the playground embeds in an
+ * iframe. `/preview/<name>/embed` is the cacheable card thumbnail every catalog
+ * and featured card loads. Both must stay naked component pages — the gate
+ * grabs "the first visible interactive element" for its hover/press/focus diff,
+ * and a sidebar full of links would hand it a nav link instead. So those two
+ * shapes render children with no chrome at all.
+ *
+ * `/embed` has to be listed explicitly: it is a deeper path, so the original
+ * single-segment pattern rejected it and every card rendered the full sidebar
+ * inside its own iframe (caught by screenshot, after the DOM check passed).
  */
 const isBarePreview = (pathname: string) =>
-  /^\/preview\/[^/]+$/.test(pathname);
+  /^\/preview\/[^/]+(?:\/embed)?$/.test(pathname);
 
 const LINK =
   "block truncate rounded-sm px-2 py-1 text-sm outline-none transition-colors hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none";
