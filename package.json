@@ -28,7 +28,7 @@
     "dev": "next dev",
     "build": "npm run registry:build && next build",
     "start": "next start",
-    "registry:build": "node scripts/build-index.ts && node scripts/build-registry.ts && node scripts/build-llms.ts && node scripts/build-autoplay.ts",
+    "registry:build": "node scripts/build-index.ts && node scripts/build-registry.ts && node scripts/build-llms.ts && node scripts/build-autoplay.ts && node scripts/build-posters.ts",
     "autoplay:build": "node scripts/build-autoplay.ts",
     "llms:build": "node scripts/build-llms.ts",
     "typecheck": "tsc --noEmit",

@@ -370,9 +370,15 @@ export function Showcase({
             play with it.
           </p>
           <ul className="mt-6 grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-2">
-            {featuredItems.map((entry) => (
+            {featuredItems.map((entry, i) => (
               <li key={entry.name}>
-                <FeaturedCard entry={entry} installCommand={installFor(entry.name)} />
+                {/* The grid is 2-up at md and above, so the first two posters
+                    are the only ones above the fold — and the LCP candidates. */}
+                <FeaturedCard
+                  entry={entry}
+                  installCommand={installFor(entry.name)}
+                  priority={i < 2}
+                />
               </li>
             ))}
           </ul>
