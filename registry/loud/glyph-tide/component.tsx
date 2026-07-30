@@ -123,7 +123,10 @@ export function GlyphTide({ cellSize = 12, className = "" }: GlyphTideProps) {
         sized = false;
         return;
       }
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const isCard = !!canvas.closest("[data-autoplay-root]");
+      dpr = isCard
+        ? Math.min(0.6, window.devicePixelRatio || 1)
+        : Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = Math.max(1, Math.round(width * dpr));
       canvas.height = Math.max(1, Math.round(height * dpr));
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);

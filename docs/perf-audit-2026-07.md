@@ -29,7 +29,27 @@ The main thread stayed ~72% blocked **indefinitely**, with the page idle and
 untouched. That is the "slow": the page paints quickly and then never becomes
 responsive — scrolling stutters and every interaction lands late.
 
-## Cause 1 — five components burn 96% of the CPU
+## Read this before trusting any number below
+
+Total Blocking Time on this hardware is dominated by **machine state**, not by
+the page. The same unmodified component measured 5606ms while other agents' dev
+servers and builds were running (load average 13-18) and **32ms** on the same
+production URL once the machine was quiet (load ~3). That is a 175x swing with
+zero code change.
+
+Consequences, and they are not small:
+
+- Every absolute TBT figure below is only meaningful next to a control measured
+  in the same minute. Where a control is not quoted, treat the number as a
+  ranking signal at best.
+- The per-component "before -> after" wins reported further down were measured
+  back-to-back under load. They are real *under CPU contention* — which is
+  exactly the condition a visitor on a mid-tier laptop is in, and the condition
+  the original complaint came from — but they do **not** reproduce on an idle
+  machine, where most of these components already measure near zero.
+- The headline homepage number did **not** improve. See below.
+
+## Cause 1 — five components burn 96% of the CPU *under contention*
 
 All 222 components were profiled individually at
 `/preview/<name>?embed=1&autoplay=1` (8s window, 3s after load).
@@ -149,6 +169,55 @@ are comparable: `scarp-horizon` 1025 vs 1153, `ascii-dither-media` 29 vs 14,
   three runs each, with tight variance. 23 lines of added state for no gain is
   a bad trade. It remains the worst component in the library at ~4.9s and is
   the obvious next piece of work.
+### Correction: the homepage did not improve
+
+The `-12%` homepage figure first recorded here (7503ms -> 6634ms) did not
+survive. Re-measured on a quiet machine, three interleaved runs each:
+
+    production  steady = 5915 / 6249 / 6290 ms
+    with fixes  steady = 6121 / 6101 / 6043 ms
+
+That is run-to-run variance, not an improvement. **The shipped component work
+does not measurably speed up the homepage.** It was worth finding out why.
+
+## Cause 1b — what actually blocks the homepage: live scaled iframes
+
+A sequence of ablations on the same build, same machine, back to back:
+
+| homepage variant | steady-state TBT / 10s |
+| --- | --- |
+| as shipped (4 featured frames mount, 2 visible) | ~4400-6100ms |
+| catalog card iframes disabled | unchanged (~6300ms) |
+| **all featured iframes disabled** | **0ms** (3/3 runs) |
+| featured frames capped to 2 instead of 4 | unchanged (~4600ms) |
+| featured frames with autoplay off | unchanged (~5000ms) |
+| featured frames unscaled (`scale(1)`, card clips) | ~2900ms |
+
+And, measured individually against the same local build, each of the four
+featured components scores **0ms in isolation** at a full 1440x900 viewport.
+
+So the cost is not the components, not the catalog, not the host page, not
+autoplay, and not the number of frames past the first couple. It is inherent to
+the design the homepage copy advertises — *"every card below is the real
+component running live"* — specifically **a continuously-repainting 1440x900
+iframe being CSS-scaled to ~26% in the parent document**. Roughly 40% of it is
+the scale transform; the rest is simply having live animating documents
+composited into the page.
+
+Nothing in this PR changes that, and no per-component optimization can. The
+levers that would are all product decisions:
+
+- render a poster frame (static image or short video) and only go live on hover
+  or click;
+- size the iframe to its displayed size instead of 1440x900 (cheap, but breaks
+  the viewport-fidelity invariant `preview-card.tsx` exists to protect);
+- keep fewer featured cards above the fold.
+
+Recommended next step: measure a poster-frame prototype for the featured rail
+before writing any more component-level optimizations.
+
+### On the components anyway
+
 - **particle-hero is not a perf bug** and should never have been on this list —
   its 6511ms came from the contended parallel sweep. Its motion is already
   shader-side and `getComputedStyle` runs only on mount. Its measurements swing
@@ -208,6 +277,15 @@ Two process notes that cost real time here:
   throttled browsers at once inflated `particle-hero` roughly 5x and sent an
   agent off to fix a component that was not broken. Re-measure any candidate
   serially before acting on its number.
+- **Check the machine before believing a profile.** `uptime` first. Under load
+  average 13-18 this codebase profiled 175x worse than at load 3, and that noise
+  is what drove most of the component work here. An A/B is only valid measured
+  back-to-back in the same conditions, and an absolute number without a control
+  measured beside it is not evidence.
+- **Ablate before optimizing.** Deleting the suspected cost (here: rendering the
+  featured iframes not at all) took ten minutes and would have redirected the
+  entire effort on day one. Five agents optimizing five components never had a
+  chance to answer "is it the components at all?" — only turning them off did.
 - **Every DOM assertion can pass while the page is visibly wrong.** The sidebar
   regression survived correct `src` attributes, 200 responses, cache HITs and a
   clean typecheck. It took one screenshot to see. When a change alters what
