@@ -290,3 +290,53 @@ Two process notes that cost real time here:
   regression survived correct `src` attributes, 200 responses, cache HITs and a
   clean typecheck. It took one screenshot to see. When a change alters what
   renders, look at it.
+
+---
+
+## Resolution (shipped)
+
+The architectural finding above — that the homepage cost is live scaled iframes,
+not components — was acted on. The featured rail now renders in three layers:
+
+1. **the still**, the screenshot the quality gate already generates. Paints
+   immediately, is the LCP element, theme-correct with no JS.
+2. **the loop**, a silent 6s recording per component per theme
+   (`scripts/build-previews.ts`), fetched only near the viewport and faded in on
+   the video's own `playing` event. Video decode is GPU work, so the card moves
+   at rest for free. Skipped entirely under `prefers-reduced-motion` — gating the
+   element, not just its visibility, because hiding it in CSS still downloads it.
+3. **the real component**, mounted on pointer-enter or focus, for anyone who
+   wants to confirm the card is not a marketing video.
+
+Recordings are committed rather than built: capturing needs a running server,
+which a Vercel build does not have. 72 files, 2.7MB in the repo; a visitor
+fetches the two on screen.
+
+Link prefetching is also off on the card titles and the sidebar. The sidebar
+lists all 222 components, and Next prefetches every link near the viewport —
+~126 RSC requests per page load for a list a visitor picks one item from.
+
+Measured like-for-like, both on Vercel, 4x CPU throttle, three interleaved runs:
+
+| | before | after |
+| --- | --- | --- |
+| TTFB | 206ms | 182ms |
+| FCP | 596ms | 440ms |
+| LCP | 596ms | 516ms |
+| CLS | 0 | 0 |
+| TBT (load phase) | 1700ms | 202ms |
+| **TBT (steady state)** | **3521ms** | **0ms** (0/0/0) |
+| requests | 61 | 53 |
+| transfer | 688KB | 864KB |
+
+Transfer is the one regression and it is the honest price of motion: ~176KB of
+video for the cards actually on screen. Everything else improved, and the
+indefinitely-blocked main thread that prompted the audit is gone.
+
+### What this cost that a profiler would not have told you
+
+The first fix shipped stills only. It measured beautifully and was wrong: a rail
+of frozen thumbnails reads as broken, and requiring a hover before anything
+moves is a worse experience than the slowness it cured. The number improved and
+the product got worse. Video was the answer to both, and it only surfaced
+because someone looked at the page instead of the metric.
