@@ -72,10 +72,13 @@ const QUERY_PARAM = "q";
 export function Showcase({
   items,
   featured,
+  stars,
 }: {
   items: ShowcaseEntry[];
   /** Curated slugs, already filtered to ones that exist — see lib/featured.ts. */
   featured: string[];
+  /** Live GitHub star count, or `null` if the fetch failed — see lib/github-stars.ts. */
+  stars?: number | null;
 }) {
   const [filter, setFilterState] = useState<Filter>("all");
   const [category, setCategoryState] = useState<string | null>(null);
@@ -273,14 +276,20 @@ export function Showcase({
         Skip to components
       </a>
 
-      <header className="grid gap-10 pt-20 sm:pt-28 lg:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] lg:items-end lg:gap-16">
+      {/* Two-column split waits for xl, not lg — the persistent sidebar
+          (site-shell.tsx) goes static at exactly lg (1024), and splitting the
+          header at the same breakpoint left the headline column squeezed to
+          ~160px there (one word per line, "Star on GitHub" wrapping). At
+          1024 the header now stays a single stacked column with the full
+          main-column width to itself. */}
+      <header className="grid gap-10 pt-20 sm:pt-28 xl:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] xl:items-end xl:gap-16">
         <div>
           <div className="flex items-center justify-between gap-3">
             <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">
               ns-ui
             </p>
             <div className="flex items-center gap-3">
-              <GitHubStarButton />
+              <GitHubStarButton stars={stars} />
               <ThemeToggle />
             </div>
           </div>
@@ -454,7 +463,7 @@ export function Showcase({
           repeated animated treatment would start reading as an ad. */}
       <div className="mt-24 flex flex-col items-center gap-3 border-t border-border pt-14 text-center">
         <p className="text-sm text-muted">If any of this was useful, a star helps others find it.</p>
-        <GitHubStarButton variant="quiet" />
+        <GitHubStarButton variant="quiet" stars={stars} />
       </div>
 
       <div className="mt-14 flex flex-col items-center border-t border-border pt-14 text-center">

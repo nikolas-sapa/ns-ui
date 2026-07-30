@@ -2,6 +2,7 @@ import registry from "@/registry.json";
 import { loadUseWhen } from "@/lib/use-when";
 import order from "@/lib/component-order.json";
 import { FEATURED } from "@/lib/featured";
+import { getStarCount } from "@/lib/github-stars";
 import { Showcase, type ShowcaseEntry } from "./_components/showcase";
 
 // Newest first. `component-order.json` is the slug list sorted by git creation
@@ -66,6 +67,7 @@ const items: ShowcaseEntry[] = registry.items
 
 const featured = [...featuredOrder.keys()];
 
-export default function Home() {
-  return <Showcase items={items} featured={featured} />;
+export default async function Home() {
+  const stars = await getStarCount();
+  return <Showcase items={items} featured={featured} stars={stars} />;
 }

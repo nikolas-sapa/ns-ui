@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { loadWritingPost, loadWritingPosts } from "@/lib/writing";
+import { getStarCount } from "@/lib/github-stars";
 import { PostBody } from "../_components/post-body";
 import { ThemeToggle } from "../../_components/theme-toggle";
 import { GitHubStarButton } from "../../_components/github-star-button";
@@ -49,6 +50,7 @@ export default async function WritingPostPage({
   const { slug } = await params;
   const post = loadWritingPost(slug);
   if (!post) notFound();
+  const stars = await getStarCount();
 
   return (
     <main className="mx-auto w-full max-w-2xl px-6 pb-32 sm:px-10">
@@ -88,7 +90,7 @@ export default async function WritingPostPage({
         >
           Back to the catalog
         </Link>
-        <GitHubStarButton variant="quiet" />
+        <GitHubStarButton variant="quiet" stars={stars} />
       </div>
     </main>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 
 export type Filter = "all" | "core" | "loud";
 export type Sort = "featured" | "newest" | "oldest";
@@ -65,6 +65,23 @@ export function CatalogControls({
   onClearAll: () => void;
 }) {
   const searchRef = useRef<HTMLInputElement | null>(null);
+  const barRef = useRef<HTMLDivElement | null>(null);
+
+  // Publishes the bar's real height as a CSS variable so a card's
+  // scroll-mt (preview-card.tsx) can clear it exactly instead of guessing a
+  // static number — the chip row wraps onto extra lines at narrower widths
+  // and the Clear button appears/disappears with `filtered`, both of which
+  // change this height at runtime.
+  useLayoutEffect(() => {
+    const el = barRef.current;
+    if (!el) return;
+    const set = () =>
+      document.documentElement.style.setProperty("--filter-bar-h", `${el.offsetHeight}px`);
+    set();
+    const ro = new ResizeObserver(set);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   // "/" focuses search — standard, cheap, and ignored while any text input
   // (this one included) or a contenteditable already has focus, so it never
@@ -85,7 +102,10 @@ export function CatalogControls({
   const activeCategory = categories.find((c) => c.id === category);
 
   return (
-    <div className="sticky top-0 z-30 -mx-6 mt-14 border-b border-border bg-background/85 px-6 py-3 backdrop-blur sm:-mx-10 sm:px-10">
+    <div
+      ref={barRef}
+      className="sticky top-0 z-30 -mx-6 mt-14 border-b border-border bg-background/85 px-6 py-3 backdrop-blur sm:-mx-10 sm:px-10"
+    >
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2.5">
         {/* Plain toggle buttons, not an ARIA tablist — there's no associated
             tabpanel and no arrow-key navigation, so `role="tab"` promised a
