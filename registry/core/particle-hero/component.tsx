@@ -72,6 +72,9 @@ function parseColor(hex: string): [number, number, number] | null {
 function Particles({ still, visible }: { still: boolean; visible: RefObject<boolean> }) {
   const material = useRef<THREE.ShaderMaterial>(null);
   const pointerInside = useRef(false);
+  // scratch vector for the per-frame ease target — avoids an allocation on
+  // every frame the pointer is inside the canvas
+  const target = useRef(new THREE.Vector2());
   const { viewport, pointer, size, gl } = useThree();
 
   const { positions, seeds } = useMemo(() => {
@@ -140,14 +143,14 @@ function Particles({ still, visible }: { still: boolean; visible: RefObject<bool
     u.uTime.value = clock.elapsedTime;
 
     const inside = pointerInside.current;
-    const target = inside
-      ? new THREE.Vector2((pointer.x * viewport.width) / 2, (pointer.y * viewport.height) / 2)
-      : REST;
+    const t = target.current;
+    if (inside) t.set((pointer.x * viewport.width) / 2, (pointer.y * viewport.height) / 2);
+    else t.copy(REST);
     // exponential ease toward target — dots swell outward as the pointer
     // approaches and relax home behind it
     const c = u.uCursor.value as THREE.Vector2;
-    c.x += (target.x - c.x) * EASE;
-    c.y += (target.y - c.y) * EASE;
+    c.x += (t.x - c.x) * EASE;
+    c.y += (t.y - c.y) * EASE;
     // fade the push in on enter / out on leave so nothing pops
     const p = u.uPush as { value: number };
     p.value += ((inside ? PUSH : 0) - p.value) * EASE;

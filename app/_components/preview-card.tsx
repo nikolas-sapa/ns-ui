@@ -188,14 +188,15 @@ export function PreviewCard({
         {mounted ? (
           <iframe
             ref={frameRef}
-            // `?embed=1` only makes the demo inert inside the frame — see the
-            // preview route. The page it renders is otherwise identical.
-            // `&autoplay=1` additionally runs the shared autoplay driver, so
-            // components that only wake on input (hover, press, drag, scroll)
-            // demonstrate themselves in the card instead of showing a still
+            // `/embed` is `/preview/<name>?embed=1&autoplay=1` with both flags
+            // baked into the path: the demo is inert, and the shared autoplay
+            // driver runs so components that only wake on input (hover, press,
+            // drag, scroll) demonstrate themselves instead of showing a still
             // frame. Components without an `autoplay` descriptor in their
-            // meta.json are unaffected.
-            src={`/preview/${entry.name}?embed=1&autoplay=1`}
+            // meta.json are unaffected. The path form exists because reading
+            // `searchParams` made the query form uncacheable — every card frame
+            // was a function invocation. See the embed route for the detail.
+            src={`/preview/${entry.name}/embed`}
             title={`${entry.title} preview`}
             loading="lazy"
             tabIndex={-1}

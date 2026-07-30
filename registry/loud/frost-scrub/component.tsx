@@ -438,7 +438,22 @@ export function FrostScrub({
       resize = () => {
         const w = Math.max(1, pane.clientWidth);
         const h = Math.max(1, pane.clientHeight);
-        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        // Homepage/catalog cards render this exact DOM inside a fixed
+        // 1440×900 iframe that a *parent-document* CSS transform shrinks to a
+        // ~380px-wide thumbnail — invisible to this document's own layout, so
+        // `pane.clientWidth` still reads 1440 and a dpr-only buffer would
+        // shade the full 5-tap fragment shader at full desktop resolution for
+        // pixels nobody can resolve at thumbnail size. `[data-autoplay-root]`
+        // (see autoplay-driver.tsx) is stamped only on that exact route
+        // shape, so it doubles as the "I'm a card" signal here: cap the
+        // buffer to what a thumbnail can actually show. The real
+        // `/preview/<name>` reference page (what scripts/verify.ts shoots)
+        // never gets this attribute, so its resolution — and look — is
+        // unchanged.
+        const isCard = !!pane.closest("[data-autoplay-root]");
+        const dpr = isCard
+          ? Math.min(0.6, window.devicePixelRatio || 1)
+          : Math.min(2, window.devicePixelRatio || 1);
         canvas.width = Math.max(1, Math.round(w * dpr));
         canvas.height = Math.max(1, Math.round(h * dpr));
         gl.viewport(0, 0, canvas.width, canvas.height);

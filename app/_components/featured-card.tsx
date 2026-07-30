@@ -65,7 +65,8 @@ export function FeaturedCard({
     return () => ro.disconnect();
   }, []);
 
-  const src = `/preview/${entry.name}?embed=1&autoplay=1`;
+  // The CDN-cacheable path form of `?embed=1&autoplay=1` — see the embed route.
+  const src = `/preview/${entry.name}/embed`;
 
   return (
     <article className="group relative flex flex-col">

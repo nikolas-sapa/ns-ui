@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { ThemeSync } from "./_components/theme-sync";
+import { SiteAnalytics } from "./_components/site-analytics";
 import { SiteShell } from "./_components/site-shell";
 import { NO_FLASH_SCRIPT } from "@/lib/theme";
 import { navGroups } from "@/lib/nav-data";
@@ -65,9 +64,9 @@ export default function RootLayout({
             client component only because it needs the active pathname. */}
         <SiteShell groups={navGroups()}>{children}</SiteShell>
         {/* Vercel Web Analytics and Speed Insights. Both no-op outside a
-            Vercel deployment, so local dev is unaffected. */}
-        <Analytics />
-        <SpeedInsights />
+            Vercel deployment, so local dev is unaffected. Skipped inside card
+            iframes — see the component. */}
+        <SiteAnalytics />
       </body>
     </html>
   );

@@ -212,20 +212,47 @@ export function ChromaTide({ colors, speed = 1, scale = 1, className = "", style
       gl = null;
     };
 
-    const draw = (nowMs: number) => {
-      if (!gl || !program || w <= 0 || h <= 0) return;
+    // viewport/resolution/scale/palette are each only touched by resize(),
+    // readColors() or a prop change — never by time. WebGL retains uniform
+    // values across draw calls on the same program, so re-sending all six
+    // uniforms and re-setting the viewport on every single animation frame
+    // (this ran continuously, forever) was pure waste on the one uniform
+    // (u_time) that actually changes frame to frame. Setting the static ones
+    // only at their own change points cuts the per-frame GL call count from
+    // 8 to 2.
+    const applyViewportUniforms = () => {
+      if (!gl || !program) return;
       gl.viewport(0, 0, canvas.width, canvas.height);
       gl.uniform2f(uRes, canvas.width, canvas.height);
-      gl.uniform1f(uTime, ((nowMs - startedAt) / 1000) * speedRef.current);
       gl.uniform1f(uScale, scale);
+    };
+    const applyColorUniforms = () => {
+      if (!gl || !program) return;
       gl.uniform3f(uC1, c1[0], c1[1], c1[2]);
       gl.uniform3f(uC2, c2[0], c2[1], c2[2]);
       gl.uniform3f(uC3, c3[0], c3[1], c3[2]);
+    };
+
+    const draw = (nowMs: number) => {
+      if (!gl || !program || w <= 0 || h <= 0) return;
+      gl.uniform1f(uTime, ((nowMs - startedAt) / 1000) * speedRef.current);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
     };
 
+    // The flow field drifts slowly enough that 60 draws/sec buys nothing a
+    // viewer can see over ~30 — it's a calm ambient backdrop, not motion
+    // graphics. Halving the draw rate halves the shader + compositor cost of
+    // an animation that already runs forever with no idle state, which was
+    // the dominant cost of this component. rAF itself still fires every
+    // frame (needed for a smooth stop the instant the tab hides or reduced-
+    // motion flips), it just skips the GL work on alternate frames.
+    const FRAME_INTERVAL_MS = 1000 / 30;
+    let lastDrawMs = 0;
     const loop = (t: number) => {
-      draw(t);
+      if (t - lastDrawMs >= FRAME_INTERVAL_MS) {
+        lastDrawMs = t;
+        draw(t);
+      }
       raf = requestAnimationFrame(loop);
     };
     const wake = () => {
@@ -248,10 +275,12 @@ export function ChromaTide({ colors, speed = 1, scale = 1, className = "", style
       canvas.height = Math.round(h * dpr);
       canvas.style.width = `${w}px`;
       canvas.style.height = `${h}px`;
+      applyViewportUniforms();
       draw(pausedAt || performance.now());
     };
 
     if (!setup()) return; // no WebGL: render nothing, container stays transparent
+    applyColorUniforms();
     const ro = new ResizeObserver(resize);
     ro.observe(container);
     resize();
@@ -282,6 +311,7 @@ export function ChromaTide({ colors, speed = 1, scale = 1, className = "", style
 
     const themeObserver = new MutationObserver(() => {
       readColors();
+      applyColorUniforms();
       if (reduced) draw(pausedAt || performance.now());
     });
     themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
@@ -292,6 +322,7 @@ export function ChromaTide({ colors, speed = 1, scale = 1, className = "", style
     };
     const onRestored = () => {
       if (setup()) {
+        applyColorUniforms();
         resize();
         applyMode();
       }
