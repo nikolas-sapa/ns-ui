@@ -78,8 +78,6 @@ interface CellHandle {
   displayed: string;
   hovering: boolean;
   token: number;
-  /** True once landCell has parked the leaf at its no-transition rest pose. */
-  settled: boolean;
 }
 
 function pick(charset: string): string {
@@ -96,7 +94,6 @@ function makeCell(ch: string): CellHandle {
     displayed: ch,
     hovering: false,
     token: 0,
-    settled: true,
   };
 }
 
