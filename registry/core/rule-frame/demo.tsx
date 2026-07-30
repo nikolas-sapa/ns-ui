@@ -11,7 +11,7 @@ export default function RuleFrameDemo() {
       <RuleFrame title="SESSION" className="w-full max-w-md">
         <div className="flex flex-col gap-3 p-2">
           <p className="text-sm text-foreground">
-            Hover or focus this panel — the border upgrades to a double rule,
+            Hover or focus this panel, the border upgrades to a double rule,
             sweeping from the top-left corner around the perimeter.
           </p>
           <button
