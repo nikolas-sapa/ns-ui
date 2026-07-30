@@ -128,6 +128,10 @@ export function HatchFill({
 
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      // clear the id, not just the frame: the restart guard below tests
+      // `!rafRef.current`, so leaving a stale id here permanently wedges the
+      // glide the first time a new value arrives mid-animation.
+      rafRef.current = 0;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- rAF reads valueRef/displayRef live
   }, [value, totalChars]);

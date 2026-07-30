@@ -172,7 +172,10 @@ export function RuleFrame({ title, children, className = "" }: RuleFrameProps) {
     };
 
     if (reduced) {
-      paint(active ? n : 0);
+      // paint(n) settles BOTH directions: active flips `i < n` (all double),
+      // inactive flips `i >= n` (all single). `paint(0)` for inactive would
+      // flip every index and render a full double border at rest.
+      paint(n);
       return;
     }
 

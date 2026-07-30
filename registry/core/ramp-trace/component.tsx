@@ -124,7 +124,12 @@ export function RampTrace({
         }}
       >
         {series.map((v, i) => {
+          // inversion follows hover-or-focus, but `aria-selected` and the focus
+          // ring follow DOM focus alone: hovering column 3 while column 0 is
+          // focused must not move the announced selection off column 0, nor
+          // leave the genuinely focused column with no visible indicator.
           const selected = activeIdx === i;
+          const focused = focusIdx === i;
           const rows = glyphFor(i);
           return (
             <div
@@ -133,14 +138,14 @@ export function RampTrace({
                 colRefs.current[i] = el;
               }}
               role="option"
-              aria-selected={selected}
+              aria-selected={focused}
               aria-label={`${label} ${i + 1} of ${series.length}: ${valueFormat(v)}`}
               tabIndex={i === (focusIdx ?? 0) ? 0 : -1}
               onFocus={() => setFocusIdx(i)}
               onPointerEnter={() => setHoverIdx(i)}
               onPointerLeave={() => setHoverIdx(null)}
               onClick={(e) => e.currentTarget.focus()}
-              className={`flex cursor-pointer flex-col text-center leading-none outline-none ${
+              className={`flex cursor-pointer flex-col text-center leading-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
                 selected ? "bg-foreground text-background" : ""
               }`}
               style={{ width: `${COL_W}ch` }}

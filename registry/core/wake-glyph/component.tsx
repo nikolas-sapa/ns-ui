@@ -43,7 +43,7 @@ export function WakeGlyph({ cellSize = 12, className = "" }: WakeGlyphProps) {
     if (!ctx) return;
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const fg = getComputedStyle(canvas).color;
+    let fg = getComputedStyle(canvas).color;
     const monoFont =
       getComputedStyle(document.documentElement).getPropertyValue("--font-mono") ||
       "ui-monospace, monospace";
@@ -192,9 +192,21 @@ export function WakeGlyph({ cellSize = 12, className = "" }: WakeGlyphProps) {
     };
     window.addEventListener("resize", onResize);
 
+    // the site's theme toggle flips a `.dark` class on <html> live, with no
+    // remount — watch it so the glyph color updates without a page reload
+    const themeObserver = new MutationObserver(() => {
+      fg = getComputedStyle(canvas).color;
+      if (reduced) draw();
+    });
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
     return () => {
       cancelAnimationFrame(raf);
       if (resizeTimer) clearTimeout(resizeTimer);
+      themeObserver.disconnect();
       window.removeEventListener("resize", onResize);
       canvas.removeEventListener("pointermove", onPointerMove);
       canvas.removeEventListener("pointerleave", onPointerLeave);
