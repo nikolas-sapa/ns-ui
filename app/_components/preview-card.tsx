@@ -168,10 +168,16 @@ export function PreviewCard({
   return (
     <article
       ref={setCardRef}
+      id={entry.name}
       data-name={entry.name}
       data-mounted={mounted ? "true" : "false"}
       data-loaded={loaded ? "true" : "false"}
-      className="group relative flex scroll-mt-24 flex-col"
+      // Clears the sticky filter bar (catalog-controls.tsx) by its measured
+      // height rather than a magic number — the bar's chip row wraps at
+      // narrower widths and grows taller than any static value would assume.
+      // The 6rem fallback matches today's static offset for the brief window
+      // before the bar has measured itself (or if JS never runs).
+      className="group relative flex scroll-mt-[calc(var(--filter-bar-h,6rem)+0.75rem)] flex-col"
     >
       {/* Aspect-locked from first paint, so the frame arriving shifts nothing. */}
       <div

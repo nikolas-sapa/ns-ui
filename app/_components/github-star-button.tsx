@@ -2,6 +2,13 @@ import { LiquidCollar } from "@/registry/loud/liquid-collar/component";
 
 const REPO_URL = "https://github.com/nikolas-sapa/ns-ui";
 
+/** `1234` -> `1,234`, `12400` -> `12.4k`. Matches at a glance rather than to
+ *  the digit, which is all a header CTA needs. */
+function formatStarCount(count: number): string {
+  if (count < 1000) return count.toLocaleString("en-US");
+  return `${(count / 1000).toFixed(1).replace(/\.0$/, "")}k`;
+}
+
 /**
  * The star CTA. Two placements share one component so the copy and target
  * never drift apart, but only the hero gets the LiquidCollar treatment —
@@ -13,24 +20,39 @@ const REPO_URL = "https://github.com/nikolas-sapa/ns-ui";
  * effect (see registry/loud/liquid-collar/component.tsx), so the link is
  * always in the DOM and clickable even where WebGL is unavailable or a
  * shader fails to compile — the ring is a visual bonus, never a dependency.
+ *
+ * `stars` is fetched server-side (see lib/github-stars.ts) and passed down
+ * rather than fetched here — this stays a client component for the hover/
+ * focus states, and a client-side fetch would mean a loading state, a
+ * layout shift once it resolves, and one API call per visitor against
+ * GitHub's 60/hour unauthenticated limit instead of one per hour. `null`
+ * (fetch failed, or not threaded through) renders exactly as before: no
+ * count, no divider, same height either way.
  */
 export function GitHubStarButton({
   variant = "collar",
   className = "",
+  stars = null,
 }: {
   variant?: "collar" | "quiet";
   className?: string;
+  stars?: number | null;
 }) {
+  const label = variant === "quiet" ? "Star ns-ui on GitHub" : "Star on GitHub";
+  const ariaLabel = stars !== null ? `${label}, ${stars.toLocaleString("en-US")} stars` : undefined;
+
   if (variant === "quiet") {
     return (
       <a
         href={REPO_URL}
         target="_blank"
         rel="noopener noreferrer"
+        aria-label={ariaLabel}
         className={`inline-flex items-center gap-2 rounded-sm border border-border px-4 py-2 text-sm text-foreground outline-none transition-colors hover:border-muted hover:bg-surface focus-visible:ring-2 focus-visible:ring-accent ${className}`}
       >
         <StarIcon />
-        Star ns-ui on GitHub
+        {label}
+        <StarCount stars={stars} />
       </a>
     );
   }
@@ -46,13 +68,30 @@ export function GitHubStarButton({
         href={REPO_URL}
         target="_blank"
         rel="noopener noreferrer"
+        aria-label={ariaLabel}
         style={{ borderRadius: 6 }}
         className="inline-flex items-center gap-2 bg-surface px-4 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:bg-border/60 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         <StarIcon />
-        Star on GitHub
+        {label}
+        <StarCount stars={stars} />
       </a>
     </LiquidCollar>
+  );
+}
+
+/** The count, set off from the label by the same border token used
+ *  everywhere else so it reads as a counter rather than trailing words in
+ *  the sentence. `aria-hidden` because the parent link's `aria-label`
+ *  already speaks the count when it's present. Renders nothing — no
+ *  divider, no width — when the count is unavailable, so the button's
+ *  height and shape never depend on the fetch. */
+function StarCount({ stars }: { stars: number | null }) {
+  if (stars === null) return null;
+  return (
+    <span aria-hidden className="ml-0.5 flex items-center gap-2 border-l border-border pl-2 font-mono text-xs tabular-nums text-muted">
+      {formatStarCount(stars)}
+    </span>
   );
 }
 
