@@ -36,10 +36,21 @@ const PRELOAD_MARGIN = 400;
  * composite no matter what is inside it, and each frame also re-downloads the
  * Next runtime, React, the stylesheet and the fonts into its own document.
  *
- * `hot` is one-way on purpose: once a card has gone live it stays live, so
- * moving the pointer away does not yank the animation out from under you. The
- * still is the screenshot the quality gate already generates, so there is no
- * second source of truth to keep in sync.
+ * A still alone fixed the cost and broke the page: a rail of frozen thumbnails
+ * reads as broken, and the whole pitch is that these things move. So the
+ * resting state is a silent looping recording (scripts/build-previews.ts).
+ * Video decode is GPU work that never touches the main thread, so the card
+ * moves at rest and still measures ~0ms.
+ *
+ * Three layers, cheapest first, each replacing the one under it:
+ *   1. the still — the screenshot the quality gate already generates, so there
+ *      is no second source of truth. Paints immediately and is the LCP element.
+ *   2. the loop — fetched only once the card is near the viewport, faded in
+ *      when it actually has frames, so there is no flash of empty video.
+ *   3. the real component — mounted on pointer-enter or focus, for anyone who
+ *      wants to confirm the card is not a marketing video. One-way on purpose:
+ *      once a card is live it stays live, so moving the pointer away does not
+ *      yank a running demo back to a recording.
  */
 export function FeaturedCard({
   entry,
@@ -57,8 +68,12 @@ export function FeaturedCard({
   const [loaded, setLoaded] = useState(false);
   const [scale, setScale] = useState<number | null>(null);
   // Set once, never cleared — see the note above about not yanking a running
-  // demo back to a still when the pointer leaves.
+  // demo back to a recording when the pointer leaves.
   const [hot, setHot] = useState(false);
+  // Flipped on the video's own `playing` event rather than on mount, so the
+  // still stays up until there is a real frame to show instead of cross-fading
+  // to a black box on a slow connection.
+  const [rolling, setRolling] = useState(false);
 
   useEffect(() => {
     const box = boxRef.current;
@@ -140,6 +155,27 @@ export function FeaturedCard({
               className="hidden object-cover dark:block"
               priority={priority}
             />
+            {/* `inView` gates the fetch so a rail of 36 does not pull 36 files
+                on load. `muted` + `playsInline` are what make autoplay legal on
+                iOS and in Chrome's policy; without both this silently never
+                starts. `motion-reduce:hidden` leaves the still in place for
+                anyone who asked for less motion — the loop is decoration, and
+                the still says the same thing. */}
+            {inView ? (
+              <video
+                src={`/previews/${entry.name}.mp4`}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                tabIndex={-1}
+                aria-hidden
+                onPlaying={() => setRolling(true)}
+                className="absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-out motion-reduce:hidden motion-reduce:opacity-0"
+                style={{ opacity: rolling ? 1 : 0 }}
+              />
+            ) : null}
           </>
         ) : null}
         {hot && inView && scale !== null ? (

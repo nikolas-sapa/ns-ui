@@ -38,7 +38,8 @@
     "predev": "npm run registry:build",
     "preverify": "npm run registry:build",
     "order:build": "node scripts/build-order.ts",
-    "record": "node scripts/record.ts"
+    "record": "node scripts/record.ts",
+    "previews:build": "node scripts/build-previews.ts"
   },
   "dependencies": {
     "@react-three/fiber": "9.6.1",
