@@ -49,13 +49,22 @@ function buildPerimeter(cols: number, rows: number, title?: string) {
     return n++;
   };
 
+  // `cols`/`rows` are the FULL measured box in character units, corners
+  // included. Each straight edge holds two of those cells for its own
+  // corners, so the run of dash/bar glyphs between them is cols-2 / rows-2
+  // long, not cols / rows — using the full count here was the bug: it made
+  // every straight edge two characters longer than the box it was supposed
+  // to tile, so the perimeter never closed.
+  const innerCols = Math.max(0, cols - 2);
+  const innerRows = Math.max(0, rows - 2);
+
   const titleText = title ? ` ${title} ` : "";
-  const titleCols = Math.min(titleText.length, Math.max(0, cols - 2));
-  const leftDashes = Math.max(1, Math.floor((cols - titleCols) / 2));
+  const titleCols = Math.min(titleText.length, innerCols);
+  const leftDashes = Math.max(0, Math.floor((innerCols - titleCols) / 2));
 
   const tl: Cell = { refIndex: alloc("corner-tl"), role: "corner-tl" };
   const top: Cell[] = [];
-  for (let i = 0; i < cols; i++) {
+  for (let i = 0; i < innerCols; i++) {
     if (title && i >= leftDashes && i < leftDashes + titleCols) {
       top.push({ char: titleText[i - leftDashes] });
     } else {
@@ -64,21 +73,21 @@ function buildPerimeter(cols: number, rows: number, title?: string) {
   }
   const tr: Cell = { refIndex: alloc("corner-tr"), role: "corner-tr" };
 
-  const right: Cell[] = Array.from({ length: rows }, () => ({
+  const right: Cell[] = Array.from({ length: innerRows }, () => ({
     refIndex: alloc("v"),
     role: "v" as Role,
   }));
 
   const br: Cell = { refIndex: alloc("corner-br"), role: "corner-br" };
   // clockwise continues right-to-left along the bottom
-  const bottomRTL: Cell[] = Array.from({ length: cols }, () => ({
+  const bottomRTL: Cell[] = Array.from({ length: innerCols }, () => ({
     refIndex: alloc("h"),
     role: "h" as Role,
   }));
   const bl: Cell = { refIndex: alloc("corner-bl"), role: "corner-bl" };
 
   // then bottom-to-top along the left edge
-  const leftBTT: Cell[] = Array.from({ length: rows }, () => ({
+  const leftBTT: Cell[] = Array.from({ length: innerRows }, () => ({
     refIndex: alloc("v"),
     role: "v" as Role,
   }));

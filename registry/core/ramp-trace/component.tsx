@@ -8,7 +8,6 @@ const ROWS = 8;
 const COL_W = 1; // ch, one glyph per column
 const COL_GAP = 0.6; // ch, whitespace between columns
 const PITCH = COL_W + COL_GAP;
-const SLOPE_EPS = 0.02; // normalized-value delta below which the trend reads flat
 
 export interface RampTraceProps {
   /** the series to plot; needs at least one value */
@@ -74,21 +73,9 @@ export function RampTrace({
       fullRows = Math.min(ROWS, fullRows + 1);
       remainder = 0;
     }
-    const lineRow = Math.min(ROWS - 1, Math.round(norm[i] * (ROWS - 1)));
-
-    const next = norm[i + 1];
-    let lineGlyph = "─";
-    if (next !== undefined) {
-      const d = next - norm[i];
-      if (d > SLOPE_EPS) lineGlyph = "╱";
-      else if (d < -SLOPE_EPS) lineGlyph = "╲";
-    }
-
-    const rows: { glyph: string; kind: "bar" | "line" | "empty" }[] = [];
+    const rows: { glyph: string; kind: "bar" | "empty" }[] = [];
     for (let r = ROWS - 1; r >= 0; r--) {
-      if (r === lineRow) {
-        rows.push({ glyph: lineGlyph, kind: "line" });
-      } else if (r < fullRows) {
+      if (r < fullRows) {
         rows.push({ glyph: "█", kind: "bar" });
       } else if (r === fullRows && remainder > 0) {
         rows.push({ glyph: BLOCKS[remainder - 1], kind: "bar" });
@@ -101,11 +88,11 @@ export function RampTrace({
 
   return (
     <div className={`font-mono ${className}`}>
-      <div className="relative h-[1.4em] text-xs" style={{ lineHeight: "1.4em" }}>
+      <div className="relative h-[1.1em] text-xs" style={{ lineHeight: "1.1em" }}>
         {activeIdx !== null ? (
           <span
             aria-hidden
-            className="absolute top-0 whitespace-nowrap text-accent"
+            className="absolute bottom-0 whitespace-nowrap text-accent"
             style={{ left: `${activeIdx * PITCH}ch` }}
           >
             {valueFormat(series[activeIdx])}
@@ -146,7 +133,7 @@ export function RampTrace({
               onPointerLeave={() => setHoverIdx(null)}
               onClick={(e) => e.currentTarget.focus()}
               className={`flex cursor-pointer flex-col text-center leading-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
-                selected ? "bg-foreground text-background" : ""
+                selected ? "bg-foreground" : ""
               }`}
               style={{ width: `${COL_W}ch` }}
             >
@@ -156,16 +143,36 @@ export function RampTrace({
                   aria-hidden
                   style={{ lineHeight: "1.2em" }}
                   className={
+                    // painting bg-foreground on every row, not just the
+                    // column div, guarantees a fully solid fill top to
+                    // bottom even though the column div and its rows don't
+                    // share a background layer once each row is its own
+                    // flex-blockified box.
                     selected
-                      ? ""
-                      : row.kind === "line"
-                        ? "text-accent"
-                        : row.kind === "bar"
-                          ? "text-foreground"
-                          : "text-muted/30"
+                      ? "bg-foreground"
+                      : row.kind === "bar"
+                        ? "text-foreground"
+                        : "text-muted/30"
                   }
                 >
-                  {row.kind === "empty" && !selected ? "·" : row.glyph}
+                  {selected
+                    ? // "█" is a fully-inked glyph: recoloring it to the
+                      // background token (as the rest of this knock-out
+                      // relies on) paints the *entire* cell in that dark
+                      // color, which just blends back into the page and
+                      // makes a tall bar's own rows disappear instead of
+                      // highlighting them. A blank cell has no ink to fight
+                      // the fill, so every row renders as blank and the
+                      // row's own solid background does all the work — a
+                      // uniform, unmistakable bar of color the full height
+                      // of the column, bar rows and empty rows alike. A
+                      // literal " " won't do it: a whitespace-only block box
+                      // collapses its line box to zero height, which is why
+                      // this needs a non-breaking space instead.
+                      " "
+                    : row.kind === "empty"
+                      ? "·"
+                      : row.glyph}
                 </span>
               ))}
             </div>
