@@ -57,8 +57,8 @@ The largest cluster by far, and the one ns-ui already answers hardest.
 | Bookmark | Verdict | ns-ui |
 |---|---|---|
 | metamorphic-loader, progressive-flux-loader | have | `blade-iris`, `lath-rack`, `hinge-topple`, `phase-swing`, `loom-shuttle` |
-| preloader, 8bit-loading-screen | **gap** | ns-ui has inline loaders only — no full-page curtain / route-transition preloader |
-| 8bit-not-found1 | gap | no 404 component |
+| preloader, 8bit-loading-screen | **gap → built** | `gel-wash` (this session) |
+| 8bit-not-found1 | have | `dead-letter`, `knockout-404` — both already here |
 
 ## Page furniture (5)
 
@@ -72,7 +72,7 @@ The largest cluster by far, and the one ns-ui already answers hardest.
 
 | Bookmark | Verdict | ns-ui |
 |---|---|---|
-| heatmaps | **gap** | `grain-tally` is a histogram; no calendar/matrix heatmap |
+| heatmaps | **gap → built** | `tide-ledger` (this session) |
 | funnel-chart | **gap** | no funnel/stage-drop chart |
 | cobe-globe-satellites | partial | `meridian-spin` |
 
@@ -83,14 +83,18 @@ easemize/pixel-perfect-hero page — **skip**. Whole-page compositions; the regi
 
 ## Ranked build queue (the real gaps)
 
-1. ~~**Footer that the page slides off**~~ — built as `footing-course`.
-2. **Full-page preloader / route curtain** — 2 bookmarks, zero coverage, and it is a mechanic
-   (hold until ready, then leave) rather than a picture.
-3. **Liquid-metal full-bleed hero** — 3 bookmarks. `liquid-collar` proves the shader; the gap is
-   the hero-scale surface with type sitting in it.
-4. **Rotating-word slot** — 1 bookmark, but the one text mechanic genuinely absent.
-5. **Heatmap** (calendar/matrix) — data-viz gap, useful beyond decoration.
-6. **Funnel chart** — same bucket, narrower need.
-7. **404 state** — cheap, low value; do it when something else touches page furniture.
+1. ~~**Footer that the page slides off**~~ — built as `footing-course` (core).
+2. ~~**Full-page preloader / route curtain**~~ — built as `gel-wash` (loud, coloured).
+3. ~~**Heatmap**~~ — built as `tide-ledger` (loud, single-hue accent ramp).
+4. **Liquid-metal full-bleed hero** — 3 bookmarks. `liquid-collar` proves the shader; the gap is
+   the hero-scale surface with type sitting in it. Biggest remaining, and a WebGL job.
+5. **Rotating-word slot** — 1 bookmark, but the one text mechanic genuinely absent.
+6. **Funnel chart** — narrower need than the heatmap, same bucket.
+7. ~~**404 state**~~ — already covered twice (`dead-letter`, `knockout-404`); the original map was
+   wrong about this one.
+
+Colour note: `core` is monochrome by construction (tokens only). Anything that wants colour goes to
+`loud`, which is where both new colour components landed — `gel-wash` on three fixed stage gels,
+`tide-ledger` on one accent-derived sequential ramp.
 
 Everything else in the 60 is already answered here or is a template.
