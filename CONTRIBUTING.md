@@ -68,6 +68,12 @@ fits. Then:
 2. `npm run registry:build`. Registration is automatic, derived from the folder
    structure. There is no central index to edit.
 
+   Then `npm run order:build`, and commit what it changes. `lib/component-order.json`
+   is the one generated file that IS committed — git history is unreliable on
+   Vercel's shallow clone, so the site ships a snapshot of creation dates instead
+   of deriving them. Skip this and your component still ships, it just sorts
+   **last** in the grid instead of first, which looks like it never deployed.
+
 3. `npm run typecheck`. It must be clean, and it reruns `registry:build`, so it
    also catches a malformed `meta.json`.
 
