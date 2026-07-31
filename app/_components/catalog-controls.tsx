@@ -136,7 +136,7 @@ export function CatalogControls({
         <div className="flex min-w-0 items-center gap-3">
           <div className="relative">
             <label htmlFor="component-search" className="sr-only">
-              Search components
+              Search catalog
             </label>
             <input
               ref={searchRef}
@@ -150,7 +150,9 @@ export function CatalogControls({
                   searchRef.current?.blur();
                 }
               }}
-              placeholder="Search"
+              // "catalog" distinguishes this from the sidebar's own search —
+              // see the comment on that input in site-shell.tsx.
+              placeholder="Search catalog"
               autoComplete="off"
               spellCheck={false}
               className="min-h-11 w-28 min-w-0 rounded-sm border border-border bg-surface py-1 pl-2 pr-6 text-sm text-foreground outline-none transition-colors placeholder:text-muted focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none sm:min-h-0 sm:w-56 sm:pl-2.5"
@@ -172,26 +174,53 @@ export function CatalogControls({
           <label htmlFor="sort-order" className="sr-only">
             Sort order
           </label>
-          <select
-            id="sort-order"
-            value={sort}
-            onChange={(e) => onSort(e.target.value as Sort)}
-            className="min-h-11 shrink-0 rounded-sm border border-border bg-surface px-1.5 py-1 text-xs text-muted outline-none transition-colors focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none hover:text-foreground sm:min-h-0"
-          >
-            {SORTS.map((s) => (
-              <option key={s.key} value={s.key}>
-                Sort: {s.label}
-              </option>
-            ))}
-          </select>
+          {/* `appearance-none` + a hand-drawn chevron: without it this was
+              the one control on the page rendering the browser's own arrow
+              glyph instead of the same chevron the sidebar's <details> and
+              the mobile menu already use — a different icon language on the
+              same screen. */}
+          <div className="relative">
+            <select
+              id="sort-order"
+              value={sort}
+              onChange={(e) => onSort(e.target.value as Sort)}
+              className="min-h-11 shrink-0 appearance-none rounded-sm border border-border bg-surface py-1 pl-1.5 pr-5 text-xs text-muted outline-none transition-colors focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none hover:text-foreground sm:min-h-0"
+            >
+              {SORTS.map((s) => (
+                <option key={s.key} value={s.key}>
+                  Sort: {s.label}
+                </option>
+              ))}
+            </select>
+            <svg
+              viewBox="0 0 16 16"
+              aria-hidden
+              className="pointer-events-none absolute right-1.5 top-1/2 size-2.5 -translate-y-1/2 text-muted"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M4 6l4 4 4-4" />
+            </svg>
+          </div>
         </div>
       </div>
 
       <div className="mt-2.5 flex items-start gap-2">
+        {/* A two-column grid below `sm`, not the flex-wrap row the wider
+            layout uses: content-sized pills at 390px mostly fit one (rarely
+            two) per line, left-aligned, leaving the rest of the row empty —
+            a ragged column of half-used rows. The grid gives every chip an
+            equal-width cell so the row fills edge to edge; `sm:` reverts to
+            the packed flex-wrap once there's room for pills to sit at their
+            own width without leaving that gap. min-h-11 (44px touch target)
+            is unchanged either way. */}
         <div
           role="group"
           aria-label="Filter by what the component is for"
-          className="flex min-w-0 flex-1 flex-wrap items-center gap-x-1.5 gap-y-2"
+          className="grid min-w-0 flex-1 grid-cols-2 gap-1.5 sm:flex sm:flex-wrap sm:items-center sm:gap-x-1.5 sm:gap-y-2"
         >
           {categories.map((c) => {
             const on = category === c.id;
@@ -201,7 +230,7 @@ export function CatalogControls({
                 type="button"
                 aria-pressed={on}
                 onClick={() => onCategory(on ? null : c.id)}
-                className={`flex min-h-11 shrink-0 items-center rounded-full border px-2.5 py-1 text-xs outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-accent sm:min-h-0 ${
+                className={`flex min-h-11 items-center justify-center rounded-full border px-2.5 py-1 text-xs outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-accent sm:min-h-0 sm:w-auto sm:shrink-0 sm:justify-start ${
                   on
                     ? "border-accent bg-accent text-white"
                     : "border-border text-muted hover:border-muted hover:text-foreground"

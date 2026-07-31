@@ -153,12 +153,22 @@ export function FeaturedCard({
       // no iframe at all until the handler moved up here.
       onPointerEnter={() => setHot(true)}
       onFocusCapture={() => setHot(true)}
-      className="group relative flex flex-col"
+      // `group/focus` — same reasoning as preview-card.tsx: the title link's
+      // own :focus-visible drives a ring on the box below, so a keyboard
+      // visitor gets a ring around the whole card instead of just the text.
+      className="group group/focus relative flex flex-col"
     >
       <div
         ref={boxRef}
-        className="relative aspect-[16/10] w-full overflow-hidden rounded-md border border-border bg-surface transition-colors duration-200 group-hover:border-muted/40 motion-reduce:transition-none"
+        className="relative aspect-[16/10] w-full overflow-hidden rounded-md border border-border bg-surface transition-colors duration-200 group-hover:border-muted/60 group-has-[a:focus-visible]/focus:ring-2 group-has-[a:focus-visible]/focus:ring-accent group-has-[a:focus-visible]/focus:ring-offset-2 group-has-[a:focus-visible]/focus:ring-offset-background motion-reduce:transition-none"
       >
+        {/* Flat, non-gradient hover wash — same as preview-card.tsx. Sits
+            above the poster/video/iframe layers (explicit z-index), so it
+            reads on all three regardless of which is currently showing. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 z-10 rounded-md bg-foreground/0 transition-colors duration-200 group-hover:bg-foreground/[0.04] motion-reduce:transition-none"
+        />
         <div
           aria-hidden
           className="absolute inset-0 [background-image:radial-gradient(circle,var(--color-border)_1px,transparent_1px)] [background-size:16px_16px] motion-safe:animate-pulse"
@@ -254,7 +264,10 @@ export function FeaturedCard({
                 // prerendered and CDN-cached, so prefetching every card's is
                 // spend without a payoff.
                 prefetch={false}
-                className="rounded-sm outline-none after:absolute after:inset-0 after:rounded-md focus-visible:ring-2 focus-visible:ring-accent"
+                // Ring lives on the preview box above (see its
+                // group-has-[a:focus-visible]/focus: classes), not here —
+                // same reasoning as preview-card.tsx.
+                className="rounded-sm outline-none after:absolute after:inset-0 after:rounded-md"
               >
                 {entry.title}
               </Link>

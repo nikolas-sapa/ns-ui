@@ -179,13 +179,32 @@ export function PreviewCard({
       // narrower widths and grows taller than any static value would assume.
       // The 6rem fallback matches today's static offset for the brief window
       // before the bar has measured itself (or if JS never runs).
-      className="group relative flex scroll-mt-[calc(var(--filter-bar-h,6rem)+0.75rem)] flex-col"
+      //
+      // `group/focus` is separate from the plain `group` hover already in use
+      // below — it's what lets the box div react to the title link's own
+      // :focus-visible (see that div's `group-has-[a:focus-visible]/focus:`
+      // classes). The whole card is one hit target (the title's
+      // `after:inset-0` stretches over it), so a mouse hover already
+      // highlights the full box; before this, Tab landed a focus ring on just
+      // the title text — a small rectangle in the corner, not "this card is
+      // focused" — which was the one control on the page where keyboard and
+      // mouse affordances didn't match.
+      className="group group/focus relative flex scroll-mt-[calc(var(--filter-bar-h,6rem)+0.75rem)] flex-col"
     >
       {/* Aspect-locked from first paint, so the frame arriving shifts nothing. */}
       <div
         ref={boxRef}
-        className="relative aspect-[16/10] w-full overflow-hidden rounded-md border border-border bg-surface transition-colors duration-200 group-hover:border-muted/40 motion-reduce:transition-none"
+        className="relative aspect-[16/10] w-full overflow-hidden rounded-md border border-border bg-surface transition-colors duration-200 group-hover:border-muted/60 group-has-[a:focus-visible]/focus:ring-2 group-has-[a:focus-visible]/focus:ring-accent group-has-[a:focus-visible]/focus:ring-offset-2 group-has-[a:focus-visible]/focus:ring-offset-background motion-reduce:transition-none"
       >
+        {/* A flat, non-gradient wash — the border brightening alone is easy
+            to miss on a near-black full-bleed canvas/WebGL demo, which is
+            most of this grid. No scale transform: the box holds a live
+            iframe, and scaling it on hover would jitter whatever's running
+            inside. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 z-10 rounded-md bg-foreground/0 transition-colors duration-200 group-hover:bg-foreground/[0.04] motion-reduce:transition-none"
+        />
         <Placeholder visible={!loaded} />
         {mounted ? (
           <iframe
@@ -243,7 +262,11 @@ export function PreviewCard({
                 // open at most one of. The route is prerendered and CDN-cached,
                 // so the click is fast without paying for 221 unused fetches.
                 prefetch={false}
-                className="rounded-sm outline-none after:absolute after:inset-0 after:rounded-md focus-visible:ring-2 focus-visible:ring-accent"
+                // No focus ring here — it lives on the preview box above,
+                // via `group-has-[a:focus-visible]/focus:`, so the ring
+                // matches the card's actual hit area instead of just this
+                // text. `outline-none` still suppresses the browser default.
+                className="rounded-sm outline-none after:absolute after:inset-0 after:rounded-md"
               >
                 {entry.title}
               </Link>

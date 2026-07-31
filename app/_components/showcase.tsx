@@ -478,35 +478,43 @@ export function Showcase({
 
       <JumpToTop />
 
-      <footer className="mt-16 flex flex-wrap items-baseline justify-between gap-x-8 gap-y-3 border-t border-border pt-6 font-mono text-xs text-muted">
-        <p>
-          For AI agents:{" "}
-          <a href="/llms.txt" className={FOOTER_LINK}>
-            /llms.txt
-          </a>{" "}
-          ·{" "}
-          <a href="/llms-full.txt" className={FOOTER_LINK}>
-            /llms-full.txt
-          </a>
-        </p>
-        <p>
-          <a href="/changelog" className={FOOTER_LINK}>
-            Changelog
-          </a>{" "}
-          ·{" "}
-          <a href="/writing" className={FOOTER_LINK}>
-            Writing
-          </a>{" "}
-          ·{" "}
-          <a href="https://github.com/nikolas-sapa/ns-ui" className={FOOTER_LINK}>
-            GitHub
-          </a>{" "}
-          ·{" "}
-          <a href="https://nikolas.helpmarq.com" className={FOOTER_LINK}>
-            Built by Nikolas
-          </a>
-        </p>
-        <p className="mt-2">Built with love for developers, with Claude Code.</p>
+      {/* Grouped rather than spread: `justify-between` used to pin these
+          three fragments to the far edges of the 1600px container, which at
+          a normal desktop width left them looking like unrelated scraps
+          rather than one footer. A bounded gap keeps the two link clusters
+          close and lets the "built with" line sit apart without spanning
+          the whole row to do it. */}
+      <footer className="mt-16 flex flex-wrap items-baseline gap-x-12 gap-y-3 border-t border-border pt-6 font-mono text-xs text-muted">
+        <div className="flex flex-wrap items-baseline gap-x-8 gap-y-3">
+          <p>
+            For AI agents:{" "}
+            <a href="/llms.txt" className={FOOTER_LINK}>
+              /llms.txt
+            </a>{" "}
+            ·{" "}
+            <a href="/llms-full.txt" className={FOOTER_LINK}>
+              /llms-full.txt
+            </a>
+          </p>
+          <p>
+            <a href="/changelog" className={FOOTER_LINK}>
+              Changelog
+            </a>{" "}
+            ·{" "}
+            <a href="/writing" className={FOOTER_LINK}>
+              Writing
+            </a>{" "}
+            ·{" "}
+            <a href="https://github.com/nikolas-sapa/ns-ui" className={FOOTER_LINK}>
+              GitHub
+            </a>{" "}
+            ·{" "}
+            <a href="https://nikolas.helpmarq.com" className={FOOTER_LINK}>
+              Built by Nikolas
+            </a>
+          </p>
+        </div>
+        <p>Built with love for developers, with Claude Code.</p>
       </footer>
     </main>
   );

@@ -220,12 +220,20 @@ export function SiteShell({
         </div>
 
         <div className="px-4 pb-3">
+          {/* "sidebar" in both the visible text and the label — this box and
+              the catalog's own search sit in near-identical bordered fields
+              and, before this, both just said "Search"/"Filter components":
+              nothing on screen said they're two different result sets
+              (this narrows the tree, the catalog's narrows the grid), so
+              typing in one and expecting the other to react was a
+              reasonable, wrong assumption. Labelled apart rather than
+              wired together — they genuinely answer different questions. */}
           <input
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Filter components"
-            aria-label="Filter components"
+            placeholder="Filter sidebar"
+            aria-label="Filter sidebar"
             className="w-full rounded-md border border-border bg-surface px-2.5 py-1.5 text-sm outline-none placeholder:text-muted focus-visible:ring-2 focus-visible:ring-accent"
           />
         </div>
