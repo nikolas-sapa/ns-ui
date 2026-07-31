@@ -1,0 +1,23 @@
+{
+  "name": "footing-course",
+  "title": "Footing Course",
+  "description": "A site footer the page slides off rather than scrolls to: pinned once, uncovered by the content sheet travelling over it.",
+  "collection": "core",
+  "tags": [
+    "footer",
+    "layout",
+    "scroll",
+    "sticky",
+    "reveal",
+    "section",
+    "parallax"
+  ],
+  "autoplay": {
+    "mode": "scroll",
+    "range": [0.55, 1],
+    "period": 5200
+  },
+  "useWhen": "A site or app footer that should read as ground the page rests on rather than one more block at the end of the scroll. Reach for a plain <footer> when the page is short enough that the footer is visible without scrolling — the reveal has nothing to reveal.",
+  "instruction": "A footer that is pinned to the bottom of its scroller from the start and progressively uncovered as the page's content sheet travels up over it, so the last screen of scroll reads as the page sliding off its own foundation rather than as another section arriving. The mechanism is deliberately not scroll-driven: the footer is `position: sticky; bottom: 0`, so it is pinned to the bottom of its scroller from the first paint, and the opaque content sheet above it (background token, z-10) is the only thing that hides it — nothing is clipped, transformed or height-animated to fake the occlusion, and scrolling to the end simply slides the sheet off. Because the footer's height is not knowable at author time — responsive link columns, a wordmark that wraps, a font that loads late — it is observed with a ResizeObserver rather than assumed, and the reveal ratio below is always computed against the current height. The one thing scroll is read for is the lag: exposure is computed as the gap between the footer's bottom edge and the sheet's bottom edge, clamped to the footer height, and the footer's inner content is translated by (1 - exposure) * parallax so it settles into place as it is uncovered instead of arriving finished. That ratio is published on the footer element as a --footing-reveal custom property (0 to 1), so a consumer can drive its own opacity, letter-spacing or rule width from the same number without adding a second scroll listener. Rects are measured element-to-element rather than against window.innerHeight, so the component behaves identically in the document scroller and inside an app shell's overflow container, and the scroll listener is registered in the capture phase because a nested scroller's scroll event does not bubble. Reads are rAF-coalesced and writes are a single transform on one node. The one hazard the pattern carries is keyboard focus: the footer is pinned inside the viewport the whole time, so a browser has no reason to scroll a focused footer link into view and the focus ring paints underneath the opaque sheet — so focus entering a still-covered footer scrolls its own scroll parent (the nearest overflow:auto/scroll ancestor, else the document) by exactly the unexposed remainder, smoothly, or instantly under reduced motion. Under prefers-reduced-motion the lag is dropped entirely — the footer's content sits at rest and the reveal, which is layout rather than animation, still works.",
+  "dependencies": []
+}
