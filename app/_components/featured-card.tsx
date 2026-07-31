@@ -242,7 +242,9 @@ export function FeaturedCard({
       <div className="mt-3 flex items-start gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline gap-2">
-            <h3 className="truncate text-sm font-medium tracking-tight">
+            {/* Same weight bump as preview-card.tsx, for the same reason —
+                title and kind caption were reading at identical weight. */}
+            <h3 className="truncate text-[15px] font-semibold tracking-tight">
               {/* `after:inset-0` stretches the hit area over the whole card —
                   same pattern as preview-card.tsx — so the entire featured
                   card is a real link to the playground, not just the title. */}

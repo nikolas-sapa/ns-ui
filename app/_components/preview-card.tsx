@@ -229,8 +229,12 @@ export function PreviewCard({
           <div className="flex items-baseline gap-2">
             {/* The title is the link; `after:inset-0` stretches its hit area
                 over the whole card. The description below lifts itself back
-                above that overlay so the copy stays selectable. */}
-            <h3 className="truncate text-sm font-medium tracking-tight">
+                above that overlay so the copy stays selectable. Semibold and
+                a notch larger than the kind caption beside it — at the old
+                text-sm/font-medium both sat at the same visual weight, so
+                the name (what the grid is meant to be scanned by) didn't
+                read as the primary word on the card. */}
+            <h3 className="truncate text-[15px] font-semibold tracking-tight">
               <Link
                 href={`/preview/${entry.name}/play`}
                 // 222 cards, one link each. Next prefetches every link near the

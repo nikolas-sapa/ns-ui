@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { NavGroup } from "@/lib/nav-data";
+import { locate, type NavGroup, type NavItem, type NavKind } from "@/lib/nav-data";
 
 /**
  * The persistent left sidebar, and the one rule that keeps it from breaking
@@ -27,6 +27,19 @@ const isBarePreview = (pathname: string) =>
 const LINK =
   "block truncate rounded-sm px-2 py-1 text-sm outline-none transition-colors hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none";
 
+/** Which categories/kinds are open, beyond the current page's own section —
+ *  persisted so a visitor's browsing structure survives navigation. */
+const STORAGE_KEY = "ns-ui-nav-open";
+
+function readStored(): string[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as string[]) : [];
+  } catch {
+    return [];
+  }
+}
+
 export function SiteShell({
   groups,
   children,
@@ -39,6 +52,65 @@ export function SiteShell({
   const [query, setQuery] = useState("");
   const activeRef = useRef<HTMLAnchorElement | null>(null);
 
+  const active = pathname.startsWith("/preview/")
+    ? pathname.split("/")[2]
+    : null;
+
+  // Where the active component lives in the tree, computed from the same
+  // pathname both the server and the client already agree on — nothing here
+  // needs a mounted-gate, unlike the persisted extra opens below.
+  const activeLocation = useMemo(
+    () => (active ? locate(groups, active) : null),
+    [groups, active],
+  );
+
+  const [openIds, setOpenIds] = useState<Set<string>>(() => {
+    const seed = new Set<string>();
+    if (activeLocation) {
+      seed.add(activeLocation.groupId);
+      if (activeLocation.kindId) seed.add(activeLocation.kindId);
+    }
+    return seed;
+  });
+
+  // Merge in whatever the visitor had open in a previous session. Additive
+  // only, and deferred to an effect — localStorage doesn't exist on the
+  // server, so this is the one part of the open-state that needs the mounted
+  // gate (same pattern as ThemeToggle / Showcase's sort-from-URL sync).
+  useEffect(() => {
+    const stored = readStored();
+    if (stored.length === 0) return;
+    setOpenIds((prev) => new Set([...prev, ...stored]));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify([...openIds]));
+    } catch {
+      /* private mode / storage disabled — open state just won't persist */
+    }
+  }, [openIds]);
+
+  // Re-open the active component's section on every navigation (not just
+  // mount) — arriving at a component via a catalog card or a direct link
+  // should reveal it even if that section isn't in the persisted set. This
+  // only ever adds ids, so a section the visitor manually collapsed stays
+  // collapsed for every *other* navigation.
+  useEffect(() => {
+    if (!activeLocation) return;
+    setOpenIds((prev) => {
+      const alreadyOpen =
+        prev.has(activeLocation.groupId) &&
+        (!activeLocation.kindId || prev.has(activeLocation.kindId));
+      if (alreadyOpen) return prev;
+      const next = new Set(prev);
+      next.add(activeLocation.groupId);
+      if (activeLocation.kindId) next.add(activeLocation.kindId);
+      return next;
+    });
+  }, [activeLocation]);
+
   // Close the mobile drawer on navigation — otherwise tapping a component
   // leaves the panel covering the thing you just asked to see.
   useEffect(() => setOpen(false), [pathname]);
@@ -46,8 +118,14 @@ export function SiteShell({
   // The list is long enough that the active item is routinely scrolled out
   // of view (arriving via a catalog card, a direct link, prev/next) — so pull
   // it into the middle of the panel rather than leaving the visitor to hunt.
+  // Deferred one frame: the section-opening effect above can still be
+  // committing when this runs, and `scrollIntoView` on an element inside a
+  // closed <details> is a no-op (no layout box).
   useEffect(() => {
-    activeRef.current?.scrollIntoView({ block: "center" });
+    const id = requestAnimationFrame(() => {
+      activeRef.current?.scrollIntoView({ block: "center" });
+    });
+    return () => cancelAnimationFrame(id);
   }, [pathname]);
 
   useEffect(() => {
@@ -59,32 +137,32 @@ export function SiteShell({
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  const active = pathname.startsWith("/preview/")
-    ? pathname.split("/")[2]
-    : null;
+  const toggle = useCallback((id: string, next: boolean) => {
+    setOpenIds((prev) => {
+      const nextSet = new Set(prev);
+      if (next) nextSet.add(id);
+      else nextSet.delete(id);
+      return nextSet;
+    });
+  }, []);
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return groups;
-    return groups
-      .map((g) => ({
-        ...g,
-        items: g.items.filter(
-          (i) =>
-            i.name.includes(q) || i.title.toLowerCase().includes(q),
-        ),
-      }))
-      .filter((g) => g.items.length > 0);
-  }, [groups, query]);
+  const filtered = useMemo(() => filterGroups(groups, query), [groups, query]);
 
-  const total = useMemo(
-    () => groups.reduce((n, g) => n + g.items.length, 0),
-    [groups],
-  );
+  const total = useMemo(() => groups.reduce((n, g) => n + g.count, 0), [groups]);
   const shown = useMemo(
-    () => filtered.reduce((n, g) => n + g.items.length, 0),
+    () => filtered.reduce((n, g) => n + countGroup(g), 0),
     [filtered],
   );
+  const isFiltering = query.trim().length > 0;
+
+  const allIds = useMemo(() => {
+    const ids: string[] = [];
+    for (const g of groups) {
+      ids.push(g.id);
+      for (const k of g.kinds) ids.push(k.id);
+    }
+    return ids;
+  }, [groups]);
 
   if (isBarePreview(pathname)) return <>{children}</>;
 
@@ -141,45 +219,41 @@ export function SiteShell({
           />
         </div>
 
+        {/* Bulk controls — at 223 items across up to three levels, hunting
+            down every chevron by hand is the wrong default interaction. */}
+        <div className="flex items-center gap-3 px-4 pb-2 font-mono text-[10px] uppercase tracking-wider text-muted">
+          <button
+            type="button"
+            onClick={() => setOpenIds(new Set(allIds))}
+            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            Expand all
+          </button>
+          <button
+            type="button"
+            onClick={() => setOpenIds(new Set())}
+            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            Collapse all
+          </button>
+        </div>
+
         <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-6">
-          {query && shown === 0 ? (
+          {isFiltering && shown === 0 ? (
             <p className="px-2 py-3 text-sm text-muted">No match.</p>
           ) : null}
           {filtered.map((g) => (
-            <section key={g.id} className="mb-4">
-              <h2 className="px-2 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
-                {g.label}
-              </h2>
-              <ul>
-                {g.items.map((i) => {
-                  const on = i.name === active;
-                  return (
-                    <li key={i.name}>
-                      <Link
-                        ref={on ? activeRef : undefined}
-                        href={`/preview/${i.name}/play`}
-                        // This sidebar lists every component, so the default
-                        // fired ~126 RSC prefetches on every page load — for a
-                        // list the visitor picks at most one item from. Before
-                        // these routes were made cacheable that was ~126
-                        // uncached function invocations per visit; now it is
-                        // merely 126 wasted CDN round trips. The target is
-                        // prerendered, so the click is fast without them.
-                        prefetch={false}
-                        aria-current={on ? "page" : undefined}
-                        className={`${LINK} ${
-                          on
-                            ? "bg-surface font-medium text-accent"
-                            : "text-muted"
-                        }`}
-                      >
-                        {i.title}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </section>
+            <NavCategory
+              key={g.id}
+              group={g}
+              open={isFiltering || openIds.has(g.id)}
+              onToggle={(v) => toggle(g.id, v)}
+              openIds={openIds}
+              onToggleKind={toggle}
+              isFiltering={isFiltering}
+              active={active}
+              activeRef={activeRef}
+            />
           ))}
         </div>
 
@@ -201,6 +275,177 @@ export function SiteShell({
 
       <div className="min-w-0 flex-1">{children}</div>
     </div>
+  );
+}
+
+/** Only counts items — kinds are just a grouping of the same items, not
+ *  additional ones, so `count` fields would double a component up otherwise. */
+const countGroup = (g: NavGroup) =>
+  g.items.length + g.kinds.reduce((n, k) => n + k.items.length, 0);
+
+/**
+ * Category-level `<details>`. `<summary>` is the platform's own disclosure
+ * control — free keyboard support (Enter/Space) and `aria-expanded` handled
+ * by the browser, so there's no bespoke button+state to keep in sync.
+ */
+function NavCategory({
+  group,
+  open,
+  onToggle,
+  openIds,
+  onToggleKind,
+  isFiltering,
+  active,
+  activeRef,
+}: {
+  group: NavGroup;
+  open: boolean;
+  onToggle: (open: boolean) => void;
+  openIds: Set<string>;
+  onToggleKind: (id: string, open: boolean) => void;
+  isFiltering: boolean;
+  active: string | null;
+  activeRef: React.RefObject<HTMLAnchorElement | null>;
+}) {
+  return (
+    <details
+      className="group/cat mb-1"
+      open={open}
+      onToggle={(e) => onToggle(e.currentTarget.open)}
+    >
+      <summary className="flex cursor-pointer list-none items-center justify-between rounded-sm px-2 py-1.5 outline-none [&::-webkit-details-marker]:hidden hover:bg-surface focus-visible:ring-2 focus-visible:ring-accent">
+        <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-muted group-hover/cat:text-foreground">
+          <Chevron />
+          {group.label}
+        </span>
+        <span className="font-mono text-[10px] text-muted">{group.count}</span>
+      </summary>
+
+      <div className="pl-1.5">
+        {group.kinds.map((k) => (
+          <NavKindGroup
+            key={k.id}
+            kind={k}
+            open={isFiltering || openIds.has(k.id)}
+            onToggle={(v) => onToggleKind(k.id, v)}
+            active={active}
+            activeRef={activeRef}
+          />
+        ))}
+        {group.items.length > 0 ? (
+          <ul>
+            {group.items.map((i) => (
+              <NavLink key={i.name} item={i} active={active} activeRef={activeRef} />
+            ))}
+          </ul>
+        ) : null}
+      </div>
+    </details>
+  );
+}
+
+/** Kind-level `<details>`, nested one indent further than its category. */
+function NavKindGroup({
+  kind,
+  open,
+  onToggle,
+  active,
+  activeRef,
+}: {
+  kind: NavKind;
+  open: boolean;
+  onToggle: (open: boolean) => void;
+  active: string | null;
+  activeRef: React.RefObject<HTMLAnchorElement | null>;
+}) {
+  return (
+    <details
+      className="group/kind"
+      open={open}
+      onToggle={(e) => onToggle(e.currentTarget.open)}
+    >
+      <summary className="flex cursor-pointer list-none items-center justify-between rounded-sm px-2 py-1 pl-3.5 text-xs outline-none [&::-webkit-details-marker]:hidden hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent">
+        <span className="flex items-center gap-1.5 text-muted group-hover/kind:text-foreground">
+          <Chevron small />
+          {kind.label}
+        </span>
+        <span className="font-mono text-[10px] text-muted">{kind.items.length}</span>
+      </summary>
+      <ul className="pl-3">
+        {kind.items.map((i) => (
+          <NavLink key={i.name} item={i} active={active} activeRef={activeRef} />
+        ))}
+      </ul>
+    </details>
+  );
+}
+
+function NavLink({
+  item,
+  active,
+  activeRef,
+}: {
+  item: NavItem;
+  active: string | null;
+  activeRef: React.RefObject<HTMLAnchorElement | null>;
+}) {
+  const on = item.name === active;
+  return (
+    <li>
+      <Link
+        ref={on ? activeRef : undefined}
+        href={`/preview/${item.name}/play`}
+        // This sidebar lists every component, so the default fired ~126 RSC
+        // prefetches on every page load — for a list the visitor picks at
+        // most one item from. Before these routes were made cacheable that
+        // was ~126 uncached function invocations per visit; now it is merely
+        // 126 wasted CDN round trips. The target is prerendered, so the click
+        // is fast without them.
+        prefetch={false}
+        aria-current={on ? "page" : undefined}
+        className={`${LINK} ${on ? "bg-surface font-medium text-accent" : "text-muted"}`}
+      >
+        {item.title}
+      </Link>
+    </li>
+  );
+}
+
+/**
+ * Narrows every level of the tree to items whose name/title matches, drops
+ * kinds and categories left empty by that, and leaves the rest untouched.
+ * Kept out of `lib/nav-data.ts` — this operates on the client-typed query,
+ * not on anything server-derivable.
+ */
+function filterGroups(groups: NavGroup[], query: string): NavGroup[] {
+  const q = query.trim().toLowerCase();
+  if (!q) return groups;
+  const matches = (i: NavItem) => i.name.includes(q) || i.title.toLowerCase().includes(q);
+  return groups
+    .map((g) => {
+      const kinds = g.kinds
+        .map((k) => ({ ...k, items: k.items.filter(matches) }))
+        .filter((k) => k.items.length > 0);
+      const items = g.items.filter(matches);
+      return { ...g, kinds, items, count: items.length + kinds.reduce((n, k) => n + k.items.length, 0) };
+    })
+    .filter((g) => g.count > 0);
+}
+
+function Chevron({ small }: { small?: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      className={`${small ? "size-2.5" : "size-3"} shrink-0 -rotate-90 text-muted transition-transform duration-150 ease-out group-open/cat:rotate-0 group-open/kind:rotate-0 motion-reduce:transition-none`}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <path d="M4 6l4 4 4-4" />
+    </svg>
   );
 }
 
