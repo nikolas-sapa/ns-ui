@@ -43,8 +43,8 @@ Ordered by (does it unlock a whole page) × (is it an interaction, not a picture
 
 ### Now — page furniture ns-ui cannot ship a site without
 
-1. ~~**Footer**~~ — built: `footing-course` (core).
-2. ~~**Preloader / route curtain**~~ — built: `gel-wash` (loud, colour).
+1. **Footer** — open. First attempt (`footing-course`) was removed: category answered, bookmark not.
+2. **Preloader / route curtain** — open. Same (`gel-wash`, removed).
 3. **Site nav** — the one block with real mechanics in it (scroll state, condense, mobile sheet,
    focus trap). Highest leverage remaining.
 4. **Theme toggler** — small, and conspicuous by its absence in a registry whose entire contract is

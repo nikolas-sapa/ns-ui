@@ -57,14 +57,14 @@ The largest cluster by far, and the one ns-ui already answers hardest.
 | Bookmark | Verdict | ns-ui |
 |---|---|---|
 | metamorphic-loader, progressive-flux-loader | have | `blade-iris`, `lath-rack`, `hinge-topple`, `phase-swing`, `loom-shuttle` |
-| preloader, 8bit-loading-screen | **gap → built** | `gel-wash` (this session) |
+| preloader, 8bit-loading-screen | **gap** | `gel-wash` was built and removed — an invention, not a port of what was bookmarked |
 | 8bit-not-found1 | have | `dead-letter`, `knockout-404` — both already here |
 
 ## Page furniture (5)
 
 | Bookmark | Verdict | ns-ui |
 |---|---|---|
-| motion-footer, animated-footer | **gap → built** | `footing-course` (this session) |
+| motion-footer, animated-footer | **gap** | `footing-course` was built and removed — a sticky reveal anyone can write, not what these two do |
 | book-a-demo-2 | partial | `counterpoise-tiers`, `dovetail-run` |
 | preloader/404 | see above | |
 
@@ -83,8 +83,9 @@ easemize/pixel-perfect-hero page — **skip**. Whole-page compositions; the regi
 
 ## Ranked build queue (the real gaps)
 
-1. ~~**Footer that the page slides off**~~ — built as `footing-course` (core).
-2. ~~**Full-page preloader / route curtain**~~ — built as `gel-wash` (loud, coloured).
+1. **Footer** — still open. `footing-course` was built and removed: it answered the *category*
+   rather than either bookmarked component.
+2. **Preloader / route curtain** — still open, same reason (`gel-wash`, removed).
 3. ~~**Heatmap**~~ — built as `tide-ledger` (loud, single-hue accent ramp).
 4. **Liquid-metal full-bleed hero** — 3 bookmarks. `liquid-collar` proves the shader; the gap is
    the hero-scale surface with type sitting in it. Biggest remaining, and a WebGL job.
@@ -93,8 +94,10 @@ easemize/pixel-perfect-hero page — **skip**. Whole-page compositions; the regi
 7. ~~**404 state**~~ — already covered twice (`dead-letter`, `knockout-404`); the original map was
    wrong about this one.
 
-Colour note: `core` is monochrome by construction (tokens only). Anything that wants colour goes to
-`loud`, which is where both new colour components landed — `gel-wash` on three fixed stage gels,
-`tide-ledger` on one accent-derived sequential ramp.
+Method note, learned the hard way: this map was built from slugs alone. Classifying by name is fine
+for deciding *whether* something is a gap; it is not enough to build against. Anything built from a
+bookmark must start by reading that component's real source — its timings, easings and mechanics —
+not by inventing a house-style answer to its category. Two components were built that way and both
+were removed.
 
 Everything else in the 60 is already answered here or is a template.
