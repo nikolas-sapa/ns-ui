@@ -23,12 +23,18 @@ const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").repla
 /**
  * The sidebar's grouped, two-level component tree: category -> kind -> item.
  *
- * `categorize()` returns EVERY category a component belongs to, which is right
- * for filter chips (a chip should find it) and wrong for a nav tree (the same
- * slug appearing under four headings reads as four components). So each
- * component is placed in its FIRST matching category only — CATEGORIES order
- * is already curated newcomer-first — and anything with no match lands in
- * "Other" rather than disappearing.
+ * `categorize()` returns EVERY category a component belongs to, and the tree
+ * now lists a component under every one of them — the same multi-match rule
+ * the catalog's filter chips already use, so "Overlays" means the same 31
+ * components whether you find them by chip or by opening the tree. A
+ * component that is genuinely both a hero and a background IS both; filing
+ * it under only the first match hid it from whichever category it lost the
+ * tiebreak in, and a visitor scanning "Backgrounds" for it would come up
+ * empty. Duplication across sections costs nothing to scroll past — a
+ * missing component costs the thing someone came here for. (This used to be
+ * first-match-only, to keep the tree from listing anything twice; that
+ * produced sidebar counts that silently disagreed with the chips a few
+ * hundred pixels away, which is worse than the duplication it avoided.)
  *
  * The kind level is measured, not assumed: histogrammed across the registry,
  * most categories are spiky — a handful of kinds with real membership (Loader
@@ -51,15 +57,17 @@ export function navGroups(): NavGroup[] {
   const buckets = new Map<string, (NavItem & { kind: string | null })[]>();
 
   for (const item of items) {
-    const id = memberships.get(item.name)?.[0] ?? "other";
-    const list = buckets.get(id) ?? [];
-    list.push({
-      name: item.name,
-      title: item.title,
-      loud: item.loud,
-      kind: kindOf(item.tags),
-    });
-    buckets.set(id, list);
+    const ids = memberships.get(item.name);
+    for (const id of ids?.length ? ids : ["other"]) {
+      const list = buckets.get(id) ?? [];
+      list.push({
+        name: item.name,
+        title: item.title,
+        loud: item.loud,
+        kind: kindOf(item.tags),
+      });
+      buckets.set(id, list);
+    }
   }
 
   // Newest first inside a group/kind, same recency snapshot the catalog sorts by.

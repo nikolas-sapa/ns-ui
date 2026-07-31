@@ -148,7 +148,18 @@ export function SiteShell({
 
   const filtered = useMemo(() => filterGroups(groups, query), [groups, query]);
 
-  const total = useMemo(() => groups.reduce((n, g) => n + g.count, 0), [groups]);
+  // Unique components, not a sum of category counts — a component listed
+  // under two categories (multi-match, same rule the filter chips use) is
+  // still one component, and this is the number next to the wordmark that
+  // has to match the "223 shown" the catalog page opens with.
+  const total = useMemo(() => {
+    const names = new Set<string>();
+    for (const g of groups) {
+      for (const k of g.kinds) for (const i of k.items) names.add(i.name);
+      for (const i of g.items) names.add(i.name);
+    }
+    return names.size;
+  }, [groups]);
   const shown = useMemo(
     () => filtered.reduce((n, g) => n + countGroup(g), 0),
     [filtered],
