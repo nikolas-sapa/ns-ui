@@ -48,9 +48,9 @@ GET https://design.helpmarq.com/llms.txt
 ```
 
 One fetch returns the whole catalog as plain text: every component, its props,
-the situation it suits, and its exact install command. No MCP server, no tool
-definitions, no pagination. An agent that can make an HTTP request can pick the
-right component and install it in two steps.
+the situation it suits, and its exact install command. No tool definitions, no
+pagination. An agent that can make an HTTP request can pick the right
+component and install it in two steps.
 
 `llms-full.txt` at the same origin adds the full behavioral description per
 component, hand-written rather than derived from tags, for the cases where
@@ -58,6 +58,13 @@ several components share a UI role and a model has to tell them apart.
 
 `/registry.json` serves the standard shadcn registry index for tools that
 expect it.
+
+Prefer tools over a one-time fetch (an agent working across a whole session,
+not just picking one component up front)? **[`mcp/`](mcp/)** is an MCP server
+over the same catalog — `search_components`, `get_component` (full prop
+signature + real source), `list_categories`, `install_command`, and
+`get_conventions` (the token/theming contract). `npx -y @nikolas.sapa/ns-ui-mcp`,
+stdio transport, see [`mcp/README.md`](mcp/README.md) for the config block.
 
 ## The gate
 

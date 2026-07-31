@@ -1,0 +1,224 @@
+old_slug	new_slug	new_title	collection	kind	one_line_reason
+hasp-fold	accordion-latch	Accordion Latch	core	Accordion	Accordion whose closed sections latch shut with an SVG hasp and staple
+assay-gate	approval-inline-diff	Approval Inline Diff	core	Approval	Tool-call approval row with every argument editable as an old-to-new diff
+burin-etch	ascii-engraving-contour	ASCII Engraving Contour	loud	Generative	ASCII engraving where glyph density traces contour bands, not brightness
+meridian-spin	ascii-globe-spin	ASCII Globe Spin	loud	Globe	ASCII globe with real landmasses and a day/night terminator, drag-rotated
+torus-render	ascii-torus-donut	ASCII Torus Donut	loud	Torus	Rotating ASCII torus with real per-character depth buffering and Lambertian shading
+pawl-tick	autosave-ratchet	Autosave Ratchet	core	Autosave	Autosave status as a 10-tooth gear advancing one notch per saved change
+flock-stack	avatar-stack-flock	Avatar Stack Flock	core	Avatar	Avatar stack that mills as a boids flock and resolves into a row on hover
+ascii-dither-media	background-ascii-dither	Background ASCII Dither	core	Background	Luminance-to-glyph background with ASCII, Bayer-dither and dot-matrix modes
+glyph-tide	background-ascii-plasma	Background ASCII Plasma	loud	Background	Animated ASCII plasma field warped outward by the pointer
+wake-glyph	background-ascii-wake	Background ASCII Wake	core	Background	Monospace cursor-trail field dragging a velocity-scaled character comet
+chroma-tide	background-gradient-shader	Background Gradient Shader	loud	Gradient	Full-bleed WebGL gradient drifting theme colours through a domain-warped flow
+patina-pip	badge-unread-tarnish	Badge Unread Tarnish	core	Badge	Unread badge that tarnishes from solid to outline to ring as it ages
+tear-stub	banner-tear-stub	Banner Tear Stub	core	Banner	Dismissible notice that rips along a perforation, leaving a reopening stub
+liquid-collar	border-chrome-ring	Border Chrome Ring	loud	Metal	Wraps any element in a WebGL molten-chrome torus band, not a flat gradient
+spark-gap	border-electric-arc	Border Electric Arc	loud	CTA	Electric CTA border crackling via feTurbulence, arcing open near the cursor
+bellows-crumb	breadcrumb-fold	Breadcrumb Fold	core	Breadcrumb	Breadcrumb whose ancestors rest pleated into slivers and inflate on hover
+worn-path	breadcrumb-overflow-menu	Breadcrumb Overflow Menu	core	Breadcrumb	Breadcrumb collapsing from the middle into a menu of the hidden levels
+heat-soak	button-cooldown-heat	Button Cooldown Heat	core	Button	Rate-limited button that visibly heat-soaks and hazes as presses deposit heat
+glass-button	button-glass	Button Glass	core	Button	Liquid-glass button with translucent blurred surface and press states
+torsion-wind	button-retry-backoff	Button Retry Backoff	core	Button	Retry button that winds a torsion spring through its real backoff timing
+emboss-plate	card-number-emboss	Card Number Emboss	core	Payment	Card-number input where digits raise as bevelled metal under a stamping caret
+riffle-edge	carousel-card-riffle	Carousel Card Riffle	core	Stack	Card-stack navigator scrubbed by its own visible stripe of card edges
+aurora-flow-chart	chart-area-aurora	Chart Area Aurora	loud	Chart	Area chart whose fill is a live aurora curtain hue-banded by local trend
+signal-terrain	chart-ridgeline-terrain	Chart Ridgeline Terrain	core	Data viz	Ridgeline chart whose history recedes into cursor-dented ambient noise terrain
+topple-run	checkbox-domino-run	Checkbox Domino Run	core	Checkbox	Select-all propagating as a domino wavefront you can interrupt mid-run
+nib-check	checkbox-ink-stroke	Checkbox Ink Stroke	core	Checkbox	Checkbox and tri-state select-all inked by a variable-width calligraphic stroke
+tally-notch	checkbox-tally-notch	Checkbox Tally Notch	core	Checkbox	Checkbox group carving tally notches, every fifth stroke crossing the group
+trestle-gap	citation-grounding-gap	Citation Grounding Gap	core	RAG	RAG baseline: a solid plank under sourced sentences, a dashed gap where none
+bedrock-trace	citation-grounding-hatch	Citation Grounding Hatch	core	RAG	Per-sentence RAG grounding with a third state: hatch where a source contradicts
+margin-cite	citation-inline-card	Citation Inline Card	core	Citation	Inline citation pill opening one card with a 1-of-N stepper, not a popover each
+event-horizon-command	command-palette-orbit	Command Palette Orbit	loud	Command palette	Cmd-K palette where orbital radius is the fuzzy-match score
+periscope-sweep	command-palette-rotary	Command Palette Rotary	loud	Command palette	Jump switcher navigated as a 1D rotary compass ring instead of a ranked list
+crack-compare	compare-crack-seam	Compare Crack Seam	core	Compare	Before/after compare slider whose divider is a living Voronoi crack seam
+pencil-hedge	confidence-logprob-hatch	Confidence Logprob Hatch	core	Confidence	Hand-hatched underlines whose stroke density maps to token logprob doubt
+tumbler-gate	confirm-dial-align	Confirm Dial Align	core	Dial	Destructive confirm gated on rotating a dial notch within 3deg and holding
+hold-to-confirm	confirm-hold-ink	Confirm Hold Ink	core	Button	Press-and-hold destructive confirm where ink pours up from the press point
+signet-drop	confirm-hold-wax	Confirm Hold Wax	loud	Confirm	Press-and-hold confirm pouring molten wax, stamped by a dropping signet
+slide-to-shatter	confirm-slide-shatter	Confirm Slide Shatter	core	Slider	Glass confirm slider where drag distance drives Voronoi crack density
+lamp-black	consent-scope-redact	Consent Scope Redact	core	Consent	Consent surface where toggling a scope sweeps a felt-pen redaction over the text
+rule-frame	container-box-drawing	Container Box Drawing	core	Container	Container with real box-drawing chrome upgrading to double-line on hover
+oxbow-turn	context-compaction-river	Context Compaction River	core	Context window	Context compaction as a river where compacted turns neck off into a reopenable lake
+jack-knife	context-menu-unfold	Context Menu Unfold	core	Context menu	Context menu whose items swing out from a hinged spine like pocket-knife blades
+shim-fit	context-prompt-shims	Context Prompt Shims	core	Prompt engineering	Prompt composition as machinist shims whose heights map to real token counts
+carbon-lift	copy-button-travel	Copy Button Travel	core	Button	Copy button where a duplicate of the text visibly travels to the clipboard glyph
+crimp-copy	copy-field-crimp	Copy Field Crimp	core	Copy	Copyable field whose confirmation crimps letter-spacing shut in a wave
+vapor-countdown	countdown-vapor-digits	Countdown Vapor Digits	core	Particles	Countdown where the outgoing digit sublimates and the incoming one condenses
+carry-digit	counter-carry-ripple	Counter Carry Ripple	core	Counter	Numeric readout where only changed digits move and carries ripple right-to-left
+terminator-date-field	date-picker-moon	Date Picker Moon	core	Date picker	Masked date input whose calendar cells carry a real synodic moon terminator
+span-tape	date-range-tape	Date Range Tape	core	Date picker	Date-range calendar where selection extends a mono-ticked tape across the grid
+moire-dial	dial-moire	Dial Moire	core	Moire	Weighted rotary knob whose counter-rotating gratings resolve a word at the detent
+emerge-dialog	dialog-emerge	Dialog Emerge	core	Dialog	Native dialog that grows out of the control that opened it and returns into it
+seam-diff	diff-unified-viewer	Diff Unified Viewer	core	Diff	Unified/split diff swapping red-green blocks for a rail marker and gutter glyph
+magnetic-dock	dock-cursor-magnify	Dock Cursor Magnify	core	Navigation	Cursor-proximity magnification row with Gaussian falloff, macOS-dock physics
+shelf-cant	dock-shelf-lean	Dock Shelf Lean	core	Navigation	Dock whose items lean like books, straightening one and canting its neighbours
+sash-cord	drawer-counterweight	Drawer Counterweight	core	Drawer	Side drawer hung on a counterweight pill travelling opposite the drag
+spine-stack	drill-down-spines	Drill Down Spines	core	Navigation	Drill-down nav where each pushed level compresses into a clickable book spine
+drape-menu	dropdown-drape	Dropdown Drape	core	Menu	Dropdown panel as a live verlet cloth that drapes and billows under the cursor
+fallow-panel	empty-state-dashed	Empty State Dashed	core	Empty state	Empty state whose dashed boundary drifts and contracts toward the CTA on hover
+shadow-board	empty-state-pegboard	Empty State Pegboard	core	Empty state	Empty state as a pegboard of dashed silhouettes matching future item geometry
+echo-sound	empty-state-sonar	Empty State Sonar	core	Empty state	Empty state that pings like sonar, then grows skeleton rows when results land
+stake-line	empty-state-survey	Empty State Survey	core	Empty state	First-run empty state as a staked plot with dashed strings tied off at the CTA
+cloud-chamber	event-stream-vapor	Event Stream Vapor	loud	Monitoring	Event stream as a Wilson cloud chamber where each event condenses a vapour trail
+escapement-tick	feed-escapement	Feed Escapement	core	Feed	Live feed gating arrivals one at a time through an anchor-fork escapement
+vacuum-seal	file-upload-seal	File Upload Seal	core	Dropzone	Upload progress as a dashed outline pulling taut and puckering shut at 100%
+updraft-dropzone	file-upload-thermal	File Upload Thermal	core	Dropzone	Dropzone as a thermal field where accepted drops buoy up and squash-land
+sieve-facets	filter-facet-mesh	Filter Facet Mesh	core	Filter	Facet chips wired into a hairline sieve mesh that tightens per active thread
+caustic-coverflow	gallery-coverflow-caustic	Gallery Coverflow Caustic	core	Gallery	3D coverflow whose frosted cards run a live caustic-light simulation
+gantry-run	gallery-gantry-track	Gallery Gantry Track	loud	Gallery	Infinitely-looping 3D card gallery hung off a receding perspective gantry
+plimsoll-gauge	gauge-capacity-waterline	Gauge Capacity Waterline	core	Gauge	Capacity gauge as a hull with Plimsoll load lines settling deeper under load
+warp-lattice	grid-magnetic-lattice	Grid Magnetic Lattice	core	Grid	Card grid on a magnetised lattice where cards ride the cursor-bent sheet
+scroll-island	header-scroll-pill	Header Scroll Pill	core	Header	Header morphing between a full-width nav bar and a floating centred pill
+tide-ledger	heatmap-calendar-tide	Heatmap Calendar Tide	loud	Heatmap	Calendar heatmap read as a tide table with a single accent-mixed depth ramp
+stipple-year	heatmap-year-stipple	Heatmap Year Stipple	core	Calendar	Year activity calendar where intensity is stipple density, not colour
+scarp-horizon	hero-ascii-terrain	Hero ASCII Terrain	loud	Hero	ASCII landscape hero of five noise ridgelines receding toward a horizon
+vanish-run	hero-ascii-tunnel	Hero ASCII Tunnel	loud	Hero	ASCII perspective corridor of squircle rings advancing toward the viewer
+glyph-cast	hero-ascii-wordmark	Hero ASCII Wordmark	core	Hero	Hero wordmark in ASCII block letters, lit by the pointer like a torch
+pen-lag	hero-chart-recorder	Hero Chart Recorder	loud	Data viz	Chart-recorder hero whose pen chases the live value through an underdamped spring
+mesh-text-drag	hero-cloth-type	Hero Cloth Type	loud	Text	Headline re-drawn each frame through a spring-loaded mesh you can drag like cloth
+lodestone-hero	hero-dipole-field	Hero Dipole Field	core	Hero	Hero whose headline is redrawn beneath as iron filings solved from a dipole field
+singularity-text	hero-gravity-well	Hero Gravity Well	loud	Hero	Headline particle cloud eaten into an orbital accretion ring by the cursor
+pressure-front	hero-isobar-contours	Hero Isobar Contours	loud	Hero	Hero contour field whose isobars bunch around the CTA and lean toward the pointer
+quoin-lock	hero-letterpress-lockup	Hero Letterpress Lockup	loud	Hero	Letterpress hero whose glyphs slide in on sprung rails and lock up as one
+solargraph-hero	hero-long-exposure	Hero Long Exposure	core	Hero	Hero canvas that accumulates cursor light streaks on a 4s decay half-life
+oscillo-crest	hero-oscilloscope	Hero Oscilloscope	loud	Hero	Oscilloscope hero drawing a summed three-harmonic wave in box-drawing glyphs
+particle-hero	hero-particles-webgl	Hero Particles WEBGL	core	Hero	Full-viewport hero with a cursor-reactive WebGL particle field and text reveal
+nested-slug	hero-recursive-type	Hero Recursive Type	loud	Hero	Wordmark whose lit letterform cells are subdivided and filled with readable text
+vortex-street	hero-vortex-street	Hero Vortex Street	loud	Fluid	Cursor sheds a von Karman vortex street of alternating-sign vortices
+grain-tally	histogram-live-grain	Histogram Live Grain	core	Data viz	Live histogram where each arrival falls as a grain and the heap re-settles
+intent-coil	hover-card-dwell	Hover Card Dwell	core	Hover card	Hover card that must be wound open by pointer dwell and unwinds if you drift
+mat-crop	image-crop-mat	Image Crop Mat	core	Image	Image crop as four passe-partout mat boards snapping to ratio presets
+respire-field	input-focus-membrane	Input Focus Membrane	core	Input	Text input whose focus ring is a breathing noise-displaced canvas membrane
+shingle-course	listbox-sticky-groups	Listbox Sticky Groups	core	Select	Grouped listbox where passed headers stack into readable overlapping slivers
+braille-spin	loader-braille	Loader Braille	core	Loader	Determinate/indeterminate loader built from individually addressable braille dots
+hinge-topple	loader-die-tumble	Loader Die Tumble	core	Loader	Ambient loader as a die tumbling face over face with spring-corrected landings
+thinking-glyph	loader-ink-blob	Loader Ink Blob	core	Loader	Assistant-state ink blob traced through 72 points with six motion signatures
+blade-iris	loader-iris	Loader Iris	core	Loader	Ambient loader shaped as a six-blade camera-iris diaphragm
+loom-shuttle	loader-loom-weave	Loader Loom Weave	loud	Loader	Loader as a loom where progress is the cloth the shuttle accumulates
+phase-swing	loader-pendulum-sync	Loader Pendulum Sync	core	Loader	Indeterminate loader where pendulums drift out of unison and back on a knowable cycle
+lath-rack	loader-spring-bars	Loader Spring Bars	core	Loader	Ambient loader as staggered leaf springs reading as one pulse travelling the rail
+wind-spool	loader-thread-spool	Loader Thread Spool	core	Loader	Loader winding thread until total size arrives, then converting the coil to a gauge
+patina-ledger	memory-ledger-decay	Memory Ledger Decay	core	Memory	Session memory whose facts fade toward muted the longer they go unrehearsed
+shunt-tray	menu-nested-trays	Menu Nested Trays	core	Menu	Nested menus as telescoping trays that shunt the parent back instead of flying out
+ballast-context	meter-context-window	Meter Context Window	core	Meter	Stacked hairline meter segmenting an LLM context window by pattern, not colour
+meniscus-hold	meter-latency-capillary	Meter Latency Capillary	core	Loading	Time-to-first-token as calibrated capillary rise holding at a scribed p50 line
+meniscus-meter	meter-quota-meniscus	Meter Quota Meniscus	core	Meter	Quota meter where surface curvature, not level, carries the reading
+ration-rule	meter-quota-rule	Meter Quota Rule	core	Meter	Quota meter with no bar: a printed reading over a solid/dashed hairline rule
+bimetal-trip	meter-threshold-trip	Meter Threshold Trip	core	Meter	Threshold meter that bows, snaps across a contact gap and latches with hysteresis
+scissor-reach	minimap-pantograph	Minimap Pantograph	core	Minimap	Minimap wired to the real viewport by a live two-bar IK pantograph linkage
+packet-trace	network-packet-trace	Network Packet Trace	core	Network	Hairline node/edge graph where data pulses branch across random routes
+knockout-404	not-found-knockout	Not Found Knockout	loud	404	404 numerals punched through a surface plane to reveal a deep grain void
+dead-letter	not-found-postmark	Not Found Postmark	loud	404	404 as returned mail, its routing history stamped hop by hop as ink postmarks
+clapper-bell	notification-bell-swing	Notification Bell Swing	core	Notifications	Notification bell whose clapper rings on a real damped harmonic oscillator
+baste-stitch	optimistic-stitch	Optimistic Stitch	core	Optimistic UI	Optimistic-write state drawn as a basting stitch along a row's left seam
+cipher-reel-otp	otp-reel	OTP Reel	core	OTP input	Six-box OTP entry where each box is a slot-machine cipher reel
+folio-turn	pagination-dog-ear	Pagination Dog Ear	core	Pagination	Pagination as book folios with a CSS corner dog-ear that curls to peek ahead
+tide-gauge-password	password-strength-tide	Password Strength Tide	core	Input	Password field whose entropy raises a tide that sloshes on every keystroke
+ridge-walk	picker-pareto-frontier	Picker Pareto Frontier	core	Picker	Model picker as a cost/latency/quality Pareto scatter with a solid frontier line
+plumb-sway	popover-pendulum	Popover Pendulum	core	Popover	Popover hanging from its trigger on a hairline string, swaying plumb on settle
+counterpoise-tiers	pricing-scale	Pricing Scale	core	Pricing	Pricing tiers hanging as pans from a balance beam under spring torque
+hatch-fill	progress-hatch	Progress Hatch	core	Progress	Engineering-drawing progress meter with a shade-ramp fill and dithered edge
+chronicle-bar	progress-narrated	Progress Narrated	core	Progress	Progress bar whose leading edge types each phase, then docks it as a milestone
+wire-feed	progress-telegraph-log	Progress Telegraph Log	core	Progress	Telegraph feed where each sub-step ticks its own elapsed timer, then collapses
+wick-run	progress-wick	Progress Wick	core	Progress	Progress bar advancing by capillary action with a wet-front runner ahead
+pawl-click	queue-triage-ratchet	Queue Triage Ratchet	core	Queue	Card-triage queue on a one-way ratchet where undo means lifting the pawl
+ballot-drop	radio-ballot-drop	Radio Ballot Drop	core	Radio	Single-choice radio where the pick folds into a slip and drops through a slot
+pin-tumbler	radio-group-pin	Radio Group Pin	core	Radio group	Vertical radio group with exactly one dot resting on the checked option's notch
+chop-press	rating-stamp	Rating Stamp	core	Rating	Rating input as seal impressions that stamp solid with an expanding ring
+under-ink	redaction-hold-reveal	Redaction Hold Reveal	core	Redaction	Inline redaction bar sized by the real text, held to peek and clicked to latch
+flywheel-pull	refresh-pull-flywheel	Refresh Pull Flywheel	core	Refresh	Pull-to-refresh that winds a spoked flywheel and freewheels through the fetch
+redline-parley	refusal-negotiation	Refusal Negotiation	core	Guardrail	Refusal that echoes the blocked span struck through with rewriting lever chips
+bow-wake	reorder-drag-wake	Reorder Drag Wake	core	Drag reorder	Drag-reorder where a falloff field shoulders neighbours aside ahead of the card
+bolt-unfurl	reveal-cloth-unfurl	Reveal Cloth Unfurl	loud	Image	Media reveal unrolling an image as vertical strips off a rotateY hinge
+ripple-unfold	reveal-ripple-tiles	Reveal Ripple Tiles	core	Media	Media reveal driven by a height-field water sim popping grid tiles open
+scroll-caliper	scroll-caliper	Scroll Caliper	core	Instrument	Vernier caliper whose spring-damped jaws close over the active section's extent
+frost-scrub	scroll-defrost	Scroll Defrost	loud	Image	Scroll-scrubbed defroster annealing a frosted image to optical clarity
+particle-tunnel-scrub	scroll-particle-tunnel	Scroll Particle Tunnel	core	Particles	Scroll scrubs a camera through a monochrome point tunnel with velocity streaks
+core-sample-scroll	scroll-story-strata	Scroll Story Strata	loud	Story	Pinned scroll story drilling down through procedurally banded geological strata
+sprocket-scrub	scrubber-film-strip	Scrubber Film Strip	core	Slider	Media scrubber as a film strip with a gate claw snapping hole to hole
+chaff-winnow	search-winnow	Search Winnow	core	Search	Search input where non-matching rows tumble aside before their slot collapses
+fling-segment	segmented-control-fling	Segmented Control Fling	core	Control	Segmented control with a grabbable pill that coasts on real release velocity
+caustic-select	select-caustic	Select Caustic	core	Select	Glass select whose caustic light pools bend toward the highlighted option
+quick-key	shortcuts-cheat-sheet	Shortcuts Cheat Sheet	core	Shortcuts	Keyboard shortcut sheet whose keycaps depress and swallow the matching keydown
+deed-stroke	signature-consent	Signature Consent	core	Signature	Signature capture that replays itself as a witness stroke before embossing
+develop-skeleton	skeleton-develop	Skeleton Develop	core	Skeleton	Skeleton whose placeholder blocks develop into real content under a masked sweep
+slip-cast	skeleton-schema	Skeleton Schema	core	Skeleton	Schema-driven skeleton for streaming structured output, setting solid field by field
+catenary-split	slider-allocation-wire	Slider Allocation Wire	core	Slider	Two-way allocation slider whose wire sag encodes the unallocated remainder
+chladni-tune	slider-chladni-tune	Slider Chladni Tune	loud	Slider	Precision-tuning slider whose sand grains lock into a Chladni figure on target
+loupe-slider	slider-loupe	Slider Loupe	core	Slider	Slider read through a magnifying loupe riding the thumb over a soft-focus scale
+shear-band	slider-range-shear	Slider Range Shear	core	Slider	Dual-handle range slider whose selected span shears under drag velocity
+vernier-slip	slider-vernier	Slider Vernier	core	Slider	Numeric input as a true vernier caliper with a 0.9x-pitch fine tick row
+carbon-flimsy	slug-field-mirror	Slug Field Mirror	core	Field	Primary field with a live slugified copy stamped underneath it
+ramp-trace	sparkline-ascii	Sparkline ASCII	core	Chart	Sparkline drawn entirely in block-fraction characters, keyboard-navigable
+rule-sparkline	sparkline-automaton	Sparkline Automaton	core	Data viz	KPI sparkline grown over an elementary cellular-automaton texture
+solari-flap	split-flap-board	Split Flap Board	core	Split flap	Split-flap departure board for short status strings with hard-creased 3D flips
+sash-weight	split-pane-weighted	Split Pane Weighted	core	Divider	Split-pane divider that trails the pointer like a counterweighted window sash
+scan-sweep-stats	stats-radar-sweep	Stats Radar Sweep	core	Radar	Dashboard KPI grid under a radar arm that lights each card as it passes
+beacon-cadence	status-glyph-cadence	Status Glyph Cadence	core	Status	Inline agent status glyph where five motion cadences replace five colours
+gyre-mote	status-sphere-dots	Status Sphere Dots	core	Status	AI thinking indicator as a rotating sphere of depth-cued SVG dots
+stem-sift	stem-and-leaf-live	Stem And Leaf Live	core	Data viz	Live stem-and-leaf plot where arrivals drop into their tens row in sorted order
+needle-stepper	stepper-needle	Stepper Needle	core	Stepper	Bounded numeric stepper with an inertial needle swinging to each committed value
+pawl-lift	stepper-ratchet	Stepper Ratchet	core	Stepper	Spinbutton where incrementing is free but decrementing needs a held pawl lift
+decal-peel	sticker-peel	Sticker Peel	loud	Sticker	Vinyl sticker you can drag-peel, exposing an adhesive underside with a sheen
+wet-ink	streaming-ink-dry	Streaming Ink Dry	core	Text	Streaming text where new tokens arrive translucent and dry a beat behind
+kerf-caret	streaming-markdown-caret	Streaming Markdown Caret	core	Text	Streaming markdown where only the unterminated trailing edge carries a caret
+retract-ink	streaming-retraction	Streaming Retraction	core	Streaming	Streaming text where a retraction strikes through and leaves a reopenable scar
+loose-type	streaming-token-settle	Streaming Token Settle	core	Text	Streaming text where provisional tokens sit off-baseline until confirmed
+iron-filings	success-iron-filings	Success Iron Filings	loud	Success	Success moment where drifting filings align to draw the checkmark as field lines
+seed-crystal	success-nucleation	Success Nucleation	loud	Confirmation	Success moment built on supercooling: a nucleation flash crystallises the field
+plumb-true	success-plumb-bob	Success Plumb Bob	loud	Success	Success moment where a plumb bob settles collinear with a fixed index
+glass-panel	surface-glass	Surface Glass	core	Surface	Container-level liquid glass: blur, saturation, grain, specular rim, shadow ramp
+detent-swipe	swipe-row-detent	Swipe Row Detent	core	Swipe	Swipeable row clicking through machined detent stops with overtravel-armed delete
+throw-switch	switch-ascii-knife	Switch ASCII Knife	core	Switch	Accessible switch drawn in box-drawing glyphs as a physical knife switch
+umbra-toggle	switch-eclipse	Switch Eclipse	core	Switch	Binary switch as an eclipse, forming a computed crescent at the midpoint
+frostbite-switch	switch-frost	Switch Frost	core	Switch	Switch whose OFF state freezes over with seeded dendritic frost
+solder-bridge	switch-solder-bead	Switch Solder Bead	core	Switch	Switch as two solder beads trading mass through a gooey neck that pinches off
+heatwave-ledger	table-heat-shimmer	Table Heat Shimmer	core	Table	Ops table where rows above a heat threshold refract through a displacement filter
+carriage-return	tabs-carriage	Tabs Carriage	core	Tabs	Tab underline as a typewriter carriage that glides forward and snaps back
+mortise-slip	tabs-notch-tenon	Tabs Notch Tenon	core	Tabs	Tabs whose bottom rule has a notch the active panel's raised tenon slots into
+points-throw	tabs-rail-points	Tabs Rail Points	core	Tabs	Tabs whose indicator is one continuous rail that throws the points on selection
+slack-rail	tabs-slack-cable	Tabs Slack Cable	core	Tabs	Tabs whose indicator sags like a slack cable proportional to jump distance
+loose-thread	tag-input-backspace	Tag Input Backspace	core	Input	Tag input where Backspace arms the last tag with a depleting bar before deleting
+cinch-bead	tag-input-cord	Tag Input Cord	core	Tag input	Tag input as beads cinched onto a cord, unravelling from the end on Backspace
+burr-chip	tag-input-pull	Tag Input Pull	core	Tag input	Tag input whose chips stretch and pop free only under a deliberate pull
+tear-tab	tag-input-tear	Tag Input Tear	core	Tag input	Tag input whose chips hang from a perforation and tear off dash by dash
+erosion-trail	terrain-erosion-carve	Terrain Erosion Carve	loud	Terrain	Cursor as a river carving channels into a live marching-squares heightfield
+card-flick	text-card-flick	Text Card Flick	core	Text	Hover flourish where every letter flicks over like an index card on a spindle
+decrypt-text	text-decrypt	Text Decrypt	core	Text	Scramble-to-decode text reveal with left-to-right character locking
+cardio-baseline	text-ekg-baseline	Text EKG Baseline	core	Text	Text whose baseline is a live EKG trace throwing glyphs up each QRS spike
+ligature-melt	text-ligature-melt	Text Ligature Melt	core	Text	Headline whose glyphs fuse into temporary ligatures near the cursor via a goo filter
+prism-drag-split	text-prism-split	Text Prism Split	loud	Text	Frosted prism strip riding the cursor, tearing the headline into RGB slices
+stitch-pick	text-stitch-unpick	Text Stitch Unpick	loud	Text	Headline as running-stitch embroidery the cursor picks loose into dangling thread
+dynamic-weight-text	text-variable-weight	Text Variable Weight	core	Text	Letters morphing variable-font weight by cursor proximity
+proof-rise	textarea-autosize-swell	Textarea Autosize Swell	core	Textarea	Autosize textarea that swells line by line like proofing dough, not reflowing
+bourse-tape	ticker-tape-splice	Ticker Tape Splice	core	Ticker	Finance ticker with mechanical feed physics and a visible splice seam
+roll-crawl	ticker-teleprinter	Ticker Teleprinter	core	Ticker	Character-quantised teleprinter crawl advancing one full cell per beat
+drift-stamp	time-ago-drift	Time Ago Drift	core	Time	Relative timestamp whose variable-font weight and ink drift as the moment recedes
+gnomon-set	time-picker-sundial	Time Picker Sundial	core	Time picker	Time-of-day picker as a flat sundial with hour and 5-minute detent rings
+relay-lane	timeline-agent-lanes	Timeline Agent Lanes	core	Agent	Multi-agent turn tracker with one hairline lane per agent and stepped handoffs
+strandline	timeline-changelog-wave	Timeline Changelog Wave	core	Timeline	Changelog timeline where each release arrives as a breaking foam crest
+sounding-rail	timeline-reasoning-rail	Timeline Reasoning Rail	core	Timeline	Collapsible agent-reasoning timeline where status lives in the node glyph
+sediment-stack	toast-gravity-stack	Toast Gravity Stack	core	Toast	Toast stack with real gravity where errors sink under their own mass
+impulse-cradle	toast-newton-cradle	Toast Newton Cradle	loud	Toast	Toast stack behaving as a Newton's cradle, carrying impact down the queue
+short-fuse	toast-undo-fuse	Toast Undo Fuse	core	Toast	Undo toast whose remaining lifetime burns along the bottom edge as a fuse
+mercury-minimap	toc-minimap-mercury	TOC Minimap Mercury	core	Navigation	TOC minimap where scroll progress is a gooey mercury blob absorbing section ticks
+tackle-board	tool-call-board	Tool Call Board	core	Agent	Agent tools hung as capability chips that pay out streaming-argument strips
+penumbra-tip	tooltip-delay-group	Tooltip Delay Group	core	Tooltip	Tooltip tracing its border from the trigger edge, with instant delay-group handoff
+leading-light	tour-spotlight	Tour Spotlight	core	Onboarding	Onboarding tour lighting the target through a single SVG-masked penumbra scrim
+siphon-lift	transfer-list-siphon	Transfer List Siphon	core	Listbox	Transfer list where dragging one selected item siphons the rest through a tube
+scree-pour	transition-panel-crumble	Transition Panel Crumble	loud	Transition	Layout transition where the outgoing panel crumbles into grains that refill the next
+bough-index	tree-box-drawing	Tree Box Drawing	core	Tree	File tree whose box-drawing connectors redraw as folders expand and collapse
+folding-rule	tree-hinge-fold	Tree Hinge Fold	core	Tree	Tree whose child groups swing open around a visible hinge like a folding rule
+taproot-trace	tree-root-trace	Tree Root Trace	core	Tree	Tree whose indent guides are one SVG root path drawing itself into each child
+vanish-taper	truncation-taper-fade	Truncation Taper Fade	core	Text	Truncation without an ellipsis: trailing characters crowd and dissolve
+selvage-fold	truncation-word-count	Truncation Word Count	core	Truncation	Line clamp whose fold control states the exact word count it is hiding
+tremor-trace	typing-indicator-trace	Typing Indicator Trace	core	Presence	Multi-user presence as a seismograph strip spiking with real keystroke cadence
+undertow-drift	undo-drift-bar	Undo Drift Bar	core	List	Deleted row collapses to a bar whose drift distance is the only undo clock
+after-image	undo-ghost-row	Undo Ghost Row	core	List	Deleted row leaves a height-as-time ghost you can click to restore
+punch-list	validation-error-summary	Validation Error Summary	core	Form	Failed-submit error summary with leader lines linking each defect to its field
+litmus-wick	validation-inline-wick	Validation Inline Wick	core	Input	Per-field validation diffusing an error tint in from the offending character
+hump-yard	view-toggle-rails	View Toggle Rails	core	Layout	List/grid/board switcher that rides each item along a drawn curved rail
+reed-vu	voice-recorder-meter	Voice Recorder Meter	core	Voice	Voice-capture chip whose amplitude strip is real Web Audio, not fake bars
+lock-flight	wizard-canal-lock	Wizard Canal Lock	core	Stepper	Wizard stepper as canal locks: the next chamber equalises before the gate opens
+dovetail-run	wizard-dovetail	Wizard Dovetail	core	Form	Multi-step form whose valid steps mate into a rail as interlocking dovetail chips

@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "dist",
+    "declaration": false,
+    // Node refuses --experimental-strip-types on anything under node_modules
+    // (ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING) — confirmed by installing
+    // this package from a packed tarball and running its bin. So unlike the
+    // rest of this repo (which runs .ts directly), the published package
+    // ships compiled .js. Source still imports "./foo.ts" so `node
+    // src/index.ts` keeps working uncompiled for local dev; this build
+    // config rewrites those specifiers to "./foo.js" to match the emitted
+    // output (TS 5.7+ rewriteRelativeImportExtensions).
+    "rewriteRelativeImportExtensions": true
+  }
+}

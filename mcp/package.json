@@ -1,0 +1,54 @@
+{
+  "name": "@nikolas.sapa/ns-ui-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for the ns-ui component registry: search components, read full source, and get the token/theming conventions an agent needs to build in the same design language.",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "shadcn",
+    "registry",
+    "react",
+    "tailwind",
+    "component-library"
+  ],
+  "homepage": "https://design.helpmarq.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nikolas-sapa/ns-ui.git",
+    "directory": "mcp"
+  },
+  "bugs": {
+    "url": "https://github.com/nikolas-sapa/ns-ui/issues"
+  },
+  "author": "Nikolas Sapalidis",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "ns-ui-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "data"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "prepack": "npm run build && node ../scripts/build-mcp-snapshot.ts",
+    "dev": "node src/index.ts",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.9.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

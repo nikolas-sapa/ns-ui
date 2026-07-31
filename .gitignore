@@ -22,6 +22,15 @@ lib/card-frame.generated.json
 public/llms.txt
 public/llms-full.txt
 
+# MCP server's offline snapshot of the registry — same story: regenerated
+# by `npm run registry:build` (build-mcp-snapshot.ts) and by mcp/'s own
+# `prepack` before every publish. See mcp/README.md.
+mcp/data/
+# mcp/'s compiled output — Node refuses type stripping under node_modules,
+# so unlike the rest of this repo the published package ships build output.
+# `npm run build` (mcp/) or `prepack` regenerates it.
+mcp/dist/
+
 # debug scratch from agent sessions — never commit
 .scratch-dbg/
 recordings/
@@ -38,6 +47,7 @@ recordings/
 /wiki/.wiki/
 /.worktrees/
 .scratch-audit/
+.scratch-21st/
 *.tmp.mjs
 __audit_tmp*
 *_tmp.mjs
