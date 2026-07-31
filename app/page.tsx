@@ -1,5 +1,6 @@
 import registry from "@/registry.json";
 import { loadUseWhen } from "@/lib/use-when";
+import { kindOf } from "@/lib/kind";
 import order from "@/lib/component-order.json";
 import { FEATURED } from "@/lib/featured";
 import { getStarCount } from "@/lib/github-stars";
@@ -48,6 +49,8 @@ const items: ShowcaseEntry[] = registry.items
     title: item.title,
     description: item.description,
     collection: item.meta?.collection ?? "core",
+    // Plain-language label beside the metaphorical name — see lib/kind.ts.
+    kind: kindOf(item.meta?.tags),
     // Search matches tags too, so the projection carries them to the client.
     tags: item.meta?.tags ?? [],
     // …and the two plainest-spoken fields the registry has, so a descriptive

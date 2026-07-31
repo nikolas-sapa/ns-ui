@@ -257,6 +257,11 @@ export function FeaturedCard({
                 {entry.title}
               </Link>
             </h3>
+            {/* Same caption as the grid cards — the name is a metaphor, this
+                says what it is. See lib/kind.ts. */}
+            {entry.kind ? (
+              <span className="shrink-0 text-xs text-muted">{entry.kind}</span>
+            ) : null}
             {entry.isNew ? (
               <span className="shrink-0 rounded-sm border border-border px-1.5 py-px font-mono text-[10px] uppercase tracking-wider text-foreground">
                 new

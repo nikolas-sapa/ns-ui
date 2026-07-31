@@ -11,6 +11,8 @@ export type RegistryEntry = {
   title: string;
   description: string;
   collection: string;
+  /** Plain-language "what is this" label — see lib/kind.ts. */
+  kind: string | null;
   /** True for the NEW_COUNT most recently added components — see app/page.tsx. */
   isNew: boolean;
 };
@@ -242,6 +244,12 @@ export function PreviewCard({
                 {entry.title}
               </Link>
             </h3>
+            {/* The names are metaphors on purpose; this is what stops a card
+                from being a riddle. Muted and after the title, so it reads as
+                a caption rather than competing with the name. */}
+            {entry.kind ? (
+              <span className="shrink-0 text-xs text-muted">{entry.kind}</span>
+            ) : null}
             {entry.isNew ? (
               <span className="shrink-0 rounded-sm border border-border px-1.5 py-px font-mono text-[10px] uppercase tracking-wider text-foreground">
                 new

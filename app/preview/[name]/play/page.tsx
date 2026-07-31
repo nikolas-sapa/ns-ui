@@ -6,6 +6,8 @@ import order from "@/lib/component-order.json";
 import { loadUseWhen } from "@/lib/use-when";
 import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
 import { CopyButton } from "@/app/_components/copy-button";
+import { kindOf } from "@/lib/kind";
+import { loadSource } from "@/lib/source";
 import { ThemeToggle } from "@/app/_components/theme-toggle";
 
 /**
@@ -77,6 +79,8 @@ export default async function PlaygroundPage({
   const collection =
     (item.meta as { collection?: string } | undefined)?.collection ?? "core";
   const installCommand = `npx shadcn add ${REGISTRY_ORIGIN}/r/${name}.json`;
+  const kind = kindOf(tags);
+  const source = loadSource(name);
   const summary = firstSentence(item.description);
   const hasMore = summary !== item.description;
 
@@ -97,6 +101,9 @@ export default async function PlaygroundPage({
             <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
               {item.title}
             </h1>
+            {kind ? (
+              <span className="shrink-0 text-sm text-muted">{kind}</span>
+            ) : null}
             {collection === "loud" ? (
               <span className="shrink-0 rounded-sm border border-border px-1.5 py-px font-mono text-[10px] uppercase tracking-wider text-muted">
                 loud
@@ -148,6 +155,27 @@ export default async function PlaygroundPage({
             />
           </div>
         </details>
+
+        {source ? (
+          <details className="py-3">
+            <summary className={SUMMARY}>Source</summary>
+            <div className="mt-3">
+              <div className="flex items-center justify-between gap-3">
+                <code className="font-mono text-[11px] text-muted">{source.file}</code>
+                <CopyButton
+                  variant="inline"
+                  value={source.code}
+                  label="Copy component source"
+                />
+              </div>
+              {/* No highlighter: one <pre> of real source, the same bytes the
+                  CLI would write, and nothing to keep in sync with a theme. */}
+              <pre className="mt-2 max-h-[60vh] overflow-auto rounded-md border border-border bg-surface p-4 font-mono text-[11px] leading-relaxed text-foreground">
+                <code>{source.code}</code>
+              </pre>
+            </div>
+          </details>
+        ) : null}
 
         {useWhen || hasMore ? (
           <details className="py-3">
