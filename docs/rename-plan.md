@@ -156,6 +156,12 @@ Do it as one atomic change on a branch. A half-applied rename is worse than none
 
     **Do NOT run `npm run order:build`.** See §5 — it would either destroy the
     curated ordering or hard-fail.
+
+    Update, post-29b5364: `scripts/build-order.ts` now follows rename chains
+    (`--diff-filter=AR -M`) and reconstructs true creation order across any
+    number of renames, verified byte-identical against the hand-remapped file.
+    A future mass rename can run `npm run order:build` directly — no more
+    hand-remapping `lib/component-order.json`.
 12. **Verify** (see §6), then commit as one commit.
 
 Steps 2-9 are best done by a single script driven directly off
