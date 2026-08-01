@@ -41,6 +41,13 @@ them, so committing them means guaranteed conflicts in files nobody wrote.
 If something in the generated output is wrong, fix `meta.json` or the component
 source and rebuild. Hand edits are silently overwritten.
 
+One exception: `README.md` is committed and hand-edited, since it's the repo's
+front page. Its component-count numbers are still generated, not hand-tracked
+— `scripts/build-readme.ts` rewrites only the text between paired
+`<!-- generated:NAME start -->`/`<!-- generated:NAME end -->` markers, leaving
+everything else in the file untouched. Missing or malformed markers fail the
+build loudly rather than being skipped or auto-inserted.
+
 ## Adding a component
 
 Open a component request issue first if you want a read on whether the idea
@@ -69,10 +76,11 @@ fits. Then:
    structure. There is no central index to edit.
 
    Then `npm run order:build`, and commit what it changes. `lib/component-order.json`
-   is the one generated file that IS committed — git history is unreliable on
-   Vercel's shallow clone, so the site ships a snapshot of creation dates instead
-   of deriving them. Skip this and your component still ships, it just sorts
-   **last** in the grid instead of first, which looks like it never deployed.
+   is a generated file that IS committed (like `README.md`, above) — git history
+   is unreliable on Vercel's shallow clone, so the site ships a snapshot of
+   creation dates instead of deriving them. Skip this and your component still
+   ships, it just sorts **last** in the grid instead of first, which looks like
+   it never deployed.
 
 3. `npm run typecheck`. It must be clean, and it reruns `registry:build`, so it
    also catches a malformed `meta.json`.
