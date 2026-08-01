@@ -2,560 +2,586 @@
 
 Status: proposal. Nothing below is implemented.
 
-Verified against the repo, and against the owner's other projects on this machine, at read time.
-Where a claim is a guess it says so.
+Backend is **Convex** — owner's decision, recorded in §7.1, not re-argued. An earlier draft of this
+document evaluated Neon/Postgres and recommended it; that evaluation is in git history if the
+reasoning is ever wanted. This version specs what was chosen.
 
-Two corrections to the original brief, both of which make the security case stronger:
-`featured-card.tsx` does **not** read `contentDocument` (only `preview-card.tsx` does — the exposure
-is the shared origin, and a third frame nobody mentions is the interactive one), and
-`generateStaticParams()` returns `[]` on both cached preview routes, so they are ISR rather than
-build-time prerender. Details in §6.1 and §4 group B.
+Verified against the repo, against the owner's seven existing Convex projects, and against the
+installed `@convex-dev/auth` package source. Where a claim is a guess it says so (§9).
 
 ---
 
 ## 1. Non-goals
 
-These are explicitly out of scope. Each is here because someone will ask for it.
-
-1. **User-uploaded components are not previewed on this origin.** Ever, under this spec. Submissions
-   are GitHub pull requests. §6 states what would have to change and what it costs; the answer is a
-   separate deployment, not an attribute.
+1. **User-uploaded components are not previewed on this origin.** Ever. Submissions are GitHub pull
+   requests. §6.2 states what would have to change and what it costs.
 2. **No in-app code editor, no paste-and-run playground.** Same reason.
-3. **No passwords.** GitHub, Google, email OTP. No Apple, no X.
+3. **No passwords.** GitHub, Google, email OTP.
 4. **The catalog does not become dynamic.** `/`, `/preview/<name>`, `/preview/<name>/embed`,
-   `/preview/<name>/play` keep their current caching characteristics exactly. No `cookies()` or
-   `headers()` call is added to `app/layout.tsx` or `SiteShell` — one such call opts every route out
-   of static generation.
-5. **`npx shadcn add` stays anonymous forever.** `/r/*.json`, `/registry.json`, `/llms.txt` never
+   `/preview/<name>/play` keep their current caching behaviour exactly. Specifically:
+   `ConvexAuthNextjsServerProvider` is **never** placed in `app/layout.tsx` (§6.4), and no
+   `cookies()`/`headers()` call is added to the layout or `SiteShell`.
+5. **No Convex client on catalog pages.** `ConvexReactClient` and the auth provider mount only on
+   auth-bearing routes. §7.2.
+6. **`npx shadcn add` stays anonymous forever.** `/r/*.json`, `/registry.json`, `/llms.txt` never
    require a session, never receive a `Set-Cookie`, never leave the CDN.
-6. **No public user directory, no follows, no comments, no ratings, no DMs.** Profiles are a page
-   about you and your saves; they are not a social graph.
-7. **No moderation tooling.** GitHub's PR review UI is the moderation tooling.
-8. **No realtime.** No subscriptions, no WebSocket, no live-updating catalog. §7 explains why this
-   is a decision rather than an omission.
-9. **No migration of the shipped registry into a database.** Component metadata stays in `meta.json`
-   on disk, built by `registry:build`. The database holds people and their pointers, nothing else.
-10. **No SSR of user-specific content into any cached route.** Saves are read client-side after
-    hydration.
+7. **No realtime.** No `useQuery` subscriptions, no WebSocket on the catalog. Saves are a fetch, not
+   a subscription. Convex is chosen as a database here, not as a reactivity engine.
+8. **No public user directory, no follows, comments, ratings or DMs.**
+9. **No moderation tooling.** GitHub's PR review UI is the moderation tooling.
+10. **No migration of the registry into Convex.** Component metadata stays in `meta.json` on disk.
+11. **No SSR of user-specific content into any cached route.**
 
 ---
 
 ## 2. Phases
 
-Each phase ships on its own and leaves the site correct if the next never happens.
+### Phase 0 — auth spike (load-bearing)
+
+**Depends on:** nothing. Runs *while* the rename lands, so it costs no calendar time.
+
+A throwaway Next 16 app on a scratch Convex deployment that proves the three things this spec assumes
+and the owner's existing code does not demonstrate:
+
+1. **GitHub OAuth** through `@convex-dev/auth`.
+2. **Google OAuth** through `@convex-dev/auth`.
+3. **Email OTP** as a first-class sign-in method (not just the password-reset flow).
+4. **Token storage**: confirm §6.1's finding on the pinned version, and confirm `storage="inMemory"`
+   suppresses the localStorage write.
+
+**Why this exists:** of the three required providers, only OTP-over-Resend has a working precedent in
+the owner's code (`reserved-app/convex/ResendOTP.ts`). marketmyapp is Password-only, and its
+`CLAUDE.md` records that Google OAuth was *dropped* in the Supabase→Convex cutover because re-adding
+it "needs an Auth.js Google provider + client id/secret on the Convex deployment." OAuth on Convex
+Auth is unexercised in this owner's stack.
+
+**Done means:** all four demonstrated, or a written recommendation to change auth library. One day of
+work. **If the spike fails on OAuth, stop and reopen the auth decision** — do not work around it
+inside Phase A.
 
 ### Phase A — auth, profiles, saves
 
-**Depends on:** the in-flight 223-slug rename landing on `main` first. Hard gate, not a preference —
-see §3.
+**Depends on:** Phase 0 passing, **and** the 223-slug rename being merged to `main`. Hard gate — §3.
 
 **Ships:**
 
-- Better Auth on Postgres. Providers: GitHub OAuth, Google OAuth, email OTP.
-- New routes, all dynamic, all outside the cached set:
-  - `/api/auth/[...all]` — Better Auth's handler.
-  - `/api/saves` — `GET` (the caller's saves), `POST` (save a slug), `DELETE` (unsave).
-  - `/account` — signed-in only: profile fields, connected providers, saved components,
-    sign-out-everywhere, delete-account.
-  - `/u/<handle>` — public profile. Dynamic or short-revalidate; not in the static set either way.
-- Header auth UI in `SiteShell`, rendered **client-side after hydration** from the session endpoint.
-  Signed-out is the server-rendered default, so the shell's HTML is identical for everyone and every
-  cached route stays cached.
-- A save control on the catalog card and the playground page. Optimistic, client-only, hydrated from
-  one `GET /api/saves` per page load.
-- `SECURITY.md` rewritten. Lines 5-7 currently read "There is no backend, no database, and no user
-  data." That becomes false the moment this ships, and correcting it is part of the phase, not a
-  follow-up. Add: what is stored, the deletion path, and that component previews still run as
-  first-party code.
-- A privacy note (short, on `/account`, linked from the footer) listing exactly what is stored and
-  how to delete it.
+- `@convex-dev/auth` with GitHub, Google, email OTP (Resend).
+- Convex schema: `authTables` + `profiles`, `saves`, optionally `collections`.
+- Next route handlers on our own origin, all dynamic, all outside the cached set:
+  - `/api/auth` — Convex Auth's proxy endpoint (required by the middleware, §6.4).
+  - `/api/me` — `{ signedIn, handle, displayName }` or `{ signedIn: false }`.
+  - `/api/saves` — `GET`/`POST`/`DELETE`, reading the session cookie server-side and calling Convex
+    with an authed server client.
+- `/account` and `/u/<handle>` pages.
+- Header auth UI in `SiteShell`, rendered **client-side after hydration** from `/api/me`.
+- Save control on the catalog card and playground, hydrated from one `GET /api/saves` per page load.
+- `SECURITY.md` rewritten. Its lines 5-7 currently say "There is no backend, no database, and no user
+  data" — false the moment this ships.
+- Privacy note on `/account`, linked from the footer.
 
-**Done means:** every test in §4 groups A, B and C passes, and `next build`'s route table for `/`,
-`/preview/[name]`, `/preview/[name]/embed`, `/preview/[name]/play` is byte-identical to the
-pre-change baseline.
+**Done means:** §4 groups A, B and C all pass, and the `next build` route table for the four catalog
+routes is byte-identical to the pre-change baseline.
 
-### Phase B — guidelines page and contributor credit
+### Phase B — guidelines and contributor credit
 
-**Depends on:** nothing in A, technically. Ship after A so credit can link to a profile; it degrades
-to a plain GitHub login if A slipped.
+**Depends on:** nothing in A; ship after so credit can link to a profile, degrading to a plain GitHub
+login otherwise.
 
-**Ships:**
+- `/guidelines`, static. The *taste* document the repo lacks: what "one interaction" means, why both
+  themes are non-negotiable, why the card matters as much as the preview, the token rule, what gets
+  rejected. `CONTRIBUTING.md` stays the mechanical how-to; they cross-link.
+- MIT grant stated; PR template gains a DCO checkbox and `Signed-off-by`; add a `DCO` file.
+- `scripts/build-contributors.ts` → `lib/contributors.generated.json` (slug → GitHub login), read
+  from **git history at build time, not from Convex**. Added to the `registry:build` chain,
+  gitignored like its siblings.
 
-- `/guidelines` — a static page. Not a copy of `CONTRIBUTING.md`; it is the *taste* document the
-  repo does not have: what "one interaction" means, why both themes are non-negotiable, why the card
-  matters as much as the preview, the token rule, what gets rejected and why. `CONTRIBUTING.md`
-  stays the mechanical how-to; the two link to each other.
-- Licensing stated there: contributions are MIT, and the PR template gains a DCO sign-off checkbox
-  plus a `Signed-off-by` line. Add a `DCO` file at the repo root.
-- Contributor credit: a build step reads merged git history and writes
-  `lib/contributors.generated.json` (slug → GitHub login), consumed by the playground page and a
-  `/contributors` index. **Generated at build from git, not from the database.** If a contributor
-  also has an account, credit links to `/u/<handle>`; matching is by GitHub login on the `account`
-  row.
-
-**Done means:** `/guidelines` is in the static route set, the PR template requires sign-off, and
-credit renders correctly for a component whose author has no account at all.
+**Done means:** `/guidelines` is static, sign-off is required, and credit renders for a contributor
+with no account.
 
 ### Phase C — PR-opening submission portal
 
-**Depends on:** A (session + GitHub token) and B (guidelines to point at).
+**Depends on:** A and B.
 
-**Ships:**
+- `/submit`, GitHub sign-in only. Form → validate → fork as the user → commit on a branch → open a
+  PR, all through the GitHub API under an incremental OAuth scope requested at submit time.
+- Submitted code is **never imported, built, rendered or executed on this origin.** CI runs it in
+  GitHub's sandbox.
+- Contributors still run `npm run verify` locally and attach screenshots.
 
-- `/submit` — signed-in with GitHub only. A form: component name, title, description, collection,
-  tags, `component.tsx`, `demo.tsx`, and the `meta.json` fields.
-- On submit, the server uses the user's own GitHub token — an incremental OAuth scope requested at
-  submit time, not at sign-in — to fork the repo *as them*, commit the files on a branch, and open a
-  PR. The bot never commits under the maintainer's identity.
-- The pasted code is written to a file and pushed. **It is never imported, never built, never
-  rendered, never executed on this origin.** CI runs it in GitHub's sandbox, as it does for any PR
-  today.
-- Contributors still run `npm run verify` locally and attach screenshots. The portal lowers the
-  barrier to opening a PR; it does not replace the gate.
-
-**Done means:** a fresh account can produce a PR that CI accepts as well-formed, and a static
-analysis of the app confirms no code path imports anything from the submitted payload.
+**Done means:** a fresh account produces a well-formed PR, and static analysis confirms no code path
+imports the payload.
 
 ---
 
 ## 3. Data model
 
-Better Auth's own CLI generates and owns `user`, `session`, `account`, `verification`. Do not
-hand-author them; extend via its documented additional-fields mechanism rather than by altering its
-tables.
+Convex, so `defineSchema`/`defineTable`/`v.*` with explicit indexes. Two properties differ from a SQL
+draft and change real things: **Convex has no foreign keys and no cascading deletes**, and **no unique
+indexes**.
 
-Our tables, alongside:
+```ts
+export default defineSchema({
+  ...authTables,   // users, authAccounts, authSessions, authRefreshTokens,
+                   // authVerificationCodes, authVerifiers, authRateLimits
 
+  profiles: defineTable({
+    userId:      v.id("users"),
+    handle:      v.string(),        // stored lowercased
+    displayName: v.union(v.string(), v.null()),
+    bio:         v.union(v.string(), v.null()),   // capped, rendered as plain text
+    url:         v.union(v.string(), v.null()),   // http/https only, validated on write
+    createdAt:   v.number(),
+  }).index("by_userId", ["userId"])
+    .index("by_handle", ["handle"]),
+
+  saves: defineTable({
+    userId:    v.id("users"),
+    slug:      v.string(),
+    createdAt: v.number(),
+  }).index("by_user", ["userId"])
+    .index("by_user_slug", ["userId", "slug"]),
+
+  collections: defineTable({
+    userId: v.id("users"), name: v.string(), isPublic: v.boolean(), createdAt: v.number(),
+  }).index("by_user", ["userId"]),
+
+  collectionItems: defineTable({
+    collectionId: v.id("collections"), slug: v.string(), position: v.number(),
+  }).index("by_collection", ["collectionId"]),
+});
 ```
-profile
-  user_id      text  PK, FK -> user.id  ON DELETE CASCADE
-  handle       text  UNIQUE (case-insensitive)
-  display_name text
-  bio          text          -- length-capped, rendered as plain text, never HTML
-  url          text          -- http/https only, validated on write
-  created_at   timestamptz
 
-save
-  user_id    text  FK -> user.id ON DELETE CASCADE
-  slug       text            -- registry item name
-  created_at timestamptz
-  PRIMARY KEY (user_id, slug)
+**Uniqueness is enforced by mutation, not by the schema.** Convex has no unique index. `claimHandle`
+reads `by_handle` and inserts in one mutation; Convex mutations are serializable, so the
+read-then-insert is atomic and a concurrent duplicate loses. That is a real guarantee, but it is a
+*transaction* guarantee, not a constraint — anything writing `profiles` outside that mutation
+bypasses it. One writer, by convention, enforced in review.
 
-collection                    -- ship in Phase A if cheap, otherwise defer
-  id, user_id FK, name, created_at
+### The slug gate
 
-collection_item
-  collection_id FK ON DELETE CASCADE, slug, position
-  PRIMARY KEY (collection_id, slug)
-```
+There is no stable non-slug identity in this repo. `meta.json`'s `name` *is* the slug, the folder name
+*is* the slug, and `files[0].target` derives from the folder (`docs/rename-plan.md` §1).
 
-That is the whole model. No component table, no tags table, no ratings table.
+`docs/rename-plan.md` renames **222 of 223** components in one atomic commit. A `saves` table
+populated before it merges holds 222 dead pointers the day it lands.
 
-### The slug problem, and why it gates Phase A
+**No table keyed on slug may exist before the rename commit is on `main`** — `saves` and
+`collectionItems`. Phase 0 has no schema and is unaffected; run it during the rename.
 
-There is no stable non-slug identity in this repo. `meta.json`'s `name` *is* the slug, the folder
-name *is* the slug, and `files[0].target` is derived from the folder (`docs/rename-plan.md` §1).
-Introducing a permanent component id is a change to the registry format and is not proposed here.
-
-`docs/rename-plan.md` renames **222 of 223** components in one atomic commit, and that rename is
-executing now. A saves table populated before it merges holds 222 dead pointers on the day it lands,
-and there is no migration unless someone commits to keeping `docs/rename-map.tsv` as a permanent
-redirect table — which is worse than waiting a week.
-
-**Therefore: no table keyed on slug may exist before the rename commit is on `main`.** That means
-`save`, `collection_item`, and any future slug-keyed table. `user`, `session`, `account`,
-`verification` and `profile` are slug-free and could technically ship earlier, but splitting Phase A
-across the rename buys nothing; ship it whole, afterwards.
-
-`save.slug` has no foreign key and cannot have one — the registry is not in the database.
-Unresolvable slugs degrade silently, matching the idiom already in the repo at `app/page.tsx:26-31`,
-where `FEATURED` is filtered against `registryNames` so a rename "degrades quietly instead of
-leaving a dead slug in the featured rail". Saves do the same: the client filters its saves against
-the slugs already in the catalog payload. A row resolving to nothing is invisible, not an error.
-
-Future renames should ship a one-off `UPDATE save SET slug = ...` driven off the rename map. Add that
-line to the rename runbook rather than building machinery for it.
+`saves.slug` has no referential integrity and cannot have any. Unresolvable slugs degrade silently,
+matching `app/page.tsx:26-31`, where `FEATURED` is filtered against `registryNames` so a rename
+"degrades quietly instead of leaving a dead slug in the featured rail." The client filters saves
+against the slugs already in the catalog payload. Future renames ship a one-off migration mutation;
+put that line in the rename runbook.
 
 ---
 
 ## 4. Test plan
 
-Written before the implementation plan, on purpose. Every criterion is a number or a literal string.
-Group C baselines come from `docs/perf-audit-2026-07.md`, measured against production.
+Numeric criteria, before the implementation plan. Group C baselines come from
+`docs/perf-audit-2026-07.md`, measured against production.
 
 ### Group A — auth and saves
 
 | # | Test | Pass criterion |
 |---|---|---|
-| A1 | `GET /api/saves` with no cookie | `401`, no user data in body, < 100ms |
-| A2 | `POST /api/saves` with no cookie | `401`; `SELECT count(*) FROM save` unchanged |
-| A3 | Sign in via GitHub, then read the session endpoint | `200`, resolves to exactly one `user` row, p95 over 20 sequential calls **< 200ms** warm |
-| A4 | Same via Google | identical criteria |
-| A5 | Email OTP: request → deliver → submit | delivered in **< 30s**, valid exactly **10 minutes**, single-use (second submit → `400`), max **5** requests per address per hour |
-| A6 | Save, then reload `/preview/<slug>/play` | control shows saved state within **500ms** of hydration, from exactly **1** `GET /api/saves` per page load |
-| A7 | Save a slug not in the registry | `400`, no row written |
-| A8 | Save 3 slugs, then delete account | rows in `user`, `session`, `account`, `profile`, `save`, `collection`, `collection_item` for that id all → **0**, verified by direct SQL, within **60s** |
-| A9 | Session cookie inspection | `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`, **no `Domain` attribute**, `Max-Age` ≤ **30 days** |
-| A10 | Cookie scope regression | `Set-Cookie` must not contain `helpmarq.com`. See §6.2 — this is a specific, likely copy-paste mistake |
-| A11 | Sign out | cookie cleared **and** the `session` row deleted; replaying the captured cookie → `401` |
-| A12 | 100 `POST /api/saves` in 10s from one session | ≥ the 31st returns `429`; rows written ≤ **30** |
-| A13 | Cross-origin `POST /api/saves` from `https://evil.example` with credentials | blocked or `403`; no row written; no `Access-Control-Allow-Origin` for that origin |
-| A14 | Handle uniqueness under concurrency | two simultaneous claims → exactly one `201`, one `409`, enforced by the DB unique constraint, not application code |
-| A15 | `bio` containing `<script>`, `url` set to `javascript:...` | bio renders as literal text on `/u/<handle>`; url rejected at write unless scheme is http/https |
+| A1 | `GET /api/saves`, no cookie | `401`, no user data, < 100ms |
+| A2 | `POST /api/saves`, no cookie | `401`; `saves` count unchanged |
+| A3 | GitHub sign-in → `GET /api/me` | `200`, resolves to exactly one `users` doc, p95 over 20 sequential calls **< 200ms** warm |
+| A4 | Google sign-in | identical criteria |
+| A5 | Email OTP request → deliver → submit | delivered **< 30s**, valid **10 minutes**, single-use (second submit `400`), max **5** requests per address per hour |
+| A6 | Save, reload `/preview/<slug>/play` | saved state within **500ms** of hydration, from exactly **1** `GET /api/saves` |
+| A7 | Save a slug absent from the registry | `400`, no doc written |
+| A9 | **Explicit-cascade audit.** After delete, query by `userId` across `users`, `authAccounts`, `authSessions`, `authRefreshTokens`, `authVerificationCodes`, `authVerifiers`, `profiles`, `saves`, `collections`, and `collectionItems` by owning collection | **0 docs from every one of the ten**, within **60s**. Enumerated because Convex has no cascade and a missed table is silent orphan data |
+| A10 | Session cookie inspection | name is `__Host-__convexAuthJWT`; `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`, **no `Domain`** |
+| A11 | **`window.localStorage` after sign-in, on every page** | **0 keys** containing `__convexAuthJWT` or `__convexAuthRefreshToken`. This is §6.1; it is the single most important test in this document |
+| A12 | Sign out | cookies cleared **and** the `authSessions` doc deleted; replaying the captured cookie → `401` |
+| A13 | 100 `POST /api/saves` in 10s, one session | ≥ the 31st returns `429`; docs written ≤ **30** |
+| A14 | Cross-origin `POST /api/saves` from `https://evil.example`, with credentials | blocked or `403`; no doc written; no `Access-Control-Allow-Origin` for that origin |
+| A15 | **Unauthenticated direct call to every exported Convex query and mutation**, at `NEXT_PUBLIC_CONVEX_URL`, enumerated from `convex/_generated/api.d.ts` | every one returns null/throws; **0 rows of anyone's data**. See §6.3 — Convex functions are public by default |
+| A16 | Two simultaneous claims of one handle | exactly one succeeds, one fails; exactly **1** `profiles` doc with that handle |
+| A17 | `bio` containing `<script>`; `url` set to `javascript:...` | bio renders as literal text; url rejected at write unless http/https |
 
-### Group B — the static invariant (the one that must not regress)
+### Group B — the static invariant
 
 | # | Test | Pass criterion |
 |---|---|---|
-| B1 | `next build` route table | rows for `/`, `/preview/[name]`, `/preview/[name]/embed`, `/preview/[name]/play`, `/writing/[slug]` **byte-identical** to the pre-change baseline captured in step 3 |
-| B2 | `grep -rn "cookies()\|headers()\|draftMode()" app/layout.tsx app/_components/site-shell.tsx` | **0 matches.** Currently 0 — this is a regression guard |
-| B3 | Anonymous `curl -I /preview/<slug>/embed`, warm | `200`, `x-nextjs-cache: HIT`, `cache-control` contains `s-maxage=3600`, **no `set-cookie`** |
-| B4 | Same for `/preview/<slug>/play` | identical criteria |
-| B5 | Anonymous `curl -I /r/<slug>.json` and `/registry.json` | `200`, cache HIT, **no `set-cookie`**, no `vary: cookie` |
-| B6 | `npx shadcn add <origin>/r/<slug>.json` in a clean project, no session | succeeds, writes the same bytes as before the change |
-| B7 | Middleware matcher, if middleware exists at all | must not match `/`, `/preview/**`, `/r/**`, `/llms*.txt`, `/writing/**`. Assert by reading the matcher **and** by B3-B5 |
-| B8 | HTML of `/` for anonymous vs. signed-in request | **identical bytes.** Auth UI appears only after hydration |
+| B1 | `next build` route table | rows for `/`, `/preview/[name]`, `/preview/[name]/embed`, `/preview/[name]/play`, `/writing/[slug]` **byte-identical** to the baseline captured at step 2 |
+| B2 | `grep -rn "ConvexAuthNextjsServerProvider\|cookies()\|headers()" app/layout.tsx app/_components/site-shell.tsx` | **0 matches**. §6.4 |
+| B3 | Middleware matcher is an explicit allowlist | matches only `/api/auth(.*)`, `/api/me`, `/api/saves`, `/account(.*)`, `/submit(.*)`. Asserted by reading `proxy.ts` **and** by B4-B6 |
+| B4 | Anonymous `curl -I /preview/<slug>/embed`, warm | `200`, `x-nextjs-cache: HIT`, `s-maxage=3600`, **no `set-cookie`** |
+| B5 | Same for `/preview/<slug>/play` | identical |
+| B6 | Anonymous `curl -I /r/<slug>.json`, `/registry.json` | `200`, cache HIT, **no `set-cookie`**, no `vary: cookie` |
+| B7 | `npx shadcn add <origin>/r/<slug>.json`, clean project, no session | succeeds, same bytes as before |
+| B8 | HTML of `/`, anonymous vs signed-in | **identical bytes** |
+| B9 | JS bundle of `/` | contains **no** `ConvexReactClient` and no `convex/react`. Non-goal #5 |
 
-Note on what "static" means here, since it changes the reasoning: `generateStaticParams()` returns
-`[]` on both `/preview/[name]/embed` and `/preview/[name]/play`. Declaring the function at all is
-what moves them out of the always-dynamic bucket; they are ISR, not build-time prerender. That
-**strengthens** the constraint — an ISR page is one cached artifact shared by every visitor, so
-user-specific content can never be server-rendered into it under any circumstances.
-
-### Group C — performance, against the audit's own baselines
+### Group C — performance
 
 | # | Test | Pass criterion |
 |---|---|---|
 | C1 | `/` TTFB, warm CDN hit, 3 runs | ≤ **200ms** (baseline 174-182ms) |
 | C2 | `/` steady-state TBT, 15-25s window, 4x CPU throttle, quiet machine | **0ms, 3 of 3 runs** (current shipped value) |
 | C3 | `/` LCP, 4x throttle | ≤ **600ms** (baseline 516ms) |
-| C4 | Requests on one `/` load | ≤ **56** (baseline 53; the saves fetch is the one addition) |
-| C5 | `/api/saves` p95, signed in, warm | < **200ms** |
-| C6 | Initial JS added to `/` by auth | ≤ **15KB** brotli over the current ~225KB. Assert by bundle analysis. This is a target, not a measurement — see §9 |
+| C4 | Requests on one `/` load | ≤ **57** (baseline 53; `/api/me` + `/api/saves`) |
+| C5 | `/api/saves` p95, signed in, warm | < **250ms** (one extra hop: our origin → Convex) |
+| C6 | Initial JS added to `/` | ≤ **10KB** brotli over the current ~225KB. Target, not a measurement — §9 |
 
-### Group D — Phase C, submission portal
+### Group D — submission portal
 
 | # | Test | Pass criterion |
 |---|---|---|
-| D1 | Static analysis of the app | **0** `import`, `eval`, `new Function`, `dangerouslySetInnerHTML` or dynamic `import()` whose argument derives from submitted content |
-| D2 | Submit a payload with a webpack magic comment, a `../` path, or a null byte in a filename | rejected before any GitHub call; the written path is always `registry/<collection>/<validated-slug>/<fixed-filename>` |
-| D3 | End-to-end submit | a PR appears, authored by the submitting user's own GitHub identity, CI runs |
-| D4 | Payload limits | rejected above **256KB** total; max **1** submission per user per 10 minutes |
+| D1 | Static analysis | **0** `import`, `eval`, `new Function`, `dangerouslySetInnerHTML` or dynamic `import()` deriving from submitted content |
+| D2 | Payload with a webpack magic comment, `../`, or a null byte in a filename | rejected before any GitHub call; path always `registry/<collection>/<validated-slug>/<fixed-filename>` |
+| D3 | End-to-end submit | PR appears under the submitting user's own GitHub identity; CI runs |
+| D4 | Limits | rejected above **256KB**; max **1** submission per user per 10 minutes |
 
 ---
 
 ## 5. Implementation plan
 
-**Phase A**
-
-1. Wait for the rename commit on `main`. Nothing below starts before it (§3).
-2. Provision Postgres (§7). `DATABASE_URL` set in **both** Production and Preview on Vercel in the
-   same change — a missing one is a total outage, and Preview builds run the same code.
-3. Capture the pre-change `next build` route table as the B1 baseline artifact. Do this before
-   touching anything.
-4. Better Auth: install, run its schema CLI, commit the generated migration. Configure GitHub +
-   Google + email OTP. Cookie flags per A9/A10.
-5. Wire OTP delivery through Resend (§7).
-6. `/api/auth/[...all]`. Run A3, A4, A5, A9, A10, A11.
-7. `profile` + `save` migrations. `/api/saves` with origin allowlist and rate limiting. Run A1, A2,
-   A6, A7, A12, A13.
-8. Client auth UI in `SiteShell`, hydration-only. **Run all of groups B and C here.** This is the
-   step that can break the site, and the step where the temptation to call `cookies()` in the layout
-   appears.
-9. `/account`, `/u/<handle>`, delete-account. Run A8, A14, A15.
-10. Rewrite `SECURITY.md`. Add the privacy note.
-
-**Phase B**
-
-11. `/guidelines`, static. Cross-link with `CONTRIBUTING.md`.
-12. `DCO` file, PR template checkbox and `Signed-off-by` line.
-13. `scripts/build-contributors.ts` → `lib/contributors.generated.json`, added to the
-    `registry:build` chain, listed in `CONTRIBUTING.md`'s generated-files table, gitignored like its
-    siblings. Render credit on the playground and `/contributors`.
-14. Re-run group B. A new build step must not change the route table.
-
-**Phase C**
-
-15. Incremental GitHub scope at submit time, not at sign-in.
-16. `/submit`: validate → fork → branch → commit → PR, entirely through the GitHub API under the
-    user's token. Run D1-D4.
+1. **Phase 0 spike** (§2). Runs during the rename.
+2. Capture the pre-change `next build` route table as the B1 baseline. Before touching anything.
+3. Wait for the rename commit on `main`.
+4. Provision Convex. Set `JWT_PRIVATE_KEY`, `JWKS`, `SITE_URL`, `RESEND_API_KEY`, `AUTH_EMAIL_FROM`
+   **on the Convex deployment** via `npx convex env set` — not `.env.local`. Set them on **both** the
+   dev and prod Convex deployments, and `NEXT_PUBLIC_CONVEX_URL` in **both** Vercel Production and
+   Preview, in one change. A missing one is a total outage.
+5. `convex/schema.ts` (`authTables` + `profiles`), `convex/auth.ts`, `convex/http.ts`,
+   `convex/auth.config.ts`.
+6. `proxy.ts` with the **allowlist** matcher (§6.4). Run B3.
+7. Auth routes and the `/account` shell. Run A3, A4, A5, A10, **A11**, A12.
+8. `saves` table and its mutations; `/api/saves`, `/api/me` on our origin. Run A1, A2, A6, A7, A13,
+   A14, A15.
+9. Client auth UI in `SiteShell`, hydration-only. **Run all of groups B and C here** — this is the
+   step that can break the site.
+10. `/u/<handle>`, handle claim, account deletion. Run A9, A16, A17.
+11. Rewrite `SECURITY.md`; add the privacy note.
+12. Phase B: `/guidelines`, DCO, `build-contributors.ts`. Re-run group B.
+13. Phase C: incremental GitHub scope, `/submit`. Run D1-D4.
 
 ---
 
 ## 6. Security
 
-### 6.1 The origin question — the reason uploads are PRs
+### 6.1 The finding that shapes everything: Convex Auth mirrors its tokens into `localStorage`
 
-**Verified, and the constraint is one layer deeper than the iframe.**
+Read from the installed package at `@convex-dev/auth@0.0.94`.
+
+The **cookie** posture is excellent, and better than a hand-specified one.
+`dist/nextjs/server/cookies.js:20-31,71-81` sets `__Host-__convexAuthJWT` and
+`__Host-__convexAuthRefreshToken` with `httpOnly: true`, `secure: true`, `sameSite: "lax"`,
+`path: "/"`. The `__Host-` prefix is enforced by the browser to mean host-only with no `Domain` —
+which **structurally forbids** the `.helpmarq.com` cookie-scope mistake that a copy-paste from the
+owner's other stack would otherwise create. That risk is gone by construction.
+
+But the React layer also writes the same tokens to JavaScript-readable storage.
+`dist/react/client.js:14-15,46-47` stores `__convexAuthJWT` and `__convexAuthRefreshToken` through
+the injected `storage`, and `dist/nextjs/client.js:28-32` injects `window.localStorage` by default.
+Lines 219-229 write both again from the server-provided state.
+
+**Why that is disqualifying for this specific site.** `localStorage` is same-origin readable by any
+script on the origin — including the three un-sandboxed same-origin iframes documented in §6.2:
+`preview-card.tsx:210`, `featured-card.tsx:232`, and the *interactive* one at `play/page.tsx:134`. A
+component would need one line to read a refresh token and exfiltrate it. That is strictly worse than
+the cookie case: it is bearer-credential theft usable from anywhere, not merely an authenticated
+fetch an attacker can trigger from inside the page.
+
+**Two mitigations, and we take both.**
+
+1. **Do not mount the Convex auth client on catalog pages at all** (non-goal #5). The provider mounts
+   only on `/account`, `/submit` and the sign-in route — pages with no component iframes. The catalog
+   ships no `convex/react` (test B9).
+2. **Pass `storage="inMemory"`.** Verified available: `dist/nextjs/server/index.js:13-16` accepts a
+   `storage` prop and forwards it to the client provider, and `dist/nextjs/client.js:30-32` maps
+   `"inMemory"` to `null`, which `dist/react/client.js:287` resolves to an in-memory store rather
+   than `localStorage`. Note `ConvexAuthNextjsProvider` (`dist/nextjs/index.js:31-34`) takes only
+   `client` and `children` and does **not** forward `storage` — the prop belongs on
+   `ConvexAuthNextjsServerProvider`. Easy to get wrong.
+
+Test A11 asserts the outcome on every page. In-memory still means the token exists in JS memory on
+those two pages, reachable in principle by same-origin script; that is acceptable only because those
+pages render no component iframes, and it is why mitigation 1 is not optional.
+
+**Consequence for the data path.** Because the browser never holds a usable token, saves do not go
+browser→Convex. They go **browser → `/api/saves` on our origin → Convex server-side**, with the route
+handler reading the `__Host-` cookie and calling Convex with an authed server client. This is the
+owner's own pattern in `marketmyapp/src/lib/convex/server.ts` and `reserved-app`. It costs one hop
+(C5 budgets 250ms rather than 200ms) and forecloses realtime, which is already non-goal #7. It
+preserves the entire CSRF story below.
+
+### 6.2 The origin question — why uploads stay PRs
 
 Three same-origin iframes render component code, none with a `sandbox` attribute:
 
 - `app/_components/preview-card.tsx:210-242` — `/preview/<name>/embed`, and it **reads the child
-  document**: `el.contentDocument?.querySelector(frame.focus)` at line 95, and
+  document**: `el.contentDocument?.querySelector(frame.focus)` at line 95,
   `contentDocument?.readyState` at line 138. The comments at lines 79-80 and 131-133 state the
   same-origin dependency outright.
 - `app/_components/featured-card.tsx:232` — same route, un-sandboxed, but it does **not** read
-  `contentDocument` (only `onLoad`). Correcting the brief: the exposure here is the shared origin,
-  not a document read.
-- `app/preview/[name]/play/page.tsx:134` — `/preview/<name>?embed=1&interactive=1`, un-sandboxed and
-  **not** `inert`. This is the only frame that receives real user input, and it is the one nobody
-  names when this comes up.
+  `contentDocument` (only `onLoad`). The exposure is the shared origin, not a document read.
+- `app/preview/[name]/play/page.tsx:134` — `?embed=1&interactive=1`, un-sandboxed and **not**
+  `inert`. The only frame that receives real user input, and the one nobody names.
 
-The deeper fact is that the iframe is not the boundary at all. `app/preview/[name]/page.tsx:3`
-imports `demos` from `@/registry/index`, which `scripts/build-index.ts` generates from folder names.
-**Component code is compiled into the site's own bundle.** Untrusted component code would therefore
-execute:
+The iframe is not the boundary anyway. `app/preview/[name]/page.tsx:3` imports `demos` from
+`@/registry/index`, generated by `scripts/build-index.ts` from folder names. **Component code is
+compiled into the site's own bundle**, so untrusted code would execute during `next build` (with
+build-environment secrets), during SSR/ISR of `/preview/<name>`, and in the browser — iframe or not.
+A `sandbox` attribute addresses only the last.
 
-- during `next build`, in the build environment, with whatever secrets it holds;
-- during SSR/ISR render of `/preview/<name>`, in the server runtime;
-- in the browser on the origin, iframe or not.
+**What would have to change to ever preview user-uploaded components:**
 
-A `sandbox` attribute addresses the third case and neither of the first two. This is why
-"submissions are PRs" is correct on its own merits, independent of auth: every component here is code
-a human read before it was compiled in.
+1. **A separate origin with its own build and deployment** — a distinct registrable origin, its own
+   Vercel project, no Convex URL, no auth env, no session cookie ever scoped to it.
+2. **`sandbox="allow-scripts"` without `allow-same-origin`.** Together those two are equivalent to no
+   sandbox; that is the easy mistake.
+3. **Card framing rebuilt.** `contentDocument` is `null` across an opaque origin, so `refit()` and
+   the `readyState` poll both die. `lib/card-frame.generated.json` carries **75** `focus` entries —
+   75 components lose framing. Replacement is a `postMessage` handshake that must also replace the
+   poll, which exists because `onLoad` is a race (`preview-card.tsx:128-133`); a card that never
+   receives the message needs a timeout fallback or it sits at opacity 0 showing a blank stage.
+4. **A strict CSP** on that origin.
+5. **Cost:** a second Vercel project and build pipeline, the `postMessage` protocol and its
+   fallbacks, and the loss of the "card and direct link are the same document" invariant
+   `preview-card.tsx` exists to protect. About a week, plus a permanent second thing to maintain. Not
+   worth it to avoid a pull request.
 
-**What would have to change if user-uploaded components were ever previewed:**
+### 6.3 Convex functions are public by default — no RLS, no row security
 
-1. **A separate origin with its own build and deployment.** Not a path, not a cookie-sharing
-   subdomain — a distinct origin (e.g. `ns-ui-preview.dev`) with its own Vercel project, its own
-   build, no `DATABASE_URL`, no auth secrets, no mail keys, and no session cookie ever scoped to it.
-   Untrusted code is compiled and served only there.
-2. **`sandbox="allow-scripts"` on every frame, without `allow-same-origin`.** Those two together are
-   equivalent to no sandbox at all; that is the easy mistake. Without `allow-same-origin`, the frame
-   gets an opaque origin.
-3. **Card framing has to be rebuilt.** `contentDocument` returns `null` across an opaque origin, so
-   both `refit()` and the `readyState` poll stop working. `lib/card-frame.generated.json` currently
-   carries **75** `focus` entries — 75 components lose their framing and revert to the unframed
-   full-viewport card. Replacing it means a `postMessage` handshake: the child measures its own
-   subject and posts the rect; the parent applies it. That handshake must also replace the
-   `readyState` poll, which exists precisely because `onLoad` is a race
-   (`preview-card.tsx:128-133`) — a card that never receives the message must fall back to a
-   timeout, or it sits at opacity 0 showing a blank stage.
-4. **A strict CSP on the preview origin**, which now runs arbitrary code.
-5. **Cost, honestly:** a second Vercel project, a second build pipeline, the `postMessage` protocol
-   and its fallbacks, and the loss of the "the card and the direct link are the same document"
-   invariant that `preview-card.tsx` exists to protect. Roughly a week of work and a permanent second
-   thing to maintain. Not worth it to avoid a pull request.
+The owner's own code says it plainly. `networth/convex/lib.ts:1-3`: *"Convex query/mutation endpoints
+are callable by anyone who knows the deployment URL — there is no RLS equivalent."*
+`marketmyapp/convex/schema.ts:5-6`: *"Convex has no foreign keys or RLS; ownership is enforced
+explicitly in each function."*
 
-**Until then the invariant is simple and testable:** every `.tsx` under `registry/` was reviewed by a
-human and merged through a PR. Auth does not change that; it raises the cost of violating it, because
-there are now session cookies on the origin to steal.
+`NEXT_PUBLIC_CONVEX_URL` is public by definition — it is in the client bundle. So **every exported
+query and mutation is an internet-facing endpoint**, and authorization is per-function code with no
+backstop. A forgotten check is a data leak, not a bug caught by a policy engine.
 
-### 6.2 Cookies, CSRF, and why they are one problem here
+Rules:
 
-- Session cookie: `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`, **host-only (no `Domain`)**,
-  lifetime ≤ 30 days with rotation. Sessions are DB-backed rows, so sign-out is a real revocation
-  rather than a cleared cookie.
-- **Do not copy the existing helpmarq Better Auth config as a template.**
-  `helpmarq-backend/config/auth.js:24-36` sets `sameSite: "none"` and `domain: ".helpmarq.com"` in
-  production, correctly, because that is a split frontend/backend across two hosts. ns-ui is a single
-  Next app, and its origin `design.helpmarq.com` is a subdomain of that same parent — so a
-  `.helpmarq.com`-scoped cookie would be sent to every sibling subdomain, including the marketplace
-  app. That is a cross-application session leak created by a copy-paste. Test A10 exists for exactly
-  this.
-- `SameSite=Lax` handles classic cross-site CSRF for `POST`/`DELETE`. On top of it, `/api/saves`
-  validates `Origin` against an allowlist of exactly this site's origin and rejects anything else,
-  including a missing `Origin` on a state-changing method. Better Auth's `trustedOrigins` covers its
-  own routes the same way (as it already does in the helpmarq config).
-- **`HttpOnly` is necessary and insufficient, and this is where the origin question and CSRF turn out
-  to be the same problem.** `HttpOnly` blocks `document.cookie`. It does not stop a same-origin frame
-  from calling `fetch('/api/saves', {method:'DELETE'})` — the cookie rides along automatically,
-  `SameSite` sees a same-site request, and any CSRF token the page holds is readable by that frame
-  through `window.top`. A same-origin frame defeats all of these controls at once. That is why
-  §6.1's answer is "a different origin", not "a stricter cookie".
-- No auth cookie is ever set on a response from a cached route. Middleware, if any exists, must not
-  match `/`, `/preview/**` or `/r/**` (test B7). A `Set-Cookie` on a CDN-cached response leaks a
-  session to every subsequent visitor.
+- Every public function derives identity from `getAuthUserId(ctx)` and returns null or throws when it
+  is null. Never accept a `userId` argument from the caller — that is an IDOR by construction.
+- Anything not called from the browser path is an `internalQuery`/`internalMutation`, unreachable
+  from outside.
+- The shared-secret pattern in `networth`/`reserved-app` is for **server-only** callers. Our
+  `/api/saves` handler is server-side, so it can use it in addition to the auth identity; do not ship
+  a secret to the browser, which would defeat it entirely.
+- Test A15 enumerates every export from `convex/_generated/api.d.ts` and calls it unauthenticated.
+  Run it in CI, not once.
 
-### 6.3 Rate limiting
+### 6.4 Middleware: the single likeliest way to break this site
 
-- `POST`/`DELETE /api/saves`: 30/min per session, 300/hr per user.
-- OTP: 5 requests per address per hour, 5 per IP per hour, 5 verification attempts per code.
-- Sign-in: 10 per IP per minute.
+The owner's working Convex Auth setup, `marketmyapp/src/proxy.ts:28-32`, uses:
 
-In-memory counters do not survive serverless. Use one shared store across instances — Better Auth's
-DB-backed limiter is preferred here (one fewer vendor, and saves traffic is low); Upstash Redis is the
-fallback if it proves inadequate. Exceeding a limit returns `429` with `Retry-After`.
+```
+matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"]
+```
 
-### 6.4 What an attacker gets if a session leaks
+That is a deny-list: it runs on essentially **every route**. Copied into ns-ui it would run
+`convexAuthNextjsMiddleware` on `/`, on `/preview/<name>/embed`, and on `/r/<slug>.json`.
+`docs/perf-audit-2026-07.md` cause 2 was precisely "~50 uncached invocations per visitor"; this
+reintroduces an edge invocation on every catalog and registry request, and middleware that touches
+auth cookies can attach `Set-Cookie` to a CDN-cached response — which leaks a session to every
+subsequent visitor of that cached object.
+
+**Rule, not just a test: the matcher is an explicit allowlist** — `/api/auth(.*)`, `/api/me`,
+`/api/saves`, `/account(.*)`, `/submit(.*)` — and never the deny-list default. Middleware is still
+required, because `dist/nextjs/server/index.js:58-60` shows `convexAuthNextjsMiddleware` proxies auth
+actions at `/api/auth`. B3 asserts the matcher by reading it; B4-B6 assert the observable harms.
+
+**Related trap:** `ConvexAuthNextjsServerProvider` (`dist/nextjs/server/index.js:13`) is an async
+server component that reads cookies via `next/headers`. In `app/layout.tsx` it makes **every route
+dynamic** — non-goal #4, violated in one line. marketmyapp puts it in its root layout, correctly for
+that app, and that is exactly the file someone will copy. B2 guards it.
+
+### 6.5 CSRF
+
+`SameSite=Lax` on the `__Host-` cookies handles classic cross-site CSRF for `POST`/`DELETE`. On top of
+it, `/api/saves` and `/api/me` validate `Origin` against an allowlist of exactly this origin,
+rejecting anything else including a missing `Origin` on a state-changing method (A14).
+
+The deeper point from §6.1 and §6.2 still stands: `HttpOnly` and `SameSite` are necessary and
+insufficient, because a same-origin frame can call `fetch('/api/saves', {method:'DELETE'})` with the
+cookie riding along and read any CSRF token the page holds. A same-origin frame defeats all of these
+at once. That is why the answer to untrusted components is a different origin, not a stricter cookie.
+
+### 6.6 What an attacker gets from a leaked session
 
 They can read a public profile, read and modify that user's saves and collections, edit display
-name/bio/URL, and delete the account. They cannot reach component source (it is public anyway),
-cannot publish anything (submissions are PRs, and Phase C needs a separately granted GitHub scope),
-and cannot reach any other user. The blast radius is deliberately one person's bookmark list.
-Mitigation: a "sign out everywhere" control on `/account` that deletes that user's `session` rows.
+name/bio/URL, and delete the account. They cannot reach component source (public anyway), cannot
+publish (submissions are PRs; Phase C needs a separately granted GitHub scope), and cannot reach
+another user. Blast radius: one person's bookmark list. `/account` offers "sign out everywhere",
+which deletes that user's `authSessions` docs.
 
-### 6.5 What is stored about people, and how it is deleted
+The refresh token is the sharper risk, which is why A11 exists: a stolen JWT expires, a stolen refresh
+token renews.
 
-Stored: email address; provider account id and provider name; OAuth tokens where the provider
-requires them; display name and avatar URL as supplied by the provider; chosen handle; optional bio
-and URL; saved slugs and collections with timestamps; session records with creation time. Vercel
-Analytics is already in place and is unchanged.
+### 6.7 Personal data, and the deletion path
 
-Not stored: IP logs beyond Vercel's own platform logs; payment data (there is none); anything from
-the components.
+Stored in Convex: email address; provider account id and provider name in `authAccounts`; OAuth tokens
+where the provider requires them; display name and avatar URL from the provider; handle; optional bio
+and URL; saved slugs and collections with timestamps; sessions, refresh tokens, verification codes and
+verifiers in the `auth*` tables. Vercel Analytics is unchanged. Resend holds delivery logs for OTP
+emails — a second processor, named in the privacy note.
 
-Deletion: `/account` → delete account → confirm. One transaction cascades `session`, `account`,
-`profile`, `save`, `collection`, `collection_item` off `user`, then deletes the `user` row. Test A8
-asserts zero rows within 60 seconds. Provider tokens are revoked where the provider supports it;
-deleted locally where it does not, and the privacy note says which.
+**Deletion is an explicit enumerated mutation.** Convex has no cascade, so this is code, not a
+constraint:
 
-**Contributor credit is not deleted, and the guidelines page must say so.** Credit is derived at
-build time from merged git history — a public record of an MIT-licensed contribution, not data the
-site stores about a person. It survives account deletion. Promising otherwise would be a promise the
-project cannot keep. A deleted account's credit reverts from a `/u/<handle>` link to a plain GitHub
-login.
+```
+deleteAccount → for the calling userId, delete docs from:
+  saves, collectionItems (via owning collections), collections, profiles,
+  authVerifiers, authVerificationCodes, authRefreshTokens, authSessions,
+  authAccounts, users
+```
+
+**A missed table is silent orphan data with no safety net**, which is why test A9 enumerates all ten
+and asserts zero from each rather than spot-checking. Add a new table, add it to both the mutation and
+A9 — put that line in a comment above the mutation.
+
+Provider tokens are revoked where the provider supports it, deleted locally where it does not, and the
+privacy note says which. Resend's own logs follow Resend's retention, which we do not control; the
+note says that too.
+
+**Contributor credit is not deleted, and the guidelines page must say so.** Credit is derived at build
+time from merged git history — a public record of an MIT-licensed contribution, not data the site
+stores about a person. It survives account deletion; a deleted account's credit reverts from a
+`/u/<handle>` link to a plain GitHub login.
 
 ---
 
-## 7. Backend: Convex vs Neon vs Supabase
+## 7. Convex: the decision, and the four things that will bite
 
-The owner asked directly: why not Convex? Answering that is the point of this section. The repo
-itself uses **no database and no auth vendor** today — `.env.example` lists exactly three variables
-(`NEXT_PUBLIC_REGISTRY_ORIGIN`, `EMAILOCTOPUS_API_KEY`, `EMAILOCTOPUS_LIST_ID`) — so this is a
-greenfield choice.
+### 7.1 Decision, recorded
 
-### What was found on this machine, rather than assumed
+**Backend is Convex.** The owner's reasons: Supabase is out; they are wary of hitting limits on
+Neon-via-Vercel; they already run Convex on this machine (seven projects); and one backend for
+everything beats an auth adapter plus a separate database. Recorded, not re-argued. Convex is used
+here as a database with server functions — its reactivity is explicitly declined (non-goal #7),
+because a save is written by one person and read once after paint, and a subscription per visitor on
+a CDN-cached catalog would add steady-state work to a page whose measured steady-state cost is
+currently 0ms.
 
-Context7 was unavailable, so instead of memory the owner's own installed code was checked:
+### 7.2 Auth library: use Convex Auth, not Better Auth
 
-- **Better Auth 1.6.23 is already running in the owner's production stack**, at
-  `Marketplace/helpmarq-backend/config/auth.js`: GitHub + Google social providers, DB-backed sessions
-  with cookie cache, `trustedOrigins`, account linking, session hooks. This is not a new library for
-  this owner.
-- **Resend is already a vendor in that stack** for transactional email, OTP included. It is not a new
-  vendor, and it is the obvious OTP sender here.
-- **Seven Convex projects exist on this machine** (`networth`, `marketmyapp`, `creator-roast`,
-  `statement-converter`, `reserved-app`, `helm/control-plane`, `pulse/relay`), with a CLI token
-  configured. Familiarity is real.
-- **But that familiarity is with `@convex-dev/auth@0.0.94`** — Convex's own Auth.js-derived library,
-  pre-1.0, and a *different* library from Better Auth. `@convex-dev/better-auth` is installed in
-  **zero** projects on this machine. There is no local evidence about that adapter's maturity, and no
-  context7 access this session to check it.
+**Recommendation: `@convex-dev/auth`.**
 
-### The discriminator: where the session cookie is validated
+For it:
+- **One backend is the owner's stated reason for choosing Convex.** Bolting Better Auth on
+  reintroduces exactly the two-system split the decision was meant to avoid.
+- **`@convex-dev/better-auth` is installed in zero projects on this machine** and its maturity could
+  not be checked this session. Specifying an unverifiable dependency at the centre of the auth system
+  is the wrong risk to take.
+- **Email OTP over Resend is already proven in the owner's own code** — `reserved-app/convex/ResendOTP.ts`
+  is a complete, working `Email()` provider with a CSPRNG 6-digit code, a 15-minute expiry, per-email
+  rate limiting deliberately made indistinguishable from a normal send to avoid a probing side
+  channel, and no logging of the token. That file is a template, not a starting point.
+- **The cookie posture is better than a hand-specified one** — `__Host-` prefixed, httpOnly, secure,
+  lax (§6.1).
 
-Not realtime, not cost, not familiarity. It is §6.2, applied to each candidate.
+Against it, stated plainly:
+- **`@convex-dev/auth` is 0.0.94.** Pre-1.0, and the owner's own comment records having to read
+  `dist/` source to confirm parameter names "since the API is version-pinned at 0.0.94". Expect
+  breaking changes; pin the version.
+- **GitHub and Google OAuth are unexercised in this owner's Convex code.** marketmyapp is
+  Password-only and dropped Google in the cutover. Only OTP has a working precedent.
+- **The localStorage default is a genuine defect for this site**, mitigated but not removed (§6.1).
 
-`/api/saves` has to read an `HttpOnly` cookie and enforce an `Origin` allowlist **on this site's own
-origin**, because §6.1 established that a same-origin frame defeats every cookie-level control. Better
-Auth on Postgres puts that check in a Next route handler on `design.helpmarq.com` — structurally the
-same as the config already working in helpmarq.
+That gap is exactly what Phase 0 exists to close. If the spike fails on OAuth, the fallback is an
+external OIDC provider (Auth0/WorkOS/Clerk free tier) fronting Convex via `auth.config.ts` — Convex
+accepts any OIDC issuer. That keeps Convex as the database and moves only the identity problem. Cost
+roughly $0-25/mo at this scale; do not take it without the spike failing first.
 
-Convex's native model is a JWT the client holds and sends to `*.convex.cloud`. A token readable by
-JavaScript is readable by the un-sandboxed same-origin frames at `preview-card.tsx:210`,
-`featured-card.tsx:232` and `play/page.tsx:134`. That is strictly worse than the cookie case: it is
-bearer-credential exfiltration, not merely an authenticated fetch the attacker can trigger. To get
-equivalent safety you keep the `HttpOnly` cookie on the Next origin anyway and proxy through to
-Convex — at which point Convex is a database sitting behind your own API route, and you are paying for
-reactivity you have routed around.
+### 7.3 Convex alongside a heavily static Next site
 
-That reasoning comes from this repo's own architecture, not from vendor documentation, so no answer
-about adapter maturity changes it.
+- **The catalog ships no Convex at all.** No `ConvexReactClient`, no provider, no `useQuery`
+  (non-goal #5, test B9). The prerendered HTML is identical for everyone (B8).
+- **Saves are read client-side after paint**, by `fetch('/api/saves')` from our own origin — one
+  request per page load, after hydration, filtered client-side against the slugs already in the
+  catalog payload.
+- **A signed-out visitor** gets exactly today's site: same bytes, same CDN cache entry, one extra
+  `/api/me` returning `{ signedIn: false }`. Budgeted in C4.
+- **First render of a profile page** (`/u/<handle>`) is server-rendered on demand from Convex through
+  the server client, or short-revalidate ISR if it proves slow. Not in the static set either way.
+  There is no flash-of-signed-out on the catalog because the header's signed-out state *is* the
+  server-rendered default — the auth UI appears on hydration, additively.
+- **`/account` and `/submit`** are the only pages that mount the Convex auth client, with
+  `storage="inMemory"`, and they render no component iframes.
 
-### Does reactivity buy anything here? No, plainly
+The one honest cost: server-side reads add a hop (our origin → Convex) versus the browser talking to
+Convex directly. C5 budgets 250ms p95 for it. In exchange the browser never holds a token, which
+§6.1 makes non-negotiable here.
 
-The workload is one row per save, written by one person, read once after hydration, on a site whose
-entire design is that nothing re-renders after paint. There is no second writer to a user's saves and
-no shared document. A reactive subscription would mean an open WebSocket per visitor on a CDN-cached
-catalog page, pushing updates for data only that visitor can change — new steady-state work on a
-homepage whose measured steady-state main-thread cost is currently **0ms**, and which took a full
-performance audit to get there. Convex's headline strength is a cost here, not a benefit.
+### 7.4 Free tier, in numbers — **all figures unverified, see §9**
 
-### The honest case for Convex, stated fairly
+Convex's free (Starter) tier meters roughly: **~1M function calls/month, ~0.5 GiB database storage,
+~1 GiB database bandwidth/month, ~1 GiB file storage, 1-2 team members.** The first paid tier
+(Professional) is around **$25/member/month**. Confirm on the pricing page before relying on these.
 
-One backend for database, functions, scheduling and file storage is worth real money in reduced
-operational surface, and the owner already knows the tool. If this product were going to grow a
-live-collaborative surface, that argument would probably win. It does not win against a users table, a
-saves table, and a fetch after hydration. And the familiarity argument, followed honestly, points at
-using `@convex-dev/auth` instead of Better Auth — which relitigates a decision the brief closed.
+Per signed-in page view: **1 query** (`/api/saves`, plus `/api/me`, which can be folded into the same
+call — do that). Mutations only on save/unsave. **No subscriptions**, so no long-lived connection
+burning calls.
 
-### Supabase
+| | function calls/mo | storage |
+|---|---|---|
+| 0 users | ~0 | ~0 |
+| 100 users, 20 page views each | ~2,000-4,000 | << 1 MB |
+| 10,000 users, 20 page views each | ~200,000-400,000 | ~200,000 save docs, single-digit MB |
 
-Postgres plus auth from one vendor, which would matter if auth were undecided. It is decided. Better
-Auth's Postgres adapter works against Supabase's Postgres identically to Neon's, so choosing Supabase
-buys an auth product this spec will not use, plus RLS and a client SDK it does not need, in exchange
-for a second dashboard outside the deployment. If the project later wants file uploads (avatars beyond
-provider URLs, submission screenshots), Supabase Storage becomes a genuine reason to revisit.
+**10,000 users stays inside a ~1M-call free tier**, with room for roughly 2-3x that traffic before
+billing. The binding limit at that point is the team-seat count, not usage.
 
-### Cost at 0 / 100 / 10,000 users
+On the owner's stated worry about limits, the failure modes genuinely differ. Neon meters **compute
+hours**, so an idle database is nearly free and a busy one costs. Convex meters **function calls and
+bandwidth**, so a chatty client is what moves the bill. This spec's design — no subscriptions, one
+query per page load, nothing on the catalog — is the cheap shape for Convex's meter specifically. The
+thing that would blow it is adding `useQuery` to the catalog, which is why that is non-goal #7 and not
+merely a preference.
 
-The data is genuinely small: 10,000 users × 20 saves ≈ 200,000 narrow rows, single-digit MB. Cost is
-driven by compute time and connections, not storage — which argues for scale-to-zero and for keeping
-`/api/saves` to one query per page load.
+Other vendors: **Resend** for OTP, already in the owner's stack, ~$0 at these volumes. **Rate
+limiting** uses a Convex table (`authRateLimits` already exists, and
+`reserved-app/convex/passwordResetRateLimit.ts` is a working precedent) — no Redis, no extra vendor.
+GitHub and Google OAuth app registrations and a verified Resend sending domain need DNS access and are
+effort rather than cost.
 
-| | 0 users | 100 users | 10,000 users |
-|---|---|---|---|
-| **Neon (Vercel Marketplace)** | $0 | $0 | ~$19-25/mo |
-| **Convex** | $0 | $0 | ~$25/mo, plus per-function-call and bandwidth beyond the included tier |
-| **Supabase** | $0 | $0 | ~$25/mo |
-| Resend (OTP) | $0 | $0 | ~$20/mo — **already in the owner's stack** |
-| Rate-limit store | $0 (DB-backed) | $0 | $0-10 |
-| **Total** | **$0** | **$0** | **~$40-55/mo** |
-
-All three are effectively free at this scale, and within noise of each other at 10,000. **Cost does
-not decide this.** Pricing is from memory and unverified this session — confirm before committing.
-Note Convex's free tier is metered on function calls and bandwidth rather than storage, so a chatty
-client is the thing that would move its bill; Neon's is metered on compute hours, so an idle database
-is nearly free.
-
-Also new and not free in effort, for any option: an OAuth app registration on GitHub and on Google,
-and (already done for helpmarq, possibly reusable) a verified Resend sending domain. Both need DNS
-access.
-
-### Recommendation: Neon Postgres via the Vercel Marketplace
-
-Because the security model requires an `HttpOnly` cookie validated on this origin, that path is Better
-Auth's best-trodden adapter, the owner already runs Better Auth in production, provisioning happens in
-the same dashboard as the deployment, and the workload has no property that reactivity improves.
-
-**What would have to be true to flip to Convex:**
-
-1. Realtime becomes load-bearing — public collections that several people edit, or live
-   submission-review status. That is a genuine Convex win and this recommendation should be revisited
-   the day it is on the roadmap.
-2. `@convex-dev/better-auth` reaches ≥1.0 **and** supports the `HttpOnly`-cookie-on-your-own-origin
-   pattern rather than only client-held JWTs. Verify this claim before acting on it; it is the one
-   thing here that could not be checked.
-3. Convex absorbs something else the project needs anyway — file uploads, scheduled jobs, or the MCP
-   backend. One vendor for four jobs beats two vendors for two.
-
-None of these hold today.
+**Total: $0 at 0, 100 and 10,000 users**, on these unverified figures.
 
 ---
 
 ## 8. Open questions for the owner
 
 1. **Handles.** Auto-derive from the GitHub login with one free change, or force a choice at signup?
-   Auto-derive is friendlier but has nothing to derive from for Google/OTP users.
-2. **Are profiles public by default?** Default-public makes `/u/<handle>` worth building;
-   default-private makes it nearly empty. Recommendation: profiles public, saves private by default
-   with a per-collection "make public" toggle. Not decidable from the code.
-3. **Collections in Phase A, or deferred?** The schema costs little; the UI is real work. Saves alone
-   is a smaller, cleaner Phase A.
-4. **Does the existing email-capture form merge with auth?** OTP signup produces an email address and
-   EmailOctopus already has a list. Subscribing signups to it needs an explicit checkbox, not an
-   assumption.
-5. **Sign-in for the CLI or MCP server?** Both exist (`cli/`, `mcp/`) and this spec assumes both stay
-   anonymous forever. Syncing saves to the CLI is a token flow and its own spec.
-6. **Contributor credit for the 223 existing components** — all one author today. Does
-   `/contributors` ship in Phase B as a single-entry page, or wait for a second contributor?
-7. **Rename timing.** Phase A is blocked on it. If the rename is far out, the alternative is
-   introducing a stable component id first — a registry-format change and its own spec.
+   Auto-derive has nothing to derive from for Google/OTP users.
+2. **Are profiles public by default?** Recommendation: profiles public, saves private by default with
+   a per-collection "make public" toggle.
+3. **Collections in Phase A or deferred?** Schema costs little; the UI is real work. Saves alone is a
+   cleaner Phase A.
+4. **Does the email-capture form merge with auth?** OTP signup produces an email and EmailOctopus
+   already has a list. Needs an explicit checkbox, not an assumption.
+5. **One Convex deployment or two?** Vercel Preview builds against the prod Convex deployment would
+   let a preview write to real user data. Recommendation: a separate dev deployment wired to Preview.
+6. **Sign-in for the CLI or MCP server?** Both exist and this spec assumes both stay anonymous.
+7. **Contributor credit for the 223 existing components** — all one author today. Does `/contributors`
+   ship in Phase B as a single-entry page, or wait?
+8. **Rename timing.** Phase A is blocked on it; Phase 0 is not.
 
 ---
 
 ## 9. Where this document is guessing
 
-- **`@convex-dev/better-auth`'s existence, version and cookie model are unverified.** No context7/MCP
-  access this session, and the package is installed nowhere on this machine. §7's Convex
-  recommendation does not rest on it — the discriminator is this repo's same-origin frames — but flip
-  condition 2 does, and must be checked before anyone acts on it.
-- **Better Auth's core behaviour is verified**, not from memory: `better-auth@1.6.23` is running in
-  the owner's production stack with the social providers, DB-backed sessions and `trustedOrigins`
-  this spec relies on. The narrow unknowns are the email-OTP plugin's exact configuration and the
-  current schema-CLI invocation; check both at step 4.
-- **All pricing in §7 is unverified.**
-- **The ≤15KB auth bundle budget (C6)** is a target, not a measurement. Measure at step 8 and correct
-  this document if it is wrong, rather than quietly failing the test.
-- **The "week of work" estimate in §6.1** is a judgement call, not a plan.
+- **All Convex pricing and free-tier figures in §7.4 are unverified.** They are numbers the owner's
+  decision partly rests on, so check them first.
+- **`@convex-dev/better-auth` is entirely unverified** — not installed anywhere on this machine.
+  §7.2 recommends against it partly *because* of that uncertainty, which is an argument about risk,
+  not about the package's quality.
+- **Verified from installed source, not memory:** the cookie names and flags
+  (`dist/nextjs/server/cookies.js`), the localStorage write (`dist/react/client.js:14-15,46-47` with
+  `dist/nextjs/client.js:28-32`), the `storage="inMemory"` escape hatch and the fact that
+  `ConvexAuthNextjsProvider` does not forward it (`dist/nextjs/index.js:31-34`), the `/api/auth` proxy
+  requirement (`dist/nextjs/server/index.js:58-60`), and `ConvexAuthNextjsServerProvider` being an
+  async cookie-reading server component (`:13-16`). All at version **0.0.94** — re-check after any
+  upgrade.
+- **Whether email OTP works as a primary sign-in method** (rather than the password-reset flow proven
+  in `reserved-app`) is an assumption. Phase 0 item 3 tests it.
+- **The C6 bundle budget (≤10KB)** is a target, not a measurement. Measure at step 9 and correct this
+  document if wrong rather than quietly failing the test.
+- **The "week of work" in §6.2** is a judgement call.
