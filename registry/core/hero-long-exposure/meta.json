@@ -1,6 +1,6 @@
 {
-  "name": "solargraph-hero",
-  "title": "Solargraph Hero",
+  "name": "hero-long-exposure",
+  "title": "Hero Long Exposure",
   "description": "Hero card whose canvas behaves like a long-exposure photograph: cursor movement burns light streaks that never clear per frame, only decay on a 4s half-life, accumulating a light painting of the session.",
   "collection": "core",
   "tags": ["canvas", "hero", "cursor", "trail", "long-exposure", "accumulation", "ambient", "blend-mode"],

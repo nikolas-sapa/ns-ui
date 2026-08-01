@@ -109,7 +109,7 @@ export default function SprocketScrubDemo() {
 
   return (
     <div ref={rootRef} className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">ns-ui / sprocket-scrub</p>
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">ns-ui / scrubber-film-strip</p>
 
       <div className="w-full max-w-lg rounded-[12px] border border-border bg-background p-5">
         <div className="mb-4 flex items-center justify-between gap-3">

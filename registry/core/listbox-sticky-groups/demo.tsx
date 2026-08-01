@@ -9,7 +9,7 @@ export default function ShingleCourseDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / shingle-course
+        ns-ui / listbox-sticky-groups
       </p>
 
       <div className="w-full max-w-sm rounded-md border border-border bg-surface">

@@ -17,7 +17,7 @@ import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode 
 // before crossfading into the real content in place. Two timeline handoffs
 // (ping -> contact, contact -> resolved) — no rAF loop, no canvas.
 //
-// Distinct from beacon-cadence: that is a small inline status lamp whose
+// Distinct from status-glyph-cadence: that is a small inline status lamp whose
 // cadence itself IS the message, blinking in place forever. This is a full
 // content region — the ring is a spatial probe INTO that region, and it is
 // the arriving content, not a timer, that interrupts and answers it.

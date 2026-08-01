@@ -94,7 +94,7 @@ export default function EmergeDialogDemo() {
       </EmergeDialog>
 
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / emerge-dialog — the panel grows out of the control that opened it
+        ns-ui / dialog-emerge — the panel grows out of the control that opened it
       </p>
 
       <div className="flex w-full max-w-md items-center justify-between gap-6 rounded-md border border-border bg-surface px-4 py-3">

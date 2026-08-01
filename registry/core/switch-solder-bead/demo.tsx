@@ -17,7 +17,7 @@ export default function SolderBridgeDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-10 px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / solder-bridge
+        ns-ui / switch-solder-bead
       </p>
 
       <div className="flex flex-col items-center gap-8">

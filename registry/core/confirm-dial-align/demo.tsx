@@ -8,7 +8,7 @@ export default function TumblerGateDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-10 bg-background px-6 py-16">
       <p className="order-1 font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / tumbler-gate — align the notch, hold it, then confirm
+        ns-ui / confirm-dial-align — align the notch, hold it, then confirm
       </p>
       {/* DOM-first interactive control (visually last via order-3): the gate's
           hover-liveness check probes the first button it finds, and the

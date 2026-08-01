@@ -1,6 +1,6 @@
 {
-  "name": "loose-thread",
-  "title": "Loose Thread",
+  "name": "tag-input-backspace",
+  "title": "Tag Input Backspace",
   "description": "Tag input where Backspace on an empty field arms the last tag with a depleting bar instead of deleting it — a second Backspace inside the window removes it.",
   "collection": "core",
   "tags": [

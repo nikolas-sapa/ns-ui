@@ -1,6 +1,6 @@
 {
-  "name": "aurora-flow-chart",
-  "title": "Aurora Flow Chart",
+  "name": "chart-area-aurora",
+  "title": "Chart Area Aurora",
   "description": "Area chart whose fill is a live aurora curtain — series values drive curtain height per column, a cool-to-warm hue band tracks local trend direction (falling cool, rising warm), the noise-warped top edge drifts even at rest, and data updates glide the curve to its new shape with a staggered ease.",
   "collection": "loud",
   "tags": ["chart", "data-viz", "canvas", "noise", "ambient", "tooltip", "dashboard"],

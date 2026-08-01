@@ -1,6 +1,6 @@
 {
-  "name": "stipple-year",
-  "title": "Stipple Year",
+  "name": "heatmap-year-stipple",
+  "title": "Heatmap Year Stipple",
   "description": "A GitHub-style year activity calendar where intensity is stipple density, not color — every day cell holds a handful of deterministically jittered ink dots, denser for more activity, like an engraved print. Hovering or arrow-keying through days opens a zoomed loupe with the exact count, and each new day's dots spring into the loupe with a brief ink-settle scatter, like fresh ink landing on paper.",
   "collection": "core",
   "tags": [

@@ -48,7 +48,7 @@ export default function DovetailRunDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-md">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">ns-ui / dovetail-run</p>
+        <p className="mb-4 font-mono text-xs tracking-widest text-muted">ns-ui / wizard-dovetail</p>
         <h1 className="text-lg font-semibold text-foreground">Checkout</h1>
         <p className="mt-1 text-sm leading-relaxed text-muted">
           Each completed step joins the rail as a physical dovetail chip. Submit clean and it
@@ -61,7 +61,7 @@ export default function DovetailRunDemo() {
             steps={steps}
             defaultValues={defaultValues}
             submitLabel="Place order"
-            onComplete={(values) => console.log("dovetail-run complete", values)}
+            onComplete={(values) => console.log("wizard-dovetail complete", values)}
           />
         </div>
       </div>

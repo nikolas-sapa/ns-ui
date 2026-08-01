@@ -468,7 +468,7 @@ export function SashWeight({
           {/* showModal() focuses the first focusable descendant unless something
               claims it — here that's the close button, which paints a focus
               ring at rest (this demo rests open). Same pattern as
-              emerge-dialog: take the focus on the panel itself, so screen
+              dialog-emerge: take the focus on the panel itself, so screen
               readers announce the title and Tab starts at the top without
               preselecting a control. */}
           <div autoFocus tabIndex={-1} className="flex min-w-0 flex-1 flex-col outline-none">

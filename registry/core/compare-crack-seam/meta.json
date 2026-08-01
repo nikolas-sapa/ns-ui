@@ -1,6 +1,6 @@
 {
-  "name": "crack-compare",
-  "title": "Crack Compare",
+  "name": "compare-crack-seam",
+  "title": "Compare Crack Seam",
   "description": "Before/after comparison slider whose divider is a living Voronoi crack seam — fast drags spawn branching micro-fissures, slow drags heal them shut, and release settles with a 1px specular glint traveling the fracture.",
   "collection": "core",
   "tags": ["compare", "slider", "before-after", "voronoi", "crack", "canvas", "clip-path", "physics", "image-diff"],

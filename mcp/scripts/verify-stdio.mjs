@@ -89,9 +89,9 @@ async function main() {
   const calls = [
     ["search_components", { query: "cursor reactive hero" }],
     ["search_components", { query: "otp", limit: 3 }],
-    ["get_component", { name: "after-image" }],
+    ["get_component", { name: "undo-ghost-row" }],
     ["list_categories", {}],
-    ["install_command", { name: "after-image" }],
+    ["install_command", { name: "undo-ghost-row" }],
     ["get_conventions", {}],
   ];
 

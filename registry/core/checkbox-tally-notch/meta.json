@@ -1,6 +1,6 @@
 {
-  "name": "tally-notch",
-  "title": "Tally Notch",
+  "name": "checkbox-tally-notch",
+  "title": "Checkbox Tally Notch",
   "description": "Checkbox group rendered as a carpenter's tally: each check carves a notch stroke into its row and adds a stroke to an aggregate tally cluster in the header, where every fifth stroke slashes diagonally across its group of four. Strokes draw on with a dashoffset sweep and retract on uncheck.",
   "collection": "core",
   "tags": [

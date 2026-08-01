@@ -1,6 +1,6 @@
 {
-  "name": "folding-rule",
-  "title": "Folding Rule",
+  "name": "tree-hinge-fold",
+  "title": "Tree Hinge Fold",
   "description": "Tree view whose branches unfold like a carpenter's folding rule — each child group is a hinged segment that swings open around a visible pivot, rows unfolding in sequence, and snaps shut faster than it opens.",
   "collection": "core",
   "tags": ["tree", "navigation", "hierarchy", "fold", "hinge", "keyboard"],

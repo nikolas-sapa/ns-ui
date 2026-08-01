@@ -1,6 +1,6 @@
 {
-  "name": "folio-turn",
-  "title": "Folio Turn",
+  "name": "pagination-dog-ear",
+  "title": "Pagination Dog Ear",
   "description": "A pagination control rendered as book folios — paper cards for each page number, a raised current page, and a CSS corner dog-ear that curls further as you hover prev/next to peek the destination number, leaving a small permanent crease on every page you've visited.",
   "collection": "core",
   "tags": [

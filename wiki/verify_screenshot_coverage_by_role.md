@@ -17,7 +17,7 @@ block. You still get `default` screenshots (both themes) and the full
 a11y audit (which uses a much broader control selector that does include
 `role=slider`), but no interaction-state screenshots at all. This is
 expected verify behavior, not a bug to work around — a slider-only
-component (e.g. `gnomon-set`'s two dial rings) legitimately ends up with
+component (e.g. `time-picker-sundial`'s two dial rings) legitimately ends up with
 just `dark-default.png`/`light-default.png` in its `screenshots/` folder.
 
 **Gotcha:** `verify.ts` never clears a component's `screenshots/`

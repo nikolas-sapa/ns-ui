@@ -1,6 +1,6 @@
 {
-  "name": "carry-digit",
-  "title": "Carry Digit",
+  "name": "counter-carry-ripple",
+  "title": "Counter Carry Ripple",
   "description": "Display-only numeric readout where change animates the way arithmetic works: only the digits that differ move, and a carry (199 -> 200) visibly ripples right-to-left across the columns it touches.",
   "collection": "core",
   "tags": ["counter", "readout", "typography", "data-viz", "spring", "accessibility", "live"],

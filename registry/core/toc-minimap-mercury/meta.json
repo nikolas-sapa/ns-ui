@@ -1,6 +1,6 @@
 {
-  "name": "mercury-minimap",
-  "title": "Mercury Minimap",
+  "name": "toc-minimap-mercury",
+  "title": "TOC Minimap Mercury",
   "description": "TOC minimap where scroll progress is a column of liquid mercury — a gooey SVG blob climbs the rail, absorbs section ticks, teardrops under fast scroll, and bulges toward hovered ticks.",
   "collection": "core",
   "tags": ["nav", "scroll", "svg", "goo", "toc", "cursor", "micro-interaction"],

@@ -24,7 +24,7 @@ export default function LampBlackDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-lg">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">ns-ui / lamp-black</p>
+        <p className="mb-4 font-mono text-xs tracking-widest text-muted">ns-ui / consent-scope-redact</p>
         <LampBlack scopes={scopes} record={record} />
         <p className="mt-3 font-mono text-[11px] text-muted">
           toggle a scope to withhold or share the tokens it controls.

@@ -9,9 +9,9 @@
  * Membership is COMPUTED from each component's real tags wherever the tags
  * carry the role (they usually do: `hero`, `otp`, `toast`, `table`, `chart`,
  * `dropzone`…). `extra` is the escape hatch for the handful whose tags describe
- * the technique rather than the job — ascii-dither-media is tagged
+ * the technique rather than the job — background-ascii-dither is tagged
  * `background, ascii, dither, canvas, cursor` with nothing saying "media", and
- * drape-menu's `menu, dropdown, cloth` says nothing about being an overlay.
+ * dropdown-drape's `menu, dropdown, cloth` says nothing about being an overlay.
  * Hand-listing every component was rejected: it would drift the moment a
  * component changes shape, whereas a tag rule keeps working.
  *
@@ -21,8 +21,8 @@
  * either as a match tag pulled form fields and sparklines into "Backgrounds".
  * Components whose actual job is a background but whose tags don't say so
  * are listed in `backgrounds.extra` instead. Same reasoning kept `grid` and
- * `field` off backgrounds: both are shared by form components (`span-tape`,
- * `carbon-flimsy`), not just background ones.
+ * `field` off backgrounds: both are shared by form components (`date-range-tape`,
+ * `slug-field-mirror`), not just background ones.
  *
  * This set was measured against the full registry (`categorize()` against
  * every item) after being extended in 2026-07 to close a real gap: 41 of 206
@@ -43,8 +43,8 @@ export const CATEGORIES: Category[] = [
     id: "actions",
     label: "Buttons",
     tags: ["button", "control", "confirm", "confirmation", "destructive"],
-    // detent-swipe is a swipe-to-act list row — an action, not a list.
-    extra: ["detent-swipe"],
+    // swipe-row-detent is a swipe-to-act list row — an action, not a list.
+    extra: ["swipe-row-detent"],
   },
   {
     id: "forms",
@@ -80,8 +80,8 @@ export const CATEGORIES: Category[] = [
       "toc",
       "command-palette",
       "cmd-k",
-      // "navigation" itself was missing — several components (bellows-crumb,
-      // carriage-return, mortise-slip…) are tagged with the literal word and
+      // "navigation" itself was missing — several components (breadcrumb-fold,
+      // tabs-carriage, tabs-notch-tenon…) are tagged with the literal word and
       // nothing else this list matched.
       "navigation",
       "breadcrumb",
@@ -108,9 +108,9 @@ export const CATEGORIES: Category[] = [
       "feed",
       "network",
     ],
-    // patina-ledger is a data/list display (agent memory ledger) with no tag
+    // memory-ledger-decay is a data/list display (agent memory ledger) with no tag
     // this list's roles cover.
-    extra: ["patina-ledger"],
+    extra: ["memory-ledger-decay"],
   },
   {
     id: "feedback",
@@ -178,24 +178,24 @@ export const CATEGORIES: Category[] = [
       "coach-mark",
       "shortcuts",
     ],
-    extra: ["drape-menu", "event-horizon-command", "terminator-date-field"],
+    extra: ["dropdown-drape", "command-palette-orbit", "date-picker-moon"],
   },
   {
     id: "media",
     label: "Media",
     tags: ["gallery", "coverflow", "media", "image", "image-diff", "compare"],
-    // decal-peel (a draggable sticker) and flock-stack (a team avatar
+    // sticker-peel (a draggable sticker) and avatar-stack-flock (a team avatar
     // cluster) are visual/imagery components with no tag saying so.
-    extra: ["ascii-dither-media", "decal-peel", "flock-stack"],
+    extra: ["background-ascii-dither", "sticker-peel", "avatar-stack-flock"],
   },
   {
     id: "backgrounds",
     label: "Backgrounds",
     tags: ["background", "terrain", "topographic"],
-    // burin-etch and warp-lattice are full-bleed canvas backgrounds, but
+    // ascii-engraving-contour and grid-magnetic-lattice are full-bleed canvas backgrounds, but
     // `canvas` itself is shared by 40+ non-background components (inputs,
     // sliders, charts) — see the file header — so it can't be a match tag.
-    extra: ["burin-etch", "warp-lattice"],
+    extra: ["ascii-engraving-contour", "grid-magnetic-lattice"],
   },
   {
     id: "sections",

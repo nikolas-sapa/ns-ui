@@ -97,7 +97,7 @@ server.registerTool(
     inputSchema: {
       name: z
         .string()
-        .describe("Exact component name, e.g. 'after-image'. Case-sensitive, matches search_components' 'name' field."),
+        .describe("Exact component name, e.g. 'undo-ghost-row'. Case-sensitive, matches search_components' 'name' field."),
     },
   },
   async ({ name }) => {
@@ -152,7 +152,7 @@ server.registerTool(
     description:
       "The exact `npx shadcn add <url>` command to install one ns-ui component by name.",
     inputSchema: {
-      name: z.string().describe("Exact component name, e.g. 'after-image'."),
+      name: z.string().describe("Exact component name, e.g. 'undo-ghost-row'."),
     },
   },
   async ({ name }) => {

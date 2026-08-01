@@ -40,7 +40,7 @@ export default function ShuntTrayDemo() {
     <div className="flex min-h-screen items-start justify-center bg-background px-6 py-20 text-foreground">
       <div className="w-full max-w-3xl">
         <p className="font-mono text-xs uppercase tracking-widest text-muted">
-          ns-ui / shunt-tray
+          ns-ui / menu-nested-trays
         </p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight">
           Every ancestor stays on the rails

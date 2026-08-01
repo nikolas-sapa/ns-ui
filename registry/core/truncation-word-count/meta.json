@@ -1,6 +1,6 @@
 {
-  "name": "selvage-fold",
-  "title": "Selvage Fold",
+  "name": "truncation-word-count",
+  "title": "Truncation Word Count",
   "description": "Line-clamp that tells the truth: the fold control states the exact measured word count it hides ('+ 42 words'), the cut edge is a dashed selvage rule with a soft fade, and unfolding is an in-place height ease.",
   "collection": "core",
   "tags": ["typography", "truncation", "clamp", "expand", "read-more", "text", "accessibility"],

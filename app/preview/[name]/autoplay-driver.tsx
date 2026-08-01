@@ -106,7 +106,7 @@ const MOUSE_MIRROR: Record<string, string | undefined> = {
  * A synthetic keystroke has to emulate a real browser closely enough to drive
  * BOTH kinds of keyboard component:
  *
- *  - keyboard-first controls (cipher-reel-otp) `preventDefault()` the digit
+ *  - keyboard-first controls (otp-reel) `preventDefault()` the digit
  *    `keydown` and drive themselves from `event.key`, never letting the value
  *    change natively — so no `input` must follow;
  *  - ordinary controlled inputs let the `keydown` through and update from the
@@ -270,7 +270,7 @@ function chainOf(el: HTMLElement, root: HTMLElement): HTMLElement[] {
 /**
  * Hover-state machine. `pointerenter`/`pointerleave` do not bubble, so they
  * have to be dispatched on every element entering or leaving the chain —
- * that is what wakes `pointerleave`-on-container components like magnetic-dock.
+ * that is what wakes `pointerleave`-on-container components like dock-cursor-magnify.
  */
 class Hover {
   private chain: HTMLElement[] = [];
@@ -323,7 +323,7 @@ type Box = { x: number; y: number; w: number; h: number };
  *
  * The union matters. A demo's root is usually `min-h-screen`, so its centre is
  * nowhere near the thing worth demonstrating — a sweep across the root's
- * vertical centre missed magnetic-dock's row entirely. `target: "button"`
+ * vertical centre missed dock-cursor-magnify's row entirely. `target: "button"`
  * unions all nine dock items into exactly the dock. Positive `inset` shrinks
  * the box, negative overshoots it (so a sweep can enter and leave).
  */

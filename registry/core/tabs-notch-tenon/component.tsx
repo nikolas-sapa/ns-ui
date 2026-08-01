@@ -20,8 +20,8 @@ export type MortiseSlipTab = {
 // SVG <path> with a notch (mortise) missing under the active tab, and the
 // panel below carries a matching raised tenon (a 6px-radius nub) that pokes
 // up 1px into that gap — the two pieces read as one interrupted border, not
-// a floating bar under a label (contrast carriage-return/shadcn/Radix) and
-// not a cut-based caret (contrast kerf-caret, which is a streaming-text
+// a floating bar under a label (contrast tabs-carriage/shadcn/Radix) and
+// not a cut-based caret (contrast streaming-markdown-caret, which is a streaming-text
 // cursor, not a tab indicator at all). At rest, with zero motion, which
 // panel belongs to which tab is legible from the joint alone. On switch the
 // notch's x/width chase the newly active tab's measured rect on an

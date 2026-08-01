@@ -50,10 +50,10 @@ import { useEffect, useRef, useState } from "react";
 // announcing "Card N of total" on every committed change); the stripe itself
 // is role="slider" (vertical, aria-valuemax = count-1) and owns the keyboard
 // — ArrowLeft/Right and PageUp/PageDown step one card, Home/End jump to the
-// ends. Differs from caustic-coverflow (lateral drag-through of large cover
-// art, momentum + chromatic aberration, browsing) and from spine-stack
+// ends. Differs from gallery-coverflow-caustic (lateral drag-through of large cover
+// art, momentum + chromatic aberration, browsing) and from drill-down-spines
 // (levels compress into read-at-rest spines you click to pop back to):
-// riffle-edge has exactly one visible card, and the "how many / where am I"
+// carousel-card-riffle has exactly one visible card, and the "how many / where am I"
 // readout is the scrubbable thickness of the stack itself, not a row of
 // static dots or a shelf of resting spines. DOM/CSS only, no canvas.
 // ---------------------------------------------------------------------------

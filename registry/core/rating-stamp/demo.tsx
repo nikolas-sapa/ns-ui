@@ -20,7 +20,7 @@ export default function ChopPressDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / chop-press — stamp a level, no stars
+        ns-ui / rating-stamp — stamp a level, no stars
       </p>
 
       <div className="w-full max-w-lg rounded-md border border-border bg-surface">
@@ -38,7 +38,7 @@ export default function ChopPressDemo() {
           <div className="flex items-center justify-between gap-4">
             <label className="text-sm text-foreground">Priority</label>
             <ChopPress
-              className="chop-press-autoplay"
+              className="rating-stamp-autoplay"
               label="Priority"
               max={5}
               value={priority}

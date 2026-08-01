@@ -1,6 +1,6 @@
 {
-  "name": "slide-to-shatter",
-  "title": "Slide to Shatter",
+  "name": "confirm-slide-shatter",
+  "title": "Confirm Slide Shatter",
   "description": "Frosted-glass confirm slider where drag distance drives Voronoi crack density — release early and the cracks heal on a spring; complete the travel and the pane explodes into tumbling glass shards revealing the confirmed state.",
   "collection": "core",
   "tags": ["slider", "confirm", "destructive", "glass", "canvas", "voronoi", "shatter", "physics"],

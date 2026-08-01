@@ -62,7 +62,7 @@ export default function SparkGapDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-10 px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / spark-gap
+        ns-ui / border-electric-arc
       </p>
 
       <div ref={stageRef} className="flex items-center justify-center py-8">

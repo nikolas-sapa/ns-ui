@@ -213,7 +213,7 @@ if (process.env.NODE_ENV !== "production") {
     ["non-Latin layout falls back to e.code", chordMatchesEvent(macModK, ev("к", { code: "KeyK", metaKey: true }))],
   ];
   for (const [name, ok] of checks) {
-    if (!ok) console.warn(`[quick-key] key normalization check failed: ${name}`);
+    if (!ok) console.warn(`[shortcuts-cheat-sheet] key normalization check failed: ${name}`);
   }
 }
 

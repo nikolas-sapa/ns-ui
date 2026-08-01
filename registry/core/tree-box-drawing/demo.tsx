@@ -36,7 +36,7 @@ export default function BoughIndexDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 p-8">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / bough-index
+        ns-ui / tree-box-drawing
       </p>
       <div className="w-full max-w-md rounded-md border border-border bg-surface/60 p-6">
         <BoughIndex

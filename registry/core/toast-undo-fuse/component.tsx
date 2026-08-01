@@ -315,7 +315,7 @@ export function ShortFuse({
         <p className="min-w-0 flex-1 text-sm leading-snug">{message}</p>
         <button
           type="button"
-          data-short-fuse-undo=""
+          data-toast-undo-fuse-undo=""
           onClick={handleUndo}
           className="shrink-0 cursor-pointer rounded-[6px] px-2 py-1 text-xs font-medium tracking-wide text-accent transition-opacity duration-150 hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >

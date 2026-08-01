@@ -12,7 +12,7 @@ export default function PawlLiftDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / pawl-lift — up is free, down needs a hold
+        ns-ui / stepper-ratchet — up is free, down needs a hold
       </p>
 
       <div className="w-full max-w-sm rounded-md border border-border bg-surface">

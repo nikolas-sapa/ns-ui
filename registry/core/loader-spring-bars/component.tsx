@@ -8,7 +8,7 @@
 // the house spring curve -> back to rest) but at a negative animation-delay
 // staggered by index, so what's actually one waveform looks like a pulse
 // of energy travelling down the rack rather than N bars animating in
-// isolation — the same "one rule, offset per element" trick phase-swing
+// isolation — the same "one rule, offset per element" trick loader-pendulum-sync
 // uses for its pendulum row, here on translateY/scaleY instead of rotation.
 // ---------------------------------------------------------------------------
 
@@ -67,7 +67,7 @@ export function LathRack({
     <span
       role="status"
       aria-live="polite"
-      data-lath-rack
+      data-loader-spring-bars
       className={`inline-flex items-end ${className}`}
       style={{
         height,

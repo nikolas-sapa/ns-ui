@@ -60,7 +60,7 @@ export default function CarryDigitDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-sm rounded-md border border-border bg-surface p-6">
-        <p className="mb-5 font-mono text-xs tracking-widest text-muted">ns-ui / carry-digit</p>
+        <p className="mb-5 font-mono text-xs tracking-widest text-muted">ns-ui / counter-carry-ripple</p>
         <div className="flex flex-col gap-6">
           <CarryDigit value={count} label="requests / min" />
           <CarryDigit value={balance} decimals={2} label="account balance · usd" />

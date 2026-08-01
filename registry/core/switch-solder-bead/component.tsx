@@ -7,7 +7,7 @@ import { useEffect, useId, useRef, useState } from "react";
 // hairline rail, trading mass through a gooey neck instead of sliding a
 // thumb. Both beads sit at FIXED anchor points; only their radius (mass)
 // and a connecting neck's thickness change. The gooey look (bulge, stretch,
-// pinch-off) comes from the same recipe as mercury-minimap: blur the whole
+// pinch-off) comes from the same recipe as toc-minimap-mercury: blur the whole
 // liquid layer, then push contrast back up with a matrix threshold so
 // anything close enough merges into one blob and anything far enough snaps
 // apart cleanly — no manual blob-path math needed.

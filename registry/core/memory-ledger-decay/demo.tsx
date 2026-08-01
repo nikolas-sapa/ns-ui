@@ -42,7 +42,7 @@ export default function PatinaLedgerDemo() {
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 py-16">
       <div className="w-full max-w-md">
         <p className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-muted">
-          ns-ui / patina-ledger — turn {turn}
+          ns-ui / memory-ledger-decay — turn {turn}
         </p>
 
         <PatinaLedger

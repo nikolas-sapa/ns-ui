@@ -45,7 +45,7 @@ export default function SolargraphHeroDemo() {
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-4xl">
         <p className="mb-4 font-mono text-xs tracking-widest text-muted">
-          ns-ui / solargraph-hero
+          ns-ui / hero-long-exposure
         </p>
         <SolargraphHero className="rounded-md border border-border bg-surface">
           <div className="flex flex-col items-center px-8 py-16 text-center sm:px-14 sm:py-24">

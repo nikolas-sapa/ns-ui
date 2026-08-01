@@ -1,6 +1,6 @@
 {
-  "name": "erosion-trail",
-  "title": "Erosion Trail",
+  "name": "terrain-erosion-carve",
+  "title": "Terrain Erosion Carve",
   "description": "The cursor is a river — dragging across a live topographic map carves a channel into the heightfield, marching-squares isolines reflowing into canyon walls with a faint waterline; release and sediment heals the terrain back over ~6 seconds. At rest the sheet stays alive: contours drift in a slow traveling ripple and sediment specks trickle downhill continuously.",
   "collection": "loud",
   "tags": ["terrain", "topographic", "cursor", "canvas", "marching-squares", "drag", "physics", "ambient"],

@@ -300,7 +300,7 @@ export function ShearBand({
     <div className={`relative w-full font-mono ${className}`} style={{ height: ROOT_H }}>
       <div
         ref={rootRef}
-        data-shear-band-track
+        data-slider-range-shear-track
         className="relative h-full w-full touch-none select-none"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}

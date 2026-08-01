@@ -26,7 +26,7 @@ export type PointsThrowTab = {
 // old positions to the new tab's positions on an ease-out-expo curve over
 // 350ms, direct-DOM (no React state on the hot path), so the bend visibly
 // travels down the line rather than a puck jumping between slots. Distinct
-// from fling-segment: there is never a discrete indicator object, only one
+// from segmented-control-fling: there is never a discrete indicator object, only one
 // line whose geometry changes.
 export function PointsThrow({
   tabs,
@@ -285,7 +285,7 @@ const RAMP = 10; // px — horizontal run of each diagonal ramp
 const SVG_H = 10; // px — svg box height
 const BASE_Y = SVG_H - 1; // baseline, near the bottom of the box
 const RAISED_Y = 1; // plateau, lifted toward the tab label above
-const DURATION_MS = 350; // points-throw tween duration
+const DURATION_MS = 350; // tabs-rail-points tween duration
 const PANEL_SLIDE = 12; // px — panel lateral slide-fade distance
 
 function clamp(v: number, lo: number, hi: number): number {

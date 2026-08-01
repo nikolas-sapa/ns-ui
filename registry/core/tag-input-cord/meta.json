@@ -1,6 +1,6 @@
 {
-  "name": "cinch-bead",
-  "title": "Cinch Bead",
+  "name": "tag-input-cord",
+  "title": "Tag Input Cord",
   "description": "Tag input as beads threaded onto a cord: committing a tag cinches a bead into place with one overshoot squeeze while its knot draws on; Backspace on an empty input unravels the last bead with a drop-and-twist. Duplicate commits shudder the existing bead instead of re-threading it.",
   "collection": "core",
   "tags": [

@@ -32,7 +32,7 @@ export default function PeriscopeSweepDemo() {
     <main className="min-h-screen bg-background px-6 py-16">
       <div className="mx-auto max-w-2xl">
         <p className="font-mono text-xs tracking-[0.25em] text-muted">
-          ns-ui / periscope-sweep
+          ns-ui / command-palette-rotary
         </p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground">
           Periscope Sweep

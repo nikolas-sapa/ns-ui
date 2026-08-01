@@ -32,7 +32,7 @@ export default function DevelopSkeletonDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / develop-skeleton — placeholder resolving into content
+        ns-ui / skeleton-develop — placeholder resolving into content
       </p>
 
       <div className="w-[420px] rounded-md border border-border bg-surface p-6">

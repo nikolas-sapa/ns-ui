@@ -202,7 +202,7 @@ export function RuleFrame({ title, children, className = "" }: RuleFrameProps) {
 
   return (
     <div
-      data-rule-frame
+      data-container-box-drawing
       className={`relative inline-block font-mono ${className}`}
       style={{ lineHeight: LINE_HEIGHT }}
       onPointerEnter={() => setHovered(true)}

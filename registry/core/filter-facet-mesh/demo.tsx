@@ -28,7 +28,7 @@ export default function SieveFacetsDemo() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-8 bg-background px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / sieve-facets
+        ns-ui / filter-facet-mesh
       </p>
       <div ref={wrapRef} className="w-full max-w-md">
         <SieveFacets />

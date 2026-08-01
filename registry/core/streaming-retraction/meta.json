@@ -1,6 +1,6 @@
 {
-  "name": "retract-ink",
-  "title": "Retract Ink",
+  "name": "streaming-retraction",
+  "title": "Streaming Retraction",
   "description": "Streaming-text renderer for models that take words back: a retraction strikes through mid-sentence, evaporates, and leaves a notched scar tick that reopens the revision inline.",
   "collection": "core",
   "tags": [

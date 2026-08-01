@@ -6,7 +6,7 @@ export default function ScreePourDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-background px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / scree-pour — the old panel crumbles into the new one
+        ns-ui / transition-panel-crumble — the old panel crumbles into the new one
       </p>
 
       <ScreePour className="h-[440px] w-full max-w-lg" />

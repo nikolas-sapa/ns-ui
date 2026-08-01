@@ -15,7 +15,7 @@ import {
 // cadence, decaying flat on pause, ending in a small terminal tick when they
 // disconnect. Every number on screen originates from a real event the
 // consumer feeds in (pulse() per throttled keystroke, `status` per presence
-// update) — this component holds no rhythm of its own, unlike cardio-baseline's
+// update) — this component holds no rhythm of its own, unlike text-ekg-baseline's
 // internal bpm timer. It never sees keystroke content, only that one
 // occurred, coarse enough it can't leak timing beyond "someone is typing".
 //

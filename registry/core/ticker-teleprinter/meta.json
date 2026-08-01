@@ -1,10 +1,10 @@
 {
-  "name": "roll-crawl",
-  "title": "Roll Crawl",
+  "name": "ticker-teleprinter",
+  "title": "Ticker Teleprinter",
   "description": "Character-quantised teleprinter crawl: a fixed row of monospace cells advances one full cell per beat via content substitution, never a subpixel slide.",
   "collection": "core",
   "tags": ["ticker", "marquee", "ascii", "mono", "teleprinter"],
-  "useWhen": "a self-driving ambient status line where the mechanical, one-cell-at-a-time advance and per-character settle-in are themselves the point. Reach for bourse-tape instead when the content is discrete data rows that need keyboard navigation and a visible append/splice moment — roll-crawl has no roving focus and is meant to be looked at, not tabbed through.",
+  "useWhen": "a self-driving ambient status line where the mechanical, one-cell-at-a-time advance and per-character settle-in are themselves the point. Reach for ticker-tape-splice instead when the content is discrete data rows that need keyboard navigation and a visible append/splice moment — ticker-teleprinter has no roving focus and is meant to be looked at, not tabbed through.",
   "autoplay": {
     "mode": "none"
   },

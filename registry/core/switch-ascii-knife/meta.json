@@ -1,10 +1,10 @@
 {
-  "name": "throw-switch",
-  "title": "Throw Switch",
+  "name": "switch-ascii-knife",
+  "title": "Switch ASCII Knife",
   "description": "An accessible switch drawn entirely in box-drawing and block characters, in the register of a physical knife switch: the blade fills one cell at a time and the handle glyph spins through the throw.",
   "collection": "core",
   "tags": ["switch", "toggle", "ascii", "mono", "accessibility"],
-  "useWhen": "a binary control where the mechanical, character-by-character throw is a deliberate flourish and a printed OFF/ON legend belongs in the UI. Reach for frostbite-switch instead for an iOS-pill switch with a soft, decorative animation and no printed text legend.",
+  "useWhen": "a binary control where the mechanical, character-by-character throw is a deliberate flourish and a printed OFF/ON legend belongs in the UI. Reach for switch-frost instead for an iOS-pill switch with a soft, decorative animation and no printed text legend.",
   "autoplay": {
     "mode": "press"
   },

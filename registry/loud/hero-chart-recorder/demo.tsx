@@ -35,7 +35,7 @@ export default function PenLagDemo() {
       <div className="mx-auto max-w-3xl">
         <div className="flex items-center justify-between gap-4">
           <p className="font-mono text-xs tracking-widest text-muted">
-            ns-ui / pen-lag
+            ns-ui / hero-chart-recorder
           </p>
           <button
             type="button"

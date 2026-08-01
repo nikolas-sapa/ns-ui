@@ -100,7 +100,7 @@ export default function SeamDiffDemo() {
   return (
     <main className="flex min-h-screen flex-col items-center gap-8 bg-background px-6 py-16 text-foreground">
       <div className="flex w-full max-w-3xl flex-col gap-2">
-        <p className="font-mono text-xs uppercase tracking-[0.3em] text-muted">ns-ui / seam-diff</p>
+        <p className="font-mono text-xs uppercase tracking-[0.3em] text-muted">ns-ui / diff-unified-viewer</p>
         <h1 className="text-2xl font-semibold tracking-tight">Pull request #482 — rate limiter</h1>
         <p className="max-w-xl text-sm text-muted">
           Left-rail markers stand in for red/green: a solid bar for additions, a

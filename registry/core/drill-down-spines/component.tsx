@@ -238,26 +238,26 @@ export const SpineStack = forwardRef<SpineStackHandle, SpineStackProps>(function
   return (
     <div
       ref={containerRef}
-      className={["ns-spine-stack relative flex h-full w-full overflow-hidden", className]
+      className={["ns-drill-down-spines relative flex h-full w-full overflow-hidden", className]
         .filter(Boolean)
         .join(" ")}
     >
       <style>{`
-.ns-spine-stack .ns-level{transition:width ${TRANSITION_MS}ms ${SPRING_EASE},opacity ${TRANSITION_MS}ms ease-out;}
-.ns-spine-stack .ns-spine-face,
-.ns-spine-stack .ns-active-face{transition:opacity ${TRANSITION_MS}ms ease-out;}
-.ns-spine-stack .ns-spine-label{transition:opacity 200ms ease-out;}
-.ns-spine-stack .ns-spine-enter{animation:ns-spine-enter ${ENTER_MS}ms ${SPRING_EASE};}
+.ns-drill-down-spines .ns-level{transition:width ${TRANSITION_MS}ms ${SPRING_EASE},opacity ${TRANSITION_MS}ms ease-out;}
+.ns-drill-down-spines .ns-spine-face,
+.ns-drill-down-spines .ns-active-face{transition:opacity ${TRANSITION_MS}ms ease-out;}
+.ns-drill-down-spines .ns-spine-label{transition:opacity 200ms ease-out;}
+.ns-drill-down-spines .ns-spine-enter{animation:ns-spine-enter ${ENTER_MS}ms ${SPRING_EASE};}
 @keyframes ns-spine-enter{
   from{opacity:0.35;transform:translateX(18px);}
   to{opacity:1;transform:translateX(0);}
 }
 @media (prefers-reduced-motion: reduce){
-  .ns-spine-stack .ns-level,
-  .ns-spine-stack .ns-spine-face,
-  .ns-spine-stack .ns-active-face,
-  .ns-spine-stack .ns-spine-label{transition:none !important;}
-  .ns-spine-stack .ns-spine-enter{animation:none !important;}
+  .ns-drill-down-spines .ns-level,
+  .ns-drill-down-spines .ns-spine-face,
+  .ns-drill-down-spines .ns-active-face,
+  .ns-drill-down-spines .ns-spine-label{transition:none !important;}
+  .ns-drill-down-spines .ns-spine-enter{animation:none !important;}
 }
 `}</style>
 

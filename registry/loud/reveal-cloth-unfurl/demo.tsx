@@ -91,7 +91,7 @@ export default function BoltUnfurlDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">ns-ui / bolt-unfurl</p>
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">ns-ui / reveal-cloth-unfurl</p>
 
       <div ref={sectionRef} className="w-full max-w-lg">
         {src && <BoltUnfurl src={src} alt="Geometric line-art study in ink, off-white, and blue" trigger={trigger} strips={14} />}

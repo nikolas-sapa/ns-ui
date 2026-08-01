@@ -1,6 +1,6 @@
 {
-  "name": "needle-stepper",
-  "title": "Needle Stepper",
+  "name": "stepper-needle",
+  "title": "Stepper Needle",
   "description": "Bounded numeric stepper with a large mono value readout, prominent -/+ buttons, and a labeled history strip: an inertial needle swings to each committed value while the strip advances, etching the last 20 adjustments with the newest mark highlighted.",
   "collection": "core",
   "tags": [

@@ -214,7 +214,7 @@ export function SoundingRail({
           const hasDetail = Boolean(
             step.detail || (step.evidence && step.evidence.length > 0)
           );
-          const detailId = `sounding-rail-detail-${step.id}`;
+          const detailId = `timeline-reasoning-rail-detail-${step.id}`;
           const toggle = () =>
             setOverrides((o) => ({ ...o, [step.id]: !expanded }));
 

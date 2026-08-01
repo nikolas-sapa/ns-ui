@@ -171,7 +171,7 @@ function buildTooltipText(
 
 export function PawlTick({ status, size = 20, className = "" }: PawlTickProps) {
   const autoId = useId();
-  const tooltipId = `pawl-tick-tip-${autoId.replace(/:/g, "")}`;
+  const tooltipId = `autosave-ratchet-tip-${autoId.replace(/:/g, "")}`;
 
   const rootRef = useRef<HTMLSpanElement | null>(null);
   const wheelRef = useRef<SVGGElement | null>(null);

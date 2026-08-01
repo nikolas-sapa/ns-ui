@@ -30,7 +30,7 @@ export default function WornPathDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-10 px-6">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / worn-path — a trail that gives way from the middle
+        ns-ui / breadcrumb-overflow-menu — a trail that gives way from the middle
       </p>
 
       <div className="flex w-full max-w-2xl flex-col items-start gap-8">

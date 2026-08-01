@@ -38,7 +38,7 @@ export default function BeaconCadenceDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-12 px-6">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / beacon-cadence
+        ns-ui / status-glyph-cadence
       </p>
 
       <div className="w-full max-w-sm rounded-xl border border-border bg-surface">

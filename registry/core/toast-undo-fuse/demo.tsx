@@ -43,7 +43,7 @@ export default function ShortFuseDemo() {
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-sm">
         <p className="mb-4 font-mono text-xs tracking-widest text-muted">
-          ns-ui / short-fuse
+          ns-ui / toast-undo-fuse
         </p>
         <div className="overflow-hidden rounded-md border border-border bg-background">
           <header className="border-b border-border px-4 py-3">

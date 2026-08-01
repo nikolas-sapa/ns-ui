@@ -67,7 +67,7 @@ export default function StemSiftDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-md">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">ns-ui / stem-sift</p>
+        <p className="mb-4 font-mono text-xs tracking-widest text-muted">ns-ui / stem-and-leaf-live</p>
         <div className="rounded-md border border-border bg-surface p-5">
           <StemSift records={records} unit="ms" label="checkout · response time" />
           <div className="mt-4 flex items-center justify-between border-t border-border pt-3">

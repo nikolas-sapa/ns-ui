@@ -10,7 +10,7 @@ export default function GlyphTideDemo() {
           ns://ui
         </span>
         <span className="font-mono text-xs tracking-[0.25em] text-muted">
-          ns-ui / glyph-tide
+          ns-ui / background-ascii-plasma
         </span>
       </header>
       {/* drag across the field — it pushes outward from the cursor and

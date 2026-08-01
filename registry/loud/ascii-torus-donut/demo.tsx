@@ -10,7 +10,7 @@ export default function TorusRenderDemo() {
           ns://ui
         </span>
         <span className="font-mono text-xs tracking-[0.25em] text-muted">
-          ns-ui / torus-render
+          ns-ui / ascii-torus-donut
         </span>
       </header>
       {/* drag to spin on both axes; release for inertia, it settles back

@@ -115,7 +115,7 @@ export default function LockFlightDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 py-16">
       <p className="max-w-md text-center font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / lock-flight — a stepper where each gate only opens once the
+        ns-ui / wizard-canal-lock — a stepper where each gate only opens once the
         water equalizes
       </p>
 

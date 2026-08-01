@@ -13,7 +13,7 @@ export default function HeatwaveLedgerDemo() {
       <div className="w-full max-w-3xl">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
           <p className="font-mono text-xs tracking-widest text-muted">
-            ns-ui / heatwave-ledger
+            ns-ui / table-heat-shimmer
           </p>
           <div
             role="group"

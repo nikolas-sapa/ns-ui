@@ -8,7 +8,7 @@ export default function HoldToConfirmDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / hold-to-confirm — press and hold
+        ns-ui / confirm-hold-ink — press and hold
       </p>
       <HoldToConfirm
         key={resetKey}

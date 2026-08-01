@@ -15,7 +15,7 @@ export default function BurrChipDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / burr-chip — pull a chip loose, don&apos;t just delete it
+        ns-ui / tag-input-pull — pull a chip loose, don&apos;t just delete it
       </p>
 
       <div className="w-full max-w-md">

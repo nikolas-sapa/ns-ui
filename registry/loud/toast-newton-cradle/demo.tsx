@@ -73,7 +73,7 @@ export default function ImpulseCradleDemo() {
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-sm">
         <p className="mb-4 font-mono text-xs tracking-widest text-muted">
-          ns-ui / impulse-cradle
+          ns-ui / toast-newton-cradle
         </p>
         <div className="mb-3 flex flex-wrap items-center gap-2">
           <button

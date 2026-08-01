@@ -2,7 +2,7 @@
 
 import { ProofRise } from "./component";
 
-const FIELD_ID = "proof-rise-comment";
+const FIELD_ID = "textarea-autosize-swell-comment";
 const LONG_COMMENT =
   "Thanks for the detailed writeup — this is exactly the kind of context I was missing.\n\nA few things I noticed while reading through:\n1. The timeline in section two assumes the migration finishes before the freeze.\n2. We should double-check the rollback plan against last quarter's incident.\n3. Happy to pair on the risky part tomorrow if that helps.";
 
@@ -29,7 +29,7 @@ export default function ProofRiseDemo() {
     <main className="flex min-h-screen items-center justify-center bg-background px-6 text-foreground">
       <div className="w-full max-w-md">
         <p className="font-mono text-xs tracking-widest text-muted">
-          ns-ui / proof-rise
+          ns-ui / textarea-autosize-swell
         </p>
         <h1 className="mt-3 text-2xl font-semibold tracking-tight">
           It rises like it&apos;s proofing.

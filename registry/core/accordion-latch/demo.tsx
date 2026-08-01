@@ -24,7 +24,7 @@ const ITEMS: HaspFoldItem[] = [
 // Self-driving: real click() dispatch on the header buttons, on a timer,
 // so the demo exercises the same code path a pointing user would and the
 // screenshot gate catches the board mid-open/mid-close rather than only
-// ever at rest — matching pawl-tick's script-driven-through-real-state
+// ever at rest — matching autosave-ratchet's script-driven-through-real-state
 // pattern, just via DOM clicks instead of a prop.
 const SCRIPT_IDS = ["manifest", "route", "custody", "route"];
 const STEP_MS = 2400;
@@ -48,7 +48,7 @@ export default function HaspFoldDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / hasp-fold
+        ns-ui / accordion-latch
       </p>
 
       <div ref={rootRef} className="w-full max-w-md">

@@ -48,7 +48,7 @@ export default function EscapementTickDemo() {
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-sm">
         <p className="mb-4 font-mono text-xs tracking-widest text-muted">
-          ns-ui / escapement-tick
+          ns-ui / feed-escapement
         </p>
         <EscapementTick ref={tickRef} aria-label="Deploy activity feed" />
         <div className="mt-3 flex items-center justify-between gap-3">

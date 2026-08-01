@@ -1,6 +1,6 @@
 {
-  "name": "rule-sparkline",
-  "title": "Rule Sparkline",
+  "name": "sparkline-automaton",
+  "title": "Sparkline Automaton",
   "description": "Inline KPI sparkline grown over an elementary cellular-automaton texture — the Wolfram rule is picked by the series' volatility, one generation column per data point.",
   "collection": "core",
   "tags": ["canvas", "data-viz", "sparkline", "cellular-automaton", "generative", "scrub", "kpi"],

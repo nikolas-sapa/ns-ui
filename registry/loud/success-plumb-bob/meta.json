@@ -1,10 +1,10 @@
 {
-  "name": "plumb-true",
-  "title": "Plumb True",
+  "name": "success-plumb-bob",
+  "title": "Success Plumb Bob",
   "description": "A success moment built on a plumb bob instead of confetti or a checkmark — the bob drops, overshoots into a damped pendulum swing, and the instant it settles collinear with a fixed datum line, a level line draws outward from its tip and the success text rises onto it.",
   "collection": "loud",
   "tags": ["success", "confirmation", "svg", "physics", "instrument", "status"],
-  "useWhen": "a success/confirmation moment that reads as a quiet, checked instrument rather than a celebration — a plumb bob drops, overshoots and swings with honest damped decay, and only once it settles collinear with a fixed datum line does a level line draw outward and the success text set onto it; the coincidence of string and datum IS the proof, not a separate checkmark symbol. Distinct from hold-to-confirm (that's the press gesture BEFORE commit, destructive-action ink fill); plumb-true starts AFTER the event already happened (payment confirmed, deploy finished) and only visualizes verification of an outcome already decided.",
+  "useWhen": "a success/confirmation moment that reads as a quiet, checked instrument rather than a celebration — a plumb bob drops, overshoots and swings with honest damped decay, and only once it settles collinear with a fixed datum line does a level line draw outward and the success text set onto it; the coincidence of string and datum IS the proof, not a separate checkmark symbol. Distinct from confirm-hold-ink (that's the press gesture BEFORE commit, destructive-action ink fill); success-plumb-bob starts AFTER the event already happened (payment confirmed, deploy finished) and only visualizes verification of an outcome already decided.",
   "autoplay": {
     "mode": "press",
     "target": "button",

@@ -252,7 +252,7 @@ export function BurinEtch({
   }, [cellSize, ringDensity, ringWidth, polishRadius, polishStrength, glitchIntervalMs]);
 
   return (
-    <div ref={containerRef} data-burin-etch className={`relative h-full w-full overflow-hidden ${className}`}>
+    <div ref={containerRef} data-ascii-engraving-contour className={`relative h-full w-full overflow-hidden ${className}`}>
       <canvas ref={canvasRef} aria-hidden className="block h-full w-full text-foreground" />
     </div>
   );

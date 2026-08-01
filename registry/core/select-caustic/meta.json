@@ -1,6 +1,6 @@
 {
-  "name": "caustic-select",
-  "title": "Caustic Select",
+  "name": "select-caustic",
+  "title": "Select Caustic",
   "description": "Single-select whose frosted-glass trigger and listbox sit over drifting caustic light pools; hovering or arrow-keying an option bends the caustics toward that row so the highlight reads as pressed into the glass.",
   "collection": "core",
   "tags": ["select", "listbox", "form", "canvas", "glass", "keyboard", "micro-interaction"],

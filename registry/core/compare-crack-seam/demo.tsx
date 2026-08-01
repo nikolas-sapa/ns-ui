@@ -109,7 +109,7 @@ export default function CrackCompareDemo() {
     <main className="flex min-h-screen flex-col items-center justify-center gap-10 bg-background px-6 py-24 text-foreground">
       <div className="flex flex-col items-center gap-3 text-center">
         <p className="font-mono text-xs uppercase tracking-[0.3em] text-muted">
-          ns-ui / crack-compare
+          ns-ui / compare-crack-seam
         </p>
         <h1 className="text-3xl font-semibold tracking-tight">
           The divider is a fracture

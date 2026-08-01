@@ -15,12 +15,12 @@ Browse them live at **[design.helpmarq.com](https://design.helpmarq.com)**.
 
 |  |  |
 |---|---|
-| ![particle-hero](https://raw.githubusercontent.com/nikolas-sapa/ns-ui/main/registry/core/particle-hero/screenshots/dark-default.png) | ![pressure-front](https://raw.githubusercontent.com/nikolas-sapa/ns-ui/main/registry/loud/pressure-front/screenshots/dark-default.png) |
-| **particle-hero** — a field that answers the cursor | **pressure-front** — contour lines that bunch toward the CTA |
-| ![caustic-coverflow](https://raw.githubusercontent.com/nikolas-sapa/ns-ui/main/registry/core/caustic-coverflow/screenshots/dark-default.png) | ![ridge-walk](https://raw.githubusercontent.com/nikolas-sapa/ns-ui/main/registry/core/ridge-walk/screenshots/dark-default.png) |
-| **caustic-coverflow** — drag to scrub, flick for momentum | **ridge-walk** — pick a point on a pareto frontier |
-| ![crack-compare](https://raw.githubusercontent.com/nikolas-sapa/ns-ui/main/registry/core/crack-compare/screenshots/dark-default.png) | ![knockout-404](https://raw.githubusercontent.com/nikolas-sapa/ns-ui/main/registry/loud/knockout-404/screenshots/dark-default.png) |
-| **crack-compare** — the before/after divider is a fracture | **knockout-404** — type carved out of the surface |
+| ![hero-particles-webgl](https://raw.githubusercontent.com/nikolas-sapa/ns-ui/main/registry/core/hero-particles-webgl/screenshots/dark-default.png) | ![hero-isobar-contours](https://raw.githubusercontent.com/nikolas-sapa/ns-ui/main/registry/loud/hero-isobar-contours/screenshots/dark-default.png) |
+| **hero-particles-webgl** — a field that answers the cursor | **hero-isobar-contours** — contour lines that bunch toward the CTA |
+| ![gallery-coverflow-caustic](https://raw.githubusercontent.com/nikolas-sapa/ns-ui/main/registry/core/gallery-coverflow-caustic/screenshots/dark-default.png) | ![picker-pareto-frontier](https://raw.githubusercontent.com/nikolas-sapa/ns-ui/main/registry/core/picker-pareto-frontier/screenshots/dark-default.png) |
+| **gallery-coverflow-caustic** — drag to scrub, flick for momentum | **picker-pareto-frontier** — pick a point on a pareto frontier |
+| ![compare-crack-seam](https://raw.githubusercontent.com/nikolas-sapa/ns-ui/main/registry/core/compare-crack-seam/screenshots/dark-default.png) | ![not-found-knockout](https://raw.githubusercontent.com/nikolas-sapa/ns-ui/main/registry/loud/not-found-knockout/screenshots/dark-default.png) |
+| **compare-crack-seam** — the before/after divider is a fracture | **not-found-knockout** — type carved out of the surface |
 
 ## Install
 
@@ -38,7 +38,7 @@ New project:
 
 ```bash
 npx shadcn init -d
-npx shadcn add https://design.helpmarq.com/r/caustic-coverflow.json
+npx shadcn add https://design.helpmarq.com/r/gallery-coverflow-caustic.json
 ```
 
 ## For agents

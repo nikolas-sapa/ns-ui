@@ -97,7 +97,7 @@ export default function PlumbSwayDemo() {
   return (
     <div className="flex min-h-screen items-start justify-center bg-background px-6 py-20 text-foreground">
       <div className="w-full max-w-xl">
-        <p className="font-mono text-xs uppercase tracking-widest text-muted">ns-ui / plumb-sway</p>
+        <p className="font-mono text-xs uppercase tracking-widest text-muted">ns-ui / popover-pendulum</p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight">Hangs like a plumb bob</h1>
         <p className="mt-2 max-w-md text-sm leading-relaxed text-muted">
           A popover connected to its trigger by a hairline string. It drops in slightly off-vertical,

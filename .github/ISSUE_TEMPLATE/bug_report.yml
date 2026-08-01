@@ -7,7 +7,7 @@ body:
     attributes:
       label: Component
       description: The registry name, as used in the install command.
-      placeholder: caustic-coverflow
+      placeholder: gallery-coverflow-caustic
     validations:
       required: true
 

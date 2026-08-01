@@ -19,7 +19,7 @@ export default function ToppleRunDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / topple-run
+        ns-ui / checkbox-domino-run
       </p>
 
       <div className="w-full max-w-md">

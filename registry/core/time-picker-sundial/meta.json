@@ -1,6 +1,6 @@
 {
-  "name": "gnomon-set",
-  "title": "Gnomon Set",
+  "name": "time-picker-sundial",
+  "title": "Time Picker Sundial",
   "description": "A time-of-day picker as a flat sundial — drag the outer ring to set the hour and the inner ring for 5-minute detents, while a soft blurred gnomon shadow points at the hour and lengthens from a short AM wedge into a long PM one as you keep dragging past noon.",
   "collection": "core",
   "tags": [

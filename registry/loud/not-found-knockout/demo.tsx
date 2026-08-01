@@ -11,7 +11,7 @@ export default function Knockout404Demo() {
             ns://ui
           </span>
           <span className="font-mono text-xs tracking-[0.25em] text-muted">
-            ns-ui / knockout-404
+            ns-ui / not-found-knockout
           </span>
         </div>
         <a

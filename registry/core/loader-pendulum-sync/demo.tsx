@@ -65,7 +65,7 @@ export default function PhaseSwingDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-12 px-6">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / phase-swing
+        ns-ui / loader-pendulum-sync
       </p>
 
       <div className="flex w-full max-w-2xl flex-col gap-8 rounded-xl border border-border bg-surface p-8">

@@ -1,6 +1,6 @@
 {
-  "name": "proof-rise",
-  "title": "Proof Rise",
+  "name": "textarea-autosize-swell",
+  "title": "Textarea Autosize Swell",
   "description": "An autosize textarea that grows like dough proofing instead of reflowing like a spreadsheet cell: ordinary typing raises it line by line with a soft 180ms swell, a large paste breathes open over 400ms in one continuous motion instead of popping, and deleting text back down is slower still (320ms) so the surface never snaps under the cursor.",
   "collection": "core",
   "tags": [

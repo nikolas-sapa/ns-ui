@@ -1,6 +1,6 @@
 {
-  "name": "spark-gap",
-  "title": "Spark Gap",
+  "name": "border-electric-arc",
+  "title": "Border Electric Arc",
   "description": "An electric border for a CTA — the outline crackles like a live wire via feTurbulence displacement, micro-arcs spark off the corners, and near the cursor the stroke opens a gap that tracks the pointer with an arc jumping across it. Pressing discharges the wire: a bright flash, then two seconds spent and calm.",
   "collection": "loud",
   "tags": [

@@ -6,7 +6,7 @@ export default function RuleFrameDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-10">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / rule-frame
+        ns-ui / container-box-drawing
       </p>
       <RuleFrame title="SESSION" className="w-full max-w-md">
         <div className="flex flex-col gap-3 p-2">

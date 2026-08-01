@@ -55,7 +55,7 @@ export default function TrestleGapDemo() {
   return (
     <div className="mx-auto flex min-h-screen max-w-2xl flex-col justify-center gap-6 px-8 py-24">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / trestle-gap — coverage you can see, not one you have to hover for
+        ns-ui / citation-grounding-gap — coverage you can see, not one you have to hover for
       </p>
       <div className="rounded-md border border-border bg-background p-6">
         <TrestleGap sentences={SENTENCES} />

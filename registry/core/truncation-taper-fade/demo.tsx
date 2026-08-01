@@ -11,8 +11,8 @@ import { VanishTaper } from "./component";
 
 const FILES: { name: string; size: string; modified: string }[] = [
   { name: "README.md", size: "4.1 KB", modified: "2d ago" },
-  { name: "vanish-taper-mechanism-notes-and-benchmarks.md", size: "18.9 KB", modified: "just now" },
-  { name: "registry/core/dynamic-weight-text/component.tsx", size: "2.3 KB", modified: "1w ago" },
+  { name: "truncation-taper-fade-mechanism-notes-and-benchmarks.md", size: "18.9 KB", modified: "just now" },
+  { name: "registry/core/text-variable-weight/component.tsx", size: "2.3 KB", modified: "1w ago" },
   { name: "scripts/build-registry-and-llms-index.generated.ts", size: "6.7 KB", modified: "3w ago" },
 ];
 
@@ -27,7 +27,7 @@ const BREADCRUMB = [
 export default function VanishTaperDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-12 bg-background px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">ns-ui / vanish-taper</p>
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">ns-ui / truncation-taper-fade</p>
 
       <div className="w-full max-w-xl space-y-2">
         <p className="text-sm text-muted">Hover or focus a row to read its full name.</p>
@@ -77,7 +77,7 @@ export default function VanishTaperDemo() {
       <div className="w-full max-w-xs space-y-1">
         <p className="font-mono text-[11px] uppercase tracking-wide text-muted">Path</p>
         <div className="rounded-sm border border-border bg-surface px-3 py-2">
-          <VanishTaper text="/Users/nikolassapalidis/Developer/misc/ns-ui/registry/core/vanish-taper/component.tsx" />
+          <VanishTaper text="/Users/nikolassapalidis/Developer/misc/ns-ui/registry/core/truncation-taper-fade/component.tsx" />
         </div>
       </div>
     </div>

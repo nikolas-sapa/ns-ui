@@ -1,6 +1,6 @@
 {
-  "name": "rule-frame",
-  "title": "Rule Frame",
+  "name": "container-box-drawing",
+  "title": "Container Box Drawing",
   "description": "A container with real box-drawing chrome — an inline title breaking the top rule, upgrading to a double-line border character by character on hover or focus.",
   "collection": "core",
   "tags": [
@@ -11,13 +11,13 @@
     "box-drawing"
   ],
   "card": {
-    "focus": "[data-rule-frame]",
+    "focus": "[data-container-box-drawing]",
     "padding": 0.2
   },
   "autoplay": {
     "mode": "pointer-path",
     "path": "sweep",
-    "target": "[data-rule-frame]"
+    "target": "[data-container-box-drawing]"
   },
   "instruction": "A reusable panel whose border is composed of actual box-drawing characters (┌ ─ ┐ │ └ ┘) laid out in a monospace character grid, not a CSS border. It measures its own content box via ResizeObserver plus a hidden 1ch/1lh probe span (same font-mono, same explicit line-height) to convert pixel dimensions into an exact character count, so the border always tiles in whole characters regardless of what the children measure out to — arbitrary child height and width both just work. An optional `title` breaks the top rule like a fieldset legend, centered with the remaining rule characters split evenly left and right (the split shrinks rather than overflows the frame if the title is wider than the measured column count allows). On hover or focus-within (tracked via bubbling focus/blur, not a CSS :focus-within selector, so the double-line color transition and the character sweep stay driven by the same state) the border upgrades from the single-line glyph set to the double-line set (╔ ═ ╗ ║ ╚ ╝), one character at a time, sweeping clockwise starting at the top-left corner; leaving reverses the same sweep, starting the reversion at the same top-left corner rather than reversing direction. The perimeter's traversal order is built once by generating each side's DOM nodes directly in clockwise sequence — the bottom and left sides are generated right-to-left and bottom-to-top respectively and then visually restored to normal reading order with `flex-row-reverse`/`flex-col-reverse`, so the ref collection order (which the sweep indexes into) never has to be computed separately from the render order. A parallel color transition (border token to foreground token) rides alongside the glyph sweep. Direct-DOM: the sweep and the initial per-character paint both write `textContent` on refs inside a rAF loop, never React state per frame. Under prefers-reduced-motion the border snaps straight to its target single/double state with no sweep. Shortcut taken: a resize that lands mid-sweep replays the full sweep from its current hover/focus state rather than resuming progress, since font/content resizes mid-hover are a rare interaction.",
   "dependencies": []

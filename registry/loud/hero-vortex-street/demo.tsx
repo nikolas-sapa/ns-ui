@@ -15,7 +15,7 @@ export default function VortexStreetDemo() {
       </div>
       <div className="pointer-events-none absolute inset-x-0 top-8 flex flex-col items-center gap-2 text-center">
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-          ns-ui / vortex-street
+          ns-ui / hero-vortex-street
         </p>
         <p className="text-xs text-muted">
           Move the cursor to shed vortices; click to stir the field for 3s.

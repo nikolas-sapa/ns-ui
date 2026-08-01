@@ -16,8 +16,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 // a just-finished call steps its opacity 100/66/33/0 across four 15s beats
 // (60s total) — recency fading back to quiet inventory. Simultaneous calls
 // simply lift multiple chips independently; nothing here choreographs
-// handoffs BETWEEN agents (that's relay-lane) or reconstructs a call after
-// the fact (that's bedrock-trace) — this is the live single-agent surface,
+// handoffs BETWEEN agents (that's timeline-agent-lanes) or reconstructs a call after
+// the fact (that's citation-grounding-hatch) — this is the live single-agent surface,
 // and the lift-and-pay-out IS the mechanism, not a decoration on top of one.
 //
 // Data is fully owned by the consumer: `tools` is the static capability
@@ -197,7 +197,7 @@ export function TackleBoard({ tools, invocations, decayMs = 60000, className = "
   if (tools.length === 0) return null;
 
   return (
-    <div className={["ns-tackle-board", className].filter(Boolean).join(" ")}>
+    <div className={["ns-tool-call-board", className].filter(Boolean).join(" ")}>
       <style>{`
 .ns-tackle-chip{transition:transform 380ms cubic-bezier(0.34,1.56,0.64,1),box-shadow 380ms cubic-bezier(0.34,1.56,0.64,1)}
 .ns-tackle-strip{transition:grid-template-rows 320ms cubic-bezier(0.16,1,0.3,1)}
@@ -216,7 +216,7 @@ export function TackleBoard({ tools, invocations, decayMs = 60000, className = "
         {announceText}
       </p>
 
-      <ul role="list" className="ns-tackle-board flex flex-wrap items-start gap-2.5 list-none p-0 m-0">
+      <ul role="list" className="ns-tool-call-board flex flex-wrap items-start gap-2.5 list-none p-0 m-0">
         {tools.map((tool) => {
           const inv = latestByTool.get(tool.id);
           const isPending = inv?.status === "pending";

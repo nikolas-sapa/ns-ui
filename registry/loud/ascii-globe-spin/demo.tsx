@@ -10,7 +10,7 @@ export default function MeridianSpinDemo() {
           ns://ui
         </span>
         <span className="font-mono text-xs tracking-[0.25em] text-muted">
-          ns-ui / meridian-spin
+          ns-ui / ascii-globe-spin
         </span>
       </header>
       {/* drag horizontally to spin the globe; hover to read the lat/lon

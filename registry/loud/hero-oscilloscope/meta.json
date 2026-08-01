@@ -1,6 +1,6 @@
 {
-  "name": "oscillo-crest",
-  "title": "Oscillo Crest",
+  "name": "hero-oscilloscope",
+  "title": "Hero Oscilloscope",
   "description": "A full-width oscilloscope hero: a summed three-harmonic waveform drawn as one continuous box-drawing trace inside a box-drawing frame with a live amplitude/frequency readout, where the pointer injects energy into a real damped wave simulation that rings outward from the touched column and settles back over about a second.",
   "collection": "loud",
   "tags": ["ascii", "hero", "canvas", "cursor", "waveform", "instrument"],

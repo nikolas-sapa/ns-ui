@@ -6,11 +6,11 @@ export default function LathRackDemo() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-10 bg-background px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-widest text-muted">
-        ns-ui / lath-rack
+        ns-ui / loader-spring-bars
       </p>
 
       <div
-        data-lath-rack-hero
+        data-loader-spring-bars-hero
         className="flex w-full max-w-sm flex-col items-center gap-6 rounded-xl border border-border bg-surface px-10 py-14"
       >
         <LathRack count={7} height={56} label="Transcribing audio" />

@@ -22,7 +22,7 @@ import {
 // a border-color pulse for the hairline edge highlight) — timed with a
 // per-item delay for the stagger — not a continuous rAF loop. A submenu is
 // the same component recursively, anchored at the parent blade's tip.
-// Distinct from shunt-tray (telescoping trays) and drape-menu (cloth
+// Distinct from menu-nested-trays (telescoping trays) and dropdown-drape (cloth
 // dropdown): this is a radial-fold context-menu primitive.
 // ---------------------------------------------------------------------------
 
@@ -360,7 +360,7 @@ export function JackKnife({ items, onSelect, children, label = "Actions", classN
       <button
         ref={triggerRef}
         type="button"
-        data-jack-knife-trigger=""
+        data-context-menu-unfold-trigger=""
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={open ? menuId : undefined}

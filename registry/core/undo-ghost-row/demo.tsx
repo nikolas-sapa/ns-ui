@@ -15,7 +15,7 @@ export default function AfterImageDemo() {
     <main className="flex min-h-screen items-center justify-center bg-background px-6 py-16">
       <div className="w-full max-w-md">
         <p className="mb-4 text-center font-mono text-xs tracking-widest text-muted">
-          ns-ui / after-image
+          ns-ui / undo-ghost-row
         </p>
         <div className="rounded-md border border-border bg-surface p-5 shadow-sm">
           <div className="mb-4 flex items-baseline justify-between gap-3">

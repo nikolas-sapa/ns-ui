@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
 // TumblerGate — a destructive-action confirm gated on ACCURACY, the third
-// axis besides hold-to-confirm's time and slide-to-shatter's distance. An
+// axis besides confirm-hold-ink's time and confirm-slide-shatter's distance. An
 // SVG dial carries one rotating notch; it must be turned (drag, wheel, or
 // arrow keys) until the notch sits within 3deg of the fixed index mark and
 // HELD there for a 400ms dwell — leaving the band before the dwell completes

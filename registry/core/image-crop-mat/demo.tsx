@@ -78,7 +78,7 @@ export default function MatCropDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">ns-ui / mat-crop</p>
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">ns-ui / image-crop-mat</p>
 
       <div ref={containerRef}>
         <MatCrop />

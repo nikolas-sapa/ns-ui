@@ -22,7 +22,7 @@ const TOOLS: TackleTool[] = [
 const CALLS: { toolId: string; args: string; summary: string; status: "success" | "error" }[] = [
   { toolId: "search_web", args: 'query: "vercel geist changelog"', summary: "12 results", status: "success" },
   { toolId: "read_file", args: 'path: "src/routes/board.tsx"', summary: "214 lines", status: "success" },
-  { toolId: "run_tests", args: "suite: tackle-board.spec.ts", summary: "18 passed", status: "success" },
+  { toolId: "run_tests", args: "suite: tool-call-board.spec.ts", summary: "18 passed", status: "success" },
   { toolId: "send_message", args: 'text: "board is ready for review"', summary: "delivered", status: "success" },
   { toolId: "fetch_url", args: 'url: "https://vercel.com/design"', summary: "200 OK, 42kb", status: "success" },
   { toolId: "read_file", args: 'path: "config/tsconfig.json"', summary: "not found", status: "error" },

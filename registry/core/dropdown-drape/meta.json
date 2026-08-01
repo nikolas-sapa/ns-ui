@@ -1,6 +1,6 @@
 {
-  "name": "drape-menu",
-  "title": "Drape Menu",
+  "name": "dropdown-drape",
+  "title": "Dropdown Drape",
   "description": "Dropdown whose panel is a live verlet cloth pinned to the trigger — it falls and drapes like an awning, labels ride the weave, the cursor billows the fabric, and close yanks it back up.",
   "collection": "core",
   "tags": ["menu", "dropdown", "cloth", "physics", "verlet", "cursor", "nav"],

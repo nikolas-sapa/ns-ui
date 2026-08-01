@@ -1,6 +1,6 @@
 {
-  "name": "updraft-dropzone",
-  "title": "Updraft Dropzone",
+  "name": "file-upload-thermal",
+  "title": "File Upload Thermal",
   "description": "File dropzone as a thermal field: dragging spawns rising accent convection wisps, accepted drops buoy off the drop point and squash-land into a docked queue rack, rejected files sink and fade.",
   "collection": "core",
   "tags": ["dropzone", "file-upload", "form", "canvas", "particles", "physics", "input"],

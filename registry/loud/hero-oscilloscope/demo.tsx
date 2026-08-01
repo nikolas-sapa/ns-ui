@@ -10,7 +10,7 @@ export default function OscilloCrestDemo() {
           ns://ui
         </span>
         <span className="font-mono text-xs tracking-[0.25em] text-muted">
-          ns-ui / oscillo-crest
+          ns-ui / hero-oscilloscope
         </span>
       </header>
       {/* sweep across the trace — it rings where you touch it and settles

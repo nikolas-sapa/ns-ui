@@ -17,7 +17,7 @@ export default function StakeLineDemo() {
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6">
       <style>{CSS}</style>
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / stake-line — staked out before the data arrives
+        ns-ui / empty-state-survey — staked out before the data arrives
       </p>
 
       <div className="ns-stake-demo-frame w-full max-w-[560px] rounded-md border border-border bg-surface p-8">

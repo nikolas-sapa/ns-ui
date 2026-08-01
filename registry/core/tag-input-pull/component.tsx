@@ -308,7 +308,7 @@ export function BurrChip({
                 if (el) chipRefs.current.set(tag, el);
                 else chipRefs.current.delete(tag);
               }}
-              data-burr-chip
+              data-tag-input-pull
               onPointerDown={(e) => handleChipPointerDown(e, tag)}
               className="inline-flex select-none items-center gap-1.5 rounded-full border border-border bg-background py-1 pl-3 pr-1.5 text-sm text-foreground will-change-transform"
               style={{ touchAction: "pan-y" }}
@@ -321,7 +321,7 @@ export function BurrChip({
                   else buttonRefs.current.delete(tag);
                 }}
                 type="button"
-                data-burr-chip-remove
+                data-tag-input-pull-remove
                 tabIndex={tag === rovingTag ? 0 : -1}
                 disabled={disabled || isRemoving}
                 aria-label={`Remove ${tag}`}

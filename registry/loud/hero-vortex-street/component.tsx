@@ -23,7 +23,7 @@ import { useEffect, useRef } from "react";
 // MutationObserver on documentElement's class attribute, so both themes
 // render correctly. The rAF loop pauses on visibilitychange; the backing
 // store is dpr-clamped(2) with a zero-size guard. No interactive controls —
-// the canvas is aria-hidden decoration, matching particle-hero's precedent.
+// the canvas is aria-hidden decoration, matching hero-particles-webgl's precedent.
 //
 // prefers-reduced-motion: no rAF loop, no pointer tracking at all. One
 // static frame is drawn instead: streamlines integrated once through a fixed

@@ -111,7 +111,7 @@ function WireFeedRow({
 
   return (
     <div
-      className="wire-feed-row overflow-hidden"
+      className="progress-telegraph-log-row overflow-hidden"
       aria-live={isError ? "assertive" : undefined}
       aria-hidden={status === "active" ? true : undefined}
       style={{
@@ -270,13 +270,13 @@ export function WireFeed({
       }}
     >
       <style>{`
-        @keyframes wire-feed-in {
+        @keyframes progress-telegraph-log-in {
           from { opacity: 0; transform: translateY(8px); }
           to { opacity: 1; transform: translateY(0); }
         }
-        .wire-feed-row { animation: wire-feed-in ${SLIDE_MS}ms cubic-bezier(0.19,1,0.22,1) both; }
+        .progress-telegraph-log-row { animation: progress-telegraph-log-in ${SLIDE_MS}ms cubic-bezier(0.19,1,0.22,1) both; }
         @media (prefers-reduced-motion: reduce) {
-          .wire-feed-row { animation: none; }
+          .progress-telegraph-log-row { animation: none; }
         }
       `}</style>
       {steps.map((s) => (

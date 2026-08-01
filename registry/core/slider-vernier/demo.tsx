@@ -14,7 +14,7 @@ export default function VernierSlipDemo() {
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-md">
         <p className="mb-4 font-mono text-xs tracking-widest text-muted">
-          ns-ui / vernier-slip
+          ns-ui / slider-vernier
         </p>
         <h1 className="text-lg font-semibold text-foreground">
           Read the last digit off the vernier

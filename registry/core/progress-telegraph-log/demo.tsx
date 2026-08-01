@@ -125,7 +125,7 @@ export default function WireFeedDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / wire-feed
+        ns-ui / progress-telegraph-log
       </p>
 
       <div

@@ -18,7 +18,7 @@ import { useEffect, useRef, useState } from "react";
 // MECHANISM: growth is precomputed synchronously the instant success fires
 // (mulberry32-seeded), not simulated tip-by-tip per frame — every needle
 // segment carries a "birth" time (seconds from growth start) baked in when
-// it's built, the same reveal-by-threshold technique as frostbite-switch.
+// it's built, the same reveal-by-threshold technique as switch-frost.
 // Each animation frame just draws every segment whose birth <= elapsed and
 // every particle whose precomputed lockBirth <= elapsed, which is O(live
 // geometry) per frame instead of O(particles x segments) per frame — the
@@ -145,7 +145,7 @@ function buildDust(count: number, w: number, h: number, rand: () => number): Par
 // the nucleation point, each a slightly curved walk that throws side
 // branches at ~60deg with depth-decaying probability. Every segment's birth
 // time is baked in at build time (reveal-by-threshold at draw time), the
-// same trick frostbite-switch uses for its frost spines.
+// same trick switch-frost uses for its frost spines.
 function buildCrystal(
   rand: () => number,
   cx: number,

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Strandline } from "@/registry/core/strandline/component";
+import { Strandline } from "@/registry/core/timeline-changelog-wave/component";
 import { ThemeToggle } from "../_components/theme-toggle";
 import { loadChangelog } from "./entries";
 import { ChangelogEntryList } from "./entry-list";
@@ -8,11 +8,11 @@ import { ChangelogEntryList } from "./entry-list";
 export const metadata: Metadata = {
   title: "Changelog — ns-ui",
   description:
-    "What shipped in ns-ui, drawn with strandline — a component from the registry itself.",
+    "What shipped in ns-ui, drawn with timeline-changelog-wave — a component from the registry itself.",
 };
 
 export default function ChangelogPage() {
-  // CHANGELOG.md is written newest first; strandline wants oldest first, so the
+  // CHANGELOG.md is written newest first; timeline-changelog-wave wants oldest first, so the
   // oldest release breaks nearest the now edge.
   const entries = loadChangelog();
   const events = [...entries].reverse().map((e) => ({
@@ -36,7 +36,7 @@ export default function ChangelogPage() {
         </h1>
         <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted">
           {entries.length} releases since {entries[entries.length - 1]?.iso}.
-          The tide below is <span className="font-mono text-foreground">strandline</span>,
+          The tide below is <span className="font-mono text-foreground">timeline-changelog-wave</span>,
           a component from this registry, running on the real release history.
         </p>
       </header>

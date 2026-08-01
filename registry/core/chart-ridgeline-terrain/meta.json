@@ -1,6 +1,6 @@
 {
-  "name": "signal-terrain",
-  "title": "Signal Terrain",
+  "name": "chart-ridgeline-terrain",
+  "title": "Chart Ridgeline Terrain",
   "description": "Unknown-Pleasures ridgeline chart whose live history recedes into scrolling ambient noise terrain, dented gravitationally by the cursor.",
   "collection": "core",
   "tags": ["canvas", "data-viz", "ridgeline", "noise", "cursor", "ambient", "chart"],

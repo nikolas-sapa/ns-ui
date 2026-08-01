@@ -1,6 +1,6 @@
 {
-  "name": "frostbite-switch",
-  "title": "Frostbite Switch",
+  "name": "switch-frost",
+  "title": "Switch Frost",
   "description": "iOS-style switch whose OFF state freezes over: seeded dendritic frost feathers creep in from the track edges over a frosted-glass film, with sparkle grain that glistens at idle; switching ON drives a melt front ahead of the sliding thumb with droplet run-off.",
   "collection": "core",
   "tags": [

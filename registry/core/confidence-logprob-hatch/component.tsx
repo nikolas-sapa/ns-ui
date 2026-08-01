@@ -310,7 +310,7 @@ export function PencilHedge({
   }, [openId]);
 
   return (
-    <span className={`ns-pencil-hedge ${className}`}>
+    <span className={`ns-confidence-logprob-hatch ${className}`}>
       {/* One shared <defs> per instance: three diagonal-stroke patterns,
           density escalating sparse -> medium -> cross-hatch, like a
           draftsman going over a line once, then again, then crossed. Every

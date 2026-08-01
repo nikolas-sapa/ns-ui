@@ -143,19 +143,19 @@ export function CinchBead({
           55% { transform: translateX(2.5px); }
           80% { transform: translateX(-1.5px); }
         }
-        .cinch-bead-chip { animation: cinch-in 280ms cubic-bezier(0.22, 1, 0.36, 1) backwards; }
-        .cinch-bead-chip .cinch-knot {
+        .tag-input-cord-chip { animation: cinch-in 280ms cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+        .tag-input-cord-chip .cinch-knot {
           stroke-dasharray: 1;
           animation: cinch-knot-draw 320ms 120ms ease-out backwards;
         }
-        .cinch-bead-chip[data-leaving="true"] {
+        .tag-input-cord-chip[data-leaving="true"] {
           animation: cinch-unravel 240ms cubic-bezier(0.55, 0, 0.55, 0.2) forwards;
         }
-        .cinch-bead-chip[data-shaking="true"] { animation: cinch-shudder 280ms ease-in-out; }
+        .tag-input-cord-chip[data-shaking="true"] { animation: cinch-shudder 280ms ease-in-out; }
         @media (prefers-reduced-motion: reduce) {
-          .cinch-bead-chip, .cinch-bead-chip .cinch-knot,
-          .cinch-bead-chip[data-leaving="true"],
-          .cinch-bead-chip[data-shaking="true"] { animation: none; }
+          .tag-input-cord-chip, .tag-input-cord-chip .cinch-knot,
+          .tag-input-cord-chip[data-leaving="true"],
+          .tag-input-cord-chip[data-shaking="true"] { animation: none; }
         }
       `}</style>
       <Cord className="w-2" />
@@ -164,7 +164,7 @@ export function CinchBead({
           <span
             data-leaving={leaving.includes(tag) || undefined}
             data-shaking={shaking === tag || undefined}
-            className="cinch-bead-chip flex items-center gap-1.5 rounded-full border border-border bg-background py-1 pl-2 pr-1"
+            className="tag-input-cord-chip flex items-center gap-1.5 rounded-full border border-border bg-background py-1 pl-2 pr-1"
           >
             <Knot />
             <span className="max-w-[16ch] truncate text-xs text-foreground">{tag}</span>

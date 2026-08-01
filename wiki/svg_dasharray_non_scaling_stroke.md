@@ -13,7 +13,7 @@ computes `stroke-dasharray`/`stroke-dashoffset` in *screen space* when
 non-scaling-stroke is set, ignoring `pathLength` entirely. A normalized dash
 window like `0.2 0.8` becomes meaningless — the painted segment lands at
 arbitrary positions while every attribute reads "correct" in DevTools and in
-code review. Four fix attempts on lock-flight's connector passed code review
+code review. Four fix attempts on wizard-canal-lock's connector passed code review
 and failed on screen because of exactly this.
 
 Rules of thumb:
@@ -23,7 +23,7 @@ Rules of thumb:
 - If the shape is a straight line (progress tracks, steppers, underlines),
   skip SVG: two absolutely-positioned divs (full-width track + translated
   segment) do the same job with none of the coordinate-space pitfalls.
-  Reference implementation: `registry/core/lock-flight/component.tsx`.
+  Reference implementation: `registry/core/wizard-canal-lock/component.tsx`.
 - Verify paint, not attributes: screenshot + pixel-sample in a real browser
-  (see the pattern in the lock-flight fix — Playwright screenshot decoded via
+  (see the pattern in the wizard-canal-lock fix — Playwright screenshot decoded via
   in-page canvas, no PNG dependency needed).

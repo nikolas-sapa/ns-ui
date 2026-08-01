@@ -1,6 +1,6 @@
 {
-  "name": "burr-chip",
-  "title": "Burr Chip",
+  "name": "tag-input-pull",
+  "title": "Tag Input Pull",
   "description": "A tag/token input whose chips attach like burrs — hooked, not glued. Removing one takes a deliberate pull: it stretches at the trailing edge, pops free, and the row exhales closed behind it with a staggered ripple toward the caret.",
   "collection": "core",
   "tags": [
@@ -16,7 +16,7 @@
   ],
   "autoplay": {
     "mode": "press",
-    "target": "[data-burr-chip-remove]",
+    "target": "[data-tag-input-pull-remove]",
     "period": 4200,
     "delay": 700,
     "hold": 1000

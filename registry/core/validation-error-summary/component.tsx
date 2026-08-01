@@ -25,7 +25,7 @@ import {
 // this adds three things that pattern never renders: the spatial leader
 // link between summary and field, live strike-through as items get fixed,
 // and self-dismissal at zero — the summary is a live progress artifact, not
-// a one-shot dump. Unlike assay-gate (a single tool-call approved/denied
+// a one-shot dump. Unlike approval-inline-diff (a single tool-call approved/denied
 // once and never reopened) this is per-field, revalidates live, and can
 // re-arm on a second failed submit.
 //
@@ -40,7 +40,7 @@ import {
 //
 // Colors: --background/--foreground/--muted/--border/--accent throughout;
 // error state reads the semantic --error custom property (house convention
-// for status-only red, e.g. litmus-wick / sediment-stack / needle-stepper)
+// for status-only red, e.g. validation-inline-wick / toast-gravity-stack / stepper-needle)
 // with a literal fallback so the component still reads correctly for a
 // consumer who hasn't set --error. --accent is reserved for the submit
 // button and focus rings — never used to indicate the error itself.

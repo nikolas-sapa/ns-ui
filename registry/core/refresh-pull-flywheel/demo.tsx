@@ -34,7 +34,7 @@ export default function FlywheelPullDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / flywheel-pull — wind it up, let it spin
+        ns-ui / refresh-pull-flywheel — wind it up, let it spin
       </p>
 
       <FlywheelPull defaultItems={SEED_ITEMS} label="Activity feed" />

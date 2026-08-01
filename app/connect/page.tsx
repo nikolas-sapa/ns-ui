@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 const CLI_SEARCH = 'npx @nikolas.sapa/ns-ui search "reactive hero"';
-const CLI_INFO = "npx @nikolas.sapa/ns-ui info after-image";
+const CLI_INFO = "npx @nikolas.sapa/ns-ui info undo-ghost-row";
 const CLI_INSTALL = "npx @nikolas.sapa/ns-ui add <name> [...names]";
 
 const SECTION_LABEL =

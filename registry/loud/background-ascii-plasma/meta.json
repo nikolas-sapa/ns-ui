@@ -1,6 +1,6 @@
 {
-  "name": "glyph-tide",
-  "title": "Glyph Tide",
+  "name": "background-ascii-plasma",
+  "title": "Background ASCII Plasma",
   "description": "A full-bleed animated ASCII plasma field — three octaves of traveling value noise mapped through a density ramp to a monospace glyph grid, with the pointer warping the field outward and letting it relax back like dragging a finger through liquid.",
   "collection": "loud",
   "tags": ["ascii", "background", "canvas", "cursor", "noise", "plasma"],

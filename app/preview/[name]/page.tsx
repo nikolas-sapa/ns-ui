@@ -47,7 +47,7 @@ export default async function PreviewPage({
   // `?embed=1` is how the landing-page cards load this page inside an iframe.
   // It changes nothing visual — this page stays the reference the cards are
   // matched against — it only makes the demo inert. Without it, a demo that
-  // focuses something on mount (event-horizon-command focuses its input) hands
+  // focuses something on mount (command-palette-orbit focuses its input) hands
   // focus to the iframe, and the browser scrolls the *host* page to reveal
   // that iframe: the landing page jumped ~1000px on its own. Inert also keeps
   // the demo's own controls out of the host page's tab order.

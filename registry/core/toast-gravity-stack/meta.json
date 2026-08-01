@@ -1,6 +1,6 @@
 {
-  "name": "sediment-stack",
-  "title": "Sediment Stack",
+  "name": "toast-gravity-stack",
+  "title": "Toast Gravity Stack",
   "description": "Toast stack with real gravity — notifications thud into a jostling heap, errors sink under their own mass, and the pile resettles when one is dismissed.",
   "collection": "core",
   "tags": ["toast", "notification", "physics", "gravity", "rigid-body", "micro-interaction", "feedback"],

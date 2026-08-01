@@ -20,7 +20,7 @@ diff on hydration since the raw float gets serialized into the SSR HTML.
 This is a genuine console error, not a benign warning — `verify.ts`'s
 console-error check fails on it. It only shows up on components that
 actually use `Math.cos`/`Math.sin` (or similar) to place SVG geometry (e.g.
-`gnomon-set`'s sundial dial); straight-line/grid layouts using plain
+`time-picker-sundial`'s sundial dial); straight-line/grid layouts using plain
 arithmetic never hit it.
 
 **Fix:** round every computed coordinate to a fixed decimal precision (a

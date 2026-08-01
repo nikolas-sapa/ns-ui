@@ -1,10 +1,10 @@
 {
-  "name": "shunt-tray",
-  "title": "Shunt Tray",
+  "name": "menu-nested-trays",
+  "title": "Menu Nested Trays",
   "description": "Nested menus as telescoping card-catalog trays: opening a submenu shunts the parent back and dims it instead of spawning a flyout, leaving a 12px clickable edge per ancestor as a live breadcrumb of depth.",
   "collection": "core",
   "tags": ["menu", "nested", "navigation", "breadcrumb", "mobile", "context-menu", "accessibility"],
-  "useWhen": "Use when nested content is genuinely a menu — role=menu/menuitem rows, ArrowRight/Enter to drill in, ArrowLeft/Escape to back out — and you want every ancestor level to stay physically on screen as a scaled-down, dimmed, directly-clickable 12px edge so depth is always visible and any level is one click away, which is what makes it suit deep context menus and mobile-width nested navigation where cascading flyovers would overflow or miss diagonal hovers. Pick spine-stack instead for full-page drill-down navigation (nav landmark, real page content per level) where history compresses into vertical book-spines rather than menu semantics.",
+  "useWhen": "Use when nested content is genuinely a menu — role=menu/menuitem rows, ArrowRight/Enter to drill in, ArrowLeft/Escape to back out — and you want every ancestor level to stay physically on screen as a scaled-down, dimmed, directly-clickable 12px edge so depth is always visible and any level is one click away, which is what makes it suit deep context menus and mobile-width nested navigation where cascading flyovers would overflow or miss diagonal hovers. Pick drill-down-spines instead for full-page drill-down navigation (nav landmark, real page content per level) where history compresses into vertical book-spines rather than menu semantics.",
   "autoplay": {
     "mode": "press",
     "target": "[data-item-id=\"share\"]",

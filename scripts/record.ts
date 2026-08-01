@@ -4,7 +4,7 @@
 // Requires the dev server running (BASE_URL) and ffmpeg on PATH.
 // Usage: node scripts/record.ts [component-name ...]
 //        node scripts/record.ts --collection loud
-//        DURATION=15 node scripts/record.ts glass-button
+//        DURATION=15 node scripts/record.ts button-glass
 import { chromium } from "playwright";
 import { execFileSync } from "node:child_process";
 import { readFileSync, mkdirSync, existsSync, rmSync, readdirSync } from "node:fs";

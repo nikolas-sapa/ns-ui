@@ -11,7 +11,7 @@ export default function DeadLetterDemo() {
             ns://ui
           </span>
           <span className="font-mono text-xs tracking-[0.25em] text-muted">
-            ns-ui / dead-letter
+            ns-ui / not-found-postmark
           </span>
         </div>
         <a

@@ -8,7 +8,7 @@ export default function DecryptTextDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-10">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / decrypt-text
+        ns-ui / text-decrypt
       </p>
       <DecryptText
         replayKey={replayKey}

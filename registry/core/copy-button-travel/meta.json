@@ -1,6 +1,6 @@
 {
-  "name": "carbon-lift",
-  "title": "Carbon Lift",
+  "name": "copy-button-travel",
+  "title": "Copy Button Travel",
   "description": "Copy-to-clipboard button whose confirmation shows what got copied: a duplicate of the source text visibly peels off the line and travels the real distance to the clipboard glyph before fading, arriving as the glyph gives a small catch-bounce and the label ticks to \"Copied\".",
   "collection": "core",
   "tags": [
@@ -10,7 +10,7 @@
     "micro-interaction",
     "form"
   ],
-  "useWhen": "copying API keys, code snippets, install commands or share links, where the confirmation should visibly carry the actual copied text so the user can eyeball that the right value left — pick chop-press instead for a rating/level input, unrelated to clipboard actions.",
+  "useWhen": "copying API keys, code snippets, install commands or share links, where the confirmation should visibly carry the actual copied text so the user can eyeball that the right value left — pick rating-stamp instead for a rating/level input, unrelated to clipboard actions.",
   "autoplay": {
     "mode": "press",
     "target": "button",

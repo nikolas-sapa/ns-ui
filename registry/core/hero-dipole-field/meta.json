@@ -1,6 +1,6 @@
 {
-  "name": "lodestone-hero",
-  "title": "Lodestone Hero",
+  "name": "hero-dipole-field",
+  "title": "Hero Dipole Field",
   "description": "Full-bleed hero where the headline exists twice: crisp DOM type above, and beneath it a canvas field of iron-filing strokes solved from a two-pole dipole field, so the type visibly iron-files into existence as the cursor approaches and CTA hover bends the whole field toward the button.",
   "collection": "core",
   "tags": ["canvas", "hero", "vector-field", "dipole", "particles", "cursor", "letter-mask", "text", "ambient"],

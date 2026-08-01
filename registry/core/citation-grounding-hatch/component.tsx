@@ -282,16 +282,16 @@ export function BedrockTrace({ sentences, sources = [], streaming = false, class
   }
 
   return (
-    <div className={["ns-bedrock-trace", className].filter(Boolean).join(" ")}>
+    <div className={["ns-citation-grounding-hatch", className].filter(Boolean).join(" ")}>
       <style>{`
-.ns-bedrock-trace .ns-bedrock-highlight{box-shadow:none;transition:box-shadow 200ms ease-out}
-.ns-bedrock-trace .ns-bedrock-highlight[data-active="true"]{box-shadow:inset 0 -2px 0 0 var(--accent)}
-.ns-bedrock-trace .ns-bedrock-legend-mark .ns-bedrock-mark{transition:none !important}
+.ns-citation-grounding-hatch .ns-bedrock-highlight{box-shadow:none;transition:box-shadow 200ms ease-out}
+.ns-citation-grounding-hatch .ns-bedrock-highlight[data-active="true"]{box-shadow:inset 0 -2px 0 0 var(--accent)}
+.ns-citation-grounding-hatch .ns-bedrock-legend-mark .ns-bedrock-mark{transition:none !important}
 @media (prefers-reduced-motion: reduce){
-  .ns-bedrock-trace .ns-bedrock-mark,
-  .ns-bedrock-trace .ns-bedrock-highlight,
-  .ns-bedrock-trace .ns-bedrock-panel-rows,
-  .ns-bedrock-trace .ns-bedrock-sentence{transition:none !important;transition-delay:0s !important}
+  .ns-citation-grounding-hatch .ns-bedrock-mark,
+  .ns-citation-grounding-hatch .ns-bedrock-highlight,
+  .ns-citation-grounding-hatch .ns-bedrock-panel-rows,
+  .ns-citation-grounding-hatch .ns-bedrock-sentence{transition:none !important;transition-delay:0s !important}
 }
 `}</style>
 

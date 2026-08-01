@@ -16,7 +16,7 @@ export const CATEGORIES = [
     id: "actions",
     label: "Buttons",
     tags: ["button", "control", "confirm", "confirmation", "destructive"],
-    extra: ["detent-swipe"],
+    extra: ["swipe-row-detent"],
   },
   {
     id: "forms",
@@ -77,7 +77,7 @@ export const CATEGORIES = [
       "feed",
       "network",
     ],
-    extra: ["patina-ledger"],
+    extra: ["memory-ledger-decay"],
   },
   {
     id: "feedback",
@@ -139,19 +139,19 @@ export const CATEGORIES = [
       "coach-mark",
       "shortcuts",
     ],
-    extra: ["drape-menu", "event-horizon-command", "terminator-date-field"],
+    extra: ["dropdown-drape", "command-palette-orbit", "date-picker-moon"],
   },
   {
     id: "media",
     label: "Media",
     tags: ["gallery", "coverflow", "media", "image", "image-diff", "compare"],
-    extra: ["ascii-dither-media", "decal-peel", "flock-stack"],
+    extra: ["background-ascii-dither", "sticker-peel", "avatar-stack-flock"],
   },
   {
     id: "backgrounds",
     label: "Backgrounds",
     tags: ["background", "terrain", "topographic"],
-    extra: ["burin-etch", "warp-lattice"],
+    extra: ["ascii-engraving-contour", "grid-magnetic-lattice"],
   },
   {
     id: "sections",

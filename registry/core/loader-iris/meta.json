@@ -1,6 +1,6 @@
 {
-  "name": "blade-iris",
-  "title": "Blade Iris",
+  "name": "loader-iris",
+  "title": "Loader Iris",
   "description": "An ambient loading glyph shaped as a six-blade camera-iris diaphragm breathing open and shut inside a fixed housing ring — one wedge shape repeated by rotation, its shared displacement keyframe overshooting each open and close before settling on a spring.",
   "collection": "core",
   "tags": ["loader", "loading", "spinner", "indicator", "svg", "css-animation", "physics", "aria-live", "icon"],
@@ -8,7 +8,7 @@
   "dependencies": [],
   "autoplay": { "mode": "none" },
   "card": {
-    "focus": "[data-blade-iris-hero]",
+    "focus": "[data-loader-iris-hero]",
     "padding": 0.15
   }
 }

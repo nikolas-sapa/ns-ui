@@ -21,7 +21,7 @@ export default function FlockStackDemo() {
       />
       <div className="relative w-full max-w-sm">
         <p className="mb-4 text-center font-mono text-xs text-muted">
-          ns-ui / flock-stack
+          ns-ui / avatar-stack-flock
         </p>
         <div className="rounded-md border border-border bg-surface p-6 shadow-sm">
           <div className="flex items-start justify-between gap-4">

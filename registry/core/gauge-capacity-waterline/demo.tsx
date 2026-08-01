@@ -34,7 +34,7 @@ export default function PlimsollGaugeDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / plimsoll-gauge
+        ns-ui / gauge-capacity-waterline
       </p>
 
       <div className="flex w-full max-w-sm flex-col items-center gap-5 rounded-[16px] border border-border bg-background p-6">

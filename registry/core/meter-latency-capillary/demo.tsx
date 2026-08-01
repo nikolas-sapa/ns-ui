@@ -84,7 +84,7 @@ export default function MeniscusHoldDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-10 px-6">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / meniscus-hold
+        ns-ui / meter-latency-capillary
       </p>
 
       <div className="w-full max-w-sm rounded-xl border border-border bg-surface px-6 py-7">

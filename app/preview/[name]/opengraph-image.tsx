@@ -6,9 +6,9 @@ import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
 
 // Screenshot embedding was tried and dropped: registry/<collection>/<name>/
 // screenshots/dark-default.png reads fine off disk in this runtime, but the
-// content is currently wrong — checked particle-hero and glass-button, both
-// are correctly THAT component (particle-hero's "Interfaces with gravity"
-// headline + CTA; glass-button's own "Get started" pill), but rendered in
+// content is currently wrong — checked hero-particles-webgl and button-glass, both
+// are correctly THAT component (hero-particles-webgl's "Interfaces with gravity"
+// headline + CTA; button-glass's own "Get started" pill), but rendered in
 // the LIGHT theme, not dark, despite the "dark-default" filename. All of
 // screenshots/ was touched today ~06:44-06:47, so this looks like an
 // in-flight theme regression in the screenshot pipeline from a concurrent

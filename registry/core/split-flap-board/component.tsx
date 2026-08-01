@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 // ---------------------------------------------------------------------------
 // SolariFlap — a mechanical split-flap (Solari board) display for short
 // status strings. Each character cell is FOUR stacked layers, not a single
-// rolling digit (that's carry-digit's territory):
+// rolling digit (that's counter-carry-ripple's territory):
 //   - a static bottom plate (permanently shows the settled char's bottom
 //     half, updated mid-flip)
 //   - a static "under" plate behind the flap (only ever exposed by the

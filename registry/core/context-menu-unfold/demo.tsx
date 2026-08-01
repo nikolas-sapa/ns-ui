@@ -32,7 +32,7 @@ export default function JackKnifeDemo() {
 
     const cycle = () => {
       if (cancelled) return;
-      const trigger = rootRef.current?.querySelector<HTMLButtonElement>("[data-jack-knife-trigger]");
+      const trigger = rootRef.current?.querySelector<HTMLButtonElement>("[data-context-menu-unfold-trigger]");
       trigger?.click();
       timer = setTimeout(() => {
         if (cancelled) return;
@@ -51,7 +51,7 @@ export default function JackKnifeDemo() {
   return (
     <div ref={rootRef} className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / jack-knife
+        ns-ui / context-menu-unfold
       </p>
 
       <div className="flex w-full max-w-md flex-col items-center gap-3">

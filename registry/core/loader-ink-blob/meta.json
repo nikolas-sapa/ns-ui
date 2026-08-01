@@ -1,13 +1,13 @@
 {
-  "name": "thinking-glyph",
-  "title": "Thinking Glyph",
+  "name": "loader-ink-blob",
+  "title": "Loader Ink Blob",
   "description": "A small canvas-2D assistant-state indicator: a soft ink blob traced through 72 points around a circle, each perturbed by one of six distinct motion signatures — idle, thinking, listening, speaking, success, error — with a checkmark or X that strokes itself in for the two settled states.",
   "collection": "core",
   "tags": ["loader", "status", "canvas", "ai", "chat", "indicator", "spinner"],
   "instruction": "A small fixed-size (default 48 CSS px, plain `size` prop) canvas-2D indicator for an AI assistant's current state, driven by a `state` prop: 'idle' | 'thinking' | 'listening' | 'speaking' | 'success' | 'error'. Internally it traces a smooth closed blob through 72 points sampled evenly around a circle of radius 0.32×size, each point's radius perturbed by a state-specific function of angle and time (no shared noise field across states — each is its own formula): idle is one slow sine wobble; thinking sums three sine bands at different frequencies/phases plus a tiny deterministic per-point jitter (hash-seeded, not Math.random, so it's reproducible) for a turbulent surface; listening keeps the blob almost still while a ring emits from its edge and expands/fades on a fixed 1.2s period (sonar pulse) in the --accent token; speaking rides a 6-lobe standing wave around the outline under a slow amplitude envelope; success eases the wobble amplitude to zero over 0.5s (settling into a near-circle) while a checkmark strokes itself in over 0.4s in the --success token, timed from the moment `state` became 'success' (tracked via a ref updated during render when the prop changes, not in an effect, so the timer never lags a rapid state change); error plays a short exponentially-decaying horizontal shake burst every ~950ms while an X strokes itself in over 0.35s in the --error token, timed the same way. The blob itself is filled at 14% alpha and stroked at ~92% alpha in the --foreground token (--muted while thinking, to read as 'processing' rather than 'settled'). All ink is read via getComputedStyle(document.documentElement) at mount and re-read on a MutationObserver watching documentElement's class attribute. The rAF loop pauses on document visibilitychange and under prefers-reduced-motion (draws one static settled frame instead) and can be frozen on its current frame via a `paused` prop (checked through a lightweight ref poll so toggling it doesn't tear down the canvas). `speed` scales every state's internal clock. Backing store is dpr-clamped to 2. The wrapper carries role='img' and an aria-label naming the current state ('Assistant is thinking', etc.) since this is a display-only status glyph with no interactive control — screen reader users get the state as text instead of inferring it from motion.",
   "dependencies": [],
   "card": {
-    "focus": "[data-thinking-glyph-stage]",
+    "focus": "[data-loader-ink-blob-stage]",
     "padding": 0.25
   }
 }

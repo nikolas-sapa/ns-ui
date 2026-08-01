@@ -9,7 +9,7 @@ export default function ScarpHorizonDemo() {
           the horizon, like looking out of a moving window */}
       <ScarpHorizon>
         <span className="font-mono text-xs tracking-[0.25em] text-muted">
-          ns-ui / scarp-horizon
+          ns-ui / hero-ascii-terrain
         </span>
         <h1 className="max-w-xl text-4xl font-semibold tracking-tight text-foreground sm:text-6xl">
           Terrain rendered in type.

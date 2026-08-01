@@ -1,6 +1,6 @@
 {
-  "name": "develop-skeleton",
-  "title": "Develop Skeleton",
+  "name": "skeleton-develop",
+  "title": "Skeleton Develop",
   "description": "Loading wrapper whose placeholder blocks develop into the real content — a masked sweep resolves the text instead of swapping it.",
   "collection": "core",
   "tags": [

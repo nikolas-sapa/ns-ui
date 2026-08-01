@@ -14,7 +14,7 @@ custom property, not just `outline-style: none` directly. Because
 style stays `none`, so the outline never paints even though `outline-2
 outline-offset-2 outline-accent` all read correct in the DOM inspector.
 
-This shipped in `umbra-toggle` (`className="... outline-none ...
+This shipped in `switch-eclipse` (`className="... outline-none ...
 focus-visible:outline-2 focus-visible:outline-offset-2
 focus-visible:outline-accent"`) and failed `scripts/verify.ts`'s
 "keyboard focus renders no visible focus state" check — the unfocused/focus

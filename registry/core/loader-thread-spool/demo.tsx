@@ -67,7 +67,7 @@ export default function WindSpoolDemo() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-10 bg-background p-6">
       <p className="self-start font-mono text-xs tracking-widest text-muted">
-        ns-ui / wind-spool
+        ns-ui / loader-thread-spool
       </p>
 
       <div className="flex flex-col items-center gap-6 rounded-md border border-border bg-background p-10">

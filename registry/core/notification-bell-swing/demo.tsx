@@ -60,7 +60,7 @@ export default function ClapperBellDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / clapper-bell
+        ns-ui / notification-bell-swing
       </p>
 
       <div className="flex w-full max-w-sm items-center justify-between rounded-[12px] border border-border bg-background px-4 py-3">

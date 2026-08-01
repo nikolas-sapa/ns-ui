@@ -1,6 +1,6 @@
 {
-  "name": "vapor-countdown",
-  "title": "Vapor Countdown",
+  "name": "countdown-vapor-digits",
+  "title": "Countdown Vapor Digits",
   "description": "Live countdown where each digit change is a phase transition: the outgoing digit sublimates into grains on curl-noise wind while the incoming digit condenses from the same cloud.",
   "collection": "core",
   "tags": ["canvas", "particles", "countdown", "typography", "noise", "spring", "time"],

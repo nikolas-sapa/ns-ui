@@ -1,6 +1,6 @@
 {
-  "name": "glass-panel",
-  "title": "Glass Panel",
+  "name": "surface-glass",
+  "title": "Surface Glass",
   "description": "Container-level liquid glass: blur, saturation, noise grain, specular rim, graduated shadow ramp.",
   "collection": "core",
   "tags": [

@@ -24,7 +24,7 @@ export default function DriftStampDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-6">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / drift-stamp — hover or focus a stamp for the exact moment
+        ns-ui / time-ago-drift — hover or focus a stamp for the exact moment
       </p>
       <div className="w-full max-w-sm overflow-hidden rounded-md border border-border bg-surface">
         {ROWS.map((row, i) => (

@@ -611,7 +611,7 @@ export function ShimFit({
                 data-shim-row
                 className={`relative flex items-center gap-2 border-t bg-muted/8 px-2 outline-none transition-colors hover:bg-muted/16 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-inset ${
                   isLifted ? "border-t-accent bg-accent/5" : isPulsing ? "border-t-foreground" : "border-t-border"
-                } ${isPulsing && !reduced ? "shim-fit-pulse" : ""}`}
+                } ${isPulsing && !reduced ? "context-prompt-shims-pulse" : ""}`}
                 style={{ height: h }}
               >
                 <div
@@ -703,7 +703,7 @@ export function ShimFit({
                 <div
                   key={c.id}
                   className={`flex items-center gap-2 rounded-sm border border-border bg-background px-2.5 py-1.5 transition-transform ${
-                    bouncing ? "shim-fit-bounce" : ""
+                    bouncing ? "context-prompt-shims-bounce" : ""
                   }`}
                 >
                   <span className="min-w-0 flex-1 truncate text-xs text-foreground">{c.label}</span>
@@ -727,21 +727,21 @@ export function ShimFit({
       ) : null}
 
       <style>{`
-        @keyframes shim-fit-pulse-kf {
+        @keyframes context-prompt-shims-pulse-kf {
           0% { border-top-color: var(--border); }
           30% { border-top-color: var(--foreground); }
           100% { border-top-color: var(--border); }
         }
-        .shim-fit-pulse { animation: shim-fit-pulse-kf ${PULSE_MS}ms ease-out 1; }
-        @keyframes shim-fit-bounce-kf {
+        .context-prompt-shims-pulse { animation: context-prompt-shims-pulse-kf ${PULSE_MS}ms ease-out 1; }
+        @keyframes context-prompt-shims-bounce-kf {
           0% { transform: translateY(0) scale(1); }
           30% { transform: translateY(-6px) scale(1.02); }
           60% { transform: translateY(2px) scale(0.99); }
           100% { transform: translateY(0) scale(1); }
         }
-        .shim-fit-bounce { animation: shim-fit-bounce-kf 420ms ${FLIP_EASE} 1; }
+        .context-prompt-shims-bounce { animation: context-prompt-shims-bounce-kf 420ms ${FLIP_EASE} 1; }
         @media (prefers-reduced-motion: reduce) {
-          .shim-fit-pulse, .shim-fit-bounce { animation: none; }
+          .context-prompt-shims-pulse, .context-prompt-shims-bounce { animation: none; }
         }
       `}</style>
     </div>

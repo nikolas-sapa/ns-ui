@@ -7,7 +7,7 @@ export default function PressureFrontDemo() {
     <main className="min-h-screen bg-background">
       <header className="flex items-center justify-between gap-4 border-b border-border px-6 py-4">
         <p className="font-mono text-xs tracking-widest text-muted">
-          ns-ui / pressure-front
+          ns-ui / hero-isobar-contours
         </p>
         <p className="hidden font-mono text-[11px] text-muted sm:block">
           the contour lines bunch tighter the closer they get to the button —

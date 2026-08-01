@@ -79,7 +79,7 @@ function poissonPoints(w: number, h: number, count: number, minDist: number): Pt
 /**
  * Nearest and second-nearest seeds to (x, y). Their perpendicular bisector is
  * the half-plane boundary between the two Voronoi cells — the exact wall the
- * slide-to-shatter clipper would produce — so points solved on it lie on real
+ * confirm-slide-shatter clipper would produce — so points solved on it lie on real
  * cell edges without ever chaining polygons.
  */
 function nearestPair(seeds: Pt[], x: number, y: number): { a: Pt; b: Pt; ia: number } {

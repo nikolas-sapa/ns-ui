@@ -186,7 +186,7 @@ export function GantryRun({ items = DEFAULT_ITEMS, className = "" }: GantryRunPr
   // rules minus the depth-driven trigger.
   if (reduced) {
     return (
-      <section data-gantry-run data-gantry-viewport className={`bg-background px-6 py-16 ${className}`}>
+      <section data-gallery-gantry-track data-gantry-viewport className={`bg-background px-6 py-16 ${className}`}>
         <div className="mx-auto flex max-w-4xl items-center justify-between pb-6">
           <span className="font-mono text-xs uppercase tracking-widest text-muted">Gantry catalog</span>
           <span className="font-mono text-xs tabular-nums text-foreground">{items.length} items</span>
@@ -219,7 +219,7 @@ export function GantryRun({ items = DEFAULT_ITEMS, className = "" }: GantryRunPr
   }
 
   return (
-    <section ref={sectionRef} data-gantry-run className={`relative h-[400vh] bg-background ${className}`}>
+    <section ref={sectionRef} data-gallery-gantry-track className={`relative h-[400vh] bg-background ${className}`}>
       <div data-gantry-viewport className="sticky top-0 flex h-screen w-full flex-col overflow-hidden">
 
         <div

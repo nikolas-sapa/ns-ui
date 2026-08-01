@@ -305,7 +305,7 @@ export function WarpLattice({
       draw();
 
       // cards sample the same field: translate field(center) * 0.35,
-      // nearest gets 0.6x plus scale 1.02 (magnetic-dock pull)
+      // nearest gets 0.6x plus scale 1.02 (dock-cursor-magnify pull)
       let maxDelta = 0;
       items.forEach((el, i) => {
         sampleField(

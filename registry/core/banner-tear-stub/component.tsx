@@ -14,7 +14,7 @@ import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from 
 // is promoted into the Reopen button only once the panel is actually gone —
 // so there is never a pointless enabled control sitting idle at rest.
 //
-// Differs from selvage-fold on purpose: that folds content away in place and
+// Differs from truncation-word-count on purpose: that folds content away in place and
 // keeps the same object at a smaller size. Here the remainder is a distinct,
 // much smaller object (a torn stub, not a folded panel) and the physical
 // contract is that the record is never destroyed, only shrunk — dismissal

@@ -1,6 +1,6 @@
 {
-  "name": "warp-lattice",
-  "title": "Warp Lattice",
+  "name": "grid-magnetic-lattice",
+  "title": "Grid Magnetic Lattice",
   "description": "Card grid on a magnetized hairline lattice — the cursor bends the grid lines and the DOM cards sample the same displacement field, riding the bent sheet.",
   "collection": "core",
   "tags": ["canvas", "grid", "cursor", "cards", "field", "micro-interaction"],

@@ -1,10 +1,10 @@
 {
-  "name": "bough-index",
-  "title": "Bough Index",
+  "name": "tree-box-drawing",
+  "title": "Tree Box Drawing",
   "description": "File/directory tree drawn with real box-drawing connectors, whose glyphs redraw themselves as folders expand and collapse instead of static per-level guides.",
   "collection": "core",
   "tags": ["tree", "navigation", "file-tree", "hierarchy", "ascii", "keyboard", "sidebar"],
-  "useWhen": "a tree whose connector glyphs (├── └── │) are the medium itself, drawn in monospace with a bottom-up retract sequence that flips a sibling's ├── into └── the instant its neighbor's row vanishes; pick taproot-trace instead for an SVG-drawn indent guide with a continuous root-system animation.",
+  "useWhen": "a tree whose connector glyphs (├── └── │) are the medium itself, drawn in monospace with a bottom-up retract sequence that flips a sibling's ├── into └── the instant its neighbor's row vanishes; pick tree-root-trace instead for an SVG-drawn indent guide with a continuous root-system animation.",
   "autoplay": {
     "mode": "press",
     "target": "[data-bough-row=\"components\"]",

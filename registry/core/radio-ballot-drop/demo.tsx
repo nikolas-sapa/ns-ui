@@ -29,7 +29,7 @@ export default function BallotDropDemo() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-8 bg-background px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / ballot-drop
+        ns-ui / radio-ballot-drop
       </p>
       <div ref={wrapRef}>
         <BallotDrop />

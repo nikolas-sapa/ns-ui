@@ -12,7 +12,7 @@ const TRAIL: BellowsCrumbItem[] = [
   { id: "ns-ui", label: "ns-ui", href: "#ns-ui" },
   { id: "registry", label: "registry", href: "#registry" },
   { id: "core", label: "core", href: "#core" },
-  { id: "bellows-crumb", label: "bellows-crumb.tsx" },
+  { id: "breadcrumb-fold", label: "breadcrumb-fold.tsx" },
 ];
 
 function Frame({ width, note, children }: { width: string; note: string; children: ReactNode }) {
@@ -28,7 +28,7 @@ export default function BellowsCrumbDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-10 px-6">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / bellows-crumb — every ancestor stays reachable, pleated
+        ns-ui / breadcrumb-fold — every ancestor stays reachable, pleated
       </p>
 
       <div className="flex w-full max-w-2xl flex-col items-start gap-8">

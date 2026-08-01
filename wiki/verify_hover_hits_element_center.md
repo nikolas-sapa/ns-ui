@@ -28,5 +28,5 @@ scale linearly through the center — e.g.
 `Math.max(0.5, Math.min(1, Math.abs(offset)))` times a fixed sign — so a
 cursor-relative effect still produces a guaranteed, visible pixel change
 even for a synthetic hover that lands precisely on center. Real
-implementation: `registry/core/clapper-bell/component.tsx`'s
+implementation: `registry/core/notification-bell-swing/component.tsx`'s
 `onPointerMove`.

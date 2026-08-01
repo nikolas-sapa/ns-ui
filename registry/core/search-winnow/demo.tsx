@@ -20,7 +20,7 @@ export default function ChaffWinnowDemo() {
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-md">
         <p className="mb-4 font-mono text-xs tracking-widest text-muted">
-          ns-ui / chaff-winnow
+          ns-ui / search-winnow
         </p>
         <ChaffWinnow label="Search unix tools" placeholder="Filter tools…" items={ITEMS} />
         <p className="mt-3 font-mono text-[11px] text-muted">

@@ -61,7 +61,7 @@ export default function CloudChamberDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-background px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / cloud-chamber
+        ns-ui / event-stream-vapor
       </p>
 
       <div className="w-full max-w-3xl rounded-lg border border-border bg-background p-5 shadow-sm">

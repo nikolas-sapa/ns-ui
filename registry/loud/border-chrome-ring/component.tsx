@@ -240,7 +240,7 @@ function compile(gl: WebGLRenderingContext, type: number, src: string): WebGLSha
   if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
     const info = gl.getShaderInfoLog(s);
     gl.deleteShader(s);
-    throw new Error(`liquid-collar: shader compile failed: ${info ?? ""}`);
+    throw new Error(`border-chrome-ring: shader compile failed: ${info ?? ""}`);
   }
   return s;
 }
@@ -621,7 +621,7 @@ export function LiquidCollar({
   return (
     <div
       ref={wrapRef}
-      data-liquid-collar={uid}
+      data-border-chrome-ring={uid}
       className={`relative inline-block touch-none ${variant === "circle" ? "rounded-full" : ""} ${className}`}
       style={{
         padding: ringWidth,

@@ -358,9 +358,9 @@ export function OxbowTurn({
 .ns-oxbow-lake-anim[data-state="entering"],.ns-oxbow-chip-wrap[data-state="entering"]{transform:translateX(0);opacity:0}
 .ns-oxbow-lake-anim[data-state="settled"],.ns-oxbow-chip-wrap[data-state="settled"]{transform:translateX(${OFFSET}px);opacity:1}
 .ns-oxbow-lake-anim[data-state="exiting"],.ns-oxbow-chip-wrap[data-state="exiting"]{transform:translateX(0);opacity:0;transition:transform 240ms cubic-bezier(.4,0,.9,.4),opacity 200ms ease-in}
-.ns-oxbow-chip-tip,.ns-oxbow-turn-tip{opacity:0;transition:opacity 150ms ease-out}
+.ns-oxbow-chip-tip,.ns-context-compaction-river-tip{opacity:0;transition:opacity 150ms ease-out}
 [data-oxbow-trigger]:hover+.ns-oxbow-chip-tip,[data-oxbow-trigger]:focus+.ns-oxbow-chip-tip,[data-oxbow-trigger]:focus-visible+.ns-oxbow-chip-tip{opacity:1}
-[data-oxbow-turn-btn]:hover+.ns-oxbow-turn-tip,[data-oxbow-turn-btn]:focus+.ns-oxbow-turn-tip,[data-oxbow-turn-btn]:focus-visible+.ns-oxbow-turn-tip{opacity:1}
+[data-context-compaction-river-btn]:hover+.ns-context-compaction-river-tip,[data-context-compaction-river-btn]:focus+.ns-context-compaction-river-tip,[data-context-compaction-river-btn]:focus-visible+.ns-context-compaction-river-tip{opacity:1}
 @keyframes ns-oxbow-dot-in{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:scale(1)}}
 @keyframes ns-oxbow-breathe{0%,100%{opacity:.75}50%{opacity:1}}
 @keyframes ns-oxbow-snap{0%{stroke-width:1.5}35%{stroke-width:2.6}100%{stroke-width:1.5}}
@@ -370,7 +370,7 @@ export function OxbowTurn({
   .ns-oxbow-lake-anim,.ns-oxbow-chip-wrap{transition:opacity 160ms ease-out !important;transform:translateX(${OFFSET}px) !important}
   .ns-oxbow-lake-anim[data-state="entering"],.ns-oxbow-chip-wrap[data-state="entering"]{opacity:0 !important}
   .ns-oxbow-lake-anim[data-state="exiting"],.ns-oxbow-chip-wrap[data-state="exiting"]{opacity:0 !important}
-  .ns-oxbow-chip-tip,.ns-oxbow-turn-tip{transition:none !important}
+  .ns-oxbow-chip-tip,.ns-context-compaction-river-tip{transition:none !important}
 }
 `}</style>
 
@@ -470,7 +470,7 @@ export function OxbowTurn({
             >
               <button
                 type="button"
-                data-oxbow-turn-btn
+                data-context-compaction-river-btn
                 aria-label={accName}
                 aria-describedby={hasPreview ? turnTipId : undefined}
                 className="block h-4 w-4 cursor-default rounded-full bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
@@ -479,7 +479,7 @@ export function OxbowTurn({
                 <span
                   id={turnTipId}
                   role="tooltip"
-                  className="ns-oxbow-turn-tip pointer-events-none absolute left-[calc(100%+8px)] top-1/2 z-20 block w-max max-w-[200px] -translate-y-1/2 whitespace-normal rounded-md border border-border px-2 py-1 font-mono text-[10px] leading-relaxed text-foreground shadow-lg"
+                  className="ns-context-compaction-river-tip pointer-events-none absolute left-[calc(100%+8px)] top-1/2 z-20 block w-max max-w-[200px] -translate-y-1/2 whitespace-normal rounded-md border border-border px-2 py-1 font-mono text-[10px] leading-relaxed text-foreground shadow-lg"
                   style={{ background: "color-mix(in srgb, var(--foreground) 4%, var(--background))" }}
                 >
                   Turn {t.label}: {t.preview}

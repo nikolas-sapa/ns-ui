@@ -1,6 +1,6 @@
 {
-  "name": "respire-field",
-  "title": "Respire Field",
+  "name": "input-focus-membrane",
+  "title": "Input Focus Membrane",
   "description": "Text input whose focus ring is a living membrane: a noise-displaced canvas loop that breathes on idle, dilates on focus, sends a peristaltic pulse from the caret on each keystroke, constricts and quivers on error, and exhales once on valid submit.",
   "collection": "core",
   "tags": ["input", "form", "canvas", "noise", "membrane", "micro-interaction", "focus-ring"],

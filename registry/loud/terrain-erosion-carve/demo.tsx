@@ -7,7 +7,7 @@ export default function ErosionTrailDemo() {
     <main className="flex min-h-screen flex-col items-center justify-center bg-background px-6 py-16">
       <div className="w-full max-w-4xl">
         <p className="mb-6 font-mono text-xs tracking-[0.25em] text-muted">
-          ns-ui / erosion-trail
+          ns-ui / terrain-erosion-carve
         </p>
         <div className="overflow-hidden rounded-md border border-border bg-surface">
           <ErosionTrail className="h-96" />

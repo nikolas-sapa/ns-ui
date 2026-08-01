@@ -102,7 +102,7 @@ const STAGE_CLASSES: Record<PatinaPipStage, string> = {
 };
 
 const BASE_CLASSES =
-  "ns-patina-pip inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full px-1.5 font-mono text-[11px] leading-none tabular-nums select-none transition-[background-color,border-color,color,border-width] duration-[400ms] ease-out";
+  "ns-badge-unread-tarnish inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full px-1.5 font-mono text-[11px] leading-none tabular-nums select-none transition-[background-color,border-color,color,border-width] duration-[400ms] ease-out";
 
 export function PatinaPip({ count, newestTimestamp, id, className }: PatinaPipProps) {
   const autoId = useId();

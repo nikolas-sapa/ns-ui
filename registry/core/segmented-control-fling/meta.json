@@ -1,6 +1,6 @@
 {
-  "name": "fling-segment",
-  "title": "Fling Segment",
+  "name": "segmented-control-fling",
+  "title": "Segmented Control Fling",
   "description": "Segmented control with a visibly grabbable pill (grip dots, hover lift) — fling it, it coasts on real release velocity, rubber-bands off the ends, and snaps into the nearest detent. Optional one-shot intro fling demos the mechanic on first view.",
   "collection": "core",
   "tags": [

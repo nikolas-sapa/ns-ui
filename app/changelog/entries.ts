@@ -6,7 +6,7 @@ export type ChangelogEntry = {
   version: string;
   /** ISO date, e.g. "2026-07-21" */
   iso: string;
-  /** short mono label strandline prints, e.g. "JUL 21" */
+  /** short mono label timeline-changelog-wave prints, e.g. "JUL 21" */
   date: string;
   title: string;
   body: string;

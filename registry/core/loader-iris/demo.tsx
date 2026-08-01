@@ -6,11 +6,11 @@ export default function BladeIrisDemo() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-10 bg-background px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-widest text-muted">
-        ns-ui / blade-iris
+        ns-ui / loader-iris
       </p>
 
       <div
-        data-blade-iris-hero
+        data-loader-iris-hero
         className="flex w-full max-w-sm flex-col items-center gap-6 rounded-xl border border-border bg-surface px-10 py-14"
       >
         <BladeIris size={72} label="Rendering export" />

@@ -1,6 +1,6 @@
 {
-  "name": "tear-tab",
-  "title": "Tear Tab",
+  "name": "tag-input-tear",
+  "title": "Tag Input Tear",
   "description": "Tag input whose chips hang from a perforated edge instead of an x icon: dragging a chip down snaps its dashes into torn stubs top-to-bottom as a 0-1 tear progress crosses each one, and past 80% releasing drops the chip with a 4deg rotate and gravity while siblings close the gap via FLIP; releasing early springs everything back and re-knits the perforation in reverse. Delete/Backspace on a focused chip removes it instantly through a plain 150ms fade, no tear theater, and Ctrl+Z undoes any removal.",
   "collection": "core",
   "tags": [

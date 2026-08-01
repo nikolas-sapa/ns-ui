@@ -18,7 +18,7 @@ import { useEffect, useRef, useState } from "react";
 // destination-out at the low per-frame alpha a 6-10s fade requires rounds
 // dst*(1-a) to no-op once dst*alpha < 0.5 in the 8-bit backing store, which
 // stalls the fade at a permanent low haze instead of returning to empty —
-// the same residue failure mode noted on event-horizon-command. Redrawing
+// the same residue failure mode noted on command-palette-orbit. Redrawing
 // from an explicit, analytically-decaying list has no such floor: once every
 // stamp prunes out, the canvas is provably transparent again. A soft round
 // sprite (radial gradient baked from the CURRENT --foreground token) is

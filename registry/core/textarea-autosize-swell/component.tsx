@@ -109,7 +109,7 @@ export function ProofRise({
   ...textareaProps
 }: ProofRiseProps) {
   const autoId = useId();
-  const fieldId = id ?? `proof-rise-${autoId}`;
+  const fieldId = id ?? `textarea-autosize-swell-${autoId}`;
   const wrapRef = useRef<HTMLDivElement>(null);
   const taRef = useRef<HTMLTextAreaElement>(null);
   const mirrorRef = useRef<HTMLDivElement>(null);

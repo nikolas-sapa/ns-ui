@@ -10,7 +10,7 @@ export default function WickRunDemo() {
 
   // simulated chunked upload: uneven bursts landing at uneven intervals, a
   // hold at 100, then a fresh run — exactly the bursty real-world cadence
-  // wick-run's draw-dwell rhythm is built to absorb without looking janky.
+  // progress-wick's draw-dwell rhythm is built to absorb without looking janky.
   useEffect(() => {
     let t = 0;
     let v = 0;
@@ -41,7 +41,7 @@ export default function WickRunDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-10 px-6">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / wick-run
+        ns-ui / progress-wick
       </p>
 
       <div

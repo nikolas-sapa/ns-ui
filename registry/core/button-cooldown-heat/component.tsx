@@ -117,7 +117,7 @@ export function HeatSoak({ children, onPress, className = "" }: HeatSoakProps) {
   // -- rAF loop: decays h and the dip, writes --heat/--dip, watches the
   // re-arm edge, and throttles the caption's own re-renders. Sleeps once
   // both scalars settle and the flag is clear, exactly like this registry's
-  // other rAF-driven scalars (short-fuse's ember spring, etc).
+  // other rAF-driven scalars (toast-undo-fuse's ember spring, etc).
   useEffect(() => {
     const tick = (now: number) => {
       const dt = clampDt((now - lastTsRef.current) / 1000);
@@ -203,7 +203,7 @@ export function HeatSoak({ children, onPress, className = "" }: HeatSoakProps) {
   return (
     <div className={className}>
       <style>{`
-.ns-heat-soak-btn{
+.ns-button-cooldown-heat-btn{
   --h: min(var(--heat, 0), 1);
   /* warmup ramp: 0 until h=0.7, 0->1 across 0.7-1.0 — a "near the limit"
      glow, independent of the (much lower) re-arm point below. It fades out
@@ -218,14 +218,14 @@ export function HeatSoak({ children, onPress, className = "" }: HeatSoakProps) {
   transform: translateY(calc(var(--dip, 0) * 1px)) scale(calc(1 + 0.02 * var(--h)));
   border-color: color-mix(in srgb, var(--border), var(--foreground) calc(var(--h) * 100%));
 }
-.ns-heat-soak-btn:hover{ background-color: color-mix(in srgb, var(--background), var(--foreground) 6%); }
-.ns-heat-soak-btn[aria-disabled="true"]{ cursor: not-allowed; }
+.ns-button-cooldown-heat-btn:hover{ background-color: color-mix(in srgb, var(--background), var(--foreground) 6%); }
+.ns-button-cooldown-heat-btn[aria-disabled="true"]{ cursor: not-allowed; }
 
 /* accumulated-heat fill: a bottom-up band reading the same --h the border
    and scale already use, so the gauge is legible even where the swelling
    is subtle. Tone shifts from --muted (cool) toward --foreground (hot) as
    --warm rises, never toward --accent — thermal state, not an affordance. */
-.ns-heat-soak-fill{
+.ns-button-cooldown-heat-fill{
   position: absolute;
   inset: 0;
   background-image: linear-gradient(to top,
@@ -238,7 +238,7 @@ export function HeatSoak({ children, onPress, className = "" }: HeatSoakProps) {
 }
 /* soaked (over-limit): the fill grows a hazard hatch and breathes — a
    distinct, unmissable "dead" read, still no color outside the palette. */
-.ns-heat-soak-btn[aria-disabled="true"] .ns-heat-soak-fill{
+.ns-button-cooldown-heat-btn[aria-disabled="true"] .ns-button-cooldown-heat-fill{
   background-image:
     repeating-linear-gradient(135deg,
       color-mix(in srgb, var(--foreground) 22%, transparent) 0 1px,
@@ -248,16 +248,16 @@ export function HeatSoak({ children, onPress, className = "" }: HeatSoakProps) {
       color-mix(in srgb, var(--muted), var(--foreground) 45%) calc(var(--h) * 100%),
       transparent calc(var(--h) * 100%),
       transparent 100%);
-  animation: ns-heat-soak-hazard 1.6s ease-in-out infinite;
+  animation: ns-button-cooldown-heat-hazard 1.6s ease-in-out infinite;
 }
-.ns-heat-soak-btn[aria-disabled="true"] .ns-heat-soak-label{
+.ns-button-cooldown-heat-btn[aria-disabled="true"] .ns-button-cooldown-heat-label{
   color: color-mix(in srgb, var(--foreground), var(--muted) 35%);
 }
 
 /* heat shimmer/haze: a soft band sweeping the surface, opacity gated to
    --warm so it's invisible until the button is genuinely close to (or
    still cooling from) the limit — never at rest, never mid-warmup. */
-.ns-heat-soak-haze{
+.ns-button-cooldown-heat-haze{
   position: absolute;
   inset: 0;
   background-image: linear-gradient(100deg,
@@ -266,31 +266,31 @@ export function HeatSoak({ children, onPress, className = "" }: HeatSoakProps) {
     transparent 70%);
   background-size: 220% 100%;
   opacity: calc(var(--warm) * 0.35);
-  animation: ns-heat-soak-shimmer 2.4s linear infinite;
+  animation: ns-button-cooldown-heat-shimmer 2.4s linear infinite;
 }
 
-.ns-heat-soak-label{
+.ns-button-cooldown-heat-label{
   position: relative;
   z-index: 1;
   letter-spacing: calc(var(--h) * 0.06em);
   transition: color 200ms ease-out;
 }
 
-@keyframes ns-heat-soak-shimmer{
+@keyframes ns-button-cooldown-heat-shimmer{
   0%{ background-position: 130% 0; }
   100%{ background-position: -30% 0; }
 }
-@keyframes ns-heat-soak-hazard{
+@keyframes ns-button-cooldown-heat-hazard{
   0%, 100%{ opacity: 0.6; }
   50%{ opacity: 1; }
 }
 
 @media (prefers-reduced-motion: reduce){
-  .ns-heat-soak-btn{ transform: none !important; }
-  .ns-heat-soak-label{ letter-spacing: 0 !important; transition: none !important; }
-  .ns-heat-soak-fill{ transition: none !important; }
-  .ns-heat-soak-haze{ display: none !important; }
-  .ns-heat-soak-btn[aria-disabled="true"] .ns-heat-soak-fill{
+  .ns-button-cooldown-heat-btn{ transform: none !important; }
+  .ns-button-cooldown-heat-label{ letter-spacing: 0 !important; transition: none !important; }
+  .ns-button-cooldown-heat-fill{ transition: none !important; }
+  .ns-button-cooldown-heat-haze{ display: none !important; }
+  .ns-button-cooldown-heat-btn[aria-disabled="true"] .ns-button-cooldown-heat-fill{
     animation: none !important;
     opacity: 1 !important;
   }
@@ -303,11 +303,11 @@ export function HeatSoak({ children, onPress, className = "" }: HeatSoakProps) {
         aria-disabled={soaked ? "true" : undefined}
         aria-describedby={descId}
         onClick={handleClick}
-        className="ns-heat-soak-btn inline-flex items-center justify-center rounded-sm border bg-background px-5 py-2.5 text-sm font-medium text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        className="ns-button-cooldown-heat-btn inline-flex items-center justify-center rounded-sm border bg-background px-5 py-2.5 text-sm font-medium text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
       >
-        <span aria-hidden="true" className="ns-heat-soak-fill" />
-        <span aria-hidden="true" className="ns-heat-soak-haze" />
-        <span className="ns-heat-soak-label">{children}</span>
+        <span aria-hidden="true" className="ns-button-cooldown-heat-fill" />
+        <span aria-hidden="true" className="ns-button-cooldown-heat-haze" />
+        <span className="ns-button-cooldown-heat-label">{children}</span>
       </button>
 
       <p id={descId} className="mt-1.5 font-mono text-[11px] text-muted">

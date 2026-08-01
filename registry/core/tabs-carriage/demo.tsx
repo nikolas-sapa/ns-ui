@@ -35,7 +35,7 @@ export default function CarriageReturnDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-10 px-6">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / carriage-return — the indicator is a carriage on a rail
+        ns-ui / tabs-carriage — the indicator is a carriage on a rail
       </p>
       <div className="w-full max-w-xl rounded-md border border-border bg-surface p-6">
         <CarriageReturn tabs={TABS} />

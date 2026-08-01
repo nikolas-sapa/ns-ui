@@ -1,6 +1,6 @@
 {
-  "name": "cardio-baseline",
-  "title": "Cardio Baseline",
+  "name": "text-ekg-baseline",
+  "title": "Text EKG Baseline",
   "description": "Text whose baseline is a live EKG trace: each beat fires a QRS spike that travels under the letters, throwing every glyph up the waveform before it spring-settles flat.",
   "collection": "core",
   "tags": ["text", "ekg", "waveform", "svg", "spring", "beat", "raf", "imperative"],

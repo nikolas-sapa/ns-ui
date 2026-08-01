@@ -1,6 +1,6 @@
 {
-  "name": "loom-shuttle",
-  "title": "Loom Shuttle",
+  "name": "loader-loom-weave",
+  "title": "Loader Loom Weave",
   "description": "Loader as a loom — warp threads span the frame, a shuttle carries the weft back and forth alternating direction per row like real weaving, and progress is the woven cloth accumulating row by row, each pass beaten up against the fell with a small compression bounce.",
   "collection": "loud",
   "tags": ["loader", "progress", "canvas", "weaving", "shuttle", "ambient"],

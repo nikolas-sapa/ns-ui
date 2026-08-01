@@ -36,7 +36,7 @@ export default function PawlTickDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / pawl-tick
+        ns-ui / autosave-ratchet
       </p>
 
       <div className="w-full max-w-md rounded-[12px] border border-border bg-background">

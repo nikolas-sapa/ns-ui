@@ -1,6 +1,6 @@
 {
-  "name": "grain-tally",
-  "title": "Grain Tally",
+  "name": "histogram-live-grain",
+  "title": "Histogram Live Grain",
   "description": "Live distribution instrument where the histogram IS the samples: each arrival falls as a grain into its bin and stacks, the heap visibly re-settles as the rolling window slides, and P50/P90 fences ride the same scale.",
   "collection": "core",
   "tags": ["data-viz", "histogram", "distribution", "live", "latency", "percentile", "monitoring", "accessibility"],

@@ -13,7 +13,7 @@ export default function VaporCountdownDemo() {
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="flex w-full max-w-3xl flex-col items-center">
         <p className="mb-10 self-start font-mono text-xs tracking-widest text-muted">
-          ns-ui / vapor-countdown
+          ns-ui / countdown-vapor-digits
         </p>
 
         <p className="mb-8 font-mono text-[11px] tracking-[0.25em] text-muted">

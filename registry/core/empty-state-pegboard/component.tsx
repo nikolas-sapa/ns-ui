@@ -11,8 +11,8 @@ import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 // hook notch overlapping its top edge — so the empty state previews the
 // exact spatial geometry future items will occupy instead of showing an
 // illustration. This is deliberately prescriptive, not dormant: compare
-// fallow-panel (a single boundary drifting around nothing, no item shape at
-// all) and develop-skeleton (a shimmer standing in for content already
+// empty-state-dashed (a single boundary drifting around nothing, no item shape at
+// all) and skeleton-develop (a shimmer standing in for content already
 // fetched but not yet painted). ShadowBoard's silhouettes are the real
 // populated layout, drawn before there's data for it.
 //

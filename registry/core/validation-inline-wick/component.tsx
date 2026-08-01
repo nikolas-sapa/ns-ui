@@ -16,7 +16,7 @@ import {
 // error tint doesn't flash on as a flat colored border — it diffuses in from
 // the exact x-position of the character that broke the pattern (measured via
 // an off-screen mirror span) and, once fixed, wicks back out and converges
-// on that same point. Two registered custom properties (--litmus-wick-left/
+// on that same point. Two registered custom properties (--validation-inline-wick-left/
 // -right, percentages) drive the stop positions of the wick div's own
 // mask-image, so a CSS transition on those properties genuinely animates the
 // diffusion front with real easing rather than a border-color crossfade —
@@ -30,7 +30,7 @@ import {
 // resolution announcements. Keyboard flow is an untouched plain input — no
 // key interception anywhere.
 //
-// Deliberately unlike assay-gate: this is per-field and positional (the tint
+// Deliberately unlike approval-inline-diff: this is per-field and positional (the tint
 // originates under the offending character and the field stays live/editable
 // the whole time), not a form-level approve/deny gate that collapses once
 // and never reopens.
@@ -67,7 +67,7 @@ export interface LitmusWickProps {
   className?: string;
 }
 
-// ease-out-expo-shaped — same curve assay-gate's collapse and vanish-taper's
+// ease-out-expo-shaped — same curve approval-inline-diff's collapse and truncation-taper-fade's
 // spring both use, kept consistent across the registry rather than inventing
 // a new feel for the same "settle" grammar.
 const EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
@@ -234,8 +234,8 @@ export function LitmusWick({
         : origin;
 
   const wickStyle = {
-    "--litmus-wick-left": `${left}%`,
-    "--litmus-wick-right": `${right}%`,
+    "--validation-inline-wick-left": `${left}%`,
+    "--validation-inline-wick-right": `${right}%`,
     backgroundColor: "var(--error, #ea001d)",
   } as CSSProperties;
 
@@ -245,41 +245,41 @@ export function LitmusWick({
   return (
     <div className={className}>
       <style>{`
-        @property --litmus-wick-left {
+        @property --validation-inline-wick-left {
           syntax: '<percentage>';
           inherits: false;
           initial-value: 50%;
         }
-        @property --litmus-wick-right {
+        @property --validation-inline-wick-right {
           syntax: '<percentage>';
           inherits: false;
           initial-value: 50%;
         }
-        .ns-litmus-wick {
+        .ns-validation-inline-wick {
           transition:
-            --litmus-wick-left 480ms ${EASE},
-            --litmus-wick-right 480ms ${EASE},
+            --validation-inline-wick-left 480ms ${EASE},
+            --validation-inline-wick-right 480ms ${EASE},
             opacity 480ms ease;
           opacity: 1;
           mask-image: linear-gradient(
             to right,
-            transparent 0%, transparent var(--litmus-wick-left),
-            black var(--litmus-wick-left), black var(--litmus-wick-right),
-            transparent var(--litmus-wick-right), transparent 100%
+            transparent 0%, transparent var(--validation-inline-wick-left),
+            black var(--validation-inline-wick-left), black var(--validation-inline-wick-right),
+            transparent var(--validation-inline-wick-right), transparent 100%
           );
           -webkit-mask-image: linear-gradient(
             to right,
-            transparent 0%, transparent var(--litmus-wick-left),
-            black var(--litmus-wick-left), black var(--litmus-wick-right),
-            transparent var(--litmus-wick-right), transparent 100%
+            transparent 0%, transparent var(--validation-inline-wick-left),
+            black var(--validation-inline-wick-left), black var(--validation-inline-wick-right),
+            transparent var(--validation-inline-wick-right), transparent 100%
           );
         }
-        .ns-litmus-wick[data-phase="checking"] {
+        .ns-validation-inline-wick[data-phase="checking"] {
           transition-duration: 1100ms;
           opacity: .6;
           animation: ns-litmus-pulse 900ms ease-in-out infinite;
         }
-        .ns-litmus-wick[data-phase="invalid"] {
+        .ns-validation-inline-wick[data-phase="invalid"] {
           transition-duration: 420ms;
           opacity: 1;
         }
@@ -288,10 +288,10 @@ export function LitmusWick({
           50% { opacity: .72; }
         }
         @media (prefers-reduced-motion: reduce) {
-          .ns-litmus-wick {
+          .ns-validation-inline-wick {
             transition: none;
           }
-          .ns-litmus-wick[data-phase="checking"] {
+          .ns-validation-inline-wick[data-phase="checking"] {
             animation: none;
             opacity: .6;
           }
@@ -332,7 +332,7 @@ export function LitmusWick({
         <div
           aria-hidden
           data-phase={status}
-          className="ns-litmus-wick pointer-events-none absolute inset-x-0 bottom-0 h-[2px]"
+          className="ns-validation-inline-wick pointer-events-none absolute inset-x-0 bottom-0 h-[2px]"
           style={wickStyle}
         />
 

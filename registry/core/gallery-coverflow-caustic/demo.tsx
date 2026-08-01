@@ -17,7 +17,7 @@ export default function CausticCoverflowDemo() {
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-5xl">
         <p className="mb-4 font-mono text-xs tracking-widest text-muted">
-          ns-ui / caustic-coverflow
+          ns-ui / gallery-coverflow-caustic
         </p>
         <section className="rounded-md border border-border bg-surface px-6 py-10 sm:px-10 sm:py-12">
           <div className="mb-8 flex flex-wrap items-end justify-between gap-4">

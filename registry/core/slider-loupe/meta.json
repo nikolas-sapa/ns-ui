@@ -1,6 +1,6 @@
 {
-  "name": "loupe-slider",
-  "title": "Loupe Slider",
+  "name": "slider-loupe",
+  "title": "Slider Loupe",
   "description": "Slider read through a circular magnifying loupe riding the thumb: the tick beneath sits sharp at 1.8x inside the lens while the rest of the scale rests soft-focus; rubber-banding past the bounds wobbles the magnification on release.",
   "collection": "core",
   "tags": ["slider", "input", "form", "canvas", "magnifier", "micro-interaction"],

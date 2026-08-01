@@ -1,6 +1,6 @@
 {
-  "name": "beacon-cadence",
-  "title": "Beacon Cadence",
+  "name": "status-glyph-cadence",
+  "title": "Status Glyph Cadence",
   "description": "A 20-64px inline status glyph for agent work where the motion pattern itself is the signal — five states, five distinct cadences, no color and no swapped icon.",
   "collection": "core",
   "tags": [

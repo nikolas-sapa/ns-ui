@@ -1,6 +1,6 @@
 {
-  "name": "plimsoll-gauge",
-  "title": "Plimsoll Gauge",
+  "name": "gauge-capacity-waterline",
+  "title": "Gauge Capacity Waterline",
   "description": "Capacity-vs-legal-limit meter drawn as a ship's side-profile hull with Plimsoll load-line marks: the waterline rises with load, the hull itself settles a few px deeper on a separate spring, and the S mark flips to amber the moment load passes the legal limit.",
   "collection": "core",
   "tags": [

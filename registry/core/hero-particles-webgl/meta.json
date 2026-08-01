@@ -1,6 +1,6 @@
 {
-  "name": "particle-hero",
-  "title": "Particle Hero",
+  "name": "hero-particles-webgl",
+  "title": "Hero Particles WEBGL",
   "description": "Full-viewport hero with a cursor-reactive WebGL particle field and staggered text reveal.",
   "collection": "core",
   "tags": [

@@ -6,7 +6,7 @@ export default function PrismDragSplitDemo() {
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background">
       <p className="absolute left-8 top-8 font-mono text-xs uppercase tracking-widest text-muted">
-        ns-ui / prism-drag-split
+        ns-ui / text-prism-split
       </p>
 
       <PrismDragSplit

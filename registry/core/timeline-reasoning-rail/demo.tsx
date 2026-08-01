@@ -145,7 +145,7 @@ export default function SoundingRailDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / sounding-rail
+        ns-ui / timeline-reasoning-rail
       </p>
 
       <div className="w-full max-w-xl">

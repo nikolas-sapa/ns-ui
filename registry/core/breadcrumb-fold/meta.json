@@ -1,10 +1,10 @@
 {
-  "name": "bellows-crumb",
-  "title": "Bellows Crumb",
+  "name": "breadcrumb-fold",
+  "title": "Breadcrumb Fold",
   "description": "A breadcrumb that folds like a camera bellows — ancestor segments rest pleated into narrow slivers and the current page sits fully extended, with hover or focus inflating any sliver back to natural width as its neighbours redistribute the fixed total width.",
   "collection": "core",
   "tags": ["breadcrumb", "navigation", "hierarchy", "overflow", "accessibility"],
-  "useWhen": "Pick bellows-crumb over worn-path when every ancestor must stay individually reachable at all times — deep file paths, org trees, nested categories — because nothing is ever folded into a menu; the trail redistributes a fixed total width instead of hiding levels. Pick worn-path instead when the hierarchy is so deep that even a compressed sliver per level would still overflow, and an ellipsis-menu fallback for the middle is acceptable.",
+  "useWhen": "Pick breadcrumb-fold over breadcrumb-overflow-menu when every ancestor must stay individually reachable at all times — deep file paths, org trees, nested categories — because nothing is ever folded into a menu; the trail redistributes a fixed total width instead of hiding levels. Pick breadcrumb-overflow-menu instead when the hierarchy is so deep that even a compressed sliver per level would still overflow, and an ellipsis-menu fallback for the middle is acceptable.",
   "autoplay": {
     "mode": "pointer-path",
     "path": "sweep",

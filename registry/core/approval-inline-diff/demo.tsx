@@ -22,7 +22,7 @@ export default function AssayGateDemo() {
     <main className="flex min-h-screen justify-center bg-background px-6 py-16">
       <div className="w-full max-w-lg">
         <p className="mb-8 font-mono text-xs uppercase tracking-[0.2em] text-muted">
-          ns-ui / assay-gate — tool-call approval
+          ns-ui / approval-inline-diff — tool-call approval
         </p>
 
         <section className="rounded-md border border-border bg-surface/40 p-5">
@@ -47,7 +47,7 @@ export default function AssayGateDemo() {
               ]}
               initialValues={{ command: "npm run deploy --env=staging" }}
               onDecision={(decision) => {
-                console.log("assay-gate decision", decision);
+                console.log("approval-inline-diff decision", decision);
                 setTimeout(() => setResetKey((k) => k + 1), 2600);
               }}
             />

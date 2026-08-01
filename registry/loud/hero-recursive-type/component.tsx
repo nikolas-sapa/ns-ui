@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 // ---------------------------------------------------------------------------
 // NestedSlug — recursive-type hero. The headline is rasterized through a
 // hand-authored 5x7 block font into a coarse letterform mask, the same way
-// glyph-cast does — but rather than lighting a density ramp, every lit coarse
+// hero-ascii-wordmark does — but rather than lighting a density ramp, every lit coarse
 // cell here is subdivided into an NxN grid of small cells, and the filler
 // string (a tagline, an install command, whatever the consumer passes) is
 // poured through the mask in raster order: one filler character per lit fine

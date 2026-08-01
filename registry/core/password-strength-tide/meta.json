@@ -1,6 +1,6 @@
 {
-  "name": "tide-gauge-password",
-  "title": "Tide Gauge Password",
+  "name": "password-strength-tide",
+  "title": "Password Strength Tide",
   "description": "Password field with a canvas water tank behind the masked text: entropy raises the tide on a damped spring, keystrokes slosh a real 1D heightfield wave, deletions pull the level back down.",
   "collection": "core",
   "tags": ["input", "password", "form", "canvas", "physics", "micro-interaction"],

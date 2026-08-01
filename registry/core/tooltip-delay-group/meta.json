@@ -1,6 +1,6 @@
 {
-  "name": "penumbra-tip",
-  "title": "Penumbra Tip",
+  "name": "tooltip-delay-group",
+  "title": "Tooltip Delay Group",
   "description": "A tooltip whose 1px border traces itself outward from the trigger's own edge and whose delay-group lets adjacent triggers hand off instantly with no re-animation, like a real menu bar.",
   "collection": "core",
   "tags": ["tooltip", "overlay", "hover", "delay-group", "placement", "portal", "accessibility", "keyboard"],

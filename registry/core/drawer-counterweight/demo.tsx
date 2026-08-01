@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { SashWeight } from "./component";
 
 // Rest state is gated on the same `embed=1&autoplay=1` pair as the reopen
-// loop below. The honest `/preview/sash-cord` reference rests CLOSED — the
+// loop below. The honest `/preview/drawer-counterweight` reference rests CLOSED — the
 // drawer opens only on deliberate interaction (the Filters trigger, Escape,
 // a drag) and stays closed once closed, which is exactly what the owner
 // asked for ("open only on deliberate interaction"). Only the landing-page
@@ -16,9 +16,9 @@ import { SashWeight } from "./component";
 // demonstrating on a loop rather than going stone-still.
 //
 // That reopen must only fire for the landing-page card. Same bug as
-// respire-field's autoplay-only seed value (see its demo.tsx comment): this
+// input-focus-membrane's autoplay-only seed value (see its demo.tsx comment): this
 // component's own local demo state was reopening the drawer unconditionally,
-// including on the plain `/preview/sash-cord` reference with no query params
+// including on the plain `/preview/drawer-counterweight` reference with no query params
 // at all — the honest, fully-interactive view every real owner/consumer
 // actually uses. Closing the drawer there (Apply, the close button, Escape,
 // backdrop, or a drag-release toward closed) got silently undone ~1.8s later,
@@ -62,7 +62,7 @@ export default function SashWeightDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center gap-8 px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / sash-cord — drag the rail, watch the weight decide
+        ns-ui / drawer-counterweight — drag the rail, watch the weight decide
       </p>
 
       <div className="w-full max-w-3xl rounded-md border border-border bg-surface">

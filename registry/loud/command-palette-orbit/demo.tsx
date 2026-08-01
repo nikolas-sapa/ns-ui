@@ -34,7 +34,7 @@ export default function EventHorizonCommandDemo() {
     <main className="min-h-screen bg-background px-6 py-16">
       <div className="mx-auto max-w-5xl">
         <p className="font-mono text-xs tracking-[0.25em] text-muted">
-          ns-ui / event-horizon-command
+          ns-ui / command-palette-orbit
         </p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground">
           Event Horizon Command

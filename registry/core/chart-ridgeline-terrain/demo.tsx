@@ -39,7 +39,7 @@ export default function SignalTerrainDemo() {
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-3xl">
         <p className="mb-4 font-mono text-xs tracking-widest text-muted">
-          ns-ui / signal-terrain
+          ns-ui / chart-ridgeline-terrain
         </p>
         <div className="overflow-hidden rounded-md border border-border bg-surface">
           <header className="flex items-center justify-between gap-4 border-b border-border px-5 py-3">

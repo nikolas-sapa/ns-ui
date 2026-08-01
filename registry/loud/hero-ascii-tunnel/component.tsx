@@ -11,11 +11,11 @@ import type { ReactNode } from "react";
 // never change — the same treadmill trick a starfield uses, which is what
 // makes the loop read as continuous forward motion down a tunnel rather than
 // a reset. Every ring point projects into ISOTROPIC pixel space (both axes
-// scaled by one constant K1, exactly the torus-render discipline) around a
+// scaled by one constant K1, exactly the ascii-torus-donut discipline) around a
 // shared vanishing point, and only THEN quantizes to the mono cell grid, so
 // the rings stay true ellipses/squares instead of stretching with the cell's
 // ~2:1 aspect. Nearer points win a per-cell Float32Array depth competition
-// (bigger 1/z = nearer), same as torus-render's depth buffer, because ring
+// (bigger 1/z = nearer), same as ascii-torus-donut's depth buffer, because ring
 // draw order does not correspond to depth order once rings have wrapped at
 // different times — without it, a far ring could paint over a near one. The
 // pointer steers the shared vanishing point itself (eased trailing toward

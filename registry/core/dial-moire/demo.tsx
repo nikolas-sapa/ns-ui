@@ -10,7 +10,7 @@ export default function MoireDialDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-10 bg-background px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / moire-dial
+        ns-ui / dial-moire
       </p>
       <MoireDial
         key={seed}

@@ -1,10 +1,10 @@
 {
-  "name": "shelf-cant",
-  "title": "Shelf Cant",
+  "name": "dock-shelf-lean",
+  "title": "Dock Shelf Lean",
   "description": "A dock/toolbar where items lean like books on a shelf — hover or focus straightens one and cants its neighbors away, reorder is a pick-up/move/drop cycle, nothing ever scales.",
   "collection": "core",
   "tags": ["nav", "dock", "toolbar", "reorder", "micro-interaction", "accessibility"],
-  "useWhen": "Use when a dock, favorites bar or pinned-item row needs a quieter emphasis mechanic than magnification — hover/focus straightens one item and leans its neighbors away by a few degrees, with a small breathing gap, so labels and hit areas never move except a 2px lift. Pick magnetic-dock instead when cursor-proximity magnification and Gaussian falloff scale is the wanted effect; pick shelf-cant when scale must stay fixed (stable hit targets, denser rows, a more restrained posture-only read) and when the row also needs first-class keyboard reordering.",
+  "useWhen": "Use when a dock, favorites bar or pinned-item row needs a quieter emphasis mechanic than magnification — hover/focus straightens one item and leans its neighbors away by a few degrees, with a small breathing gap, so labels and hit areas never move except a 2px lift. Pick dock-cursor-magnify instead when cursor-proximity magnification and Gaussian falloff scale is the wanted effect; pick dock-shelf-lean when scale must stay fixed (stable hit targets, denser rows, a more restrained posture-only read) and when the row also needs first-class keyboard reordering.",
   "autoplay": {
     "mode": "pointer-path",
     "path": "sweep",

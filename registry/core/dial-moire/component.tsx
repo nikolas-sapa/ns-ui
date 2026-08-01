@@ -123,7 +123,7 @@ export function MoireDial({
       canvas.width = w * dpr;
       canvas.height = h * dpr;
 
-      // message glyphs → offscreen alpha mask (singularity-text pattern)
+      // message glyphs → offscreen alpha mask (hero-gravity-well pattern)
       const mask = document.createElement("canvas");
       mask.width = w * dpr;
       mask.height = h * dpr;

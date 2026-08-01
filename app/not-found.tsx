@@ -1,13 +1,13 @@
-import { Knockout404 } from "@/registry/loud/knockout-404/component";
+import { Knockout404 } from "@/registry/loud/not-found-knockout/component";
 import { CopyButton } from "./_components/copy-button";
 import { ThemeReassert } from "./_components/theme-reassert";
 import { ThemeToggle } from "./_components/theme-toggle";
 import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
 
-const INSTALL = `npx shadcn add ${REGISTRY_ORIGIN}/r/knockout-404.json`;
+const INSTALL = `npx shadcn add ${REGISTRY_ORIGIN}/r/not-found-knockout.json`;
 
-// Dogfooding, same reason /changelog is drawn with strandline: the 404 a
-// visitor actually hits IS the knockout-404 demo, running in production on a
+// Dogfooding, same reason /changelog is drawn with timeline-changelog-wave: the 404 a
+// visitor actually hits IS the not-found-knockout demo, running in production on a
 // real miss. The chrome is deliberately thin — the component is the page.
 export default function NotFound() {
   return (
@@ -37,22 +37,22 @@ export default function NotFound() {
         <span>
           This page is{" "}
           <a
-            href="/preview/knockout-404"
+            href="/preview/not-found-knockout"
             className="rounded-sm text-foreground underline underline-offset-2 outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
-            knockout-404
+            not-found-knockout
           </a>
           , a component from this registry:
         </span>
         <code className="min-w-0 break-all text-foreground">
           npx shadcn add {REGISTRY_ORIGIN}
           <wbr />
-          /r/knockout-404.json
+          /r/not-found-knockout.json
         </code>
         <CopyButton
           variant="inline"
           value={INSTALL}
-          label="Copy install command for knockout-404"
+          label="Copy install command for not-found-knockout"
         />
       </footer>
     </main>

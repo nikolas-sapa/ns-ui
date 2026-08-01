@@ -17,41 +17,41 @@ export const FEATURED: string[] = [
   // collections so the first screen shows both registers rather than reading
   // as one. The list was 18 core to 2 loud, which sold the showcase short and
   // made the grid look more uniform than the registry actually is.
-  "glyph-tide", // loud   full-bleed ASCII plasma, drag through it
-  "caustic-coverflow", // core   drag to scrub, flick for momentum
-  "torus-render", // loud   ASCII torus, real depth buffer, drag-rotate
-  "particle-hero", // core   a field that answers the cursor
-  "vanish-run", // loud   perspective corridor, cursor steers the vanishing point
-  "glyph-cast", // core   block-letter wordmark lit by the pointer
-  "meridian-spin", // loud   ASCII globe with a day/night terminator
-  "crack-compare", // core   the before/after divider is a fracture
-  "oscillo-crest", // loud   oscilloscope trace, pointer rings the wave
-  "wake-glyph", // core   cursor wake with velocity-dependent decay
-  "scarp-horizon", // loud   layered ridgelines, per-layer parallax
-  "ridge-walk", // core   pick a point on a pareto frontier
-  "nested-slug", // loud   wordmark whose letterforms are made of readable text
-  "bough-index", // core   tree whose connectors redraw as it collapses
-  "chladni-tune", // loud   sand locks into a symmetric figure on target
-  "gnomon-set", // core   sundial time picker
-  "knockout-404", // loud   type carved out of the surface
-  "tumbler-gate", // core   align the notch, hold, confirm
-  "frost-scrub", // loud   scroll is the defroster
-  "cipher-reel-otp", // core   OTP reels
-  "burin-etch", // loud   contour hatch, pointer polishes a trail
-  "dovetail-run", // core
-  "singularity-text", // loud
-  "sieve-facets", // core
+  "background-ascii-plasma", // loud   full-bleed ASCII plasma, drag through it
+  "gallery-coverflow-caustic", // core   drag to scrub, flick for momentum
+  "ascii-torus-donut", // loud   ASCII torus, real depth buffer, drag-rotate
+  "hero-particles-webgl", // core   a field that answers the cursor
+  "hero-ascii-tunnel", // loud   perspective corridor, cursor steers the vanishing point
+  "hero-ascii-wordmark", // core   block-letter wordmark lit by the pointer
+  "ascii-globe-spin", // loud   ASCII globe with a day/night terminator
+  "compare-crack-seam", // core   the before/after divider is a fracture
+  "hero-oscilloscope", // loud   oscilloscope trace, pointer rings the wave
+  "background-ascii-wake", // core   cursor wake with velocity-dependent decay
+  "hero-ascii-terrain", // loud   layered ridgelines, per-layer parallax
+  "picker-pareto-frontier", // core   pick a point on a pareto frontier
+  "hero-recursive-type", // loud   wordmark whose letterforms are made of readable text
+  "tree-box-drawing", // core   tree whose connectors redraw as it collapses
+  "slider-chladni-tune", // loud   sand locks into a symmetric figure on target
+  "time-picker-sundial", // core   sundial time picker
+  "not-found-knockout", // loud   type carved out of the surface
+  "confirm-dial-align", // core   align the notch, hold, confirm
+  "scroll-defrost", // loud   scroll is the defroster
+  "otp-reel", // core   OTP reels
+  "ascii-engraving-contour", // loud   contour hatch, pointer polishes a trail
+  "wizard-dovetail", // core
+  "hero-gravity-well", // loud
+  "filter-facet-mesh", // core
   // Tail: the rest of the previous curation, order preserved.
-  "scissor-reach",
-  "flywheel-pull",
-  "hump-yard",
-  "after-image",
-  "lodestone-hero",
-  "warp-lattice",
-  "vortex-street",
-  "mercury-minimap",
-  "bedrock-trace",
-  "grain-tally",
-  "bimetal-trip",
-  "beacon-cadence",
+  "minimap-pantograph",
+  "refresh-pull-flywheel",
+  "view-toggle-rails",
+  "undo-ghost-row",
+  "hero-dipole-field",
+  "grid-magnetic-lattice",
+  "hero-vortex-street",
+  "toc-minimap-mercury",
+  "citation-grounding-hatch",
+  "histogram-live-grain",
+  "meter-threshold-trip",
+  "status-glyph-cadence",
 ];

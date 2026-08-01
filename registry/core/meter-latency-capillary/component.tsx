@@ -21,8 +21,8 @@ import { useEffect, useRef, useState } from "react";
 //   waiting -> "Waiting, typically N seconds."
 //   slow    -> "Taking longer than usual."
 //   stalled -> "May be stalled, retry available."
-// Distinct from beacon-cadence (liveness — the connection is alive, no
-// notion of "how long is normal") and tide-gauge-password (liquid level
+// Distinct from status-glyph-cadence (liveness — the connection is alive, no
+// notion of "how long is normal") and password-strength-tide (liquid level
 // encodes input strength, not elapsed-time-vs-percentile). This is the only
 // one of the three built from a calibrated latency distribution.
 //

@@ -1,6 +1,6 @@
 {
-  "name": "singularity-text",
-  "title": "Singularity Text",
+  "name": "hero-gravity-well",
+  "title": "Hero Gravity Well",
   "description": "Headline as a monochrome particle cloud — the cursor is a gravity well that eats letters into an orbital accretion ring, then releases them to spring back into typeset.",
   "collection": "loud",
   "tags": ["hero", "text", "particles", "cursor", "canvas", "physics"],

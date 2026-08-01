@@ -1,6 +1,6 @@
 {
-  "name": "frost-scrub",
-  "title": "Frost Scrub",
+  "name": "scroll-defrost",
+  "title": "Scroll Defrost",
   "description": "Scroll-scrubbed defroster — a pinned full-bleed image behind rippled shower glass anneals from heavy frost with chromatic fringing to optical clarity, sealed by a specular sweep.",
   "collection": "loud",
   "tags": ["scroll", "webgl", "shader", "image", "refraction", "glass", "hero"],

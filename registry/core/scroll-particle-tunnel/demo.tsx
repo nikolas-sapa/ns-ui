@@ -7,7 +7,7 @@ export default function Demo() {
     <main className="min-h-screen bg-background text-foreground">
       <header className="fixed inset-x-0 top-0 z-20 flex items-center justify-between px-6 py-5">
         <span className="font-mono text-xs tracking-widest text-muted">
-          ns-ui / particle-tunnel-scrub
+          ns-ui / scroll-particle-tunnel
         </span>
         <button
           type="button"

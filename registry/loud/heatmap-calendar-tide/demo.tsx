@@ -26,7 +26,7 @@ export default function TideLedgerDemo() {
   const data = useMemo(() => series(26 * 7), []);
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">ns-ui / tide-ledger</p>
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">ns-ui / heatmap-calendar-tide</p>
       <TideLedger data={data} label="Commits per day" />
       <p className="max-w-md text-center text-xs text-muted">
         One hue, five depths, mixed from the accent token into the background — so the ramp is

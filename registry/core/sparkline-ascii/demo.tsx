@@ -11,7 +11,7 @@ export default function RampTraceDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-10">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / ramp-trace
+        ns-ui / sparkline-ascii
       </p>
       <RampTrace
         data={SERIES}

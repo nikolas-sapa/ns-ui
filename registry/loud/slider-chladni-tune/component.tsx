@@ -435,7 +435,7 @@ export function ChladniTune({
   // (sr-only, not display:none, so Tab reaches it and arrow/Home/End/PageUp/
   // PageDown come free from native semantics) while a plain DOM track+thumb
   // pair carries pointer interaction and the visible "core-styled" look.
-  // This split (crack-compare's / shear-band's pattern in this registry)
+  // This split (compare-crack-seam's / slider-range-shear's pattern in this registry)
   // matters beyond taste: a synthetic pointerdown/pointermove dispatched at
   // a native range's thumb is not guaranteed to move it — that native
   // click-drag-to-set-value behavior is UA-internal, not something a script

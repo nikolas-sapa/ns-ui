@@ -1,6 +1,6 @@
 {
-  "name": "decrypt-text",
-  "title": "Decrypt Text",
+  "name": "text-decrypt",
+  "title": "Text Decrypt",
   "description": "Scramble-to-decode text reveal with left-to-right character locking.",
   "collection": "core",
   "tags": [

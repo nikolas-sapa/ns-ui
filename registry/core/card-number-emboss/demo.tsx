@@ -87,7 +87,7 @@ export default function EmbossPlateDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">ns-ui / emboss-plate</p>
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">ns-ui / card-number-emboss</p>
 
       <div ref={containerRef} className="w-full max-w-sm">
         <EmbossPlate />

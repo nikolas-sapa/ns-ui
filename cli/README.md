@@ -55,8 +55,8 @@ by default (it's long); pass `--source` to also fetch and print the real
 `component.tsx` (one network request).
 
 ```
-npx @nikolas.sapa/ns-ui info after-image
-npx @nikolas.sapa/ns-ui info after-image --source
+npx @nikolas.sapa/ns-ui info undo-ghost-row
+npx @nikolas.sapa/ns-ui info undo-ghost-row --source
 ```
 
 ### add
@@ -72,9 +72,9 @@ to `shadcn`. `--dry-run` validates names and prints what would be installed
 without running `shadcn`.
 
 ```
-npx @nikolas.sapa/ns-ui add after-image
-npx @nikolas.sapa/ns-ui add after-image span-tape
-npx @nikolas.sapa/ns-ui add after-image --dry-run
+npx @nikolas.sapa/ns-ui add undo-ghost-row
+npx @nikolas.sapa/ns-ui add undo-ghost-row date-range-tape
+npx @nikolas.sapa/ns-ui add undo-ghost-row --dry-run
 ```
 
 ### categories

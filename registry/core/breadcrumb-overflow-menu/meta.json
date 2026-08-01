@@ -1,6 +1,6 @@
 {
-  "name": "worn-path",
-  "title": "Worn Path",
+  "name": "breadcrumb-overflow-menu",
+  "title": "Breadcrumb Overflow Menu",
   "description": "A breadcrumb trail that collapses from the middle into a menu of the hidden levels, with an accent rule that sweeps under the current level.",
   "collection": "core",
   "tags": [

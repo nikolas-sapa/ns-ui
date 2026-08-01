@@ -80,7 +80,7 @@ function deriveLabel(children: ReactNode, explicit?: string): string {
 
 export function IntentCoil({ href, children, preview, previewLabel, className = "" }: IntentCoilProps) {
   const uid = useId();
-  const panelId = `ns-intent-coil-${uid.replace(/:/g, "")}`;
+  const panelId = `ns-hover-card-dwell-${uid.replace(/:/g, "")}`;
 
   const triggerRef = useRef<HTMLAnchorElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -286,7 +286,7 @@ export function IntentCoil({ href, children, preview, previewLabel, className = 
   const label = useMemo(() => deriveLabel(children, previewLabel), [children, previewLabel]);
 
   return (
-    <span className={`ns-intent-coil relative inline-flex items-center ${className}`}>
+    <span className={`ns-hover-card-dwell relative inline-flex items-center ${className}`}>
       <a
         ref={triggerRef}
         href={href}
@@ -357,7 +357,7 @@ export function IntentCoil({ href, children, preview, previewLabel, className = 
       >
         {children}
       </a>
-      <svg aria-hidden width={14} height={14} viewBox="0 0 14 14" className="ns-intent-coil-dial ml-1 shrink-0 text-muted">
+      <svg aria-hidden width={14} height={14} viewBox="0 0 14 14" className="ns-hover-card-dwell-dial ml-1 shrink-0 text-muted">
         <circle cx={7} cy={7} r={2} fill="currentColor" />
         <circle
           ref={arcRef}
@@ -395,18 +395,18 @@ export function IntentCoil({ href, children, preview, previewLabel, className = 
             if (next && (panelRef.current?.contains(next) || triggerRef.current?.contains(next))) return;
             scheduleMaybeClose();
           }}
-          className="ns-intent-coil-card absolute left-0 top-full z-50 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-md border border-border bg-background p-3 text-sm text-foreground shadow-sm"
+          className="ns-hover-card-dwell-card absolute left-0 top-full z-50 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-md border border-border bg-background p-3 text-sm text-foreground shadow-sm"
         >
           {preview}
         </div>
       )}
       <style>{`
-.ns-intent-coil-card{animation:ns-coil-in 220ms cubic-bezier(0.34,1.56,0.64,1) both}
+.ns-hover-card-dwell-card{animation:ns-coil-in 220ms cubic-bezier(0.34,1.56,0.64,1) both}
 @keyframes ns-coil-in{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:none}}
 @keyframes ns-coil-fade{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion: reduce){
-  .ns-intent-coil-dial{display:none}
-  .ns-intent-coil-card{animation:ns-coil-fade 130ms ease-out both}
+  .ns-hover-card-dwell-dial{display:none}
+  .ns-hover-card-dwell-card{animation:ns-coil-fade 130ms ease-out both}
 }
 `}</style>
     </span>

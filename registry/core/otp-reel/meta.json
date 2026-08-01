@@ -1,6 +1,6 @@
 {
-  "name": "cipher-reel-otp",
-  "title": "Cipher Reel OTP",
+  "name": "otp-reel",
+  "title": "OTP Reel",
   "description": "6-box code entry where each box is a tiny slot-machine cipher reel: keystrokes spin a canvas glyph strip into a weighted detent on the typed digit with an accent flash; backspace reverse-spins to blank and idle cells carry a faint ambient drift.",
   "collection": "core",
   "tags": ["otp", "input", "form", "canvas", "slot-machine", "2fa", "micro-interaction"],

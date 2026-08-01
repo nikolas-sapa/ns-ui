@@ -22,7 +22,7 @@ export default function DrapeMenuDemo() {
     <div className="flex min-h-screen items-start justify-center bg-background px-6 py-20 text-foreground">
       <div className="w-full max-w-3xl">
         <p className="font-mono text-xs uppercase tracking-widest text-muted">
-          ns-ui / drape-menu
+          ns-ui / dropdown-drape
         </p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight">
           The dropdown is a piece of fabric

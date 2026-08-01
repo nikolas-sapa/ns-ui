@@ -32,7 +32,7 @@ import { useLayoutEffect, useRef, type CSSProperties } from "react";
 // the 150ms crossfade for an instant opacity flip and drops the step/weight
 // transition entirely.
 //
-// Differs from terminator-date-field: that component is a date ENTRY
+// Differs from date-picker-moon: that component is a date ENTRY
 // control (masked input + calendar popover) whose canvas moon-phases are
 // decoration on top of a picker. DriftStamp has no input, no popover, no
 // canvas — it is a pure display where elapsed time itself drives type, and
@@ -220,18 +220,18 @@ export function DriftStamp({
       ref={timeRef}
       dateTime={iso}
       tabIndex={0}
-      data-drift-stamp
+      data-time-ago-drift
       aria-label={initialLabel}
       aria-description={isoDisplay(dateMs)}
       suppressHydrationWarning
-      className={`ns-drift-stamp inline-grid cursor-default rounded-sm font-sans align-baseline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${className}`}
+      className={`ns-time-ago-drift inline-grid cursor-default rounded-sm font-sans align-baseline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${className}`}
       style={{ "--ds-wght": STEPS[0].weight } as CSSProperties}
     >
       <span
         ref={relRef}
         aria-hidden
         suppressHydrationWarning
-        className="ns-drift-stamp-layer ns-drift-stamp-relative tabular-nums"
+        className="ns-time-ago-drift-layer ns-time-ago-drift-relative tabular-nums"
       >
         {initialLabel}
       </span>
@@ -240,7 +240,7 @@ export function DriftStamp({
         aria-hidden
         suppressHydrationWarning
         data-drift-face="exact"
-        className="ns-drift-stamp-layer pointer-events-none font-mono tabular-nums opacity-0"
+        className="ns-time-ago-drift-layer pointer-events-none font-mono tabular-nums opacity-0"
       >
         {isoDisplay(dateMs)}
       </span>
@@ -250,7 +250,7 @@ export function DriftStamp({
 }
 
 const CSS = `
-.ns-drift-stamp{
+.ns-time-ago-drift{
   position: relative;
   font-variation-settings: 'wght' var(--ds-wght, 650);
   font-weight: var(--ds-wght, 650);
@@ -258,14 +258,14 @@ const CSS = `
   transition-duration: ${STEP_MS}ms;
   transition-timing-function: ${EASE_EXPO};
 }
-.ns-drift-stamp-layer{
+.ns-time-ago-drift-layer{
   grid-area: 1 / 1;
   transition-property: opacity;
   transition-duration: ${CROSSFADE_MS}ms;
   transition-timing-function: ${EASE_EXPO};
 }
 @media (prefers-reduced-motion: reduce){
-  .ns-drift-stamp{ transition-duration: 0ms !important; }
-  .ns-drift-stamp-layer{ transition-duration: 0ms !important; }
+  .ns-time-ago-drift{ transition-duration: 0ms !important; }
+  .ns-time-ago-drift-layer{ transition-duration: 0ms !important; }
 }
 `;

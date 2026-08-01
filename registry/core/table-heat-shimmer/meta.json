@@ -1,6 +1,6 @@
 {
-  "name": "heatwave-ledger",
-  "title": "Heatwave Ledger",
+  "name": "table-heat-shimmer",
+  "title": "Table Heat Shimmer",
   "description": "Dense ops table where rows above a heat threshold shimmer like air over asphalt — live DOM text refracts through an animated SVG displacement filter while cold rows sit dead-still behind hairline borders.",
   "collection": "core",
   "tags": ["table", "data-viz", "svg-filter", "displacement", "heat-haze", "canvas", "sortable", "dashboard"],

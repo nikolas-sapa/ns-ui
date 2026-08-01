@@ -1,6 +1,6 @@
 {
-  "name": "ridge-walk",
-  "title": "Ridge Walk",
+  "name": "picker-pareto-frontier",
+  "title": "Picker Pareto Frontier",
   "description": "Model picker rendered as a legible cost/latency/quality Pareto scatter: the frontier is a rising line of solid nodes (quality can't rise without moving right into cost), dominated models are hollow nodes below it joined by a connector whose length is the quality you'd forfeit, and a readout names the selection with its three numbers plus the concrete delta once per commit.",
   "collection": "core",
   "tags": [

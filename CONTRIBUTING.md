@@ -160,7 +160,7 @@ npm run verify      # every component
 Narrower runs:
 
 ```bash
-node scripts/verify.ts glass-button              # one component
+node scripts/verify.ts button-glass              # one component
 BASE_URL=http://localhost:3001 npm run verify    # non-default port
 ```
 

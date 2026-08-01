@@ -14,7 +14,7 @@ body:
     attributes:
       label: Proposed name
       description: Lowercase, hyphenated, evocative rather than descriptive.
-      placeholder: mercury-minimap
+      placeholder: toc-minimap-mercury
     validations:
       required: true
 

@@ -1,6 +1,6 @@
 {
-  "name": "topple-run",
-  "title": "Topple Run",
+  "name": "checkbox-domino-run",
+  "title": "Checkbox Domino Run",
   "description": "Select-all where the change propagates like a domino run: flip the master and a wavefront tips down the list, each row's checkbox flipping and shoving the next — click any row mid-run to halt the wave there, leaving the rest untouched.",
   "collection": "core",
   "tags": ["checkbox", "select-all", "bulk-action", "list", "form", "micro-interaction"],

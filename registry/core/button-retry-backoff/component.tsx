@@ -52,7 +52,7 @@ const REDUCED_STEPS = 10; // discrete arc steps under prefers-reduced-motion
 const DT_MAX = 0.05; // s — clamp tab-switch/frame-stall jumps
 
 // settle spring (icon pop + glyph un-tense), same recipe family as
-// hold-to-confirm's proven "pop" constants — underdamped, one visible bounce
+// confirm-hold-ink's proven "pop" constants — underdamped, one visible bounce
 const SETTLE_K = 300;
 const SETTLE_C = 12;
 

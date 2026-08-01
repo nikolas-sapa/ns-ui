@@ -37,7 +37,7 @@ export default function HatchFillDemo() {
       className="flex min-h-screen flex-col items-center justify-center gap-10 px-6"
     >
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / hatch-fill
+        ns-ui / progress-hatch
       </p>
       <div className="flex flex-col gap-8 rounded-xl border border-border bg-surface px-10 py-12">
         <HatchFill value={value} aria-label="Build progress" totalChars={44} className="text-xl" />

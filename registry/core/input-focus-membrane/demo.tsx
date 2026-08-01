@@ -36,7 +36,7 @@ export default function RespireFieldDemo() {
     <main className="flex min-h-screen items-center justify-center bg-background px-6 text-foreground">
       <div className="w-full max-w-sm">
         <p className="font-mono text-xs tracking-widest text-muted">
-          ns-ui / respire-field
+          ns-ui / input-focus-membrane
         </p>
         <h1 className="mt-3 text-2xl font-semibold tracking-tight">
           The field breathes.

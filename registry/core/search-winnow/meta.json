@@ -1,6 +1,6 @@
 {
-  "name": "chaff-winnow",
-  "title": "Chaff Winnow",
+  "name": "search-winnow",
+  "title": "Search Winnow",
   "description": "Search input that winnows its list like grain from chaff: non-matching rows tumble aside with a slight rotation and fade, then their slot collapses so survivors settle together. Clearing the query lets the chaff drift back in. Full combobox keyboard pattern with a live match counter.",
   "collection": "core",
   "tags": [

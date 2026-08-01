@@ -1,6 +1,6 @@
 {
-  "name": "dynamic-weight-text",
-  "title": "Dynamic Weight Text",
+  "name": "text-variable-weight",
+  "title": "Text Variable Weight",
   "description": "Letters morph variable-font weight by cursor proximity — pure typography interaction.",
   "collection": "core",
   "tags": [

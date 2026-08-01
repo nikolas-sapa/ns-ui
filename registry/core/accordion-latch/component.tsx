@@ -24,7 +24,7 @@ import { useId, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type
 // one closes any other); `multiple` allows independent panels. Headers
 // are real <button> elements with a roving tabindex (only the active
 // header is in the tab sequence; ArrowUp/Down/Home/End move focus,
-// matching the drape-menu pattern), aria-expanded + aria-controls, and
+// matching the dropdown-drape pattern), aria-expanded + aria-controls, and
 // a <div role="region" aria-labelledby> panel per the standard
 // disclosure pattern. prefers-reduced-motion collapses every stage's
 // duration/delay to zero, so open/close still happens (nothing gets

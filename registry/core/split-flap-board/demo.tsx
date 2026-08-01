@@ -109,7 +109,7 @@ export default function SolariFlapDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / solari-flap
+        ns-ui / split-flap-board
       </p>
 
       <div className="ns-sf-departures inline-flex flex-col gap-4 rounded-[16px] border border-border bg-background p-8">

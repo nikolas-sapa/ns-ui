@@ -8,7 +8,7 @@ export default function SeedCrystalDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-6">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / seed-crystal
+        ns-ui / success-nucleation
       </p>
       <SeedCrystal
         key={resetKey}

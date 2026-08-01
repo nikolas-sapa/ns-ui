@@ -5,8 +5,8 @@ import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } f
 // ---------------------------------------------------------------------------
 // PlimsollGauge — a capacity/legal-limit meter drawn as a ship's side-profile
 // hull with Plimsoll load-line marks (TF/F/S/W), not a liquid-in-a-vessel
-// meter (that's meniscus-meter's job) and not an input-strength meter (that's
-// tide-gauge-password's). Two independent, small effects read as one physical
+// meter (that's meter-quota-meniscus's job) and not an input-strength meter (that's
+// password-strength-tide's). Two independent, small effects read as one physical
 // system: the waterline (an SVG rect+line pinned to a fixed frame) rises
 // directly with `value`, while the hull silhouette itself (a sibling <g>)
 // sinks a few px on a separate, smaller spring — cargo settling under its own

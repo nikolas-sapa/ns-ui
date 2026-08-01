@@ -134,7 +134,7 @@ export function HeatwaveLedger({
   // mirrors row hover into a data-attribute alongside the CSS `hover:` classes
   // below — Chromium never advances `:hover` for the site's synthetic
   // (isTrusted: false) autoplay driver, so the cosmetic hover tint needs a JS
-  // source of truth too (same pattern as glass-button).
+  // source of truth too (same pattern as button-glass).
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const wrapRef = useRef<HTMLDivElement>(null);

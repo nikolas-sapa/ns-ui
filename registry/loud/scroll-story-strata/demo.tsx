@@ -8,7 +8,7 @@ export default function CoreSampleScrollDemo() {
       {/* intro block above the pinned stage */}
       <section className="mx-auto max-w-3xl px-6 pb-16 pt-24 text-center">
         <p className="font-mono text-xs tracking-[0.25em] text-muted">
-          ns-ui / core-sample-scroll
+          ns-ui / scroll-story-strata
         </p>
         <h1 className="mt-6 text-4xl font-semibold tracking-tight sm:text-5xl">
           Take a core sample of the stack

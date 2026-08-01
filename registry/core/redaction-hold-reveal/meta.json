@@ -1,6 +1,6 @@
 {
-  "name": "under-ink",
-  "title": "Under Ink",
+  "name": "redaction-hold-reveal",
+  "title": "Redaction Hold Reveal",
   "description": "Inline redaction bar sized by the real text beneath it — hold to peek and the ink flows back after release, click to latch it open; the lifted bar stays hovering as a thin overline so the redaction never disappears.",
   "collection": "core",
   "tags": [

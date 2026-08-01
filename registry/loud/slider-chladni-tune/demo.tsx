@@ -15,7 +15,7 @@ export default function ChladniTuneDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 bg-background px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / chladni-tune — tune by ear, not by number
+        ns-ui / slider-chladni-tune — tune by ear, not by number
       </p>
 
       <div className="w-full max-w-xs rounded-md border border-border bg-surface p-6">

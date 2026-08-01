@@ -1,6 +1,6 @@
 {
-  "name": "fallow-panel",
-  "title": "Fallow Panel",
+  "name": "empty-state-dashed",
+  "title": "Empty State Dashed",
   "description": "Empty state whose dashed SVG boundary drifts like a plot marked out and not yet planted, and contracts toward the CTA on hover.",
   "collection": "core",
   "tags": [

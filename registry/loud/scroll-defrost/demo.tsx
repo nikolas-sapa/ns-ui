@@ -7,7 +7,7 @@ export default function FrostScrubDemo() {
     <main className="min-h-screen bg-background text-foreground">
       <section className="flex h-screen flex-col items-center justify-center gap-6 px-6 text-center">
         <p className="font-mono text-xs tracking-[0.25em] text-muted">
-          ns-ui / frost-scrub
+          ns-ui / scroll-defrost
         </p>
         <h1 className="max-w-2xl text-5xl font-semibold tracking-tight md:text-6xl">
           Scroll is the defroster.

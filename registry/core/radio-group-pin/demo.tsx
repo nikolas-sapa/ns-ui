@@ -23,7 +23,7 @@ export default function PinTumblerDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-10 px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / pin-tumbler — one pin, exactly one choice
+        ns-ui / radio-group-pin — one pin, exactly one choice
       </p>
 
       <div className="grid w-full max-w-2xl gap-6 sm:grid-cols-2">

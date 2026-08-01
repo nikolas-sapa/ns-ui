@@ -1,6 +1,6 @@
 {
-  "name": "kerf-caret",
-  "title": "Kerf Caret",
+  "name": "streaming-markdown-caret",
+  "title": "Streaming Markdown Caret",
   "description": "Streaming-text renderer where already-arrived content never re-animates — only the trailing, unterminated edge carries a muted caret and settles when its markdown span closes.",
   "collection": "core",
   "tags": [

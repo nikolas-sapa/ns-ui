@@ -1,6 +1,6 @@
 {
-  "name": "scroll-island",
-  "title": "Scroll Island",
+  "name": "header-scroll-pill",
+  "title": "Header Scroll Pill",
   "description": "A page header that morphs between a full-width quiet nav bar at the top and a floating centered pill once scrolled — spring-like width/radius/padding morph, section label roll, and a progress hairline, with hysteresis so it never flutters at the threshold and a fast upward scroll flicks it back open with overshoot.",
   "collection": "core",
   "tags": [

@@ -20,7 +20,7 @@ const installFor = (name: string) =>
  * that fails. It now shows a real component so the clipboard always holds
  * something runnable; the caption says any name substitutes.
  */
-const EXAMPLE_NAME = "particle-hero";
+const EXAMPLE_NAME = "hero-particles-webgl";
 
 export type ShowcaseEntry = RegistryEntry & {
   tags: string[];

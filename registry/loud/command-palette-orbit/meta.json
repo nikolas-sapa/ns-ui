@@ -1,6 +1,6 @@
 {
-  "name": "event-horizon-command",
-  "title": "Event Horizon Command",
+  "name": "command-palette-orbit",
+  "title": "Command Palette Orbit",
   "description": "Cmd-K palette where fuzzy-match results orbit the input as label pills — orbital radius is inverse match score, so the gravity sim is the ranking: an empty query leaves every command in calm staggered orbits, typing pulls strong matches into tight fast orbits while weak ones destabilize, fling off and despawn, and Enter consumes the winner into the horizon glow.",
   "collection": "loud",
   "tags": ["command-palette", "cmd-k", "orbit", "physics", "fuzzy-search", "canvas", "keyboard"],

@@ -1,6 +1,6 @@
 {
-  "name": "glass-button",
-  "title": "Glass Button",
+  "name": "button-glass",
+  "title": "Button Glass",
   "description": "Liquid-glass button with translucent blurred surface and press states.",
   "collection": "core",
   "tags": [

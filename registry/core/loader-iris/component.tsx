@@ -55,7 +55,7 @@ export function BladeIris({
     <span
       role="status"
       aria-live="polite"
-      data-blade-iris
+      data-loader-iris
       className={`inline-flex shrink-0 items-center justify-center ${className}`}
       style={{ width: size, height: size }}
     >

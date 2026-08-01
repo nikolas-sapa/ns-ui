@@ -1,4 +1,4 @@
-import { LiquidCollar } from "@/registry/loud/liquid-collar/component";
+import { LiquidCollar } from "@/registry/loud/border-chrome-ring/component";
 
 const REPO_URL = "https://github.com/nikolas-sapa/ns-ui";
 
@@ -17,7 +17,7 @@ function formatStarCount(count: number): string {
  * `variant="quiet"` is a plain bordered link with the same label and target.
  *
  * LiquidCollar itself renders `children` unconditionally outside its GL
- * effect (see registry/loud/liquid-collar/component.tsx), so the link is
+ * effect (see registry/loud/border-chrome-ring/component.tsx), so the link is
  * always in the DOM and clickable even where WebGL is unavailable or a
  * shader fails to compile — the ring is a visual bonus, never a dependency.
  *

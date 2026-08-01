@@ -1,7 +1,7 @@
 "use client";
 
-import { AsciiDitherMedia } from "../ascii-dither-media/component";
-import { GlassButton } from "../glass-button/component";
+import { AsciiDitherMedia } from "../background-ascii-dither/component";
+import { GlassButton } from "../button-glass/component";
 import { GlassPanel } from "./component";
 
 export default function GlassPanelDemo() {
@@ -12,7 +12,7 @@ export default function GlassPanelDemo() {
       </div>
       <GlassPanel className="w-80 p-6">
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-          ns-ui / glass-panel
+          ns-ui / surface-glass
         </p>
         <h2 className="mt-3 text-lg font-semibold tracking-tight">
           Frosted, grained, rimmed.

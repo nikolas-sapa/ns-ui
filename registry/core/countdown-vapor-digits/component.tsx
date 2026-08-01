@@ -38,7 +38,7 @@ function noise2(x: number, y: number) {
 const FLOATS = 6; // grains: x, y, vx, vy, hx, hy · vapor: x, y, vx, vy, age, life
 const MAX_GRAINS = 2500; // per digit
 const SAMPLE_STRIDE = 3; // px between alpha samples on the glyph raster
-const SPRING_K = 90; // s⁻² — singularity-text constants exactly
+const SPRING_K = 90; // s⁻² — hero-gravity-well constants exactly
 const ZETA = 0.55; // damping ratio; < 1 gives a soft condensation overshoot
 const DRAG = 0.92; // per-frame velocity drag
 const DT_MAX = 0.032; // s — clamp tab-switch jumps

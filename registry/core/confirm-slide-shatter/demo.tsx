@@ -9,7 +9,7 @@ export default function SlideToShatterDemo() {
     <main className="flex min-h-screen flex-col items-center justify-center gap-12 bg-background px-6 py-24 text-foreground">
       <div className="flex flex-col items-center gap-3 text-center">
         <p className="font-mono text-xs uppercase tracking-[0.3em] text-muted">
-          ns-ui / slide-to-shatter
+          ns-ui / confirm-slide-shatter
         </p>
         <h1 className="text-3xl font-semibold tracking-tight">
           Destruction is the progress bar

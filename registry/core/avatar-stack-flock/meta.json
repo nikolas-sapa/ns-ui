@@ -1,6 +1,6 @@
 {
-  "name": "flock-stack",
-  "title": "Flock Stack",
+  "name": "avatar-stack-flock",
+  "title": "Avatar Stack Flock",
   "description": "Avatar stack that mills as a live boids flock and resolves into the classic overlapping row on hover, with the +N badge appearing only once the formation settles.",
   "collection": "core",
   "tags": ["avatar", "boids", "physics", "hover", "team", "micro-interaction"],

@@ -27,7 +27,7 @@ export default function ShadowBoardDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / shadow-board — an empty list that previews its own layout
+        ns-ui / empty-state-pegboard — an empty list that previews its own layout
       </p>
       <ShadowBoard
         className="max-w-md"

@@ -42,7 +42,7 @@ export default function ReedVuDemo() {
       </div>
 
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / reed-vu — real levels, or an honest error, never fake bars
+        ns-ui / voice-recorder-meter — real levels, or an honest error, never fake bars
       </p>
     </div>
   );

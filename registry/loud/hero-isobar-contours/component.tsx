@@ -272,7 +272,7 @@ export function PressureFront({
     let pullVel = 0;
 
     // Pointer follow: raw target from the event, a smoothed trailing
-    // position (framerate-normalized lerp, same idiom as signal-terrain),
+    // position (framerate-normalized lerp, same idiom as chart-ridgeline-terrain),
     // and a spring-eased 0..1 strength so entering/leaving ramps rather than
     // snaps. Snaps straight to the raw position on the frame pointer
     // tracking (re)starts, so it doesn't sweep in from wherever it last was.
@@ -351,7 +351,7 @@ export function PressureFront({
     // Whole-hero pointer tracking — the field leans toward the cursor
     // wherever it is, not just when hovering the CTA. Mouse/pen only: touch
     // has no hover state and pointermove-during-scroll would read as jitter.
-    // rect is re-measured on every move (matching signal-terrain's idiom)
+    // rect is re-measured on every move (matching chart-ridgeline-terrain's idiom)
     // rather than cached, so page scroll never throws the coordinates off.
     const onRootMove = (e: PointerEvent) => {
       if (e.pointerType === "touch") return;

@@ -20,8 +20,8 @@ practice, not as rare jitter.
 
 Symptom: anything derived from that first-frame delta going through a
 non-linear function can misbehave in a way that's hard to trace back to
-"time went backwards." Concretely, in signet-drop
-(`registry/loud/signet-drop/component.tsx`), a hold-to-confirm progress
+"time went backwards." Concretely, in confirm-hold-wax
+(`registry/loud/confirm-hold-wax/component.tsx`), a confirm-hold-ink progress
 value was computed as `progress = min(1, progress + raw / holdMs)`, so a
 negative `raw` on the hold's opening frame drove `progress` to something
 like `-0.003`. That alone is invisible — but it was fed through

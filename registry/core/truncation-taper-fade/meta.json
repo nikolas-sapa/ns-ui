@@ -1,10 +1,10 @@
 {
-  "name": "vanish-taper",
-  "title": "Vanish Taper",
+  "name": "truncation-taper-fade",
+  "title": "Truncation Taper Fade",
   "description": "Truncation without the ellipsis — an overflowing line's trailing characters crowd tighter and dissolve toward the clip edge instead of getting cut to '...'; hover or focus decompresses it to read the tail.",
   "collection": "core",
   "tags": ["text", "truncation", "table", "typography", "accessibility", "variable-font", "hover"],
-  "useWhen": "a table cell, breadcrumb, or file path needs to communicate 'there is more, and roughly how much' without spending three characters on '...' — the trailing run visibly crowds and fades toward the clip edge at rest, and hover/focus springs it back to full width (gliding the line left to peek the tail if it still doesn't fit). Distinct from kerf-caret (a streaming-markdown caret/settle effect, not a truncation strategy) and from singularity-text (text-as-spectacle collapse, not a boring information-preserving line-clamp).",
+  "useWhen": "a table cell, breadcrumb, or file path needs to communicate 'there is more, and roughly how much' without spending three characters on '...' — the trailing run visibly crowds and fades toward the clip edge at rest, and hover/focus springs it back to full width (gliding the line left to peek the tail if it still doesn't fit). Distinct from streaming-markdown-caret (a streaming-markdown caret/settle effect, not a truncation strategy) and from hero-gravity-well (text-as-spectacle collapse, not a boring information-preserving line-clamp).",
   "autoplay": {
     "mode": "pointer-path",
     "path": "sweep",

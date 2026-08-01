@@ -139,7 +139,7 @@ export function NibCheck({
   "aria-label": ariaLabel,
 }: NibCheckProps) {
   const autoId = useId();
-  const inputId = id ?? `nib-check-${autoId}`;
+  const inputId = id ?? `checkbox-ink-stroke-${autoId}`;
   const inputRef = useRef<HTMLInputElement>(null);
   const boxRef = useRef<HTMLSpanElement>(null);
   const reducedRef = useRef(false);

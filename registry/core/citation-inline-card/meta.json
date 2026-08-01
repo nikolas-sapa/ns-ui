@@ -1,6 +1,6 @@
 {
-  "name": "margin-cite",
-  "title": "Margin Cite",
+  "name": "citation-inline-card",
+  "title": "Citation Inline Card",
   "description": "An inline citation pill (hostname + source count, Geist Mono) that opens one bordered card with a title, excerpt and a 1/N stepper, instead of a popover per source.",
   "collection": "core",
   "tags": [

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 
 // ---------------------------------------------------------------------------
 // DeedStroke — signature capture as consent, not a checkbox tick (see
-// nib-check for that). A canvas ink layer renders pointer strokes with
+// checkbox-ink-stroke for that). A canvas ink layer renders pointer strokes with
 // pen-pressure feel (velocity maps inversely to line width, a pooled dab at
 // every stroke start), backed by a baseline guide div. On release, a
 // "witness" replay retraces the captured points once at a constant pace so
@@ -260,7 +260,7 @@ export function DeedStroke({ prompt = "Sign to authorize", onConfirm, className 
     reset();
   }, [confirmed, reset]);
 
-  const nameId = `deed-stroke-name-${autoId}`;
+  const nameId = `signature-consent-name-${autoId}`;
   const captionText = confirmed ? "Authorized" : prompt;
   const drawReady = mode === "draw" && canConfirm && !confirmed;
   const typeReady = mode === "type" && typedName.trim().length > 0 && !confirmed;

@@ -98,7 +98,7 @@ export default function MortiseSlipDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / mortise-slip — tabs as joinery
+        ns-ui / tabs-notch-tenon — tabs as joinery
       </p>
 
       <MortiseSlip

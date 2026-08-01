@@ -10,7 +10,7 @@ export default function NestedSlugDemo() {
           ns://ui
         </span>
         <span className="font-mono text-xs tracking-[0.25em] text-muted">
-          ns-ui / nested-slug
+          ns-ui / hero-recursive-type
         </span>
       </header>
       {/* move the cursor over the wordmark — it's a lens onto the words that

@@ -9,7 +9,7 @@ export default function VanishRunDemo() {
           it, while the rings keep advancing on their own loop */}
       <VanishRun>
         <span className="font-mono text-xs tracking-[0.25em] text-muted">
-          ns-ui / vanish-run
+          ns-ui / hero-ascii-tunnel
         </span>
         <h1 className="text-4xl font-semibold tracking-tight text-foreground sm:text-6xl">
           Forward, always forward.

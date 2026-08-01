@@ -7,7 +7,7 @@ export default function ScanSweepStatsDemo() {
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-3xl">
         <p className="mb-4 font-mono text-xs tracking-widest text-muted">
-          ns-ui / scan-sweep-stats
+          ns-ui / stats-radar-sweep
         </p>
         <h1
           className="max-w-xl font-semibold text-foreground"

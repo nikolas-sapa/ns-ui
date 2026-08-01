@@ -391,7 +391,7 @@ export function PacketTrace({ state = "idle", className = "" }: PacketTraceProps
               role="button"
               tabIndex={0}
               aria-label={`Network node ${i + 1}${isError ? ", congested" : ""}`}
-              aria-describedby={isHovered ? "packet-trace-tip" : undefined}
+              aria-describedby={isHovered ? "network-packet-trace-tip" : undefined}
               cx={n.x}
               cy={n.y}
               r={isHovered ? 5.5 : 4}
@@ -425,7 +425,7 @@ export function PacketTrace({ state = "idle", className = "" }: PacketTraceProps
 
       {hovered && (
         <div
-          id="packet-trace-tip"
+          id="network-packet-trace-tip"
           role="tooltip"
           aria-live="off"
           className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-[6px] border border-border bg-background px-2 py-1 font-mono text-[11px] text-foreground shadow-sm"

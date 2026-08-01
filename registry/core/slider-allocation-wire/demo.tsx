@@ -13,7 +13,7 @@ export default function CatenarySplitDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / catenary-split — the wire is the readout
+        ns-ui / slider-allocation-wire — the wire is the readout
       </p>
 
       <div className="w-full max-w-md rounded-md border border-border bg-surface p-6">

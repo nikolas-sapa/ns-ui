@@ -112,7 +112,7 @@ function compile(gl: WebGLRenderingContext, type: number, src: string): WebGLSha
   if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
     const info = gl.getShaderInfoLog(s);
     gl.deleteShader(s);
-    throw new Error(`chroma-tide: shader compile failed: ${info ?? ""}`);
+    throw new Error(`background-gradient-shader: shader compile failed: ${info ?? ""}`);
   }
   return s;
 }

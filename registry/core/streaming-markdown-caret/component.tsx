@@ -76,10 +76,10 @@ export function KerfCaret({ text, streaming = true, className = "" }: KerfCaretP
         @keyframes ns-kerf-settle { from { opacity: .45 } to { opacity: 1 } }
         .ns-kerf-settle { animation: ns-kerf-settle 120ms cubic-bezier(.16,1,.3,1); }
         @keyframes ns-kerf-blink { 0%, 50% { opacity: 1 } 50.01%, 100% { opacity: .25 } }
-        .ns-kerf-caret { animation: ns-kerf-blink 1s steps(1, end) infinite; }
+        .ns-streaming-markdown-caret { animation: ns-kerf-blink 1s steps(1, end) infinite; }
         @media (prefers-reduced-motion: reduce) {
           .ns-kerf-settle { animation: none; }
-          .ns-kerf-caret { animation: none; opacity: .55; }
+          .ns-streaming-markdown-caret { animation: none; opacity: .55; }
         }
       `}</style>
       {segments.map((seg) => {
@@ -107,7 +107,7 @@ export function KerfCaret({ text, streaming = true, className = "" }: KerfCaretP
         <span
           key="caret"
           aria-hidden
-          className="ns-kerf-caret ml-0.5 inline-block h-[1em] w-[0.55em] translate-y-[0.15em] rounded-[2px] bg-muted align-text-bottom"
+          className="ns-streaming-markdown-caret ml-0.5 inline-block h-[1em] w-[0.55em] translate-y-[0.15em] rounded-[2px] bg-muted align-text-bottom"
         />
       )}
       <span key="status" role="status" aria-live="polite" className="sr-only">

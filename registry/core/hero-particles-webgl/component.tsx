@@ -117,7 +117,7 @@ function Particles({ still, visible }: { still: boolean; visible: RefObject<bool
 
   // derive dot color from CSS tokens at mount, and again whenever the theme
   // class flips — mirrors the pattern used by other canvas components in
-  // this registry (e.g. solargraph-hero)
+  // this registry (e.g. hero-long-exposure)
   useEffect(() => {
     const derive = () => {
       const u = material.current?.uniforms;

@@ -7,7 +7,7 @@ export default function StrandlineDemo() {
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-3xl">
         <p className="mb-4 font-mono text-xs tracking-widest text-muted">
-          ns-ui / strandline
+          ns-ui / timeline-changelog-wave
         </p>
 
         <div className="rounded-md border border-border bg-surface p-6 sm:p-8">

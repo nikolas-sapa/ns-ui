@@ -8,7 +8,7 @@ export default function WarpLatticeDemo() {
       <section className="mx-auto flex w-full max-w-5xl flex-1 flex-col justify-center gap-10 px-6 py-20">
         <header className="max-w-xl">
           <p className="font-mono text-xs uppercase tracking-widest text-muted">
-            ns-ui / warp-lattice
+            ns-ui / grid-magnetic-lattice
           </p>
           <h1 className="mt-4 text-3xl font-semibold tracking-tight">
             The grid is the medium

@@ -522,12 +522,12 @@ export function UpdraftDropzone({
   // No new animation or state machine: every visual (wisps, border, the
   // buoy-and-dock flight) is the engine that already exists for real drops.
   // Native listeners (not React props) mirror the pattern this repo already
-  // uses for driver-driven hover (magnetic-dock's
+  // uses for driver-driven hover (dock-cursor-magnify's
   // addEventListener("pointerleave", ...)) so the driver's directly-
   // dispatched, non-bubbling pointerleave is caught reliably.
   // Gated on [data-autoplay-root]: the preview route only ever stamps that
   // attribute for `embed=1&autoplay=1` cards, so a real mouse hover on
-  // /preview/updraft-dropzone (or plain ?embed=1) never wires this up and
+  // /preview/file-upload-thermal (or plain ?embed=1) never wires this up and
   // behaves exactly as before.
   useEffect(() => {
     const zone = zoneRef.current;

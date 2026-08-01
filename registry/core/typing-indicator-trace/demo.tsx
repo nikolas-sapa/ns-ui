@@ -108,7 +108,7 @@ export default function TremorTraceDemo() {
       </div>
 
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / tremor-trace — cadence, not a canned pulse
+        ns-ui / typing-indicator-trace — cadence, not a canned pulse
       </p>
     </div>
   );

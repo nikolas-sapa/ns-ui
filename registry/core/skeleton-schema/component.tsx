@@ -38,8 +38,8 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 // exactly as dashed — an honest "this field never arrived" rather than a
 // skeleton dissolving into empty space. It renders the *shape* of a
 // streaming payload; it does not own the character-level caret inside a
-// value that is itself still arriving — that's kerf-caret's job, and the two
-// compose (a string slot's value can itself be a kerf-caret span).
+// value that is itself still arriving — that's streaming-markdown-caret's job, and the two
+// compose (a string slot's value can itself be a streaming-markdown-caret span).
 //
 // Pure DOM + CSS: real dt/dd pairs inside real dl elements (nested objects
 // get a nested dl, array items a dl per row), role=region with aria-busy
@@ -247,53 +247,53 @@ async function copyToClipboard(text: string): Promise<boolean> {
 }
 
 const CSS = `
-.ns-slip-cast dt,.ns-slip-cast dd,.ns-slip-cast dl{margin:0;padding:0}
-.ns-slip-cast .ns-slip-dl{display:flex;flex-direction:column;gap:8px}
-.ns-slip-cast .ns-slip-row{display:flex;align-items:flex-start;gap:12px}
-.ns-slip-cast .ns-slip-row > dd{flex:1;min-width:0;display:flex}
-.ns-slip-cast .ns-slip-key,.ns-slip-cast .ns-slip-index{
+.ns-skeleton-schema dt,.ns-skeleton-schema dd,.ns-skeleton-schema dl{margin:0;padding:0}
+.ns-skeleton-schema .ns-slip-dl{display:flex;flex-direction:column;gap:8px}
+.ns-skeleton-schema .ns-slip-row{display:flex;align-items:flex-start;gap:12px}
+.ns-skeleton-schema .ns-slip-row > dd{flex:1;min-width:0;display:flex}
+.ns-skeleton-schema .ns-slip-key,.ns-skeleton-schema .ns-slip-index{
   flex:0 0 auto;min-width:64px;padding-top:3px;
   font-family:var(--font-mono);font-size:11.5px;line-height:18px;color:var(--muted);white-space:nowrap;
 }
-.ns-slip-cast .ns-slip-index{opacity:.75;min-width:32px}
+.ns-skeleton-schema .ns-slip-index{opacity:.75;min-width:32px}
 
-.ns-slip-cast .ns-slip-container{position:relative;display:block;flex:1;padding:8px;border-radius:12px}
-.ns-slip-cast .ns-slip-container > .ns-slip-dl{position:relative}
+.ns-skeleton-schema .ns-slip-container{position:relative;display:block;flex:1;padding:8px;border-radius:12px}
+.ns-skeleton-schema .ns-slip-container > .ns-slip-dl{position:relative}
 
-.ns-slip-cast .ns-slip-value-wrap{
+.ns-skeleton-schema .ns-slip-value-wrap{
   position:relative;display:inline-flex;align-items:center;box-sizing:border-box;
   min-height:22px;padding:2px 7px;border-radius:6px;
 }
-.ns-slip-cast .ns-slip-string{display:flex;width:100%}
-.ns-slip-cast .ns-slip-number{min-width:3.5ch;justify-content:flex-end;font-family:var(--font-mono);font-variant-numeric:tabular-nums}
-.ns-slip-cast .ns-slip-boolean{width:5ch;font-family:var(--font-mono)}
-.ns-slip-cast .ns-slip-null{width:4ch;font-family:var(--font-mono)}
+.ns-skeleton-schema .ns-slip-string{display:flex;width:100%}
+.ns-skeleton-schema .ns-slip-number{min-width:3.5ch;justify-content:flex-end;font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.ns-skeleton-schema .ns-slip-boolean{width:5ch;font-family:var(--font-mono)}
+.ns-skeleton-schema .ns-slip-null{width:4ch;font-family:var(--font-mono)}
 
-.ns-slip-cast .ns-slip-edge{position:absolute;inset:0;border-radius:inherit;pointer-events:none}
-.ns-slip-cast .ns-slip-edge-dashed{border:1px dashed var(--border);opacity:1}
-.ns-slip-cast .ns-slip-edge-solid{border:1px solid var(--border);opacity:0}
-.ns-slip-cast [data-state="set"] > .ns-slip-edge-dashed{opacity:0}
-.ns-slip-cast [data-state="set"] > .ns-slip-edge-solid{opacity:1}
-.ns-slip-cast [data-state="set"] > .ns-slip-tick{background:var(--foreground)}
-.ns-slip-cast [data-state="set"] > .ns-slip-value{opacity:1;transform:translateY(0)}
+.ns-skeleton-schema .ns-slip-edge{position:absolute;inset:0;border-radius:inherit;pointer-events:none}
+.ns-skeleton-schema .ns-slip-edge-dashed{border:1px dashed var(--border);opacity:1}
+.ns-skeleton-schema .ns-slip-edge-solid{border:1px solid var(--border);opacity:0}
+.ns-skeleton-schema [data-state="set"] > .ns-slip-edge-dashed{opacity:0}
+.ns-skeleton-schema [data-state="set"] > .ns-slip-edge-solid{opacity:1}
+.ns-skeleton-schema [data-state="set"] > .ns-slip-tick{background:var(--foreground)}
+.ns-skeleton-schema [data-state="set"] > .ns-slip-value{opacity:1;transform:translateY(0)}
 
-.ns-slip-cast .ns-slip-tick{
+.ns-skeleton-schema .ns-slip-tick{
   position:absolute;top:-1px;left:-1px;width:4px;height:4px;background:var(--muted);
 }
-.ns-slip-cast .ns-slip-value{position:relative;font-size:12.5px;color:var(--foreground);opacity:0;transform:translateY(3px)}
+.ns-skeleton-schema .ns-slip-value{position:relative;font-size:12.5px;color:var(--foreground);opacity:0;transform:translateY(3px)}
 
 /* the fill transitions only arm once mounted-live, so pre-filled content
    (a value that arrived complete on first render) never plays a cascade it
    didn't earn */
-.ns-slip-cast.ns-slip-live .ns-slip-edge{transition:opacity 150ms cubic-bezier(.16,1,.3,1)}
-.ns-slip-cast.ns-slip-live .ns-slip-tick{transition:background-color 200ms ease-out}
-.ns-slip-cast.ns-slip-live .ns-slip-value{transition:transform 320ms cubic-bezier(.34,1.56,.64,1),opacity 200ms ease-out}
+.ns-skeleton-schema.ns-slip-live .ns-slip-edge{transition:opacity 150ms cubic-bezier(.16,1,.3,1)}
+.ns-skeleton-schema.ns-slip-live .ns-slip-tick{transition:background-color 200ms ease-out}
+.ns-skeleton-schema.ns-slip-live .ns-slip-value{transition:transform 320ms cubic-bezier(.34,1.56,.64,1),opacity 200ms ease-out}
 
-.ns-slip-cast .ns-slip-copy{outline:none}
-.ns-slip-cast .ns-slip-copy:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.ns-skeleton-schema .ns-slip-copy{outline:none}
+.ns-skeleton-schema .ns-slip-copy:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 @media (prefers-reduced-motion: reduce){
-  .ns-slip-cast .ns-slip-edge,.ns-slip-cast .ns-slip-tick,.ns-slip-cast .ns-slip-value{transition:none !important}
+  .ns-skeleton-schema .ns-slip-edge,.ns-skeleton-schema .ns-slip-tick,.ns-skeleton-schema .ns-slip-value{transition:none !important}
 }
 `;
 
@@ -345,7 +345,7 @@ export function SlipCast({ schema, value, streaming = false, label = "Structured
       role="region"
       aria-busy={streaming}
       aria-label={label}
-      className={`ns-slip-cast ${live ? "ns-slip-live" : ""} ${className}`}
+      className={`ns-skeleton-schema ${live ? "ns-slip-live" : ""} ${className}`}
     >
       <style>{CSS}</style>
 

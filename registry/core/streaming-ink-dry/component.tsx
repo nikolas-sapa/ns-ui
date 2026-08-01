@@ -128,14 +128,14 @@ export function WetInk({
       className={className}
       style={
         dryMs !== DEFAULT_DRY_MS
-          ? ({ "--ns-wet-ink-dry-ms": `${dryMs}ms` } as CSSProperties)
+          ? ({ "--ns-streaming-ink-dry-dry-ms": `${dryMs}ms` } as CSSProperties)
           : undefined
       }
     >
-      <p aria-hidden="true" className="ns-wet-ink-visual whitespace-pre-wrap">
+      <p aria-hidden="true" className="ns-streaming-ink-dry-visual whitespace-pre-wrap">
         {tokens.map((tok, i) =>
           tok === "" ? null : (
-            <span key={i} className="ns-wet-ink-token">
+            <span key={i} className="ns-streaming-ink-dry-token">
               {tok}
             </span>
           )
@@ -153,16 +153,16 @@ export function WetInk({
 }
 
 const CSS = `
-.ns-wet-ink-token{
+.ns-streaming-ink-dry-token{
   font-weight:400;
   font-variation-settings:'wght' 400;
-  animation:ns-wet-ink-dry var(--ns-wet-ink-dry-ms,600ms) cubic-bezier(.16,1,.3,1) both;
+  animation:ns-streaming-ink-dry-dry var(--ns-streaming-ink-dry-dry-ms,600ms) cubic-bezier(.16,1,.3,1) both;
 }
-@keyframes ns-wet-ink-dry{
+@keyframes ns-streaming-ink-dry-dry{
   from{opacity:.55;filter:blur(.4px)}
   to{opacity:1;filter:blur(0)}
 }
 @media (prefers-reduced-motion: reduce){
-  .ns-wet-ink-token{animation:none;font-weight:400;font-variation-settings:'wght' 400;opacity:1;filter:none}
+  .ns-streaming-ink-dry-token{animation:none;font-weight:400;font-variation-settings:'wght' 400;opacity:1;filter:none}
 }
 `;

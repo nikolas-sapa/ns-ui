@@ -6,7 +6,7 @@ import { useEffect, useRef } from "react";
 // MeridianSpin — a rotating ASCII globe. A unit sphere is swept by lat/lon
 // samples, projected orthographically into ISOTROPIC PIXEL space (both axes
 // scaled by the same K1) and only THEN quantized to a monospace cell via
-// cellW/cellH — same aspect-correction discipline as torus-render, one code
+// cellW/cellH — same aspect-correction discipline as ascii-torus-donut, one code
 // path, no missed site. A coarse hand-authored lat/lon rectangle mask stands
 // in for continents (see the ponytail note below); a Lambertian dot against
 // a light direction FIXED in world space (independent of spin) produces a day
@@ -21,7 +21,7 @@ import { useEffect, useRef } from "react";
 // trig value ever reaches SSR'd HTML.
 // ---------------------------------------------------------------------------
 
-const RAMP = ".,-~:;=!*#$@"; // 12-step density ramp, reused from torus-render
+const RAMP = ".,-~:;=!*#$@"; // 12-step density ramp, reused from ascii-torus-donut
 const IDLE_OMEGA = 0.22; // rad/s idle yaw spin
 const FRICTION = 1.5; // s^-1 — relaxation rate back toward idle omega
 const MAX_OMEGA = 10; // rad/s — release velocity ceiling

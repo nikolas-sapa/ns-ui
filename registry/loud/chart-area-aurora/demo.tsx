@@ -105,7 +105,7 @@ export default function AuroraFlowChartDemo() {
     <main className="flex min-h-screen items-center justify-center bg-background px-6 py-20">
       <div className="w-full max-w-3xl">
         <p className="font-mono text-xs tracking-[0.25em] text-muted">
-          ns-ui / aurora-flow-chart
+          ns-ui / chart-area-aurora
         </p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground">
           The fill is the phenomenon

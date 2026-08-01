@@ -23,7 +23,7 @@ import type { ReactNode } from "react";
 // running once a state is reached, and a still frame is fully legible with
 // zero motion — dashed vs. solid vs. muted-frayed-dimmed are three
 // structurally different rests, not degrees of the same shimmer. That's
-// what keeps it distinct from wet-ink, which encodes a still-arriving
+// what keeps it distinct from streaming-ink-dry, which encodes a still-arriving
 // token *stream* and never stops animating until the stream itself ends.
 //
 // The component holds no write logic of its own (no fetch, no retry

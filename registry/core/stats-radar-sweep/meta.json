@@ -1,6 +1,6 @@
 {
-  "name": "scan-sweep-stats",
-  "title": "Scan Sweep Stats",
+  "name": "stats-radar-sweep",
+  "title": "Stats Radar Sweep",
   "description": "Dashboard KPI grid under an observatory radar: a 1px accent arm sweeps the panel once per 12s with sonar rings, and each stat card counts up and lights its border only the instant the wedge crosses its bearing, then settles back to muted until the next revolution.",
   "collection": "core",
   "tags": [

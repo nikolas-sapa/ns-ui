@@ -13,7 +13,7 @@ import { useEffect, useId, useMemo, useRef } from "react";
 // re-derived live when the documentElement class flips.
 // ---------------------------------------------------------------------------
 
-// deterministic 2-octave value noise (house noise2, shared with signal-terrain)
+// deterministic 2-octave value noise (house noise2, shared with chart-ridgeline-terrain)
 function hash2(x: number, y: number) {
   const n = Math.sin(x * 127.1 + y * 311.7) * 43758.5453123;
   return n - Math.floor(n);

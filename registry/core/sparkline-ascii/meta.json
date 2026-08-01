@@ -1,6 +1,6 @@
 {
-  "name": "ramp-trace",
-  "title": "Ramp Trace",
+  "name": "sparkline-ascii",
+  "title": "Sparkline ASCII",
   "description": "A production-usable sparkline chart drawn entirely in characters: block-fraction bars, keyboard-navigable column by column.",
   "collection": "core",
   "tags": [

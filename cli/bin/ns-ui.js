@@ -168,8 +168,8 @@ Options:
 Examples:
   npx @nikolas.sapa/ns-ui search "reactive hero"
   npx @nikolas.sapa/ns-ui list --category forms
-  npx @nikolas.sapa/ns-ui info after-image
-  npx @nikolas.sapa/ns-ui add after-image span-tape
+  npx @nikolas.sapa/ns-ui info undo-ghost-row
+  npx @nikolas.sapa/ns-ui add undo-ghost-row date-range-tape
   npx @nikolas.sapa/ns-ui mcp
 
 Run \`npx @nikolas.sapa/ns-ui <command> --help\` for command-specific options.
@@ -221,8 +221,8 @@ Options:
   -h, --help    Show this help
 
 Examples:
-  npx @nikolas.sapa/ns-ui info after-image
-  npx @nikolas.sapa/ns-ui info after-image --source
+  npx @nikolas.sapa/ns-ui info undo-ghost-row
+  npx @nikolas.sapa/ns-ui info undo-ghost-row --source
 `,
   add: `Usage:
   npx @nikolas.sapa/ns-ui add <name> [...names] [options]
@@ -236,9 +236,9 @@ Options:
   -h, --help    Show this help
 
 Examples:
-  npx @nikolas.sapa/ns-ui add after-image
-  npx @nikolas.sapa/ns-ui add after-image span-tape
-  npx @nikolas.sapa/ns-ui add after-image --dry-run
+  npx @nikolas.sapa/ns-ui add undo-ghost-row
+  npx @nikolas.sapa/ns-ui add undo-ghost-row date-range-tape
+  npx @nikolas.sapa/ns-ui add undo-ghost-row --dry-run
 `,
   categories: `Usage:
   npx @nikolas.sapa/ns-ui categories [options]

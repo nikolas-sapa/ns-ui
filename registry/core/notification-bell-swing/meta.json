@@ -1,6 +1,6 @@
 {
-  "name": "clapper-bell",
-  "title": "Clapper Bell",
+  "name": "notification-bell-swing",
+  "title": "Notification Bell Swing",
   "description": "A notification bell whose clapper physically rings — arrivals add an impulse to a damped harmonic oscillator swinging the clapper and recoiling the bell body, bursts read as one cumulative swing rather than N separate dings, and opening the tray damps the bell to rest and drains the badge.",
   "collection": "core",
   "tags": [

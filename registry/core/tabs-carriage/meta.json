@@ -1,6 +1,6 @@
 {
-  "name": "carriage-return",
-  "title": "Carriage Return",
+  "name": "tabs-carriage",
+  "title": "Tabs Carriage",
   "description": "Tabs whose underline is a typewriter carriage on a rail — forward moves glide on a spring and stretch with speed, backward moves snap home faster with a ding-bounce, and the panel line-feeds in from the travel direction.",
   "collection": "core",
   "tags": ["tabs", "navigation", "spring", "physics", "indicator", "keyboard"],

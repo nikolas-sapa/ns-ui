@@ -47,7 +47,7 @@ export default function PenumbraTipDemo() {
   return (
     <div className="mx-auto flex min-h-[420px] w-full max-w-2xl flex-col justify-center gap-6 p-8">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / penumbra-tip — traces out from the trigger, siblings hand off instantly
+        ns-ui / tooltip-delay-group — traces out from the trigger, siblings hand off instantly
       </p>
 
       <div className="flex items-center justify-between gap-4 rounded-md border border-border bg-surface p-3">

@@ -1,6 +1,6 @@
 # Round 5 — daily-driver primitives
 
-The registry is 50 showpieces and zero plumbing. Someone installs `particle-hero`, then
+The registry is 50 showpieces and zero plumbing. Someone installs `hero-particles-webgl`, then
 goes to shadcn for everything an app is actually made of. This round adds the three
 missing primitives, each carrying one behavior the alternatives don't have.
 
@@ -36,7 +36,7 @@ byte-identical to the default. So:
 - That element must have a visible hover state.
 - Dark and light default screenshots must differ, or the gate fails the component.
 
-## 1. `emerge-dialog` — the modal
+## 1. `dialog-emerge` — the modal
 
 A modal built on the native `<dialog>` element with `showModal()`. Focus trap, inert
 background, Escape-to-close, top-layer stacking and `::backdrop` all come from the
@@ -61,7 +61,7 @@ button in DOM order so verify.ts hovers a live in-dialog button and not the iner
 trigger behind it. `autoplay` mode `press` targeting the dialog's own close control,
 so the card shows the return-to-origin motion.
 
-## 2. `fallow-panel` — the empty state
+## 2. `empty-state-dashed` — the empty state
 
 The screen a list shows before it has anything in it. Fallow: land left unplanted, on
 purpose, waiting.
@@ -72,12 +72,12 @@ hover the outline contracts toward the button, so the affordance points at itsel
 
 Deliberately the plainest of the three. Content is a headline, one line of muted copy,
 and one accent CTA. Does not use ghost content rows — that silhouette belongs to
-`develop-skeleton`, and two components that look alike at rest is worse than either
+`skeleton-develop`, and two components that look alike at rest is worse than either
 being dull.
 
 Reduced motion: outline static, no drift, no contraction.
 
-## 3. `develop-skeleton` — the loading state
+## 3. `skeleton-develop` — the loading state
 
 A wrapper, not a grey rectangle: `<DevelopSkeleton loading>{children}</DevelopSkeleton>`.
 While loading it renders placeholder blocks matching the children's layout; when

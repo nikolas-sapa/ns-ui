@@ -312,8 +312,8 @@ export function ToppleRun({
     undoSnapshotRef.current = null;
   }, []);
 
-  const groupId = `topple-run-${uid}-group`;
-  const liveId = `topple-run-${uid}-live`;
+  const groupId = `checkbox-domino-run-${uid}-group`;
+  const liveId = `checkbox-domino-run-${uid}-live`;
 
   return (
     <div className={`w-full rounded-md border border-border bg-surface ${className}`}>

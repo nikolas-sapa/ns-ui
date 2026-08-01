@@ -1,10 +1,10 @@
 {
-  "name": "baste-stitch",
-  "title": "Baste Stitch",
+  "name": "optimistic-stitch",
+  "title": "Optimistic Stitch",
   "description": "Optimistic-write feedback for a single row rendered as a tailor's basting stitch along its left seam — dashed hand-stitch while pending, pulled tight into a solid hairline on ack, or unraveled to muted and dimmed on failure with an inline retry.",
   "collection": "core",
   "tags": ["optimistic-ui", "list", "form", "comments", "svg", "accessibility", "aria-live", "retry", "state"],
-  "useWhen": "Per-row pending/committed/failed feedback for an optimistic write (a list item, a comment, a form field) where the row's own left seam encodes the write's lifecycle — dashed while unacked, solid the instant the server confirms, muted-and-frayed with a real Retry button on failure — and every one of those three rests must read correctly from a single still frame. Reach for wet-ink instead when the thing that's unsettled is a live token *stream* (chat/generation text) whose 'not yet dry' state keeps animating for as long as tokens keep arriving — baste-stitch's states are terminal snapshots of one write's outcome, never a continuously running effect.",
+  "useWhen": "Per-row pending/committed/failed feedback for an optimistic write (a list item, a comment, a form field) where the row's own left seam encodes the write's lifecycle — dashed while unacked, solid the instant the server confirms, muted-and-frayed with a real Retry button on failure — and every one of those three rests must read correctly from a single still frame. Reach for streaming-ink-dry instead when the thing that's unsettled is a live token *stream* (chat/generation text) whose 'not yet dry' state keeps animating for as long as tokens keep arriving — optimistic-stitch's states are terminal snapshots of one write's outcome, never a continuously running effect.",
   "autoplay": {
     "mode": "press",
     "target": ".ns-baste-retry",

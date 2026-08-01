@@ -2,13 +2,13 @@
  * The plain-language label that answers "what am I looking at" before the
  * component's own name gets a chance to be evocative.
  *
- * Names here are deliberately metaphorical (bough-index, quoin-lock,
- * escapement-tick) — that is the registry's voice and renaming 223 components
- * would break every install anyone has already run. So the *kind* is shown
- * next to the name instead: "Bough Index · Tree view".
+ * Slugs lead with the type (tree-box-drawing, hero-letterpress-lockup,
+ * feed-escapement) but the trailing half is still the registry's voice, and a
+ * title on its own reads as a name rather than a category. So the *kind* is
+ * shown next to the name: "Tree Box Drawing · Tree view".
  *
  * It is derived, not authored. `meta.json` tags are written kind-first by
- * convention — the first tag of emerge-dialog is "dialog", of blade-iris
+ * convention — the first tag of dialog-emerge is "dialog", of loader-iris
  * "loader" — so the label is just the first tag that names what the thing IS.
  * About 27 components lead with the technology they happen to be built on
  * instead, so those words are skipped and the next tag wins.

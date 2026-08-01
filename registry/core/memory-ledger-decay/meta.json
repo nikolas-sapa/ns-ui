@@ -1,6 +1,6 @@
 {
-  "name": "patina-ledger",
-  "title": "Patina Ledger",
+  "name": "memory-ledger-decay",
+  "title": "Memory Ledger Decay",
   "description": "Session memory that visibly patinates: each remembered fact steps its ink from --foreground toward --muted the longer it goes unused, snaps back and underlines when the agent rehearses it, and is governed by real pin/evict controls.",
   "collection": "core",
   "tags": [
@@ -16,7 +16,7 @@
     "accessibility",
     "governance"
   ],
-  "useWhen": "the panel showing what a long-running agent currently remembers about the user, where each fact visibly ages toward --muted if unreferenced and snaps back to --foreground the turn it's actually cited in a reply — a time-decay-with-rehearsal ledger the user can pin or evict, not a load meter (ballast-context) or an unused-space treatment (fallow-panel).",
+  "useWhen": "the panel showing what a long-running agent currently remembers about the user, where each fact visibly ages toward --muted if unreferenced and snaps back to --foreground the turn it's actually cited in a reply — a time-decay-with-rehearsal ledger the user can pin or evict, not a load meter (meter-context-window) or an unused-space treatment (empty-state-dashed).",
   "autoplay": {
     "mode": "press",
     "target": "[data-dormant-toggle=\"true\"]",

@@ -22,7 +22,7 @@ export default function BowWakeDemo() {
         className="absolute inset-0 [background-image:radial-gradient(circle,var(--color-border)_1px,transparent_1px)] [background-size:24px_24px]"
       />
       <div className="relative w-full max-w-sm">
-        <p className="mb-4 text-center font-mono text-xs text-muted">ns-ui / bow-wake</p>
+        <p className="mb-4 text-center font-mono text-xs text-muted">ns-ui / reorder-drag-wake</p>
         <div className="rounded-md border border-border bg-surface p-5 shadow-sm">
           <div className="mb-4">
             <h2 className="text-sm font-semibold text-foreground">Today</h2>

@@ -245,7 +245,7 @@ function FileCard({
         ref={wrapRef}
         data-just-sealed={justSealed || undefined}
         onAnimationEnd={() => setJustSealed(false)}
-        className="ns-vacuum-seal-card relative rounded-md border border-border bg-surface"
+        className="ns-file-upload-seal-card relative rounded-md border border-border bg-surface"
       >
         <svg
           ref={svgRef}
@@ -552,7 +552,7 @@ export function VacuumSeal({
   };
 
   // -- landing-card autoplay bridge -----------------------------------------
-  // Mirrors updraft-dropzone's pattern: the shared pointer-path driver only
+  // Mirrors file-upload-thermal's pattern: the shared pointer-path driver only
   // dispatches Pointer/Mouse events, so a sweep across the zone is bridged
   // into a synthetic drop on its "leave" (sweep-closing) edge, via the exact
   // same processFiles() a real onDrop calls with a File built through the
@@ -561,7 +561,7 @@ export function VacuumSeal({
   // nothing autoplay-specific is animated. Bounded: the previous demo file
   // is cleared before the next is added, so a card left running never
   // accumulates rows. Gated on [data-autoplay-root], stamped only for
-  // embed=1&autoplay=1, so a real hover on /preview/vacuum-seal never wires
+  // embed=1&autoplay=1, so a real hover on /preview/file-upload-seal never wires
   // this up.
   useEffect(() => {
     const zone = zoneRef.current;
@@ -681,16 +681,16 @@ export function VacuumSeal({
       </p>
 
       <style>{`
-        .ns-vacuum-seal-card[data-just-sealed] {
-          animation: ns-vacuum-seal-pucker ${PUCKER_MS}ms cubic-bezier(0.32, 1.6, 0.5, 1) both;
+        .ns-file-upload-seal-card[data-just-sealed] {
+          animation: ns-file-upload-seal-pucker ${PUCKER_MS}ms cubic-bezier(0.32, 1.6, 0.5, 1) both;
         }
-        @keyframes ns-vacuum-seal-pucker {
+        @keyframes ns-file-upload-seal-pucker {
           0% { transform: scale(1); }
           40% { transform: scale(0.99); }
           100% { transform: scale(1); }
         }
         @media (prefers-reduced-motion: reduce) {
-          .ns-vacuum-seal-card[data-just-sealed] { animation: none; }
+          .ns-file-upload-seal-card[data-just-sealed] { animation: none; }
         }
       `}</style>
     </div>

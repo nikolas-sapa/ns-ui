@@ -24,7 +24,7 @@ export default function MercuryMinimapDemo() {
       <MercuryMinimap sections={SECTIONS} />
 
       <main className="mx-auto max-w-2xl px-6 pb-48 pt-20">
-        <p className="font-mono text-xs text-muted">ns-ui / mercury-minimap</p>
+        <p className="font-mono text-xs text-muted">ns-ui / toc-minimap-mercury</p>
 
         <section id="intro" className="flex min-h-[85vh] flex-col justify-start pt-10">
           <h1 className="text-4xl font-semibold tracking-tight">Mercury Minimap</h1>
@@ -66,7 +66,7 @@ export default function MercuryMinimapDemo() {
             liquid settles.
           </p>
           <pre className="mt-6 overflow-x-auto rounded-md border border-border bg-surface p-4 font-mono text-xs leading-relaxed text-muted">
-            {"npx shadcn add @ns-ui/mercury-minimap"}
+            {"npx shadcn add @ns-ui/toc-minimap-mercury"}
           </pre>
           <p className="mt-4 max-w-prose leading-relaxed text-muted">
             Everything is direct-DOM: the scroll listener is passive and only writes a

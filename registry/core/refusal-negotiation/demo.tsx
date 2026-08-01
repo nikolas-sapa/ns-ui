@@ -42,7 +42,7 @@ export default function RedlineParleyDemo() {
     <main className="flex min-h-screen justify-center bg-background px-6 py-16">
       <div className="w-full max-w-lg space-y-6">
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-          ns-ui / redline-parley — negotiated refusal
+          ns-ui / refusal-negotiation — negotiated refusal
         </p>
 
         <section>
@@ -76,7 +76,7 @@ export default function RedlineParleyDemo() {
                 },
               ]}
               onResend={(resolution) =>
-                console.log("redline-parley resend", resolution)
+                console.log("refusal-negotiation resend", resolution)
               }
             />
           </div>
@@ -111,7 +111,7 @@ export default function RedlineParleyDemo() {
                 },
               ]}
               onResend={(resolution) =>
-                console.log("redline-parley resend", resolution)
+                console.log("refusal-negotiation resend", resolution)
               }
             />
           </div>

@@ -1,6 +1,6 @@
 {
-  "name": "reed-vu",
-  "title": "Reed VU",
+  "name": "voice-recorder-meter",
+  "title": "Voice Recorder Meter",
   "description": "Voice-capture chip whose amplitude strip is real Web Audio, not Math.random() bars — flat at rest, live spectrum while listening, an honest error if the mic is denied.",
   "collection": "core",
   "tags": ["voice", "audio", "recorder", "microphone", "input", "svg", "accessibility"],

@@ -1,6 +1,6 @@
 {
-  "name": "counterpoise-tiers",
-  "title": "Counterpoise Tiers",
+  "name": "pricing-scale",
+  "title": "Pricing Scale",
   "description": "Pricing section rendered as a literal balance scale: two tier cards hang as pans from a canvas beam, billing toggle and feature checkmarks add weight, and beam-torque spring physics settles with one inertial overshoot to show which tier objectively outweighs the other.",
   "collection": "core",
   "tags": ["pricing", "canvas", "physics", "spring", "balance-scale", "section", "interactive", "ambient"],

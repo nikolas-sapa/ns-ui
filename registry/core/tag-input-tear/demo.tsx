@@ -7,7 +7,7 @@ export default function TearTabDemo() {
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-md">
         <p className="mb-4 font-mono text-xs tracking-widest text-muted">
-          ns-ui / tear-tab
+          ns-ui / tag-input-tear
         </p>
         <TearTab
           label="Recipients"

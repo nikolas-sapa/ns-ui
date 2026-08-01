@@ -1,6 +1,6 @@
 {
-  "name": "emerge-dialog",
-  "title": "Emerge Dialog",
+  "name": "dialog-emerge",
+  "title": "Dialog Emerge",
   "description": "A native <dialog> modal that grows out of the control that opened it and returns into it on close.",
   "collection": "core",
   "tags": [

@@ -37,7 +37,7 @@ export interface AfterImageListProps {
 }
 
 // Re-inflate curve: an ease-out-expo approximation, matching the house
-// spring-adjacent easing used elsewhere in this registry (see assay-gate's
+// spring-adjacent easing used elsewhere in this registry (see approval-inline-diff's
 // collapse transition) rather than inventing a new one.
 const REINFLATE_EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
 const REINFLATE_MS = 380;

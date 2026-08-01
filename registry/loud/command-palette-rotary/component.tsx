@@ -106,7 +106,7 @@ function useResolvedDestinations(
   storageKey: string
 ): ResolvedDestination[] {
   return useMemo(() => {
-    const lsKey = `ns-periscope-sweep:${storageKey}`;
+    const lsKey = `ns-command-palette-rotary:${storageKey}`;
     let stored: Record<string, number> = {};
     if (typeof window !== "undefined") {
       try {

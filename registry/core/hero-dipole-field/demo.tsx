@@ -7,7 +7,7 @@ export default function LodestoneHeroDemo() {
     <main className="min-h-screen bg-background">
       <header className="flex items-center justify-between gap-4 border-b border-border px-6 py-4">
         <p className="font-mono text-xs tracking-widest text-muted">
-          ns-ui / lodestone-hero
+          ns-ui / hero-dipole-field
         </p>
         <p className="hidden font-mono text-[11px] text-muted sm:block">
           move the cursor — the headline iron-files into place · hover the

@@ -1,6 +1,6 @@
 {
-  "name": "terminator-date-field",
-  "title": "Terminator Date Field",
+  "name": "date-picker-moon",
+  "title": "Date Picker Moon",
   "description": "Masked date input whose popover calendar doubles as a moon-phase almanac: every day cell carries a canvas moon with a real synodic terminator, the field icon tracks the focused date's phase live, and committing runs an eclipse transit across the chosen numeral.",
   "collection": "core",
   "tags": ["date-picker", "input", "calendar", "canvas", "form", "moon", "keyboard", "micro-interaction"],

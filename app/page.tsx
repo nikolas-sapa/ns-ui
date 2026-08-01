@@ -35,7 +35,7 @@ const firstSentence = (text: string) => text.split(/(?<=\.)\s/, 1)[0] ?? "";
 
 /**
  * `useWhen` is written as "use for X, not Y" — and the Y half made searching
- * lie: glass-button says "not a destructive action needing deliberate
+ * lie: button-glass says "not a destructive action needing deliberate
  * confirmation", so it surfaced for "confirm". The negative clause is guidance
  * for a reader, never a match target, so it is dropped here.
  */

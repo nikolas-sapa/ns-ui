@@ -9,7 +9,7 @@ const FILES = [
   { name: "layout.tsx", dir: false, depth: 2 },
   { name: "page.tsx", dir: false, depth: 2 },
   { name: "components/", dir: true, depth: 1 },
-  { name: "sash-weight.tsx", dir: false, depth: 2, active: true },
+  { name: "split-pane-weighted.tsx", dir: false, depth: 2, active: true },
   { name: "toolbar.tsx", dir: false, depth: 2 },
   { name: "lib/", dir: true, depth: 1 },
   { name: "spring.ts", dir: false, depth: 2 },
@@ -38,7 +38,7 @@ export default function SashWeightDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / sash-weight — drag has weight, release finds a rail
+        ns-ui / split-pane-weighted — drag has weight, release finds a rail
       </p>
 
       <div className="h-[420px] w-full max-w-3xl overflow-hidden rounded-md border border-border bg-surface">

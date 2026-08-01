@@ -23,7 +23,7 @@ Put a `╱` and a `█` in the same row and the `╱` floats above the `█`.
 
 ## How this presented
 
-`ramp-trace` drew bars from block-fraction glyphs and a trend line from
+`sparkline-ascii` drew bars from block-fraction glyphs and a trend line from
 `╱ ╲ ─`. The trend line rendered visibly detached, floating above the bar
 tops, reading as a rendering fault rather than a chart.
 
@@ -49,7 +49,7 @@ Pick one:
 1. **Use one family for anything that must align.** Draw the line out of
    block glyphs too, or draw the bars out of box-drawing glyphs. Alignment
    is then free.
-2. **Drop the overlay.** This is what `ramp-trace` did. A clean bar chart
+2. **Drop the overlay.** This is what `sparkline-ascii` did. A clean bar chart
    reads better than a bar chart with a detached line through it, and the
    removal also took an orphan glyph on the last column with it.
 3. **Render to canvas instead of a DOM text grid** if both families are
@@ -63,4 +63,4 @@ The same "measure, do not assume" principle applies to cell width: measure
 the mono advance with `measureText` on an offscreen canvas gated on
 `document.fonts.ready`, never at mount, or a fallback-font measurement
 bakes in the wrong ratio until reload. See the loud ASCII components
-(`torus-render`, `meridian-spin`, `glyph-tide`) for that pattern.
+(`ascii-torus-donut`, `ascii-globe-spin`, `background-ascii-plasma`) for that pattern.

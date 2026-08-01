@@ -361,7 +361,7 @@ export function SashWeight({
   return (
     <div
       ref={containerRef}
-      data-sash-weight-track
+      data-split-pane-weighted-track
       className={`relative flex h-full w-full ${vertical ? "flex-row" : "flex-col"} ${className}`}
     >
       {/* faint rail marks at each reachable detent — self-explaining before first touch */}

@@ -45,8 +45,8 @@ ns-ui/
 **meta.json shape (fixed):**
 ```json
 {
-  "name": "particle-hero",
-  "title": "Particle Hero",
+  "name": "hero-particles-webgl",
+  "title": "Hero Particles WEBGL",
   "description": "Full-viewport hero with a cursor-reactive WebGL particle field.",
   "collection": "core",
   "tags": ["hero", "webgl", "particles"],
@@ -70,13 +70,13 @@ Loved: shader/particle backgrounds · text & scroll choreography · 3D/interacti
 
 ## Component #1
 
-`core/particle-hero` — Geist-dark hero section: WebGL particle/dot field reacting to cursor (r3f), staggered text reveal (Motion), one CTA. Combines the owner's top two loved styles (shader background + text choreography); immediately usable in client work.
+`core/hero-particles-webgl` — Geist-dark hero section: WebGL particle/dot field reacting to cursor (r3f), staggered text reveal (Motion), one CTA. Combines the owner's top two loved styles (shader background + text choreography); immediately usable in client work.
 
 **Roadmap candidates after #1 (one at a time, each through the full gate, no batch scaffolding):** liquid-glass button set → 3D tilt card → scroll-story section → text scramble/morph headline.
 
 ## Install story
 
-- After public deploy: `npx shadcn add <registry-url>/r/particle-hero.json` from any project.
+- After public deploy: `npx shadcn add <registry-url>/r/hero-particles-webgl.json` from any project.
 - Until then: local registry URL (`http://localhost:3000/r/...`) or direct file copy.
 
 ## Out of scope (deliberately)

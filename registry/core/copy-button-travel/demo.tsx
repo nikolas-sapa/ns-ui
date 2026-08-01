@@ -6,7 +6,7 @@ export default function CarbonLiftDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / carbon-lift
+        ns-ui / copy-button-travel
       </p>
 
       <div className="flex w-full max-w-md flex-col gap-4 rounded-md border border-border bg-surface p-6">
@@ -31,7 +31,7 @@ export default function CarbonLiftDemo() {
           </p>
           <div className="flex items-center justify-between gap-3 rounded-sm border border-border bg-background px-3 py-2">
             <CarbonLift
-              value="npx shadcn@latest add carbon-lift"
+              value="npx shadcn@latest add copy-button-travel"
               description="install command"
             />
           </div>

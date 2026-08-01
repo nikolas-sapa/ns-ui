@@ -59,7 +59,7 @@ import {
 // the dot/line, --border for notches and the rail, --muted for resting
 // label text, --accent solely for the keyboard focus ring.
 //
-// Distinct from fling-segment: fling-segment is a horizontal segmented
+// Distinct from segmented-control-fling: segmented-control-fling is a horizontal segmented
 // control with a draggable, flingable pill and release-velocity physics.
 // PinTumbler is a stacked vertical radio *list* — no dragging, selection
 // only ever changes via click or native radio keyboard roving — whose

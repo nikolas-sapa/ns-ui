@@ -13,8 +13,8 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 //
 // The motion IS the data: jitter vs. baseline is the only signal for
 // provisional vs. committed, there's no separate status pill. Distinct from
-// wet-ink (which encodes elapsed-time freshness via weight/opacity and never
-// snaps) and decrypt-text (a one-shot scramble-to-reveal on a fixed string,
+// streaming-ink-dry (which encodes elapsed-time freshness via weight/opacity and never
+// snaps) and text-decrypt (a one-shot scramble-to-reveal on a fixed string,
 // no underlying state machine at all).
 // ---------------------------------------------------------------------------
 
@@ -264,7 +264,7 @@ export function LooseType({ tokens, className = "" }: LooseTypeProps) {
     .join(" ");
 
   return (
-    <div className={`ns-loose-type ${className}`}>
+    <div className={`ns-streaming-token-settle ${className}`}>
       <div aria-live="polite" className="sr-only">
         {committedText}
       </div>
@@ -281,7 +281,7 @@ export function LooseType({ tokens, className = "" }: LooseTypeProps) {
             return (
               <span
                 key={it.id}
-                className={it.committed ? "ns-loose-type-token text-foreground" : "ns-loose-type-token ns-loose-type-provisional text-muted"}
+                className={it.committed ? "ns-streaming-token-settle-token text-foreground" : "ns-streaming-token-settle-token ns-streaming-token-settle-provisional text-muted"}
                 style={base}
               >
                 {it.text}
@@ -311,7 +311,7 @@ export function LooseType({ tokens, className = "" }: LooseTypeProps) {
                 ref={(node) => {
                   if (node) nodesRef.current.set(it.id, node);
                 }}
-                className={it.committed ? "ns-loose-type-token text-foreground" : "ns-loose-type-token ns-loose-type-provisional text-muted"}
+                className={it.committed ? "ns-streaming-token-settle-token text-foreground" : "ns-streaming-token-settle-token ns-streaming-token-settle-provisional text-muted"}
                 style={style}
                 onTransitionEnd={(e) => onEnterTransitionEnd(it.id, e)}
               >
@@ -349,7 +349,7 @@ export function LooseType({ tokens, className = "" }: LooseTypeProps) {
                 ref={(node) => {
                   if (node) nodesRef.current.set(it.id, node);
                 }}
-                className={it.committed ? "ns-loose-type-token text-foreground" : "ns-loose-type-token ns-loose-type-provisional text-muted"}
+                className={it.committed ? "ns-streaming-token-settle-token text-foreground" : "ns-streaming-token-settle-token ns-streaming-token-settle-provisional text-muted"}
                 style={style}
                 onTransitionEnd={(e) => onGhostTransitionEnd(it.id, e)}
               >
@@ -364,7 +364,7 @@ export function LooseType({ tokens, className = "" }: LooseTypeProps) {
           return (
             <span
               key={it.id}
-              className={it.committed ? "ns-loose-type-token text-foreground" : "ns-loose-type-token ns-loose-type-provisional text-muted"}
+              className={it.committed ? "ns-streaming-token-settle-token text-foreground" : "ns-streaming-token-settle-token ns-streaming-token-settle-provisional text-muted"}
               style={{
                 ...base,
                 transform: it.committed ? "translateY(0) rotate(0deg)" : `translateY(${it.jitter.ty}px) rotate(${it.jitter.rot}deg)`,
@@ -384,11 +384,11 @@ export function LooseType({ tokens, className = "" }: LooseTypeProps) {
 }
 
 const CSS = `
-.ns-loose-type-provisional{
+.ns-streaming-token-settle-provisional{
   text-decoration: none;
 }
 @media (prefers-reduced-motion: reduce){
-  .ns-loose-type-provisional{
+  .ns-streaming-token-settle-provisional{
     text-decoration: underline;
     text-decoration-style: dotted;
     text-underline-offset: 3px;

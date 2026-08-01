@@ -204,7 +204,7 @@ export default function FlingSegmentDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / fling-segment — grab the pill, fling it
+        ns-ui / segmented-control-fling — grab the pill, fling it
       </p>
 
       <div className="w-full max-w-2xl rounded-md border border-border bg-surface">

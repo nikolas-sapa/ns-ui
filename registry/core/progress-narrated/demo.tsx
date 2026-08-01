@@ -46,7 +46,7 @@ export default function ChronicleBarDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-12 px-6">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / chronicle-bar
+        ns-ui / progress-narrated
       </p>
 
       <div

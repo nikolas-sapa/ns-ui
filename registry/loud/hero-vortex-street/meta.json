@@ -1,6 +1,6 @@
 {
-  "name": "vortex-street",
-  "title": "Vortex Street",
+  "name": "hero-vortex-street",
+  "title": "Hero Vortex Street",
   "description": "Cursor fluid — moving the pointer through a full-bleed dark field sheds a von Karman vortex street of alternating-sign vortices that drift downstream and decay, revealed by ~600 velocity-aligned tracer streaks; clicking drops a counter-rotating vortex pair that stirs the field for exactly 3 seconds.",
   "collection": "loud",
   "tags": ["fluid", "vortex", "cursor", "canvas", "particles", "physics", "hero", "decorative"],

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
 
 // TrestleGap — grounding coverage drawn as a walkable bridge under a RAG
-// answer. Citation pills (margin-cite) and coverage tracks (bedrock-trace)
+// answer. Citation pills (citation-inline-card) and coverage tracks (citation-grounding-hatch)
 // both put the evidence signal in a SEPARATE element beside or below the
 // prose; here it runs directly under the words themselves — one SVG layer,
 // measured off the live sentence buttons with Range.getClientRects() (so it

@@ -6,7 +6,7 @@ export default function CardFlickDemo() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-8 bg-background px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / card-flick — hover the headline
+        ns-ui / text-card-flick — hover the headline
       </p>
       <CardFlick
         text="FLICK THIS"

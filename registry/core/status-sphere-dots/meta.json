@@ -1,6 +1,6 @@
 {
-  "name": "gyre-mote",
-  "title": "Gyre Mote",
+  "name": "status-sphere-dots",
+  "title": "Status Sphere Dots",
   "description": "A canvas-free AI thinking indicator: a rotating sphere of depth-cued SVG dots. Four states — thinking, searching, done, idle — distinct by motion, not color, legible from 24px inline to a 200px showpiece.",
   "collection": "core",
   "tags": [

@@ -58,7 +58,7 @@ export default function ScrollIslandDemo() {
 
       <div className="flex flex-col items-center gap-2 px-6 pb-10 pt-28">
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-          ns-ui / scroll-island
+          ns-ui / header-scroll-pill
         </p>
         <p className="max-w-md text-center text-xs text-muted">
           Scroll to compress the bar into a pill; a fast upward scroll flicks

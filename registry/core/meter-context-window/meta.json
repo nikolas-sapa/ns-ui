@@ -1,6 +1,6 @@
 {
-  "name": "ballast-context",
-  "title": "Ballast Context",
+  "name": "meter-context-window",
+  "title": "Meter Context Window",
   "description": "A context-window budget meter: one hairline stacked bar segmenting the window into system prompt / tools / history / current turn, told apart by fill pattern instead of color, that visibly resettles rather than jumps when the window compacts.",
   "collection": "core",
   "tags": [

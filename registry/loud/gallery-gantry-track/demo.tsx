@@ -6,7 +6,7 @@ export default function GantryRunDemo() {
   return (
     <main className="min-h-screen bg-background text-foreground">
       <header className="fixed inset-x-0 top-0 z-20 flex items-center justify-between px-6 py-5">
-        <span className="font-mono text-xs tracking-widest text-muted">ns-ui / gantry-run</span>
+        <span className="font-mono text-xs tracking-widest text-muted">ns-ui / gallery-gantry-track</span>
         <button
           type="button"
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}

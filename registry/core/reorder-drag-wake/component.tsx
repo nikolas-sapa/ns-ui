@@ -24,7 +24,7 @@ import {
 // and the card itself settles last, on a short hold, into one underdamped
 // spring with a single overshoot. Positions are refs-only, written per-frame
 // on a direct-DOM rAF loop that sleeps once every row is at rest — no canvas,
-// DOM + CSS transforms only. Distinct from flock-stack: nothing here trails a
+// DOM + CSS transforms only. Distinct from avatar-stack-flock: nothing here trails a
 // leader, every neighbor reacts independently to a field around one dragged
 // card. Full keyboard reorder ships alongside: a grip button arms discrete
 // mode (aria-pressed), arrow keys step the row through the same slots with a

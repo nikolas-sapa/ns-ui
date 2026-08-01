@@ -46,7 +46,7 @@ export default function EchoSoundDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / echo-sound — a probe that the results interrupt
+        ns-ui / empty-state-sonar — a probe that the results interrupt
       </p>
 
       <div className="w-[420px] rounded-md border border-border bg-background p-6">

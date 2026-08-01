@@ -26,7 +26,7 @@ import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent }
 // Keyboard is a roving-tabindex toolbar (prev, every page number, next, all
 // one tab stop): ArrowLeft/ArrowRight move focus by one among the ENABLED
 // controls, Home/End jump to the first/last, matching the roving pattern
-// used elsewhere in this registry (drape-menu, hasp-fold) rather than a
+// used elsewhere in this registry (dropdown-drape, accordion-latch) rather than a
 // custom listbox. Enter/Space activate the focused control natively.
 // `<nav aria-label>` + `aria-current="page"` on the current button is the
 // only semantic layer; there is no live region because the page number

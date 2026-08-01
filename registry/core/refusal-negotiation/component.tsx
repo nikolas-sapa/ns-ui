@@ -4,7 +4,7 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 
 // ---------------------------------------------------------------------------
 // RedlineParley — the counter-offer after a guardrail closes, not the gate
-// itself (that's assay-gate's job, for a different decision entirely: a
+// itself (that's approval-inline-diff's job, for a different decision entirely: a
 // human approving an agent's already-permitted tool call). Here the request
 // was already refused. The offending span is echoed back struck through —
 // never a full-red block, just a --muted strikethrough bar that draws

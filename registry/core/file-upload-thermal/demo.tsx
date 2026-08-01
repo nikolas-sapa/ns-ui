@@ -15,7 +15,7 @@ export default function UpdraftDropzoneDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / updraft-dropzone — accepted files rise, rejected files sink
+        ns-ui / file-upload-thermal — accepted files rise, rejected files sink
       </p>
 
       <div className="w-full max-w-lg rounded-md border border-border bg-surface">

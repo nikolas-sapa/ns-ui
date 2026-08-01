@@ -1,6 +1,6 @@
 {
-  "name": "lock-flight",
-  "title": "Lock Flight",
+  "name": "wizard-canal-lock",
+  "title": "Wizard Canal Lock",
   "description": "A wizard stepper built as a flight of canal locks: the next chamber's water level climbs to meet the current one, and only once they equalize does the shared gate split open for the active highlight to glide through — an invalid step's level visibly stalls short of the gate line instead of popping a toast.",
   "collection": "core",
   "tags": [
@@ -25,5 +25,5 @@
     "openBy": "button[data-lockflight-continue]",
     "expect": "[data-lockflight-status]"
   },
-  "useWhen": "Pick lock-flight for a multi-step form/wizard where a step's own validation should be the visible reason you can't advance — an unfilled next chamber literally won't rise to meet the gate. It's unrelated to tumbler-gate (a lock-cylinder pin-tumbler unlock affordance) and quoin-lock (a letterpress clamp interaction) — neither of those animates a precondition; lock-flight's whole mechanism is validation made physical across a sequence of steps, not a single lock's open/closed state."
+  "useWhen": "Pick wizard-canal-lock for a multi-step form/wizard where a step's own validation should be the visible reason you can't advance — an unfilled next chamber literally won't rise to meet the gate. It's unrelated to confirm-dial-align (a lock-cylinder radio-group-pin unlock affordance) and hero-letterpress-lockup (a letterpress clamp interaction) — neither of those animates a precondition; wizard-canal-lock's whole mechanism is validation made physical across a sequence of steps, not a single lock's open/closed state."
 }

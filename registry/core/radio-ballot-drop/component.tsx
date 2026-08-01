@@ -127,7 +127,7 @@ export function BallotDrop({
   return (
     <div ref={wrapRef} className={`relative flex w-64 flex-col items-center ${className}`}>
       <style>{`
-        @keyframes nsui-ballot-drop {
+        @keyframes nsui-radio-ballot-drop {
           0% { transform: translateY(0) rotate(0deg) scaleY(1); opacity: 1; }
           18% { transform: translateY(calc(var(--nsui-travel) * 0.12)) rotate(-7deg) scaleY(0.9); opacity: 1; }
           40% { transform: translateY(calc(var(--nsui-travel) * 0.55)) rotate(6deg) scaleY(0.82); opacity: 1; }
@@ -140,7 +140,7 @@ export function BallotDrop({
           55% { transform: translateY(calc(var(--nsui-travel) * 0.25)) rotate(4deg) scaleY(0.9); opacity: 0.6; }
           100% { transform: translateY(0) rotate(0deg) scaleY(1); opacity: 0; }
         }
-        @keyframes nsui-ballot-drop-reduced {
+        @keyframes nsui-radio-ballot-drop-reduced {
           0% { transform: translateY(0); opacity: 1; }
           100% { transform: translateY(calc(var(--nsui-travel) * 0.4)); opacity: 0; }
         }
@@ -178,10 +178,10 @@ export function BallotDrop({
                 animation: `${
                   reducedRef.current
                     ? g.mode === "drop"
-                      ? "nsui-ballot-drop-reduced"
+                      ? "nsui-radio-ballot-drop-reduced"
                       : "nsui-ballot-retract-reduced"
                     : g.mode === "drop"
-                      ? "nsui-ballot-drop"
+                      ? "nsui-radio-ballot-drop"
                       : "nsui-ballot-retract"
                 } ${reducedRef.current ? 260 : 620}ms cubic-bezier(0.3,0.6,0.3,1) forwards`,
               } as React.CSSProperties

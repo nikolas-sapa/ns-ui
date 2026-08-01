@@ -1,6 +1,6 @@
 {
-  "name": "prism-drag-split",
-  "title": "Prism Drag Split",
+  "name": "text-prism-split",
+  "title": "Text Prism Split",
   "description": "A frosted prism strip rides the cursor across a headline, magnifying the text beneath it and tearing it into velocity-driven RGB channel slices that snap back with spring overshoot.",
   "collection": "loud",
   "tags": ["cursor", "text", "rgb-split", "chromatic-aberration", "glass", "spring", "headline"],

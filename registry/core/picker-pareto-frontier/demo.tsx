@@ -21,7 +21,7 @@ export default function RidgeWalkDemo() {
     <main className="flex min-h-screen items-center justify-center bg-background px-6 py-16">
       <div className="w-full max-w-xl">
         <p className="mb-10 text-center font-mono text-xs tracking-widest text-muted">
-          ns-ui / ridge-walk
+          ns-ui / picker-pareto-frontier
         </p>
         <div className="mx-auto mb-10 max-w-md text-center">
           <h1 className="text-4xl font-semibold tracking-tight text-foreground">

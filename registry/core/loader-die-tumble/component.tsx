@@ -7,7 +7,7 @@
 // isn't a clean rotation to its target — it eases in fast (ease-out-expo),
 // swings 8deg past the landing face, then corrects back on the house spring
 // curve (cubic-bezier(.34,1.56,.64,1), the same overshoot used for
-// dovetail-run's chip seat), so every landing reads as weight catching
+// wizard-dovetail's chip seat), so every landing reads as weight catching
 // itself rather than an animation hitting a number. A soft floor shadow
 // underneath compresses as the cube rocks up off it and flares as it lands,
 // entirely in CSS, synced to the same four-beat timeline.
@@ -140,7 +140,7 @@ export function HingeTopple({
     <span
       role="status"
       aria-live="polite"
-      data-hinge-topple
+      data-loader-die-tumble
       className={`inline-flex items-center justify-center ${className}`}
       style={{
         width: size,

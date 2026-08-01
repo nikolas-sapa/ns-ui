@@ -29,8 +29,8 @@ import { useEffect, useRef, useState } from "react";
 // (add, either removal path, undo) the surviving chips' rects are snapshotted;
 // after React commits the new layout, each chip is offset back to its old
 // position and released on a spring-approximating cubic-bezier (the same
-// honest-approximation call this registry already made in spine-stack/
-// shear-band — a real spring integrator wasn't worth it for a one-shot
+// honest-approximation call this registry already made in drill-down-spines/
+// slider-range-shear — a real spring integrator wasn't worth it for a one-shot
 // settle). Ctrl+Z / Cmd+Z pops a small undo stack (tag + its removal index)
 // and re-inserts, reusing the same FLIP path. Pure DOM + inline SVG + CSS;
 // no canvas, no dependencies.
@@ -94,7 +94,7 @@ function Perforation({
         const torn = progress >= threshold;
         const jittering = jitterIndex === i;
         return torn ? (
-          <g key={i} className={jittering ? "tear-tab-jitter" : undefined}>
+          <g key={i} className={jittering ? "tag-input-tear-jitter" : undefined}>
             <line x1={1.5} x2={3.6} y1={cy - 1} y2={cy - 1} stroke={stroke} strokeWidth={1.3} strokeLinecap="round" />
             <line x1={4.4} x2={7.2} y1={cy + 1} y2={cy + 1} stroke={stroke} strokeWidth={1.3} strokeLinecap="round" />
           </g>
@@ -440,27 +440,27 @@ export function TearTab({
   return (
     <div className={`w-full ${className}`} onKeyDown={onRootKeyDown}>
       <style>{`
-        @keyframes tear-tab-in {
+        @keyframes tag-input-tear-in {
           from { opacity: 0; transform: translateY(4px); }
           to { opacity: 1; transform: translateY(0); }
         }
-        @keyframes tear-tab-jitter {
+        @keyframes tag-input-tear-jitter {
           0% { transform: translate(0, 0); }
           30% { transform: translate(0, -1px); }
           60% { transform: translate(0, 1px); }
           100% { transform: translate(0, 0); }
         }
-        @keyframes tear-tab-fall {
+        @keyframes tag-input-tear-fall {
           from { transform: translateY(0) rotate(0deg); opacity: 1; }
           to { transform: translateY(48px) rotate(4deg); opacity: 0; }
         }
-        .tear-tab-chip { animation: tear-tab-in 180ms ease-out backwards; }
-        .tear-tab-jitter { animation: tear-tab-jitter ${JITTER_MS}ms ease-out; }
-        .tear-tab-fading { transition: opacity ${FADE_MS}ms ease, transform ${FADE_MS}ms ease; opacity: 0; transform: scale(0.94); }
-        .tear-tab-ghost { animation: tear-tab-fall ${FALL_MS}ms cubic-bezier(0.55, 0, 1, 0.45) forwards; }
+        .tag-input-tear-chip { animation: tag-input-tear-in 180ms ease-out backwards; }
+        .tag-input-tear-jitter { animation: tag-input-tear-jitter ${JITTER_MS}ms ease-out; }
+        .tag-input-tear-fading { transition: opacity ${FADE_MS}ms ease, transform ${FADE_MS}ms ease; opacity: 0; transform: scale(0.94); }
+        .tag-input-tear-ghost { animation: tag-input-tear-fall ${FALL_MS}ms cubic-bezier(0.55, 0, 1, 0.45) forwards; }
         @media (prefers-reduced-motion: reduce) {
-          .tear-tab-chip, .tear-tab-jitter, .tear-tab-ghost { animation: none; }
-          .tear-tab-fading { transition: none; opacity: 0; }
+          .tag-input-tear-chip, .tag-input-tear-jitter, .tag-input-tear-ghost { animation: none; }
+          .tag-input-tear-fading { transition: none; opacity: 0; }
         }
       `}</style>
 
@@ -495,10 +495,10 @@ export function TearTab({
                 onKeyDown={onChipKeyDown(tag)}
                 data-tear-first={chipIndex(tag) === 0 || undefined}
                 className={[
-                  "tear-tab-chip inline-flex h-7 shrink-0 cursor-grab touch-none select-none items-stretch",
+                  "tag-input-tear-chip inline-flex h-7 shrink-0 cursor-grab touch-none select-none items-stretch",
                   "overflow-visible rounded-md border border-l-0 border-border bg-background",
                   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
-                  isFading ? "tear-tab-fading" : "",
+                  isFading ? "tag-input-tear-fading" : "",
                 ].join(" ")}
                 style={{
                   transform: dragging
@@ -539,7 +539,7 @@ export function TearTab({
       {ghost ? (
         <div
           aria-hidden
-          className="tear-tab-ghost pointer-events-none fixed z-50 flex h-7 items-center overflow-hidden rounded-md border border-border bg-background"
+          className="tag-input-tear-ghost pointer-events-none fixed z-50 flex h-7 items-center overflow-hidden rounded-md border border-border bg-background"
           style={{ left: ghost.left, top: ghost.top, width: ghost.width }}
         >
           <Perforation progress={1} jitterIndex={null} armed />

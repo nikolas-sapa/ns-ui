@@ -33,7 +33,7 @@ function ActivityPanel() {
     { who: "AR", what: "opened PR #214 — feeler-gap threshold copy", when: "3m" },
     { who: "NS", what: "merged registry:build cache fix", when: "1h" },
     { who: "KM", what: "flagged a light-theme contrast issue", when: "2h" },
-    { who: "JL", what: "shipped drape-menu physics tuning", when: "5h" },
+    { who: "JL", what: "shipped dropdown-drape physics tuning", when: "5h" },
   ];
   return (
     <ul className="flex flex-col gap-3">
@@ -90,7 +90,7 @@ export default function SlackRailDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / slack-rail — the underline is a cable, not a bar
+        ns-ui / tabs-slack-cable — the underline is a cable, not a bar
       </p>
 
       <div className="w-full max-w-lg rounded-md border border-border bg-background p-6">

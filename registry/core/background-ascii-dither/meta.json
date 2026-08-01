@@ -1,6 +1,6 @@
 {
-  "name": "ascii-dither-media",
-  "title": "ASCII Dither Media",
+  "name": "background-ascii-dither",
+  "title": "Background ASCII Dither",
   "description": "Luminance-to-glyph canvas renderer: ASCII, Bayer-dither, and dot-matrix modes with cursor-proximity resolve.",
   "collection": "core",
   "tags": [

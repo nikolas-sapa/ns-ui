@@ -1,6 +1,6 @@
 {
-  "name": "ligature-melt",
-  "title": "Ligature Melt",
+  "name": "text-ligature-melt",
+  "title": "Text Ligature Melt",
   "description": "Headline whose glyphs liquefy near the cursor — an SVG gooey filter fuses neighbors into temporary ligatures that spring apart on leave, with a faint field drifting the melt on its own at rest.",
   "collection": "core",
   "tags": ["text", "cursor", "svg-filter", "goo", "micro-interaction"],

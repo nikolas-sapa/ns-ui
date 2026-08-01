@@ -1,6 +1,6 @@
 {
-  "name": "ripple-unfold",
-  "title": "Ripple Unfold",
+  "name": "reveal-ripple-tiles",
+  "title": "Reveal Ripple Tiles",
   "description": "Media reveal driven by a height-field water sim: a ripple front sweeps from the trigger point, popping grid tiles open as the wave crosses them and refracting revealed tiles like wet glass; the cursor keeps stirring the water after full reveal.",
   "collection": "core",
   "tags": [

@@ -16,7 +16,7 @@ export default function NibCheckDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-10 px-6">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / nib-check — the everyday checkbox and its select-all cousin
+        ns-ui / checkbox-ink-stroke — the everyday checkbox and its select-all cousin
       </p>
 
       <div className="w-full max-w-sm rounded-md border border-border bg-surface p-5">

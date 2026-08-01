@@ -33,7 +33,7 @@ export default function ShearBandDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-        ns-ui / shear-band — the span is one taut object, not two thumbs
+        ns-ui / slider-range-shear — the span is one taut object, not two thumbs
       </p>
 
       <div className="w-full max-w-md rounded-md border border-border bg-surface">

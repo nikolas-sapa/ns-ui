@@ -236,7 +236,7 @@ export function MarginCite({ sources, className = "" }: MarginCiteProps) {
   };
 
   return (
-    <span className={`ns-margin-cite relative inline whitespace-nowrap ${className}`}>
+    <span className={`ns-citation-inline-card relative inline whitespace-nowrap ${className}`}>
       <button
         ref={triggerRef}
         type="button"
@@ -294,7 +294,7 @@ export function MarginCite({ sources, className = "" }: MarginCiteProps) {
               setOpen(false);
             }}
             style={{ position: "fixed", top: pos.top, left: pos.left, width: CARD_WIDTH }}
-            className="ns-margin-cite-panel z-50 max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-md border border-border bg-surface text-foreground shadow-lg outline-none"
+            className="ns-citation-inline-card-panel z-50 max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-md border border-border bg-surface text-foreground shadow-lg outline-none"
           >
             <div className="flex items-center justify-between gap-2 border-b border-border px-3 py-2">
               <span aria-hidden className="font-mono text-[11px] tabular-nums tracking-wide text-muted">
@@ -355,9 +355,9 @@ export function MarginCite({ sources, className = "" }: MarginCiteProps) {
               </a>
             </div>
             <style>{`
-.ns-margin-cite-panel{animation:ns-mc-in 160ms cubic-bezier(0.16,1,0.3,1) both}
+.ns-citation-inline-card-panel{animation:ns-mc-in 160ms cubic-bezier(0.16,1,0.3,1) both}
 @keyframes ns-mc-in{from{opacity:0;transform:translateY(-4px) scale(.98)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion: reduce){.ns-margin-cite-panel{animation:none}}
+@media (prefers-reduced-motion: reduce){.ns-citation-inline-card-panel{animation:none}}
 `}</style>
           </div>,
           document.body
