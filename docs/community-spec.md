@@ -283,13 +283,22 @@ Numeric criteria, before the implementation plan. Group C baselines come from
 | B1 | `next build` route table | rows for `/`, `/preview/[name]`, `/preview/[name]/embed`, `/preview/[name]/play`, `/writing/[slug]` **byte-identical** to the baseline captured at step 2 |
 | B2 | `grep -rn "ConvexAuthNextjsServerProvider\|cookies()\|headers()" app/layout.tsx app/_components/site-shell.tsx` | **0 matches**. §6.4 |
 | B3 | Middleware matcher is an explicit allowlist | matches only `/api/auth(.*)`, `/api/me`, `/api/saves`, `/account(.*)`, `/welcome`, `/submit(.*)`. **`/u/(.*)` is not on it** — §8.1. Asserted by reading `proxy.ts` **and** by B4-B6 |
-| B4 | Anonymous `curl -I /preview/<slug>/embed`, warm | `200`, `x-nextjs-cache: HIT`, `s-maxage=3600`, **no `set-cookie`** |
+| B4 | Anonymous `curl -I /preview/<slug>/embed`, warm | `200`, `x-vercel-cache: HIT`, `x-nextjs-prerender: 1`, **no `set-cookie`** |
 | B5 | Same for `/preview/<slug>/play` | identical |
 | B6 | Anonymous `curl -I /r/<slug>.json`, `/registry.json` | `200`, cache HIT, **no `set-cookie`**, no `vary: cookie` |
 | B7 | `npx shadcn add <origin>/r/<slug>.json`, clean project, no session | succeeds, same bytes as before |
 | B8 | HTML of `/`, anonymous vs signed-in | **identical bytes** |
 | B9 | JS bundle of `/` | contains **no** `ConvexReactClient` and no `convex/react`. Non-goal #5 |
 | B10 | Anonymous `curl -I /u/<a-public-handle>` | `200`, **no `set-cookie`**, **no `vary: cookie`**. `/u/<handle>` renders the public projection only and never reads a cookie — the owner's own preview of an unpublished profile lives at `/account`, not here (§8.1) |
+
+**B4/B5 header drift.** The original criterion named `x-nextjs-cache: HIT` and `s-maxage=3600` —
+headers this stack does not emit. Measured against a real preview: Vercel's own edge sends
+`x-vercel-cache: HIT` on a repeat request, not `x-nextjs-cache`, and the ISR route's `Cache-Control` is
+`public, max-age=0, must-revalidate` (the revalidation window lives server-side, not in the header)
+alongside `x-nextjs-prerender: 1` and `x-nextjs-stale-time: 300`. Same class of drift as C6's build-log
+column disappearing in Turbopack — the functional property the test exists to protect (a genuine warm
+edge cache hit, and no `set-cookie` leaking a session into that cached object) is unchanged and stays
+mandatory; only the header names were Next-version-specific and did not survive.
 
 ### Group C — performance
 
@@ -298,7 +307,7 @@ Numeric criteria, before the implementation plan. Group C baselines come from
 | C1 | `/` TTFB, warm CDN hit, 3 runs | ≤ **200ms** (baseline 174-182ms) |
 | C2 | `/` steady-state TBT, 15-25s window, 4x CPU throttle, quiet machine | **0ms, 3 of 3 runs** (current shipped value) |
 | C3 | `/` LCP, 4x throttle | ≤ **600ms** (baseline 516ms) |
-| C4 | Requests on one `/` load | ≤ **57** (baseline 53; `/api/me` + `/api/saves`) |
+| C4 | Requests on one `/` load, measured at the load event (same point the 53-request baseline was captured at, not network-idle) | ≤ **57** (baseline 53; `/api/me` + `/api/saves`). Observed on a real preview: **50 at load** — PASS. A separate, informational count to **63 at network-idle** once Next's own prefetches and Vercel's Analytics/Speed Insights/`vercel.live` scripts finish loading; `vercel.live` is preview-only and will not exist in production, so the network-idle figure is not the one this budget is measured against |
 | C5 | `/api/saves` p95, signed in, warm | < **250ms** (one extra hop: our origin → Convex) |
 | C6 | Initial JS on `/` | ≤ **206,509 bytes** brotli, summed across every unique `/_next/static/*.js` referenced by a `<script>` tag or a preload/modulepreload `<link>` on the production server's response for `/`. Measured baseline on Next 16.2.11: **196,269 bytes across 12 files**; the pass criterion is that baseline plus 10,240 bytes (10KB) of budget for what Convex adds |
 
