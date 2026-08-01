@@ -43,12 +43,14 @@
     "previews:build": "node scripts/build-previews.ts"
   },
   "dependencies": {
+    "@convex-dev/auth": "0.0.94",
     "@react-three/fiber": "9.6.1",
     "@vercel/analytics": "2.0.1",
     "@vercel/speed-insights": "2.0.0",
+    "convex": "1.42.3",
     "geist": "1.7.2",
     "motion": "12.42.2",
-    "next": "16.2.10",
+    "next": "16.2.11",
     "react": "19.2.7",
     "react-dom": "19.2.7",
     "three": "0.185.1"
