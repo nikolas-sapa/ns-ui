@@ -22,16 +22,16 @@ across the ecosystem and zero times here:
 |---|---|---|
 | features / feature grid | 19 | the single most repeated block out there |
 | testimonials | 13 | quote cards, marquees of them, wall-of-love |
-| navbar / nav | 12 | ns-ui has `jack-knife`, `periscope-sweep` — menus, not a site nav |
+| navbar / nav | 12 | ns-ui has `context-menu-unfold`, `command-palette-rotary` — menus, not a site nav |
 | bento grid | 12 | layout primitive, not an effect |
 | logo cloud | 10 | with `logo_search` MCP available, cheap to do properly |
 | device mockup (iphone/safari/apple) | 15 | frame + screen, the standard hero prop |
 | theme toggler | 9 | ns-ui is token-driven throughout and still has no toggle |
 | blog / post list | 8 | index + card |
 | stat tile / KPI | 7 | `dataviz` skill covers the form; nothing here implements it |
-| login / auth form | 7 | `dovetail-run` is a stepper, not an auth surface |
-| masonry gallery | 5 | `caustic-coverflow` is a coverflow, different job |
-| lens / magnifier | 5 | `prism-drag-split` is close but is a text instrument |
+| login / auth form | 7 | `wizard-dovetail` is a stepper, not an auth surface |
+| masonry gallery | 5 | `gallery-coverflow-caustic` is a coverflow, different job |
+| lens / magnifier | 5 | `text-prism-split` is close but is a text instrument |
 | tweet / GitHub card | 10 | embed cards |
 | contact form | 4 | |
 | pie / donut | 6 | data-viz form ns-ui skips |
@@ -58,11 +58,11 @@ Ordered by (does it unlock a whole page) × (is it an interaction, not a picture
 
 Each is a picture unless it earns a mechanic. Only build the version where something actually
 happens — a testimonial wall that reflows on read, a logo cloud that settles, a stat tile whose
-number arrives the way `carry-digit` does.
+number arrives the way `counter-carry-ripple` does.
 
 ### Data-viz — the forms ns-ui skips
 
-11. ~~**Heatmap**~~ — built: `tide-ledger` (loud, accent-derived sequential ramp).
+11. ~~**Heatmap**~~ — built: `heatmap-calendar-tide` (loud, accent-derived sequential ramp).
 12. **Funnel / stage drop** — from the bookmarks.
 13. **Pie / donut** — only with a real reason; the `dataviz` skill's form heuristic says bar beats
     pie for almost every job.
@@ -70,10 +70,10 @@ number arrives the way `carry-digit` does.
 
 ### Showpieces — from the bookmarks, colour welcome
 
-15. **Liquid-metal full-bleed hero** — 3 bookmarks. `liquid-collar` proves the shader; the gap is
+15. **Liquid-metal full-bleed hero** — 3 bookmarks. `border-chrome-ring` proves the shader; the gap is
     hero scale with type sitting in it. WebGL, the biggest single build in this list.
 16. **Rotating-word slot** — 1 bookmark, and the one text mechanic genuinely absent.
-17. **Knot / volumetric geometry** — `torus-render` and `meridian-spin` are ASCII; a real 3D knot
+17. **Knot / volumetric geometry** — `ascii-torus-donut` and `ascii-globe-spin` are ASCII; a real 3D knot
     is not covered.
 
 ## Explicitly not building
@@ -81,9 +81,9 @@ number arrives the way `carry-digit` does.
 - **Whole-page templates** (portfolio, landing clones). The registry ships parts.
 - **Branded embeds** — Product Hunt badges, platform-specific badges.
 - **Restyles of what exists** — anything the bookmark map marked *partial*: shader gradients,
-  swirls, particle fields, glass buttons, shiny buttons, scramble text. `chroma-tide`, `glyph-tide`,
-  `vortex-street`, `frost-scrub`, `glass-button` and `decrypt-text` already hold those positions.
-- **404** — covered twice already (`dead-letter`, `knockout-404`).
+  swirls, particle fields, glass buttons, shiny buttons, scramble text. `background-gradient-shader`, `background-ascii-plasma`,
+  `hero-vortex-street`, `scroll-defrost`, `button-glass` and `text-decrypt` already hold those positions.
+- **404** — covered twice already (`not-found-postmark`, `not-found-knockout`).
 
 ## Method note
 
@@ -91,3 +91,38 @@ The ecosystem sweep is name-level, not source-level: it finds concepts with no c
 it will miss a component whose name hides its mechanic. It is a filter for what to look at, not a
 verdict on any single component. The 60 bookmarks were classified individually because that list is
 small enough to deserve it.
+
+---
+
+## Dither Kit (tripwire.sh/dither-kit) — a whole aesthetic to study
+
+Flagged by the owner 2026-08-01: "the designs are soo cool." Not a list of gaps like the rest of
+this file — it is one coherent aesthetic applied across a component set, which is the same thing
+ns-ui is trying to be. Worth studying as a body of work before cherry-picking from it.
+
+**What it ships**
+
+| Group | Items |
+|---|---|
+| Charts | area, bar, line, pie, radar, sparkline |
+| Extras | generative avatars, dithered buttons, gradient washes |
+| Behaviours across all of them | ordered-dither fills, entrance animations, interactive tooltips, selection states, sparkle effects, colour bloom |
+
+**How it is built** — canvas engine (not WebGL/shader), D3 for chart logic, Motion for animation.
+Distributed as a shadcn registry with its own CLI (`@dither-kit/cli`) and a lockfile for version
+tracking. Requires Tailwind and a shadcn `components.json`.
+
+**Why it cannot be ported directly.** It carries D3 and Motion as runtime dependencies. This
+registry's entire pitch is plain source you own with zero or minimal dependencies, and ordered
+dithering is a small pure function over pixel data — the Bayer matrix is a 4x4 or 8x8 constant.
+Anything taken from here is a rewrite against `<canvas>` and the token palette, not a port.
+
+**What it answers in this backlog.** Pie/donut (#13) and the chart family generally, in a house
+style that would already be consistent with `background-ascii-dither`, `ascii-engraving-contour` and `heatmap-year-stipple` —
+the three components here already working in ink-density rather than colour. That is the real
+opportunity: not "copy dither-kit" but "the dithering aesthetic is already latent in this registry
+and could become a coherent chart family."
+
+**Open question for the owner.** Does the accent-token colour rule survive contact with dithering,
+or do these want to be pure ink-on-paper? `heatmap-year-stipple` chose density-not-colour deliberately; a
+dithered chart family should make the same choice once, everywhere, rather than per component.
