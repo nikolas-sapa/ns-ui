@@ -121,6 +121,37 @@
   opacity: 0;
 }
 
+/* Desktop sidebar collapse. `html.sidebar-hidden` is set by the no-flash
+   script (lib/sidebar.ts) before hydration, so a returning visitor who
+   collapsed the sidebar never sees it flash open. Scoped to the same
+   1024px `lg` breakpoint Tailwind's `lg:` utilities use everywhere else in
+   the shell — collapsing is a desktop-only affordance; the mobile drawer
+   (its own toggle, unrelated state) is untouched below it.
+
+   `.sidebar-restore` (the rail button that brings the sidebar back) is
+   hidden by default and only shown in this same collapsed+desktop
+   condition — never at any other combination, so it can't duplicate or
+   collide with the mobile drawer's own hamburger toggle.
+
+   Plain `display: none`, no transition: #site-nav is a flex sibling of the
+   content column, so removing it from flow is what lets the content reflow
+   into the freed space, and skipping an animated width/margin here is what
+   keeps this at zero main-thread cost instead of animating layout on every
+   toggle. */
+.sidebar-restore {
+  display: none;
+}
+
+@media (min-width: 64rem) {
+  html.sidebar-hidden #site-nav {
+    display: none;
+  }
+
+  html.sidebar-hidden .sidebar-restore {
+    display: flex;
+  }
+}
+
 /* MCP popup entrance — transform + opacity only, `motion-safe:` on the
    element itself (mcp-popup.tsx) so it just appears under reduced motion
    instead of skipping a still-defined animation. */

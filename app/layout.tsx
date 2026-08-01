@@ -6,6 +6,7 @@ import { ThemeSync } from "./_components/theme-sync";
 import { SiteAnalytics } from "./_components/site-analytics";
 import { SiteShell } from "./_components/site-shell";
 import { NO_FLASH_SCRIPT } from "@/lib/theme";
+import { NO_FLASH_SIDEBAR_SCRIPT } from "@/lib/sidebar";
 import { navGroups } from "@/lib/nav-data";
 import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
 
@@ -57,6 +58,9 @@ export default function RootLayout({
         {/* Runs before hydration so there's no flash of the wrong theme. See
             lib/theme.ts for what it does and why it has to stay inlined. */}
         <script dangerouslySetInnerHTML={{ __html: NO_FLASH_SCRIPT }} />
+        {/* Same reasoning, for a collapsed sidebar instead of a theme — see
+            lib/sidebar.ts. */}
+        <script dangerouslySetInnerHTML={{ __html: NO_FLASH_SIDEBAR_SCRIPT }} />
       </head>
       <body className="bg-background font-sans text-foreground antialiased">
         <ThemeSync />

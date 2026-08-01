@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { locate, type NavGroup, type NavItem, type NavKind } from "@/lib/nav-data";
+import { SIDEBAR_HIDDEN_KEY } from "@/lib/sidebar";
 import { McpPopup } from "./mcp-popup";
 
 /**
@@ -73,6 +74,34 @@ export function SiteShell({
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+
+  // Desktop-only sidebar collapse (separate from `open`, which is the
+  // mobile drawer above). `sidebarHidden` only gates the two toggle
+  // buttons' `aria-expanded` — the actual hide/show is driven by the
+  // `sidebar-hidden` class on <html>, set synchronously pre-hydration by
+  // the no-flash script (lib/sidebar.ts) and toggled imperatively on click
+  // below, same split as ThemeToggle's `isDark`/`document.documentElement`.
+  // `mounted` gates only the a11y state for the same reason ThemeToggle's
+  // does: the persisted value can't be known during SSR.
+  const [sidebarHidden, setSidebarHidden] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setSidebarHidden(document.documentElement.classList.contains("sidebar-hidden"));
+    setMounted(true);
+  }, []);
+
+  const setSidebarHiddenPersisted = useCallback((next: boolean) => {
+    document.documentElement.classList.toggle("sidebar-hidden", next);
+    try {
+      if (next) localStorage.setItem(SIDEBAR_HIDDEN_KEY, "1");
+      else localStorage.removeItem(SIDEBAR_HIDDEN_KEY);
+    } catch {
+      // Storage unavailable (private mode, locked down) — the toggle still
+      // works for this tab, it just won't persist.
+    }
+    setSidebarHidden(next);
+  }, []);
+
   const [query, setQuery] = useState("");
   const activeRef = useRef<HTMLAnchorElement | null>(null);
   const isFiltering = query.trim().length > 0;
@@ -259,7 +288,25 @@ export function SiteShell({
           >
             ns-ui
           </Link>
-          <span className="font-mono text-[11px] text-muted">{total}</span>
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-[11px] text-muted">{total}</span>
+            {/* Desktop-only: collapses the whole sidebar, not a section
+                inside it — do not confuse with Expand all / Collapse all
+                below, which never remove the nav itself. Hidden below `lg`
+                because the mobile drawer already has its own close
+                affordance (the hamburger button above); this would just be
+                a second, redundant way to dismiss the same panel there. */}
+            <button
+              type="button"
+              onClick={() => setSidebarHiddenPersisted(true)}
+              aria-expanded={mounted ? !sidebarHidden : undefined}
+              aria-controls="site-nav"
+              className="hidden size-6 shrink-0 items-center justify-center rounded-sm text-muted outline-none transition-colors hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none lg:inline-flex"
+            >
+              <span className="sr-only">Hide sidebar</span>
+              <RailChevron direction="left" />
+            </button>
+          </div>
         </div>
 
         <div className="px-4 pb-3">
@@ -351,6 +398,23 @@ export function SiteShell({
           </Link>
         </div>
       </nav>
+
+      {/* The rail that survives hiding the sidebar — CSS-only visibility
+          (see the `.sidebar-restore` rule in globals.css) so it appears in
+          the exact same paint as the collapse itself, pre-hydration
+          included, instead of the button vanishing along with the nav it
+          controls. Desktop-only by construction: that CSS rule only ever
+          applies at the `lg` breakpoint. */}
+      <button
+        type="button"
+        onClick={() => setSidebarHiddenPersisted(false)}
+        aria-expanded={mounted ? !sidebarHidden : undefined}
+        aria-controls="site-nav"
+        className="sidebar-restore fixed left-0 top-4 z-40 h-11 w-6 items-center justify-center rounded-r-md border border-l-0 border-border bg-background text-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none"
+      >
+        <span className="sr-only">Show sidebar</span>
+        <RailChevron direction="right" />
+      </button>
 
       <div className="min-w-0 flex-1">{children}</div>
 
@@ -521,6 +585,27 @@ function Chevron({ small }: { small?: boolean }) {
     <svg
       viewBox="0 0 16 16"
       className={`${small ? "size-2.5" : "size-3"} shrink-0 -rotate-90 text-muted transition-transform duration-150 ease-out group-open/cat:rotate-0 group-open/kind:rotate-0 motion-reduce:transition-none`}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <path d="M4 6l4 4 4-4" />
+    </svg>
+  );
+}
+
+/** Same chevron path as `Chevron` above (and the Sort select in
+ *  catalog-controls.tsx) — the site's one chevron glyph, just pointed left
+ *  (collapse) or right (restore) instead of tied to a `<details>`'s own
+ *  open/closed rotation. */
+function RailChevron({ direction }: { direction: "left" | "right" }) {
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      className={`size-3 shrink-0 text-muted ${direction === "left" ? "rotate-90" : "-rotate-90"}`}
       fill="none"
       stroke="currentColor"
       strokeWidth="1.75"
