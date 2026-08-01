@@ -45,16 +45,29 @@ export function ClientSwitcher({ clients }: { clients: MCPClient[] }) {
       </div>
 
       <p className="mt-3 font-mono text-[11px] uppercase tracking-wider text-muted">
-        {client.configPath}
+        {client.kind === "command" ? (
+          <span className="text-accent">Run in a terminal</span>
+        ) : (
+          `Paste into ${client.configPath}`
+        )}
       </p>
       <div className="mt-2 flex items-start gap-2 rounded-md border border-border bg-surface py-2 pl-3.5 pr-1.5">
         <pre className="min-w-0 flex-1 overflow-x-auto whitespace-pre-wrap break-words font-mono text-xs leading-relaxed text-foreground">
-          <code>{client.snippet}</code>
+          {client.kind === "command" ? (
+            <code>
+              <span aria-hidden className="select-none text-muted">
+                ${" "}
+              </span>
+              {client.snippet}
+            </code>
+          ) : (
+            <code>{client.snippet}</code>
+          )}
         </pre>
         <CopyButton
           variant="inline"
           value={client.snippet}
-          label={`Copy ${client.label} config`}
+          label={`Copy ${client.label} ${client.kind === "command" ? "command" : "config"}`}
         />
       </div>
     </div>

@@ -206,6 +206,18 @@ export function SiteShell({
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
+        {/* Traveling light trace along the nav's own right hairline (the
+            border-r below) — a slow accent glow drifting down and looping,
+            gone entirely under reduced motion rather than left static. Sits
+            on the hairline itself (w-px, right-0) so it reads as the border
+            breathing, not a separate decoration next to it. */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 right-0 w-px overflow-hidden motion-reduce:hidden"
+        >
+          <span className="absolute inset-x-0 top-0 h-24 animate-[nav-trace_9s_ease-in-out_infinite] bg-gradient-to-b from-transparent via-accent/40 to-transparent" />
+        </span>
+
         {/* pl-14 clears the fixed mobile toggle button (44px, left-3 top-3),
             which otherwise sits directly on top of the wordmark once the
             drawer is open. Not needed at lg — the toggle is hidden there. */}

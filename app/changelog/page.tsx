@@ -50,17 +50,25 @@ export default function ChangelogPage() {
             {events.length} releases
           </p>
         </div>
-        {/* Strandline lays 8 markers along the strand with mono labels under
-            each. Below ~560px those labels collide, so the strand gets its own
-            scroll rail rather than being squeezed. */}
+        {/* Strandline spaces its markers evenly across whatever width it's
+            given, with a fixed mono label under each — it does not thin
+            labels out on its own. A fixed min-width (560px) worked while the
+            changelog had 6-8 releases; at 18+ the same 560px squeezes labels
+            close enough to overprint ("v0.18.v0.17.v0.16…"). Scale the
+            strand's width with the event count instead — ~64px per marker is
+            enough room for a "v0.18.0" mono label not to touch its
+            neighbour — and let the existing scroll rail carry whatever
+            doesn't fit the viewport, so nothing ever renders overlapping. */}
         <div className="-mx-1 overflow-x-auto px-1">
-          <Strandline
-            events={events}
-            // Every release breaks on load — the whole history, not a teaser.
-            autoplay={events.length}
-            className="mt-1 h-72 min-w-[560px] sm:h-80"
-            aria-label="ns-ui release timeline"
-          />
+          <div style={{ minWidth: `${Math.max(560, events.length * 64)}px` }}>
+            <Strandline
+              events={events}
+              // Every release breaks on load — the whole history, not a teaser.
+              autoplay={events.length}
+              className="mt-1 h-72 sm:h-80"
+              aria-label="ns-ui release timeline"
+            />
+          </div>
         </div>
         <p className="mt-3 border-t border-border pt-3 font-mono text-[10px] uppercase tracking-wider text-muted">
           Scrub with the arrows · hover a mark to replay its swash

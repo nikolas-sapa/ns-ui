@@ -48,3 +48,25 @@
   --radius-md: 12px;
   --radius-lg: 16px;
 }
+
+/* Sidebar hairline trace — a single soft accent band drifting down the nav's
+   right border, looping. transform + opacity only (compositor, never
+   layout/paint-heavy), so it costs nothing on the main thread; the element
+   itself is dropped under prefers-reduced-motion (site-shell.tsx), not just
+   frozen mid-animation. */
+@keyframes nav-trace {
+  0% {
+    transform: translateY(-6rem);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
