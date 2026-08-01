@@ -505,12 +505,16 @@ export function Showcase({
               Writing
             </a>{" "}
             ·{" "}
+            <a href="/connect" className={FOOTER_LINK}>
+              Connect
+            </a>{" "}
+            ·{" "}
             <a href="https://github.com/nikolas-sapa/ns-ui" className={FOOTER_LINK}>
               GitHub
             </a>{" "}
             ·{" "}
             <a href="https://nikolas.helpmarq.com" className={FOOTER_LINK}>
-              Built by Nikolas
+              Built by Nikolas Sapa
             </a>
           </p>
         </div>

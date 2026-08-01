@@ -3,7 +3,9 @@
 Reference for an agent **editing ns-ui itself**. Two other documents may be the one you want:
 
 - Consuming a component in some other project → `https://design.helpmarq.com/llms.txt`, or the
-  README.
+  README. There's also an MCP server (`mcp/`) and a CLI (`cli/`) — both optional, neither required
+  to install a component; see `https://design.helpmarq.com/connect` for per-client config and
+  current publish status.
 - Setup, the add-a-component walkthrough, the token rule, and how to open a PR → `CONTRIBUTING.md`.
   That is the shared ground for humans and agents, and it is shorter.
 

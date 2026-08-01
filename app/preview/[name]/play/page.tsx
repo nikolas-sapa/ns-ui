@@ -218,6 +218,21 @@ export default async function PlaygroundPage({
           </details>
         ) : null}
       </div>
+
+      <footer className="mt-8 flex flex-wrap items-baseline gap-x-6 gap-y-2 border-t border-border pt-4 font-mono text-xs text-muted">
+        <Link
+          href="/"
+          className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+        >
+          Back to the grid
+        </Link>
+        <a
+          href="https://nikolas.helpmarq.com"
+          className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+        >
+          Built by Nikolas Sapa
+        </a>
+      </footer>
     </div>
   );
 }

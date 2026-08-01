@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Strandline } from "@/registry/core/strandline/component";
 import { ThemeToggle } from "../_components/theme-toggle";
 import { loadChangelog } from "./entries";
+import { ChangelogEntryList } from "./entry-list";
 
 export const metadata: Metadata = {
   title: "Changelog — ns-ui",
@@ -66,34 +67,21 @@ export default function ChangelogPage() {
         </p>
       </section>
 
-      <ol className="mt-16 space-y-12">
-        {entries.map((entry) => (
-          <li key={entry.version} id={entry.version}>
-            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-              <h2 className="text-base font-medium tracking-tight">
-                {entry.title}
-              </h2>
-              <span className="font-mono text-xs text-muted">
-                {entry.version}
-              </span>
-            </div>
-            <p className="mt-1 font-mono text-[11px] uppercase tracking-wider text-muted">
-              <time dateTime={entry.iso}>{entry.iso}</time>
-            </p>
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
-              {entry.body}
-            </p>
-          </li>
-        ))}
-      </ol>
+      <ChangelogEntryList entries={entries} />
 
-      <footer className="mt-24 border-t border-border pt-6 font-mono text-xs text-muted">
+      <footer className="mt-24 flex flex-wrap items-baseline gap-x-8 gap-y-2 border-t border-border pt-6 font-mono text-xs text-muted">
         <Link
           href="/"
           className="underline underline-offset-2 hover:text-foreground"
         >
           Back to the grid
         </Link>
+        <a
+          href="https://nikolas.helpmarq.com"
+          className="underline underline-offset-2 hover:text-foreground"
+        >
+          Built by Nikolas Sapa
+        </a>
       </footer>
     </main>
   );

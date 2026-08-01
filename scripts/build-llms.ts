@@ -14,6 +14,7 @@ import { readFileSync, writeFileSync, readdirSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { REGISTRY_ORIGIN } from "../lib/registry-origin.ts";
+import { PACKAGE_PUBLISHED } from "../lib/package-publish-status.ts";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 // Single source of truth (lib/registry-origin.ts) — see that file for the
@@ -568,17 +569,38 @@ for (const collection of ["core", "loud"] as const) {
 
 const warnings: string[] = [];
 
+// Two optional tools sit on top of the plain-fetch path below. Both read
+// PACKAGE_PUBLISHED (lib/package-publish-status.ts) so this text can't say a
+// command works when it 404s — flip that file and rerun `registry:build`
+// once either package is actually on npm.
+const MCP_LINE = PACKAGE_PUBLISHED.mcp
+  ? "MCP server (search_components, get_component with real source, list_categories,\n" +
+    "  install_command, get_conventions): npx -y @nikolas.sapa/ns-ui-mcp. Config and\n" +
+    `  per-client setup: ${HOMEPAGE}/connect`
+  : "MCP server: built (search_components, get_component with real source, list_categories,\n" +
+    "  install_command, get_conventions) but not yet published to npm. Run it from a clone:\n" +
+    `  ${HOMEPAGE}/connect has the per-client config and the working local command.`;
+const CLI_LINE = PACKAGE_PUBLISHED.cliSearch
+  ? "CLI: npx @nikolas.sapa/ns-ui add <name> to install, list/search subcommands also\n" +
+    "  available — see npx @nikolas.sapa/ns-ui --help."
+  : "CLI: npx @nikolas.sapa/ns-ui add <name> installs a component today. list/search\n" +
+    "  subcommands are built but not yet published (0.1.1 on npm is install-only).";
+
 const HEADER = `# ns-ui — AI-agent quickstart
 
 ns-ui is a personal React/Next.js component registry: ${components.length} self-contained,
 dependency-light components (a Geist-dark "core" set + a deliberately flashy "loud" set).
-Every component installs as plain source you own — no runtime package, no MCP server.
+Every component installs as plain source you own — no runtime package required.
 
 Install directly, zero config:
   npx shadcn add ${HOMEPAGE}/r/<name>.json
 
 This drops component.tsx into your project (components/ui/<name>.tsx) and pulls its npm
-deps via shadcn. No account, no API key.
+deps via shadcn. No account, no API key. Both tools below are optional — this one command
+is the whole dependency.
+
+- ${MCP_LINE}
+- ${CLI_LINE}
 
 Requirements before you use any of these:
 - Colors MUST come from CSS custom properties already in scope: --background --foreground

@@ -64,7 +64,14 @@ not just picking one component up front)? **[`mcp/`](mcp/)** is an MCP server
 over the same catalog — `search_components`, `get_component` (full prop
 signature + real source), `list_categories`, `install_command`, and
 `get_conventions` (the token/theming contract). `npx -y @nikolas.sapa/ns-ui-mcp`,
-stdio transport, see [`mcp/README.md`](mcp/README.md) for the config block.
+stdio transport, per-client config at
+**[design.helpmarq.com/connect](https://design.helpmarq.com/connect)** or
+[`mcp/README.md`](mcp/README.md).
+
+There's also a thin CLI, **[`cli/`](cli/)** (`@nikolas.sapa/ns-ui`): `npx
+@nikolas.sapa/ns-ui add <name>` installs a component, `search`/`list`/`info`/
+`categories` cover the rest of the catalog from a terminal. See
+[`cli/README.md`](cli/README.md).
 
 ## The gate
 

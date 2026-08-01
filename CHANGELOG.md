@@ -3,6 +3,62 @@
 Single source of truth for the /changelog page. Each entry is a `## vX.Y.Z - YYYY-MM-DD`
 heading, a `###` title, then one paragraph of body. Newest first.
 
+## v0.18.0 - 2026-08-01
+
+### Keyboard focus covers the card, and five smaller defects
+
+Tabbing the grid drew a focus ring in the corner of a card while a mouse got the whole
+card as one hit target, the same accessibility mismatch on the site's primary content.
+The ring now lives on the element hover already highlights, verified with real Tab key
+events rather than a bare .focus() call, which would not have caught it. Five smaller
+polish defects went with it: the footer stopped spreading three unrelated lines
+edge-to-edge at desktop width, mobile filter chips became a two-column grid instead of
+one per row with dead space beside it, the sidebar's component search and the catalog's
+own search now say which is which since they do different jobs, the Sort select wears
+the site's own chevron instead of the browser's, and card hover gained a perceptible
+wash since brightening a hairline border was invisible against a near-black demo.
+docs/polish-audit.md records every item considered, including one left alone on purpose.
+
+## v0.17.0 - 2026-08-01
+
+### A collapsible sidebar, and a count it agrees with
+
+Category now opens to kind (Slider, Loader, Tabs) and kind opens to components, each
+level counted, because a flat 223-item list under 12 categories was still a list. A kind
+only earns its own group at two or more members, so a category with 35 kinds and 25
+singletons doesn't add a click to reach a third of the registry for nothing. The count
+next to each category in the sidebar had drifted from the number on the matching filter
+chip, 61 versus 55 for Inputs & forms, because the tree filed a component under its
+first matching category while the chips counted every match. Both now use the same
+multi-match rule, verified sidebar against chip across all twelve categories.
+
+## v0.16.0 - 2026-07-31
+
+### Plain-language labels, raw source, and an MCP server
+
+Component names kept their metaphor at this point, renaming 223 of them was a separate
+decision for later, but each now carries a plain "kind" caption derived from the tag each
+meta.json already carries: Nested Slug reads as Nested Slug / Hero, not something you
+click through to understand. The playground gained a Source disclosure showing the real
+component.tsx with a copy button, since these install as plain files with no runtime
+package, so the source is the artifact. And a stdio MCP server shipped alongside the
+CLI: five tools, search, full detail plus source, categories, the install command, and
+the design-token conventions, so an agent building against the registry keeps the token
+contract in context for a session instead of re-fetching it.
+
+## v0.15.0 - 2026-07-31
+
+### A colour gap filled, and two components that didn't belong
+
+tide-ledger, a calendar heatmap on a five-step sequential ramp mixed at runtime from
+--accent into --background, joined the registry. Two siblings built alongside it in the
+same pass, gel-wash (a theatre-lantern preloader) and footing-course (a footer the page
+slides off), came out again: both were built from a bookmarked slug rather than from the
+thing the slug was pointing at, so they answered a category rather than the actual gap.
+The backlog behind all three is now one organized document across the 21st.dev bookmark
+sweep and a name-level diff against seven other component ecosystems, ordered by what
+unlocks a whole page rather than what is easiest to build next.
+
 ## v0.14.0 - 2026-07-29
 
 ### Open to contributions

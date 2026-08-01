@@ -27,7 +27,13 @@ stdio):
 
 Claude Code specifically: `claude mcp add ns-ui -- npx -y @nikolas.sapa/ns-ui-mcp`.
 
-Requires Node 18+.
+See [design.helpmarq.com/connect](https://design.helpmarq.com/connect) for the config
+shapes for Cursor, VS Code, Windsurf, Zed, Cline and Codex CLI, which differ from the
+shape above.
+
+Requires Node 18+. If `npx` refuses with "No versions available", that's npm's own
+`minimum-release-age` setting on your machine rejecting a recently-published package, not
+a problem with this one — wait out the window or override the policy locally.
 
 ## Tools
 
