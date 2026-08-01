@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { locate, type NavGroup, type NavItem, type NavKind } from "@/lib/nav-data";
 import { SIDEBAR_HIDDEN_KEY } from "@/lib/sidebar";
 import { McpPopup } from "./mcp-popup";
+import { SiteAuth } from "./site-auth";
 
 /**
  * The persistent left sidebar, and the one rule that keeps it from breaking
@@ -396,6 +397,10 @@ export function SiteShell({
           >
             Connect
           </Link>
+          {/* Hydration-only — see site-auth.tsx for why it fetches nothing
+              until after paint and never flashes a different state than the
+              signed-out default already rendered here. */}
+          <SiteAuth />
         </div>
       </nav>
 
