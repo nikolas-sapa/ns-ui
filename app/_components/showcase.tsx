@@ -276,24 +276,34 @@ export function Showcase({
         Skip to components
       </a>
 
+      {/* Star + theme toggle used to open the two-column header grid below,
+          which only spans the narrower left column above xl — it read as
+          floating somewhere in the middle of the page rather than sitting
+          at the top. Pulled out to its own full-width row above the header
+          so it's the first thing on the page, right-aligned against the
+          Install column's edge instead of the left column's, and genuinely
+          higher: `lg:pt-10` only kicks in once the fixed mobile nav toggle
+          (site-shell.tsx, `fixed left-3 top-3`, 44px) is hidden at lg, so it
+          never climbs into that button's space at narrower widths. */}
+      <div className="flex items-center justify-between gap-3 pt-20 sm:pt-28 lg:pt-10">
+        <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">
+          ns-ui
+        </p>
+        <div className="flex items-center gap-3">
+          <GitHubStarButton stars={stars} />
+          <ThemeToggle />
+        </div>
+      </div>
+
       {/* Two-column split waits for xl, not lg — the persistent sidebar
           (site-shell.tsx) goes static at exactly lg (1024), and splitting the
           header at the same breakpoint left the headline column squeezed to
           ~160px there (one word per line, "Star on GitHub" wrapping). At
           1024 the header now stays a single stacked column with the full
           main-column width to itself. */}
-      <header className="grid gap-10 pt-20 sm:pt-28 xl:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] xl:items-end xl:gap-16">
+      <header className="mt-8 grid gap-10 xl:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] xl:items-end xl:gap-16">
         <div>
-          <div className="flex items-center justify-between gap-3">
-            <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">
-              ns-ui
-            </p>
-            <div className="flex items-center gap-3">
-              <GitHubStarButton stars={stars} />
-              <ThemeToggle />
-            </div>
-          </div>
-          <h1 className="mt-5 max-w-3xl text-3xl font-semibold leading-[1.15] tracking-tight sm:text-4xl">
+          <h1 className="max-w-3xl text-3xl font-semibold leading-[1.15] tracking-tight sm:text-4xl">
             A personal registry of {items.length} React components.
           </h1>
           <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted">
@@ -511,6 +521,13 @@ export function Showcase({
             ·{" "}
             <a href="https://github.com/nikolas-sapa/ns-ui" className={FOOTER_LINK}>
               GitHub
+            </a>{" "}
+            ·{" "}
+            <a
+              href="https://github.com/nikolas-sapa/ns-ui/issues/new?template=component_request.yml"
+              className={FOOTER_LINK}
+            >
+              Request a component
             </a>{" "}
             ·{" "}
             <a href="https://nikolas.helpmarq.com" className={FOOTER_LINK}>
