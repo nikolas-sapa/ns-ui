@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { locate, type NavGroup, type NavItem, type NavKind } from "@/lib/nav-data";
+import { McpPopup } from "./mcp-popup";
 
 /**
  * The persistent left sidebar, and the one rule that keeps it from breaking
@@ -28,8 +29,19 @@ const LINK =
   "block truncate rounded-sm px-2 py-1 text-sm outline-none transition-colors hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none";
 
 /** Which categories/kinds are open, beyond the current page's own section —
- *  persisted so a visitor's browsing structure survives navigation. */
-const STORAGE_KEY = "ns-ui-nav-open";
+ *  persisted so a visitor's browsing structure survives navigation.
+ *
+ *  Bumped to `-v2`: v1 leaked. `<details>` fires its native `onToggle` for
+ *  *any* open change, including ones this component forced (filter-matched
+ *  sections, "Expand all") rather than ones the visitor actually clicked —
+ *  and every write landed in storage regardless. One search or one
+ *  Expand-all click permanently expanded the whole tree for that visitor,
+ *  which is what "collapsed by default" actually looked like on a browser
+ *  that had ever done either. The toggle handler below now only persists
+ *  opens/closes that came from a real click; this key rename is a one-time
+ *  reset for storage that's already poisoned by the old behavior. Don't
+ *  bump it again for anything short of another genuine leak. */
+const STORAGE_KEY = "ns-ui-nav-open-v2";
 
 function readStored(): string[] {
   try {
@@ -37,6 +49,18 @@ function readStored(): string[] {
     return raw ? (JSON.parse(raw) as string[]) : [];
   } catch {
     return [];
+  }
+}
+
+/** Written only from the specific places below that represent an actual
+ *  visitor choice — never from a blanket effect watching `openIds`, which is
+ *  what let a filter search or "Expand all" write themselves to storage in
+ *  the first place (see the STORAGE_KEY comment). */
+function persistOpen(ids: Set<string>) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([...ids]));
+  } catch {
+    /* private mode / storage disabled — open state just won't persist */
   }
 }
 
@@ -51,6 +75,7 @@ export function SiteShell({
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const activeRef = useRef<HTMLAnchorElement | null>(null);
+  const isFiltering = query.trim().length > 0;
 
   const active = pathname.startsWith("/preview/")
     ? pathname.split("/")[2]
@@ -84,19 +109,13 @@ export function SiteShell({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify([...openIds]));
-    } catch {
-      /* private mode / storage disabled — open state just won't persist */
-    }
-  }, [openIds]);
-
   // Re-open the active component's section on every navigation (not just
   // mount) — arriving at a component via a catalog card or a direct link
   // should reveal it even if that section isn't in the persisted set. This
   // only ever adds ids, so a section the visitor manually collapsed stays
-  // collapsed for every *other* navigation.
+  // collapsed for every *other* navigation. Landing here is itself a real
+  // signal about the visitor's tree (unlike the filter/expand-all cases
+  // below), so this one still persists.
   useEffect(() => {
     if (!activeLocation) return;
     setOpenIds((prev) => {
@@ -107,6 +126,7 @@ export function SiteShell({
       const next = new Set(prev);
       next.add(activeLocation.groupId);
       if (activeLocation.kindId) next.add(activeLocation.kindId);
+      persistOpen(next);
       return next;
     });
   }, [activeLocation]);
@@ -137,14 +157,26 @@ export function SiteShell({
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  const toggle = useCallback((id: string, next: boolean) => {
-    setOpenIds((prev) => {
-      const nextSet = new Set(prev);
-      if (next) nextSet.add(id);
-      else nextSet.delete(id);
-      return nextSet;
-    });
-  }, []);
+  // The browser fires <details onToggle> for a forced open exactly like a
+  // real click — while filtering, every matched section's `open` is forced
+  // (below, `isFiltering || openIds.has(g.id)`), so without this guard a
+  // single search permanently added every matched id to storage. Bail out
+  // entirely rather than just skip the persist: leaving those ids out of
+  // openIds too is what makes them snap back to their real state once the
+  // filter clears, instead of staying stuck open.
+  const toggle = useCallback(
+    (id: string, next: boolean) => {
+      if (isFiltering) return;
+      setOpenIds((prev) => {
+        const nextSet = new Set(prev);
+        if (next) nextSet.add(id);
+        else nextSet.delete(id);
+        persistOpen(nextSet);
+        return nextSet;
+      });
+    },
+    [isFiltering],
+  );
 
   const filtered = useMemo(() => filterGroups(groups, query), [groups, query]);
 
@@ -164,7 +196,6 @@ export function SiteShell({
     () => filtered.reduce((n, g) => n + countGroup(g), 0),
     [filtered],
   );
-  const isFiltering = query.trim().length > 0;
 
   const allIds = useMemo(() => {
     const ids: string[] = [];
@@ -240,19 +271,26 @@ export function SiteShell({
               typing in one and expecting the other to react was a
               reasonable, wrong assumption. Labelled apart rather than
               wired together — they genuinely answer different questions. */}
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Filter sidebar"
-            aria-label="Filter sidebar"
-            className="w-full rounded-md border border-border bg-surface px-2.5 py-1.5 text-sm outline-none placeholder:text-muted focus-visible:ring-2 focus-visible:ring-accent"
-          />
+          <div className="search-trace-field relative rounded-md">
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Filter sidebar"
+              aria-label="Filter sidebar"
+              className="w-full rounded-md border border-border bg-surface px-2.5 py-1.5 text-sm outline-none placeholder:text-muted focus-visible:ring-2 focus-visible:ring-accent"
+            />
+            <span aria-hidden className="search-trace pointer-events-none motion-reduce:hidden" />
+          </div>
         </div>
 
         {/* Bulk controls — at 223 items across up to three levels, hunting
             down every chevron by hand is the wrong default interaction. */}
         <div className="flex items-center gap-3 px-4 pb-2 font-mono text-[10px] uppercase tracking-wider text-muted">
+          {/* Expand all is a one-off "show me everything right now", not a
+              standing preference — it doesn't persist, so the tree is back
+              to normal on the next visit. Collapse all is the opposite kind
+              of click (a deliberate reset) and does persist. */}
           <button
             type="button"
             onClick={() => setOpenIds(new Set(allIds))}
@@ -262,7 +300,11 @@ export function SiteShell({
           </button>
           <button
             type="button"
-            onClick={() => setOpenIds(new Set())}
+            onClick={() => {
+              const empty = new Set<string>();
+              setOpenIds(empty);
+              persistOpen(empty);
+            }}
             className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
           >
             Collapse all
@@ -311,6 +353,11 @@ export function SiteShell({
       </nav>
 
       <div className="min-w-0 flex-1">{children}</div>
+
+      {/* /connect is where this popup would send someone — pointless there.
+          Every /preview/<name> shape (bare route + /embed, the screenshot
+          gate and every card's iframe) already returned above this point. */}
+      {pathname !== "/connect" ? <McpPopup /> : null}
     </div>
   );
 }

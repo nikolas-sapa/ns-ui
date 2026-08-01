@@ -134,7 +134,7 @@ export function CatalogControls({
         </div>
 
         <div className="flex min-w-0 items-center gap-3">
-          <div className="relative">
+          <div className="search-trace-field relative rounded-sm">
             <label htmlFor="component-search" className="sr-only">
               Search catalog
             </label>
@@ -157,6 +157,7 @@ export function CatalogControls({
               spellCheck={false}
               className="min-h-11 w-28 min-w-0 rounded-sm border border-border bg-surface py-1 pl-2 pr-6 text-sm text-foreground outline-none transition-colors placeholder:text-muted focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none sm:min-h-0 sm:w-56 sm:pl-2.5"
             />
+            <span aria-hidden className="search-trace pointer-events-none motion-reduce:hidden" />
             {/* Hidden until search is unfocused-and-empty, so the "/" hint
                 doesn't overlap the caret once someone's actually typing. */}
             {!query ? (

@@ -4,6 +4,7 @@ import { Strandline } from "@/registry/core/timeline-changelog-wave/component";
 import { ThemeToggle } from "../_components/theme-toggle";
 import { loadChangelog } from "./entries";
 import { ChangelogEntryList } from "./entry-list";
+import { TimelineScrub } from "./timeline-scrub";
 
 export const metadata: Metadata = {
   title: "Changelog — ns-ui",
@@ -57,19 +58,18 @@ export default function ChangelogPage() {
             close enough to overprint ("v0.18.v0.17.v0.16…"). Scale the
             strand's width with the event count instead — ~64px per marker is
             enough room for a "v0.18.0" mono label not to touch its
-            neighbour — and let the existing scroll rail carry whatever
-            doesn't fit the viewport, so nothing ever renders overlapping. */}
-        <div className="-mx-1 overflow-x-auto px-1">
-          <div style={{ minWidth: `${Math.max(560, events.length * 64)}px` }}>
-            <Strandline
-              events={events}
-              // Every release breaks on load — the whole history, not a teaser.
-              autoplay={events.length}
-              className="mt-1 h-72 sm:h-80"
-              aria-label="ns-ui release timeline"
-            />
-          </div>
-        </div>
+            neighbour. TimelineScrub carries whatever doesn't fit the
+            viewport (scroll rail + on-screen/keyboard arrows) instead of
+            letting it render off past the visible edge unreachable. */}
+        <TimelineScrub minWidth={Math.max(560, events.length * 64)}>
+          <Strandline
+            events={events}
+            // Every release breaks on load — the whole history, not a teaser.
+            autoplay={events.length}
+            className="mt-1 h-72 sm:h-80"
+            aria-label="ns-ui release timeline"
+          />
+        </TimelineScrub>
         <p className="mt-3 border-t border-border pt-3 font-mono text-[10px] uppercase tracking-wider text-muted">
           Scrub with the arrows · hover a mark to replay its swash
         </p>

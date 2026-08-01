@@ -70,3 +70,67 @@
     opacity: 0;
   }
 }
+
+/* Same trace family, on the two search inputs (sidebar's "Filter sidebar",
+   catalog's "Search catalog") — a light chasing the input's own border
+   instead of drifting one edge, since a small field has no single hairline
+   worth singling out the way the sidebar's right border does.
+   `transform: rotate` on the ring itself was the first idea and the wrong
+   one: rotating a rounded-rect frame visibly tilts its corners every frame.
+   Sweeping the conic-gradient's start angle instead keeps the ring's shape
+   completely still — only the highlight travels — and it's still a
+   pure-CSS, no-JS animation (paint/compositor work, never main-thread
+   script), so it costs nothing against the homepage's TBT budget. Masked to
+   a 1px ring with the padding + mask-composite:exclude trick, same
+   thickness as the input's own border. */
+@property --search-trace-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes search-trace {
+  to {
+    --search-trace-angle: 360deg;
+  }
+}
+
+.search-trace {
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--search-trace-angle),
+    transparent 0%,
+    color-mix(in srgb, var(--accent) 70%, transparent) 6%,
+    transparent 16%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: search-trace 5.5s linear infinite;
+}
+
+/* The focus ring reads as the input's own state, not something this trace
+   should compete with — hide the trace the moment :focus-visible lands
+   rather than layering a second glow on top of it. */
+.search-trace-field:has(:focus-visible) .search-trace {
+  opacity: 0;
+}
+
+/* MCP popup entrance — transform + opacity only, `motion-safe:` on the
+   element itself (mcp-popup.tsx) so it just appears under reduced motion
+   instead of skipping a still-defined animation. */
+@keyframes mcp-popup-in {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
