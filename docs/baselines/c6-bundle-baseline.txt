@@ -1,0 +1,45 @@
+# C6 baseline — initial JS served for / (pre-Convex/auth)
+# Captured at commit: 02016db1b3e99437abdeced9e6228c9a1779c1fa
+# (working tree dirty at capture time: package.json/package-lock.json modified
+#  to install next@16.2.11, convex@1.42.3, @convex-dev/auth@0.0.94 — not committed)
+# Next.js version: 16.2.11 (Turbopack)
+#
+# Method: ran `npx next start -p 3999` against the production build, curled
+# `http://localhost:3999/`, and extracted every unique JS URL under
+# `/_next/static/` referenced by the served HTML (<script src>, <link
+# rel="preload" as="script">, <link rel="modulepreload">). Each matching file
+# under .next/static/ was brotli-compressed with Node's built-in
+# zlib.brotliCompressSync and the sizes were summed.
+#
+# CAVEAT: this counts initial JS referenced by the served HTML only, not
+# chunks fetched later on hydration or interaction. That is deliberate and
+# matches C6's wording ("Initial JS added to /").
+#
+# IMPORTANT: if Next.js version changes again, re-capture this file — a
+# baseline from a different Next version is not a valid comparison target.
+
+## Per-file table (URL, raw bytes, brotli bytes)
+
+/_next/static/chunks/0avs1qwdlbnrx.js            17460   5966
+/_next/static/chunks/0cz1d0mv5g_q7.js            112594  35158
+/_next/static/chunks/0oconeqpcut-4.js            29288   7998
+/_next/static/chunks/1ntn7efqc-iiw.js            54763   11280
+/_next/static/chunks/21pcf-vyxfyma.js            36386   9145
+/_next/static/chunks/24j6c6ho8vtzb.js            138409  32314
+/_next/static/chunks/2e2zpkvw_xke6.js            14742   5065
+/_next/static/chunks/2yl1jv4w6po1z.js            3380    1268
+/_next/static/chunks/367xbj6_12vhd.js            227426  60719
+/_next/static/chunks/3nc6x0_y5iwnk.js            44491   7989
+/_next/static/chunks/3peax54bc0tna.js            58009   15619
+/_next/static/chunks/turbopack-0gz_07npic1ue.js  10581   3748
+
+## Totals
+
+File count: 12
+Raw bytes total: 747529
+Brotli bytes total: 196269
+
+## Pass criterion (spec test C6)
+
+After Convex/auth lands, re-run this same measurement against /; it must be
+<= baseline + 10240 bytes brotli (i.e. <= 206509 bytes brotli) (spec test C6).
