@@ -152,16 +152,17 @@
   }
 }
 
-/* MCP popup entrance — transform + opacity only, `motion-safe:` on the
+/* MCP popup entrance — transform only, no opacity. The card sits over a
+   featured card's live content (poster/video/iframe), so fading it in would
+   mean it's genuinely translucent — and therefore see-through to whatever is
+   underneath — for a good chunk of the animation. `motion-safe:` on the
    element itself (mcp-popup.tsx) so it just appears under reduced motion
    instead of skipping a still-defined animation. */
 @keyframes mcp-popup-in {
   from {
     transform: translateY(8px);
-    opacity: 0;
   }
   to {
     transform: translateY(0);
-    opacity: 1;
   }
 }

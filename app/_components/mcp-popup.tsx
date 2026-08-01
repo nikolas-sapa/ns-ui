@@ -20,6 +20,17 @@ const DELAY_MS = 4000;
  * `pointer-events-none` on the positioning shell and `pointer-events-auto`
  * on the card itself keeps the rest of the page fully interactive under it.
  *
+ * `isolate` on the positioning shell: without it, once the entrance
+ * animation finishes (`transform` reverts to `none`), this element has no
+ * stacking context of its own, and the featured cards' `<iframe>` previews
+ * — each its own compositing layer — can paint over it despite the z-40 and
+ * despite `elementFromPoint` correctly reporting this card as the topmost
+ * hit target at that point. That mismatch (hit-test says on top, paint
+ * says under) is what a solid `bg-surface` panel doing literally nothing
+ * wrong looks like when the bug is compositing, not transparency — checked
+ * via computed styles over CDP before reaching for `isolate` rather than
+ * guessing from a screenshot.
+ *
  * Hidden below `sm`: at 390px there's no fixed-position slot big enough for
  * this card that isn't also a slot some scrollable content passes under —
  * bottom sits on the category chips, top sits under the header controls.
@@ -76,7 +87,7 @@ export function McpPopup() {
   return (
     <div
       aria-hidden={!visible}
-      className="pointer-events-none fixed inset-x-0 bottom-6 z-40 hidden justify-end px-6 sm:flex"
+      className="pointer-events-none fixed inset-x-0 bottom-6 z-40 isolate hidden justify-end px-6 sm:flex"
     >
       <div
         role="status"

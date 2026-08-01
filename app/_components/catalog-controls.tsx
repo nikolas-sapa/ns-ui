@@ -106,7 +106,18 @@ export function CatalogControls({
       ref={barRef}
       className="sticky top-0 z-30 -mx-6 mt-14 border-b border-border bg-background/85 px-6 py-3 backdrop-blur sm:-mx-10 sm:px-10"
     >
-      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2.5">
+      {/* The extra `pl-8`/`sm:pl-4` (on top of the bar's own px-6/sm:px-10)
+          clears the fixed mobile nav toggle (44px, left-3 top-3) — same
+          button site-shell.tsx's own header row uses an identical trick for.
+          This bar is `sticky top-0`, so once scrolled to the top of the
+          viewport it pins exactly where that button already lives, and
+          without this the button sat on top of the "All" tab's label,
+          leaving only its count visible. Scoped to this row only, not the
+          category-chip row below — giving the whole bar that much left
+          padding shrank the two-column chip grid enough to wrap "Inputs &
+          forms" onto two lines, a worse regression than the one it fixed.
+          Reset at `lg`, where the toggle is `lg:hidden`. */}
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2.5 pl-8 sm:pl-4 lg:pl-0">
         {/* Plain toggle buttons, not an ARIA tablist — there's no associated
             tabpanel and no arrow-key navigation, so `role="tab"` promised a
             keyboard pattern this never implemented. `aria-pressed` matches
