@@ -12,12 +12,16 @@
 // Email OTP: adapted from reserved-app/convex/ResendOTP.ts (the spec's named
 // template, §7.2 — "a template, not a starting point"), inlined here because
 // this step's brief lists exactly four files to create. Every property of
-// the template is preserved: CSPRNG 6-digit code, per-email rate limiting
-// indistinguishable from a normal send, no logging of the token. Two
-// deliberate deviations from the template, both because this spec is
-// authoritative over the template where they conflict:
-//   1. maxAge is 10 minutes, not 15 — test A5 requires "valid 10 minutes".
+// the template is preserved: CSPRNG numeric code, per-email rate limiting
+// indistinguishable from a normal send, no logging of the token. Three
+// deliberate deviations from the template:
+//   1. maxAge is 5 minutes, not 15 — tighter than even A5's "valid 10
+//      minutes" baseline, compensating for a verified library defect in
+//      installed @convex-dev/auth 0.0.94 (full explanation and line refs on
+//      the OTP_CODE_MAX_AGE_S constant below).
 //   2. The rate limit is 5 requests/address/hour, not 3 — A5's own number.
+//   3. The code is 8 digits, not 6 — same library-defect compensation as
+//      (1); see the same comment.
 // A third deviation, not a spec conflict: the `resend` npm package is not
 // installed in this repo and this step is not permitted to add a dependency
 // (brief: "pin nothing new"), so the email send uses a direct `fetch` to
@@ -34,15 +38,46 @@ import { internal } from "./_generated/api";
 import { internalMutation } from "./_generated/server";
 import type { ActionCtx } from "./_generated/server";
 
-// OTP codes are short-lived: 10 minutes (A5: "valid 10 minutes").
-const OTP_CODE_MAX_AGE_S = 10 * 60;
+// OTP_CODE_MAX_AGE_S and generateNumericCode's length (below, in emailOTP)
+// are BOTH set stricter than A5's baseline ("valid 10 minutes", 6-digit) to
+// compensate for a verified library defect in installed @convex-dev/auth
+// 0.0.94, not a spec requirement — do not "simplify" these back without
+// re-reading the three lines below on any auth version bump:
+//   1. node_modules/@convex-dev/auth/dist/server/implementation/mutations/
+//      verifyCodeAndSignIn.js:66-68 — the submitted code is looked up with
+//      `.withIndex("code", q => q.eq("code", codeHash)).unique()`, a lookup
+//      GLOBAL across the whole table, not scoped to the caller's email. The
+//      account signed in is `verificationCode.accountId`, unrelated to what
+//      the caller submitted as their email.
+//   2. Same file, line 22 — `identifier = args.params.email ?? args.params.phone`,
+//      the caller-supplied string, and the send-step rate limiter (below,
+//      `checkAndRecordOtpRequest`) is keyed on it. An attacker who varies the
+//      email per request gets a fresh bucket every time, so no send-side
+//      throttle ever engages against a fixed-target guessing loop.
+//   3. dist/server/implementation/signIn.js:42-48 (handleEmailAndPhoneProvider)
+//      calls verifyCodeAndSignIn WITHOUT a `verifier`; `verifier` is only ever
+//      populated for OAuth (mutations/userOAuth.js:43). So for email OTP both
+//      sides of `verificationCode.verifier !== verifier` are `undefined` and
+//      the check passes trivially — it does not gate anything here.
+// Net effect: any caller can hit the library's own public `signIn` action
+// directly (bypassing any wrapper we put in front of it) with an arbitrary
+// email and a guessed code, at an effectively unbounded rate, and a hit
+// against ANY outstanding code across ALL users signs the attacker in as
+// that user. There is no upstream fix in 0.0.94 (latest as of writing), so
+// the only lever we control is the codes themselves: more entropy, shorter
+// life. See also generateNumericCode's call site in emailOTP below.
+const OTP_CODE_MAX_AGE_S = 5 * 60;
 
 // Per-email throttle on the send step: at most 5 requests/hour (A5).
 const OTP_WINDOW_MS = 60 * 60 * 1000;
 const OTP_MAX_REQUESTS_PER_WINDOW = 5;
 
-// 6-digit numeric code from a CSPRNG (crypto.getRandomValues is available in
-// the Convex action runtime). Never Math.random.
+// Numeric code from a CSPRNG (crypto.getRandomValues is available in the
+// Convex action runtime). Never Math.random. Called below with length 8, not
+// A5's baseline 6 — see the comment on OTP_CODE_MAX_AGE_S above for why:
+// compensating for a library defect, not a spec requirement. Kept numeric
+// rather than alphanumeric because alphanumeric would break email OTP
+// autofill and the extra charset buys less entropy than two more digits do.
 function generateNumericCode(length: number): string {
   const digits = new Uint32Array(length);
   crypto.getRandomValues(digits);
@@ -84,7 +119,7 @@ const emailOTP = Email({
   apiKey: process.env.RESEND_API_KEY,
   maxAge: OTP_CODE_MAX_AGE_S,
   generateVerificationToken() {
-    return generateNumericCode(6);
+    return generateNumericCode(8);
   },
   async sendVerificationRequest(
     { identifier: email, token }: { identifier: string; token: string },
@@ -145,7 +180,7 @@ const emailOTP = Email({
         from,
         to: [email],
         subject: "Your sign-in code",
-        text: `Your sign-in code is ${token}. It expires in 10 minutes. If you didn't request this, you can ignore this email.`,
+        text: `Your sign-in code is ${token}. It expires in 5 minutes. If you didn't request this, you can ignore this email.`,
       }),
     });
     if (!res.ok) {
