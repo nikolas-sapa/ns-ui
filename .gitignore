@@ -26,6 +26,7 @@ public/llms-full.txt
 # by `npm run registry:build` (build-mcp-snapshot.ts) and by mcp/'s own
 # `prepack` before every publish. See mcp/README.md.
 mcp/data/
+cli/data/
 # mcp/'s compiled output — Node refuses type stripping under node_modules,
 # so unlike the rest of this repo the published package ships build output.
 # `npm run build` (mcp/) or `prepack` regenerates it.
