@@ -19,6 +19,15 @@ const DELAY_MS = 4000;
  * No backdrop, no focus trap, no layout shift — it's an aside, not a modal.
  * `pointer-events-none` on the positioning shell and `pointer-events-auto`
  * on the card itself keeps the rest of the page fully interactive under it.
+ *
+ * Hidden below `sm`: at 390px there's no fixed-position slot big enough for
+ * this card that isn't also a slot some scrollable content passes under —
+ * bottom sits on the category chips, top sits under the header controls.
+ * Reserving permanent space for it would fix that but reintroduces the
+ * layout shift this was built to avoid (the card only appears at 4s, so
+ * reserving its height from first paint moves everything below it on load).
+ * A non-essential nudge toward `/connect` isn't worth either tradeoff on the
+ * narrowest breakpoint, so it simply doesn't render there.
  */
 export function McpPopup() {
   const [mounted, setMounted] = useState(false);
@@ -67,7 +76,7 @@ export function McpPopup() {
   return (
     <div
       aria-hidden={!visible}
-      className="pointer-events-none fixed inset-x-0 bottom-4 z-40 flex justify-center px-4 sm:bottom-6 sm:justify-end sm:px-6"
+      className="pointer-events-none fixed inset-x-0 bottom-6 z-40 hidden justify-end px-6 sm:flex"
     >
       <div
         role="status"
