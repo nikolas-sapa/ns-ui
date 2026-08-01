@@ -1,6 +1,7 @@
 # ns-ui: from personal registry to community registry
 
-Status: proposal. Nothing below is implemented.
+Status: proposal. Nothing below is implemented **in this repo** — Phase 0 ran as a throwaway spike on
+a scratch deployment and its results are recorded in §2, §6.1a and §10.
 
 Backend is **Convex** — owner's decision, recorded in §7.1, not re-argued. An earlier draft of this
 document evaluated Neon/Postgres and recommended it; that evaluation is in git history if the
@@ -39,32 +40,69 @@ installed `@convex-dev/auth` package source. Where a claim is a guess it says so
 
 ## 2. Phases
 
-### Phase 0 — auth spike (load-bearing)
+### Phase 0 — auth spike (load-bearing) — **RAN. Verdict: proceed to Phase A on Convex Auth.**
 
-**Depends on:** nothing. Runs *while* the rename lands, so it costs no calendar time.
+The auth decision is **not** reopened. All four items are answered; item 4 is answered in two halves,
+one of which is a defect in 0.0.94 and is now a named constraint on Phase A (§6.1a). Results are
+recorded in place below, and the evidence caveats are in §10.
 
-A throwaway Next 16 app on a scratch Convex deployment that proves the three things this spec assumes
-and the owner's existing code does not demonstrate:
+**Depended on:** nothing. Ran *while* the rename lands, so it cost no calendar time.
 
-1. **GitHub OAuth** through `@convex-dev/auth`.
-2. **Google OAuth** through `@convex-dev/auth`.
-3. **Email OTP** as a first-class sign-in method (not just the password-reset flow).
+A throwaway Next 16 app on a scratch Convex deployment, proving the four things this spec assumes and
+the owner's existing code does not demonstrate:
+
+1. **GitHub OAuth** through `@convex-dev/auth` — **code-complete, blocked only on real credentials.**
+2. **Google OAuth** through `@convex-dev/auth` — **same.**
+3. **Email OTP** as a first-class sign-in method (not just the password-reset flow) — **proven end to
+   end.**
 4. **Token storage**: confirm §6.1's finding on the pinned version, and confirm `storage="inMemory"`
-   suppresses the localStorage write.
+   suppresses the localStorage write — **suppression confirmed; the in-memory client's React auth
+   state is separately broken. §6.1a.**
 
-**Why this exists:** of the three required providers, only OTP-over-Resend has a working precedent in
+**Why this existed:** of the three required providers, only OTP-over-Resend had a working precedent in
 the owner's code (`reserved-app/convex/ResendOTP.ts`). marketmyapp is Password-only, and its
 `CLAUDE.md` records that Google OAuth was *dropped* in the Supabase→Convex cutover because re-adding
 it "needs an Auth.js Google provider + client id/secret on the Convex deployment." OAuth on Convex
-Auth is unexercised in this owner's stack.
+Auth was unexercised in this owner's stack.
 
-**Done means:** all four demonstrated, or a written recommendation to change auth library. One day of
-work. **If the spike fails on OAuth, stop and reopen the auth decision** — do not work around it
-inside Phase A.
+**1 and 2 — OAuth. The risk is closed.** With fake client ids set, `signIn()` was called through the
+real client → proxy → Convex path and the redirect Convex actually issued was followed. PKCE
+challenge generation, cookie issuance, provider config resolution and redirect construction all
+worked; the only thing missing is a real client id and secret. marketmyapp's note was exactly right
+and nothing more than it said: an Auth.js provider plus credentials on the deployment.
+
+- **Env var names** are the standard Auth.js convention — `AUTH_GITHUB_ID`/`AUTH_GITHUB_SECRET`,
+  `AUTH_GOOGLE_ID`/`AUTH_GOOGLE_SECRET`. Confirmed by reading `provider_utils.js`, which calls
+  `@auth/core`'s `setEnvDefaults`.
+- **Callback URLs are on the Convex HTTP router, not on the Next app's origin.** This is the thing
+  people get wrong, and it is what goes into the GitHub and Google app registrations:
+
+  ```
+  https://<deployment>.convex.site/api/auth/callback/github
+  https://<deployment>.convex.site/api/auth/callback/google
+  ```
+
+  Confirmed from `dist/server/implementation/index.js`'s `addHttpRoutes`. Note `.convex.site`, not
+  `.convex.cloud`, and note that a per-deployment URL means the dev and prod deployments of §5 step 4
+  need **separate OAuth app registrations**, or at least separate callback entries.
+
+**3 — Email OTP works as a primary sign-in method.** Request code → submit → `signIn("email-otp")` →
+authenticated, resolving to exactly one `users` doc. This was listed in §10 as an assumption; it is
+now a result.
+
+**4 — `storage="inMemory"` works, and the mode it enables has a defect.** Zero `localStorage` keys
+before sign-in, after sign-in, after reload and on a second route, in both dev and a production
+build. §6.1's mitigation is real rather than theoretical and A11 passes. The defect it exposes is
+§6.1a, and it changes one rule for Phase A rather than the design.
+
+**Verdict:** proceed to Phase A on `@convex-dev/auth`. Nothing found here meets the "stop and reopen
+the auth decision" bar that this section set — that bar was a spike *failure* on OAuth, and OAuth did
+not fail.
 
 ### Phase A — auth, profiles, saves
 
-**Depends on:** Phase 0 passing, **and** the 223-slug rename being merged to `main`. Hard gate — §3.
+**Depends on:** ~~Phase 0 passing~~ (done — see above), **and** the 223-slug rename being merged to
+`main`. That is now the only gate left. Hard gate — §3.
 
 **Ships:**
 
@@ -209,7 +247,7 @@ Numeric criteria, before the implementation plan. Group C baselines come from
 | A6 | Save, reload `/preview/<slug>/play` | saved state within **500ms** of hydration, from exactly **1** `GET /api/saves` |
 | A7 | Save a slug absent from the registry | `400`, no doc written |
 | A9 | **Explicit-cascade audit.** After delete, query by `userId` across `users`, `authAccounts`, `authSessions`, `authRefreshTokens`, `authVerificationCodes`, `authVerifiers`, `profiles`, `saves`, `collections`, and `collectionItems` by owning collection | **0 docs from every one of the ten**, within **60s**. Enumerated because Convex has no cascade and a missed table is silent orphan data |
-| A10 | Session cookie inspection | name is `__Host-__convexAuthJWT`; `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`, **no `Domain`** |
+| A10 | Session cookie inspection, **on a preview deployment, not localhost** | name is `__Host-__convexAuthJWT`; `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`, **no `Domain`**. `cookies.js:21-22` gates the prefix and `Secure` on `isLocalhost`, so a local run tests the dev-mode cookie and proves nothing here — §10 |
 | A11 | **`window.localStorage` after sign-in, on every page** | **0 keys** containing `__convexAuthJWT` or `__convexAuthRefreshToken`. This is §6.1; it is the single most important test in this document |
 | A12 | Sign out | cookies cleared **and** the `authSessions` doc deleted; replaying the captured cookie → `401` |
 | A13 | 100 `POST /api/saves` in 10s, one session | ≥ the 31st returns `429`; docs written ≤ **30** |
@@ -224,6 +262,7 @@ Numeric criteria, before the implementation plan. Group C baselines come from
 | A22 | Handle validation: the reserved list plus **40** fuzz inputs (uppercase, leading/trailing hyphen, double hyphen, empty, 31 chars, RTL override, homoglyphs, `.`/`_`/`/`) | **40/40 rejected** at the mutation, `0` new `profiles` docs; the 13 reserved words rejected too |
 | A23 | Profile field caps: 281-code-point bio, 51-char display name, 4 tags, one tag outside the 12 `CATEGORIES` ids, 201-char url | each `400` with **0** writes; the out-of-vocabulary tag is **rejected, not silently dropped** |
 | A24 | Onboarding abandonment: complete OAuth, close the tab before claiming a handle, save 2 components, sign in again | exactly **1** `users` doc and **0** `profiles` docs after the abandon; both saves still resolve; the handle prompt reappears; **0** rows deleted by any cleanup path |
+| A27 | **§6.1a.** `grep -rn "useConvexAuth" app/` **and** `/account` signed-in, `storage="inMemory"` | **0 matches**; `/account` shows signed-in UI on first paint and still does **after a reload and on a second auth route**, with **0** `localStorage` keys. The grep is the real test — the defect is silent and looks like a session bug |
 | A26 | HTML + network trace of `/u/<handle>` and `/account`, anonymous and signed-in | **0** requests to `github.com`, `githubusercontent.com` or `googleusercontent.com`; every avatar byte served from this origin (§8.2) |
 
 ### Group B — the static invariant
@@ -268,14 +307,18 @@ Numeric criteria, before the implementation plan. Group C baselines come from
 1. **Phase 0 spike** (§2). Runs during the rename.
 2. Capture the pre-change `next build` route table as the B1 baseline. Before touching anything.
 3. Wait for the rename commit on `main`.
-4. Provision Convex. Set `JWT_PRIVATE_KEY`, `JWKS`, `SITE_URL`, `RESEND_API_KEY`, `AUTH_EMAIL_FROM`
+4. Provision Convex. Set `JWT_PRIVATE_KEY`, `JWKS`, `SITE_URL`, `RESEND_API_KEY`, `AUTH_EMAIL_FROM`,
+   `AUTH_GITHUB_ID`, `AUTH_GITHUB_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`
    **on the Convex deployment** via `npx convex env set` — not `.env.local`. Set them on **both** the
    dev and prod Convex deployments, and `NEXT_PUBLIC_CONVEX_URL` in **both** Vercel Production and
-   Preview, in one change. A missing one is a total outage.
+   Preview, in one change. A missing one is a total outage. Register the OAuth apps against the
+   **`.convex.site` callback URLs** of Phase 0 — one set per deployment, since the URL contains the
+   deployment name.
 5. `convex/schema.ts` (`authTables` + `profiles`), `convex/auth.ts`, `convex/http.ts`,
    `convex/auth.config.ts`.
 6. `proxy.ts` with the **allowlist** matcher (§6.4). Run B3.
-7. Auth routes and the `/account` shell. Run A3, A4, A5, A10, **A11**, A12.
+7. Auth routes and the `/account` shell — signed-in state from `isAuthenticatedNextjs()` or
+   `/api/me`, **never `useConvexAuth()`** (§6.1a). Run A3, A4, A5, A10, **A11**, A12, A27.
 8. `saves` table and its mutations; `/api/saves`, `/api/me` on our origin. Run A1, A2, A6, A7, A13,
    A14, A15.
 9. Client auth UI in `SiteShell`, hydration-only. **Run all of groups B and C here** — this is the
@@ -299,7 +342,9 @@ Read from the installed package at `@convex-dev/auth@0.0.94`.
 The **cookie** posture is excellent, and better than a hand-specified one.
 `dist/nextjs/server/cookies.js:20-31,71-81` sets `__Host-__convexAuthJWT` and
 `__Host-__convexAuthRefreshToken` with `httpOnly: true`, `secure: true`, `sameSite: "lax"`,
-`path: "/"`. The `__Host-` prefix is enforced by the browser to mean host-only with no `Domain` —
+`path: "/"`. Lines 21-22 gate the prefix and `Secure` on `isLocalhost`, so this posture is the
+deployed one and a local run will not show it (§10 — read, not witnessed).
+The `__Host-` prefix is enforced by the browser to mean host-only with no `Domain` —
 which **structurally forbids** the `.helpmarq.com` cookie-scope mistake that a copy-paste from the
 owner's other stack would otherwise create. That risk is gone by construction.
 
@@ -337,6 +382,45 @@ handler reading the `__Host-` cookie and calling Convex with an authed server cl
 owner's own pattern in `marketmyapp/src/lib/convex/server.ts` and `reserved-app`. It costs one hop
 (C5 budgets 250ms rather than 200ms) and forecloses realtime, which is already non-goal #7. It
 preserves the entire CSRF story below.
+
+### 6.1a Constraint from Phase 0: under `inMemory`, client-side auth state never settles
+
+**Named constraint, not a footnote.** Phase 0 confirmed `storage="inMemory"` suppresses every
+`localStorage` write (A11 passes). In that same mode the client-side React auth state does not
+settle: the websocket sends `Authenticate{tokenType:"User"}` and then immediately
+`Authenticate{tokenType:"None"}`.
+
+**Root cause**, read from `dist/react/client.js:287`:
+
+```js
+useMemo(() => peristentStorage ?? inMemoryStorage(), [peristentStorage])
+```
+
+When `peristentStorage` is `null` — which is exactly what `"inMemory"` maps to
+(`dist/nextjs/client.js:30-32`) — the dependency never changes, so `getItem`/`setItem` stay closed
+over the first render's `useState({})` forever. A **stale closure, not a race**: no amount of waiting
+or retrying fixes it. It is a genuine defect in 0.0.94's in-memory path.
+
+**Why it does not sink the design.** The server-side `httpOnly` cookie is still issued correctly under
+`inMemory`, and a proxy-gated route using `convexAuth.isAuthenticated()` — which reads that cookie
+server-side — passes. The broken path is the browser's own view of its auth state, and this spec
+never uses it: non-goal #5 forbids mounting `ConvexReactClient` on catalog pages, non-goal #7 forbids
+`useQuery`, and §6.1 already routes every read and write through
+browser → `/api/saves` on our origin → Convex server-side. The defect lands squarely inside the part
+of the library the design had already declined.
+
+**The rule it produces, which is now load-bearing:**
+
+> On `/account` and `/submit` — the only two pages that mount the auth client — signed-in UI state is
+> derived **from the server**: `isAuthenticatedNextjs()` in a server component, or `/api/me`. Never
+> from `useConvexAuth()` on the client.
+
+Step 7 of §5 already fetches `/api/me`; what changes is that this stops being a stylistic preference
+and becomes the thing that makes those pages work. A future contributor reaching for
+`useConvexAuth()` there will get a component that believes nobody is signed in, and it will look like
+a session bug rather than a library bug — which is why this is written down here rather than left to
+be rediscovered. Re-check it after any upgrade off 0.0.94; if the stale closure is fixed upstream the
+rule can relax, and nothing else in the spec depends on it.
 
 ### 6.2 The origin question — why uploads stay PRs
 
@@ -519,15 +603,19 @@ For it:
 Against it, stated plainly:
 - **`@convex-dev/auth` is 0.0.94.** Pre-1.0, and the owner's own comment records having to read
   `dist/` source to confirm parameter names "since the API is version-pinned at 0.0.94". Expect
-  breaking changes; pin the version.
-- **GitHub and Google OAuth are unexercised in this owner's Convex code.** marketmyapp is
-  Password-only and dropped Google in the cutover. Only OTP has a working precedent.
-- **The localStorage default is a genuine defect for this site**, mitigated but not removed (§6.1).
+  breaking changes; pin the version. Phase 0 found one such defect in the in-memory storage path
+  (§6.1a), which is the concrete form this risk takes.
+- ~~**GitHub and Google OAuth are unexercised in this owner's Convex code.**~~ **Closed by Phase 0**
+  — both are code-complete through the real client → proxy → Convex path and blocked only on real
+  credentials.
+- **The localStorage default is a genuine defect for this site**, mitigated but not removed (§6.1) —
+  and the mitigation carries the §6.1a constraint with it.
 
-That gap is exactly what Phase 0 exists to close. If the spike fails on OAuth, the fallback is an
-external OIDC provider (Auth0/WorkOS/Clerk free tier) fronting Convex via `auth.config.ts` — Convex
-accepts any OIDC issuer. That keeps Convex as the database and moves only the identity problem. Cost
-roughly $0-25/mo at this scale; do not take it without the spike failing first.
+Phase 0 existed to close that gap and did. The fallback it was hedging against — an external OIDC
+provider (Auth0/WorkOS/Clerk free tier) fronting Convex via `auth.config.ts`, keeping Convex as the
+database and moving only the identity problem, roughly $0-25/mo at this scale — is **not being
+taken**, because its trigger was a spike failure on OAuth and OAuth did not fail. Recorded here in
+case a future upgrade reopens it.
 
 ### 7.3 Convex alongside a heavily static Next site
 
@@ -835,9 +923,16 @@ the catalog bundle, which is non-goal #5 and test B9.
   `ConvexAuthNextjsProvider` does not forward it (`dist/nextjs/index.js:31-34`), the `/api/auth` proxy
   requirement (`dist/nextjs/server/index.js:58-60`), and `ConvexAuthNextjsServerProvider` being an
   async cookie-reading server component (`:13-16`). All at version **0.0.94** — re-check after any
-  upgrade.
-- **Whether email OTP works as a primary sign-in method** (rather than the password-reset flow proven
-  in `reserved-app`) is an assumption. Phase 0 item 3 tests it.
+  upgrade. **Phase 0 re-checked every one of these against installed 0.0.94 and found no
+  contradiction in any load-bearing claim.**
+- ~~**Whether email OTP works as a primary sign-in method**~~ — **answered by Phase 0: yes.** Proven
+  end to end, resolving to exactly one `users` doc. No longer an assumption.
+- **A10's `__Host-` prefix and `Secure` flag are read, not witnessed.** `cookies.js:21-22` gates both
+  on `isLocalhost`, and the spike ran on localhost, so what it observed was the plain dev-mode
+  cookie. The production behaviour follows from the source and from how the browser enforces
+  `__Host-`, but nobody has seen it on a real deployment. A10 is therefore the first test to run
+  against a preview URL rather than locally — it is currently the strongest claim in §6.1 with the
+  weakest evidence behind it.
 - **The C6 bundle budget (≤10KB)** is a target, not a measurement. Measure at step 9 and correct this
   document if wrong rather than quietly failing the test.
 - **The "week of work" in §6.2** is a judgement call.
