@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { demos } from "@/registry/index";
 import autoplayMap from "@/lib/autoplay.generated.json";
@@ -26,6 +27,14 @@ import { AutoplayDriver } from "../autoplay-driver";
  * screenshot gate catches it.
  */
 export const revalidate = 3600;
+
+// This route's DOM is byte-for-byte what `/preview/<name>` renders for
+// `?embed=1&autoplay=1` (see the docblock above) — a genuine duplicate, not
+// an independent page, so it is excluded from indexing to avoid competing
+// with the real page for the same content.
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 export function generateStaticParams() {
   // Empty: the 218 demos are client components that have never been exercised

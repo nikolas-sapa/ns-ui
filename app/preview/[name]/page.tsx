@@ -5,6 +5,17 @@ import registry from "@/registry.json";
 import autoplayMap from "@/lib/autoplay.generated.json";
 import { parseAutoplay } from "@/lib/autoplay";
 import { AutoplayDriver } from "./autoplay-driver";
+import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
+import { jsonLdScript } from "@/lib/json-ld";
+import pkg from "@/package.json";
+
+// package.json's repository.url is the git clone URL (`...ns-ui.git`);
+// schema.org's `codeRepository` wants the browsable repo URL instead.
+const CODE_REPOSITORY = pkg.repository.url.replace(/\.git$/, "");
+const LICENSE_URL =
+  pkg.license === "MIT"
+    ? "https://opensource.org/licenses/MIT"
+    : undefined;
 
 // The per-component opengraph-image.tsx in this same folder is picked up by
 // the file-convention automatically — this only needs to supply the title
@@ -43,6 +54,36 @@ export default async function PreviewPage({
   const { embed, autoplay, interactive } = await searchParams;
   const Demo = demos[name];
   if (!Demo) notFound();
+
+  const item = registry.items.find((i) => i.name === name);
+  const pageUrl = `${REGISTRY_ORIGIN}/preview/${name}`;
+
+  // Only fields populated from real registry/package data — nothing here is
+  // invented to fill out the schema. Server-rendered (this is an async
+  // Server Component), so crawlers see it in the initial HTML.
+  const softwareSourceCodeJsonLd = item
+    ? {
+        "@context": "https://schema.org",
+        "@type": "SoftwareSourceCode",
+        name: item.title,
+        description: item.description,
+        url: pageUrl,
+        programmingLanguage: "TypeScript",
+        codeRepository: CODE_REPOSITORY,
+        ...(LICENSE_URL ? { license: LICENSE_URL } : {}),
+      }
+    : null;
+
+  const breadcrumbJsonLd = item
+    ? {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "ns-ui", item: REGISTRY_ORIGIN },
+          { "@type": "ListItem", position: 2, name: item.title, item: pageUrl },
+        ],
+      }
+    : null;
 
   // `?embed=1` is how the landing-page cards load this page inside an iframe.
   // It changes nothing visual — this page stays the reference the cards are
@@ -84,6 +125,18 @@ export default async function PreviewPage({
       inert={embedded && !interactiveEmbed}
       data-autoplay-root={spec ? "" : undefined}
     >
+      {softwareSourceCodeJsonLd ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLdScript(softwareSourceCodeJsonLd) }}
+        />
+      ) : null}
+      {breadcrumbJsonLd ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLdScript(breadcrumbJsonLd) }}
+        />
+      ) : null}
       <Demo />
       {spec ? <AutoplayDriver spec={spec} /> : null}
     </div>

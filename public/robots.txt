@@ -1,6 +1,8 @@
 User-agent: *
 Allow: /
 
+Sitemap: https://design.helpmarq.com/sitemap.xml
+
 # AI-agent quickstart — component list, props, install commands.
 # See https://llmstxt.org
 # /llms.txt

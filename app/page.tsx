@@ -4,6 +4,8 @@ import { kindOf } from "@/lib/kind";
 import order from "@/lib/component-order.json";
 import { FEATURED } from "@/lib/featured";
 import { getStarCount } from "@/lib/github-stars";
+import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
+import { jsonLdScript } from "@/lib/json-ld";
 import { Showcase, type ShowcaseEntry } from "./_components/showcase";
 
 // Newest first. `component-order.json` is the slug list sorted by git creation
@@ -70,7 +72,35 @@ const items: ShowcaseEntry[] = registry.items
 
 const featured = [...featuredOrder.keys()];
 
+// Count comes from `registry.items.length` at build time, not a hardcoded
+// number — this codebase has a history of stale counts (218, 222, 223) baked
+// in as literals that drifted the moment a component was added or removed.
+const collectionPageJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  name: "ns-ui",
+  url: REGISTRY_ORIGIN,
+  mainEntity: {
+    "@type": "ItemList",
+    numberOfItems: registry.items.length,
+    itemListElement: registry.items.map((item, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: `${REGISTRY_ORIGIN}/preview/${item.name}`,
+      name: item.title,
+    })),
+  },
+};
+
 export default async function Home() {
   const stars = await getStarCount();
-  return <Showcase items={items} featured={featured} stars={stars} />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(collectionPageJsonLd) }}
+      />
+      <Showcase items={items} featured={featured} stars={stars} />
+    </>
+  );
 }
