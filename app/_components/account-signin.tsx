@@ -35,7 +35,17 @@ export function AccountSignIn() {
     setError("");
     setOauthPending(provider);
     try {
-      await signIn(provider);
+      // Explicit `redirectTo` is required: without it Convex Auth sends the
+      // browser back to `SITE_URL` (the site root `/`) once the OAuth
+      // provider completes. `/` is deliberately off the middleware allowlist
+      // in `proxy.ts` (so `convexAuthNextjsMiddleware` can never set a
+      // cookie on the CDN-cached homepage) and mounts no Convex client, so
+      // that redemption can never happen there — the provider signs the
+      // user in but no session is ever created. `/account` is on the
+      // allowlist and mounts the Convex client, so it can actually redeem
+      // the code. Do not delete this as "redundant" — that reintroduces the
+      // silent failure.
+      await signIn(provider, { redirectTo: "/account" });
     } catch {
       setError("Sign-in failed. Try again.");
       setOauthPending(null);
