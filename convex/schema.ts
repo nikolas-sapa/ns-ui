@@ -75,4 +75,23 @@ export default defineSchema({
   })
     .index("by_emailHash", ["emailHash"])
     .index("by_window", ["windowStart"]),
+
+  // A13's durable rate limit for `saves.add`/`saves.remove` — an in-memory
+  // per-instance counter in the route handler was rejected: on Vercel this
+  // route runs as multiple serverless instances, so a per-process `Map`
+  // turns a 30-per-10s cap into 30-per-instance, and a cold start resets the
+  // window for free. Modeled on `otpRequestLimits` above, but the opposite
+  // of it on the one property that matters: this table IS keyed on
+  // `userId`, not a hash of something pre-account, so it belongs in the
+  // ten-table A9 `deleteAccount` cascade and enumeration — add it there
+  // when that mutation is built (Phase A step 10, not this step).
+  // Check-and-increment happens inside the same mutation as the write it
+  // guards (`saves.add`/`saves.remove` in convex/saves.ts), so Convex's
+  // serializable-mutation guarantee makes the read-check-increment-write
+  // atomic and closes the race a route-handler-side check would reopen.
+  saveRateLimits: defineTable({
+    userId: v.id("users"),
+    windowStart: v.number(),
+    count: v.number(),
+  }).index("by_userId", ["userId"]),
 });
