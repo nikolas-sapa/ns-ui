@@ -20,16 +20,41 @@ const DELAY_MS = 4000;
  * `pointer-events-none` on the positioning shell and `pointer-events-auto`
  * on the card itself keeps the rest of the page fully interactive under it.
  *
- * `isolate` on the positioning shell: without it, once the entrance
- * animation finishes (`transform` reverts to `none`), this element has no
- * stacking context of its own, and the featured cards' `<iframe>` previews
- * — each its own compositing layer — can paint over it despite the z-40 and
- * despite `elementFromPoint` correctly reporting this card as the topmost
- * hit target at that point. That mismatch (hit-test says on top, paint
- * says under) is what a solid `bg-surface` panel doing literally nothing
- * wrong looks like when the bug is compositing, not transparency — checked
- * via computed styles over CDP before reaching for `isolate` rather than
- * guessing from a screenshot.
+ * The card once looked see-through over a featured card's live preview —
+ * readable label and canvas dot-pattern bleeding through the surface. The
+ * actual cause: the entrance keyframe (`mcp-popup-in`, globals.css)
+ * animated `opacity: 0 → 1` over its 260ms duration. Over live content that
+ * is not a rendering bug, it's what a fade-in *is* — the card is genuinely,
+ * correctly partially transparent for the first ~150-160ms of every single
+ * appearance, and a screenshot landing in that window (as the original
+ * report's did — the popup fires 4s after mount, easy to catch mid-fade)
+ * reads as a persistent transparency defect when it's actually a transient
+ * animation frame. Proved by pausing the card's Web Animation and scrubbing
+ * `currentTime` deterministically, sampling a pixel over card content (not
+ * the popup's own surface color, which can't discriminate the two states):
+ *
+ *   ms    computed opacity   sampled pixel        surface token is (23,23,23)
+ *   0     0                  (6,6,6)   — pure content, no card there yet
+ *   40    0.564              (16,16,16)
+ *   80    0.841              (20,20,20)
+ *   120   0.948              (22,22,22)
+ *   160+  ~1                 (23,23,23) — settled, matches surface exactly
+ *
+ * (10 + 0.564×(23−10) ≈ 17.3 — reconciles with the crop that reported the
+ * bug, which showed flat 16-17 regions.) The keyframe no longer animates
+ * opacity (globals.css) — the card slides in already-opaque instead of
+ * fading in translucent. Re-running the same scrub after that change reads
+ * the surface token at every one of the 0-260ms steps.
+ *
+ * An iframe-compositing-layer theory was raised and tested first (real
+ * hover driven via CDP `Input.dispatchMouseEvent`, not synthetic DOM
+ * events, to actually mount a featured card's iframe and screenshot it
+ * live under the popup) — it did not reproduce. `isolate` stays on the
+ * positioning shell anyway, not as this bug's fix but as cheap, correct
+ * defensive hygiene: a fixed overlay sitting above iframe-bearing content
+ * is exactly the kind of element that should own its stacking context
+ * rather than depend on z-index alone, even though it wasn't what broke
+ * here.
  *
  * Hidden below `sm`: at 390px there's no fixed-position slot big enough for
  * this card that isn't also a slot some scrollable content passes under —
