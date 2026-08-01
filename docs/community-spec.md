@@ -706,7 +706,7 @@ cacheable, taggable, `no set-cookie`, `no vary: cookie` (B10) — instead of a r
 depends on who is asking, which is the shape non-goal #11 exists to prevent. One route, one
 audience.
 
-**Recommendation — `/u/<handle>` moves out of Phase A and into Phase B.** In Phase A there is no
+**Decided (owner, 2026-08-01) — `/u/<handle>` moves out of Phase A and into Phase B**, and the 404-for-nothing-published behaviour of §8.1 is confirmed. In Phase A there is no
 publish control, so every profile page that could exist returns 404: the route would ship with no
 reachable non-error state. Phase B is where its first real reader arrives (contributor credit) and
 where publishing arrives, and it is the phase that is not also carrying the auth cutover. The handle
@@ -755,7 +755,7 @@ Written that way the two never look like the same promise being broken.
 The owner asked for full customization. Below is the concrete field list, the two places where
 "more" costs a permanent duty rather than a day, and an explicit list of what is being declined.
 
-**Avatar — recommendation: provider-supplied only.** GitHub and Google both hand us one; it lands in
+**Avatar — decided (owner, 2026-08-01): provider-supplied only.** GitHub and Google both hand us one; it lands in
 `users.image` from `authTables`, so it costs zero schema and zero storage. OTP-only users, who have
 no provider avatar, get a deterministic identicon derived from the handle — generated, not stored.
 
@@ -780,7 +780,7 @@ Provider-avatar-only ships in a day. Uploads are a week plus a permanent duty, a
 expensive half. **This is the recommendation the owner is most likely to want to overrule, so it is
 the one to overrule first if any of them are.**
 
-**Tags — recommendation: a fixed vocabulary, drawn from `lib/search-categories.ts`.** The 12 ids
+**Tags — decided (owner, 2026-08-01): a fixed vocabulary, drawn from `lib/search-categories.ts`.** The 12 ids
 (`heroes`, `actions`, `forms`, `navigation`, `data`, `feedback`, `scroll`, `text`, `surfaces`,
 `media`, `backgrounds`, `sections`), maximum 3, chosen from chips. Free text has no abuse story here
 that does not end in moderation: a bio field is one thing, but a tag is a short public label that
@@ -936,7 +936,10 @@ the catalog bundle, which is non-goal #5 and test B9.
 - **The C6 bundle budget (≤10KB)** is a target, not a measurement. Measure at step 9 and correct this
   document if wrong rather than quietly failing the test.
 - **The "week of work" in §6.2** is a judgement call.
-- **§8 mixes one decision with several recommendations.** Private-by-default (§8.1) is the owner's
+- **§8 is now decided throughout.** The owner confirmed the 404-not-a-card behaviour, the two-step
+  onboarding cap and the fixed-vocabulary tags on 2026-08-01; provider-only avatars stand as written.
+  What follows describes how they were reached.
+- **§8 originally mixed one decision with several recommendations.** Private-by-default (§8.1) is the owner's
   decision. The 404-not-minimal-card choice, `/u/<handle>` moving to Phase B, per-collection-only
   visibility, provider-avatars-only, the fixed tag vocabulary, the declined field list and the
   two-step cap are all recommendations with the reasoning attached, and each is overrulable on its
