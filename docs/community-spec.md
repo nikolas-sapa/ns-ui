@@ -7,7 +7,7 @@ document evaluated Neon/Postgres and recommended it; that evaluation is in git h
 reasoning is ever wanted. This version specs what was chosen.
 
 Verified against the repo, against the owner's seven existing Convex projects, and against the
-installed `@convex-dev/auth` package source. Where a claim is a guess it says so (§9).
+installed `@convex-dev/auth` package source. Where a claim is a guess it says so (§10).
 
 ---
 
@@ -31,6 +31,9 @@ installed `@convex-dev/auth` package source. Where a claim is a guess it says so
 9. **No moderation tooling.** GitHub's PR review UI is the moderation tooling.
 10. **No migration of the registry into Convex.** Component metadata stays in `meta.json` on disk.
 11. **No SSR of user-specific content into any cached route.**
+12. **No user-uploaded images.** No avatar upload, no cover image. Avatars are the provider's,
+    proxied through this origin. Uploaded imagery is user-generated content on our origin and would
+    contradict non-goal #9 the day it shipped — §8.2 prices it.
 
 ---
 
@@ -72,7 +75,8 @@ inside Phase A.
   - `/api/me` — `{ signedIn, handle, displayName }` or `{ signedIn: false }`.
   - `/api/saves` — `GET`/`POST`/`DELETE`, reading the session cookie server-side and calling Convex
     with an authed server client.
-- `/account` and `/u/<handle>` pages.
+- `/account` and `/welcome` (onboarding, §8.3). **`/u/<handle>` moves to Phase B** — with
+  private-by-default (§8.1) every profile page in existence would return 404 in Phase A.
 - Header auth UI in `SiteShell`, rendered **client-side after hydration** from `/api/me`.
 - Save control on the catalog card and playground, hydrated from one `GET /api/saves` per page load.
 - `SECURITY.md` rewritten. Its lines 5-7 currently say "There is no backend, no database, and no user
@@ -94,9 +98,13 @@ login otherwise.
 - `scripts/build-contributors.ts` → `lib/contributors.generated.json` (slug → GitHub login), read
   from **git history at build time, not from Convex**. Added to the `registry:build` chain,
   gitignored like its siblings.
+- `/u/<handle>` and the collection-publish toggle (§8.1), moved here from Phase A. Credit is the
+  first thing on the site with a reason to link to a profile, and publishing is the first thing that
+  makes a profile non-empty. Building the route in the phase that also builds its only reader keeps
+  the enumeration and caching questions of §8.1 out of the phase carrying the auth risk.
 
-**Done means:** `/guidelines` is static, sign-off is required, and credit renders for a contributor
-with no account.
+**Done means:** `/guidelines` is static, sign-off is required, credit renders for a contributor
+with no account, and §4 tests A18-A21, A26 and B10 pass.
 
 ### Phase C — PR-opening submission portal
 
@@ -127,13 +135,17 @@ export default defineSchema({
   profiles: defineTable({
     userId:      v.id("users"),
     handle:      v.string(),        // stored lowercased
-    displayName: v.union(v.string(), v.null()),
-    bio:         v.union(v.string(), v.null()),   // capped, rendered as plain text
-    url:         v.union(v.string(), v.null()),   // http/https only, validated on write
+    displayName: v.union(v.string(), v.null()),   // ≤ 50 code points, plain text
+    bio:         v.union(v.string(), v.null()),   // ≤ 280 code points, rendered as plain text
+    url:         v.union(v.string(), v.null()),   // http/https only, ≤ 200 chars, validated on write
+    tags:        v.array(v.string()),             // ≤ 3, each a CATEGORIES id (§8.2). [] by default
+    isPublic:    v.boolean(),                     // FALSE on insert. §8.1 — gates /u/<handle>
+    handleChangedAt: v.union(v.number(), v.null()),  // one free change, then it is a support request
     createdAt:   v.number(),
   }).index("by_userId", ["userId"])
     .index("by_handle", ["handle"]),
 
+  // Deliberately has NO visibility field. A save is never individually publishable — §8.1.
   saves: defineTable({
     userId:    v.id("users"),
     slug:      v.string(),
@@ -141,6 +153,7 @@ export default defineSchema({
   }).index("by_user", ["userId"])
     .index("by_user_slug", ["userId", "slug"]),
 
+  // isPublic is the ONLY publish switch in the schema, and it is false on insert.
   collections: defineTable({
     userId: v.id("users"), name: v.string(), isPublic: v.boolean(), createdAt: v.number(),
   }).index("by_user", ["userId"]),
@@ -150,6 +163,9 @@ export default defineSchema({
   }).index("by_collection", ["collectionId"]),
 });
 ```
+
+**There is no avatar field**, and that is a decision, not an omission: the avatar is the provider's,
+already present as `users.image` from `authTables`. Uploads are declined in §8.2.
 
 **Uniqueness is enforced by mutation, not by the schema.** Convex has no unique index. `claimHandle`
 reads `by_handle` and inserts in one mutation; Convex mutations are serializable, so the
@@ -201,6 +217,14 @@ Numeric criteria, before the implementation plan. Group C baselines come from
 | A15 | **Unauthenticated direct call to every exported Convex query and mutation**, at `NEXT_PUBLIC_CONVEX_URL`, enumerated from `convex/_generated/api.d.ts` | every one returns null/throws; **0 rows of anyone's data**. See §6.3 — Convex functions are public by default |
 | A16 | Two simultaneous claims of one handle | exactly one succeeds, one fails; exactly **1** `profiles` doc with that handle |
 | A17 | `bio` containing `<script>`; `url` set to `javascript:...` | bio renders as literal text; url rejected at write unless http/https |
+| A18 | **Signed-out `GET /u/<handle>` for a private profile** (Phase B) | `404`, and the response is **byte-identical** to `GET /u/<a-handle-nobody-has-claimed>` — status, body and headers. Any difference is a handle-enumeration oracle against a site with no user directory (non-goal #8). No `set-cookie` |
+| A19 | **`POST /api/saves` from a default client that sends no visibility field** | doc written has **no visibility field at all**; then call every anonymous read path (`/u/<handle>`, its collection route, and every export in `convex/_generated/api.d.ts`) and assert **0 rows** referencing that save. Privacy must not require the client to ask for it |
+| A20 | Publish one collection of 3 items, with 4 other private collections and 20 bare saves on the account; fetch `/u/<handle>` anonymously | `200`; payload contains exactly the **3** published slugs and **0** of the other 21 distinct private slugs, asserted by substring search over the raw response |
+| A21 | Un-publish that collection | `/u/<handle>` returns `404` within **≤ 5s** — the publish mutation calls `revalidateTag`, so this is not a TTL wait. If the tag path is not used, the route's `revalidate` must be ≤ 60 and the criterion becomes 60s |
+| A22 | Handle validation: the reserved list plus **40** fuzz inputs (uppercase, leading/trailing hyphen, double hyphen, empty, 31 chars, RTL override, homoglyphs, `.`/`_`/`/`) | **40/40 rejected** at the mutation, `0` new `profiles` docs; the 13 reserved words rejected too |
+| A23 | Profile field caps: 281-code-point bio, 51-char display name, 4 tags, one tag outside the 12 `CATEGORIES` ids, 201-char url | each `400` with **0** writes; the out-of-vocabulary tag is **rejected, not silently dropped** |
+| A24 | Onboarding abandonment: complete OAuth, close the tab before claiming a handle, save 2 components, sign in again | exactly **1** `users` doc and **0** `profiles` docs after the abandon; both saves still resolve; the handle prompt reappears; **0** rows deleted by any cleanup path |
+| A26 | HTML + network trace of `/u/<handle>` and `/account`, anonymous and signed-in | **0** requests to `github.com`, `githubusercontent.com` or `googleusercontent.com`; every avatar byte served from this origin (§8.2) |
 
 ### Group B — the static invariant
 
@@ -208,13 +232,14 @@ Numeric criteria, before the implementation plan. Group C baselines come from
 |---|---|---|
 | B1 | `next build` route table | rows for `/`, `/preview/[name]`, `/preview/[name]/embed`, `/preview/[name]/play`, `/writing/[slug]` **byte-identical** to the baseline captured at step 2 |
 | B2 | `grep -rn "ConvexAuthNextjsServerProvider\|cookies()\|headers()" app/layout.tsx app/_components/site-shell.tsx` | **0 matches**. §6.4 |
-| B3 | Middleware matcher is an explicit allowlist | matches only `/api/auth(.*)`, `/api/me`, `/api/saves`, `/account(.*)`, `/submit(.*)`. Asserted by reading `proxy.ts` **and** by B4-B6 |
+| B3 | Middleware matcher is an explicit allowlist | matches only `/api/auth(.*)`, `/api/me`, `/api/saves`, `/account(.*)`, `/welcome`, `/submit(.*)`. **`/u/(.*)` is not on it** — §8.1. Asserted by reading `proxy.ts` **and** by B4-B6 |
 | B4 | Anonymous `curl -I /preview/<slug>/embed`, warm | `200`, `x-nextjs-cache: HIT`, `s-maxage=3600`, **no `set-cookie`** |
 | B5 | Same for `/preview/<slug>/play` | identical |
 | B6 | Anonymous `curl -I /r/<slug>.json`, `/registry.json` | `200`, cache HIT, **no `set-cookie`**, no `vary: cookie` |
 | B7 | `npx shadcn add <origin>/r/<slug>.json`, clean project, no session | succeeds, same bytes as before |
 | B8 | HTML of `/`, anonymous vs signed-in | **identical bytes** |
 | B9 | JS bundle of `/` | contains **no** `ConvexReactClient` and no `convex/react`. Non-goal #5 |
+| B10 | Anonymous `curl -I /u/<a-public-handle>` | `200`, **no `set-cookie`**, **no `vary: cookie`**. `/u/<handle>` renders the public projection only and never reads a cookie — the owner's own preview of an unpublished profile lives at `/account`, not here (§8.1) |
 
 ### Group C — performance
 
@@ -225,7 +250,7 @@ Numeric criteria, before the implementation plan. Group C baselines come from
 | C3 | `/` LCP, 4x throttle | ≤ **600ms** (baseline 516ms) |
 | C4 | Requests on one `/` load | ≤ **57** (baseline 53; `/api/me` + `/api/saves`) |
 | C5 | `/api/saves` p95, signed in, warm | < **250ms** (one extra hop: our origin → Convex) |
-| C6 | Initial JS added to `/` | ≤ **10KB** brotli over the current ~225KB. Target, not a measurement — §9 |
+| C6 | Initial JS added to `/` | ≤ **10KB** brotli over the current ~225KB. Target, not a measurement — §10 |
 
 ### Group D — submission portal
 
@@ -255,9 +280,12 @@ Numeric criteria, before the implementation plan. Group C baselines come from
    A14, A15.
 9. Client auth UI in `SiteShell`, hydration-only. **Run all of groups B and C here** — this is the
    step that can break the site.
-10. `/u/<handle>`, handle claim, account deletion. Run A9, A16, A17.
-11. Rewrite `SECURITY.md`; add the privacy note.
-12. Phase B: `/guidelines`, DCO, `build-contributors.ts`. Re-run group B.
+10. `/welcome` onboarding and the handle claim (§8.3), profile fields (§8.2), account deletion. Run
+    A16, A17, A22, A23, A24, A9.
+11. Rewrite `SECURITY.md`; add the privacy note, including the two sentences §8.1 requires about
+    contributor credit.
+12. Phase B: `/guidelines`, DCO, `build-contributors.ts`, then `/u/<handle>` and the
+    collection-publish toggle. Run A18-A21, A26, B10, and re-run group B.
 13. Phase C: incremental GitHub scope, `/submit`. Run D1-D4.
 
 ---
@@ -385,7 +413,9 @@ auth cookies can attach `Set-Cookie` to a CDN-cached response — which leaks a 
 subsequent visitor of that cached object.
 
 **Rule, not just a test: the matcher is an explicit allowlist** — `/api/auth(.*)`, `/api/me`,
-`/api/saves`, `/account(.*)`, `/submit(.*)` — and never the deny-list default. Middleware is still
+`/api/saves`, `/account(.*)`, `/welcome`, `/submit(.*)` — and never the deny-list default.
+`/u/(.*)` is deliberately absent: §8.1 makes the profile page anonymous-only, and adding it to the
+matcher is how it would quietly acquire a cookie read. Middleware is still
 required, because `dist/nextjs/server/index.js:58-60` shows `convexAuthNextjsMiddleware` proxies auth
 actions at `/api/auth`. B3 asserts the matcher by reading it; B4-B6 assert the observable harms.
 
@@ -407,8 +437,9 @@ at once. That is why the answer to untrusted components is a different origin, n
 
 ### 6.6 What an attacker gets from a leaked session
 
-They can read a public profile, read and modify that user's saves and collections, edit display
-name/bio/URL, and delete the account. They cannot reach component source (public anyway), cannot
+They can read that user's profile — including the parts §8.1 keeps private — read and modify their
+saves and collections, publish or unpublish a collection, edit display name/bio/URL/tags, and delete
+the account. They cannot reach component source (public anyway), cannot
 publish (submissions are PRs; Phase C needs a separately granted GitHub scope), and cannot reach
 another user. Blast radius: one person's bookmark list. `/account` offers "sign out everywhere",
 which deletes that user's `authSessions` docs.
@@ -445,7 +476,14 @@ note says that too.
 **Contributor credit is not deleted, and the guidelines page must say so.** Credit is derived at build
 time from merged git history — a public record of an MIT-licensed contribution, not data the site
 stores about a person. It survives account deletion; a deleted account's credit reverts from a
-`/u/<handle>` link to a plain GitHub login.
+`/u/<handle>` link to a plain GitHub login. **A private profile takes the same degradation path as a
+deleted one** — credit links to `/u/<handle>` only where a profile exists *and* is public (§8.1) —
+so the public-by-design credit line and the private-by-default profile never contradict each other on
+the page. §8.1 gives the two sentences the privacy note and `/guidelines` must both carry.
+
+Also stored, from §8.2: up to 3 category tags, and `isPublic` on the profile and on each collection.
+No avatar bytes are stored — the avatar is the provider's, proxied through this origin so a profile
+view does not report the viewer's IP to GitHub or Google.
 
 ---
 
@@ -501,7 +539,10 @@ roughly $0-25/mo at this scale; do not take it without the spike failing first.
 - **A signed-out visitor** gets exactly today's site: same bytes, same CDN cache entry, one extra
   `/api/me` returning `{ signedIn: false }`. Budgeted in C4.
 - **First render of a profile page** (`/u/<handle>`) is server-rendered on demand from Convex through
-  the server client, or short-revalidate ISR if it proves slow. Not in the static set either way.
+  the server client, or short-revalidate ISR if it proves slow. Not in the static set either way. It
+  reads no cookie and renders the same bytes for everyone (§8.1, B10), so ISR is safe here in a way
+  it would not be for a route with a signed-in variant; the publish mutation invalidates by tag so
+  A21's un-publish criterion is 5s rather than a TTL.
   There is no flash-of-signed-out on the catalog because the header's signed-out state *is* the
   server-rendered default — the auth UI appears on hydration, additively.
 - **`/account` and `/submit`** are the only pages that mount the Convex auth client, with
@@ -511,7 +552,7 @@ The one honest cost: server-side reads add a hop (our origin → Convex) versus 
 Convex directly. C5 budgets 250ms p95 for it. In exchange the browser never holds a token, which
 §6.1 makes non-negotiable here.
 
-### 7.4 Free tier, in numbers — **all figures unverified, see §9**
+### 7.4 Free tier, in numbers — **all figures unverified, see §10**
 
 Convex's free (Starter) tier meters roughly: **~1M function calls/month, ~0.5 GiB database storage,
 ~1 GiB database bandwidth/month, ~1 GiB file storage, 1-2 team members.** The first paid tier
@@ -547,16 +588,231 @@ effort rather than cost.
 
 ---
 
-## 8. Open questions for the owner
+## 8. Profiles, privacy and onboarding
 
-1. **Handles.** Auto-derive from the GitHub login with one free change, or force a choice at signup?
-   Auto-derive has nothing to derive from for Google/OTP users.
-2. **Are profiles public by default?** Recommendation: profiles public, saves private by default with
-   a per-collection "make public" toggle.
+### 8.1 Everything is private by default — decided
+
+**Owner's decision, recorded, not re-argued.** Every row a signed-in user creates — their profile,
+their saves, their collections — is invisible to everyone but them until they take an explicit action
+to publish it. This closes what was open question 2, and it closes it *further* than the old
+recommendation there, which had profiles public.
+
+It is a server-side invariant, not a UI one: `isPublic` is `false` on insert (§3) and the anonymous
+read path filters on it, so a forgotten client-side check cannot leak anything. §6.3 is the reason
+that distinction matters here — Convex has no RLS, so "the query does not return it" is the whole of
+the enforcement.
+
+**What `/u/<handle>` renders for someone who has shared nothing: a 404**, byte-identical to the 404
+for a handle nobody has ever claimed. Both are defensible and this one wins on one argument: any
+distinguishable response is a handle-enumeration oracle. A minimal card that says "this user exists
+but has published nothing" confirms membership of a user list that non-goal #8 says does not exist,
+and it does so for every account on the site — including accounts that signed up with an email whose
+local part they let us pre-fill into the handle (§8.3). The secondary argument is smaller but real:
+a minimal card is a thin page with no content, one per account, offered to a crawler. Test A18
+asserts the byte-identity rather than merely asserting the status code, because a status match with
+a different body is the same oracle.
+
+**The owner previewing their own unpublished profile does not happen at `/u/<handle>`.** It lives
+under `/account`. That keeps `/u/<handle>` a route that never reads a cookie — anonymous-only,
+cacheable, taggable, `no set-cookie`, `no vary: cookie` (B10) — instead of a route whose output
+depends on who is asking, which is the shape non-goal #11 exists to prevent. One route, one
+audience.
+
+**Recommendation — `/u/<handle>` moves out of Phase A and into Phase B.** In Phase A there is no
+publish control, so every profile page that could exist returns 404: the route would ship with no
+reachable non-error state. Phase B is where its first real reader arrives (contributor credit) and
+where publishing arrives, and it is the phase that is not also carrying the auth cutover. The handle
+*claim* stays in Phase A — it is identity, it is cheap while `profiles` is being written anyway, and
+A16's race test belongs next to the mutation that has the race. **Owner can overrule; the cost of
+overruling is building a 404 and testing it twice.**
+
+**Per-item versus per-collection visibility: per-collection only, and `saves` gets no visibility
+field at all.** A single save is never individually publishable. If someone wants to share one
+component they make a collection containing one component. The argument, in order of weight:
+
+1. **One enforcement point.** Two publishable row types means every anonymous read path unions two
+   sources, and every future feature has to remember both. §6.3 makes a forgotten check a data leak.
+2. **The mental model already exists.** "A list I can share" is a thing people have used elsewhere.
+   "This one bookmark is public but that one is not" is a thing they have to be taught.
+3. **Page cost.** A per-item toggle is a second control next to the save control on the catalog card
+   — on the page whose byte budget (C6, ≤10KB) is the tightest constraint in this document, for a
+   capability collections already cover.
+
+`collections.isPublic` is therefore the only publish switch in the data model, and `profiles.isPublic`
+gates whether the page that would list them exists at all. Publishing a collection prompts once, in
+plain words, that this also makes `/u/<handle>` visible, and sets both flags in one mutation. Two
+flags rather than one because the profile must be able to be public with zero public collections —
+that is exactly the case contributor credit needs, below.
+
+**Contributor credit (§6.7) and the privacy default do not contradict each other, and the page must
+say why.** Credit is derived at build time from merged git history. It is not profile data, it is not
+read from Convex, it does not consult `isPublic`, and it exists for people who never created an
+account. What a private profile changes is only the *link target*: §6.7 already specifies that credit
+degrades from a `/u/<handle>` link to a plain GitHub login, and a private profile takes that same
+degradation path as a deleted account does. So the rule is one line: **credit links to `/u/<handle>`
+only when a profile exists and is public; otherwise it renders the GitHub login as plain text.**
+
+The privacy note and `/guidelines` must both carry both halves, in these terms:
+
+- Nothing you save, and nothing you write on your profile, is visible to anyone unless you publish
+  it. Publishing is per collection, and it is off until you turn it on.
+- Contributing a component to the repository is public git history under the GitHub identity you
+  opened the pull request with. It is not covered by the privacy setting, it is not something this
+  site stores about you, and it survives deleting your account.
+
+Written that way the two never look like the same promise being broken.
+
+### 8.2 Profile customization
+
+The owner asked for full customization. Below is the concrete field list, the two places where
+"more" costs a permanent duty rather than a day, and an explicit list of what is being declined.
+
+**Avatar — recommendation: provider-supplied only.** GitHub and Google both hand us one; it lands in
+`users.image` from `authTables`, so it costs zero schema and zero storage. OTP-only users, who have
+no provider avatar, get a deterministic identicon derived from the handle — generated, not stored.
+
+Serve it from this origin. Hotlinking `avatars.githubusercontent.com` sends every viewer's IP to a
+third party on every profile view, which is a privacy regression introduced by a privacy feature.
+`next/image` with the two avatar hosts allowlisted in `remotePatterns` does it in a config line;
+A26 asserts the outcome.
+
+What uploads would actually entail, since it is Convex's own feature and therefore looks free:
+`ctx.storage.generateUploadUrl()` for a client-direct PUT, a storage id on the profile row, the
+`_storage` system table, and metering against the ~1 GiB file-storage line in §7.4. Then the parts
+that are not Convex's problem: server-side content-type sniffing (never the client's declared type),
+a hard byte cap (512KB), dimension caps and a re-encode so a 40-byte decompression bomb cannot be
+served back, EXIF stripping (uploaded photos carry GPS), a delete path wired into the §6.7 cascade
+and test A9, and — the actual cost — **a moderation surface**. An uploaded avatar is user-generated
+imagery rendered on this origin, next to a public credit line, and non-goal #9 says there is no
+moderation tooling. Uploads do not merely add work, they contradict a stated non-goal unless a
+report-and-takedown path and a person to action it arrive with them.
+
+So: **provider avatar only, and uploads join §1 as a non-goal until there is a moderation story.**
+Provider-avatar-only ships in a day. Uploads are a week plus a permanent duty, and the duty is the
+expensive half. **This is the recommendation the owner is most likely to want to overrule, so it is
+the one to overrule first if any of them are.**
+
+**Tags — recommendation: a fixed vocabulary, drawn from `lib/search-categories.ts`.** The 12 ids
+(`heroes`, `actions`, `forms`, `navigation`, `data`, `feedback`, `scroll`, `text`, `surfaces`,
+`media`, `backgrounds`, `sections`), maximum 3, chosen from chips. Free text has no abuse story here
+that does not end in moderation: a bio field is one thing, but a tag is a short public label that
+invites slurs, handles-in-a-tag and URL-in-a-tag, and it needs length caps, normalization, homoglyph
+handling and a review path. The fixed vocabulary needs none of that — the validator is
+`tags.every(t => CATEGORY_IDS.includes(t))`, rejecting rather than silently dropping (A23) — and it
+buys something free text cannot: the values are already the site's own taxonomy, so "contributors who
+work on backgrounds" is a query later rather than a text search.
+
+**Bio, display name, URL.** Already in §3; the concrete rules:
+
+- `bio`: **280 code points** (counted as code points, not UTF-16 units, or an emoji costs two),
+  plain text, rendered as text. No markdown, no HTML, and **no autolinking** — autolinking is what
+  turns a bio into a spam vector and it quietly undoes the URL-scheme validation next to it.
+  Newlines preserved, runs of blank lines collapsed to one.
+- `displayName`: 50 code points, same rendering rule.
+- `url`: one field, parsed with `new URL()`, `http:`/`https:` only, 200 chars, rejected at the
+  mutation on anything else. A17 already covers `javascript:`; A23 covers the cap.
+
+**What is not being built, and why — this is the "no".**
+
+- **A social-links array** (X, Bluesky, Dribbble, LinkedIn…). N rows of URL validation, a per-platform
+  icon set and a per-platform normalizer, to do what the single `url` field already does. No.
+- **Uploaded avatars and cover images.** Above. The banner is the same cost with more pixels. No.
+- **Pronouns, location, company, "available for work".** These are user-directory furniture, and
+  non-goal #8 says there is no user directory. They also broaden what a leaked session exposes
+  (§6.6) from a bookmark list to a small dossier. No.
+- **A per-profile accent colour or theme.** The registry's entire contract is that colour comes from
+  tokens and both themes are non-negotiable. A profile that overrides the accent breaks the one rule
+  every component here is held to. No.
+- **Markdown or rich text in the bio.** No.
+
+That is "full customization" minus every part that buys a moderation duty this project has already
+declined. Each bullet is a recommendation, overrulable individually.
+
+### 8.3 Onboarding
+
+**Hard cap: two steps**, both after identity is established, and only one of them is required.
+
+The justification is the abandonment arithmetic. The account already exists the moment the OAuth
+callback returns — a question asked after that point cannot prevent a signup, it can only produce a
+half-finished account. And the entire value of a new account on this site is one thing: saving a
+component. Anything not required to make a save work is therefore asked later, from `/account`, where
+the person is already invested rather than standing in a doorway. One thing must be collected (the
+handle) and one thing is worth offering while attention is high (an optional profile). That is two.
+A third step would have to justify itself against "ask this from `/account` instead", and nothing
+does.
+
+**Step 1 — handle. Required, and the only required step.** This resolves open question 1.
+
+**Decision: always show the field, pre-filled where we can derive a value.** Not silent auto-derive,
+and not an empty box.
+
+- GitHub gives `login`. Google and OTP give only an email, so the candidate is the local part.
+- Normalize the candidate: lowercase, drop everything outside `[a-z0-9-]`, collapse repeated hyphens,
+  trim leading/trailing hyphens, truncate to 30, and on collision append `-2`, `-3`.
+- Show it in an editable field with the collision-checked state visible, and claim it only on submit.
+
+Why not silent auto-derive: for the two providers that have nothing to derive from but an email, the
+derived handle publishes a fragment of the email address without anyone being asked —
+`firstname.lastname@` becomes a public `firstnamelastname`. Why not a bare choice: it is the only
+blocking step in the flow, and a valid pre-filled value turns it into one keystroke for the GitHub
+majority.
+
+Validation: 2-30 characters, `^[a-z0-9](-?[a-z0-9])*$`, plus a reserved list — `account`, `submit`,
+`api`, `u`, `r`, `preview`, `writing`, `guidelines`, `contributors`, `admin`, `about`, `new`,
+`settings`. Claimed by the `claimHandle` mutation of §3; A16 covers the race, A22 the validation.
+**One free change later** from `/account` (`handleChangedAt`), then it is a support request: enough
+to fix a typo or a regretted signup, not enough to churn handles that credit links point at.
+
+**Step 2 — profile. Entirely optional, one screen.** Display name (pre-filled from the provider), up
+to 3 tags from the fixed vocabulary, bio. Plus one unchecked newsletter checkbox — which is where
+open question 4's "explicit checkbox, not an assumption" lives, and it lives nowhere else. "Skip" is
+rendered with the same weight as "Continue", not as a grey link under it.
+
+**Not asked at all:** how you heard about us; role or company; interests for personalization (there
+is no personalization); email confirmation for OAuth users (the provider did it); and — deliberately
+— any privacy toggle. Everything is already private (§8.1). A privacy question here would imply
+otherwise and hand the user a chance to mis-set on their first thirty seconds on the site.
+
+**Abandonment. Nothing is destroyed and nothing needs cleaning up.** Two points to abandon at:
+
+- *Before the handle is claimed.* A `users` row exists with no `profiles` row. That is a valid and
+  usable state, not a broken one: saves are keyed on `userId`, so the person can browse and save
+  normally, and the header shows the provider's display name. The handle prompt reappears on the
+  next visit to any auth surface. Nothing is blocked except a profile page, which for them would 404
+  anyway (§8.1).
+- *After the handle, before step 2.* Nothing to do; step 2 is optional by construction.
+
+So the rule is: **onboarding is resumable and never destructive, and the only gate is that the handle
+prompt reappears until it is answered.** There is deliberately no timed cleanup of half-onboarded
+accounts — such a job would delete real saves belonging to someone who closed a tab. A24 asserts the
+whole of this: one `users` doc, zero `profiles` docs, both saves surviving, zero rows deleted.
+
+**The account of someone who skips everything:** a `users` row, and a `profiles` row carrying the
+handle, the provider's display name and avatar, `isPublic: false`, no bio, no tags, no collections.
+Zero public surface, fully functional for saving, and `/u/<handle>` 404s — which is exactly the
+"shared nothing" case §8.1 describes.
+
+**Where it runs:** a dedicated `/welcome` route, dynamic and `no-store`, in the middleware allowlist
+of §6.4 alongside `/account`. Not a modal over the catalog — a modal on `/` would need auth state in
+the catalog bundle, which is non-goal #5 and test B9.
+
+---
+
+## 9. Open questions for the owner
+
+1. ~~**Handles.**~~ **Answered in §8.3:** always show the field, pre-filled from the GitHub login or
+   the email local part, editable before it is claimed, one free change afterwards.
+2. ~~**Are profiles public by default?**~~ **Decided by the owner, §8.1: private by default** —
+   further than this document's old recommendation, which had profiles public. Visibility is
+   per-collection only; `saves` has no visibility field.
 3. **Collections in Phase A or deferred?** Schema costs little; the UI is real work. Saves alone is a
-   cleaner Phase A.
+   cleaner Phase A. §8.1 sharpens the question: the publish toggle is now the *only* way anything
+   becomes public, so deferring collections defers publishing entirely — which is consistent with
+   `/u/<handle>` moving to Phase B, and is the recommended pairing.
 4. **Does the email-capture form merge with auth?** OTP signup produces an email and EmailOctopus
-   already has a list. Needs an explicit checkbox, not an assumption.
+   already has a list. Needs an explicit checkbox, not an assumption. §8.3 places that checkbox —
+   unchecked, on the optional onboarding step, and nowhere else — but whether the list itself is
+   wired to EmailOctopus is still the owner's call.
 5. **One Convex deployment or two?** Vercel Preview builds against the prod Convex deployment would
    let a preview write to real user data. Recommendation: a separate dev deployment wired to Preview.
 6. **Sign-in for the CLI or MCP server?** Both exist and this spec assumes both stay anonymous.
@@ -566,7 +822,7 @@ effort rather than cost.
 
 ---
 
-## 9. Where this document is guessing
+## 10. Where this document is guessing
 
 - **All Convex pricing and free-tier figures in §7.4 are unverified.** They are numbers the owner's
   decision partly rests on, so check them first.
@@ -585,3 +841,12 @@ effort rather than cost.
 - **The C6 bundle budget (≤10KB)** is a target, not a measurement. Measure at step 9 and correct this
   document if wrong rather than quietly failing the test.
 - **The "week of work" in §6.2** is a judgement call.
+- **§8 mixes one decision with several recommendations.** Private-by-default (§8.1) is the owner's
+  decision. The 404-not-minimal-card choice, `/u/<handle>` moving to Phase B, per-collection-only
+  visibility, provider-avatars-only, the fixed tag vocabulary, the declined field list and the
+  two-step cap are all recommendations with the reasoning attached, and each is overrulable on its
+  own. The "week plus a permanent duty" for avatar uploads is the same kind of judgement call as the
+  one in §6.2.
+- **Verified, not remembered:** the 12 category ids quoted in §8.2 were read from
+  `lib/search-categories.ts`. Convex file-storage API names in §8.2 are from memory — check them
+  before costing an upload path.
