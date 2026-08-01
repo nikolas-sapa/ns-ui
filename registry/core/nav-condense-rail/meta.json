@@ -1,0 +1,26 @@
+{
+  "name": "nav-condense-rail",
+  "title": "Nav Condense Rail",
+  "description": "A full-width site nav that condenses in place as the page scrolls — roomy padding, full-size wordmark and links at the top, tightening to a dense pinned rail — over a distance measured from the bar's own rendered height at each extreme, not a guessed scroll-pixel constant.",
+  "collection": "core",
+  "tags": [
+    "header",
+    "navigation",
+    "scroll",
+    "condense",
+    "density",
+    "measured",
+    "chrome"
+  ],
+  "autoplay": {
+    "mode": "scroll",
+    "range": [0, 1]
+  },
+  "card": {
+    "focus": "[role=navigation]",
+    "padding": 0.15
+  },
+  "useWhen": "Pick nav-condense-rail for a top-of-site bar whose transition is a density change — the same full-width silhouette from roomy to a tight pinned rail, with the condense distance measured from the bar's own rendered height at each extreme (two off-screen probes, ResizeObserver) rather than an arbitrary scroll-pixel constant. Pick header-scroll-pill instead when the destination shape itself should change — full bar collapsing into a small centered floating pill with a rolling active-section label — which is a silhouette morph, not a density change, and already owns scroll-linked active-section tracking with hysteresis and a fast-scroll-up overshoot.",
+  "instruction": "Build a full-width site navigation bar — fixed to the top, a wordmark on the left, a link row and an accent CTA button on the right — that condenses continuously as the page scrolls: tall vertical padding and full-size type at rest, shrinking to tight padding, a smaller wordmark (via a counter-scaled transform, not a font-size change, so it never touches layout) and smaller link/button type once the page has moved past it. The one constraint that makes this more than a CSS scroll-snap trick: the pixel distance the condense happens over must never be an arbitrary constant. Derive it instead from measurement — render the bar's real markup twice more, off-screen (position: fixed, left: -99999px, visibility: hidden, aria-hidden), once at the roomy style values and once at the dense ones, and read each one's actual height via ResizeObserver. The travel distance is roomyHeight − denseHeight: exactly as long as the bar's own vertical shrink actually is, so it stays correct across a different wordmark, a different font stack, or a narrower viewport, with no per-deployment constant to retune. A single continuous progress value in [0,1] is computed every frame inside one requestAnimationFrame loop as clamp(window.scrollY / travel, 0, 1), eased toward that target with an exponential approach (1 − exp(−rate·dt)) for a soft settle rather than a snap, and written straight to refs' inline styles — bar padding-block, wordmark transform: scale(), link font-size, link row gap, the CTA's own padding, background (color-mix'd from --background, fading in as progress leaves 0 so the roomy bar reads as transparent chrome over hero content), a 1px --border bottom hairline whose opacity fades in the same way, and a backdrop-filter blur once any condensing has begun — never through React state per frame, so there is zero re-render on the scroll hot path. A spacer div sits in normal document flow directly under the fixed bar and has its height written every frame to the same interpolated value, so the page never jumps as the bar's real height changes. prefers-reduced-motion drops the rAF loop and the continuous interpolation entirely: a plain scroll listener applies one of exactly two discrete style sets — fully roomy or fully dense — with the cut set at half the measured travel distance (still a measured boundary, never a hand-picked pixel figure), so the bar still functions, just without the tween. Links get a real focus-visible ring (outline-2, outline-offset-4, outline-accent) and a hover color change from --muted to --foreground distinct from the resting state; the CTA is a role=navigation landmark's ordinary link, not a button, since it navigates. Colors are entirely token-derived (--background, --foreground, --muted, --border, --accent, --accent-hover) including the color-mix'd background and border fades, so both themes render correctly with no per-theme branch. Demo is a real, tall page (four sections beneath the bar) with no scripted auto-scroll — /preview stays the honest, fully interactive reference — while the card's `autoplay: scroll` descriptor eases the homepage grid's iframe through the same range to demonstrate the condense without user input.",
+  "dependencies": []
+}

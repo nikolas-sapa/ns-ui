@@ -1,0 +1,25 @@
+{
+  "name": "grid-bento-dense",
+  "title": "Grid Bento Dense",
+  "description": "A composable bento grid where activating a tile genuinely promotes it: the tile takes a 2x2 slot and every other tile re-packs around it via CSS grid-auto-flow: dense, FLIP-animated so the reflow reads as tiles sliding into new slots rather than jumping.",
+  "collection": "core",
+  "tags": ["grid", "layout", "bento", "dashboard", "keyboard-navigation", "reflow", "accessibility"],
+  "useWhen": "A dashboard or overview grid where one tile should be able to earn the large slot — the caller passes arbitrary cells (any count, any content) and lets whoever's looking at it decide which one matters right now, rather than a designer fixing that in a template. Reach for grid-magnetic-lattice instead when the point is ambient cursor-reactive motion over a fixed card layout, not an actual change of which tile is largest.",
+  "instruction": "A bento grid built as a real layout primitive rather than a fixed grid-template-areas arrangement: it takes a `cells` array of arbitrary length and content (`{ id, title, meta?, body?, size? }`, size one of 1x1/2x1/1x2 as its resting footprint) and a `cols` count, and lays every cell out with native CSS `grid-auto-flow: dense` — the browser's own packing algorithm, not JS-computed positions. Clicking, or Enter/Space on, any tile ACTIVATES it: that tile's span becomes 2x2 regardless of its resting size, the previously-featured tile drops back to its own resting size, and dense re-runs the pack — every other tile can shift to fill the gap, which is what makes this a primitive the rest of a dashboard composes into rather than a decoration. The reflow is FLIP-animated: before the state write, every tile's current getBoundingClientRect is captured; after the new layout has painted, each tile that moved is inverted back to its old screen position with transitions off, forced to reflow, then released into a 380ms transform transition back to zero — so the motion is a real position change riding a transform, not a fake. Size changes happen INSTANTLY, never scaled: animating a bordered, rounded tile's width/height via scale is what smears its border and distorts its text, so only translation is animated and the grid-column/row spans swap in the same frame as the state update. The container's own height never changes across activations — `computeRows` evaluates every cell as the hypothetical featured one, takes the worst-case total area, and fixes `grid-template-rows` to that count once, so a dashboard embedding this grid never has its neighbors jump when someone taps a different tile. ARROW KEYS move focus by actual on-screen geometry, not DOM order: from the focused tile's centre, candidates in the pressed half-plane are scored by distance along that axis plus double the perpendicular drift, and the closest wins — a tile below and slightly right of the current one is `ArrowDown`, not `ArrowRight`, which flat DOM-order roving tabindex gets wrong the moment tiles vary in size. Every tile is `role=button` with roving tabindex (exactly one at 0), `aria-pressed` reflecting featured state, and an `aria-label` from its title; a visually-hidden `role=status` region announces which tile just got featured. Hover and keyboard focus both lift the border from --border to --muted and reveal a small 'feature this' hint (opacity 0 to 1), and the featured tile alone carries a small --accent dot — the only place accent appears. `prefers-reduced-motion` skips the FLIP capture entirely: the new layout still applies, cells still move, there's just no transform animating the transition. All color from --background/--foreground/--muted/--border/--accent tokens via Tailwind utility classes, zero canvas, zero dependencies.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "press",
+    "target": "[data-featured=\"false\"]",
+    "hold": 500,
+    "period": 4200,
+    "delay": 700
+  },
+  "gate": {
+    "openBy": "[data-cell-id=\"uptime\"]",
+    "expect": "[data-cell-id=\"uptime\"][data-featured=\"true\"]"
+  },
+  "card": {
+    "focus": "[role=\"group\"]",
+    "padding": 0.1
+  }
+}
