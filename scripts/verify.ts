@@ -38,7 +38,20 @@ function componentDir(name: string): string {
   throw new Error(`no registry folder found for ${name}`);
 }
 
-type Gate = { openBy?: string; expect?: string };
+// resetBefore: opt-in escape hatch for a component whose gate.openBy target
+// can be left in a mutated, animating state by the earlier interactive-states
+// phase above (hover/press/focus on the first visible button — a real
+// mouse.down+up, i.e. a real click). undo-ghost-row is the case that forced
+// this: that phase's click deletes row 0, starting an 8s WAA height-collapse
+// on the ghost; every remaining [data-afterimage-delete] then sits below it
+// and drifts a fraction of a px every frame (measured: y 381.08 -> 378.69 px
+// over 5 x 200ms samples), so Playwright's 2-stable-frame click check never
+// passes and opener.click() times out — not a missing selector, not a real
+// user-facing barrier (a real mouseup dispatches regardless of reflow).
+// Setting this re-navigates to a clean preview right before opener.click()
+// so the gate tests what openBy/expect was meant to test — click from resting
+// state — instead of silently inheriting whatever the press phase left behind.
+type Gate = { openBy?: string; expect?: string; resetBefore?: boolean };
 type Meta = { gate?: Gate } & Record<string, unknown>;
 
 function checkMeta(name: string, dir: string): Meta {
@@ -292,6 +305,16 @@ async function verifyComponent(page: Page, name: string, dir: string, meta: Meta
     // popover clipped invisible by an ancestor's overflow-hidden shipped green.
     const gate = meta.gate;
     if (gate?.openBy && gate.expect) {
+      if (gate.resetBefore) {
+        // see the Gate type comment: undo whatever the interactive-states
+        // phase above did before this component's gate click.
+        await page.goto(`${BASE_URL}/preview/${name}`, { waitUntil: "networkidle" });
+        await page.evaluate((t) => {
+          document.documentElement.classList.toggle("dark", t === "dark");
+        }, theme);
+        await page.mouse.move(0, 0);
+        await page.waitForTimeout(1000);
+      }
       const opener = page.locator(gate.openBy).first();
       if (!(await opener.count())) {
         fail(`${name} [${theme}]: gate.openBy "${gate.openBy}" matches nothing`);
