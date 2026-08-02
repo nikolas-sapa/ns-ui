@@ -83,6 +83,61 @@ export function Showcase({
   const [filter, setFilterState] = useState<Filter>("all");
   const [category, setCategoryState] = useState<string | null>(null);
   const [query, setQueryState] = useState("");
+  const [saved, setSaved] = useState<Set<string>>(new Set());
+  const [authenticated, setAuthenticated] = useState<boolean | null>(null);
+  const [saving, setSaving] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    fetch("/api/saves")
+      .then(async (res) => {
+        if (res.status === 401) {
+          setAuthenticated(false);
+          return;
+        }
+        if (!res.ok) throw new Error("save list failed");
+        const data = (await res.json()) as { slugs?: unknown };
+        setSaved(new Set(Array.isArray(data.slugs) ? data.slugs.filter((s): s is string => typeof s === "string") : []));
+        setAuthenticated(true);
+      })
+      .catch(() => setAuthenticated(false));
+  }, []);
+
+  const toggleSave = useCallback(
+    async (name: string) => {
+      if (authenticated !== true || saving.has(name)) return;
+      const wasSaved = saved.has(name);
+      setSaving((current) => new Set(current).add(name));
+      setSaved((current) => {
+        const next = new Set(current);
+        if (wasSaved) next.delete(name);
+        else next.add(name);
+        return next;
+      });
+      try {
+        const res = await fetch("/api/saves", {
+          method: wasSaved ? "DELETE" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ slug: name }),
+        });
+        if (res.status === 401) setAuthenticated(false);
+        if (!res.ok) throw new Error("save failed");
+      } catch {
+        setSaved((current) => {
+          const next = new Set(current);
+          if (wasSaved) next.add(name);
+          else next.delete(name);
+          return next;
+        });
+      } finally {
+        setSaving((current) => {
+          const next = new Set(current);
+          next.delete(name);
+          return next;
+        });
+      }
+    },
+    [authenticated, saved, saving],
+  );
 
   // Starts at the server-rendered default and syncs from the URL once
   // mounted — same mounted-gate pattern as ThemeToggle, so there is nothing
@@ -388,6 +443,10 @@ export function Showcase({
                   entry={entry}
                   installCommand={installFor(entry.name)}
                   priority={i < 2}
+                  saved={saved.has(entry.name)}
+                  authenticated={authenticated}
+                  savePending={saving.has(entry.name)}
+                  onToggleSave={toggleSave}
                 />
               </li>
             ))}
@@ -468,6 +527,10 @@ export function Showcase({
               active={isActive(entry.name)}
               registerRef={registerRef}
               installCommand={installFor(entry.name)}
+              saved={saved.has(entry.name)}
+              authenticated={authenticated}
+              savePending={saving.has(entry.name)}
+              onToggleSave={toggleSave}
             />
           </li>
         ))}

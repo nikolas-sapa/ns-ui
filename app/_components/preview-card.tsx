@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { CopyButton } from "./copy-button";
+import { SaveButton } from "./save-button";
 import cardFrames from "@/lib/card-frame.generated.json";
 import { fitTo, parseCardFrame, type Fit } from "@/lib/card-frame";
 
@@ -43,11 +44,19 @@ export function PreviewCard({
   active,
   registerRef,
   installCommand,
+  saved,
+  authenticated,
+  savePending,
+  onToggleSave,
 }: {
   entry: RegistryEntry;
   active: boolean;
   registerRef: (name: string, el: HTMLElement | null) => void;
   installCommand: string;
+  saved: boolean;
+  authenticated: boolean | null;
+  savePending: boolean;
+  onToggleSave: (name: string) => void;
 }) {
   const boxRef = useRef<HTMLDivElement | null>(null);
   const frameRef = useRef<HTMLIFrameElement | null>(null);
@@ -296,6 +305,13 @@ export function PreviewCard({
           value={installCommand}
           label={`Copy install command for ${entry.name}`}
           className="relative z-20 -mt-1"
+        />
+        <SaveButton
+          name={entry.name}
+          saved={saved}
+          authenticated={authenticated}
+          pending={savePending}
+          onToggle={onToggleSave}
         />
       </div>
     </article>

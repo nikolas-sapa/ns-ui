@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { CopyButton } from "./copy-button";
+import { SaveButton } from "./save-button";
 import type { RegistryEntry } from "./preview-card";
 
 // Same fixed-viewport-then-scale approach as preview-card.tsx, and the same
@@ -56,11 +57,19 @@ export function FeaturedCard({
   entry,
   installCommand,
   priority = false,
+  saved,
+  authenticated,
+  savePending,
+  onToggleSave,
 }: {
   entry: RegistryEntry;
   installCommand: string;
   /** True for the first row, whose posters are the page's LCP candidates. */
   priority?: boolean;
+  saved: boolean;
+  authenticated: boolean | null;
+  savePending: boolean;
+  onToggleSave: (name: string) => void;
 }) {
   const boxRef = useRef<HTMLDivElement | null>(null);
   const frameRef = useRef<HTMLIFrameElement | null>(null);
@@ -298,6 +307,13 @@ export function FeaturedCard({
           value={installCommand}
           label={`Copy install command for ${entry.name}`}
           className="relative z-20"
+        />
+        <SaveButton
+          name={entry.name}
+          saved={saved}
+          authenticated={authenticated}
+          pending={savePending}
+          onToggle={onToggleSave}
         />
       </div>
     </article>
