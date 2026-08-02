@@ -17,11 +17,13 @@ Node 22.18 or newer. The build scripts are TypeScript executed directly by
 node (`node scripts/build-index.ts`), which relies on Node's native type
 stripping.
 
-The preview site has two routes worth knowing:
+The preview site has three routes worth knowing:
 
 - `/` lists every component as a live, self-demonstrating card.
-- `/preview/<name>` renders one component, fully interactive. This is the
-  honest reference and what the screenshot gate captures.
+- `/components/<name>` renders one component, fully interactive. This is the
+  canonical, indexed page — what a visitor or a search engine lands on.
+- `/preview/<name>` renders the identical component, chrome-less. This is the
+  screenshot gate's fixture, not a page anyone is meant to link to.
 
 ## Generated files never go in a diff
 
@@ -57,8 +59,8 @@ fits. Then:
 
    - `component.tsx` — the component itself. `"use client"`, zero or minimal
      dependencies.
-   - `demo.tsx` — the preview render used by `/preview/<name>` and the
-     verifier.
+   - `demo.tsx` — the preview render used by `/components/<name>` and the
+     `/preview/<name>` verifier fixture.
    - `meta.json` — the source of truth: `name`, `title`, `description`,
      `collection`, `tags`, `instruction` (a rich paragraph describing behavior,
      read by `scripts/build-llms.ts` into `llms-full.txt`), and `dependencies`.
@@ -102,14 +104,14 @@ fits. Then:
      the background, a shadow that becomes a smear. The gate only fails a
      component whose two themes are byte-identical, so a light theme that is
      merely *wrong* sails straight through. Toggle the theme on
-     `/preview/<name>` and look.
+     `/components/<name>` and look.
    - **The card, not just the preview.** The homepage renders your component
      live, at a real 1440x900 viewport scaled down to a card roughly 660px
      wide. A demo that reads fine at full size can arrive in the grid as a
      speck of interface adrift in empty background, or with the interesting
      part outside the frame. Open `/`, find your card, and ask whether someone
      who has never seen the component could tell what it does. If not, set a
-     `card.focus` selector (below). `/preview/<name>` renders unscaled and
+     `card.focus` selector (below). `/components/<name>` renders unscaled and
      uncropped, so it will never surface this.
 
 ## Framing the card
@@ -144,7 +146,7 @@ full-viewport card. That is exactly why you look at the homepage card yourself.
 
 Framing is site-only metadata. It never reaches `registry.json`, `public/r/*`
 or `llms.txt`, and it changes nothing about the component, the demo, or
-`/preview/<name>`.
+`/components/<name>`.
 
 ## The token rule
 

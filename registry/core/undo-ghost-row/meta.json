@@ -15,6 +15,7 @@
   },
   "gate": {
     "openBy": "[data-afterimage-delete]",
-    "expect": "[data-afterimage-undo]"
+    "expect": "[data-afterimage-undo]",
+    "resetBefore": true
   }
 }

@@ -13,7 +13,7 @@ export function generateStaticParams() {
 }
 
 // The per-slug opengraph-image.tsx in this same folder is picked up by the
-// file-convention automatically — same split as app/preview/[name]/page.tsx:
+// file-convention automatically — same split as app/components/[name]/page.tsx:
 // this only supplies title/description text.
 export async function generateMetadata({
   params,

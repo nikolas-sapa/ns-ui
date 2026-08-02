@@ -37,7 +37,7 @@ export default function NotFound() {
         <span>
           This page is{" "}
           <a
-            href="/preview/not-found-knockout"
+            href="/components/not-found-knockout"
             className="rounded-sm text-foreground underline underline-offset-2 outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             not-found-knockout

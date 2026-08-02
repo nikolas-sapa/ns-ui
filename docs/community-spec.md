@@ -86,9 +86,11 @@ and nothing more than it said: an Auth.js provider plus credentials on the deplo
   `.convex.cloud`, and note that a per-deployment URL means the dev and prod deployments of §5 step 4
   need **separate OAuth app registrations**, or at least separate callback entries.
 
-**3 — Email OTP works as a primary sign-in method.** Request code → submit → `signIn("email-otp")` →
+**3 — Email OTP works as a primary sign-in method.** Request code → submit → `signIn("email")` →
 authenticated, resolving to exactly one `users` doc. This was listed in §10 as an assumption; it is
-now a result.
+now a result. **The provider id is `"email"`, not `"email-otp"`**, regardless of how the provider is
+configured — read from `node_modules/@convex-dev/auth/dist/providers/Email.js` at 0.0.94, which
+hardcodes `id: "email"`. The sign-in UI must call `signIn("email")`.
 
 **4 — `storage="inMemory"` works, and the mode it enables has a defect.** Zero `localStorage` keys
 before sign-in, after sign-in, after reload and on a second route, in both dev and a production
@@ -199,6 +201,15 @@ export default defineSchema({
   collectionItems: defineTable({
     collectionId: v.id("collections"), slug: v.string(), position: v.number(),
   }).index("by_collection", ["collectionId"]),
+
+  // Throttles OTP *send* requests, not sign-in attempts (authTables' own authRateLimits does that).
+  // Keyed on a salted HMAC of the address, never the plaintext — §6.3/§7.4. Deliberately NOT part of
+  // the A9 cascade: a row can exist for an address with no account to cascade from.
+  otpRequestLimits: defineTable({
+    emailHash:  v.string(),   // HMAC-SHA256(address, OTP_RATE_LIMIT_SALT)
+    count:      v.number(),
+    windowEnd:  v.number(),   // expired rows deleted by the same mutation that checks the limit
+  }).index("by_emailHash", ["emailHash"]),
 });
 ```
 
@@ -272,13 +283,22 @@ Numeric criteria, before the implementation plan. Group C baselines come from
 | B1 | `next build` route table | rows for `/`, `/preview/[name]`, `/preview/[name]/embed`, `/preview/[name]/play`, `/writing/[slug]` **byte-identical** to the baseline captured at step 2 |
 | B2 | `grep -rn "ConvexAuthNextjsServerProvider\|cookies()\|headers()" app/layout.tsx app/_components/site-shell.tsx` | **0 matches**. §6.4 |
 | B3 | Middleware matcher is an explicit allowlist | matches only `/api/auth(.*)`, `/api/me`, `/api/saves`, `/account(.*)`, `/welcome`, `/submit(.*)`. **`/u/(.*)` is not on it** — §8.1. Asserted by reading `proxy.ts` **and** by B4-B6 |
-| B4 | Anonymous `curl -I /preview/<slug>/embed`, warm | `200`, `x-nextjs-cache: HIT`, `s-maxage=3600`, **no `set-cookie`** |
+| B4 | Anonymous `curl -I /preview/<slug>/embed`, warm | `200`, `x-vercel-cache: HIT`, `x-nextjs-prerender: 1`, **no `set-cookie`** |
 | B5 | Same for `/preview/<slug>/play` | identical |
 | B6 | Anonymous `curl -I /r/<slug>.json`, `/registry.json` | `200`, cache HIT, **no `set-cookie`**, no `vary: cookie` |
 | B7 | `npx shadcn add <origin>/r/<slug>.json`, clean project, no session | succeeds, same bytes as before |
 | B8 | HTML of `/`, anonymous vs signed-in | **identical bytes** |
 | B9 | JS bundle of `/` | contains **no** `ConvexReactClient` and no `convex/react`. Non-goal #5 |
 | B10 | Anonymous `curl -I /u/<a-public-handle>` | `200`, **no `set-cookie`**, **no `vary: cookie`**. `/u/<handle>` renders the public projection only and never reads a cookie — the owner's own preview of an unpublished profile lives at `/account`, not here (§8.1) |
+
+**B4/B5 header drift.** The original criterion named `x-nextjs-cache: HIT` and `s-maxage=3600` —
+headers this stack does not emit. Measured against a real preview: Vercel's own edge sends
+`x-vercel-cache: HIT` on a repeat request, not `x-nextjs-cache`, and the ISR route's `Cache-Control` is
+`public, max-age=0, must-revalidate` (the revalidation window lives server-side, not in the header)
+alongside `x-nextjs-prerender: 1` and `x-nextjs-stale-time: 300`. Same class of drift as C6's build-log
+column disappearing in Turbopack — the functional property the test exists to protect (a genuine warm
+edge cache hit, and no `set-cookie` leaking a session into that cached object) is unchanged and stays
+mandatory; only the header names were Next-version-specific and did not survive.
 
 ### Group C — performance
 
@@ -287,9 +307,20 @@ Numeric criteria, before the implementation plan. Group C baselines come from
 | C1 | `/` TTFB, warm CDN hit, 3 runs | ≤ **200ms** (baseline 174-182ms) |
 | C2 | `/` steady-state TBT, 15-25s window, 4x CPU throttle, quiet machine | **0ms, 3 of 3 runs** (current shipped value) |
 | C3 | `/` LCP, 4x throttle | ≤ **600ms** (baseline 516ms) |
-| C4 | Requests on one `/` load | ≤ **57** (baseline 53; `/api/me` + `/api/saves`) |
+| C4 | Requests on one `/` load, measured at the load event (same point the 53-request baseline was captured at, not network-idle) | ≤ **57** (baseline 53; `/api/me` + `/api/saves`). Observed on a real preview: **50 at load** — PASS. A separate, informational count to **63 at network-idle** once Next's own prefetches and Vercel's Analytics/Speed Insights/`vercel.live` scripts finish loading; `vercel.live` is preview-only and will not exist in production, so the network-idle figure is not the one this budget is measured against |
 | C5 | `/api/saves` p95, signed in, warm | < **250ms** (one extra hop: our origin → Convex) |
-| C6 | Initial JS added to `/` | ≤ **10KB** brotli over the current ~225KB. Target, not a measurement — §10 |
+| C6 | Initial JS on `/` | ≤ **206,509 bytes** brotli, summed across every unique `/_next/static/*.js` referenced by a `<script>` tag or a preload/modulepreload `<link>` on the production server's response for `/`. Measured baseline on Next 16.2.11: **196,269 bytes across 12 files**; the pass criterion is that baseline plus 10,240 bytes (10KB) of budget for what Convex adds |
+
+**C6's method, and why the other two were rejected.** Next 16 with Turbopack no longer emits a
+Size / First Load JS column at build time, so there is no build-log figure to baseline against — the
+method has to be a runtime measurement instead: start the production server, request `/`, collect
+every unique `/_next/static/*.js` referenced by a script tag or a preload/modulepreload link, brotli
+each with Node's built-in `zlib`, and sum. Two other methods were tried and rejected:
+`app-build-manifest.json` does not exist on this Next version, and `rootMainFiles` +
+`polyfillFiles` is framework-shared JS that would be byte-identical before and after Convex lands —
+a metric that structurally cannot fail is not a metric. **Caveat: this counts initial JS only**, not
+chunks fetched on hydration or route transition. **This baseline is valid only for Next 16.2.11** — a
+framework upgrade invalidates it and requires re-measuring, same as B1's route-table baseline.
 
 ### Group D — submission portal
 
@@ -308,7 +339,7 @@ Numeric criteria, before the implementation plan. Group C baselines come from
 2. Capture the pre-change `next build` route table as the B1 baseline. Before touching anything.
 3. Wait for the rename commit on `main`.
 4. Provision Convex. Set `JWT_PRIVATE_KEY`, `JWKS`, `SITE_URL`, `RESEND_API_KEY`, `AUTH_EMAIL_FROM`,
-   `AUTH_GITHUB_ID`, `AUTH_GITHUB_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`
+   `AUTH_GITHUB_ID`, `AUTH_GITHUB_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `OTP_RATE_LIMIT_SALT`
    **on the Convex deployment** via `npx convex env set` — not `.env.local`. Set them on **both** the
    dev and prod Convex deployments, and `NEXT_PUBLIC_CONVEX_URL` in **both** Vercel Production and
    Preview, in one change. A missing one is a total outage. Register the OAuth apps against the
@@ -536,8 +567,10 @@ token renews.
 Stored in Convex: email address; provider account id and provider name in `authAccounts`; OAuth tokens
 where the provider requires them; display name and avatar URL from the provider; handle; optional bio
 and URL; saved slugs and collections with timestamps; sessions, refresh tokens, verification codes and
-verifiers in the `auth*` tables. Vercel Analytics is unchanged. Resend holds delivery logs for OTP
-emails — a second processor, named in the privacy note.
+verifiers in the `auth*` tables; a salted HMAC of any address that requests an OTP, in
+`otpRequestLimits` (§7.4) — never the plaintext address, and not tied to an account. Vercel Analytics
+is unchanged. Resend holds delivery logs for OTP emails — a second processor, named in the privacy
+note.
 
 **Deletion is an explicit enumerated mutation.** Convex has no cascade, so this is code, not a
 constraint:
@@ -551,7 +584,8 @@ deleteAccount → for the calling userId, delete docs from:
 
 **A missed table is silent orphan data with no safety net**, which is why test A9 enumerates all ten
 and asserts zero from each rather than spot-checking. Add a new table, add it to both the mutation and
-A9 — put that line in a comment above the mutation.
+A9 — put that line in a comment above the mutation. **`otpRequestLimits` is not one of the ten and is
+not added to this mutation** — it holds no `userId` to cascade from (§7.4), by design.
 
 Provider tokens are revoked where the provider supports it, deleted locally where it does not, and the
 privacy note says which. Resend's own logs follow Resend's retention, which we do not control; the
@@ -640,39 +674,74 @@ The one honest cost: server-side reads add a hop (our origin → Convex) versus 
 Convex directly. C5 budgets 250ms p95 for it. In exchange the browser never holds a token, which
 §6.1 makes non-negotiable here.
 
-### 7.4 Free tier, in numbers — **all figures unverified, see §10**
+### 7.4 Free tier, in numbers — **verified against the pricing page**
 
-Convex's free (Starter) tier meters roughly: **~1M function calls/month, ~0.5 GiB database storage,
-~1 GiB database bandwidth/month, ~1 GiB file storage, 1-2 team members.** The first paid tier
-(Professional) is around **$25/member/month**. Confirm on the pricing page before relying on these.
+Checked against https://www.convex.dev/pricing and https://docs.convex.dev/production/state/limits,
+not guessed. Convex's free (Starter) tier meters: **1M function calls/month, 0.5 GB database storage,
+1 GB database I/O per month, 1 GB file storage, 1-6 developers.** There is no intermediate tier —
+the next step up is Professional at **$25 per developer per month**, metered on the same four
+dimensions with higher caps rather than a different model.
 
 Per signed-in page view: **1 query** (`/api/saves`, plus `/api/me`, which can be folded into the same
 call — do that). Mutations only on save/unsave. **No subscriptions**, so no long-lived connection
 burning calls.
 
-| | function calls/mo | storage |
+| | function calls/mo | database storage |
 |---|---|---|
 | 0 users | ~0 | ~0 |
 | 100 users, 20 page views each | ~2,000-4,000 | << 1 MB |
 | 10,000 users, 20 page views each | ~200,000-400,000 | ~200,000 save docs, single-digit MB |
 
-**10,000 users stays inside a ~1M-call free tier**, with room for roughly 2-3x that traffic before
-billing. The binding limit at that point is the team-seat count, not usage.
+**10,000 users x 20 page views sits at roughly 20% of the 1M-call cap and roughly 4% of the 0.5 GB
+storage cap.** Both leave headroom well past this scale.
+
+**Database I/O is the tightest of the four dimensions, not calls or storage.** The 1 GB/month I/O
+budget stays comfortable only while every read is an indexed point read rather than a table scan — a
+scan on `saves` or `profiles` at 10,000+ users would move the meter far faster than the call count
+does. This is exactly why the `by_user` and `by_user_slug` indexes on `saves` and `by_userId` /
+`by_handle` on `profiles` (§3) exist: they are not a performance nicety, they are what keeps this
+dimension inside the free tier.
 
 On the owner's stated worry about limits, the failure modes genuinely differ. Neon meters **compute
-hours**, so an idle database is nearly free and a busy one costs. Convex meters **function calls and
-bandwidth**, so a chatty client is what moves the bill. This spec's design — no subscriptions, one
-query per page load, nothing on the catalog — is the cheap shape for Convex's meter specifically. The
-thing that would blow it is adding `useQuery` to the catalog, which is why that is non-goal #7 and not
-merely a preference.
+hours**, so an idle database is nearly free and a busy one costs. Convex meters **function calls,
+database storage, database I/O and file storage**, so a chatty or scan-heavy client is what moves the
+bill. This spec's design — no subscriptions, one indexed query per page load, nothing on the catalog —
+is the cheap shape for Convex's meter specifically. The thing that would blow it is adding `useQuery`
+to the catalog, or a query without a matching index, which is why the former is non-goal #7 and the
+latter is why the indexes in §3 are load-bearing rather than optional.
 
 Other vendors: **Resend** for OTP, already in the owner's stack, ~$0 at these volumes. **Rate
-limiting** uses a Convex table (`authRateLimits` already exists, and
+limiting for failed sign-in attempts** uses a Convex table (`authRateLimits` already exists, and
 `reserved-app/convex/passwordResetRateLimit.ts` is a working precedent) — no Redis, no extra vendor.
+**Rate limiting for OTP send requests is a separate table, `otpRequestLimits`**, corrected below.
 GitHub and Google OAuth app registrations and a verified Resend sending domain need DNS access and are
 effort rather than cost.
 
-**Total: $0 at 0, 100 and 10,000 users**, on these unverified figures.
+**Total: $0 at 0, 100 and 10,000 users**, on these verified figures.
+
+**Rate limiting, corrected.** The claim that OTP-request throttling reuses `authRateLimits` was wrong.
+Verified against `node_modules/@convex-dev/auth/dist/server/implementation/rateLimit.js`:
+`authRateLimits` throttles *failed sign-in attempts* only, keyed by identifier and decremented by
+`recordFailedSignIn`. It never runs on the OTP *send* step, so A5's "max 5 requests per address per
+hour" had nothing implementing it — that is the limit that stops someone using the project's Resend
+account to mail strangers who never asked for a code.
+
+A new table, **`otpRequestLimits`**, implements it. Keyed on `emailHash`: a salted HMAC-SHA256 of the
+address under a per-deployment `OTP_RATE_LIMIT_SALT`, never the plaintext address. Expired rows are
+deleted by the same mutation that checks the limit, so no cron is needed. It is deliberately **outside
+the ten-table A9 cascade** — there is no account to cascade from, since a rate-limit row can exist for
+an address that never signed up.
+
+Plaintext was rejected because it would accumulate a permanent list of every email address that ever
+requested a code, including people who never made an account and are therefore unreachable by account
+deletion — failing §6.7 and A24. A bare SHA-256 of the address was also rejected: email addresses are
+low-entropy and trivially rainbow-tabled, so an unsalted hash is functionally plaintext against anyone
+willing to precompute a table of common addresses. The HMAC with a per-deployment salt closes both
+gaps.
+
+`otpRequestLimits` and `OTP_RATE_LIMIT_SALT` belong wherever this document enumerates tables and
+environment variables — §3's schema, §5 step 4's env var list, and §6.7's stored-data inventory all
+carry it.
 
 ---
 
@@ -723,8 +792,8 @@ component they make a collection containing one component. The argument, in orde
 2. **The mental model already exists.** "A list I can share" is a thing people have used elsewhere.
    "This one bookmark is public but that one is not" is a thing they have to be taught.
 3. **Page cost.** A per-item toggle is a second control next to the save control on the catalog card
-   — on the page whose byte budget (C6, ≤10KB) is the tightest constraint in this document, for a
-   capability collections already cover.
+   — on the page whose byte budget (C6, ≤206,509 bytes brotli) is the tightest constraint in this
+   document, for a capability collections already cover.
 
 `collections.isPublic` is therefore the only publish switch in the data model, and `profiles.isPublic`
 gates whether the page that would list them exists at all. Publishing a collection prompts once, in
@@ -912,8 +981,6 @@ the catalog bundle, which is non-goal #5 and test B9.
 
 ## 10. Where this document is guessing
 
-- **All Convex pricing and free-tier figures in §7.4 are unverified.** They are numbers the owner's
-  decision partly rests on, so check them first.
 - **`@convex-dev/better-auth` is entirely unverified** — not installed anywhere on this machine.
   §7.2 recommends against it partly *because* of that uncertainty, which is an argument about risk,
   not about the package's quality.
@@ -933,9 +1000,12 @@ the catalog bundle, which is non-goal #5 and test B9.
   `__Host-`, but nobody has seen it on a real deployment. A10 is therefore the first test to run
   against a preview URL rather than locally — it is currently the strongest claim in §6.1 with the
   weakest evidence behind it.
-- **The C6 bundle budget (≤10KB)** is a target, not a measurement. Measure at step 9 and correct this
-  document if wrong rather than quietly failing the test.
 - **The "week of work" in §6.2** is a judgement call.
+- **Next was upgraded from 16.2.10 to 16.2.11 during implementation.** 16.2.10 sits inside the
+  affected range of GHSA-6gpp-xcg3-4w24, a middleware/proxy bypass in App Router applications using
+  Turbopack and a single locale — precisely the mechanism §6.4 makes the load-bearing auth boundary
+  for this site. The B1 and C6 baselines are recorded against 16.2.11 and are valid only for that
+  version; re-measure both after any further Next upgrade.
 - **§8 is now decided throughout.** The owner confirmed the 404-not-a-card behaviour, the two-step
   onboarding cap and the fixed-vocabulary tags on 2026-08-01; provider-only avatars stand as written.
   What follows describes how they were reached.

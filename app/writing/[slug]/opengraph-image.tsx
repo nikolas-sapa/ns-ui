@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { loadWritingPost } from "@/lib/writing";
 import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
 
-// Same rationale as app/opengraph-image.tsx and app/preview/[name]/opengraph-image.tsx:
+// Same rationale as app/opengraph-image.tsx and app/components/[name]/opengraph-image.tsx:
 // Satori has no DOM, so these are the dark-mode token values from
 // app/globals.css, copied literally. Always renders dark.
 const TOKEN = {

@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { locate, type NavGroup, type NavItem, type NavKind } from "@/lib/nav-data";
 import { SIDEBAR_HIDDEN_KEY } from "@/lib/sidebar";
 import { McpPopup } from "./mcp-popup";
+import { SiteAuth } from "./site-auth";
 
 /**
  * The persistent left sidebar, and the one rule that keeps it from breaking
@@ -377,7 +378,11 @@ export function SiteShell({
           ))}
         </div>
 
-        <div className="flex items-center gap-3 border-t border-border px-4 py-3 font-mono text-[11px] text-muted">
+        {/* flex-wrap so a long signed-in name/email drops to its own line
+            (SiteAuth's `basis-full` below) instead of overflowing past the
+            sidebar's fixed width — it never affects Changelog/Writing/Connect
+            themselves, which stay on the first line at any name length. */}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-border px-4 py-3 font-mono text-[11px] text-muted">
           <Link
             href="/changelog"
             className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
@@ -396,6 +401,10 @@ export function SiteShell({
           >
             Connect
           </Link>
+          {/* Hydration-only — see site-auth.tsx for why it fetches nothing
+              until after paint and never flashes a different state than the
+              signed-out default already rendered here. */}
+          <SiteAuth />
         </div>
       </nav>
 

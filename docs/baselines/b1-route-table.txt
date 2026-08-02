@@ -1,0 +1,46 @@
+# B1 baseline — pre-Convex/auth route table
+# Captured at commit: 02016db1b3e99437abdeced9e6228c9a1779c1fa
+# (working tree dirty at capture time: package.json/package-lock.json modified
+#  to install next@16.2.11, convex@1.42.3, @convex-dev/auth@0.0.94 — not committed)
+# Next.js version: 16.2.11 (Turbopack)
+# Command: npm run build
+#
+# NOTE: this Next.js/Turbopack build no longer prints "Size / First Load JS"
+# columns in the route table (only Route / Revalidate / Expire). See the
+# "First Load JS for /" section below for what could be captured for C6 —
+# currently NOT AVAILABLE from this build output; flagging for team-lead.
+#
+# B1 scope: Next 16.2.11 + Turbopack emits no size column, so B1 compares
+# route/rendering-mode rows only (static vs SSG vs dynamic), not bundle size.
+# Bundle size is now tracked separately for C6 in c6-bundle-baseline.txt.
+#
+# IMPORTANT: if Next.js version changes again, re-capture this file — a
+# baseline from a different Next version is not a valid comparison target.
+
+Route (app)                           Revalidate  Expire
+┌ ○ /                                         1h      1y
+├ ○ /_not-found
+├ ○ /changelog
+├ ○ /connect
+├ ○ /icon.svg
+├ ○ /opengraph-image
+├ ƒ /preview/[name]
+├ ● /preview/[name]/embed
+├ ƒ /preview/-/opengraph-image
+├ ● /preview/[name]/play
+├ ○ /sitemap.xml
+├ ○ /writing
+├ ● /writing/[slug]                           1h      1y
+│ └ /writing/agent-readable-registry          1h      1y
+└ ƒ /writing/-/opengraph-image
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+
+## First Load JS for / (test C6, budget +10KB brotli over baseline)
+
+NOT PRINTED by this Next.js version's build output. No Size / First Load JS
+column exists in the table above. Tracked separately in
+c6-bundle-baseline.txt using the brotli sum of / page's JS from
+.next/build-manifest.json (App Router / Turbopack manifest shape).

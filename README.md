@@ -97,7 +97,7 @@ the repo rather than asserted here.
 
 ```bash
 npm install
-npm run dev            # / lists components, /preview/<name> renders one
+npm run dev            # / lists components, /components/<name> renders one
 npm run verify         # the gate, in another shell, with dev running
 ```
 
