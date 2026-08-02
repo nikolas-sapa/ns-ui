@@ -61,7 +61,14 @@ export function AccountProfileForm({
         body: JSON.stringify({ displayName, bio, url, tags }),
       });
       if (!res.ok) {
-        setError("Could not save. Check the URL and try again.");
+        const data = (await res.json().catch(() => ({}))) as { error?: string };
+        const message =
+          data.error === "display_name_not_allowed"
+            ? "That display name is not allowed."
+            : data.error === "display_owner_name_reserved"
+              ? "That name is reserved for the site owner."
+              : "Could not save. Check the URL and try again.";
+        setError(message);
         setPending(false);
         return;
       }
