@@ -72,9 +72,16 @@ export function SiteAuth() {
   const label = me.displayName || me.handle || "Account";
 
   return (
+    // `basis-full` drops this onto its own line under Changelog/Writing/Connect
+    // (the footer row is flex-wrap in site-shell.tsx) rather than fighting them
+    // for space on the first line — a long display name or email then only
+    // ever has to fit the sidebar's own width, not whatever's left after three
+    // fixed labels, so `min-w-0 flex-1 truncate` below is what actually clips
+    // it instead of a fixed max-width that still overflowed past that point.
     <Link
       href="/account"
-      className="flex items-center gap-1.5 rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+      title={label}
+      className="flex w-full basis-full items-center gap-1.5 rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
     >
       <span
         aria-hidden
@@ -82,7 +89,7 @@ export function SiteAuth() {
       >
         {label.charAt(0).toUpperCase()}
       </span>
-      <span className="max-w-[8rem] truncate">{label}</span>
+      <span className="min-w-0 flex-1 truncate">{label}</span>
     </Link>
   );
 }
