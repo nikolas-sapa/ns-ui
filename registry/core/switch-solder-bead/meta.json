@@ -13,6 +13,7 @@
     "animation",
     "accessibility"
   ],
+  "useWhen": "a two-sided allocation rather than a plain binary, since the ratio prop renders any split of mass between the left and right beads and the on/off case is just the extremes; pick switch-frost instead for an on/off setting with no intermediate values to express, or switch-eclipse for a light/dark theme toggle.",
   "autoplay": {
     "mode": "press",
     "target": "button[role=\"switch\"]",

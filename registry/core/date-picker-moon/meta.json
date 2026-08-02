@@ -4,6 +4,7 @@
   "description": "Masked date input whose popover calendar doubles as a moon-phase almanac: every day cell carries a canvas moon with a real synodic terminator, the field icon tracks the focused date's phase live, and committing runs an eclipse transit across the chosen numeral.",
   "collection": "core",
   "tags": ["date-picker", "input", "calendar", "canvas", "form", "moon", "keyboard", "micro-interaction"],
+  "useWhen": "a single calendar date where the lunar phase of the choice is genuinely relevant or worth the ceremony (launch dates, observation windows, editorial calendars), with a masked MM/DD/YYYY field for typists and a 42-cell grid for pointers; pick date-range-tape instead when a span and its duration are what is being decided rather than one day, or time-picker-sundial when the value is a time of day rather than a date.",
   "autoplay": {
     "mode": "press",
     "target": "button[aria-haspopup='grid']",

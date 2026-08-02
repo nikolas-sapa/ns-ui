@@ -12,6 +12,7 @@
     "submenu",
     "accessibility"
   ],
+  "useWhen": "a right-click context menu on a region where the open itself is the flourish, blades swinging out from a hinged spine and submenus unfolding from a blade's tip, with a visible trigger button so the affordance is reachable by keyboard; pick menu-nested-trays instead when the nesting goes deep enough that every ancestor level needs to stay on screen and one click away, or dropdown-drape when the panel hangs from a trigger in normal page flow rather than from a pointer position.",
   "gate": {
     "openBy": "[data-context-menu-unfold-trigger]",
     "expect": "[role=\"menu\"]"

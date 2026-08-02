@@ -10,6 +10,7 @@
     "canvas",
     "cursor"
   ],
+  "useWhen": "a full-bleed glyph field driven by a real source, an image or flowing noise, mapped through a luminance ramp with a cursor-proximity resolve, and the only one of these that can render an image you supply; pick background-ascii-plasma instead for a purely procedural interference field the pointer warps and relaxes, background-ascii-wake when the persistent decaying pointer trail is the effect, or ascii-engraving-contour when the glyphs should trace contour hatching over an evolving form.",
   "instruction": "A full-bleed canvas engine that maps a source (animated flowing noise by default, or an image) to a luminance-driven monochrome glyph grid with three modes: ASCII characters in a density ramp, 4x4 Bayer-matrix dithered pixels, and dot-matrix circles sized by brightness. The cursor brightens and resolves nearby cells with a Gaussian falloff and eased trailing. Direct-DOM rAF loop with no React state, theme-aware glyph color, single static frame under prefers-reduced-motion. Window resize is debounced (150ms) so dragging a window edge doesn't spam the grid recompute or (in image mode) refetch/redecode the source on every event; a generation counter discards any image decode superseded by a newer resize before it can write stale-sized data.",
   "dependencies": []
 }

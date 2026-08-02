@@ -4,6 +4,7 @@
   "description": "Pricing section rendered as a literal balance scale: two tier cards hang as pans from a canvas beam, billing toggle and feature checkmarks add weight, and beam-torque spring physics settles with one inertial overshoot to show which tier objectively outweighs the other.",
   "collection": "core",
   "tags": ["pricing", "canvas", "physics", "spring", "balance-scale", "section", "interactive", "ambient"],
+  "useWhen": "a two-tier pricing section where the comparison should be settled physically, the billing toggle and each feature adding real weight until the beam tips toward whichever tier outweighs the other; pick picker-pareto-frontier instead when the options carry numeric axes and dominance should be computed rather than felt, or grid-bento-dense when the section is an overview grid rather than a two-way comparison.",
   "autoplay": {
     "mode": "press",
     "target": "input[type=\"checkbox\"]",

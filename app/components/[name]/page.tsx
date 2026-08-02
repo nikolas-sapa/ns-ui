@@ -7,6 +7,7 @@ import { DemoFrame } from "@/app/_components/demo-frame";
 import { loadUseWhen } from "@/lib/use-when";
 import { loadComponentProps } from "@/lib/component-props";
 import { CopyButton } from "@/app/_components/copy-button";
+import { categoriesFor } from "@/lib/category-pages";
 import pkg from "@/package.json";
 
 // package.json's repository.url is the git clone URL (`...ns-ui.git`);
@@ -77,6 +78,11 @@ export default async function ComponentPage({
   // than rendered as if it were.
   const useWhen = item ? loadUseWhen()[item.name] : undefined;
   const props = item ? loadComponentProps(item.name) : null;
+  // Tags aren't category ids (most, like "hasp"/"svg", have no category) —
+  // this is the same categorize() call the sidebar and /categories/[id] use,
+  // rendered as its own link row rather than turning the tag chips into
+  // links two-thirds of which would have nowhere to go.
+  const categories = item ? categoriesFor(item.name, item.meta?.tags ?? []) : [];
 
   // Only fields populated from real registry/package data — nothing here is
   // invented to fill out the schema. Server-rendered (this is an async
@@ -160,8 +166,23 @@ export default async function ComponentPage({
             </div>
           </div>
 
-          {item.meta?.tags?.length ? (
+          {categories.length ? (
             <ul className="mt-6 flex flex-wrap gap-1.5">
+              {categories.map((c) => (
+                <li key={c.id}>
+                  <Link
+                    href={`/categories/${c.id}`}
+                    className="block rounded-sm border border-border px-1.5 py-px font-mono text-[10px] uppercase tracking-wider text-muted outline-none transition-colors hover:border-foreground hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+                  >
+                    {c.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+
+          {item.meta?.tags?.length ? (
+            <ul className="mt-3 flex flex-wrap gap-1.5">
               {item.meta.tags.map((tag) => (
                 <li
                   key={tag}

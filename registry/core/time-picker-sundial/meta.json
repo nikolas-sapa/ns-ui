@@ -13,6 +13,7 @@
     "accessibility",
     "sundial"
   ],
+  "useWhen": "a time of day set by dragging rather than typing, hour on the outer ring and 5-minute detents on the inner one, with the gnomon shadow lengthening past noon so AM and PM stay readable without a separate control; pick date-picker-moon instead when the value is a calendar date, or stepper-needle when the time is better entered as a bounded numeric field than found on a dial.",
   "autoplay": {
     "mode": "drag",
     "target": ".ns-gs-dial",

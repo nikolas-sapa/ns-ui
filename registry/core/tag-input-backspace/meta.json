@@ -11,6 +11,7 @@
     "undo",
     "micro-interaction"
   ],
+  "useWhen": "fast typists over-backspace and destroy tags they meant to keep, so an empty-field Backspace arms the last tag with a depleting 2s bar and only a second Backspace inside that window removes it; pick tag-input-pull instead when removal should cost a deliberate gesture at the chip itself rather than a keyboard grace period, or tag-input-cord when the moment worth designing is the commit rather than the removal.",
   "autoplay": {
     "mode": "pointer-path",
     "path": "orbit",

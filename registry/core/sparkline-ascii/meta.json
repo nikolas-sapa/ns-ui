@@ -10,6 +10,7 @@
     "keyboard",
     "sparkline"
   ],
+  "useWhen": "a trend line that has to render in a monospace character grid, survive being copied as text, and be walked column by column from the keyboard, which rules out canvas and SVG; pick sparkline-automaton instead when it is a KPI tile that can afford a canvas, or chart-bar-halftone when the values are separate categories rather than a series over time.",
   "card": {
     "focus": "[role=listbox]",
     "padding": 0.3

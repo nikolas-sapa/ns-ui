@@ -14,6 +14,7 @@
     "hover",
     "glow"
   ],
+  "useWhen": "a single CTA whose outline should read as live current, crackling on turbulence and opening a gap that tracks the cursor before discharging on press into two seconds of calm; pick border-chrome-ring instead when the border should be a heavy metal collar rather than a wire, or button-glass when the CTA should be the ordinary default rather than a showpiece.",
   "card": {
     "focus": "button",
     "padding": 1

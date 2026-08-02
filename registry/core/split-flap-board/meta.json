@@ -13,6 +13,7 @@
     "3d-transform",
     "solari"
   ],
+  "useWhen": "a short status string that changes occasionally and should clatter through its change like departure-board signage, one cell per character rippling left to right; pick counter-carry-ripple instead when the value is numeric and place value matters, or status-glyph-cadence when the status is one of a small fixed set better encoded as motion than spelled out.",
   "autoplay": {
     "mode": "none"
   },

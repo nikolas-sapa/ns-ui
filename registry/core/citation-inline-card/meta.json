@@ -12,6 +12,7 @@
     "accessibility",
     "typography"
   ],
+  "useWhen": "a claim needs attribution at the point it is made and one claim may carry several sources, so a superscript hostname pill opens a single card with a 1/N stepper instead of stacking one popover per source; pick citation-grounding-hatch instead when the question is how much of the whole answer is supported, since pills can only mark where a source was attached and say nothing about the spans with none.",
   "autoplay": {
     "mode": "press",
     "target": "button[aria-haspopup=\"dialog\"]"

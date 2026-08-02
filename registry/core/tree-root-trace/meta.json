@@ -4,6 +4,7 @@
   "description": "File/nav tree whose indent guides are a single living root system — an SVG path draws itself down from a parent's junction and elbows into each child row as it expands, retracting on collapse instead of toggling static border-left lines.",
   "collection": "core",
   "tags": ["tree", "navigation", "file-tree", "hierarchy", "svg", "keyboard", "sidebar"],
+  "useWhen": "the indent guides themselves should be alive, an SVG path growing down from each expanded parent and elbowing into every child row rather than static border-left rules toggling on; pick tree-box-drawing instead when the connectors should be monospace glyphs that reflow as siblings vanish, or tree-hinge-fold when the animated element is the child group swinging open rather than the guide drawing itself.",
   "autoplay": {
     "mode": "press",
     "target": "[data-taproot-row=\"components\"]",

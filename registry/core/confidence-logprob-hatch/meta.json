@@ -13,6 +13,7 @@
     "accessibility",
     "chat"
   ],
+  "useWhen": "the doubt on display is the model's own token-level uncertainty from a single generation's logprobs, and the useful detail is what it almost said instead, so hatch density under a token maps to its bucket and a popover names the alternatives; pick citation-grounding-hatch instead when the question is whether a retrieved source backs the sentence, which is a different failure from the model being unsure of a word.",
   "autoplay": {
     "mode": "pointer-path",
     "path": "sweep",

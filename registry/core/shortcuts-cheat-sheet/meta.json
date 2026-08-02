@@ -10,6 +10,7 @@
     "keyboard",
     "accessibility"
   ],
+  "useWhen": "an overlay listing keyboard shortcuts where pressing a listed combination should depress its keycap and be swallowed before the app behind can react, so the sheet doubles as a safe place to try them; pick tour-spotlight instead when the user needs walking around the interface rather than shown its bindings, or copy-field-crimp when the value is meant to be copied out rather than pressed.",
   "autoplay": {
     "mode": "press",
     "target": "[data-rehearse]",

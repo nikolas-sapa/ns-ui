@@ -9,7 +9,7 @@
     "mono",
     "micro-interaction"
   ],
-  "useWhen": "the classic scramble-to-decode reveal — monospace glyphs churn and lock into the final string left to right; use for a one-shot on-mount/on-trigger reveal, not a persistent cursor-driven effect.",
+  "useWhen": "the classic scramble-to-decode reveal — monospace glyphs churn and lock into the final string left to right; use for a one-shot on-mount/on-trigger reveal, not a persistent cursor-driven effect; pick streaming-markdown-caret instead when text is genuinely arriving over the wire rather than being revealed from a string already in hand, text-prism-split when the effect should ride the cursor continuously rather than fire once, or split-flap-board when the string changes repeatedly and each change should clatter.",
   "autoplay": {
     "mode": "press",
     "target": "button",

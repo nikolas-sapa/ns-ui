@@ -13,6 +13,7 @@
     "accessibility",
     "editor"
   ],
+  "useWhen": "an editor's save status where the session's accumulated saves should be visible as rotation rather than a text swap, and a failed save should hold a visibly broken pose until the next save resolves it; pick button-retry-backoff instead when the user has to press something to retry, or status-glyph-cadence when the states belong to an agent's work rather than to a document's save cycle.",
   "autoplay": {
     "mode": "press",
     "target": "button[aria-label=\"Autosave status\"]",

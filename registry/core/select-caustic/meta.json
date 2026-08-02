@@ -4,6 +4,7 @@
   "description": "Single-select whose frosted-glass trigger and listbox sit over drifting caustic light pools; hovering or arrow-keying an option bends the caustics toward that row so the highlight reads as pressed into the glass.",
   "collection": "core",
   "tags": ["select", "listbox", "form", "canvas", "glass", "keyboard", "micro-interaction"],
+  "useWhen": "a short flat single-select that must be a real form control with listbox keyboard semantics, where the highlight should read as pressed into glass rather than as a filled row; pick dropdown-drape instead when it is a nav menu rather than a form field, listbox-sticky-groups when the list is long and grouped, or search-winnow when the user needs to type to narrow it.",
   "autoplay": {
     "mode": "press",
     "target": "button[aria-haspopup=\"listbox\"]",

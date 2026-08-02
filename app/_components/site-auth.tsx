@@ -20,15 +20,20 @@ import Link from "next/link";
  * site-shell.tsx for why that placement, not this file, is what keeps the
  * count right.
  *
- * No avatar image: `/api/me` doesn't (yet) expose one, and the provider's
- * own `users.image` is a raw github/googleusercontent URL — rendering that
- * here would be a same-origin page shipping a third-party request on every
- * load, which is exactly what the eventual avatar proxy (non-goal #12)
- * exists to prevent. An initial-letter badge instead, until that proxy
- * exists.
+ * Avatar image: `/api/me` exposes only `hasImage` — never the provider's
+ * own `users.image` URL, which is a raw github/googleusercontent address.
+ * When `hasImage` is true the badge below points an `<img>` at
+ * `/api/avatar` (same-origin proxy, A26) instead of that URL; a page here
+ * never ships a third-party request. `AccountBadge` falls back to the
+ * initial-letter badge on load error or when there's no image at all.
  */
 type Me =
-  | { signedIn: true; handle: string | null; displayName: string | null }
+  | {
+      signedIn: true;
+      handle: string | null;
+      displayName: string | null;
+      hasImage: boolean;
+    }
   | { signedIn: false };
 
 function useMe(): Me | null {
@@ -50,6 +55,37 @@ function useMe(): Me | null {
   }, []);
 
   return me;
+}
+
+// Same box either way (16px, `size-4`) — the sidebar overflow bug fixed
+// earlier tonight was an element that could exceed its container, so the
+// `<img>` branch gets the exact same sizing classes as the badge it
+// replaces, never anything that can grow past them.
+function AccountBadge({ me }: { me: Extract<Me, { signedIn: true }> }) {
+  const [imgFailed, setImgFailed] = useState(false);
+  const label = me.displayName || me.handle || "Account";
+
+  if (me.hasImage && !imgFailed) {
+    return (
+      <img
+        src="/api/avatar"
+        alt=""
+        width={16}
+        height={16}
+        className="size-4 shrink-0 rounded-full object-cover"
+        onError={() => setImgFailed(true)}
+      />
+    );
+  }
+
+  return (
+    <span
+      aria-hidden
+      className="flex size-4 shrink-0 items-center justify-center rounded-full bg-accent/15 text-[9px] font-medium text-accent"
+    >
+      {label.charAt(0).toUpperCase()}
+    </span>
+  );
 }
 
 export function SiteAuth() {
@@ -83,12 +119,7 @@ export function SiteAuth() {
       title={label}
       className="flex w-full basis-full items-center gap-1.5 rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
     >
-      <span
-        aria-hidden
-        className="flex size-4 shrink-0 items-center justify-center rounded-full bg-accent/15 text-[9px] font-medium text-accent"
-      >
-        {label.charAt(0).toUpperCase()}
-      </span>
+      <AccountBadge me={me} />
       <span className="min-w-0 flex-1 truncate">{label}</span>
     </Link>
   );

@@ -1,5 +1,12 @@
 # shadcn registry directory PR — everything to submit
 
+> **SUBMITTED 2026-08-02:** https://github.com/shadcn-ui/ui/pull/11362
+> Branch `add-ns-ui-registry` on the fork `nikolas-sapa/ui`; single-entry diff to
+> `apps/v4/registry/directory.json`. Their `validate-registries.mts` was run locally
+> against the edited file and passed. The description shipped was shortened from the
+> draft below to match the length of neighbouring entries:
+> `"228 animated React components for Tailwind v4 and React 19, with a CLI and an MCP server."`
+
 ## Process (verified this session)
 
 The current mechanism, per <https://ui.shadcn.com/docs/registry/registry-index> and the live repo:

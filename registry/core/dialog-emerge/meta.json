@@ -10,6 +10,7 @@
     "flip",
     "accessibility"
   ],
+  "useWhen": "a modal that should visibly grow out of the control that opened it and return into it on close, built on the native dialog element so the focus trap, background inertness and Escape come from the platform; pick drawer-counterweight instead when the panel is a side sheet the user drags, or popover-pendulum when the content is non-modal and anchored rather than blocking.",
   "autoplay": {
     "mode": "press",
     "target": "[data-close]",

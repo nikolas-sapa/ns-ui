@@ -6,6 +6,69 @@ export default defineSchema({
   ...authTables, // users, authAccounts, authSessions, authRefreshTokens,
   // authVerificationCodes, authVerifiers, authRateLimits
 
+  // `authVerifiers` OVERRIDDEN below, right after the spread — same exact
+  // field definitions as `authTables.authVerifiers`
+  // (`@convex-dev/auth/dist/server/implementation/types.js:110-113`:
+  // `sessionId: v.optional(v.id("authSessions")), signature:
+  // v.optional(v.string())`, one index on `signature`), plus a second index
+  // on `sessionId`. Reasoning lives on `convex/account.ts`'s `deleteAccount`
+  // — short version: `authVerifiers` gains a row on every OAuth redirect
+  // (`mutations/verifier.js`) and only loses one on a *successful* callback
+  // (`mutations/userOAuth.js:28`), so an abandoned sign-in leaks a row
+  // forever (no expiry field, no cron in the library). Before this override,
+  // `deleteAccount` could only find a user's own verifiers with a full
+  // `.collect()` of the whole table, which has Convex's ~32k-scanned-
+  // document ceiling — meaning the table's own unbounded growth would
+  // eventually break account deletion for everyone, worst first for anyone
+  // trying to exercise a deletion right. This index makes that scan
+  // unnecessary.
+  //
+  // VERIFIED SAFE, not assumed: the library touches `authVerifiers` in
+  // exactly two places — `verifier.js`'s bare `ctx.db.insert(...)` (field
+  // shape only, no index involved) and `userOAuth.js:20-22`'s
+  // `.withIndex("signature", ...)` lookup. Both are grepped as the only
+  // hits for `"authVerifiers"` across `dist/server/oauth/*.js` and
+  // `dist/server/implementation/mutations/*.js`. Adding a second index
+  // alongside an unchanged `signature` index is additive; it does not touch
+  // the fields the library writes/reads or the one index name it already
+  // uses. Confirmed empirically too, not just by reading: exercised the
+  // library's own real mutations directly against precise-mosquito-491 with
+  // this override deployed — `auth:store` type `"verifier"` (insert),
+  // `"verifierSignature"` (patch), then `"userOAuth"` (the signature-indexed
+  // lookup + delete, plus a real `users`/`authAccounts` upsert) — all
+  // succeeded and produced a genuine signed-in-shaped account. See task
+  // report for the exact commands.
+  //
+  // Indexing an optional field: Convex allows it. A document with
+  // `sessionId` absent/undefined simply never matches `q.eq("sessionId",
+  // <a real id>)` on this index.
+  //
+  // WHAT WAS OBSERVED vs WHAT WAS INFERRED (team-lead asked this recorded
+  // explicitly, 2026-08-02, rather than left implicit): the EMPTY-match case
+  // was directly observed — querying `by_sessionId` for a `sessionId` with
+  // no matching row returned `[]`, and a real `deleteAccount` run against a
+  // genuinely-created account (via the `auth:store` flow above) correctly
+  // found and removed that account's own session-linked rows via this
+  // index (zero, in that instance, matching the fact that it had none — see
+  // task report). The POSITIVE-match case — a query for a `sessionId` that
+  // DOES have a linked verifier, returning exactly that row — was NOT
+  // independently observed: creating a session-linked verifier via CLI
+  // `--identity` and via an authenticated `ConvexHttpClient` both hit
+  // tooling limitations unrelated to this index (documented in the task
+  // report) rather than succeeding or failing on the index itself. This is
+  // inferred from Convex's documented, standard index-query semantics
+  // (an index lookup returns exactly the matching row when `sessionId` was
+  // written and matches), not from an observed positive match on this
+  // specific index. If `by_sessionId` ever appears to miss a row that
+  // should be there, re-derive this from scratch rather than trusting this
+  // note — it was never the thing actually watched succeed.
+  authVerifiers: defineTable({
+    sessionId: v.optional(v.id("authSessions")),
+    signature: v.optional(v.string()),
+  })
+    .index("signature", ["signature"])
+    .index("by_sessionId", ["sessionId"]),
+
   profiles: defineTable({
     userId: v.id("users"),
     handle: v.string(), // stored lowercased

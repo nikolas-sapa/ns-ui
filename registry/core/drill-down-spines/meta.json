@@ -4,6 +4,7 @@
   "description": "Drill-down navigation where every pushed level compresses into a slim clickable book spine instead of vanishing behind a back button, so the whole navigation history stands on a shelf beside you.",
   "collection": "core",
   "tags": ["navigation", "drill-down", "master-detail", "breadcrumb", "nav", "stack", "history"],
+  "useWhen": "full-page drill-down navigation through a record hierarchy where the levels behind you should stay on screen and clickable as compressed book spines instead of hiding behind a back button; pick menu-nested-trays instead when the nested content is genuinely a menu with menuitem semantics rather than real page content per level, or breadcrumb-overflow-menu when the trail is a text path above otherwise static content rather than the navigation mechanism itself.",
   "autoplay": {
     "mode": "press",
     "target": "[data-drill-row]",

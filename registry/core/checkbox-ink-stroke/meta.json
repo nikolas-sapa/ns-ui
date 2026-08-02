@@ -13,6 +13,7 @@
     "micro-interaction",
     "calligraphy"
   ],
+  "useWhen": "checked, unchecked and indeterminate must be three unmistakable states at small size, including the parent of a partially selected group, each a distinct pen gesture with its own entry, corner and taper rather than a glyph swap; pick checkbox-tally-notch instead when the group needs a running aggregate in its header, or checkbox-domino-run when the interaction being designed is select-all across a long list.",
   "autoplay": {
     "mode": "press",
     "target": "input[type=\"checkbox\"]",

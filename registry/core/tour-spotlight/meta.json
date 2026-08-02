@@ -13,6 +13,7 @@
     "overlay",
     "accessibility"
   ],
+  "useWhen": "a step-by-step onboarding tour where the path between targets should be visible, a beam sweeping from the old target to the new one as the mask hole morphs to match; pick shortcuts-cheat-sheet instead when the user is looking up keyboard bindings rather than being walked through the UI, or wizard-dovetail when the steps are a form the user fills in rather than a tour of things already on screen.",
   "card": {
     "focus": ".max-w-xl",
     "padding": 0.14

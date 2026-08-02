@@ -12,6 +12,7 @@
     "caret",
     "accessibility"
   ],
+  "useWhen": "free-form model output arriving as an ever-growing string where already-settled text must never re-render or shimmer, only the trailing unterminated edge carrying a caret until its markdown span closes; pick streaming-retraction instead when the model can take words back and the revision should stay inspectable, or skeleton-schema when the output is a structured object whose shape is known up front.",
   "autoplay": {
     "mode": "none"
   },

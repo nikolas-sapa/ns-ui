@@ -13,6 +13,7 @@
     "accessibility",
     "activity"
   ],
+  "useWhen": "showing that traffic is flowing across a topology, with routes that genuinely branch and a congestion state where packets visibly queue at a hub, as an ambient system-health read rather than a precise metric; pick timeline-agent-lanes instead when the moving things are agents holding turns rather than packets on edges, or meter-latency-capillary when the question is whether one specific wait is slower than usual.",
   "autoplay": {
     "mode": "pointer-path",
     "target": "circle[role=\"button\"]",

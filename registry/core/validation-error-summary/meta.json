@@ -12,6 +12,7 @@
     "checklist",
     "leader-line"
   ],
+  "useWhen": "a failed submit where the errors must gather into one focusable numbered list at the top instead of scattering as red borders down the form, each entry a real anchor that leader-lines to its field and strikes through as it is fixed; it is the wrong choice for validating one field live as it is typed (password-strength-tide does that for a password) and for gating a multi-step flow where the step itself should refuse to advance (wizard-canal-lock).",
   "autoplay": {
     "mode": "press",
     "target": "[data-punch-submit]",

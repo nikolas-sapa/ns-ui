@@ -64,6 +64,13 @@ export const config = {
   matcher: [
     "/api/auth(.*)",
     "/api/me",
+    // Same reason as /api/me: the route reads the session cookie via
+    // convexAuthNextjsToken(), so the middleware's cookie handling has to
+    // reach it. Adding a route here is never routine - it is the one list
+    // standing between the CDN-cached catalog and a Set-Cookie - but this is
+    // an auth-bearing API route that serves nothing anonymous, so it belongs
+    // on the same footing as /api/me rather than off the list.
+    "/api/avatar",
     "/api/saves",
     "/account(.*)",
     "/welcome",

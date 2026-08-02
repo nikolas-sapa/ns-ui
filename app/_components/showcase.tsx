@@ -507,6 +507,10 @@ export function Showcase({
             </a>
           </p>
           <p>
+            <a href="/categories" className={FOOTER_LINK}>
+              Categories
+            </a>{" "}
+            ·{" "}
             <a href="/changelog" className={FOOTER_LINK}>
               Changelog
             </a>{" "}

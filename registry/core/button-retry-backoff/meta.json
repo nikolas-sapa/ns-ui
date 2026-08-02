@@ -11,6 +11,7 @@
     "backoff",
     "network"
   ],
+  "useWhen": "a retry the user presses where the wait must be honest, the button genuinely disabled while a torsion arc winds on the real computed backoff timing and notches on every failure; pick button-cooldown-heat instead when the limit is driven by the user's own click rate rather than by a server's backoff schedule, or autosave-ratchet when the save retries itself and there is no button to press.",
   "autoplay": {
     "mode": "press",
     "target": "button[data-torsion-retry]",

@@ -18,6 +18,17 @@ export function AccountSignOut() {
       disabled={pending}
       onClick={async () => {
         setPending(true);
+        // Confirm server-side, on our own origin, BEFORE `signOut()` clears
+        // the cookies — the library's own sign-out proxy reports success
+        // whether or not it actually deleted the session, so this is the
+        // only place that can still tell the difference. Never blocks or
+        // conditions what follows: sign-out proceeds no matter what this
+        // reports or whether it fails outright.
+        try {
+          await fetch("/api/auth/confirm-signout", { method: "POST" });
+        } catch {
+          // Ignored — this is a diagnostic, not a precondition for sign-out.
+        }
         await signOut();
         // Signed-in state on this page is server-derived
         // (`isAuthenticatedNextjs()`), so a client-only sign-out needs a

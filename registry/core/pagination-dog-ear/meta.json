@@ -12,6 +12,7 @@
     "roving-tabindex",
     "book"
   ],
+  "useWhen": "paged results where the pages should read as a physical set the reader is moving through, hovering prev or next curling a corner to peek the destination number and every visited page keeping a permanent crease; pick breadcrumb-fold or breadcrumb-overflow-menu instead when the navigation is a hierarchy rather than a flat ordered sequence, since a dog-ear encodes visited-ness and adjacency and a hierarchy has neither.",
   "autoplay": {
     "mode": "none"
   },

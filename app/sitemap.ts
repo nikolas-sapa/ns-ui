@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import registry from "@/registry.json";
 import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
 import { loadWritingPosts } from "@/lib/writing";
+import { categoryPages } from "@/lib/category-pages";
 
 // Reversed 2026-08-01: the comment this replaced called /preview/[name] "an
 // internal embed target... not content worth a search engine crawling on its
@@ -32,6 +33,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${REGISTRY_ORIGIN}/connect`,
       lastModified: new Date(),
     },
+    {
+      url: `${REGISTRY_ORIGIN}/categories`,
+      lastModified: new Date(),
+    },
+    ...categoryPages().map((c) => ({
+      url: `${REGISTRY_ORIGIN}/categories/${c.id}`,
+      lastModified: new Date(),
+    })),
     ...registry.items.map((item) => ({
       url: `${REGISTRY_ORIGIN}/components/${item.name}`,
       lastModified: new Date(),

@@ -13,6 +13,7 @@
     "loading",
     "aria-live"
   ],
+  "useWhen": "pull-to-refresh where the gesture should hand real momentum to the request, the pull winding a flywheel through a rack and pinion that freewheels for the flight and brakes as new rows settle in; pick feed-escapement instead when the problem is metering arrivals into the feed rather than triggering the fetch, or swipe-row-detent when the gesture belongs to a single row rather than the whole list.",
   "autoplay": {
     "mode": "press",
     "target": "button[data-flywheel-refresh]",

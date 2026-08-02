@@ -8,7 +8,7 @@
     "glass",
     "micro-interaction"
   ],
-  "useWhen": "the default general-purpose button — translucent liquid-glass surface with hover lift and press states; use for any ordinary CTA, not a destructive action needing deliberate confirmation.",
+  "useWhen": "the default general-purpose button — translucent liquid-glass surface with hover lift and press states; use for any ordinary CTA, not a destructive action needing deliberate confirmation; pick button-retry-backoff instead when the action can fail and the wait between attempts must be honest, button-cooldown-heat when it is rate-limited by the user's own click rate, or confirm-hold-ink when the action is the destructive one this line rules out.",
   "instruction": "A liquid-glass button: translucent blurred surface, thin light border, subtle hover lift and press scale, visible keyboard focus ring, for a dark minimal (Geist-style) design system.",
   "dependencies": [],
   "card": {
