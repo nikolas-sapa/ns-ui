@@ -3,6 +3,21 @@
 Single source of truth for the /changelog page. Each entry is a `## vX.Y.Z - YYYY-MM-DD`
 heading, a `###` title, then one paragraph of body. Newest first.
 
+## v0.19.0 - 2026-08-02
+
+### Optional accounts, and component pages worth landing on
+
+You can now sign in with GitHub, Google or an emailed code and save components to your
+account. Signing in stays entirely optional: `npx shadcn add`, the CLI and the MCP server
+all work with no account, and the catalog is unchanged for anyone browsing without one.
+Component pages moved from `/preview/<slug>` to `/components/<slug>`, while the install
+URLs at `/r/<slug>.json` are untouched, so every install command anyone has already run
+still works. Those pages used to be the live demo and nothing else, and now carry the
+component's name, description, its own install command, a props table, dependencies and
+tags, which is also why all 228 components are in the sitemap for the first time with
+structured data behind them. Next.js moved from 16.2.10 to 16.2.11 for a security fix.
+Deleting an account is specified but not built yet.
+
 ## v0.18.0 - 2026-08-01
 
 ### Keyboard focus covers the card, and five smaller defects
