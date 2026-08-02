@@ -13,6 +13,7 @@
     "form",
     "accessibility"
   ],
+  "useWhen": "the consent document and its controls are the same surface, so toggling a sharing scope sweeps a redaction bar over exactly the tokens in the user's own record that the scope withholds, showing the consequence instead of describing it; pick redaction-hold-reveal instead when the redaction is static prose a reader peeks under rather than a live consequence of their own switches, or switch-frost when the toggles govern ordinary settings with nothing to redact.",
   "autoplay": {
     "mode": "press",
     "target": "[data-lampblack-switch=\"contact\"]",

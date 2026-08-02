@@ -13,6 +13,7 @@
     "accessibility",
     "input"
   ],
+  "useWhen": "moving many items between two lists at once, where the bulk move should be inspectable and interruptible rather than an opaque 'Move 14 items' button, since priming the siphon with a single drag flows the rest through a visible tube one at a time; pick checkbox-domino-run instead when the bulk action happens in place inside one list, or reorder-drag-wake when the items stay in one list and only their order changes.",
   "autoplay": {
     "mode": "drag",
     "from": [0.16, 0.42],

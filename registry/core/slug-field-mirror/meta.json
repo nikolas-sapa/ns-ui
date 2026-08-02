@@ -12,6 +12,7 @@
     "typography",
     "micro-interaction"
   ],
+  "useWhen": "one field must derive a second, still-editable value the user can watch being generated (title to URL slug, name to handle), stamped on every keystroke and visibly torn off the coupling the moment they edit the derived copy directly, restorable by a real Relink button; it is the wrong choice for a field that merely formats itself as you type (card-number-emboss) and for a read-only value the user copies out rather than edits (copy-field-crimp).",
   "autoplay": {
     "mode": "type",
     "text": "Weekend Trip Planner",
