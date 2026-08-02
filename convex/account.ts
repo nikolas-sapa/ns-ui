@@ -4,15 +4,16 @@
 // from `getAuthUserId(ctx)`, and there is no caller-supplied id — a caller
 // can only ever delete their own account.
 //
-// Eleven tables, not the spec's original ten (§6.7 lists ten; `saveRateLimits`
-// is keyed on `userId` and postdates that list — see its own comment in
-// schema.ts). Add a table keyed on `userId` in the future? Add it here AND
-// to A9's enumeration in the same change, per the comment on
-// `saveRateLimits` in schema.ts.
+// Ten tables reachable by `userId` (§6.7, corrected 2026-08-02 — the section
+// originally listed nine of these plus `authVerifiers`, and predated
+// `saveRateLimits`; see the comment on `saveRateLimits` in schema.ts), plus
+// `authVerifiers`, which is NOT one of the ten and is scoped by the caller's
+// own session ids instead — see the comment on that block below for why.
 //
 //   users, authAccounts, authSessions, authRefreshTokens,
-//   authVerificationCodes, authVerifiers, profiles, saves, collections,
+//   authVerificationCodes, profiles, saves, collections,
 //   collectionItems (via owning collections), saveRateLimits
+//   — plus authVerifiers, scoped by session, not userId
 //
 // `otpRequestLimits` stays OUT of this list on purpose (schema.ts's own
 // comment on that table) — it is keyed on an unrecoverable HMAC of an
@@ -48,15 +49,29 @@ export const deleteAccount = mutation({
     // verifiers are short-lived) so a full collect here, once, on the
     // account-deletion path, is the right tradeoff.
     //
-    // KNOWN GAP, flagged rather than hidden: a verifier with `sessionId ===
-    // undefined` (abandoned mid-OAuth-flow, no session ever created) is not
-    // attributable to any user by any field this table has — it is deleted
-    // by neither this mutation nor any other, for this user or anyone
-    // else's. It was never reachable from a userId in the first place. A9's
-    // "zero rows from every table, keyed on userId" cannot include this
-    // table by that literal reading, because this table has no userId-
-    // reachable key for the sessionless case. Reported to team-lead — see
-    // task report.
+    // KNOWN GAP, flagged rather than hidden, and RULED on by team-lead
+    // (2026-08-02): a verifier with `sessionId === undefined` (abandoned
+    // mid-OAuth-flow, no session ever created) is not attributable to any
+    // user by any field this table has — it is deleted by neither this
+    // mutation nor any other, for this user or anyone else's. It was never
+    // reachable from a userId in the first place, so it is out of scope for
+    // this mutation by construction, not a missed row. §6.7 and A9
+    // (docs/community-spec.md) were corrected to match: A9 now checks
+    // `authVerifiers` by the deleted account's former session ids, not by
+    // `userId`, and documents why the sessionless case can't be enumerated
+    // that way by any implementation.
+    //
+    // Checked against installed source, not assumed: nothing in
+    // `@convex-dev/auth` 0.0.94 ever sweeps a sessionless `authVerifiers`
+    // row either. The only deletion of a verifier anywhere in the library is
+    // `dist/server/implementation/mutations/userOAuth.js:28`, on a
+    // *successful* OAuth callback matching that verifier's signature — an
+    // abandoned redirect never reaches that line, the schema has no expiry
+    // field, and there's no cron. So an abandoned OAuth attempt leaves a
+    // permanent row. It holds no personal data (a random signature and,
+    // usually, nothing else) — a slow storage-count leak, not a privacy one.
+    // No sweeper is being added here; that's a separate, explicit decision
+    // per team-lead, not an implication of this comment.
     const allVerifiers = await ctx.db.query("authVerifiers").collect();
     for (const verifier of allVerifiers) {
       if (verifier.sessionId !== undefined && sessionIds.has(verifier.sessionId)) {

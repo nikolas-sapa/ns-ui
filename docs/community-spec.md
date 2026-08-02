@@ -257,7 +257,7 @@ Numeric criteria, before the implementation plan. Group C baselines come from
 | A5 | Email OTP request → deliver → submit | delivered **< 30s**, valid **10 minutes**, single-use (second submit `400`), max **5** requests per address per hour |
 | A6 | Save, reload `/preview/<slug>/play` | saved state within **500ms** of hydration, from exactly **1** `GET /api/saves` |
 | A7 | Save a slug absent from the registry | `400`, no doc written |
-| A9 | **Explicit-cascade audit.** After delete, query by `userId` across `users`, `authAccounts`, `authSessions`, `authRefreshTokens`, `authVerificationCodes`, `authVerifiers`, `profiles`, `saves`, `collections`, and `collectionItems` by owning collection | **0 docs from every one of the ten**, within **60s**. Enumerated because Convex has no cascade and a missed table is silent orphan data |
+| A9 | **Explicit-cascade audit.** After delete, query by `userId` across `users`, `authAccounts`, `authSessions`, `authRefreshTokens`, `authVerificationCodes`, `profiles`, `saves`, `collections`, `collectionItems` (by owning collection), and `saveRateLimits` — **plus `authVerifiers`, queried by the deleted account's former session ids, not by `userId`** (§6.7 — that table has no `userId`-reachable field; a verifier from an abandoned pre-session OAuth redirect is out of scope by construction, not a missed row) | **0 docs from every one of the ten `userId`-reachable tables, and 0 `authVerifiers` rows matching any of the account's former session ids**, within **60s**. Enumerated because Convex has no cascade and a missed table is silent orphan data |
 | A10 | Session cookie inspection, **on a preview deployment, not localhost** | name is `__Host-__convexAuthJWT`; `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`, **no `Domain`**. `cookies.js:21-22` gates the prefix and `Secure` on `isLocalhost`, so a local run tests the dev-mode cookie and proves nothing here — §10 |
 | A11 | **`window.localStorage` after sign-in, on every page** | **0 keys** containing `__convexAuthJWT` or `__convexAuthRefreshToken`. This is §6.1; it is the single most important test in this document |
 | A12 | Sign out | cookies cleared **and** the `authSessions` doc deleted; replaying the captured cookie → `401` |
@@ -578,14 +578,43 @@ constraint:
 ```
 deleteAccount → for the calling userId, delete docs from:
   saves, collectionItems (via owning collections), collections, profiles,
-  authVerifiers, authVerificationCodes, authRefreshTokens, authSessions,
+  saveRateLimits, authVerificationCodes, authRefreshTokens, authSessions,
   authAccounts, users
+  — plus authVerifiers, scoped by the caller's own session ids (not userId — see below)
 ```
 
+**Corrected against step 10's implementation, not the original draft above (superseded):** this list
+was originally nine tables plus `authVerifiers` making ten, and predated `saveRateLimits` (§7.4's A13
+rate-limit table, keyed on `userId`, added after this section was first written). It is now **ten
+tables reachable directly or transitively by `userId`** — `users`, `authAccounts`, `authSessions`,
+`authRefreshTokens` (via session), `authVerificationCodes` (via account), `profiles`, `saves`,
+`collections`, `collectionItems` (via owning collection), `saveRateLimits` — **plus `authVerifiers`,
+which is not one of the ten and is deleted by a different rule.**
+
+`authVerifiers` (§7's PKCE-verifier table) has no field reachable from `userId` at all: its schema
+(`node_modules/@convex-dev/auth`, `authTables`) indexes only on `signature`, and `sessionId` is
+`v.optional` — a verifier written mid-OAuth-redirect, before a session exists, is never attributable to
+any user, before deletion or after. `deleteAccount` deletes every `authVerifiers` row whose `sessionId`
+matches one of the caller's own sessions — the entire set that *is* reachable from this account — and
+a sessionless row is out of scope by construction, not by omission. It identifies nobody and links to
+nobody; there is nothing there to delete on the user's behalf.
+
+**Read from installed source, not assumed:** nothing in `@convex-dev/auth` 0.0.94 ever sweeps a
+sessionless `authVerifiers` row either. The library deletes a verifier in exactly one place —
+`dist/server/implementation/mutations/userOAuth.js:28`, on a *successful* OAuth callback that matches
+the verifier's signature. An abandoned redirect (closed tab, denied consent, network failure before the
+callback) never reaches that line, and the schema carries no expiry field and no cron prunes it. So an
+abandoned OAuth attempt leaves a permanent row — it holds no personal data (a random signature and,
+usually, nothing else), so this is a slow storage-count leak, not a privacy one, and is flagged here as
+a fact rather than fixed: **no sweeper is being built as part of this document.** If one is ever wanted,
+that is a separate, explicit decision, not an implication of this note.
+
 **A missed table is silent orphan data with no safety net**, which is why test A9 enumerates all ten
-and asserts zero from each rather than spot-checking. Add a new table, add it to both the mutation and
-A9 — put that line in a comment above the mutation. **`otpRequestLimits` is not one of the ten and is
-not added to this mutation** — it holds no `userId` to cascade from (§7.4), by design.
+`userId`-reachable tables and asserts zero from each rather than spot-checking, with `authVerifiers`
+checked separately by session id for the reason above. Add a new table keyed on `userId`, add it to
+both the mutation and A9 — put that line in a comment above the mutation. **`otpRequestLimits` is not
+one of the ten and is not added to this mutation** — it holds no `userId` to cascade from (§7.4), by
+design.
 
 Provider tokens are revoked where the provider supports it, deleted locally where it does not, and the
 privacy note says which. Resend's own logs follow Resend's retention, which we do not control; the
