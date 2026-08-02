@@ -13,6 +13,7 @@
     "panel",
     "nav"
   ],
+  "useWhen": "a side drawer the user drags, where the release position should decide the outcome through a visible counterweight rather than a hidden velocity threshold; pick dialog-emerge instead when the overlay is a centered modal opened by a control, or swipe-row-detent when the drag belongs to a list row rather than to a panel.",
   "autoplay": {
     "mode": "press",
     "target": "button[aria-label=\"Close\"]",

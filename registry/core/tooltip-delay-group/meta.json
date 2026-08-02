@@ -4,6 +4,7 @@
   "description": "A tooltip whose 1px border traces itself outward from the trigger's own edge and whose delay-group lets adjacent triggers hand off instantly with no re-animation, like a real menu bar.",
   "collection": "core",
   "tags": ["tooltip", "overlay", "hover", "delay-group", "placement", "portal", "accessibility", "keyboard"],
+  "useWhen": "short labels across a row of adjacent triggers where moving between them should hand off instantly with no re-animation, the way a real menu bar behaves, and the panel should read as extruded from the trigger's own edge; pick hover-card-dwell instead when the tooltip is a rich card and accidental opening is the failure being solved, or popover-pendulum when the content is a panel the user interacts with.",
   "autoplay": {
     "mode": "pointer-path",
     "path": "sweep",

@@ -13,6 +13,7 @@
     "micro-interaction",
     "accessibility"
   ],
+  "useWhen": "a dismissible notice the user may want back, since dismissing rips it off along a perforation and leaves a small permanent stub that reopens it rather than removing it with no route to recovery; pick toast-gravity-stack instead when the notice is transient and self-dismissing, or empty-state-dashed when the panel is a persistent empty region with a CTA rather than a notice.",
   "card": {
     "focus": ".max-w-md",
     "padding": 0.3

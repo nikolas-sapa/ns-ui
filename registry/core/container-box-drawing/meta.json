@@ -10,6 +10,7 @@
     "hover",
     "box-drawing"
   ],
+  "useWhen": "a panel whose border must be real box-drawing characters tiled to a whole character count, upgrading to double-line rules character by character on hover or focus, so the chrome lives in the same monospace grid as its content; pick surface-glass instead when the container should be a material surface rather than terminal chrome, or tree-box-drawing when the glyphs are drawing a hierarchy rather than a frame.",
   "card": {
     "focus": "[data-container-box-drawing]",
     "padding": 0.2

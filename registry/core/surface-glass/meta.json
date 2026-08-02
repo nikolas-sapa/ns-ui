@@ -9,6 +9,7 @@
     "card",
     "container"
   ],
+  "useWhen": "a container-level glass material, blur and saturation and grain and a specular rim, meant to sit over any moving or static backdrop and hold its own depth; pick button-glass instead when the glass belongs to a single control rather than a container, or container-box-drawing when the panel's chrome should be monospace characters rather than a material.",
   "instruction": "A liquid-glass container surface built as a layer stack: backdrop blur with saturation boost, tiled SVG noise grain blended over the fill, an inset specular rim lit from above, and a four-step graduated shadow ramp for depth, with children rendered above the glass. Works over any moving or static backdrop, both themes.",
   "dependencies": []
 }

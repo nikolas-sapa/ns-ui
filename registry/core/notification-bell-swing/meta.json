@@ -13,6 +13,7 @@
     "aria-live",
     "svg"
   ],
+  "useWhen": "a bell whose arrivals should accumulate physically, a burst reading as one cumulative swing rather than N separate dings, with opening the tray damping it to rest and draining the badge; pick badge-unread-tarnish instead when the pip should encode staleness rather than arrival impulse, or feed-escapement when the arrivals themselves need metering into the list one at a time.",
   "autoplay": {
     "mode": "none"
   },
