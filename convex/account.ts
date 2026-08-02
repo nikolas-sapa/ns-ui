@@ -40,14 +40,20 @@ export const deleteAccount = mutation({
       .collect();
     const sessionIds = new Set(sessions.map((s) => s._id));
 
-    // `authVerifiers` (PKCE verifiers) has no index usable from a userId or
-    // a session id — its only index is on `signature`, and `sessionId` is
-    // `v.optional` (a verifier created mid-OAuth-redirect, before a session
-    // exists, has none). One `.collect()` of the whole table plus an in-JS
-    // membership check is fewer database-I/O-metered scans (§7.4) than one
-    // unindexed `.filter()` query per session. This table is small (PKCE
-    // verifiers are short-lived) so a full collect here, once, on the
-    // account-deletion path, is the right tradeoff.
+    // `authVerifiers` (PKCE verifiers), via the `by_sessionId` index added in
+    // `schema.ts` (that file's comment on the override has the full
+    // reasoning and the verification performed before this was written this
+    // way). Originally a full `.collect()` of the whole table plus an in-JS
+    // membership check, because the library's own schema only indexes this
+    // table on `signature`. That was replaced: `authVerifiers` gains a row
+    // on every OAuth redirect and only loses one on a *successful* callback
+    // (verified against installed source — see `schema.ts`), so the table
+    // grows without bound from abandoned sign-ins specifically, and a
+    // `.collect()` here would eventually hit Convex's per-mutation
+    // scanned-document ceiling — meaning this account's OWN deletion could
+    // fail because of OTHER users' abandoned sign-in attempts. One indexed
+    // lookup per session (below) scans only this account's own rows,
+    // regardless of how large the table gets.
     //
     // KNOWN GAP, flagged rather than hidden, and RULED on by team-lead
     // (2026-08-02): a verifier with `sessionId === undefined` (abandoned
@@ -72,9 +78,12 @@ export const deleteAccount = mutation({
     // usually, nothing else) — a slow storage-count leak, not a privacy one.
     // No sweeper is being added here; that's a separate, explicit decision
     // per team-lead, not an implication of this comment.
-    const allVerifiers = await ctx.db.query("authVerifiers").collect();
-    for (const verifier of allVerifiers) {
-      if (verifier.sessionId !== undefined && sessionIds.has(verifier.sessionId)) {
+    for (const sessionId of sessionIds) {
+      const verifiers = await ctx.db
+        .query("authVerifiers")
+        .withIndex("by_sessionId", (q) => q.eq("sessionId", sessionId))
+        .collect();
+      for (const verifier of verifiers) {
         await ctx.db.delete(verifier._id);
       }
     }
