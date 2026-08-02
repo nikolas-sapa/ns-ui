@@ -14,6 +14,7 @@
     "micro-interaction",
     "aria-live"
   ],
+  "useWhen": "chips should feel hooked rather than glued so removing one visibly costs something, with all three routes (clicking the x, Backspace on a focused x, dragging the chip past 64px) funnelling through the same stretch-then-detach animation and the row exhaling closed toward the caret; pick tag-input-tear instead when the drag must be abortable mid-way with a visible tear progress, or tag-input-backspace when removal should stay a pure keyboard affair.",
   "autoplay": {
     "mode": "press",
     "target": "[data-tag-input-pull-remove]",

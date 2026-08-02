@@ -13,6 +13,7 @@
     "accessibility",
     "ai"
   ],
+  "useWhen": "coverage across the whole answer is the question, so a strip below the prose gives every sentence a mark and unsupported or contradicted spans are as visible as grounded ones, shape-encoded (solid bar, bare hairline, diagonal hatch) rather than colored; pick citation-grounding-gap instead when the gaps should be actionable and clicking one should fire a live retrieval, or citation-inline-card when per-claim attribution inside the text flow is all that is needed.",
   "autoplay": {
     "mode": "press",
     "target": "button[data-status=\"grounded\"]"

@@ -10,6 +10,7 @@
     "menu",
     "accessibility"
   ],
+  "useWhen": "a path deep enough that the middle levels must actually leave the row, where the guarantee needed is that no level becomes unreachable: the first crumb and the last two survive and everything between folds into one ellipsis menu still reachable by keyboard and assistive tech; pick breadcrumb-fold instead when every ancestor must stay individually visible and the trail can afford to compress each level to a sliver rather than hide any.",
   "autoplay": {
     "mode": "press",
     "target": "[data-ns-wp-more]",

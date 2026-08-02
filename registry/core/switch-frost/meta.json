@@ -11,6 +11,7 @@
     "micro-interaction",
     "form"
   ],
+  "useWhen": "an ordinary boolean setting in a settings list where the control should be an iOS-style pill with a soft decorative animation and no printed text legend; pick switch-eclipse instead when the switch specifically selects light versus dark, switch-solder-bead when the same control must also render partial ratios between its two sides, or consent-scope-redact when the toggles govern data scopes and switching one off should visibly redact the text it covers.",
   "autoplay": {
     "mode": "press",
     "target": "button[role=\"switch\"]",

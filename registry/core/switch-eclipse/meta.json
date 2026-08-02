@@ -12,6 +12,7 @@
     "drag",
     "accessibility"
   ],
+  "useWhen": "a light/dark theme toggle specifically, where the control's own artwork should say which mode it selects, a dark disc sliding across a bright one so both ends are self-evident without a printed legend or a swapped sun/moon icon; pick switch-frost for an ordinary iOS-pill boolean with a decorative animation, or switch-solder-bead when the value is a continuous allocation between two sides rather than a binary.",
   "autoplay": {
     "mode": "press",
     "target": "[role=\"switch\"]",
