@@ -13,6 +13,7 @@ import { AccountSignOut } from "@/app/_components/account-signout";
 import { AccountProfileForm } from "@/app/_components/account-profile-form";
 import { AccountDelete } from "@/app/_components/account-delete";
 import { AccountHandle } from "@/app/_components/account-handle";
+import { SavedLibrary } from "@/app/_components/saved-library";
 // Same source `app/page.tsx:28` reads to filter FEATURED against what
 // actually exists in the registry (§3's "slug gate") — not a second slug
 // list. A save whose slug no longer resolves degrades silently: it's
@@ -49,10 +50,10 @@ export default async function AccountPage() {
   }
 
   const token = await convexAuthNextjsToken();
-  const [viewer, profile, slugs] = await Promise.all([
+  const [viewer, profile, library] = await Promise.all([
     fetchQuery(api.users.viewer, {}, { token }),
     fetchQuery(api.profiles.mine, {}, { token }),
-    fetchQuery(api.saves.list, {}, { token }),
+    fetchQuery(api.saves.library, {}, { token }),
   ]);
 
   // No `profiles` row yet — §8.3's abandonment case: "a `users` row exists
@@ -82,12 +83,13 @@ export default async function AccountPage() {
     );
   }
 
-  const bookmarks = (slugs ?? [])
+  const slugs = library?.slugs ?? [];
+  const bookmarks = slugs
     .map((slug) => registryItems.get(slug))
     .filter((item): item is { name: string; title: string; description: string } => item !== undefined);
 
   return (
-    <main className="mx-auto flex max-w-md flex-col px-6 py-16">
+    <main className="mx-auto flex max-w-5xl flex-col px-6 py-16 sm:px-10">
       <h1 className="text-xl font-medium text-foreground">Account</h1>
       <div className="mt-6 space-y-1 text-sm">
         {viewer?.displayName ? (
@@ -121,28 +123,8 @@ export default async function AccountPage() {
       </section>
 
       <section className="mt-8">
-        <h2 className="text-sm font-medium text-foreground">
-          Saved ({bookmarks.length})
-        </h2>
-        {bookmarks.length === 0 ? (
-          <p className="mt-3 text-sm text-muted">Nothing saved yet.</p>
-        ) : (
-          <ul className="mt-3 space-y-2">
-            {bookmarks.map((item) => (
-              <li key={item.name}>
-                <Link
-                  href={`/preview/${item.name}`}
-                  className="block rounded-sm border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors hover:border-muted focus-visible:ring-2 focus-visible:ring-accent"
-                >
-                  <span className="font-medium">{item.title}</span>
-                  <span className="mt-0.5 block truncate text-xs text-muted">
-                    {item.description}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
+        <h2 className="text-sm font-medium text-foreground">Saved ({bookmarks.length})</h2>
+        <SavedLibrary items={bookmarks} slugs={slugs} initialFolders={library?.folders ?? []} />
       </section>
 
       <div className="mt-10 flex items-center justify-between">

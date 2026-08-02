@@ -120,6 +120,12 @@ Adding a component means creating a folder with
 [CONTRIBUTING.md](CONTRIBUTING.md), and [AGENTS.md](AGENTS.md) if you are an
 agent working inside this repo.
 
+## Saved library
+
+Signed-in users can bookmark components from the catalog. The account's Saved
+view shows live previews, full details, copyable install commands, and private
+folders for organizing saves. See [`docs/saved-library.md`](docs/saved-library.md).
+
 ## License
 
 MIT. See [LICENSE](LICENSE).
