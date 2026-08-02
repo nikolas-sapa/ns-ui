@@ -33,13 +33,17 @@ function jitter(i: number) {
   return r * 2 - 1; // -1..1
 }
 
-const STROKE_STYLE = (drawn: boolean, reduced: boolean) =>
+// delay folded into the shorthand itself, not a separate transitionDelay
+// longhand — mixing transition (shorthand) and transitionDelay (longhand)
+// for the same property gives React two owners for one CSS value and it
+// warns (and can genuinely race) on rerender.
+const STROKE_STYLE = (drawn: boolean, reduced: boolean, delayMs = 0) =>
   ({
     strokeDasharray: 1,
     strokeDashoffset: drawn ? 0 : 1,
     transition: reduced
       ? "none"
-      : `stroke-dashoffset 260ms ${drawn ? "cubic-bezier(0.22, 1, 0.36, 1)" : "cubic-bezier(0.55, 0, 0.55, 0.2)"}`,
+      : `stroke-dashoffset 260ms ${drawn ? "cubic-bezier(0.22, 1, 0.36, 1)" : "cubic-bezier(0.55, 0, 0.55, 0.2)"} ${delayMs}ms`,
   }) as const;
 
 function TallyCluster({
@@ -93,12 +97,9 @@ function TallyCluster({
           stroke="var(--foreground)"
           strokeWidth={p.idx % 5 === 4 ? 2 : 1.75}
           strokeLinecap="round"
-          style={{
-            ...STROKE_STYLE(p.idx < count, reduced),
-            // later strokes draw a beat after earlier ones when several
-            // arrive at once (e.g. defaultChecked mount)
-            transitionDelay: reduced ? "0ms" : `${(p.idx % 5) * 30}ms`,
-          }}
+          // later strokes draw a beat after earlier ones when several
+          // arrive at once (e.g. defaultChecked mount)
+          style={STROKE_STYLE(p.idx < count, reduced, reduced ? 0 : (p.idx % 5) * 30)}
         />
       ))}
     </svg>
@@ -136,10 +137,7 @@ function NotchMark({ checked, reduced }: { checked: boolean; reduced: boolean })
         stroke="var(--foreground)"
         strokeWidth={2}
         strokeLinecap="round"
-        style={{
-          ...STROKE_STYLE(checked, reduced),
-          transitionDelay: reduced ? "0ms" : checked ? "120ms" : "0ms",
-        }}
+        style={STROKE_STYLE(checked, reduced, reduced ? 0 : checked ? 120 : 0)}
       />
     </svg>
   );

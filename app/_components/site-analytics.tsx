@@ -28,7 +28,8 @@ export function SiteAnalytics() {
   const [top, setTop] = useState(false);
 
   useEffect(() => {
-    setTop(window.self === window.top);
+    const local = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
+    setTop(window.self === window.top && !local);
   }, []);
 
   if (!top) return null;

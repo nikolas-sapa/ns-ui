@@ -33,6 +33,7 @@
     "llms:build": "node scripts/build-llms.ts",
     "readme:build": "node scripts/build-readme.ts",
     "typecheck": "tsc --noEmit",
+    "test:name-policy": "node scripts/test-name-policy.ts",
     "verify": "node scripts/verify.ts",
     "index:build": "node scripts/build-index.ts",
     "pretypecheck": "npm run registry:build",

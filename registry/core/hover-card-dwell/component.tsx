@@ -83,7 +83,13 @@ export function IntentCoil({ href, children, preview, previewLabel, className = 
   const panelId = `ns-hover-card-dwell-${uid.replace(/:/g, "")}`;
 
   const triggerRef = useRef<HTMLAnchorElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
+  // span, not div: this trigger sits inline inside prose (a link preview
+  // mid-paragraph), and a block-level div here forces the browser to
+  // auto-close an ancestor <p> and re-parent everything after it — invalid
+  // nesting that silently restructures the DOM. The panel is already
+  // position:absolute, so the used display becomes block regardless of tag;
+  // span costs nothing visually and keeps this legal inside running text.
+  const panelRef = useRef<HTMLSpanElement>(null);
   const arcRef = useRef<SVGCircleElement>(null);
 
   const [open, setOpen] = useState(false);
@@ -374,7 +380,7 @@ export function IntentCoil({ href, children, preview, previewLabel, className = 
         />
       </svg>
       {open && (
-        <div
+        <span
           ref={panelRef}
           id={panelId}
           role="dialog"
@@ -390,7 +396,7 @@ export function IntentCoil({ href, children, preview, previewLabel, className = 
             st.hoverCard = false;
             scheduleMaybeClose();
           }}
-          onBlur={(e: ReactFocusEvent<HTMLDivElement>) => {
+          onBlur={(e: ReactFocusEvent<HTMLSpanElement>) => {
             const next = e.relatedTarget as Node | null;
             if (next && (panelRef.current?.contains(next) || triggerRef.current?.contains(next))) return;
             scheduleMaybeClose();
@@ -398,7 +404,7 @@ export function IntentCoil({ href, children, preview, previewLabel, className = 
           className="ns-hover-card-dwell-card absolute left-0 top-full z-50 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-md border border-border bg-background p-3 text-sm text-foreground shadow-sm"
         >
           {preview}
-        </div>
+        </span>
       )}
       <style>{`
 .ns-hover-card-dwell-card{animation:ns-coil-in 220ms cubic-bezier(0.34,1.56,0.64,1) both}

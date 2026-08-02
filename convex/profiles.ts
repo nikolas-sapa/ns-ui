@@ -6,8 +6,10 @@
 // construction). A15 calls each of these directly, unauthenticated.
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { mutation, query, type MutationCtx } from "./_generated/server";
+import type { Id } from "./_generated/dataModel";
 import { CATEGORIES } from "../lib/search-categories";
+import { validateProfileName } from "../lib/name-policy";
 
 const CATEGORY_IDS = new Set(CATEGORIES.map((c) => c.id));
 
@@ -51,6 +53,22 @@ const RESERVED_HANDLES = new Set([
 const HANDLE_PATTERN = /^[a-z0-9](-?[a-z0-9])*$/;
 const HANDLE_MIN_LENGTH = 2;
 const HANDLE_MAX_LENGTH = 30;
+
+function configuredOwnerEmails(): Set<string> {
+  return new Set(
+    (process.env.OWNER_EMAILS ?? "")
+      .split(",")
+      .map((email) => email.trim().toLocaleLowerCase("en-US"))
+      .filter(Boolean),
+  );
+}
+
+async function callerMayClaimOwnerName(ctx: MutationCtx, userId: Id<"users">) {
+  const configured = configuredOwnerEmails();
+  if (configured.size === 0) return false;
+  const user = await ctx.db.get(userId);
+  return user !== null && typeof user.email === "string" && configured.has(user.email.toLocaleLowerCase("en-US"));
+}
 
 type HandleValidationError =
   | "invalid_type"
@@ -147,6 +165,10 @@ export const claimHandle = mutation({
     if (formatError !== null) {
       throw new ConvexError({ code: formatError });
     }
+
+    const ownerClaim = await callerMayClaimOwnerName(ctx, userId);
+    const namePolicy = validateProfileName(handle, ownerClaim);
+    if (!namePolicy.ok) throw new ConvexError({ code: namePolicy.code });
 
     const existingProfile = await ctx.db
       .query("profiles")
@@ -246,6 +268,8 @@ export const updateProfile = mutation({
     // is the second onboarding step, reachable only after step 1.
     if (profile === null) throw new ConvexError({ code: "no_profile" });
 
+    const ownerClaim = await callerMayClaimOwnerName(ctx, userId);
+
     let normalizedDisplayName: string | null = null;
     if (displayName !== null) {
       const trimmed = displayName.trim();
@@ -253,6 +277,8 @@ export const updateProfile = mutation({
         if (codePointLength(trimmed) > 50) {
           throw new ConvexError({ code: "display_name_too_long" });
         }
+        const namePolicy = validateProfileName(trimmed, ownerClaim);
+        if (!namePolicy.ok) throw new ConvexError({ code: `display_${namePolicy.code}` });
         normalizedDisplayName = trimmed;
       }
     }

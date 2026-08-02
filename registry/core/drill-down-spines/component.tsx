@@ -301,6 +301,8 @@ export const SpineStack = forwardRef<SpineStackHandle, SpineStackProps>(function
                 onBlur={() => setFocusedId((f) => (f === level.id ? null : f))}
                 style={{
                   opacity: isActive ? 0 : 1,
+                  visibility: isActive ? "hidden" : "visible",
+                  pointerEvents: isActive ? "none" : undefined,
                   boxShadow: "inset -1px 0 0 0 color-mix(in srgb, var(--foreground) 22%, transparent)",
                 }}
                 className="ns-spine-face absolute inset-0 outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
@@ -330,7 +332,11 @@ export const SpineStack = forwardRef<SpineStackHandle, SpineStackProps>(function
                   swapping to a freshly-mounted pane. */}
               <div
                 inert={isActive ? undefined : true}
-                style={{ opacity: isActive ? 1 : 0, pointerEvents: isActive ? undefined : "none" }}
+                style={{
+                  opacity: isActive ? 1 : 0,
+                  visibility: isActive ? "visible" : "hidden",
+                  pointerEvents: isActive ? undefined : "none",
+                }}
                 className="ns-active-face absolute inset-0 overflow-auto bg-background"
               >
                 <div className="flex h-full flex-col p-4">

@@ -22,12 +22,16 @@ export default function IntentCoilDemo() {
           <IntentCoil
             href="https://docs.example.com/edge/streaming-parser"
             preview={
+              // span, not p: this preview is rendered inside a trigger that
+              // itself sits inline inside the paragraph below — a <p> here
+              // would nest inside that outer <p> and force the browser to
+              // auto-close it. "block" keeps the same layout without it.
               <>
-                <p className="font-medium text-foreground">Streaming parser</p>
-                <p className="mt-1 text-muted">
+                <span className="block font-medium text-foreground">Streaming parser</span>
+                <span className="mt-1 block text-muted">
                   Tokenizes incrementally as bytes arrive instead of buffering the full payload —
                   flat memory profile from 1KB to 50MB.
-                </p>
+                </span>
               </>
             }
           >
@@ -38,8 +42,8 @@ export default function IntentCoilDemo() {
             href="https://example.com/people/alex-rivera"
             preview={
               <>
-                <p className="font-medium text-foreground">Alex Rivera</p>
-                <p className="mt-1 text-muted">Staff engineer, edge runtime. Joined 2022.</p>
+                <span className="block font-medium text-foreground">Alex Rivera</span>
+                <span className="mt-1 block text-muted">Staff engineer, edge runtime. Joined 2022.</span>
               </>
             }
           >
@@ -51,11 +55,11 @@ export default function IntentCoilDemo() {
             previewLabel="Definition: request coalescing"
             preview={
               <>
-                <p className="font-medium text-foreground">Request coalescing</p>
-                <p className="mt-1 text-muted">
+                <span className="block font-medium text-foreground">Request coalescing</span>
+                <span className="mt-1 block text-muted">
                   Concurrent misses for the same key collapse into a single origin request; the
                   remaining waiters are served from the result once it lands.
-                </p>
+                </span>
               </>
             }
           >
