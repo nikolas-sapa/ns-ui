@@ -2,7 +2,7 @@
   "name": "ns-ui",
   "version": "0.1.0",
   "private": true,
-  "description": "A shadcn-compatible registry of 218 React components, each built around one interaction and gated by a Playwright screenshot suite.",
+  "description": "A shadcn-compatible registry of 228 React components, each built around one interaction and gated by a Playwright screenshot suite.",
   "keywords": [
     "shadcn",
     "registry",

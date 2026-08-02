@@ -15,7 +15,10 @@ next-env.d.ts
 # Not committed: two branches adding components would otherwise conflict in files
 # nobody hand-wrote. Regenerated automatically before dev/typecheck/verify/build,
 # and by Vercel on deploy.
-registry.json
+# Exception: registry.json IS committed (see below) — automated directory
+# discovery (ethan-krich/ui-registries) scans public repos for that filename.
+# The generator is deterministic (sorted meta.json sidecar scan, no
+# timestamps), so regenerating it produces no diff.
 registry/index.tsx
 lib/autoplay.generated.json
 lib/card-frame.generated.json

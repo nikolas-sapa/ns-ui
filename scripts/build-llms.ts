@@ -20,6 +20,13 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 // Single source of truth (lib/registry-origin.ts) — see that file for the
 // DNS-pending backstory and the one-line switch once it resolves.
 const HOMEPAGE = REGISTRY_ORIGIN;
+// Version and license come from root package.json / LICENSE, not a literal,
+// so a model reading this file can tell what it's redistributing without
+// grepping component prose for an incidental "licen" hit.
+const PACKAGE_VERSION = (
+  JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8")) as { version: string }
+).version;
+const GENERATED_ON = new Date().toISOString().slice(0, 10);
 
 // ---------------------------------------------------------------------------
 // Bracket-balanced text utilities — the only "parsing" this script does.
@@ -587,6 +594,8 @@ const CLI_LINE = PACKAGE_PUBLISHED.cliSearch
     "  subcommands are built but not yet published (0.1.1 on npm is install-only).";
 
 const HEADER = `# ns-ui — AI-agent quickstart
+
+License: MIT (SPDX: MIT) · Version: ${PACKAGE_VERSION} · Components: ${components.length} · Generated: ${GENERATED_ON}
 
 ns-ui is a personal React/Next.js component registry: ${components.length} self-contained,
 dependency-light components (a Geist-dark "core" set + a deliberately flashy "loud" set).
