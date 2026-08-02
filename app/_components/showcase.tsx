@@ -314,7 +314,10 @@ export function Showcase({
 
   const byName = useMemo(() => new Map(items.map((i) => [i.name, i])), [items]);
   const featuredItems = useMemo(
-    () => featured.map((name) => byName.get(name)).filter((i): i is ShowcaseEntry => !!i),
+    () => featured
+      .slice(0, 4)
+      .map((name) => byName.get(name))
+      .filter((i): i is ShowcaseEntry => !!i),
     [featured, byName],
   );
 
