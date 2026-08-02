@@ -43,28 +43,21 @@ import type { ActionCtx } from "./_generated/server";
 // compensate for a verified library defect in installed @convex-dev/auth
 // 0.0.94, not a spec requirement — do not "simplify" these back without
 // re-reading the three lines below on any auth version bump:
-//   1. node_modules/@convex-dev/auth/dist/server/implementation/mutations/
-//      verifyCodeAndSignIn.js:66-68 — the submitted code is looked up with
-//      `.withIndex("code", q => q.eq("code", codeHash)).unique()`, a lookup
-//      GLOBAL across the whole table, not scoped to the caller's email. The
-//      account signed in is `verificationCode.accountId`, unrelated to what
-//      the caller submitted as their email.
-//   2. Same file, line 22 — `identifier = args.params.email ?? args.params.phone`,
-//      the caller-supplied string, and the send-step rate limiter (below,
-//      `checkAndRecordOtpRequest`) is keyed on it. An attacker who varies the
-//      email per request gets a fresh bucket every time, so no send-side
-//      throttle ever engages against a fixed-target guessing loop.
-//   3. dist/server/implementation/signIn.js:42-48 (handleEmailAndPhoneProvider)
-//      calls verifyCodeAndSignIn WITHOUT a `verifier`; `verifier` is only ever
-//      populated for OAuth (mutations/userOAuth.js:43). So for email OTP both
-//      sides of `verificationCode.verifier !== verifier` are `undefined` and
-//      the check passes trivially — it does not gate anything here.
-// Net effect: any caller can hit the library's own public `signIn` action
-// directly (bypassing any wrapper we put in front of it) with an arbitrary
-// email and a guessed code, at an effectively unbounded rate, and a hit
-// against ANY outstanding code across ALL users signs the attacker in as
-// that user. There is no upstream fix in 0.0.94 (latest as of writing), so
-// the only lever we control is the codes themselves: more entropy, shorter
+// The defect is in the library's own email-OTP verification path, which is a
+// public action we cannot wrap or intercept — a caller reaches it directly,
+// so nothing we put in front of it helps. It is NOT reachable through OAuth.
+//
+// The mechanism is deliberately not written out here. This repository is
+// public, the defect is unfixed in 0.0.94 (latest as of writing), and it
+// affects every project using this library's email OTP, not just ours. The
+// full analysis, with file and line references and a reproduction, lives in
+// the private report at
+//   ~/MyVault/02-Projects/ns-ui/private/convex-auth-security-report.md
+// and goes to security@convex.dev. Once Convex ships a fix or declines, this
+// comment can carry the detail.
+//
+// What matters for anyone editing this file: the only lever we control is
+// the codes themselves, because we generate them. So: more entropy, shorter
 // life. See also generateNumericCode's call site in emailOTP below.
 const OTP_CODE_MAX_AGE_S = 5 * 60;
 
