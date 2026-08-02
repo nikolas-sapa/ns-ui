@@ -67,12 +67,9 @@ export function SavedLibrary({ items, slugs, initialFolders }: { items: Item[]; 
             return (
               <li key={item.name} className="overflow-hidden rounded-md border border-border bg-surface">
                 <Link href={`/components/${item.name}`} className="group block outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent">
-                  <div className="relative aspect-[16/10] overflow-hidden border-b border-border bg-background">
-                    <iframe src={`/preview/${item.name}/embed`} title={`${item.title} preview`} loading="lazy" tabIndex={-1} aria-hidden className="pointer-events-none absolute left-0 top-0 h-[900px] w-[1440px] origin-top-left scale-[0.28] border-0" />
-                    <div aria-hidden className="absolute inset-0 bg-foreground/0 transition-colors group-hover:bg-foreground/[0.04]" />
-                  </div>
-                  <div className="p-3">
-                    <h3 className="text-sm font-semibold tracking-tight text-foreground">{item.title}</h3>
+                  <div className="border-b border-border px-4 py-5 transition-colors group-hover:bg-foreground/[0.03]">
+                    <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">Saved component</p>
+                    <h3 className="mt-2 text-sm font-semibold tracking-tight text-foreground">{item.title}</h3>
                     <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted">{item.description}</p>
                   </div>
                 </Link>
