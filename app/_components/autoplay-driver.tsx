@@ -8,7 +8,7 @@ import type { AutoplaySpec } from "@/lib/autoplay";
  *
  * Mounted only for `?embed=1&autoplay=1` — i.e. only inside a landing-page
  * card. `/preview/<name>` with no params never renders this, so the honest
- * reference page receives no synthetic input at all.
+ * reference fixture receives no synthetic input at all.
  *
  * It synthesises the one kind of input the component is waiting for
  * (see `lib/autoplay.ts`) on a single rAF loop, and dispatches it *directly to

@@ -19,7 +19,7 @@ const FRAME_H = 900;
 const PRELOAD_MARGIN = 400;
 
 /**
- * A featured card is the honest reference page (`/preview/<name>`) run inside
+ * A featured card is the honest reference fixture (`/preview/<name>`) run inside
  * an iframe — autoplaying and inert, a live thumbnail rather than something to
  * drive in place. Genuine interaction lives one click away at the playground
  * (`/preview/<name>/play`): the whole card is a real link there (same

@@ -86,7 +86,7 @@ const collectionPageJsonLd = {
     itemListElement: registry.items.map((item, i) => ({
       "@type": "ListItem",
       position: i + 1,
-      url: `${REGISTRY_ORIGIN}/preview/${item.name}`,
+      url: `${REGISTRY_ORIGIN}/components/${item.name}`,
       name: item.title,
     })),
   },

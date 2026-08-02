@@ -16,7 +16,7 @@
  *
  * The card then scales and translates so that element's box (plus padding)
  * fills the card, instead of showing the whole viewport. Nothing about the
- * component, the demo or the direct `/preview/<name>` link changes — this is
+ * component, the demo or the direct `/components/<name>` link changes — this is
  * purely how the *thumbnail* is cropped.
  *
  * Like autoplay this is site-only metadata: it never reaches `registry.json`,

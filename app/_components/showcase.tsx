@@ -37,7 +37,7 @@ const FOOTER_LINK =
 /**
  * How many demos may run at once.
  *
- * Each preview is now an iframe onto /preview/<name>, so a mount costs a page
+ * Each preview is now an iframe onto /preview/<name>/embed, so a mount costs a page
  * load as well as CPU. The cap is nonetheless pinned by the "never evict a
  * visible card" invariant, not by budget: measured on-screen card counts are
  * 6 at 1440x900 (2 columns) and 12 at 2560x1080 (3 columns inside the

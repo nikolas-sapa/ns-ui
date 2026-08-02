@@ -14,16 +14,21 @@ import { ThemeToggle } from "@/app/_components/theme-toggle";
  * The playground: a dedicated, fully-interactive page per component, one
  * click away from a catalog card.
  *
- * Deliberately does NOT touch `/preview/[name]` (the sibling route). That
- * bare route is what `scripts/verify.ts` and `scripts/record.ts` screenshot
- * directly — they emulate both themes, then grab "the first visible
- * interactive element" for hover/press/focus assertions. Adding a header,
- * theme toggle, copy button etc. to that same document would hand the gate a
+ * Deliberately does NOT frame `/components/[name]` — that route now carries
+ * full site chrome (sidebar, nav) so it's indexable, which is exactly what
+ * this iframe cannot have: `scripts/verify.ts` and `scripts/record.ts`
+ * screenshot `/preview/[name]` (the bare verification fixture, kept
+ * chrome-less and noindex specifically for that gate — see its own docblock),
+ * and they emulate both themes, then grab "the first visible interactive
+ * element" for hover/press/focus assertions. A header, theme toggle, copy
+ * button etc. — or a sidebar — in that same document would hand the gate a
  * different "first interactive element" than the component's own, breaking
- * the hover/focus diff for every component that has one. So this page frames
- * the honest reference page in an iframe instead — `?embed=1&interactive=1`
- * already exists for exactly this (the featured-card thumbnail uses the same
- * URL once activated) and is provably unchanged by this file.
+ * the hover/focus diff for every component that has one (measured, once
+ * `/components/[name]` gained chrome: the locator resolved to the sidebar's
+ * own wordmark link). So this page frames the bare fixture in an iframe
+ * instead — `?embed=1&interactive=1` already exists for exactly this (the
+ * featured-card thumbnail uses the same URL once activated) and is provably
+ * unchanged by this file.
  *
  * Layout rule: the component is the page. Everything the visitor might read
  * *after* deciding they like it — the full description, when to reach for it,
@@ -127,9 +132,10 @@ export default async function PlaygroundPage({
       </header>
 
       {/* Fully interactive, uninert, not autoplaying — `interactive=1` on the
-          honest reference page. Full real viewport (no scale transform), so
-          this is exactly what the direct link renders, breathing room and
-          all — the thing the owner asked to "play with". */}
+          bare verification fixture. Full real viewport (no scale transform,
+          no site chrome), so this is exactly the component's own render,
+          breathing room and all — the thing the owner asked to "play
+          with" — without the sidebar that `/components/[name]` now carries. */}
       <div className="mt-5 flex-1 overflow-hidden rounded-md border border-border bg-surface">
         <iframe
           key={name}

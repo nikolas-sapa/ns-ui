@@ -150,7 +150,7 @@ export default async function Image({
             color: TOKEN.muted,
           }}
         >
-          {REGISTRY_ORIGIN.replace(/^https?:\/\//, "")}/preview/{name}
+          {REGISTRY_ORIGIN.replace(/^https?:\/\//, "")}/components/{name}
         </div>
       </div>
     ),

@@ -9,12 +9,15 @@ import { loadWritingPosts } from "@/lib/writing";
 // cards. They are now the only pages describing each of the 228 components
 // in the registry, and excluding them was why `site:design.helpmarq.com`
 // returned nothing — this omission wasn't an oversight when it was written,
-// the reasoning underneath it changed. Only the honest reference route
-// (`/preview/<name>`) is listed; `/preview/<name>/embed` duplicates that
-// page's DOM verbatim for iframe use and is marked noindex instead (see
-// app/preview/[name]/embed/page.tsx), and `/preview/<name>/play` is left out
-// of the sitemap per the owner's instruction even though it is not a
-// duplicate — see that route's own docblock.
+// the reasoning underneath it changed. Only the honest reference route is
+// listed, and as of the same day it is `/components/<name>` rather than
+// `/preview/<name>` — the latter is now the verification/recording fixture
+// (bare, noindex, canonical back to `/components/<name>` — see
+// app/preview/[name]/page.tsx), not a redirect. `/preview/<name>/embed`
+// duplicates the fixture's DOM verbatim for iframe use and is marked noindex
+// instead (see app/preview/[name]/embed/page.tsx), and `/preview/<name>/play`
+// is left out of the sitemap per the owner's instruction even though it is
+// not a duplicate — see that route's own docblock.
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
@@ -30,7 +33,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
     },
     ...registry.items.map((item) => ({
-      url: `${REGISTRY_ORIGIN}/preview/${item.name}`,
+      url: `${REGISTRY_ORIGIN}/components/${item.name}`,
       lastModified: new Date(),
     })),
     {
