@@ -8,7 +8,7 @@ import {
 } from "@convex-dev/auth/nextjs/server";
 import { fetchQuery } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
-import { AccountSignIn } from "@/app/_components/account-signin";
+import { AccountSignedOut } from "@/app/_components/account-signed-out";
 import { AccountSignOut } from "@/app/_components/account-signout";
 import { AccountProfileForm } from "@/app/_components/account-profile-form";
 import { AccountDelete } from "@/app/_components/account-delete";
@@ -36,17 +36,7 @@ export default async function AccountPage() {
   const authed = await isAuthenticatedNextjs();
 
   if (!authed) {
-    return (
-      <main className="mx-auto flex max-w-md flex-col items-center px-6 py-16">
-        <h1 className="text-xl font-medium text-foreground">Sign in</h1>
-        <p className="mt-2 text-center text-sm text-muted">
-          GitHub, Google, or an email code.
-        </p>
-        <div className="mt-8">
-          <AccountSignIn />
-        </div>
-      </main>
-    );
+    return <AccountSignedOut />;
   }
 
   const token = await convexAuthNextjsToken();
