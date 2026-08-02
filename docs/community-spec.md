@@ -605,9 +605,40 @@ sessionless `authVerifiers` row either. The library deletes a verifier in exactl
 the verifier's signature. An abandoned redirect (closed tab, denied consent, network failure before the
 callback) never reaches that line, and the schema carries no expiry field and no cron prunes it. So an
 abandoned OAuth attempt leaves a permanent row — it holds no personal data (a random signature and,
-usually, nothing else), so this is a slow storage-count leak, not a privacy one, and is flagged here as
-a fact rather than fixed: **no sweeper is being built as part of this document.** If one is ever wanted,
-that is a separate, explicit decision, not an implication of this note.
+usually, nothing else), so on its own this is a slow storage-count leak, not a privacy one.
+
+**Superseded 2026-08-02: it is not "on its own."** `deleteAccount`'s per-account `authVerifiers`
+lookup originally had to scan the whole table (only index was `signature`, unreachable from either
+`userId` or `sessionId`), so an unbounded table fed fastest by *failed* sign-ins was on a collision
+course with Convex's own ~32,000-scanned-document ceiling per mutation — meaning the first thing to
+break as this leak accumulated would have been account deletion, for the user least able to tolerate
+it, and it would have passed every test run before that row count was reached. Two changes, in order:
+
+1. `convex/schema.ts` overrides `authTables.authVerifiers` with its exact original field
+   definitions plus one added index, `by_sessionId`. Verified safe by reading every line in the
+   installed package that touches this table (two: an insert with no index involved, and the
+   `signature`-indexed lookup in `userOAuth.js`, both untouched by an additive index) and by
+   exercising a complete real sign-in against the deployment with the override live — `verifier` →
+   `verifierSignature` → `userOAuth` (the `signature`-indexed lookup, unchanged) → `verifyCodeAndSignIn`
+   — which produced a genuine session, refresh token and signed JWT. `deleteAccount` now looks up a
+   caller's own verifiers by `by_sessionId`, one indexed query per session, never a table scan.
+2. **No sweeper. Considered, prototyped, and deliberately not shipped.** An hourly
+   `internalMutation` deleting rows older than an hour was approved and built before change 1
+   landed, then withdrawn once it had, because the index changed what the problem was. The danger
+   was never the leak on its own: it was an unbounded table sitting inside a single-transaction
+   scan in the deletion path. Change 1 severs that coupling, and `deleteAccount` is now bounded
+   regardless of how large the table grows.
+
+   What remains is storage growth alone — rows of two optional fields holding a random signature
+   and nothing personal, on the order of a million abandoned sign-ins before it registers against
+   the tier. That does not justify a scheduled job, its own failure surface, and a recurring thing
+   to keep working. Revisit only if the row count ever becomes interesting for another reason.
+
+   Recorded because the reasoning is easy to lose: the growth is real and permanent, and choosing
+   not to fix it is a judgement about consequence, not a claim that it stops.
+
+`deleteAccount`'s existing, already-verified `.collect()`s on every other table are unchanged —
+this fix is scoped to the one table that was actually unbounded.
 
 **A missed table is silent orphan data with no safety net**, which is why test A9 enumerates all ten
 `userId`-reachable tables and asserts zero from each rather than spot-checking, with `authVerifiers`
