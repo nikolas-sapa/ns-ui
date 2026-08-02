@@ -171,6 +171,15 @@ export function FeaturedCard({
         ref={boxRef}
         className="relative aspect-[16/10] w-full overflow-hidden rounded-md border border-border bg-surface transition-colors duration-200 group-hover:border-muted/60 group-has-[a:focus-visible]/focus:ring-2 group-has-[a:focus-visible]/focus:ring-accent group-has-[a:focus-visible]/focus:ring-offset-2 group-has-[a:focus-visible]/focus:ring-offset-background motion-reduce:transition-none"
       >
+        <div className="absolute right-3 top-3 z-20">
+          <SaveButton
+            name={entry.name}
+            saved={saved}
+            authenticated={authenticated}
+            pending={savePending}
+            onToggle={onToggleSave}
+          />
+        </div>
         {/* Flat, non-gradient hover wash — same as preview-card.tsx. Sits
             above the poster/video/iframe layers (explicit z-index), so it
             reads on all three regardless of which is currently showing. */}
@@ -307,13 +316,6 @@ export function FeaturedCard({
           value={installCommand}
           label={`Copy install command for ${entry.name}`}
           className="relative z-20"
-        />
-        <SaveButton
-          name={entry.name}
-          saved={saved}
-          authenticated={authenticated}
-          pending={savePending}
-          onToggle={onToggleSave}
         />
       </div>
     </article>

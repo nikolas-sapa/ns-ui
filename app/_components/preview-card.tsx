@@ -250,6 +250,15 @@ export function PreviewCard({
             }}
           />
         ) : null}
+        <div className="absolute right-3 top-3 z-20">
+          <SaveButton
+            name={entry.name}
+            saved={saved}
+            authenticated={authenticated}
+            pending={savePending}
+            onToggle={onToggleSave}
+          />
+        </div>
       </div>
 
       <div className="mt-3 flex items-start gap-3">
@@ -305,13 +314,6 @@ export function PreviewCard({
           value={installCommand}
           label={`Copy install command for ${entry.name}`}
           className="relative z-20 -mt-1"
-        />
-        <SaveButton
-          name={entry.name}
-          saved={saved}
-          authenticated={authenticated}
-          pending={savePending}
-          onToggle={onToggleSave}
         />
       </div>
     </article>

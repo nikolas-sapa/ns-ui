@@ -32,9 +32,18 @@ export function SaveButton({
         }
         onToggle(name);
       }}
-      className="relative z-20 shrink-0 rounded-sm border border-border bg-surface px-2.5 py-1.5 text-xs text-foreground outline-none transition-colors hover:border-muted focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-wait disabled:opacity-60"
+      className="relative z-20 inline-flex size-8 shrink-0 items-center justify-center rounded-sm border border-border bg-surface/90 text-foreground outline-none backdrop-blur-sm transition-colors hover:border-muted focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-wait disabled:opacity-60"
     >
-      {pending ? "Saving…" : label}
+      <BookmarkIcon filled={saved} />
+      <span className="sr-only">{pending ? "Saving…" : label}</span>
     </button>
+  );
+}
+
+function BookmarkIcon({ filled }: { filled: boolean }) {
+  return (
+    <svg viewBox="0 0 16 16" className="size-4" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.25" aria-hidden>
+      <path d="M4 2.25h8a.75.75 0 0 1 .75.75v10.25L8 10.75l-4.75 2.5V3a.75.75 0 0 1 .75-.75Z" strokeLinejoin="round" />
+    </svg>
   );
 }
