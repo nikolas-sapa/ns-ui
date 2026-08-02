@@ -24,10 +24,17 @@ const registry = JSON.parse(readFileSync(join(ROOT, "registry.json"), "utf8"));
 const only = process.argv[2];
 const items: Item[] = registry.items.filter((i: Item) => !only || i.name === only);
 
-const failures: string[] = [];
-const fail = (msg: string) => {
-  failures.push(msg);
-  console.error(`  ✗ ${msg}`);
+// Structured so the final summary can print one consistent shape per problem
+// regardless of category — the old free-text messages had two different
+// shapes ("name: ..." vs "name [theme]: ...") and a grep tuned for one
+// silently dropped the other. variant is null when the problem isn't
+// theme-specific (meta.json checks, a11y, the dark/light-identical check).
+type Failure = { component: string; variant: "dark" | "light" | null; category: string; message: string };
+const failures: Failure[] = [];
+const fail = (component: string, variant: "dark" | "light" | null, category: string, message: string) => {
+  failures.push({ component, variant, category, message });
+  const tag = variant ? ` [${variant}]` : "";
+  console.error(`  ✗ ${component}${tag}: ${category} — ${message}`);
 };
 
 function componentDir(name: string): string {
@@ -57,21 +64,21 @@ type Meta = { gate?: Gate } & Record<string, unknown>;
 function checkMeta(name: string, dir: string): Meta {
   const metaPath = join(dir, "meta.json");
   if (!existsSync(metaPath)) {
-    fail(`${name}: meta.json missing`);
+    fail(name, null, "meta", "meta.json missing");
     return {};
   }
   const meta: Meta = JSON.parse(readFileSync(metaPath, "utf8"));
   for (const field of META_FIELDS) {
     if (meta[field] === undefined || meta[field] === "") {
-      fail(`${name}: meta.json missing field "${field}"`);
+      fail(name, null, "meta", `missing field "${field}"`);
     }
   }
   if (Array.isArray(meta.tags) && meta.tags.length === 0) {
-    fail(`${name}: meta.json tags empty`);
+    fail(name, null, "meta", "tags empty");
   }
   if (meta.gate) {
     const { openBy, expect } = meta.gate;
-    if (!openBy || !expect) fail(`${name}: meta.json "gate" needs both "openBy" and "expect" selectors`);
+    if (!openBy || !expect) fail(name, null, "meta", `"gate" needs both "openBy" and "expect" selectors`);
   }
   return meta;
 }
@@ -207,7 +214,7 @@ async function verifyComponent(page: Page, name: string, dir: string, meta: Meta
           return r.width > 0 && r.height > 0;
         }).length
     );
-    if (visibleCount < 2) fail(`${name} [${theme}]: blank render (${visibleCount} visible elements)`);
+    if (visibleCount < 2) fail(name, theme, "blank-render", `${visibleCount} visible elements`);
 
     await shoot(page, dir, theme, "default");
 
@@ -215,7 +222,7 @@ async function verifyComponent(page: Page, name: string, dir: string, meta: Meta
     // than reporting every real violation twice.
     if (theme === "dark") {
       const { controls, problems } = await page.evaluate(auditA11y);
-      for (const p of problems) fail(`${name}: a11y — ${p}`);
+      for (const p of problems) fail(name, null, "a11y", p);
 
       // Page-level keyboard reachability: if the component renders any control
       // at all, Tab from a blurred body must land on something. A display-only
@@ -231,7 +238,7 @@ async function verifyComponent(page: Page, name: string, dir: string, meta: Meta
           });
         }
         if (!landed) {
-          fail(`${name}: a11y — ${controls} interactive control(s) but nothing is reachable by Tab`);
+          fail(name, null, "a11y", `${controls} interactive control(s) but nothing is reachable by Tab`);
         }
         await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
       }
@@ -250,7 +257,7 @@ async function verifyComponent(page: Page, name: string, dir: string, meta: Meta
       const [def, hov] = ["default", "hover"].map((s) =>
         readFileSync(join(dir, "screenshots", `${theme}-${s}.png`))
       );
-      if (def.equals(hov)) fail(`${name} [${theme}]: hover state identical to default`);
+      if (def.equals(hov)) fail(name, theme, "hover", "state identical to default");
 
       await page.mouse.down();
       await page.waitForTimeout(250);
@@ -282,7 +289,7 @@ async function verifyComponent(page: Page, name: string, dir: string, meta: Meta
         readFileSync(join(dir, "screenshots", `${theme}-${s}.png`))
       );
       if (focused && unf.equals(foc)) {
-        fail(`${name} [${theme}]: keyboard focus renders no visible focus state`);
+        fail(name, theme, "focus", "keyboard focus renders no visible focus state");
       }
       await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
       await page.keyboard.press("Escape");
@@ -317,14 +324,14 @@ async function verifyComponent(page: Page, name: string, dir: string, meta: Meta
       }
       const opener = page.locator(gate.openBy).first();
       if (!(await opener.count())) {
-        fail(`${name} [${theme}]: gate.openBy "${gate.openBy}" matches nothing`);
+        fail(name, theme, "gate", `openBy "${gate.openBy}" matches nothing`);
       } else {
         await opener.click({ timeout: 5000 });
         await page.waitForTimeout(700);
         await page.mouse.move(0, 0);
         const hit = await page.evaluate(hittable, gate.expect);
         if (!hit.ok) {
-          fail(`${name} [${theme}]: gate.expect "${gate.expect}" not visible — ${hit.why}`);
+          fail(name, theme, "gate", `expect "${gate.expect}" not visible — ${hit.why}`);
         }
         await shoot(page, dir, theme, "open");
         await page.keyboard.press("Escape");
@@ -333,7 +340,7 @@ async function verifyComponent(page: Page, name: string, dir: string, meta: Meta
     }
 
     if (consoleErrors.length) {
-      fail(`${name} [${theme}]: console errors — ${consoleErrors.join(" | ")}`);
+      fail(name, theme, "console", consoleErrors.join(" | "));
     }
     page.off("console", onConsole);
     page.off("pageerror", onPageError);
@@ -349,8 +356,31 @@ async function verifyComponent(page: Page, name: string, dir: string, meta: Meta
     readFileSync(join(dir, "screenshots", `${t}-default.png`))
   );
   if (darkShot.equals(lightShot)) {
-    fail(`${name}: dark and light screenshots are identical — theme never switched`);
+    fail(name, null, "theme", "dark and light screenshots are identical — theme never switched");
   }
+}
+
+// Zero components verified is never a pass. A typo'd component-name argument
+// filters to an empty list, and until now that silently printed "0 problems"
+// and exited 0 — a mistyped name reading as a clean gate, worse than tonight's
+// miss because it prints nothing wrong at all. Fail loud, name the argument
+// that caused it, and skip the browser launch entirely since there is nothing
+// to verify.
+if (items.length === 0) {
+  console.log("");
+  console.log("==================== VERIFY SUMMARY ====================");
+  console.log(`components verified: 0`);
+  console.log(`problems found: 0`);
+  console.log(`components with problems: 0`);
+  if (only) {
+    console.log(`FAIL ${only} [none] filter: no registry item matches "${only}" — check for a typo`);
+    console.log(`GATE: ERROR no components matched "${only}"`);
+  } else {
+    console.log(`FAIL (none) [none] registry: registry.json has no items`);
+    console.log(`GATE: ERROR nothing verified — registry is empty`);
+  }
+  console.log("==========================================================");
+  process.exit(1);
 }
 
 const browser = await chromium.launch();
@@ -368,7 +398,7 @@ for (const item of items) {
     await verifyComponent(page, item.name, dir, meta);
   } catch (err) {
     const first = err instanceof Error ? err.message.split("\n")[0] : String(err);
-    failures.push(`${item.name}: verify threw — ${first}`);
+    fail(item.name, null, "threw", first);
     try {
       await page.goto("about:blank");
     } catch {
@@ -379,9 +409,27 @@ for (const item of items) {
 
 await browser.close();
 
-if (failures.length) {
-  console.error(`\nverify FAILED: ${failures.length} problem(s)`);
-  for (const f of failures) console.error(`  - ${f}`);
-  process.exit(1);
+// Final summary: printed last, one fixed shape per problem line, so it
+// survives any amount of preceding noise (a failing run's console errors and
+// DOM diffs can run hundreds of lines) and is grep-safe with a single
+// pattern regardless of category or whether a theme variant is involved —
+// unlike the per-problem console.error above, whose two message shapes
+// ("name: ..." vs "name [theme]: ...") let a pattern tuned for one silently
+// drop the other.
+const distinctComponents = new Set(failures.map((f) => f.component)).size;
+console.log("");
+console.log("==================== VERIFY SUMMARY ====================");
+console.log(`components verified: ${items.length}`);
+console.log(`problems found: ${failures.length}`);
+console.log(`components with problems: ${distinctComponents}`);
+for (const f of failures) {
+  console.log(`FAIL ${f.component} [${f.variant ?? "none"}] ${f.category}: ${f.message}`);
 }
-console.log(`\nverify passed: ${items.length} component(s), screenshots written`);
+console.log(
+  failures.length
+    ? `GATE: FAIL ${failures.length} problems in ${distinctComponents} components`
+    : "GATE: PASS"
+);
+console.log("==========================================================");
+
+if (failures.length) process.exit(1);
