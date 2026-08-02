@@ -76,8 +76,21 @@ export const deleteAccount = mutation({
     // field, and there's no cron. So an abandoned OAuth attempt leaves a
     // permanent row. It holds no personal data (a random signature and,
     // usually, nothing else) — a slow storage-count leak, not a privacy one.
-    // No sweeper is being added here; that's a separate, explicit decision
-    // per team-lead, not an implication of this comment.
+    //
+    // DECIDED, not left open (team-lead, 2026-08-02, superseding an earlier
+    // approval of a cron): no sweeper. A cron was briefly built and then
+    // deliberately removed once the `by_sessionId` index above shipped — the
+    // index severed the one property that made the leak dangerous rather
+    // than merely untidy: an unbounded table sitting inside a single-
+    // transaction scan in THIS deletion path. With the index in place,
+    // `deleteAccount` cannot hit Convex's scan ceiling regardless of table
+    // size, so what remains is storage growth alone — rows of two optional
+    // fields, no personal data, on the order of 100 bytes each. Reaching a
+    // scale where that matters against the 0.5 GB free-tier storage line
+    // (§7.4) would take on the order of a million abandoned sign-ins, which
+    // is not worth a scheduled job, new machinery, and a recurring failure
+    // surface to pre-empt today. If that number ever gets interesting, it
+    // will be visible in storage metrics for other reasons by then.
     for (const sessionId of sessionIds) {
       const verifiers = await ctx.db
         .query("authVerifiers")

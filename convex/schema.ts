@@ -41,9 +41,27 @@ export default defineSchema({
   //
   // Indexing an optional field: Convex allows it. A document with
   // `sessionId` absent/undefined simply never matches `q.eq("sessionId",
-  // <a real id>)` on this index — confirmed by seeding one session-linked
-  // and one sessionless verifier and querying `by_sessionId` for the real
-  // session id, which returned only the session-linked row.
+  // <a real id>)` on this index.
+  //
+  // WHAT WAS OBSERVED vs WHAT WAS INFERRED (team-lead asked this recorded
+  // explicitly, 2026-08-02, rather than left implicit): the EMPTY-match case
+  // was directly observed — querying `by_sessionId` for a `sessionId` with
+  // no matching row returned `[]`, and a real `deleteAccount` run against a
+  // genuinely-created account (via the `auth:store` flow above) correctly
+  // found and removed that account's own session-linked rows via this
+  // index (zero, in that instance, matching the fact that it had none — see
+  // task report). The POSITIVE-match case — a query for a `sessionId` that
+  // DOES have a linked verifier, returning exactly that row — was NOT
+  // independently observed: creating a session-linked verifier via CLI
+  // `--identity` and via an authenticated `ConvexHttpClient` both hit
+  // tooling limitations unrelated to this index (documented in the task
+  // report) rather than succeeding or failing on the index itself. This is
+  // inferred from Convex's documented, standard index-query semantics
+  // (an index lookup returns exactly the matching row when `sessionId` was
+  // written and matches), not from an observed positive match on this
+  // specific index. If `by_sessionId` ever appears to miss a row that
+  // should be there, re-derive this from scratch rather than trusting this
+  // note — it was never the thing actually watched succeed.
   authVerifiers: defineTable({
     sessionId: v.optional(v.id("authSessions")),
     signature: v.optional(v.string()),
