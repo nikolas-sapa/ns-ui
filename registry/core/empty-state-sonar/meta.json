@@ -13,6 +13,7 @@
     "aria-live",
     "sonar"
   ],
+  "useWhen": "one region has to carry empty, probing and loaded in a single vocabulary rather than handing an illustration off to an unrelated skeleton, since a null items prop makes it ping and arriving results interrupt the ping and grow rows outward from it; pick empty-state-dashed instead when the region is only ever empty and the CTA is the point, or skeleton-develop when a fetch is definitely in flight and there is no empty case to represent.",
   "autoplay": {
     "mode": "none"
   },

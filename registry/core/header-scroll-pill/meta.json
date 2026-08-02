@@ -12,6 +12,7 @@
     "pill",
     "chrome"
   ],
+  "useWhen": "the header's silhouette itself should change on scroll, a full bar collapsing into a small centered floating pill with a rolling active-section label, and the component already owns scroll-linked section tracking with hysteresis and a fast-scroll-up overshoot; pick nav-condense-rail instead when the bar should keep its full-width shape and only change density.",
   "autoplay": {
     "mode": "scroll",
     "range": [0, 0.85]

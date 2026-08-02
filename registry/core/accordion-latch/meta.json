@@ -12,6 +12,7 @@
     "roving-tabindex",
     "svg"
   ],
+  "useWhen": "collapsible sections whose closed state should look mechanically shut, a hasp hooked over a staple that swings off before the lid lifts, for FAQ blocks and settings groups a user opens deliberately one at a time; it is the wrong choice for content that folds itself as it arrives (timeline-reasoning-rail streams agent steps and collapses completed ones on its own) and for expanding a single clamped block of prose in place (truncation-word-count).",
   "autoplay": {
     "mode": "none"
   },

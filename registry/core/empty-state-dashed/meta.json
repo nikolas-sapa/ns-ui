@@ -10,6 +10,7 @@
     "cta",
     "micro-interaction"
   ],
+  "useWhen": "a plain empty region with one CTA and no repeatable item shape worth previewing, where a single drifting dashed boundary that contracts toward the button on hover is the whole idea; pick empty-state-pegboard when the future rows have a known card geometry to teach, empty-state-survey when a table or chart layout should be pre-taught in place, or empty-state-sonar when the same region must also cover probing and results arriving.",
   "autoplay": {
     "mode": "pointer-path",
     "path": "sweep",

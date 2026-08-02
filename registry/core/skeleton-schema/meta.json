@@ -14,6 +14,7 @@
     "definition-list",
     "developer-tools"
   ],
+  "useWhen": "a structured LLM response whose shape is known before its values are (a tool call's arguments, a JSON-mode answer), so every field and array slot renders as a dashed mold the instant the schema resolves and sets solid as values pour in; pick skeleton-develop instead when the incoming content is prose or layout with no schema to project, or streaming-markdown-caret when the output is free text arriving character by character.",
   "autoplay": {
     "mode": "none"
   },

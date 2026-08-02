@@ -12,6 +12,7 @@
     "list",
     "activity"
   ],
+  "useWhen": "one surface has to answer both what this agent can do and what it is doing right now, so the idle capability chips and the live invocations are the same elements, with a recency underline decaying over 60 seconds; pick timeline-agent-lanes instead when the axis is which of several agents holds the turn, or approval-inline-diff when a human must inspect and edit a proposed call's arguments before it runs.",
   "autoplay": {
     "mode": "none"
   },

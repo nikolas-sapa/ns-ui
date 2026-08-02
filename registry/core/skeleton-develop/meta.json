@@ -10,6 +10,7 @@
     "transition",
     "css-animation"
   ],
+  "useWhen": "content that already exists and is mid-fetch, stood in for by declared placeholder blocks that develop into the real thing, with the children never mounted until data arrives; pick empty-state-dashed or empty-state-pegboard instead when nothing is on its way and the region is empty because the user has not acted yet, or skeleton-schema when the incoming payload has a declared schema whose fields can be molded individually.",
   "autoplay": {
     "mode": "none"
   },
