@@ -15,7 +15,7 @@
     "hold": 1500,
     "period": 4200
   },
-  "useWhen": "a press-and-hold DESTRUCTIVE confirm — ink pours up from the press point and recoils if released early; use whenever an action needs deliberate confirm-hold-ink, not a plain single-tap button.",
+  "useWhen": "a press-and-hold DESTRUCTIVE confirm — ink pours up from the press point and recoils if released early; use whenever an action needs deliberate confirm-hold-ink, not a plain single-tap button; pick confirm-slide-shatter instead when the gate should be distance dragged rather than time held, confirm-dial-align when it should be fine-motor accuracy, or confirm-hold-wax for the same hold grammar staged as signing rather than deleting.",
   "instruction": "A destructive-action button requiring press-and-hold, rendered as a canvas ink fill: holding pours monochrome ink (foreground token) up from the press point with a live rippling meniscus edge, subtle grain, and a pressure microshake as it nears the top; the label inverts over the ink via a difference blend. Releasing early (including pointercancel or blur) recoils the ink with an elastic damped spring; when the fill completes, the button pops with one spring overshoot and the label swaps. Works with pointer and keyboard (hold Space/Enter). Canvas colors derive from computed CSS tokens and re-derive on theme change; the rAF loop sleeps when settled and pauses offscreen; prefers-reduced-motion still holds-to-confirm but renders a plain clean fill with no waves, grain, shake, or pop.",
   "dependencies": [],
   "card": {
