@@ -144,6 +144,12 @@ export const SpineStack = forwardRef<SpineStackHandle, SpineStackProps>(function
 
   const activeId = poppingTarget ?? stack[stack.length - 1].id;
 
+  useEffect(() => {
+    if (hoveredId === activeId || (hoveredId && !stack.some((level) => level.id === hoveredId))) {
+      setHoveredId(null);
+    }
+  }, [activeId, hoveredId, stack]);
+
   // focus + onNavigate fire once the *committed* top settles (immediately on
   // push, or once a pop's cascade actually truncates the stack) — never
   // mid-cascade, and never on first mount.
