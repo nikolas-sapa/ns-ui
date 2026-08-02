@@ -384,6 +384,12 @@ export function SiteShell({
             themselves, which stay on the first line at any name length. */}
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-border px-4 py-3 font-mono text-[11px] text-muted">
           <Link
+            href="/categories"
+            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            Categories
+          </Link>
+          <Link
             href="/changelog"
             className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
           >
