@@ -1,5 +1,6 @@
-// `/api/me` — `{ signedIn, handle, displayName }` or `{ signedIn: false }`
-// (§5 step 8, §7.3). Dynamic, on our own origin, in the `proxy.ts` allowlist
+// `/api/me` — `{ signedIn, handle, displayName, hasImage }` or
+// `{ signedIn: false }` (§5 step 8, §7.3). Dynamic, on our own origin, in
+// the `proxy.ts` allowlist
 // so the middleware's cookie handling reaches it — never on a cached
 // catalog route.
 //
@@ -28,5 +29,10 @@ export async function GET() {
     signedIn: true,
     handle: viewer.handle,
     displayName: viewer.displayName,
+    // Never the provider URL itself (that's exactly what `/api/avatar`
+    // exists to keep off the client) — just whether one exists, so the
+    // client knows whether to point an <img> at `/api/avatar` or fall
+    // back to the initial-letter badge.
+    hasImage: viewer.image !== null,
   });
 }

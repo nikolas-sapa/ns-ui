@@ -1,12 +1,30 @@
 # MCP directory submissions — `@nikolas.sapa/ns-ui-mcp`
 
-`@nikolas.sapa/ns-ui-mcp` is published on npm (latest `0.1.0`, MIT, repo `github.com/nikolas-sapa/ns-ui`, verified this session) and is currently listed on **none** of the three directories below. Each has a different submission mechanism; details and a ready-to-paste listing follow.
+Status: **none of the three directories could be submitted by an agent.** All three
+require either a human-completed web form, a payment, or a browser OAuth login. The
+ready-to-paste copy is below; the owner has to do the final click in each case.
+
+Verified (re-checked 2026-08-02): `@nikolas.sapa/ns-ui-mcp` is published on npm at
+`0.1.0`, MIT, repo `github.com/nikolas-sapa/ns-ui`, homepage `https://design.helpmarq.com`.
+The registry it serves has 228 items and the repo is public and MIT.
+
+---
 
 ## Shared listing copy (reuse across all three)
 
 - **Name:** ns-ui MCP
 - **Package:** `@nikolas.sapa/ns-ui-mcp`
-- **One-line description:** MCP server for the ns-ui component registry — search 228 crafted React/Tailwind components, get real source and prop signatures, install commands, and the design-token conventions they are built against, as tools an agent can call mid-session.
+- **Short description (one line):**
+  > First-party MCP server for the ns-ui component registry — search 228 React/Tailwind
+  > components, get real source, prop signatures, install commands, and the design-token
+  > conventions they are built against.
+- **Longer description:**
+  > ns-ui MCP exposes the ns-ui component registry (228 MIT-licensed React components for
+  > Tailwind v4 and React 19) as MCP tools. It is shipped by the registry itself, not a
+  > third-party wrapper. Beyond search and lookup, `get_conventions()` returns the design-token
+  > contract every component is built against, so an agent can write surrounding code that
+  > matches the components instead of fighting them. The catalog ships as a static snapshot,
+  > so it works offline once installed. Requires Node 18+.
 - **Install / config (stdio):**
   ```json
   {
@@ -18,57 +36,113 @@
   Claude Code one-liner: `claude mcp add ns-ui -- npx -y @nikolas.sapa/ns-ui-mcp`
 - **Homepage:** https://design.helpmarq.com — connect page: https://design.helpmarq.com/connect
 - **Repo:** https://github.com/nikolas-sapa/ns-ui (directory `mcp/`)
-- **Tools it exposes** (from `mcp/README.md`, verified this session):
-  - `search_components(query, category?, collection?, limit?)` — full-text search over name, title, description, tags and "use when" guidance; returns compact results.
-  - `get_component(name)` — full detail for one component: description, "use when", tags, condensed prop signature, dependencies, exact install command, and the real `component.tsx` source.
+- **License:** MIT
+- **Category:** Design (or Developer Tools, depending on the directory's taxonomy)
+- **Tools:**
+  - `search_components(query, category?, collection?, limit?)` — full-text search over name,
+    title, description, tags and "use when" guidance; compact results.
+  - `get_component(name)` — full detail: description, "use when", tags, condensed prop
+    signature, dependencies, install command, and the real `component.tsx` source.
   - `list_categories()` — the 12-category taxonomy with counts, plus per-collection counts.
   - `install_command(name)` — the exact `npx shadcn add …` string for one component.
-  - `get_conventions()` — the token contract every component is built against (`--background`/`--foreground`/`--muted`/`--border`/`--accent`, Tailwind v4, React 19, `prefers-reduced-motion`, accessibility baseline).
-- **What it is (state factually, no comparative claims):** a first-party MCP server for a 228-component shadcn-compatible registry. It ships a static snapshot of the catalog (components + categories + parsed prop signatures + source), so it works offline once installed. The distinguishing tool is `get_conventions()` — it returns the design-token contract, so an agent can write code that matches the registry's components rather than fighting them. That is what makes it more than a fetch-the-catalog wrapper. Requires Node 18+.
-
-> Note on positioning: I have deliberately **not** included the "almost no registry ships its own first-party MCP server" line. That was prior research, not verified this session, and an unverifiable comparative superlative is exactly the kind of claim a directory reviewer strikes. The factual "first-party MCP server for this registry, with a conventions tool" stands on its own.
-
----
-
-## 1. mcpservers.org — web form (verified this session)
-
-**Mechanism:** a web form at <https://mcpservers.org/submit>. Not a GitHub PR. (Older docs mention editing `mcp_server_market.json` in `chatmcpclient/mcp_server_market` — that is a different, chatmcp-specific catalog, not the mcpservers.org submit flow. The live submit page is a form.)
-
-**Fields the form asks for** (read live this session):
-- Server Name → `ns-ui MCP`
-- Short Description → the one-line description above
-- Link (GitHub or docs) → `https://github.com/nikolas-sapa/ns-ui` (or the connect page)
-- Category → **Design** (closest fit from their dropdown: Development / Productivity / Database / Search / Web Scraping / File System / Version Control / Communication / Cloud Service / Cloud Storage / Marketing / Finance / Design / Memory / Other)
-- Contact Email → owner's email
-
-**Cost:** free listing. Optional "Premium Submit" is a **$39 one-time review fee** for faster approval, an official badge, and a dofollow link. Owner's call; the free tier is sufficient to get listed.
+  - `get_conventions()` — the token contract (`--background`/`--foreground`/`--muted`/
+    `--border`/`--accent`, Tailwind v4, React 19, `prefers-reduced-motion`, accessibility
+    baseline).
 
 ---
 
-## 2. mcpmarket.com — GitHub-repo submission form (verified this session)
+## 1. mcpservers.org — web form, free, **needs the owner**
 
-**Mechanism:** a form at <https://mcpmarket.com/submit> that takes **the full GitHub repository URL** and nothing else on the page itself; they review it for inclusion and email when it goes live. Submit `https://github.com/nikolas-sapa/ns-ui`.
+**URL:** https://mcpservers.org/submit — a web form, not a GitHub PR. Re-verified live.
 
-- Their page advertises a paid placement option ("put your listing in front of our 1M+ monthly visitors", "one-time payment, no subscription", stated avg. 4–6 week listing time). The "1M+ monthly visitors" figure is **their** marketing claim, not independently verified.
-- A commonly-cited tip is that adding a `LAUNCHGUIDE.md` to the repo lets the submit form auto-fill listing details/tags/setup. I could **not** confirm this on the live submit page or in `docs.mcpmarket.com` this session — treat it as **unverified**. If the form offers auto-fill, `mcp/README.md` already contains everything it would need (tools, install, requirements). Do not add a `LAUNCHGUIDE.md` on the strength of an unverified tip; verify the form's behavior first.
+Paste into the fields:
+
+| Field | Value |
+|---|---|
+| Server Name | `ns-ui MCP` |
+| Short Description | `First-party MCP server for the ns-ui component registry — search 228 React/Tailwind components, get real source, prop signatures, install commands, and the design-token conventions they are built against.` |
+| Link (GitHub or docs) | `https://github.com/nikolas-sapa/ns-ui` |
+| Category | **Design** |
+| Contact Email | owner's email |
+
+Free listing. An optional "Premium Submit" is a **$39 one-time review fee** (faster review,
+official badge, dofollow link). Owner's call; the free tier gets you listed.
+
+**Not submitted** because the form asks for a contact email and is a human web form.
 
 ---
 
-## 3. lobehub — no working public self-serve path found (reported honestly)
+## 2. mcpmarket.com — web form, **now appears to be paid-only**, needs the owner
 
-**Mechanism:** unclear / gated. What I found this session:
-- <https://lobehub.com/mcp/submit> redirects (302) into the logged-in app as a "Request a Server" flow (`market.lobehub.com/s/plugins/submit` 404s when fetched unauthenticated), so I could not reach an actual submission form to enumerate its fields. It requires a LobeHub account.
-- There is **GitHub-issue precedent**: server-addition requests have been filed as issues on `lobehub/lobehub` with labels `feature:mcp` + `feature:marketplace` (example: issue #13861, "[Request] Add … MCP server to marketplace"). That issue was **closed as `Inactive`**, so the issue route exists but appears to go stale rather than convert reliably.
-- LobeHub's docs describe adding MCP servers to *your own* LobeHub instance (Custom MCP), which is a user-side connect flow, not a marketplace listing.
+**URL:** https://mcpmarket.com/submit (Vercel bot protection blocks plain `curl`; read in a
+real browser to verify.)
 
-**Recommendation:** the reliable path is to sign in to LobeHub and use the in-app "Request a Server" flow (needs an account, which is why I could not complete it). The GitHub-issue route is a fallback but has a poor track record. Listing copy above is ready for whichever form the in-app flow presents. Of the three directories, this is the one that may not have a clean self-serve mechanism at all.
+The page has an **MCP Server** / **Agent Skill** tab pair, and a "GitHub repo" / "Remote MCP"
+source toggle. Fields:
+
+| Field | Value |
+|---|---|
+| Tab | **MCP Server** |
+| Source | **GitHub repo** |
+| Repository URL | `https://github.com/nikolas-sapa/ns-ui` |
+| Email address | owner's email |
+| Try Now link (optional) | `https://design.helpmarq.com/connect` |
+
+**Changed since the earlier draft:** the listing-option radio group now shows only one choice —
+**"Get Listed Now — $29 one-time"** (listed within 24 hours, official badge, "Try Now" link).
+The submit button reads "Get listed now". No free submission path was visible on the page.
+Treat this as a **$29 purchase decision**, not a free listing.
+
+Their "1M+ monthly visitors / 35K+ MCP servers / 200K+ agent skills" figures are the site's own
+marketing claims, not independently verified.
+
+**Not submitted** — it requires a payment, which is the owner's decision.
+
+(The "add a `LAUNCHGUIDE.md` to auto-fill listing details" tip remains **unverified**; nothing
+on the live submit page or their docs confirms it. Do not add one on the strength of it.)
 
 ---
 
-## Submission-channel summary
+## 3. LobeHub — official CLI publish path, **needs a browser login by the owner**
 
-| Directory | Channel | Verified this session | Cost |
+Correction to the earlier draft: LobeHub **does** have a first-party self-publish path. It is a
+CLI, not a form and not a GitHub PR.
+
+- Skill doc: https://lobehub.com/publish-mcp/skill.md (same content at
+  `https://market.lobehub.com/s/publish-mcp`)
+- CLI: `@lobehub/market-cli`, binary `lhm`. Requires Node.js >= 22.
+- New listings use `lhm plugin submit <repo-url>` (imports the GitHub repo as a new listing and
+  assigns it to you; you must own the repo or have push access). `lhm plugin publish` is for
+  publishing a *new version* of an already-listed plugin, and reads an `lhm.plugin.json`
+  manifest whose `identifier` is assigned by the marketplace on first listing — never invent it.
+
+Exact sequence for the owner:
+
+```bash
+npx -y @lobehub/market-cli login          # opens a browser, OIDC PKCE, waits up to 5 min
+npx -y @lobehub/market-cli github connect # links GitHub for ownership verification
+npx -y @lobehub/market-cli plugin submit https://github.com/nikolas-sapa/ns-ui
+npx -y @lobehub/market-cli plugin list --output json   # poll; import is async, a few minutes
+```
+
+Do not poll past ~10 minutes — if nothing appears, the import failed silently.
+
+**Not submitted** — `lhm login` and `lhm github connect` both require a human completing an
+OAuth flow in a browser. No LobeHub credentials exist on this machine (`~/.lobehub-market`
+does not exist). This is the credential gate I was told to stop at rather than work around.
+
+There is also a "Request a Server" dialog at https://lobehub.com/mcp/submit, but its own copy
+points owners at the CLI: "Is this your own MCP Server? Publish it with the official CLI."
+
+---
+
+## Summary
+
+| Directory | Channel | Blocked by | Cost |
 |---|---|---|---|
-| mcpservers.org | Web form (`/submit`) | Yes — read the live form fields | Free (optional $39 premium) |
-| mcpmarket.com | Web form taking a GitHub repo URL (`/submit`) | Yes — read the live form | Free listing; paid placement offered |
-| lobehub | In-app "Request a Server" (account-gated); GitHub issue as weak fallback | Partially — redirect + issue precedent confirmed; form itself gated | Free |
+| mcpservers.org | Web form `/submit` | Human form + contact email | Free ($39 optional premium) |
+| mcpmarket.com | Web form `/submit` (GitHub repo URL) | Payment | $29 one-time (no free option visible) |
+| LobeHub | `@lobehub/market-cli` → `lhm plugin submit` | Browser OAuth login | Free |
+
+None of the three is a pull request to a public repo, so nothing could be opened on the owner's
+behalf.
