@@ -2,7 +2,7 @@
 
 Signed-in users can save components from the catalog with the bookmark icon in the upper-right corner of a preview.
 
-Open **Account → Saved** to browse saved components as live previews. Each saved item includes:
+Open **Account → Saved** to browse saved components. Each saved item includes:
 
 - **Details**, which opens the full component page with its install information.
 - A copy button for the `shadcn` install command.

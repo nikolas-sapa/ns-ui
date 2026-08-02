@@ -123,7 +123,7 @@ agent working inside this repo.
 ## Saved library
 
 Signed-in users can bookmark components from the catalog. The account's Saved
-view shows live previews, full details, copyable install commands, and private
+view shows component details, copyable install commands, and private
 folders for organizing saves. See [`docs/saved-library.md`](docs/saved-library.md).
 
 ## License
