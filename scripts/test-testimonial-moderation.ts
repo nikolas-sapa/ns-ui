@@ -231,4 +231,35 @@ assert.deepEqual(
   },
 );
 
+// --- hate / harassment screen -------------------------------------------
+// Flagged at 100 so a match always quarantines. These assert the flag fires,
+// not that the score is exactly 100 in combination with other flags.
+for (const quote of [
+  "kill all the developers who ship on friday",
+  "those immigrants should leave",
+]) {
+  const { flags, score } = scoreSubmission({ ...cleanSubmission, quote });
+  assert.ok(
+    flags.includes("hate_or_harassment"),
+    `expected hate_or_harassment for: ${quote}`,
+  );
+  assert.equal(score, 100, "hate flag must saturate the score");
+}
+
+// False-positive guards. An over-eager pattern silently quarantining real
+// testimonials is the failure mode that actually costs something here, so
+// ordinary copy containing these words must stay clean.
+for (const quote of [
+  "Women engineers on my team use this registry daily.",
+  "This killed our design debt and the men and women here love it.",
+  "We deport nothing; the components just work.",
+  "I am trans and this design system is a joy to use.",
+]) {
+  const { flags } = scoreSubmission({ ...cleanSubmission, quote });
+  assert.ok(
+    !flags.includes("hate_or_harassment"),
+    `false positive on legitimate copy: ${quote}`,
+  );
+}
+
 console.log("testimonial moderation: pass");

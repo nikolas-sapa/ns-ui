@@ -15,6 +15,9 @@ export interface Testimonial {
   status: TestimonialStatus;
 }
 
+/** Exactly the submittable fields — the same shape `validateSubmission` takes,
+ *  which is why `companyUrl` is deliberately absent: it is display-only data
+ *  the built-in testimonial carries, never something a submitter can set. */
 export interface TestimonialSeed {
   quote: string;
   name: string;
@@ -35,6 +38,7 @@ export const ALEX_TESTIMONIAL_SEED: TestimonialSeed = {
 export const ALEX_TESTIMONIAL: Testimonial = {
   id: "alex-lekkas",
   ...ALEX_TESTIMONIAL_SEED,
+  companyUrl: "https://spawnpartners.com/",
   photoUrl: "/testimonials/alex-lekkas.png",
   status: "approved",
 };

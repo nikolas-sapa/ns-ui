@@ -12,6 +12,7 @@ import { fetchQuery } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
 import { ALEX_TESTIMONIAL, type Testimonial } from "@/lib/testimonials";
 import { CommunityTestimonials } from "@/app/_components/community-testimonials";
+import { CommunityGuidelines } from "@/app/_components/community-guidelines";
 import { TestimonialForm } from "@/app/_components/testimonial-form";
 
 export const dynamic = "force-dynamic";
@@ -60,6 +61,10 @@ export default async function CommunityPage() {
       </section>
 
       <section className="mt-16 max-w-xl border-t border-border pt-10">
+        <CommunityGuidelines />
+      </section>
+
+      <section className="mt-14 max-w-xl">
         <h2 className="text-lg font-medium tracking-[-0.02em] text-foreground">
           Share your experience
         </h2>

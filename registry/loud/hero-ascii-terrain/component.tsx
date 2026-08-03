@@ -358,7 +358,9 @@ export function ScarpHorizon({
   return (
     <div
       ref={rootRef}
-      className={`relative isolate min-h-screen w-full overflow-hidden bg-background font-mono ${className}`}
+      className={`relative isolate w-full overflow-hidden bg-background font-mono ${
+        /\bmin-h-/.test(className) ? "" : "min-h-screen"
+      } ${className}`}
     >
       <canvas ref={canvasRef} aria-hidden className="absolute inset-0 block h-full w-full text-foreground" />
       {children ? (

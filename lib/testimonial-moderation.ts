@@ -94,7 +94,37 @@ const SCORE_WEIGHTS: Record<string, number> = {
   seo_promotion: 30,
   promotional_cta: 15,
   bot_marker: 40,
+  hate_or_harassment: 100,
 };
+
+// Slur/harassment screen. Deliberately NOT a slur list in source — a wordlist
+// here would itself be the ugliest file in the repo, goes stale, and is
+// trivially evaded by spacing or homoglyphs. These are structural patterns
+// for the categories a testimonial has no legitimate reason to contain:
+// dehumanizing constructions and explicit targeting of a protected class.
+//
+// ponytail: pattern screen, not a classifier. It scores 100 (auto-quarantine,
+// never auto-publish) and is a REVIEW AID, not a filter — the real backstop is
+// that nothing reaches the public query without explicit approval. If volume
+// ever justifies it, swap in a hosted moderation endpoint; don't grow this
+// list.
+const HATE_PATTERNS: RegExp[] = [
+  // "<group> are/should be <dehumanizing predicate>"
+  /\b(all|those|these)?\s*(blacks?|whites?|jews?|muslims?|arabs?|asians?|mexicans?|immigrants?|gays?|lesbians?|trans(gender)?|women|men)\s+(are|should|deserve|belong|must)\b/i,
+  // explicit eliminationist / violent targeting
+  /\b(kill|gas|exterminate|deport|lynch|purge)\s+(all|the|every)\s+\w+/i,
+  // common slur stems, spacing/punctuation tolerant
+  /\bn[\W_]*[i1!][\W_]*g[\W_]*g[\W_]*[e3][\W_]*r/i,
+  /\bf[\W_]*a[\W_]*g[\W_]*g?[\W_]*o[\W_]*t/i,
+  /\bk[\W_]*[i1!][\W_]*k[\W_]*e\b/i,
+  /\bs[\W_]*p[\W_]*[i1!][\W_]*c\b/i,
+  /\btr[\W_]*a[\W_]*n[\W_]*n[\W_]*[yi]\b/i,
+  /\br[\W_]*e[\W_]*t[\W_]*a[\W_]*r[\W_]*d/i,
+];
+
+function hasHateOrHarassment(value: string): boolean {
+  return HATE_PATTERNS.some((pattern) => pattern.test(value));
+}
 
 function normalizeText(value: string): string {
   return value.trim().replace(/\s+/g, " ");
@@ -240,6 +270,7 @@ export function scoreSubmission(input: TestimonialSubmission | NormalizedSubmiss
   if (hasSeoPromotion(value)) flags.push("seo_promotion");
   if (hasPromotionalCta(value)) flags.push("promotional_cta");
   if (hasBotMarker(value)) flags.push("bot_marker");
+  if (hasHateOrHarassment(value)) flags.push("hate_or_harassment");
 
   const score = Math.max(
     0,

@@ -10,10 +10,10 @@ import { AccountSignIn } from "./account-signin";
 // shows above the sign-in form.
 export function AccountSignedOut() {
   return (
-    <main className="grid min-h-screen bg-background text-foreground lg:grid-cols-[minmax(0,1.15fr)_minmax(28rem,0.85fr)]">
+    <main className="grid min-h-screen bg-background text-foreground lg:grid-cols-[minmax(26rem,0.72fr)_minmax(0,1.28fr)]">
       <section
         data-auth-copy
-        className="flex min-h-[42rem] flex-col justify-between px-6 py-8 sm:px-10 sm:py-12 lg:min-h-screen lg:px-16 lg:py-14"
+        className="flex min-h-[42rem] flex-col justify-between px-6 py-8 sm:px-10 sm:py-12 lg:min-h-screen lg:px-12 lg:py-12"
       >
         <div className="flex items-center justify-between gap-4">
           <Link
@@ -27,7 +27,7 @@ export function AccountSignedOut() {
           </span>
         </div>
 
-        <div className="mx-auto w-full max-w-sm py-16 lg:py-20">
+        <div className="mx-auto w-full max-w-sm py-10 lg:py-12">
           <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted">
             Account
           </p>
