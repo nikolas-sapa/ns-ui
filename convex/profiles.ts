@@ -335,3 +335,104 @@ export const updateProfile = mutation({
     return null;
   },
 });
+
+// §8.1 — the ONLY anonymous read of a profile. Private by default: returns
+// `null` for a private profile and for a handle nobody has claimed, with the
+// same shape either way (A18 — the caller, `app/u/[handle]/page.tsx`, must
+// render byte-identical output for both so this is never a handle-
+// enumeration oracle). Never accepts a userId; the handle in the URL is the
+// only input, exactly like every other public route on this site.
+export const publicProfile = query({
+  args: { handle: v.string() },
+  returns: v.union(
+    v.object({
+      handle: v.string(),
+      displayName: v.union(v.string(), v.null()),
+      bio: v.union(v.string(), v.null()),
+      url: v.union(v.string(), v.null()),
+      tags: v.array(v.string()),
+      // §8.1: per-collection visibility only — `saves` has no visibility
+      // field and is never read here. Only `isPublic` collections and their
+      // items are ever returned to an anonymous caller (A19, A20).
+      collections: v.array(
+        v.object({ name: v.string(), slugs: v.array(v.string()) }),
+      ),
+    }),
+    v.null(),
+  ),
+  handler: async (ctx, { handle }) => {
+    // Handles are claimed lowercase-only (HANDLE_PATTERN is `[a-z0-9-]`), but
+    // normalize the lookup key anyway — a URL segment can arrive
+    // uppercased and `by_handle` is an exact-match index.
+    const normalized = handle.toLocaleLowerCase("en-US");
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_handle", (q) => q.eq("handle", normalized))
+      .unique();
+    if (profile === null || !profile.isPublic) return null;
+
+    const allCollections = await ctx.db
+      .query("collections")
+      .withIndex("by_user", (q) => q.eq("userId", profile.userId))
+      .collect();
+    const published = allCollections.filter((c) => c.isPublic);
+    const collections = await Promise.all(
+      published.map(async (c) => {
+        const items = await ctx.db
+          .query("collectionItems")
+          .withIndex("by_collection", (q) => q.eq("collectionId", c._id))
+          .collect();
+        return {
+          name: c.name,
+          slugs: items
+            .sort((a, b) => a.position - b.position)
+            .map((item) => item.slug),
+        };
+      }),
+    );
+
+    return {
+      handle: profile.handle,
+      displayName: profile.displayName,
+      bio: profile.bio,
+      url: profile.url,
+      tags: profile.tags,
+      collections,
+    };
+  },
+});
+
+// Backs `app/u/[handle]/avatar/route.ts` — the anonymous, same-origin avatar
+// proxy for a public profile page (§8.2/A26: never hotlink the provider's
+// URL from a page a stranger can load). Kept separate from `publicProfile` so
+// the rendered page never carries the provider URL in its markup. Same privacy
+// gate as `publicProfile`: null for private-or-unclaimed, identical either way.
+//
+// What this does NOT do, stated accurately because an earlier version of this
+// comment claimed otherwise: §6.3 means this is an exported, internet-facing
+// endpoint, so anyone can call it directly against `NEXT_PUBLIC_CONVEX_URL`
+// with any handle and receive the raw provider URL for a PUBLIC profile. That
+// URL embeds the provider's numeric account id, which resolves back to a
+// GitHub/Google identity through their own public APIs. So this hides the
+// provider URL from the page, not from a determined caller.
+//
+// Accepted, not overlooked: it only ever answers for a profile the owner
+// explicitly published, and the linkage it exposes (this handle belongs to
+// that GitHub account) is the same claim a published profile already makes.
+// Closing it properly means the server-only shared-secret pattern §6.3
+// prescribes; that is a bigger change than the exposure warrants today.
+export const publicAvatarSource = query({
+  args: { handle: v.string() },
+  returns: v.union(v.string(), v.null()),
+  handler: async (ctx, { handle }) => {
+    const normalized = handle.toLocaleLowerCase("en-US");
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_handle", (q) => q.eq("handle", normalized))
+      .unique();
+    if (profile === null || !profile.isPublic) return null;
+    const user = await ctx.db.get(profile.userId);
+    if (user === null || typeof user.image !== "string") return null;
+    return user.image;
+  },
+});

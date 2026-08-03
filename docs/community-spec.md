@@ -29,7 +29,14 @@ installed `@convex-dev/auth` package source. Where a claim is a guess it says so
 7. **No realtime.** No `useQuery` subscriptions, no WebSocket on the catalog. Saves are a fetch, not
    a subscription. Convex is chosen as a database here, not as a reactivity engine.
 8. **No public user directory, no follows, comments, ratings or DMs.**
-9. **No moderation tooling.** GitHub's PR review UI is the moderation tooling.
+9. **No general moderation tooling.** GitHub's PR review UI is the moderation tooling, with one
+   named exception: **owner-only review of testimonial submissions** (`convex/testimonials.ts`
+   `queue`/`approve`/`reject`, surfaced on `/account`). That exception is deliberately narrow —
+   one prose field per person, reviewed by one person, nothing auto-published. It is **not**
+   precedent for comments, ratings, reviews, or user-uploaded imagery, each of which brings a
+   report-and-takedown duty this exception does not create. Amended 2026-08-03; rationale and the
+   options considered are in `08-Decisions/2026-08-03-testimonial-moderation-reverses-non-goal-9.md`
+   in the vault.
 10. **No migration of the registry into Convex.** Component metadata stays in `meta.json` on disk.
 11. **No SSR of user-specific content into any cached route.**
 12. **No user-uploaded images.** No avatar upload, no cover image. Avatars are the provider's,
@@ -901,8 +908,14 @@ a hard byte cap (512KB), dimension caps and a re-encode so a 40-byte decompressi
 served back, EXIF stripping (uploaded photos carry GPS), a delete path wired into the §6.7 cascade
 and test A9, and — the actual cost — **a moderation surface**. An uploaded avatar is user-generated
 imagery rendered on this origin, next to a public credit line, and non-goal #9 says there is no
-moderation tooling. Uploads do not merely add work, they contradict a stated non-goal unless a
-report-and-takedown path and a person to action it arrive with them.
+general moderation tooling. Uploads do not merely add work, they contradict a stated non-goal unless
+a report-and-takedown path and a person to action it arrive with them.
+
+**Amendment 2026-08-03:** #9 now carves out owner-only review of *testimonial* submissions. That
+does **not** unblock uploads, and the paragraph above stands unchanged. A text queue is one prose
+field reviewed by one person; imagery brings byte caps, re-encoding, EXIF stripping, a cascade
+delete, and a takedown duty on a legal clock. The testimonial exception was written narrow
+precisely so it could not be cited here.
 
 So: **provider avatar only, and uploads join §1 as a non-goal until there is a moderation story.**
 Provider-avatar-only ships in a day. Uploads are a week plus a permanent duty, and the duty is the

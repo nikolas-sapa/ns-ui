@@ -157,4 +157,25 @@ export default defineSchema({
     windowStart: v.number(),
     count: v.number(),
   }).index("by_userId", ["userId"]),
+
+  testimonials: defineTable({
+    userId: v.id("users"),
+    name: v.string(),
+    role: v.string(),
+    company: v.string(),
+    profileUrl: v.string(),
+    photoUrl: v.optional(v.string()),
+    quote: v.string(),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("approved"),
+      v.literal("rejected"),
+    ),
+    spamScore: v.number(),
+    spamFlags: v.array(v.string()),
+    createdAt: v.number(),
+    reviewedAt: v.union(v.number(), v.null()),
+  })
+    .index("by_status", ["status"])
+    .index("by_userId", ["userId"]),
 });

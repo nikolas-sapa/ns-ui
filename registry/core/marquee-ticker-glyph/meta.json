@@ -1,0 +1,17 @@
+{
+  "name": "marquee-ticker-glyph",
+  "title": "Marquee Ticker Glyph",
+  "description": "A grabbable ticker tape: drag to scrub through its content, release to fling it with momentum, and legibility itself is a function of speed — fast motion blurs characters into noise glyphs, slowing down resolves them back into real text.",
+  "collection": "core",
+  "tags": ["marquee", "ticker", "scrub", "drag", "mono", "glyph", "instrument"],
+  "useWhen": "a marquee the visitor can grab and scrub through, where speed itself is the readout — dragging fast blurs the tape into noise glyphs and slowing down resolves it back to real text; pick ticker-tape-splice instead for a live feed that only needs hover-to-pause easing, or ticker-teleprinter when the crawl should read as character-quantised typewriter arrival rather than something you can physically throw and catch.",
+  "autoplay": {
+    "mode": "drag",
+    "target": "[role=list]",
+    "from": [0.75, 0.5],
+    "to": [0.1, 0.5],
+    "period": 3400
+  },
+  "instruction": "A horizontal ticker tape built from `items: string[]` joined by an optional `separator` (default \"/\"), rendered as fixed-width monospace cells inside an overflow-hidden track. Unlike an auto-scrolling marquee, the tape is a real scrub instrument: pointerdown+drag on the track moves the tape 1:1 with the pointer (no easing while held) and computes instantaneous velocity in characters/sec from the pointer delta each move; release keeps that velocity as momentum, which decays under per-frame friction (0.94^ (dt*60)) back toward the ambient auto-scroll speed. Arrow keys nudge the offset the same way, briefly crossing the resolve threshold so keyboard users feel the same effect the pointer path gets. The mechanic distinct from any other ticker in this registry: PER-CHARACTER LEGIBILITY IS A FUNCTION OF |INSTANTANEOUS SPEED|. Every visible cell is repainted every animation frame from the current fractional tape offset; when |speed| stays under `resolveThreshold` (default 260px/s — comfortably above the ambient auto-scroll speed of 34px/s) each cell shows its real character. Above that threshold — an active fast scrub, or the fast part of a fling — every visible cell instead shows a randomly re-rolled member of a fixed noise charset (`░▒▓#%&@*+=-:.`), re-rolled every frame, so the tape visibly blurs into static and then snaps back into focus the instant it decelerates through the threshold. Cells never go blank and never change width (monospace, fixed cell size measured from a hidden probe span), so there is zero layout jitter regardless of state. One direct-DOM requestAnimationFrame loop owns position, velocity and per-cell textContent — no React state on the hot path. Hovering or focusing the track eases the ambient auto-scroll speed toward zero (same pause courtesy as any ticker) but does not touch the resolve mechanic. A leading pause/resume button (aria-pressed) offers an explicit, keyboard-reachable stop independent of hover. Accessibility: the scrub track is `role=list` with a single `aria-label` holding the full joined item text (the real content, always current, independent of what's mid-blur on screen); the per-character glyph cells inside it are `aria-hidden`. `prefers-reduced-motion: reduce` drops the animated track entirely in favor of a static flex row of real `role=listitem` elements, each with a matching `aria-label` — no scroll, no blur, no momentum, fully legible at all times. Zero dependencies, pure DOM.",
+  "dependencies": []
+}

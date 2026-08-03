@@ -10,6 +10,7 @@
 - [ ] I looked at the resting-state screenshot in both dark and light
 - [ ] Colors come from CSS custom properties, not hardcoded hex, including in canvas/SVG draw code
 - [ ] No generated file is in the diff (`registry.json`, `registry/index.tsx`, `public/r/*`, `public/llms*.txt`, `lib/*.generated.json`)
+- [ ] Every commit is signed off (`git commit -s`) per the [DCO](../DCO)
 
 ## Screenshots
 

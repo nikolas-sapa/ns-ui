@@ -402,6 +402,18 @@ export function SiteShell({
             Writing
           </Link>
           <Link
+            href="/community"
+            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            Community
+          </Link>
+          <Link
+            href="/guidelines"
+            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            Guidelines
+          </Link>
+          <Link
             href="/connect"
             className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
           >
@@ -477,7 +489,7 @@ function NavCategory({
       onToggle={(e) => onToggle(e.currentTarget.open)}
     >
       <summary className="flex cursor-pointer list-none items-center justify-between rounded-sm px-2 py-1.5 outline-none [&::-webkit-details-marker]:hidden hover:bg-surface focus-visible:ring-2 focus-visible:ring-accent">
-        <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-muted group-hover/cat:text-foreground">
+        <span className="flex items-center gap-1.5 text-[12px] text-muted group-hover/cat:text-foreground">
           <Chevron />
           {group.label}
         </span>

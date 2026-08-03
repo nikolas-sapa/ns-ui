@@ -7,6 +7,7 @@ import { DemoFrame } from "@/app/_components/demo-frame";
 import { loadUseWhen } from "@/lib/use-when";
 import { loadComponentProps } from "@/lib/component-props";
 import { CopyButton } from "@/app/_components/copy-button";
+import { ComponentSave } from "@/app/_components/component-save";
 import { categoriesFor } from "@/lib/category-pages";
 import pkg from "@/package.json";
 
@@ -131,9 +132,14 @@ export default async function ComponentPage({
           <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
             {item.meta?.collection === "loud" ? "ns-ui / loud" : "ns-ui"}
           </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-            {item.title}
-          </h1>
+          <div className="mt-2 flex items-start justify-between gap-4">
+            <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+              {item.title}
+            </h1>
+            <div className="mt-1.5 shrink-0">
+              <ComponentSave name={name} />
+            </div>
+          </div>
           <p className="mt-4 max-w-[65ch] text-[17px] leading-[1.75] text-foreground/90">
             {item.description}
           </p>

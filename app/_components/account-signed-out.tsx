@@ -1,32 +1,20 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ScarpHorizon } from "@/registry/loud/hero-ascii-terrain/component";
+import { ALEX_TESTIMONIAL } from "@/lib/testimonials";
 import { AccountSignIn } from "./account-signin";
 
+// Copy column is first in DOM on purpose: it is the left column on desktop
+// and — the reason the order matters — the one that stacks first on mobile.
+// The terrain is decoration, so it must never be the first thing a phone
+// shows above the sign-in form.
 export function AccountSignedOut() {
   return (
-    <main
-      className="grid min-h-screen bg-background text-foreground lg:grid-cols-[minmax(0,1.15fr)_minmax(28rem,0.85fr)]"
-      style={{ fontFamily: "ui-rounded, var(--font-sans)" }}
-    >
-      <section className="relative min-h-[42rem] overflow-hidden border-b border-border lg:min-h-screen lg:border-b-0 lg:border-r">
-        <ScarpHorizon className="min-h-[42rem] lg:min-h-screen">
-          <div className="max-w-xl pb-2">
-            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted">
-              ns-ui / save the good ones
-            </p>
-            <h1 className="mt-5 max-w-lg text-4xl font-semibold leading-[1.03] tracking-[-0.045em] text-foreground sm:text-6xl">
-              Keep the pieces that make the product feel like yours.
-            </h1>
-            <p className="mt-5 max-w-md text-sm leading-6 text-muted sm:text-base">
-              Sign in to save components, collect references, and return to the
-              details worth building.
-            </p>
-          </div>
-        </ScarpHorizon>
-      </section>
-
-      <section className="flex min-h-[42rem] flex-col justify-between px-6 py-8 sm:px-10 sm:py-12 lg:min-h-screen lg:px-16 lg:py-14">
+    <main className="grid min-h-screen bg-background text-foreground lg:grid-cols-[minmax(26rem,0.72fr)_minmax(0,1.28fr)]">
+      <section
+        data-auth-copy
+        className="flex min-h-[42rem] flex-col justify-between px-6 py-8 sm:px-10 sm:py-12 lg:min-h-screen lg:px-12 lg:py-12"
+      >
         <div className="flex items-center justify-between gap-4">
           <Link
             href="/"
@@ -39,7 +27,7 @@ export function AccountSignedOut() {
           </span>
         </div>
 
-        <div className="mx-auto w-full max-w-sm py-16 lg:py-20">
+        <div className="mx-auto w-full max-w-sm py-10 lg:py-12">
           <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted">
             Account
           </p>
@@ -56,28 +44,42 @@ export function AccountSignedOut() {
 
           <figure className="mt-14 border-t border-border pt-6">
             <blockquote className="text-sm leading-6 text-foreground">
-              “I love using this design system whenever I need inspiration for
-              primarily abstract features in our internal products, things that
-              add some flare. I love it”
+              &ldquo;{ALEX_TESTIMONIAL.quote}&rdquo;
             </blockquote>
             <figcaption className="mt-5 flex items-center gap-3">
-              <Image
-                src="/testimonials/alex-lekkas.png"
-                alt="Alex Lekkas"
-                width={40}
-                height={40}
-                className="size-10 shrink-0 rounded-full object-cover"
-              />
+              {ALEX_TESTIMONIAL.photoUrl ? (
+                <Image
+                  src={ALEX_TESTIMONIAL.photoUrl}
+                  alt={ALEX_TESTIMONIAL.name}
+                  width={40}
+                  height={40}
+                  className="size-10 shrink-0 rounded-full object-cover"
+                />
+              ) : null}
               <span className="text-xs leading-5">
                 <Link
-                  href="https://www.linkedin.com/in/alexandros-lekkas/"
+                  href={ALEX_TESTIMONIAL.profileUrl}
                   target="_blank"
                   rel="noreferrer"
                   className="font-medium text-foreground underline decoration-border underline-offset-4 outline-none hover:decoration-foreground focus-visible:ring-2 focus-visible:ring-accent"
                 >
-                  Alex Lekkas
+                  {ALEX_TESTIMONIAL.name}
                 </Link>
-                <span className="block text-muted">Founding Engineer at Spawn Partners</span>
+                <span className="block text-muted">
+                  {ALEX_TESTIMONIAL.role} at{" "}
+                  {ALEX_TESTIMONIAL.companyUrl ? (
+                    <Link
+                      href={ALEX_TESTIMONIAL.companyUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="underline decoration-border underline-offset-4 outline-none hover:decoration-foreground focus-visible:ring-2 focus-visible:ring-accent"
+                    >
+                      {ALEX_TESTIMONIAL.company}
+                    </Link>
+                  ) : (
+                    ALEX_TESTIMONIAL.company
+                  )}
+                </span>
               </span>
             </figcaption>
           </figure>
@@ -86,6 +88,14 @@ export function AccountSignedOut() {
         <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
           Built for developers and designers
         </p>
+      </section>
+
+      <section
+        data-auth-visual
+        aria-hidden="true"
+        className="relative min-h-[42rem] overflow-hidden border-t border-border lg:min-h-screen lg:border-t-0 lg:border-l"
+      >
+        <ScarpHorizon className="min-h-[42rem] lg:min-h-screen" />
       </section>
     </main>
   );

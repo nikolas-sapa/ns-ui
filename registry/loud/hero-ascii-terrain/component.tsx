@@ -50,7 +50,7 @@ const LAYERS: Layer[] = [
 ];
 
 const STAR_CHARS = [1, 2, 3]; // RAMP indices used for stars
-const IDLE_DRIFT = 0.045; // world-units/s of ambient pan, scaled per-layer
+const IDLE_DRIFT = 0.16; // world-units/s of ambient pan, scaled per-layer
 const CURSOR_EASE = 0.08;
 const MAX_PARALLAX_COLS = 46; // world-unit shift at full pointer travel
 const MAX_PARALLAX_ROWS = 5;
@@ -191,8 +191,13 @@ export function ScarpHorizon({
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
-      cols = Math.max(8, Math.floor(width / cellW));
-      rows = Math.max(10, Math.floor(height / cellH));
+      // `ceil`, not `floor`: the grid is `rows * cellH` tall, so flooring left
+      // an unpainted strip up to one cell high along the bottom edge — read as
+      // a stray band of padding under the terrain. Overdrawing by a partial
+      // row instead costs nothing, because the root clips with
+      // `overflow-hidden`. Same for columns and the right edge.
+      cols = Math.max(8, Math.ceil(width / cellW));
+      rows = Math.max(10, Math.ceil(height / cellH));
       horizonRow = Math.max(2, Math.floor(rows * 0.34));
       terrainRows = Math.max(1, rows - horizonRow);
 
@@ -355,10 +360,19 @@ export function ScarpHorizon({
     };
   }, [cellSize]);
 
+  // `h-full` matters as much as the min-height below: a min-height only sets a
+  // FLOOR. Dropped into a stretched grid/flex item taller than that floor — an
+  // auth panel whose other column carries more copy — the root stopped at its
+  // min-height and the canvas ended partway down, leaving a band of dead
+  // background under the terrain. `h-full` resolves to `auto` when the parent
+  // has no definite height (so the min-height still governs a standalone
+  // hero) and fills the parent when it does.
   return (
     <div
       ref={rootRef}
-      className={`relative isolate min-h-screen w-full overflow-hidden bg-background font-mono ${className}`}
+      className={`relative isolate h-full w-full overflow-hidden bg-background font-mono ${
+        /\bmin-h-/.test(className) ? "" : "min-h-screen"
+      } ${className}`}
     >
       <canvas ref={canvasRef} aria-hidden className="absolute inset-0 block h-full w-full text-foreground" />
       {children ? (

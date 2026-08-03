@@ -93,6 +93,7 @@ export const library = query({
         id: v.id("collections"),
         name: v.string(),
         slugs: v.array(v.string()),
+        isPublic: v.boolean(),
       })),
     }),
     v.null(),
@@ -108,9 +109,77 @@ export const library = query({
       slugs: saves.map((save) => save.slug),
       folders: await Promise.all(folders.sort((a, b) => a.createdAt - b.createdAt).map(async (folder) => {
         const items = await ctx.db.query("collectionItems").withIndex("by_collection", (q) => q.eq("collectionId", folder._id)).collect();
-        return { id: folder._id, name: folder.name, slugs: items.sort((a, b) => a.position - b.position).map((item) => item.slug) };
+        return {
+          id: folder._id,
+          name: folder.name,
+          slugs: items.sort((a, b) => a.position - b.position).map((item) => item.slug),
+          isPublic: folder.isPublic,
+        };
       })),
     };
+  },
+});
+
+// §8.1's publish toggle — the only mutation in the schema that can make
+// anything reachable at `/u/<handle>` (`convex/profiles.ts`'s
+// `publicProfile`/`publicAvatarSource`). `collections.isPublic` is the sole
+// per-item publish switch (saves themselves have none, by design); a
+// profile is only ever listed at all when `profiles.isPublic` is also true,
+// so publishing a collection sets both flags together — the caller
+// shouldn't have to take two separate actions to make a folder visible.
+//
+// Un-publishing only turns the profile back off when this was the LAST
+// published collection: A21 requires `/u/<handle>` to 404 again once the
+// one thing that was public stops being public. If the caller has other
+// published collections, the profile stays public and only this one folder
+// drops out of the anonymous view. `profiles.isPublic` can still exist as
+// `true` with zero published collections in principle (§8.1's rationale for
+// keeping two separate flags rather than one) — that state just isn't one
+// this particular mutation ever the one to *create*; it only ever turns
+// `profiles.isPublic` off, never on, as a side effect of the caller having
+// nothing left published.
+export const setCollectionVisibility = mutation({
+  args: { folderId: v.id("collections"), isPublic: v.boolean() },
+  returns: v.object({ isPublic: v.boolean(), profileIsPublic: v.boolean() }),
+  handler: async (ctx, { folderId, isPublic }) => {
+    const userId = await getAuthUserId(ctx);
+    if (userId === null) throw new Error("Not authenticated");
+
+    const folder = await ctx.db.get(folderId);
+    if (folder === null || folder.userId !== userId) throw new Error("Not found");
+
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+    // Publishing (or un-publishing) requires a claimed handle — there is no
+    // `/u/<handle>` to publish to otherwise (§8.3: profile fields, and by
+    // extension this flag, only exist once step 1 of onboarding is done).
+    if (profile === null) throw new ConvexError({ code: "no_profile" });
+
+    await ctx.db.patch(folderId, { isPublic });
+
+    let profileIsPublic = profile.isPublic;
+    if (isPublic) {
+      if (!profile.isPublic) {
+        await ctx.db.patch(profile._id, { isPublic: true });
+        profileIsPublic = true;
+      }
+    } else {
+      const siblings = await ctx.db
+        .query("collections")
+        .withIndex("by_user", (q) => q.eq("userId", userId))
+        .collect();
+      const stillHasPublished = siblings.some(
+        (c) => c._id !== folderId && c.isPublic,
+      );
+      if (!stillHasPublished && profile.isPublic) {
+        await ctx.db.patch(profile._id, { isPublic: false });
+        profileIsPublic = false;
+      }
+    }
+
+    return { isPublic, profileIsPublic };
   },
 });
 
@@ -156,6 +225,31 @@ export const deleteFolder = mutation({
     const items = await ctx.db.query("collectionItems").withIndex("by_collection", (q) => q.eq("collectionId", folderId)).collect();
     for (const item of items) await ctx.db.delete(item._id);
     await ctx.db.delete(folderId);
+
+    // Same reconciliation as `setCollectionVisibility`'s un-publish branch
+    // (§8.1/A21): deleting a published folder is another way to end up with
+    // zero published collections, and `profiles.isPublic` must not be left
+    // `true` on its own after that — the profile page would otherwise keep
+    // rendering (bio, display name, url, tags, avatar) with nothing behind
+    // it, which is exactly the leaked-visibility state A21 forbids reaching
+    // by unpublish. Only relevant if the deleted folder was itself public;
+    // deleting a private folder never touches profile visibility.
+    if (folder.isPublic) {
+      const profile = await ctx.db
+        .query("profiles")
+        .withIndex("by_userId", (q) => q.eq("userId", userId))
+        .unique();
+      if (profile !== null && profile.isPublic) {
+        const siblings = await ctx.db
+          .query("collections")
+          .withIndex("by_user", (q) => q.eq("userId", userId))
+          .collect();
+        const stillHasPublished = siblings.some((c) => c._id !== folderId && c.isPublic);
+        if (!stillHasPublished) {
+          await ctx.db.patch(profile._id, { isPublic: false });
+        }
+      }
+    }
     return null;
   },
 });

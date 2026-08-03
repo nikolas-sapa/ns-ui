@@ -14,6 +14,7 @@ import type * as http from "../http.js";
 import type * as profiles from "../profiles.js";
 import type * as saves from "../saves.js";
 import type * as session from "../session.js";
+import type * as testimonials from "../testimonials.js";
 import type * as users from "../users.js";
 
 import type {
@@ -29,6 +30,7 @@ declare const fullApi: ApiFromModules<{
   profiles: typeof profiles;
   saves: typeof saves;
   session: typeof session;
+  testimonials: typeof testimonials;
   users: typeof users;
 }>;
 

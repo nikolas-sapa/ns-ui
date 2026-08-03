@@ -1,0 +1,21 @@
+{
+  "name": "testimonial-wall-reflow",
+  "title": "Testimonial Wall Reflow",
+  "description": "A masonry testimonial wall that physically reflows as you read: expanding one card's quote via 'read more' re-packs every other card into its new shortest-column slot, animated with a FLIP transform so only the cards that actually move ever animate.",
+  "collection": "core",
+  "tags": ["testimonial", "wall", "masonry", "layout", "flip", "reflow"],
+  "useWhen": "a testimonial/quote wall where expanding a card visibly reflows the rest of the layout around it; pick a static quote grid instead if every quote is a fixed, equal height and nothing ever needs to reveal more text.",
+  "instruction": "Testimonials are packed into a shortest-column-first masonry (own arithmetic, not CSS `columns`, which flows top-to-bottom per column and can't be re-packed on demand): column count is derived from measured container width (1 below 560px, 2 below 900px, else 3), and for each item in order the next slot goes to whichever column currently has the least accumulated height. Each card is an absolutely positioned <figure> so its own height never affects siblings through normal document flow — position is entirely computed by the packing pass and written as inline left/top. Every card longer than ~150 characters gets a 'read more' button (aria-expanded, an accessible name naming both the action and the author); toggling it swaps the rendered excerpt for the full quote, which changes that one card's own height. THE REFLOW: a `useLayoutEffect` keyed on the expand/collapse state re-runs the packing pass with the new heights (read via `offsetHeight` after the content swap has already committed, so this always reads real post-toggle heights) and, for every card whose computed slot actually changed from the last pass, applies a FLIP transform: `before` is not read from a live `getBoundingClientRect` — it's the position this same packing function produced on the PREVIOUS pass, cached in a ref — the delta is applied as an instant untransitioned `translate`, then forced-reflowed and eased back to identity over 420ms (cubic-bezier(0.22,1,0.36,1)). Cards whose slot didn't move are left completely untouched, so a wall with one changed card only animates the ones that needed to. A `ResizeObserver` re-packs (unanimated — a viewport resize isn't 'reading') whenever the container width crosses a column-count breakpoint. `prefers-reduced-motion` still repacks and repositions correctly but skips the transform/transition entirely, snapping straight to the new layout. Each card exposes `data-expanded` for anyone probing its open state. Props: `items` (id/name/role/quote array, six built-in examples if omitted), className. Zero dependencies — refs, inline styles and CSS transitions only, matching this registry's direct-DOM-write convention for hot-path visual state.",
+  "dependencies": [],
+  "gate": {
+    "openBy": "[data-expand-toggle]",
+    "expect": "[data-expanded=true]",
+    "resetBefore": true
+  },
+  "autoplay": {
+    "mode": "press",
+    "target": "[data-expand-toggle]",
+    "hold": 500,
+    "period": 4500
+  }
+}

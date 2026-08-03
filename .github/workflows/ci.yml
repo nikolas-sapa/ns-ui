@@ -40,3 +40,46 @@ jobs:
 
       - name: Build site
         run: npm run build
+
+  dco:
+    name: dco
+    # Only meaningful on a PR: the repo's own pre-Phase-B history carries no
+    # Signed-off-by trailer, so this would fail on every commit if it also
+    # ran on `push` to main (see the trigger above).
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Default checkout is depth-1 of the PR's synthetic merge commit —
+          # that enumerates zero real commits and this job would pass having
+          # checked nothing. Full history so the base..head range below is real.
+          fetch-depth: 0
+
+      - name: Check Signed-off-by on every commit
+        # Base/head SHAs are 40-char hex from the event payload, not free text,
+        # but pass them through env rather than interpolating into the script
+        # directly — the safe pattern regardless of how trusted the value is.
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          range="${BASE_SHA}..${HEAD_SHA}"
+          commits=$(git log --format=%H "$range")
+          count=$(echo "$commits" | grep -c . || true)
+          if [ "$count" -eq 0 ]; then
+            echo "DCO check examined 0 commits (bad range: $range) — failing rather than passing on nothing checked."
+            exit 1
+          fi
+          fail=0
+          for sha in $commits; do
+            if ! git log -1 --format=%B "$sha" | grep -qi '^Signed-off-by: .\+ <.\+>$'; then
+              echo "::error::commit $sha is missing a 'Signed-off-by' trailer. Run: git rebase --signoff ${BASE_SHA}"
+              fail=1
+            fi
+          done
+          if [ "$fail" -ne 0 ]; then
+            exit 1
+          fi
+          echo "$count commit(s) checked, all signed off."
