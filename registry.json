@@ -112,6 +112,33 @@
       }
     },
     {
+      "name": "background-ascii-caustics",
+      "type": "registry:ui",
+      "title": "Background ASCII Caustics",
+      "description": "Ambient water-caustics rendered in ASCII ink density — three rotated wave grids combined multiplicatively and sharpened into thin bright filaments, the way overlapping light wave-fronts trace a caustic web, with the pointer acting as a lens the pattern visibly focuses toward.",
+      "files": [
+        {
+          "path": "registry/core/background-ascii-caustics/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/background-ascii-caustics.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "background",
+          "ascii",
+          "canvas",
+          "cursor",
+          "caustics",
+          "water",
+          "light"
+        ],
+        "instruction": "Build <CausticVeil cellSize? className?> as a full-bleed <canvas>. FIELD: three periodic wave layers, each rotated to its own fixed angle (0, 1.15, 2.3 rad) and drifting at its own phase speed (0.22, -0.17, 0.13 rad/s), sampled as sin(rotatedX * freq + t * speed) per layer and combined MULTIPLICATIVELY — product = wave1 * wave2 * wave3 — never summed (that is background-ascii-plasma's technique). The rendered luminance is pow(max(0, 1 - abs(product)), 5.5): a steep power curve that turns the near-zero-product contours (where the three waves cross in close alignment) into thin bright filaments against a mostly dark field, which is the actual optical mechanism behind a caustic net rather than a cosmetic recolor of a summed field. LENS: the pointer maintains a 0..1 'active' scalar that eases toward 1 while over the canvas and back to 0 once it leaves (time constant ~0.55s), and any grid cell within a 10-cell radius of the pointer has its SAMPLE coordinate pulled INWARD toward the pointer (gaussian falloff, max pull 3.4 cells) before the caustic field is evaluated there — the opposite sign of an outward push, so the web visibly contracts and focuses toward the cursor like light converging through a magnifying lens, and relaxes back to its undisturbed shape once the pointer leaves. Direct-DOM rAF, zero React state on the hot path. Rendering is two-pass for cost control: pass one evaluates every cell into a Uint8Array ramp-index buffer and buckets its index by luminance into one of 6 alpha buckets; pass two sets ctx.globalAlpha once per bucket and draws only that bucket's cells, from the shared ' .:-=+*#%@' density ramp — the same bucketing discipline background-ascii-plasma uses, adapted to this field's multiplicative math. Ink is read once via getComputedStyle(canvas).color and re-derived on a documentElement class MutationObserver for live theme flips. Mono cell measured via an offscreen canvas's measureText. prefers-reduced-motion renders exactly one static frame at t=0 with the lens fully relaxed, and skips the rAF loop and pointer listeners entirely. Loop pauses on document.hidden, resumes on visibilitychange. Props: cellSize (grid cell px, default 12), className."
+      }
+    },
+    {
       "name": "background-ascii-dither",
       "type": "registry:ui",
       "title": "Background ASCII Dither",
@@ -134,6 +161,33 @@
           "cursor"
         ],
         "instruction": "A full-bleed canvas engine that maps a source (animated flowing noise by default, or an image) to a luminance-driven monochrome glyph grid with three modes: ASCII characters in a density ramp, 4x4 Bayer-matrix dithered pixels, and dot-matrix circles sized by brightness. The cursor brightens and resolves nearby cells with a Gaussian falloff and eased trailing. Direct-DOM rAF loop with no React state, theme-aware glyph color, single static frame under prefers-reduced-motion. Window resize is debounced (150ms) so dragging a window edge doesn't spam the grid recompute or (in image mode) refetch/redecode the source on every event; a generation counter discards any image decode superseded by a newer resize before it can write stale-sized data."
+      }
+    },
+    {
+      "name": "background-ascii-flow",
+      "type": "registry:ui",
+      "title": "Background ASCII Flow",
+      "description": "An ambient ASCII flow-field background — a fixed set of tracer particles ride a time-evolving 2D curl-noise velocity field, each glyph's direction ('-', '|', '/', '\\\\') and trail alpha encoding its heading and speed, with the pointer stirring a local swirl instead of painting or repelling.",
+      "files": [
+        {
+          "path": "registry/core/background-ascii-flow/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/background-ascii-flow.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "background",
+          "ascii",
+          "canvas",
+          "cursor",
+          "noise",
+          "particles",
+          "flow"
+        ],
+        "instruction": "Build <Slipstream cellSize? className?> as a full-bleed <canvas>. FIELD: a 2D bilinear value-noise potential (hash-based, smoothstepped, two octaves at 0.7/0.3 weight, one drifting in y and one in x-t so the field itself slowly evolves) is turned into a divergence-free velocity via its CURL, taken by central finite differences (vx = dPotential/dy, vy = -dPotential/dx) at a small epsilon — the textbook incompressible-flow trick, never a raw gradient. AMBIENT LAYER: every AMBIENT_STEP-th grid cell (3) samples the curl at t and renders one direction glyph chosen from '-', '|', '/', '\\\\' by quantizing the velocity angle into 4 slope buckets, at a fixed low alpha (0.16) using the --muted token — this alone gives the field a legible static shape even at rest. PARTICLE LAYER: a fixed particle count (scaled by grid area, clamped 90-260) each holds a genuine continuous (x, y) float position (not snapped to a cell) advanced every frame by the curl velocity AT that exact point plus the current time, wrapping at the canvas edges. Each particle keeps an explicit ring buffer of its last 4 positions (Float32Array, no decay-per-cell state anywhere — this is deliberately not background-ascii-wake's persistent heat grid) and every frame redraws all of them at falling alpha (1 down to ~0.05) using the direction glyph derived from the particle's OWN current velocity, in the --foreground token. VORTEX: the pointer's presence over the canvas ramps a 0..1 'active' scalar (eased in/out over ~1/6s) that, once above a small threshold, adds a TANGENTIAL (perpendicular-to-radius) velocity term to any particle within a 120px radius, magnitude falling off linearly with distance — particles visibly swirl around the cursor rather than being pushed away from or pulled toward it, and the swirl relaxes to nothing once the pointer leaves. Direct-DOM rAF, zero React state on the hot path; ink read via getComputedStyle(canvas).color / the --muted custom property at mount and re-derived on a documentElement class MutationObserver. Mono cell measured via an offscreen canvas after document.fonts.ready. prefers-reduced-motion renders exactly one static frame (ambient direction layer only, particles motionless at their seeded positions) and skips the rAF loop and pointer listeners entirely. Loop pauses on document.hidden, resumes on visibilitychange. Props: cellSize (grid cell px, default 14), className."
       }
     },
     {
@@ -213,6 +267,32 @@
           "accessibility"
         ],
         "instruction": "A dismissible notice banner whose 1px --border perforation sits 32px in from the leading edge — a vertical dotted rule punched into a solid line via a CSS mask (5px dash, 3px gap), not the browser's own `dashed` border style, so the gap is exact rather than browser-approximate. Dismissing the panel (a labeled 'Dismiss' button) rips it off along that perforation: the panel translates 24px along X, rotates 1deg, and fades to 0 opacity over 300ms ease-out-expo while it is still occupying its layout space, so nothing else moves until it's actually gone. Once the rip finishes the panel leaves the DOM and the row's height springs (a small critically-damped JS spring driving inline height, not a CSS transition) down to whatever is left: a permanent 32px-wide stub, seated flush at the leading edge, showing the notice's icon above a rotated Geist Mono micro-label — a receipt-book check stub, not a close button, because the record that a notice exists is never destroyed, only shrunk. Clicking the stub (labeled 'Reopen: <title>') reverses both motions: the panel remounts already in its torn pose, the row springs back open, and a frame later the panel animates back to identity, perforation restored between the two pieces. The component doesn't force a width — it's `inline-flex`, sized to its content; pass className=\"w-full\" for a page-width banner, and dismissing it will still shrink it down to just the stub's own small footprint rather than leaving a wide empty strip, because removing the panel from a fit-content flex row is what does the shrinking. The stub is a decorative, non-interactive icon while the panel is attached — there is never a pointless enabled button sitting idle — and only becomes the focusable Reopen control once the panel is actually gone; it gets a 44px touch target via a 6px hit-area overhang on each side of its 32px-wide look, so the slim receipt-stub silhouette never costs tap accuracy. Dismissing moves focus to the stub; reopening moves focus back to the Dismiss button, so keyboard users never lose their place. The outer region is role=status (aria-live=polite) for ordinary notices or role=alert (aria-live=assertive) for the urgent variant, set once at mount and never toggled per interaction, so a tear-then-heal cycle can't turn a one-time 'here's a notice' announcement into repeated noise. Pure DOM/CSS/SVG — no canvas. Colors are --background, --surface, --border, --foreground, --muted and --accent only, so both themes render correctly. prefers-reduced-motion swaps the rip and the reverse rip for a plain opacity crossfade (no translate or rotate) and swaps the height spring for one short 160ms linear resize — still fully dismissible and reopenable, just without the physical motion. Distinct from truncation-word-count: that folds content away in place and the folded object is still the same panel at a smaller size; here dismissal produces a genuinely different, much smaller remainder object (a torn-off stub), and the whole point is that tearing can never destroy the underlying record the way an ordinary close button would."
+      }
+    },
+    {
+      "name": "boxplot-ascii-whisker",
+      "type": "registry:ui",
+      "title": "Boxplot ASCII Whisker",
+      "description": "ASCII-textured boxplot family with one shared fence handle: dragging or keying it re-cuts every box's whiskers live against the real sample, and outliers fade in or reclassify back into the whisker as the cut moves.",
+      "files": [
+        {
+          "path": "registry/core/boxplot-ascii-whisker/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/boxplot-ascii-whisker.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "chart",
+          "boxplot",
+          "data-viz",
+          "ascii",
+          "canvas",
+          "statistics"
+        ],
+        "instruction": "The registry's first distribution instrument: one box-and-whisker plot per group, quartiles computed by linear-interpolation quantile over the real sample (not a pre-aggregated summary). Box bodies are filled with the family's shared ASCII ramp ' .:-=+*#%@' tiled at a constant mid density purely as texture — box height already encodes the interquartile spread, so this is not a second value channel, matching the family's redundant-density convention elsewhere. The real mechanic is the single shared fence handle below the chart: a real <input type=\"range\"> (k, the IQR multiplier, 0.5 to 3.0 in 0.1 steps), visually replaced by a custom track and thumb the way slider-range-shear carries its accessibility, draggable by pointer or fully operable by the native input's own arrow/Home/End/PageUp/PageDown handling. Moving it recomputes, for every box on the chart at once, the low/high fence (Q1 - k*IQR .. Q3 + k*IQR) against the REAL underlying sample: the farthest sample still inside the fence becomes the new whisker cap (eased into position over roughly 300ms, not snapped), and every sample outside the fence renders as a small outlier ring that fades in — a sample that re-enters the fence as k grows fades back out of view instead of disappearing instantly, so the reclassification itself is visible motion, not a jump cut. Each group also has its own real hit button (roving tabindex, ArrowLeft/ArrowRight moving focus) whose hover or focus tints that box's whiskers and outline to var(--accent) and opens a small tooltip with its median, Q1, Q3 and current outlier count; var(--accent) is otherwise reserved for the fence thumb, matching the family's convention of accent for interaction only, never as a value channel. Tokens are read via getComputedStyle at mount and re-read through a MutationObserver on the document root's class attribute, so both themes repaint correctly on toggle. prefers-reduced-motion snaps whisker and outlier changes to their final state in one paint instead of lerping; the fence handle remains fully operable either way. Zero dependencies."
       }
     },
     {
@@ -587,6 +667,57 @@
       }
     },
     {
+      "name": "chart-scatter-ascii-bin",
+      "type": "registry:ui",
+      "title": "Chart Scatter ASCII Bin",
+      "description": "Two-dimensional scatter plot rendered as a glyph-density grid, with a pointer- or keyboard-driven brush that live re-bins the exact points under it and reads out the selection.",
+      "files": [
+        {
+          "path": "registry/core/chart-scatter-ascii-bin/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/chart-scatter-ascii-bin.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "chart",
+          "scatter",
+          "data-viz",
+          "ascii",
+          "canvas",
+          "brush"
+        ],
+        "instruction": "A scatter plot rendered entirely as a glyph-density grid: every raw (x, y) sample is binned into a fixed 42x20 cell grid and each cell's character comes from the shared 10-step ASCII ramp ' .:-=+*#%@', scaled to that cell's point count relative to the densest cell — a static joint-distribution print, redundant with nothing else in the registry (histogram-live-grain tallies one dimension, stem-and-leaf-live keeps every digit, neither bins two continuous axes at once). The real mechanic is the brush: a circular region tracks the pointer over the plot, or an arrow-key-steerable focus target for keyboard users (Shift moves it in larger steps, Escape clears it), and on every move it re-bins the RAW points — not the grid cells — by exact Euclidean distance to the brush centre, so the live readout above the plot ('N pts · mean (x, y)') is an exact statistic over the selection, not a cell-count approximation. Every glyph currently touched by the brush relinks from var(--foreground) to var(--accent) ink in place, and a thin accent ring traces the brush radius — the only colour anywhere in the piece, reserved for the live interaction exactly as chart-bar-dither reserves accent for keyboard focus. Losing focus or pointer-leave clears the brush and every glyph returns to plain ink. Tokens are read via getComputedStyle at mount and re-read through a MutationObserver on the document root's class attribute, so both themes repaint correctly on toggle. On mount, the whole grid fades in over 320ms; prefers-reduced-motion renders it at full opacity immediately and the brush still updates instantly on interaction (no animated lerp, no persistent rAF loop once settled). Zero dependencies."
+      }
+    },
+    {
+      "name": "chart-waterfall-ascii-step",
+      "type": "registry:ui",
+      "title": "Chart Waterfall ASCII Step",
+      "description": "ASCII-ramp waterfall chart where toggling a step excludes or restores its delta and every bar after it — plus the running total — visibly recomputes and re-animates, not just a hover tooltip.",
+      "files": [
+        {
+          "path": "registry/core/chart-waterfall-ascii-step/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/chart-waterfall-ascii-step.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "chart",
+          "waterfall",
+          "data-viz",
+          "ascii",
+          "canvas"
+        ],
+        "instruction": "The registry's first waterfall chart: a start bar, a chain of floating delta bars (each spanning the running cumulative before and after it), and a trailing running-total bar. Every bar fill uses the family's shared 10-step ASCII ramp ' .:-=+*#%@' tiled at a small cell size, with density tracking |delta| relative to the largest bar on the chart — redundant with bar height, exactly like chart-bar-dither's own colour rule (pure var(--foreground) ink, var(--accent) reserved for the hovered or keyboard-focused step). The real mechanic: every intermediate step (not the start, not the total) has a genuine toggle — a transparent hit button sized to its full slot, roving tabindex with ArrowLeft/ArrowRight moving focus between steps, aria-pressed reflecting whether the step is currently included. Activating it (click, or Enter/Space via keyboard) excludes that step's delta from the chain or restores it, and the recompute is rendered as real motion: every bar from that step onward, and the trailing total, eases its floating top/bottom to the newly recomputed cumulative over roughly 420ms, with the displayed numeric label tracking the same lerp — this is what makes it a genuine recompute rather than a tooltip. Hovering or focusing without activating shows a small tooltip with that step's exact contribution and its before/after cumulative, so the numbers are readable before committing to a change. A dashed connector line links each bar's resolved edge to the next bar's start so the chain reads as one continuous bridge even mid-animation. Tokens are read via getComputedStyle at mount and re-read through a MutationObserver on the document root's class attribute, so both themes repaint correctly on toggle with no remount. prefers-reduced-motion snaps every recompute to its final position/value in one paint instead of lerping, and the toggle itself remains fully functional. Zero dependencies."
+      }
+    },
+    {
       "name": "checkbox-domino-run",
       "type": "registry:ui",
       "title": "Checkbox Domino Run",
@@ -914,6 +1045,33 @@
       }
     },
     {
+      "name": "contact-form-teletype",
+      "type": "registry:ui",
+      "title": "Contact Form Teletype",
+      "description": "A contact form whose validation prints as a teletype receipt below it — each field's check accretes as a new line, and correcting a field strikes through the old line and reprints rather than clearing it.",
+      "files": [
+        {
+          "path": "registry/core/contact-form-teletype/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/contact-form-teletype.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "form",
+          "contact",
+          "validation",
+          "mono",
+          "log",
+          "accessibility",
+          "teletype"
+        ],
+        "instruction": "<ContactFormTeletype fields? onSubmit? debounceMs? className?> renders a real <form> (Name, Email, Message by default, each with its own validate(value) returning an error string or null) and, below it, a role=log aria-live=polite receipt panel. 260ms after the last keystroke in a field (debounceMs), that field's validate runs and a new dot-leader line prints into the receipt — 'NAME .......... OK' or 'EMAIL .......... FAIL — not a valid address' — via a width transition stepped one character at a time (steps(N, end)) so it reads as typed rather than faded in. Submitting also validates and prints a line for every field regardless of debounce state. Nothing is ever erased: when a field is corrected and revalidated, its previous receipt line gets a strike-through and stays exactly where it was, and the new result prints as a fresh line below it — the receipt is a real cumulative log of the fill, not a status that overwrites itself. Colors: --foreground for a passing line, --error for a failing one; the form fields themselves use --border/--muted/--accent for resting/hover/focus, no hardcoded hex anywhere. Under prefers-reduced-motion every line renders at full width instantly with no step transition. Zero dependencies, no canvas."
+      }
+    },
+    {
       "name": "container-box-drawing",
       "type": "registry:ui",
       "title": "Container Box Drawing",
@@ -1187,6 +1345,59 @@
           "micro-interaction"
         ],
         "instruction": "Build an inline (non-popover) month calendar, role=grid of 42 real button gridcells, where selecting a range renders as a physical tape measure pulled across the cells rather than a highlighted region. MECHANISM: pointerdown or Enter on a cell drops the hook and anchors the range (status 'anchored'); pointer move, drag, hover, or arrow-key focus movement extends a segmented strip toward the current cell. Segments are computed from real measured cell rects (getBoundingClientRect), not index math, so the strip wraps cleanly into one run per week row when the range spans multiple weeks — each row's run stops at that row's rightmost/leftmost matched cell and a new run picks up on the next row. Tick marks are a repeating-linear-gradient in var(--border) sized to the measured cell pitch (not a fixed px value) so it stays aligned to the grid at any width. A chip on the strip's free end prints the live count ('N nights'), font Geist Mono, tabular-nums; every time the count changes it replays a 60ms number-settle (slide + fade from a removed/re-added CSS class, restarted via a forced reflow so rapid crossings don't stack). A second pointerup/Enter on a different cell confirms and locks the tape (status 'confirmed', strip switches to accent-tinted styling); Escape, or a second press on the anchor cell itself, retracts the tape to zero width on a 260ms ease-out-expo scaleX(0) (transform-origin at the anchor end) and clears the selection. GEOMETRY: one ResizeObserver on the grid wrapper recomputes segments on any layout change (font load, container resize); the tape overlay is a single aria-hidden, pointer-events-none absolutely-positioned layer above the grid so it never intercepts clicks meant for cells beneath it — except the free-end count chip, which re-enables pointer-events on itself alone since it never overlaps a cell. INTERACTION: pointerdown on any cell starts or moves the sequence; a document-level pointerup listener (via refs mirroring latest state, so it never closes over stale closures) resolves drag-release anywhere on screen against the cell under the pointer. Arrow keys move grid focus (roving tabindex, one tabbable cell); Home/End jump to week edges, PageUp/PageDown change month, Shift+PageUp/PageDown change year; while anchored, arrow movement also extends the tape and updates an aria-live=polite region with 'Through July 30, 14 nights'; Enter sets the anchor or confirms; Escape retracts. Cells carry aria-selected for the current range and aria-current=date for today; the grid's aria-describedby points at a persistent readout line above it that mirrors state in plain text (idle / anchored-choose-end / confirmed-with-count) for anyone not watching the tape visually. REDUCED MOTION: the retraction scaleX transition and the number-settle animation are both dropped via prefers-reduced-motion, but the count and locked state still update instantly and correctly — nothing is lost, only the motion. TOKENS: strip fill/border, ticks, and hook use var(--border) and var(--foreground) at low alpha while armed, switching to var(--accent) at low alpha only once confirmed (interaction-only accent use, never the resting/armed color). No canvas — DOM divs plus a CSS repeating-linear-gradient background for the ticks. Controlled (value + onValueChange, value: {start, end} | null) or uncontrolled API; re-anchoring from a confirmed state clears the prior range first. DEMO: a cabin-booking card whose footer price and 'Reserve' button (disabled until a range is confirmed) derive live from the selected range."
+      }
+    },
+    {
+      "name": "device-mockup-ascii-screen",
+      "type": "registry:ui",
+      "title": "Device Mockup ASCII Screen",
+      "description": "A phone-frame device mockup whose screen is a live ASCII/scanline raster; dragging the handle skews the frame while the raster independently resamples its glyph rows to the same tilt.",
+      "files": [
+        {
+          "path": "registry/core/device-mockup-ascii-screen/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/device-mockup-ascii-screen.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "device-mockup",
+          "phone",
+          "ascii",
+          "canvas",
+          "drag",
+          "scanline"
+        ],
+        "instruction": "Build <DeviceMockupAsciiScreen className?>: a phone-shaped frame (rounded-[28px], thick border, a small pill notch) sized 220x440, its screen a <canvas> rendering a fake app UI (header bar, a row of stat blocks, ragged paragraph lines) as literal ASCII glyphs (# = - . by density) at an 8px cell pitch, plus a slow scanline sweep (one bright accent-colored row cycling top to bottom every ~3.2s, paused at its mid-position under prefers-reduced-motion). THE MECHANIC: a real drag handle below the frame (role=button, tabIndex 0, aria-label 'Drag or use arrow keys to tilt the device') applies a CSS `skew(Xdeg, Ydeg)` transform DIRECTLY to the frame element as the pointer moves (drag range +-120px maps to +-14deg on each axis, arrow keys nudge 3deg per press as a keyboard-accessible equivalent) — that transform tilts the bezel, the notch, everything. Independently, the canvas draw pass reads the CURRENT live skewX angle every frame and resamples its OWN glyph raster to match: each text row's horizontal draw position is offset by `tan(skewX) * cellHeight * (row - centerRow)`, recomputed on every paint while dragging, so the screen's ASCII content visibly shears in sync with the frame's tilt through its own procedural redraw rather than being a flat texture merely wrapped inside the frame's CSS transform (drop it and the content would never re-align with a tilted bezel). On release the skew eases back to 0 over ~420ms (eased, one rAF loop) unless reduced motion is on, in which case it snaps directly to 0. This stays a deliberate 2D skew — no perspective/projection math, no three, no WebGL. Colors are token-only: canvas ink var(--foreground), scanline var(--accent), background var(--background)/var(--border) for the bezel, read via getComputedStyle and re-read on a MutationObserver watching the root's class/style attributes. The drag handle is the only interactive control — a real role=button with a visible hover and focus-visible state distinct from rest — everything else (frame, canvas) is aria-hidden decoration. Zero dependencies."
+      }
+    },
+    {
+      "name": "diagram-ascii-flow",
+      "type": "registry:ui",
+      "title": "Diagram ASCII Flow",
+      "description": "A box-drawing flowchart whose connectors are a real orthogonal router: dragging a node re-routes every edge touching it live, cell by cell, recomputing junction glyphs (┼ ├ ┤ ┬ ┴) from scratch as paths cross. Clicking a node selects it and reports its live connection count; arrow keys move the focused node without a pointer.",
+      "files": [
+        {
+          "path": "registry/core/diagram-ascii-flow/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/diagram-ascii-flow.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "diagram",
+          "flowchart",
+          "graph",
+          "ascii",
+          "box-drawing",
+          "drag",
+          "keyboard-navigation"
+        ],
+        "instruction": "Build a flowchart from `nodes` (FlowNode[] — `{id, label}`) and `edges` (FlowEdge[] — `{from, to}` referencing node ids), laid out on a fixed 26x13 monospace character grid. Every node keeps a live `{col, row}` position in React state (seeded from a small default layout for the demo's 6-node/7-edge dataset) and is rendered as an 8x3-cell bordered box (`border-border` at rest) with a real `<button data-diagram-node={id}>` overlay covering it — never a div with a click handler. THE ROUTER (the actual mechanic): for every edge, `edgePath(src, dst)` decides orientation by whether the two node rectangles overlap in column range — if they don't, it's a side-by-side route exiting the source's right or left mid-edge and entering the destination's opposite side; if they do (one stacked over the other), it's a top/bottom route off the vertical mid-edge instead. Either way the path is a single-bend Manhattan Z (straight through if the exit and entry already share a row/column) built as an explicit polyline of grid points. `tracePolyline` walks every edge's polyline one grid cell at a time and OR-accumulates a 4-bit direction mask (N/E/S/W) per cell into one shared `Map<'x,y', mask>` covering ALL edges at once — so where two edges' paths cross or merge, that cell's mask naturally picks up bits from both. A 16-entry lookup table turns every possible mask into its box-drawing character: pure straight runs (`│`/`─`), the four corners (`┌┐└┘`), the three-way junctions (`├┤┬┴`), and the four-way crossing (`┼`) — recomputed as one `useMemo` over ALL node positions, so any node move re-derives the entire glyph grid from a blank map rather than patching stale cells. Grid glyphs render as `aria-hidden` monospace text rows UNDER the node boxes (edges are routed to stop one gap-cell short of every node's border, so they never draw through a node's interior). DRAG: pointerdown on a node's button captures the pointer and records the start client position plus the node's start cell; pointermove converts client-pixel delta into a whole-cell delta (`round(dx/CELL_W)`, `round(dy/CELL_H)`) and, if the resulting cell is inside grid bounds and does not overlap another node's rectangle (a 1-cell buffer, simple AABB check — colliding moves are silently rejected, keeping the last valid position), commits the new `{col, row}`, which re-triggers the router memo so every touched connector visibly re-routes on the same frame — this live re-route during the drag, not a static diagram, is the entire point of the component. SELECT: a pointerup that never moved the node (or a keyboard Enter/Space, which never touches the pointer handlers) fires the node's `onClick`, which toggles a `selectedId` and renders a `data-diagram-selection` readout below the canvas naming the node and its live edge count (`edges.filter(e => e.from === id || e.to === id).length`); a genuine drag sets a ref flag that suppresses the trailing synthetic click browsers fire after a captured pointerup, so dragging a node never also toggles its selection. Clicking empty canvas space, or Escape, clears the selection. KEYBOARD: every node button is a real, always-tabbable, individually-labeled control (`aria-label` states the node name, its connection count, and both available actions) — arrow keys nudge the focused node by exactly one grid cell through the same clamp+collision path the pointer drag uses, so keyboard users reach the identical re-routing mechanic with no pointer at all. Selected node's border and label switch to `--accent`; hover alone (unselected) brightens border toward `--accent` at 40% mix and label to `--foreground` — visibly distinct from both rest and selection. Tokens only (`--background --foreground --muted --border --accent`, read via `getComputedStyle` on the document root, re-read on a `MutationObserver` watching its class attribute) — no hardcoded hex, correct in both themes. No rAF loop: every recompute is a direct response to a pointer or keyboard event, so there is nothing to gate behind `prefers-reduced-motion` beyond the interaction itself, which stays fully available. Pure DOM + CSS, zero dependencies."
       }
     },
     {
@@ -1505,6 +1716,32 @@
           "dashboard"
         ],
         "instruction": "An empty state for a list, board, or dashboard that has nothing in it yet, staged as a plot of land marked out and not yet built on: <StakeLine title description actionLabel onAction shape />. `shape` is one of `{ kind: 'table', rows? }`, `{ kind: 'cards', count?, columns? }` or `{ kind: 'chart' }` and describes the real silhouette of the content that will eventually live here. That silhouette is never guessed at — a template of the real layout (rows stacked full-width, or a CSS grid of card cells, or a plain plot box) is rendered with `visibility:hidden` so it occupies genuine layout space without painting anything, then measured with getBoundingClientRect (and re-measured on resize via a ResizeObserver) so the SVG overlay drawn on top always matches the actual slots, not a fixed illustration. On mount, four short SVG tick marks land at the plot's outer corners one by one (40ms stagger, translateY(-6px) into a back-eased spring settle, stroke in --muted) — literal surveyor's stakes. Once they've settled, dashed string paths (a static 4-3 dash pattern in --border) draw themselves in via stroke-dashoffset on an ease-out-expo curve, outlining the plot's outer boundary plus every future row or card individually, so the emptiness reads as 'planned', not 'loading'. The last string doesn't stop at the plot: it continues down and terminates at the CTA's top border, closing in a small tied-off loop, so the one thing to do is physically wired to the thing that's missing rather than just sitting nearby. Hovering or keyboard-focusing the CTA nudges that connector's control point ~3px sideways — a gentle tug on the string, not a state change — via a CSS `d` transition, and releases back on blur/leave. The whole intro runs about 1.5 seconds; after that every stake and string is inert and the component does nothing until the CTA is used. Unlike skeleton-develop (and every other skeleton loader), which imitates content that is imminently arriving with grey placeholder blocks and offers no action, empty-state-survey is explicitly provisional — surveyor's marks mean 'planned', not 'loading' — and it always ships exactly one CTA that the layout points to, never a silent promise of data. The survey graphic (template + SVG overlay) is entirely `aria-hidden`; the accessible content is an ordinary heading, one sentence of body copy, and a real `<button>`, the only focusable element in the region. Colors are strictly --background, --foreground, --muted, --border and --accent (via the button's existing token classes) — no hex, no canvas, DOM+SVG+CSS only. `prefers-reduced-motion` renders every stake and string already in its settled, fully-drawn state with no draw-in, and the hover tug snaps instead of easing."
+      }
+    },
+    {
+      "name": "feature-grid-ascii-rule",
+      "type": "registry:ui",
+      "title": "Feature Grid ASCII Rule",
+      "description": "A feature grid where hovering or focusing a cell draws real box-drawing connectors to its related features, routed orthogonally through the grid's gutters and retracted glyph by glyph on leave.",
+      "files": [
+        {
+          "path": "registry/core/feature-grid-ascii-rule/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/feature-grid-ascii-rule.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "grid",
+          "feature",
+          "ascii",
+          "mono",
+          "box-drawing",
+          "canvas"
+        ],
+        "instruction": "Build <FeatureGridAsciiRule items cols? className?> where items is FeatureGridAsciiRuleItem[] ({id, title, description, relatedIds: string[]}) laid out in a CSS grid (default 3 columns, 2 rows for 6 items). Each cell is a real <button data-feature-cell={id} aria-label=\"{title}: {description}\"> so hover, focus and click all reach it natively. A single <canvas aria-hidden> absolutely covers the grid. THE MECHANIC: on pointer-enter or focus of a cell, for every id in that cell's relatedIds, a connector is routed from the source cell to the target cell through the ONE shared horizontal gutter between the grid's two rows — never straight through an intervening cell. The route is always 3 orthogonal segments measured live via getBoundingClientRect: a vertical run from the source cell's gutter-facing edge (bottom edge if it's in the top row, top edge if bottom row) down/up to the gutter's mid-line, a horizontal run across the gutter to the target's x, and a vertical run into the target's gutter-facing edge — collapsing to a single straight vertical run when both cells share the same column. This whole path is rasterized into individual box-drawing glyphs (─ for horizontal steps, │ for vertical steps, one of ┌ ┐ └ ┘ at each bend, chosen by which two of up/down/left/right that bend actually connects) at a fixed ~11px pitch, each drawn via ctx.fillText in a monospace face. Glyphs reveal one at a time, source to target, on a per-glyph stagger (~26ms step, ~140ms own fade, eased) while the pointer/focus is on the source cell; on pointer-leave or blur they retract in the OPPOSITE order — the glyphs nearest the target fade first, working back toward the source — driven by one rAF loop keyed off an activation timestamp, never a CSS transition per glyph (there is no DOM node per glyph). Only one cell's connectors are visible at a time. Colors are token-only: canvas ink is var(--foreground) read via getComputedStyle at mount and re-read through a MutationObserver on the root's class/style attributes, so both themes stay correct with no remount; cell borders and backgrounds are Tailwind token utilities. Reduced motion skips the stagger/fade entirely: connectors snap fully in on activation and fully out on deactivation in one paint. Zero dependencies."
       }
     },
     {
@@ -2054,6 +2291,33 @@
       }
     },
     {
+      "name": "keymap-ascii-heat",
+      "type": "registry:ui",
+      "title": "Keymap ASCII Heat",
+      "description": "An ASCII keyboard layout that accumulates real ink density per key as you type into it — each keystroke inks the key, heat decays on an exponential half-life, and the legend rescales to whichever key is currently hottest.",
+      "files": [
+        {
+          "path": "registry/core/keymap-ascii-heat/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/keymap-ascii-heat.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "keyboard",
+          "heatmap",
+          "ascii",
+          "mono",
+          "typing",
+          "data-visualization",
+          "live"
+        ],
+        "instruction": "Build <KeymapAsciiHeat placeholder label className> around a real, visible <input type=text> that the user actually types into (aria-label from the `label` prop). MECHANISM: the keydown handler lives directly on the input's own onKeyDown (never a document-level listener gated on document.activeElement — an autoplay-driven demo runs inside an inert subtree where focus never truly lands, so a focus-gated listener would leave the card dead; binding straight to the input's React event fires regardless). Every keydown whose key resolves to a letter or Space maps to a key id (A-Z, or 'SPACE') and calls pulse(key): a Map<string,{ink,lastAt}> in a ref holds each key's raw ink and the timestamp it was last touched; pulse reads the PREVIOUS entry, decays it forward to now via ink * 0.5^(dt/7000) (7s half-life), adds 1, and stores the new {ink,lastAt} — so heat is a pure function of elapsed time, never a per-frame accumulator, and 'what is this key's ink right now' can be asked at any instant without having run every frame in between. A throttled rAF loop (repaints at most every ~90ms) recomputes every key's CURRENT decayed value from its stored {ink,lastAt} and the loop's own `now`, finds the live max across all keys, and stores both in React state; the loop sleeps (cancels itself) once every key's decayed value has fallen under a small epsilon, and pulse() wakes it again on the next keystroke — so there is no animation running while nobody is typing. RENDERING: each key is a fixed-size cell showing its letter in the foreground normally, with a big background glyph behind it drawn from a 10-step ASCII ramp (' .:-=+*#%@') — the glyph index is that key's current decayed ink divided by the LIVE max across all keys, so the legend and every key's glyph rescale together as the max moves, never a fixed absolute scale. A legend line beneath the keyboard prints the ramp itself alongside 'max=<current max ink, one decimal>', and a second readout beside it names whichever key is currently hovered along with its live decayed ink value, updating on pointerenter/leave — since the keyboard is otherwise a static picture at rest, this hover readout is what makes hover state visibly differ from resting. REDUCED MOTION: skip the rAF loop outright — pulse() still runs the exact same decay math and still updates state, it just does so synchronously inside the keydown handler instead of on a subsequent repaint tick, so a key's ink is still correct at every keystroke, there is simply no continuously-fading glyph between keystrokes. A11Y: the input is the only real control and carries the accessible name; every key cell is a plain aria-hidden decorative div (not a button, not tabbable) since it represents live derived state rather than something to activate — Tab reaches the input, which is the control the 'Tab must reach something' rule cares about. No gate: heat can only be produced by real keystrokes, which the verify gate's single-click model cannot simulate — the `autoplay: type` descriptor is what exercises this component's characteristic non-resting state instead, and its screenshot is what an owner should look at, not a synthetic gate click. Colors are token-only: --foreground at full and reduced opacity for the glyph/letter, --border/--background/--surface for the chrome, --accent only on the input's focus ring. No canvas, zero dependencies."
+      }
+    },
+    {
       "name": "lens-ascii-magnify",
       "type": "registry:ui",
       "title": "Lens ASCII Magnify",
@@ -2328,6 +2592,32 @@
       }
     },
     {
+      "name": "map-choropleth-ascii",
+      "type": "registry:ui",
+      "title": "Map Choropleth ASCII",
+      "description": "ASCII-density choropleth over a fully synthetic hand-seeded tessellation. Hovering or keying through a region isolates it and the legend rescales to a band around its value.",
+      "files": [
+        {
+          "path": "registry/core/map-choropleth-ascii/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/map-choropleth-ascii.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "chart",
+          "map",
+          "choropleth",
+          "data-viz",
+          "ascii",
+          "canvas"
+        ],
+        "instruction": "The registry's first choropleth. The geography is entirely invented: eight hand-placed seed points on a fixed 24x13 cell grid are tessellated by nearest-seed (a plain Voronoi partition computed in-memory, no geo dependency, no GeoJSON, no real coastline or border), each cell resolving to one of eight abstract 'sectors' with a synthetic index value. Region fill uses the family's shared ASCII ramp ' .:-=+*#%@', density tracking each sector's value against the global min/max, with a small fixed-hash per-cell jitter (deterministic, not Math.random) so a solid sector still reads as ink texture rather than a flat block; thin var(--border) lines trace every sector boundary at rest. The mechanic: pointing at a cell (exact grid lookup under the cursor) or moving keyboard focus through the sector list (Tab into the map, then ArrowLeft/Right or Up/Down cycle sectors; Escape clears) isolates that sector — every other sector's cells drop to a fixed low background density at reduced opacity, muted-ink, while the isolated sector keeps its true density and gains its own boundary re-traced in var(--accent) — and the legend gradient bar beneath the map rescales its domain from the global min/max to a tight +/-14 band around the isolated sector's own value, with an accent tick marking exactly where that value falls in the rescaled band. Losing hover or focus restores the global view and the full-domain legend. var(--accent) never appears in the data fill itself, only the isolation boundary and the legend marker, matching the family's reserved-for-interaction convention. Tokens are read via getComputedStyle at mount and re-read through a MutationObserver on the document root's class attribute, so both themes repaint correctly on toggle. On mount the whole map fades in over 340ms; prefers-reduced-motion renders at full opacity immediately and isolation still updates instantly on interaction. Zero dependencies, zero geo/mapping libraries."
+      }
+    },
+    {
       "name": "marquee-ticker-glyph",
       "type": "registry:ui",
       "title": "Marquee Ticker Glyph",
@@ -2352,6 +2642,32 @@
           "instrument"
         ],
         "instruction": "A horizontal ticker tape built from `items: string[]` joined by an optional `separator` (default \"/\"), rendered as fixed-width monospace cells inside an overflow-hidden track. Unlike an auto-scrolling marquee, the tape is a real scrub instrument: pointerdown+drag on the track moves the tape 1:1 with the pointer (no easing while held) and computes instantaneous velocity in characters/sec from the pointer delta each move; release keeps that velocity as momentum, which decays under per-frame friction (0.94^ (dt*60)) back toward the ambient auto-scroll speed. Arrow keys nudge the offset the same way, briefly crossing the resolve threshold so keyboard users feel the same effect the pointer path gets. The mechanic distinct from any other ticker in this registry: PER-CHARACTER LEGIBILITY IS A FUNCTION OF |INSTANTANEOUS SPEED|. Every visible cell is repainted every animation frame from the current fractional tape offset; when |speed| stays under `resolveThreshold` (default 260px/s — comfortably above the ambient auto-scroll speed of 34px/s) each cell shows its real character. Above that threshold — an active fast scrub, or the fast part of a fling — every visible cell instead shows a randomly re-rolled member of a fixed noise charset (`░▒▓#%&@*+=-:.`), re-rolled every frame, so the tape visibly blurs into static and then snaps back into focus the instant it decelerates through the threshold. Cells never go blank and never change width (monospace, fixed cell size measured from a hidden probe span), so there is zero layout jitter regardless of state. One direct-DOM requestAnimationFrame loop owns position, velocity and per-cell textContent — no React state on the hot path. Hovering or focusing the track eases the ambient auto-scroll speed toward zero (same pause courtesy as any ticker) but does not touch the resolve mechanic. A leading pause/resume button (aria-pressed) offers an explicit, keyboard-reachable stop independent of hover. Accessibility: the scrub track is `role=list` with a single `aria-label` holding the full joined item text (the real content, always current, independent of what's mid-blur on screen); the per-character glyph cells inside it are `aria-hidden`. `prefers-reduced-motion: reduce` drops the animated track entirely in favor of a static flex row of real `role=listitem` elements, each with a matching `aria-label` — no scroll, no blur, no momentum, fully legible at all times. Zero dependencies, pure DOM."
+      }
+    },
+    {
+      "name": "masonry-ascii-settle",
+      "type": "registry:ui",
+      "title": "Masonry ASCII Settle",
+      "description": "A masonry gallery whose tiles render as live ASCII halftone and resolve from a coarse print to a fine one as they drop into their packed column slot, re-packing and re-dropping every tile when a resize crosses a column-count breakpoint.",
+      "files": [
+        {
+          "path": "registry/core/masonry-ascii-settle/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/masonry-ascii-settle.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "masonry",
+          "gallery",
+          "ascii",
+          "canvas",
+          "settle",
+          "ink"
+        ],
+        "instruction": "Build <MasonryAsciiSettle tiles className?> where tiles is MasonryAsciiTile[] ({id, title, seed, aspect}), aspect being the tile's height as a multiple of its column width. PACKING: own shortest-column-first math (never CSS `columns`, which flows top-to-bottom per column and cannot be re-packed on demand) — columnsFor(width) breaks at 1 column below 520px, 2 below 860px, 3 above; column width is (containerWidth - gap*(cols-1))/cols and each tile's height is columnWidth*aspect, packed by always placing the next tile into the currently-shortest column. THE MECHANIC: each tile is a <canvas> rendering a deterministic 2-octave value-noise field (per-tile seed) as literal ASCII glyphs from a \" .:-=+*#%@\" luminance ramp, drawn via ctx.fillText at a glyph pitch that EASES from a coarse ~15px cell down to a fine ~6px cell over ~620ms (eased, one rAF loop redrawing every animating tile's canvas each frame) — this is a real resolution change, not a fade or blur filter over a fixed image. That same eased progress simultaneously drives the tile's drop: translateY from -26px to 0 and opacity from ~0.15 to 1, so the tile visibly resolves into focus at the exact moment it lands in its slot. Every tile's drop is staggered ~55ms apart in final top-to-bottom, left-to-right order. On mount, and again any time a ResizeObserver on the container detects the column COUNT itself has changed (not just column width), every tile's position is recomputed via the packing pass and the FULL coarse-to-fine drop replays for every tile, staggered by its NEW position — a resize that changes column count is a real re-pack with visible re-drops, not a CSS reflow that snaps. A resize that keeps the same column count only updates each tile's pixel position/size with no replay. Canvas ink is var(--foreground) on a var(--surface) tile background, both read via getComputedStyle at mount and re-read through a MutationObserver on the root's class/style attributes so both themes stay correct with no remount. This is a display-only gallery — no buttons, nothing to tab to — so an sr-only paragraph lists every tile's title as its accessible content. `prefers-reduced-motion` renders every tile already at its fine pitch and final position on the first paint, skipping the drop and the resolution ease entirely, though re-packing on a column-count-changing resize still recomputes positions instantly. Zero dependencies."
       }
     },
     {
@@ -2804,6 +3120,33 @@
       }
     },
     {
+      "name": "patchbay-ascii-cable",
+      "type": "registry:ui",
+      "title": "Patchbay ASCII Cable",
+      "description": "A patchbay with real, persistent, user-authored topology: drag from one jack to another to create a patch, routed orthogonally onto the shared monospace glyph grid, and once connected a small pulse travels the cable on a loop. Grabbing a jack that already carries a patch unplugs it — the classic pull-the-plug gesture — leaving a loose end you can drop on a new jack or nowhere at all.",
+      "files": [
+        {
+          "path": "registry/core/patchbay-ascii-cable/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/patchbay-ascii-cable.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "patchbay",
+          "cable",
+          "graph",
+          "ascii",
+          "box-drawing",
+          "drag",
+          "keyboard-navigation"
+        ],
+        "instruction": "Build a patchbay from a `jacks` prop (PatchbayJack[] — `{id, label, row: 'top'|'bottom', col}`), defaulting to 3 top jacks (A/B/C) and 3 bottom jacks (1/2/3) with two already-patched pairs. State is a `patches` array of `[jackId, jackId]` pairs — the real, persistent data model, not a visual-only highlight. ROUTING: each jack has a fixed `anchor` point one cell outside its box in its natural cabling direction (straight down for a top-row jack, straight up for a bottom-row one); a patch between two jacks is drawn with `orthogonalPath(anchorA, anchorB)` — a straight line if the anchors already share a row or column, otherwise a vertical-horizontal-vertical jog through the midpoint row — walked cell-by-cell into a shared direction-bit grid (`tracePolyline`, the same N/E/S/W-mask-to-box-glyph technique diagram-ascii-flow's router uses, reimplemented locally since each component folder is self-contained) so that where two patches' cables cross or run parallel, the shared cells resolve to the correct junction glyph (┼ ├ ┤ ┬ ┴) rather than one path overwriting the other. Every character is rendered as its own fixed-width span (never one flowing text string per row) so the cable grid stays pixel-aligned with the absolutely-positioned jack buttons regardless of the actual monospace glyph advance width. THE PATCH GESTURE: pointerdown on a jack starts a gesture without immediately mutating anything; only once the pointer actually MOVES does a fresh pickup (i.e. no jack was already armed) unplug that jack's existing patch, if it had one, and start drawing a live preview cable from its anchor to the current pointer cell — a plain tap that never moves must never destructively unplug, or a keyboard-equivalent click would silently break a live connection. Releasing over a different jack completes the patch (dropping any prior patch either endpoint held); releasing over empty space after a real drag cancels, leaving the plug loose; releasing back on the same jack with no movement leaves it armed, which is also exactly the state a keyboard Enter/Space produces. KEYBOARD: every jack is a real, always-focusable button with an `aria-label` stating its patched partner or 'unpatched' plus the next available action; Enter/Space on an unarmed jack arms it (a `data-patchbay-armed` readout names it beneath the canvas), Enter/Space on a second, different jack completes the patch exactly like a drag-drop would, Enter/Space on the already-armed jack or Escape cancels. PULSE: once a patch exists, a single rAF loop (skipped entirely under `prefers-reduced-motion: reduce`, whose cable still renders, just motionless) walks a small `--accent` marker span along each patch's flattened cell path on a 1.4s loop, writing its position straight to the DOM via a ref — no per-frame React state. Hover and keyboard focus both shift a jack's border toward `--accent`; an armed jack's border is a persistent `--accent`; a patched-but-idle jack's label is `--foreground` rather than `--muted`. Tokens only (`--background --foreground --muted --border --accent`, read via `getComputedStyle` on the document root, re-read on a `MutationObserver` watching its class attribute) — no hardcoded hex, correct in both themes. Zero dependencies, pure DOM + CSS."
+      }
+    },
+    {
       "name": "picker-pareto-frontier",
       "type": "registry:ui",
       "title": "Picker Pareto Frontier",
@@ -2856,6 +3199,32 @@
           "filter"
         ],
         "instruction": "Build a popover primitive whose entrance reads as a plumb bob dropping and settling on a string, not a layer fading in from nowhere, taking `trigger` (rendered inside the trigger button), `children` (the panel body), an `interaction` mode (`\"click\"` default or `\"hover\"`), `label` (the panel's accessible name in click mode), `triggerLabel`, `placement` (`\"bottom\"` default or `\"top\"`), `panelWidth` and `className`/`panelClassName`. The panel and a 1px SVG line ('the string', stroked in `var(--border)`) live inside one wrapper whose CSS `transform-origin` sits exactly at the anchor point — the trigger's facing edge, horizontally centered — so rotating that wrapper reads as the bob swinging on a fixed line: the pivot itself never visibly moves because it IS the rotation origin. Entry is one declarative keyframe sequence, no JS physics loop: a 12px translateY drop (mirrored to +12px when the panel is flipped above the trigger) plus a damped rotation sequence of -2.5deg, 1.2deg, -0.4deg, 0deg, opacity resolving to 1 by 14% of the way through a ~480ms run. Closing is NOT the entrance reversed: the string gets its own quick opacity-only cut (90ms ease-in) while the panel, on a 70ms stagger, drops 6px and fades with ease-in over 160ms — two separate exit animations on two separate elements, which is what lets the string visibly 'let go' before the bob falls, versus one shared transform animating both at once. A one-time collision check at open (trigger rect vs viewport, measured against the rendered panel height) flips the panel to the opposite side when the preferred side doesn't fit and the other side has more room; a flipped placement mirrors the drop direction and re-orders the string to stay nearest the pivot. `interaction=\"click\"` is a non-modal popover: the trigger's click only ever opens it (never toggles closed) — Escape (from anywhere while it's mounted) and an outside pointerdown are the close paths, and both return focus to the trigger; opening moves focus into the panel (`role=\"dialog\"`, `tabIndex=-1`, labeled by `label`) exactly once per fresh open. `interaction=\"hover\"` is the profile-hovercard variant: it opens on pointer hover after a 120ms delay (debounces a fast mouse pass) or on trigger focus instantly — delaying a keyboard user's open would be a real accessibility bug — closes once both hover and focus have left the whole component (a 140ms grace absorbs the trigger-to-panel handoff), and never forces focus into the panel; the trigger carries `aria-describedby` instead of `aria-expanded`, and because the panel is a plain DOM sibling of the trigger rather than portaled, Tab from the focused trigger reaches the panel's own interactive content next in natural order — the brief's 'contents are focusable from frame one' holds because nothing about the entrance animation gates pointer-events or tabindex. No portal at all, in either mode: both trigger and panel live in one wrapper `<span>`, so outside-pointerdown containment, hover/focus-within evaluation and Tab order are all ordinary same-subtree DOM, with the standard caveat that an ancestor's `overflow:hidden` can clip it. `prefers-reduced-motion` replaces the whole sway with a flat 120ms opacity fade at the final resting position in both directions — no drop, no rotation, the string rendered already in place with no animation of its own, and no split string-cut/panel-drop staging on close. Every color is a token (`--background --foreground --muted --border --accent`); the string's `stroke` is `var(--border)` directly, not a hardcoded hex, so both themes render correctly. Zero dependencies, DOM+SVG+CSS only, no canvas."
+      }
+    },
+    {
+      "name": "post-list-ascii-index",
+      "type": "registry:ui",
+      "title": "Post List ASCII Index",
+      "description": "A blog/post list with a live ASCII gutter: j/k and arrow-key navigation moves a roving-tabindex selection, a running index rule eases to track it, and each post's reading length redraws as an ASCII bar that recomputes on selection.",
+      "files": [
+        {
+          "path": "registry/core/post-list-ascii-index/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/post-list-ascii-index.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "blog",
+          "post-list",
+          "ascii",
+          "canvas",
+          "keyboard",
+          "index"
+        ],
+        "instruction": "Build <PostListAsciiIndex posts className?> where posts is PostListAsciiItem[] ({id, title, excerpt, date, minutes}). Rows are real <button data-post-row={id} tabIndex={isActive?0:-1} aria-current aria-label=\"{title}, {date}, {minutes} minute read\"> in a roving-tabindex list (only the active row is a real Tab stop, matching this registry's established roving pattern) to the right of a narrow (56px) gutter column holding one <canvas aria-hidden>. THE MECHANIC, all driven by real getBoundingClientRect measurements of the row buttons (re-measured on a ResizeObserver over the container): (1) a vertical hairline rule runs the gutter's full height; (2) every row gets a tick into the rule, its 1-based index number above the tick, and its reading time rendered as a literal ASCII bar (repeated █ glyphs, length proportional to `minutes` capped at a 10-minute full bar) plus the raw \"Nm\" label; (3) a ▸ marker EASES (lerp 0.22/frame, one rAF loop) to the vertical centre of whichever row is currently active — this is the 'running index rule': it genuinely tracks the live cursor position, redrawn every frame while catching up, then the loop stops (wakes again next selection change); (4) the ACTIVE row's bar does not just recolor — it redraws with its own left-to-right reveal sweep (a fresh eased fill from empty to its full length over ~260ms) every time selection changes, so the metric visibly recomputes on selection rather than being a static picture with a highlight layered over it. Selection moves via ArrowDown/j and ArrowUp/k (Home/End jump to the ends), each press calling focus() on the newly active row so keyboard, click and programmatic selection all funnel through one path; an aria-live=polite sr-only span announces the newly selected post's title and reading time. Canvas ink is var(--foreground)/var(--muted)/var(--border) for rest state and var(--accent) for the active row's bar and the running marker, read via getComputedStyle at mount and re-read through a MutationObserver on the root's class/style attributes so both themes stay correct with no remount. `prefers-reduced-motion` renders the marker at its final position and every bar at its final length on every paint, skipping the lerp and the reveal sweep entirely. Rows also have real hover and focus-visible states (background tint on hover, an inset accent outline on focus) distinct from resting. Zero dependencies."
       }
     },
     {
@@ -3238,6 +3607,33 @@
       }
     },
     {
+      "name": "sankey-ascii-flow",
+      "type": "registry:ui",
+      "title": "Sankey ASCII Flow",
+      "description": "A weighted, branching multi-stage flow diagram rendered as ASCII density bands instead of colour ribbons. Clicking a node isolates every ancestor and descendant on its path — the surviving nodes and bands re-stack from scratch using only the isolated subset's values, so they genuinely grow to fill the space rather than the rest just dimming.",
+      "files": [
+        {
+          "path": "registry/core/sankey-ascii-flow/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/sankey-ascii-flow.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "sankey",
+          "flow",
+          "chart",
+          "data-viz",
+          "ascii",
+          "graph",
+          "isolate"
+        ],
+        "instruction": "Build a 3-stage weighted flow from `nodes` (SankeyNode[] — `{id, label, stage: 0|1|2, value}`) and `links` (SankeyLink[] — `{from, to, value}`, only ever connecting adjacent stages). Node vertical position and height are computed by `stackSpans`, a 1D cumulative-rounded stacking (the same technique as treemap-ascii-partition's layoutSlice, one axis): every node's span boundary derives from the running total of values-so-far in its stage, never from independently rounding its own share, so stacked nodes always share an exact edge. Each node is a real `<button data-sankey-node={id}>` (never a div), a bordered box sized from its span, with its label and value inside. CONNECTING BANDS are the family's shared 'draw density instead of colour' rule applied to a flow rather than a bar or rectangle: for every link, `stackSpans` partitions the SOURCE node's own span among its outgoing links (in declared order) and, separately, partitions the DESTINATION node's span among its incoming links — giving each link a sub-span on both ends. The band between those two sub-spans is rendered on the shared monospace grid by walking every column between the two stages and, at each column, linearly interpolating the top and bottom row bounds between the source sub-span and destination sub-span, filling every row inside that interpolated band with one ASCII_RAMP (' .:-=+*#%@') character whose level is `round((link.value / maxVisibleLinkValue) * 9)` — bigger flow reads as denser ink, never a color hue. THE ISOLATE MECHANIC (the real interaction, not the picture): clicking a node computes its full upstream (every node that can reach it by walking links backward, recursively) and downstream (every node reachable forward, recursively) and keeps exactly `{selected} union upstream union downstream`; everything else — other nodes AND any link not between two surviving nodes — is dropped from the data entirely, not just dimmed. Because `stackSpans` re-derives every stage's spans from ONLY the currently-visible nodes' values (never the original full-graph spans with some hidden), the surviving nodes and bands re-stack to claim the SAME ROWS_STAGE height among just themselves — a node that was a sliver next to five siblings can end up half the diagram's height once isolated, which is what makes this a genuine re-weight rather than an opacity trick. A `data-sankey-isolated` readout beneath the diagram states which node is isolated and how many of the original nodes survive, with a real 'Show all' button (and Escape) that clears the isolation and restores the full graph. Every node button carries an `aria-label` stating its value, connection count, and the isolate action; hover and keyboard focus both distinctly shift the border toward `--accent` and the label from `--muted` to `--foreground`, and the isolated node's border stays `--accent` persistently. Tokens only (`--background --foreground --muted --border --accent`, read via `getComputedStyle` on the document root, re-read on a `MutationObserver` watching its class attribute) — no hardcoded hex, correct in both themes. No rAF loop — every recompute is a direct response to a click, so there is nothing animated to gate behind `prefers-reduced-motion`. Pure DOM text + CSS, zero dependencies."
+      }
+    },
+    {
       "name": "scroll-caliper",
       "type": "registry:ui",
       "title": "Scroll Caliper",
@@ -3349,6 +3745,34 @@
       }
     },
     {
+      "name": "seatmap-ascii-pick",
+      "type": "registry:ui",
+      "title": "Seatmap ASCII Pick",
+      "description": "An ASCII venue floor plan where dragging a marquee selects a contiguous block of seats — taken seats and the centre aisle break the run, and the selection visibly snaps to the longest unbroken block inside the drag, with a live seat count.",
+      "files": [
+        {
+          "path": "registry/core/seatmap-ascii-pick/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/seatmap-ascii-pick.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "seatmap",
+          "selection",
+          "grid",
+          "ascii",
+          "mono",
+          "drag",
+          "keyboard-navigation",
+          "booking"
+        ],
+        "instruction": "Build <SeatmapAsciiPick seats rowLabels colLabels sectionLabel className> over a rows x cols SeatStatus grid (each cell 'available' | 'taken' | 'aisle'; default a 6-row x 11-col plan with a fixed aisle column down the centre and scattered taken seats). MECHANIC: pointerdown on an available seat sets a drag anchor and live focus cell to it (aisle cells cannot start a drag); while the pointer is down (no setPointerCapture, so native pointerenter fires on whatever seat or aisle cell the pointer is actually over, and a global window pointerup ends the drag regardless of release target) each hovered cell's onPointerEnter updates only the focus corner, and the raw marquee rectangle is the min/max of anchor and focus on both axes. THE SNAP: the rectangle itself is never the selection. On every anchor/focus change, scan every row inside the rectangle's row span for the longest unbroken horizontal run of 'available' seats whose columns lie fully inside the rectangle's column span — a 'taken' seat or the aisle column breaks a run at that exact point — and take the single longest run found across all scanned rows as the actual selection; ties keep the first (topmost) row found. This is what makes 'unavailable cells break the block, selection snaps to the largest valid run' a real, observable behavior rather than an assumption: dragging a rectangle that straddles a taken seat or the aisle visibly shrinks the highlighted block to whichever side has the longer clear run. A bare pointerdown+pointerup on one seat with no movement commits a 1x1 rectangle, so a single click on an available seat is itself a valid (length-1) run and the gate can reach a real non-resting state without a drag. KEYBOARD: one roving-tabindex button per seat (aisle cells are plain non-interactive spans, never focusable); plain ArrowKeys move the active seat and collapse the selection to it, skipping straight over the aisle column so Left/Right never lands on a gap; Shift+ArrowKeys extend the marquee from a fixed anchor exactly like a drag would, re-running the same snap-to-longest-run logic per keystroke. RENDERING: available seats render ○, taken seats render × (rendered disabled, not merely styled — a real disabled attribute, so it is excluded from the tab order and cannot start a drag), seats inside the current run render ● with an --accent-derived tint (bg-accent/[0.16], never a literal hex), and the aisle renders as blank whitespace with no seat glyph at all. A live readout beneath the plan (aria-live=polite, doubling as its own accessible announcement — no separate sr-only region needed) prints '<n> seats selected — <row label> <first seat>–<last seat>' or a 'no seats selected' placeholder at rest. A11Y: every seat button has an aria-label stating its row, its seat letter, and its status (taken / selected / available); disabled seats are real disabled buttons, satisfying the 'exposed, non-disabled interactive control needs an accessible name' rule by not being exposed as an actionable control at all. Colors are token-only (--foreground/--muted/--border/--background/--accent via Tailwind classes) — no canvas, no hex. No motion beyond a 100ms background-color transition on hover/selection, skipped under prefers-reduced-motion via motion-reduce:transition-none; there is no rAF loop anywhere in this component."
+      }
+    },
+    {
       "name": "segmented-control-fling",
       "type": "registry:ui",
       "title": "Segmented Control Fling",
@@ -3398,6 +3822,34 @@
           "micro-interaction"
         ],
         "instruction": "Build a single-select (DOM trigger button + listbox panel) whose surfaces are real frosted glass: each surface stacks a canvas 2D layer, then a translucent bg-surface span with backdrop-blur + saturate that frosts the canvas beneath it, then the content. The canvases draw caustics as 6 (trigger) / 8 (panel) radial-gradient blobs summed with globalCompositeOperation 'lighter' at 0.06-0.10 alpha, colors mixed between --accent and --foreground, with EXPLICIT canvas style.width/height plus a DPR-2-clamped backing store, and a full clear + redraw every frame (no destination-in accumulation). Idle simmer: each blob drifts on independent sin/cos phase offsets at a 6-10 px/s peak (amplitude 10-16px with frequency = speed/amplitude), running only while the panel is open, onscreen (IntersectionObserver), and the tab is visible; the closed trigger shows one static frame and the rAF is fully asleep. Open: panel with transform-origin at the trigger top scales 0.96 to 1 over 180ms on cubic-bezier(0.16,1,0.3,1) via WAAPI while blob anchors start clustered at the origin and spring (k=60 s^-2, zeta=0.9, ~450ms settle) to positions redistributed evenly down the list height. Active-row lens: a radial displacement field of radius 56px pulls blob centers up to 6px toward the active row center plus a tight accent pool under the row; the lens position follows cursor-hover or keyboard-active targets (one unified target) on a spring k=140 s^-2, zeta=0.8, with a forced-settle deadline snapping it 1.0s after the last input; lens coordinates are panel-local offsets from getBoundingClientRect deltas, never absolute page coords. Keyboard: full listbox pattern — trigger aria-haspopup=listbox aria-expanded, Enter/Space/ArrowDown/ArrowUp open, focus moves to the listbox which tracks aria-activedescendant, Up/Down skip disabled options, Home/End, 500ms typeahead buffer with startsWith matching, Enter (or Space with an empty buffer) commits, Esc and outside pointerdown close and restore focus to the trigger, hover and keyboard drive the same lens. Ink is getComputedStyle-derived from --accent/--foreground at mount and re-derived live by a MutationObserver on documentElement class so both themes render correctly. prefers-reduced-motion: static frost texture at anchor targets, no drift or lens, instant open/close. Guard zero-size hosts before sizing canvases (the panel is display:none while closed), and tear down every rAF, WAAPI animation, observer, listener, and typeahead timer on unmount. Demo: a deployment-settings card with a labeled project input, a Region select over believable region/code option data, a Failover select, and a footer status line."
+      }
+    },
+    {
+      "name": "sheet-ascii-range",
+      "type": "registry:ui",
+      "title": "Sheet ASCII Range",
+      "description": "A spreadsheet-style rectangular cell range select where the border draws itself in real box-drawing glyphs (┌─┐│└┘) and a live ASCII status bar prints the aggregate — count, sum, mean, min, max — as the range grows by drag or Shift+Arrow.",
+      "files": [
+        {
+          "path": "registry/core/sheet-ascii-range/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/sheet-ascii-range.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "spreadsheet",
+          "grid",
+          "selection",
+          "ascii",
+          "mono",
+          "box-drawing",
+          "keyboard-navigation",
+          "data-visualization"
+        ],
+        "instruction": "Build <SheetAsciiRange data rowLabels colLabels unit title className> over a rows x cols numeric grid (default a 6x8 synthetic shipment log). MECHANIC: pointerdown on a cell sets both the drag anchor and the live focus cell to it; while the pointer is down (no setPointerCapture — this deliberately relies on native hover/enter events firing on whichever cell the pointer is currently over, exactly like a real spreadsheet drag, and a global window 'pointerup' listener ends the drag regardless of what element the pointer released over), each subsequent cell's onPointerEnter updates only the focus corner, and the selection rectangle is the min/max of anchor and focus on both axes — recomputed on every cell gained or lost, not just on release. A bare pointerdown+pointerup on one cell with no movement commits a 1x1 rectangle immediately, so the mechanic has a resting, gate-visible non-drag path too. KEYBOARD: one roving-tabindex button per cell (tabIndex 0 only on the current focus cell); plain ArrowKeys move the active cell and collapse the selection to it (spreadsheet cursor behavior); Shift+ArrowKeys (preventDefault, so the page never scrolls under the extend) keep the anchor fixed and move only the focus corner, extending or shrinking the rectangle exactly like a mouse drag would, and the aggregate recomputes on every keystroke. BORDER: every cell on the rectangle's perimeter renders one absolutely-positioned, aria-hidden box-drawing glyph seated on the seam at its own edge/corner of the CELL (not a separate overlay grid) — ┌┐└┘ at the four corners (priority: a cell that is simultaneously top+left is the top-left corner, etc.), ─ centered on the outer edge of top/bottom perimeter cells, │ centered on the outer edge of left/right perimeter cells — so the whole rectangle's boundary reads as a real drawn box even though every glyph belongs to its own cell's DOM. Selected cells (including interior ones) get a flat --accent-derived tint (bg-accent/[0.09], via Tailwind's arbitrary-opacity utility over the token, never a literal hex) with no glyph. STATUS BAR: a visible (not sr-only — it doubles as its own accessible live region via aria-live=polite) monospace line beneath the grid prints 'n=<count> Σ=<sum> x̄=<mean> min=<min> max=<max> <unit>' whenever the rectangle is non-empty, or a plain 'n=0 — click a cell or drag a range' placeholder at rest. A11Y: role=grid on the container, role=gridcell + aria-selected on every cell, and each cell's aria-label states its row label, column label and raw value/unit so a screen reader can navigate the sheet cell-by-cell independent of the visual rectangle. Colors are token-only (--foreground/--muted/--border/--background/--accent via Tailwind utility classes) — no canvas, no hex, so there's nothing to re-derive on theme change. No motion beyond a 100ms background-color transition on hover/selection, skipped under prefers-reduced-motion via motion-reduce:transition-none; there is no rAF loop anywhere in this component."
       }
     },
     {
@@ -5174,6 +5626,33 @@
       }
     },
     {
+      "name": "treemap-ascii-partition",
+      "type": "registry:ui",
+      "title": "Treemap ASCII Partition",
+      "description": "A recursive slice-and-dice treemap where every rectangle's interior is filled with an ASCII density ramp keyed to its value instead of a colour scale. Clicking a rectangle with children descends into it, recomputing the partition over just its children; a breadcrumb (or Escape) climbs back out to any ancestor.",
+      "files": [
+        {
+          "path": "registry/core/treemap-ascii-partition/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/treemap-ascii-partition.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "treemap",
+          "partition",
+          "chart",
+          "data-viz",
+          "ascii",
+          "hierarchy",
+          "drill-down"
+        ],
+        "instruction": "Build a recursive slice-and-dice treemap from a `data` prop (TreemapNode[], each `{id, label, value, children?}`). At any moment the component renders exactly one level: the root's children, or — once the user has descended — the children of whichever node is currently open. Layout is computed on a fixed 34x15 character-cell grid: `layoutSlice(nodes, x, y, w, h, dir)` walks the sibling list once, accumulating each node's share of the total value and deriving every boundary from the RUNNING cumulative fraction (`start + round((acc/total)*axisSize)`), never from independently rounding one node's own share — that cumulative-rounding is what keeps adjacent cells' edges flush with no 1px gap or overlap. The split axis alternates with depth: horizontal at the root, vertical one level down, horizontal again below that (classic slice-and-dice). Each rectangle is a real, focusable `<button data-treemap-rect>` (never a div with a click handler) sized and positioned from its cell-grid rect, with a plain `border-border` CSS border (crisp rectangle edges) and an interior fill of `ASCII_RAMP = ' .:-=+*#%@'` — the shared dithered-chart-family ramp — repeated across `value/maxValue-at-this-level` many ramp positions as literal monospace text rows (never canvas), so bigger value reads as denser/darker ink fill, not a colour hue. A small label+value badge sits over the fill with a translucent background so it stays legible regardless of density. Clicking (or Enter/Space on) a rectangle whose node HAS children descends: the current path array gains that node's id and the whole grid re-lays-out over just its children, filling the same 34x15 area again — descending is never a shrinking inset of the old rectangle. A leaf rectangle (no children) is still focusable/hoverable but the click is a no-op. A breadcrumb row above the grid shows Root plus every ancestor label, each a real button that truncates the path back to that depth; a dedicated `data-treemap-up` button (aria-label naming the level it returns to) renders ONLY once the path is non-empty, giving one-click access back exactly one level, and Escape does the same. Roving tabindex across the current level's rectangles: ArrowRight/Down and ArrowLeft/Up move focus between siblings by index, both wired through the same underlying focus-index state so keyboard and pointer never fight over which rectangle is 'active'. Hover and keyboard focus are visibly distinct from rest and from each other: hover brightens the border toward `--accent` and the fill ink from `--muted` to `--foreground`; focus additionally gets a `--accent` focus-visible outline. Tokens only — `--background --foreground --muted --border --accent` read live via `getComputedStyle` on the document root and re-read on a `MutationObserver` watching its class attribute, so both themes repaint correctly with no remount. No dependencies, no canvas — pure DOM text + CSS."
+      }
+    },
+    {
       "name": "truncation-taper-fade",
       "type": "registry:ui",
       "title": "Truncation Taper Fade",
@@ -5412,6 +5891,34 @@
           "accessibility"
         ],
         "instruction": "A voice-capture chip built around a real Web Audio AnalyserNode — no component in this registry (or the prior-art it was researched against) fakes its bars with Math.random(), and this one doesn't either. Four states, told apart by the amplitude strip's MOTION rather than color, because this repo's token set has no red/green: idle is a perfectly static flat hairline (nothing has happened yet, so nothing moves); listening reads one real frequency bin per SVG bar straight off the live microphone every animation frame (analyser.fftSize is set to 2× the bar count so frequencyBinCount lands exactly on one bin per bar, smoothingTimeConstant 0.75 for the browser's own damping rather than hand-rolled easing); processing plays after capture stops while a consumer-supplied onCapture(durationMs) promise is in flight — a deterministic travelling sine sweep across the bars, explicitly NOT audio data, signalling 'still working' honestly; error is flat like idle but the strip takes one denial-shake and a legible reason renders in visible text below it (permission denied, no device found, device busy, no Web Audio support, or a client-side 8s timeout as a safety net against a stuck permission flow), so 'never started' and 'tried and failed' never look identical. The microphone is requested ONLY from the capture button's click handler, never on mount or on any other lifecycle event — getUserMedia only ever runs in response to an explicit user gesture. A denied or unavailable microphone renders that same honest error state rather than leaving a dead control, and the component renders and behaves correctly with zero microphone hardware and zero granted permission, which is exactly the environment its own screenshot verifier runs in. The capture control is a single toggle <button> with a computed aria-label (Start capturing / Stop capturing / Connecting / Processing / Retry) and aria-pressed reflecting listening state — never role=switch, so there's no separate aria-checked contract to satisfy. All state transitions announce through a polite aria-live role=status region; the error reason additionally renders as visible on-page text (not screen-reader-only) linked to the button via aria-describedby, because a legible error a sighted user can actually read is the whole point of the honesty requirement. Every bar is a fixed-geometry SVG rect; the only thing a requestAnimationFrame loop ever touches is a CSS transform: scaleY() written straight to each rect's ref (transform-box: fill-box, origin centred on the pill), never a height/y attribute rewrite — React state changes only on discrete mode transitions (idle/requesting/listening/processing/error), never per audio frame. Stopping capture always releases the MediaStream tracks and closes the AudioContext, on unmount too. prefers-reduced-motion keeps every state fully legible and operable: the listening meter still updates live but throttled to ~4/sec with a hard snap instead of a 60fps redraw (it's data, not decoration), the processing sweep is replaced by one static distinct bar pattern set once, and the error shake is dropped entirely — nothing is hidden, only the decorative motion is. Pure DOM + SVG + CSS, zero dependencies, zero canvas."
+      }
+    },
+    {
+      "name": "waveform-ascii-scrub",
+      "type": "registry:ui",
+      "title": "Waveform ASCII Scrub",
+      "description": "An audio-style waveform rendered as columns of ASCII density glyphs with a draggable playhead — dragging (or hovering, or holding keyboard focus) subdivides the glyph columns nearest the cursor into finer sub-columns that re-ink the region at higher resolution, while the rest of the strip stays coarse.",
+      "files": [
+        {
+          "path": "registry/core/waveform-ascii-scrub/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/waveform-ascii-scrub.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "waveform",
+          "ascii",
+          "audio",
+          "canvas",
+          "scrub",
+          "slider",
+          "drag",
+          "accessibility"
+        ],
+        "instruction": "<WaveformAsciiScrub value? defaultValue? duration? onValueChange? label? className?> draws a fixed-width canvas waveform from a locally synthesised (no audio API, no network) layered-sine amplitude function sampled peak-in-bucket across 64 base glyph columns, each rendered as a Geist Mono density character from ' .:-=+*#%@' stacked into a symmetric bar mirrored above and below the centerline. At rest every column is exactly that one coarse sample. Dragging the accent playhead (a role=slider div overlaying the canvas, pointer and keyboard driven), hovering anywhere over the strip, or holding it in keyboard focus subdivides the ~6 base columns nearest that position into 3 finer sub-columns apiece, each independently re-sampling its own narrower time span — genuinely finer detail, not an interpolated blur — while columns outside that radius stay at base resolution; the radius eases in and out over roughly 250ms rather than snapping, and collapses back to zero (fully coarse) the instant nothing is hovered, dragged or focused. Keyboard: ArrowLeft/Right step 1%, PageUp/PageDown step 5%, Home/End jump to the ends; aria-valuenow/aria-valuetext (an M:SS derived from the duration prop) update on every commit. Colors read live from --foreground/--border/--accent via getComputedStyle, resynced on a documentElement class MutationObserver — no hardcoded hex. Under prefers-reduced-motion the resolution radius snaps instantly with no eased rAF loop. Zero dependencies."
       }
     },
     {
@@ -5876,6 +6383,60 @@
           "colour"
         ],
         "instruction": "A calendar heatmap laid out column-major — one column per week, seven rows for weekdays — where magnitude is carried by a five-step sequential ramp of a single hue rather than a rainbow or a red-to-green scale. The ramp is not two hardcoded palettes: each step is mixed at runtime with color-mix(in oklab, var(--accent) N%, var(--background)) at 18/34/52/74/100, so the same five stops resolve to ink-on-paper depths in light and to lit water in dark, and a consumer who re-tokenises the accent gets a re-stepped ramp for free. A day with no reading is deliberately NOT step zero of that ramp — it is drawn in a border-derived slack colour, because a bottom-step cell and an empty cell mean different things and a viewer cannot be asked to tell them apart by lightness alone. The legend runs slack → five depths → flood, and the only numeric readout is the caption, which reports the hovered or focused day and otherwise reports the peak: one direct label rather than a number stamped on 182 cells. Interaction is a real grid, not a wall of tooltips — the whole heatmap is one tab stop via roving tabindex, arrow keys walk it (left/right by week, up/down by weekday) with focus moved imperatively so the browser scrolls the cell into view, every cell carries an aria-label of its date and value, and the caption is aria-live so a screen-reader user hears the value the sighted user reads. The hovered or focused cell lifts 35% and takes a two-ring highlight — a background-coloured ring first, then an accent ring — so it separates from its neighbours instead of bleeding into one continuous field. Under prefers-reduced-motion the lift and its transition are dropped; the ring, the readout and the keyboard grid are untouched."
+      }
+    },
+    {
+      "name": "hero-ascii-eclipse",
+      "type": "registry:ui",
+      "title": "Hero ASCII Eclipse",
+      "description": "A full-bleed ASCII hero built around an occlusion event — a dark glyph disc transits a bright sun disc over a fixed starfield, the pointer dragging the transit, and a corona blooms at the rim only as the two centers nearly align, the way a real solar corona is only visible near totality.",
+      "files": [
+        {
+          "path": "registry/loud/hero-ascii-eclipse/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/hero-ascii-eclipse.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "loud",
+        "tags": [
+          "ascii",
+          "hero",
+          "background",
+          "canvas",
+          "cursor",
+          "eclipse",
+          "occlusion"
+        ],
+        "instruction": "Build a full-bleed Canvas 2D hero: a fixed sun disc (radius ~15% of the shorter canvas dimension, centered slightly above screen-center) sits over a sparse fixed breathing starfield (identical technique to hero-ascii-terrain's sky: seeded via mulberry32, alpha twinkling on a per-star sine phase), and a moon disc (radius ~1.04x the sun's, so it can fully cover it) transits across it. COMPOSITING, per cell, in strict occlusion order: if the cell is within the moon's radius, it is ALWAYS blank, unconditionally occluding sun or star beneath it — there is no partial-transparency moon. Otherwise, if within the sun's radius, draw the photosphere: the shared ' .:-=+*#%@' ramp indexed by a radial falloff (brighter toward the sun's own center), in the --foreground token. Otherwise, if within a corona ring band just outside the sun's radius (width ~65% of the sun's radius) AND the scalar 'corona intensity' is above a small threshold, draw a corona glyph whose density is the product of a radial falloff and an angular 'streamer' term — sin(angle * 7 + t * 1.4), a smooth per-angle flicker, not noise — scaled by that intensity, rendered in the --accent token (the one place in this hero color leaves pure ink, deliberately, since a corona is the visual payoff). CORONA INTENSITY is a single scalar, pow(max(0, 1 - centerDistance / (sunRadius * 0.85)), 2): near zero for an ordinary partial transit and blooming only as the moon's center nearly coincides with the sun's — real eclipse astronomy, not a cosmetic pulse. Otherwise the cell falls through to the starfield (occluded by the moon check above already handled) or stays blank. The moon's position is the pointer's, inside the container, eased 0.08/frame toward the raw position; with no active pointer, an idle sweep (9s period, sine-driven horizontal traverse of ~2.6 moon-radii either side of the sun plus a small vertical bob) keeps the transit alive on its own. Direct-DOM rAF, zero React state on the hot path; grid buffers/typed arrays sized once per resize (cols/rows via Math.ceil, not floor). Ink is read via getComputedStyle(canvas).color plus the --muted and --accent custom properties at mount, re-derived on a documentElement class MutationObserver. Mono cell measured via an offscreen canvas's measureText. prefers-reduced-motion renders exactly one static frame with the moon parked clear of the sun (an ordinary partial-transit moment, corona at rest) and skips the rAF loop and pointer listeners entirely. Loop pauses on document.hidden, resumes on visibilitychange. Optional children render over the field, bottom-left anchored with padding. Props: cellSize (grid cell px, default 13), children, className."
+      }
+    },
+    {
+      "name": "hero-ascii-rainfall",
+      "type": "registry:ui",
+      "title": "Hero ASCII Rainfall",
+      "description": "A full-bleed ASCII precipitation hero — every column runs its own independent falling drop with a fixed rows/sec speed and trail length, and the pointer bends nearby streams sideways like wind gusting through rain instead of painting or warping cells directly.",
+      "files": [
+        {
+          "path": "registry/loud/hero-ascii-rainfall/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/hero-ascii-rainfall.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "loud",
+        "tags": [
+          "ascii",
+          "hero",
+          "background",
+          "canvas",
+          "cursor",
+          "rain",
+          "particles"
+        ],
+        "instruction": "Build a full-bleed Canvas 2D hero: one independent falling drop per grid column, each a float head-row position advancing at its own fixed rows/sec speed (9-22) with its own trail length (6-18 rows), seeded via a deterministic mulberry32 PRNG (never Math.random) so a session's rainfall is reproducible. A column's glyph buffer only gets a fresh random character (from '|:.\\'\\`,;') the instant the head crosses into a NEW row — never every frame — so a settled trail holds still instead of flickering; luminance is purely distance-from-head, gamma-shaped (pow 1.5) so the head reads bright and the tail fades toward the ink floor, alpha never fully to zero (0.08 floor) so the tail dissolves rather than hard-cutting. When a column's head clears rows + its trail length past the bottom, it restarts above the top at a randomized negative offset (a random multiple of its own new trail length) with freshly randomized speed and trail — this staggering is what keeps drops from ever resetting in visible unison. WIND, not paint: the pointer maintains a rising/decaying 0..1 'energy' scalar (gains on pointer speed, relaxes over ~1s once it stops moving, exactly the plasma/wake decay pattern but applied to a lateral offset instead of a stamp or sample warp) and every column computes a target horizontal pixel offset as a gaussian falloff of its distance (in columns, sigma 10) from the pointer's column, times that energy, times a per-column sine gust (each column has its own frequency 0.6-1.4 rad/s and phase so nearby streams don't bend in lockstep) capped at 14px — the whole column's rendered x is offset uniformly by this eased value, so streams bend like a curtain in a gust and glide back straight once the pointer stops and energy decays to zero. Direct-DOM rAF, zero React state on the hot path; all typed arrays sized once per resize (cols/rows computed with Math.ceil, never floor, since flooring leaves an unpainted strip along the clipped container's bottom/right edge). Ink is read once via getComputedStyle(canvas).color and re-derived on a documentElement class MutationObserver for live theme flips. Mono cell dimensions are measured via an offscreen canvas's measureText after document.fonts.ready. prefers-reduced-motion fills every column full-height with one static randomized frame (no head/trail concept, no animation, no pointer listeners attached at all) so the effect's silhouette is legible without motion. Loop pauses on document.hidden and resumes on visibilitychange. Optional children render over the field, bottom-left anchored with padding. Props: cellSize (grid cell px, default 13), children, className."
       }
     },
     {
@@ -6584,6 +7145,33 @@
           "physics"
         ],
         "instruction": "A toast stack, capped at `maxVisible` (default 4), choreographed as a Newton's cradle rather than a generic slide/scale stack. RENDERING: plain DOM cards in a vertical flex column (severity icon, truncated title, optional mono message, dismiss button), newest on top; every transform is written directly via the Web Animations API on refs, not React state, so no canvas and no per-frame re-render. MOTION: a pushed toast enters at the top on an accelerating ease-in curve (cubic-bezier(.55,.06,.68,.19), 200ms, translateY -26px to 0 plus a 0.97-to-1 scale) reading as a released cradle ball picking up speed as it swings in and 'strikes' the queue. The instant it lands, every OTHER currently-visible toast (every toast except the new arrival) plays a 60ms shunt: translateY 0 to 3px and back, staggered 35ms deeper per row via the animation's own delay — a fast domino of tiny nudges that visibly propagates from the impact point to the far end, letting a glance at the stagger read the stack's depth without counting cards. Under capacity that impulse simply dissipates: the deepest toast shunts and returns exactly like every other row. At capacity, the same event instead ejects the oldest (bottommost) toast: it is pulled out of the visible list into a brief inert overlay and, at the exact stagger slot it would have shunted at, plays a 340ms departure on the ease-out curve cubic-bezier(0.16,1,0.3,1) — translateY 0 to 10px (the 'arc') with a 2deg rotation at the 35% mark, continuing to translateY 46px, rotate 9deg, opacity 0 — matching the inherited momentum with a decelerating exit rather than an abrupt cut. Manual dismiss and auto-expiry both play a plain 150ms opacity fade (no shunt, no eject arc) before the toast leaves the array, since those departures were never caused by an incoming impulse. AUTO-DISMISS: duration prop, default 5000ms per toast (0 disables); a hover OR a keyboard focus on the card pauses its own timer, and the timer only resumes once both are clear, so a screen-reader user tabbed onto a toast is never raced by the clock. ACCESSIBILITY: a single shared aria-live announcer (visually hidden) is the only thing that speaks — remounted (via a React key on an internal sequence number) each time so a screen reader re-registers its live-ness, aria-live='assertive' for error toasts and 'polite' for info, announcing each toast's title and message exactly once on arrival; the physics-only reflow of existing toasts (shunt, eject, reposition) never touches the announcer, so nothing already announced gets re-announced. Each toast card itself is role=alert (error) or role=status (info), keyboard-focusable, with an aria-label naming its severity and title; Escape while a toast has focus dismisses that toast. A global F6 keydown sends focus straight into the region — to the newest toast if one is visible, otherwise the region landmark itself — a pane-jump convention for reaching the stack without tabbing through the whole page. Every evicted, expired, or manually dismissed toast is appended to a capped (12-entry) history list surfaced behind a 'History (n)' disclosure button (aria-expanded/aria-controls) below the stack, so an ejected toast — the whole point of the eviction policy — stays reachable and readable, tagged with why it left ('evicted' / 'expired' / 'dismissed'). REDUCED MOTION: every custom animation call above is swapped for a plain 150-200ms opacity fade in the same Web Animations calls (checked once via a matchMedia('(prefers-reduced-motion: reduce)') listener) — no shunt, no eject arc, no translateY at all — while the queue, capacity, eviction, timer, and history logic all run identically, so the cap and the eviction reason are still fully legible, just without the choreography. Colors are exclusively --background/--foreground/--muted/--border/--accent (--accent only as the focus ring); severity is distinguished by icon shape and title weight, never by hue. Imperative handle exposes push/dismiss/clear; props: maxVisible, duration, initial (toasts seeded at mount), className, aria-label. Every timer, animation, and the window keydown listener is torn down on unmount."
+      }
+    },
+    {
+      "name": "transition-ascii-dissolve",
+      "type": "registry:ui",
+      "title": "Transition ASCII Dissolve",
+      "description": "A layout transition swept by a user-driven, reversible dissolve front: outgoing content frays into a band of ASCII glyph noise ahead of the front, incoming content resolves out of that same noise behind it, and dragging the front back un-happens the transition exactly as far as you pull it.",
+      "files": [
+        {
+          "path": "registry/loud/transition-ascii-dissolve/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/transition-ascii-dissolve.tsx"
+        }
+      ],
+      "dependencies": [],
+      "meta": {
+        "collection": "loud",
+        "tags": [
+          "transition",
+          "ascii",
+          "canvas",
+          "dissolve",
+          "drag",
+          "compare",
+          "layout"
+        ],
+        "instruction": "<AsciiDissolveTransition from to value? defaultValue? onValueChange? label? className?> stacks two full-size panels: `to` underneath, always rendered; `from` above it, hard-clipped via clip-path to the region right of a front position (0..1, 0 = all `from`, 1 = all `to`). A canvas veil above both draws a band of Geist Mono ASCII noise glyphs (from a density ramp '░▒▓█#%@*+=-:. ') centered exactly on the front, density falling off smoothly with distance so the outgoing panel visibly frays into noise on the unswept side and the incoming panel visibly resolves out of the same noise on the swept side — a spatial dissolve, not a per-character identity churn. The front is a role=slider div spanning the whole surface (aria-valuenow/aria-valuetext as a percentage), draggable with the mouse or touch and steppable with ArrowLeft/Right (2%), PageUp/PageDown (10%), Home/End; because both the clip-path and the noise band are recomputed purely from the current front value, dragging it back genuinely un-sweeps the transition — there is no play-once state machine underneath. The noise churns (re-rolled every animation frame) only while the front is actively being dragged or holds keyboard focus; at rest it freezes on one frame, and the whole churn loop is skipped entirely under prefers-reduced-motion, leaving a single static band. Colors read live via getComputedStyle from --foreground/--muted/--accent, resynced on a documentElement class MutationObserver — no hardcoded hex, matching the token rule even in `loud`. Whichever of `from`/`to` currently covers less than half the surface is marked aria-hidden so assistive tech only ever encounters the panel that's actually dominant. Zero dependencies, one canvas, no WebGL."
       }
     },
     {
