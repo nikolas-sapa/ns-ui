@@ -9,24 +9,18 @@ export function AccountSignedOut() {
       className="grid min-h-screen bg-background text-foreground lg:grid-cols-[minmax(0,1.15fr)_minmax(28rem,0.85fr)]"
       style={{ fontFamily: "ui-rounded, var(--font-sans)" }}
     >
-      <section className="relative min-h-[42rem] overflow-hidden border-b border-border lg:min-h-screen lg:border-b-0 lg:border-r">
-        <ScarpHorizon className="min-h-[42rem] lg:min-h-screen">
-          <div className="max-w-xl pb-2">
-            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted">
-              ns-ui / save the good ones
-            </p>
-            <h1 className="mt-5 max-w-lg text-4xl font-semibold leading-[1.03] tracking-[-0.045em] text-foreground sm:text-6xl">
-              Keep the pieces that make the product feel like yours.
-            </h1>
-            <p className="mt-5 max-w-md text-sm leading-6 text-muted sm:text-base">
-              Sign in to save components, collect references, and return to the
-              details worth building.
-            </p>
-          </div>
-        </ScarpHorizon>
+      <section
+        data-auth-visual
+        aria-hidden="true"
+        className="relative min-h-[42rem] overflow-hidden border-b border-border lg:min-h-screen lg:border-b-0 lg:border-r"
+      >
+        <ScarpHorizon className="min-h-[42rem] lg:min-h-screen" />
       </section>
 
-      <section className="flex min-h-[42rem] flex-col justify-between px-6 py-8 sm:px-10 sm:py-12 lg:min-h-screen lg:px-16 lg:py-14">
+      <section
+        data-auth-copy
+        className="flex min-h-[42rem] flex-col justify-between px-6 py-8 sm:px-10 sm:py-12 lg:min-h-screen lg:px-16 lg:py-14"
+      >
         <div className="flex items-center justify-between gap-4">
           <Link
             href="/"
