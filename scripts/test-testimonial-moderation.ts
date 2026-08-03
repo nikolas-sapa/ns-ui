@@ -1,19 +1,15 @@
 import assert from "node:assert/strict";
+import { ALEX_TESTIMONIAL, ALEX_TESTIMONIAL_SEED } from "../lib/testimonials.ts";
 import {
   normalizeSubmission,
   scoreSubmission,
   validateSubmission,
 } from "../lib/testimonial-moderation.ts";
 
-const cleanSubmission = {
-  name: "Alex Lekkas",
-  role: "Founding Engineer",
-  company: "Spawn Partners",
-  profileUrl: "https://www.linkedin.com/in/alexandros-lekkas/",
-  quote:
-    "I love using this design system whenever I need inspiration for primarily abstract features in our internal products, things that add some flare. I love it",
-};
+const cleanSubmission = { ...ALEX_TESTIMONIAL_SEED };
+const cleanDisplayFixture = { ...ALEX_TESTIMONIAL };
 
+assert.deepEqual(scoreSubmission(cleanDisplayFixture), { score: 0, flags: [] });
 assert.deepEqual(scoreSubmission(cleanSubmission), { score: 0, flags: [] });
 assert.deepEqual(validateSubmission(cleanSubmission), {
   ok: true,
@@ -51,6 +47,14 @@ assert.deepEqual(
     quote: "https://a.test https://b.test https://c.test",
   }),
   { score: 35, flags: ["too_many_urls"] },
+);
+
+assert.deepEqual(
+  scoreSubmission({
+    ...cleanSubmission,
+    quote: "The bottom sheet made robotics tokenization examples easier to review.",
+  }),
+  { score: 0, flags: [] },
 );
 
 assert.deepEqual(

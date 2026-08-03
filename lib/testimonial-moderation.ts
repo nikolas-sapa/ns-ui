@@ -131,9 +131,32 @@ function hasRepeatedTokens(value: string): boolean {
   return false;
 }
 
+function normalizeSearchTokens(value: string): string[] {
+  return tokenize(value);
+}
+
+function includesPhrase(value: string, phrase: string): boolean {
+  const haystack = normalizeSearchTokens(value);
+  const needle = normalizeSearchTokens(phrase);
+
+  if (needle.length === 0 || haystack.length < needle.length) return false;
+
+  for (let index = 0; index <= haystack.length - needle.length; index += 1) {
+    let matched = true;
+    for (let offset = 0; offset < needle.length; offset += 1) {
+      if (haystack[index + offset] !== needle[offset]) {
+        matched = false;
+        break;
+      }
+    }
+    if (matched) return true;
+  }
+
+  return false;
+}
+
 function includesAny(value: string, phrases: readonly string[]): boolean {
-  const normalizedValue = value.toLocaleLowerCase("en-US");
-  return phrases.some((phrase) => normalizedValue.includes(phrase));
+  return phrases.some((phrase) => includesPhrase(value, phrase));
 }
 
 function hasContactSolicitation(value: string): boolean {
