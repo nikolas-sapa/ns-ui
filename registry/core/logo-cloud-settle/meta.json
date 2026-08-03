@@ -1,0 +1,15 @@
+{
+  "name": "logo-cloud-settle",
+  "title": "Logo Cloud Settle",
+  "description": "A trust-wall grid of abstract, generated marks that physically settles into place: each tile drops in from lifted/shrunk/tilted with a per-item stagger and a slight spring overshoot, triggered on viewport entry and replayed if the wall leaves and re-enters view.",
+  "collection": "core",
+  "tags": ["logo-cloud", "trust-wall", "grid", "entrance", "spring"],
+  "useWhen": "a logo/trust-wall grid whose marks should visibly settle into place on scroll reveal rather than a static grid or a plain fade; the marks here are abstract generated glyphs, not real brand logos — swap in real assets via the `marks` prop for production use.",
+  "instruction": "Renders `marks` (id/name/abstract-shape triples; eight generated geometric glyphs ship by default — ring, diamond, triangle, plus, hex, venn, chevron, dot-grid, all drawn as inline SVG with stroke=currentColor, zero real company logos or wordmarks) as a responsive grid (2 columns under sm, 4 above). At rest before its first reveal, and again any time it leaves the viewport, every tile sits lifted 22px above its slot, scaled to 0.9 and rotated -4deg with opacity 0. An IntersectionObserver (threshold 0.2) on the grid flips a single `settled` boolean the moment the wall enters view; while true, every tile transitions to translateY(0)/scale(1)/rotate(0)/opacity 1 over 560ms on a spring-approximating overshoot easing (cubic-bezier(0.22,1.7,0.36,1)), staggered 42ms per tile in DOM order, so the wall reads as physically DROPPING INTO and SETTLING onto its grid rather than fading in as a block. Leaving the viewport resets every tile instantly back to the lifted/tilted starting transform (no transition on the way out), so re-entering triggers the same settle again — this is a ONE-SHOT-PER-ENTRY transition driven by a boolean, not a continuous simulation: distinct from avatar-stack-flock, which mills continuously as a boids flock at rest and only resolves into a tidy row on hover/focus. `prefers-reduced-motion` renders every tile already settled on the first frame and never touches the IntersectionObserver. The grid is `role=list` with each tile `role=listitem` and the visible mark name as its label — this is a display-only trust wall with no interactive controls (no buttons, nothing to tab to), so nothing here is clickable. `data-settled` is exposed on the grid root for anyone probing its state. Props: `marks`, `label` (the caption above the grid, also the list's aria-label), className. Zero dependencies, plain DOM + CSS transitions, no canvas.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "scroll",
+    "range": [0, 1],
+    "period": 5200
+  }
+}

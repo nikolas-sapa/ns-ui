@@ -1,0 +1,23 @@
+{
+  "name": "nav-site-condense",
+  "title": "Nav Site Condense",
+  "description": "A full-width site nav with the furniture a real site needs: a scroll-condensed bar, a menu trigger present at every width, and a mobile sheet built on native <dialog> for a free focus trap and Escape-to-close.",
+  "collection": "core",
+  "tags": ["nav", "header", "navigation", "sheet", "dialog", "scroll", "mobile", "focus-trap"],
+  "useWhen": "the site-nav shell itself — a bar plus an always-reachable menu trigger that opens a real, focus-trapped sheet — where the scroll condense is a plain threshold state, not the point. Reach for nav-condense-rail instead when the condense transition itself is the deliverable and needs to be continuous and measured from the bar's own rendered height; reach for header-scroll-pill when the destination shape should morph into a small floating pill with a rolling active-section label. Neither of those two ships a mobile sheet or a focus trap — this one exists to be the one that does.",
+  "autoplay": {
+    "mode": "scroll",
+    "range": [0, 0.06],
+    "period": 3200
+  },
+  "gate": {
+    "openBy": "button[aria-label=\"Open menu\"]",
+    "expect": "[data-nav-site-condense-sheet] a"
+  },
+  "card": {
+    "focus": "[data-nav-site-condense]",
+    "padding": 0.15
+  },
+  "instruction": "Build <NavSiteCondense brand? links condenseAt? className?> where links is NavLinkItem[] ({label, href}). STRUCTURE: a sticky (position:sticky, top:0, z-40) <header data-nav-site-condense> containing a max-width row with a wordmark <a>, a hidden-below-sm inline link row (role via a real <nav aria-label=\"Primary\">), and a menu trigger <button aria-haspopup=\"dialog\" aria-controls aria-expanded aria-label=\"Open menu\">. CONDENSE: deliberately minimal and subordinate to the sheet — a passive, rAF-throttled scroll listener compares window.scrollY against condenseAt (default 24px) and flips one boolean React state; past the threshold the header swaps to tighter vertical padding, a background-color/backdrop-blur and a border-bottom, and the wordmark's font-size drops a step, all via a plain Tailwind class swap with a CSS transition (motion-reduce:transition-none), not a continuous interpolation, a measured height, or a spring — nav-condense-rail already owns that continuous, measured density transition and header-scroll-pill already owns the silhouette-morph-into-a-pill; duplicating either here would be a restyle. The initial scroll position is read once on mount so a page that loads already scrolled starts in the correct state. TRIGGER: rendered unconditionally at every viewport width, never hidden behind a `md:hidden`/`sm:hidden` breakpoint — a trigger that only exists below some breakpoint is unreachable (and unclickable by anything driving the page, human or otherwise) at any width at or above it. It doubles as a full-sitemap entry point even next to the inline desktop links. SHEET: a right-anchored panel built on the native <dialog> element. Opening sets React state to true, an effect calls dialogRef.current.showModal() (never .show() — modal is what gives the free focus trap, Escape-as-cancel and top-layer stacking), closing calls .close(). The panel's own CSS transitions transform from translateX(100%) to translateX(0%) and opacity 0 to 1 keyed off the dialog's own `[open]` attribute, with @media (prefers-reduced-motion: reduce) dropping the transition entirely. Backdrop click (event target === the dialog element itself, since ::backdrop isn't a real element) and Escape (the dialog's native `cancel` event, preventDefault'd only to keep this component's own state in sync, not to block the close) both close it, and the `close` event is also listened to so state never drifts out of sync with reality. Every link inside the sheet closes it on click. The sheet's own <nav aria-label=\"Mobile\" data-nav-site-condense-sheet> holds the link list. ACCESSIBILITY: the header's inline links and the sheet's links both carry hover (text-muted to text-foreground) and focus-visible:outline-2 outline-offset-4 outline-accent states with no outline-none on the same element (Tailwind v4 latches --tw-outline-style to none permanently if both are present, and the ring silently never paints even though the classes look correct). The dialog carries aria-modal=\"true\" and aria-labelledby pointing at a visible heading; Escape and the native focus trap are inherited for free from showModal(). Demo is a real, tall page with no scripted auto-scroll so /preview stays the honest interactive reference, while the card's autoplay:scroll descriptor eases the iframe a short way past the condense threshold.",
+  "dependencies": []
+}

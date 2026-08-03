@@ -1,0 +1,16 @@
+{
+  "name": "lens-ascii-magnify",
+  "title": "Lens ASCII Magnify",
+  "description": "A circular lens that resolves the text under it into a denser dot-matrix of ASCII glyphs — every character it passes over is redrawn as its own 5x7 grid of ramp characters, more glyphs per glyph rather than the same glyph bigger.",
+  "collection": "core",
+  "tags": ["lens", "magnifier", "ascii", "text", "mono", "canvas", "cursor"],
+  "useWhen": "a magnifying lens over a body of text where the payoff is seeing each letter resolve into a denser dot-matrix of ascii characters, not an optically bigger version of the same glyph; pick slider-loupe instead for optically magnifying a numeric tick scale, or text-prism-split when the lens should tear the text into RGB channel offsets rather than resample its density.",
+  "autoplay": {
+    "mode": "pointer-path",
+    "path": "sweep",
+    "target": "canvas",
+    "period": 4200
+  },
+  "instruction": "A circular lens, driven by a `text` prop rendered as real plain DOM text (one `<span>` per character, plain content, no aria-hidden anywhere on the real text — it's never hidden, so accessibility needs nothing special here). Layered on top is a purely decorative `aria-hidden` `<canvas>` plus a DOM ring div; together they are the lens. Every character in `text` has a hand-built 5x7 dot-matrix representation (a compact bitmap font covering A-Z, 0-9, space and basic punctuation; an unmapped character falls back to a light diagonal-hatch placeholder rather than rendering blank). On every frame, for each character whose measured `getBoundingClientRect()` falls within the lens radius of its current center, the canvas fills the lens circle's background with a `--background`-token flat fill (occluding the flat glyph underneath) and then redraws that character as its OWN 5x7 grid of cells, each cell either a solid ramp glyph (`--foreground` at full alpha, for an 'on' bit) or a faint one (28% alpha, for an 'off' bit) — that grid is strictly finer than the single flat character it replaces, which is the entire mechanic: MORE glyphs resolving one glyph, not the same glyph scaled up (that's slider-loupe's job) and not a channel-split refraction (text-prism-split's job). The lens position chases the pointer with an exponential lag (10/s time-constant) via one direct-DOM `requestAnimationFrame` loop that sleeps once settled, wakes on `pointermove`, and returns to a PARKED position at the text block's own center on `pointerleave` — so the resting/default screenshot already shows the lens sitting mid-block resolving whatever text is there, not a plain, unmagnified paragraph waiting for a cursor. All canvas ink (`--foreground` fill/background fill) and the mono font family are read via `getComputedStyle` at mount and re-derived on a `MutationObserver` watching `documentElement` class changes, so both themes render correctly with no baked-in hex. `prefers-reduced-motion: reduce` disables the chase loop and the pointer-follow entirely: the lens renders once, parked at center, with no rAF running — still legible as the concept, just not animated. ResizeObserver and IntersectionObserver keep it correctly sized and paused off-screen. Zero dependencies.",
+  "dependencies": []
+}
