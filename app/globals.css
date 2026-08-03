@@ -40,8 +40,13 @@
   --color-accent-hover: var(--accent-hover);
 
   /* Literal family names — @theme inline resolves at parse time. The geist
-     npm package registers "GeistSans"/"GeistMono" (verified via document.fonts). */
-  --font-sans: "GeistSans", "GeistSans Fallback", ui-sans-serif, system-ui, sans-serif;
+     npm package registers "GeistSans"/"GeistMono" (verified via document.fonts).
+     `ui-rounded` leads: it resolves to SF Rounded on Apple platforms and to
+     nothing anywhere else, so non-Apple falls through to GeistSans and keeps
+     the loaded webfont rather than dropping to a system default. "Arial
+     Rounded MT Bold" is deliberately NOT in this stack — it ships bold-only,
+     so on any machine that has it every weight below 700 would render bold. */
+  --font-sans: ui-rounded, "GeistSans", "GeistSans Fallback", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "GeistMono", "GeistMono Fallback", ui-monospace, monospace;
 
   --radius-sm: 6px;

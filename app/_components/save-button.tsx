@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { SignInSavePopover } from "./sign-in-save-popover";
 
 export function SaveButton({
   name,
@@ -17,26 +18,31 @@ export function SaveButton({
 }) {
   const router = useRouter();
   const label = authenticated === false ? "Sign in to save" : saved ? "Saved" : "Save";
+  const popoverId = `save-hint-${name}`;
 
   return (
-    <button
-      type="button"
-      aria-pressed={authenticated !== false ? saved : undefined}
-      aria-busy={pending}
-      disabled={pending || authenticated === null}
-      title={authenticated === false ? "Sign in to save this component" : label}
-      onClick={() => {
-        if (authenticated === false) {
-          router.push("/account");
-          return;
-        }
-        onToggle(name);
-      }}
-      className="relative z-20 inline-flex size-8 shrink-0 items-center justify-center rounded-sm border border-border bg-surface/90 text-foreground outline-none backdrop-blur-sm transition-colors hover:border-muted focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-wait disabled:opacity-60"
-    >
-      <BookmarkIcon filled={saved} />
-      <span className="sr-only">{pending ? "Saving…" : label}</span>
-    </button>
+    <span className="group relative inline-block shrink-0">
+      <button
+        type="button"
+        aria-pressed={authenticated !== false ? saved : undefined}
+        aria-busy={pending}
+        aria-describedby={authenticated === false ? popoverId : undefined}
+        disabled={pending || authenticated === null}
+        title={authenticated === false ? "Sign in to save this component" : label}
+        onClick={() => {
+          if (authenticated === false) {
+            router.push("/account");
+            return;
+          }
+          onToggle(name);
+        }}
+        className="relative z-20 inline-flex size-8 shrink-0 items-center justify-center rounded-sm border border-border bg-surface/90 text-foreground outline-none backdrop-blur-sm transition-colors hover:border-muted focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-wait disabled:opacity-60"
+      >
+        <BookmarkIcon filled={saved} />
+        <span className="sr-only">{pending ? "Saving…" : label}</span>
+      </button>
+      {authenticated === false ? <SignInSavePopover id={popoverId} /> : null}
+    </span>
   );
 }
 

@@ -249,6 +249,9 @@ export function scoreSubmission(input: TestimonialSubmission | NormalizedSubmiss
   return { score, flags };
 }
 
+export const MAX_QUOTE_LENGTH = 800;
+export const MAX_NAME_LENGTH = 80;
+
 export function validateSubmission(
   input: TestimonialSubmission,
 ): { ok: true; value: NormalizedSubmission } | { ok: false; code: string } {
@@ -257,8 +260,8 @@ export function validateSubmission(
   if (!normalized.name) return { ok: false, code: "empty_name" };
   if (!normalized.role) return { ok: false, code: "empty_role" };
   if (!normalized.quote) return { ok: false, code: "empty_quote" };
-  if (normalized.name.length > 80) return { ok: false, code: "name_too_long" };
-  if (normalized.quote.length > 800) return { ok: false, code: "quote_too_long" };
+  if (normalized.name.length > MAX_NAME_LENGTH) return { ok: false, code: "name_too_long" };
+  if (normalized.quote.length > MAX_QUOTE_LENGTH) return { ok: false, code: "quote_too_long" };
 
   const profileUrl = validateUrl(normalized.profileUrl);
   if (!profileUrl.ok) return profileUrl;

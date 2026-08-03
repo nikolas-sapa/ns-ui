@@ -7,6 +7,10 @@ export interface Testimonial {
   role: string;
   company: string;
   profileUrl: string;
+  /** Optional link for `company`. Not a submitted field and not in the
+   *  `testimonials` table — only the built-in seed below can carry one, and
+   *  it renders as plain text when absent. */
+  companyUrl?: string;
   photoUrl?: string;
   status: TestimonialStatus;
 }
