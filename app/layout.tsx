@@ -7,6 +7,7 @@ import { SiteAnalytics } from "./_components/site-analytics";
 import { SiteShell } from "./_components/site-shell";
 import { NO_FLASH_SCRIPT } from "@/lib/theme";
 import { NO_FLASH_SIDEBAR_SCRIPT } from "@/lib/sidebar";
+import { CATALOG_GATE_SCRIPT } from "@/lib/catalog-gate";
 import { navGroups } from "@/lib/nav-data";
 import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
 
@@ -61,6 +62,11 @@ export default function RootLayout({
         {/* Same reasoning, for a collapsed sidebar instead of a theme — see
             lib/sidebar.ts. */}
         <script dangerouslySetInnerHTML={{ __html: NO_FLASH_SIDEBAR_SCRIPT }} />
+        {/* Same reasoning again, for the homepage catalog's URL-carried
+            filter/sort state — see lib/catalog-gate.ts. This is what keeps a
+            shared `/?q=...` link from painting the unfiltered homepage and
+            then jumping once React corrects it. */}
+        <script dangerouslySetInnerHTML={{ __html: CATALOG_GATE_SCRIPT }} />
       </head>
       <body className="bg-background font-sans text-foreground antialiased">
         <ThemeSync />
