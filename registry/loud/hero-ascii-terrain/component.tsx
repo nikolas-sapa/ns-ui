@@ -50,7 +50,7 @@ const LAYERS: Layer[] = [
 ];
 
 const STAR_CHARS = [1, 2, 3]; // RAMP indices used for stars
-const IDLE_DRIFT = 0.045; // world-units/s of ambient pan, scaled per-layer
+const IDLE_DRIFT = 0.16; // world-units/s of ambient pan, scaled per-layer
 const CURSOR_EASE = 0.08;
 const MAX_PARALLAX_COLS = 46; // world-unit shift at full pointer travel
 const MAX_PARALLAX_ROWS = 5;
@@ -191,8 +191,13 @@ export function ScarpHorizon({
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
-      cols = Math.max(8, Math.floor(width / cellW));
-      rows = Math.max(10, Math.floor(height / cellH));
+      // `ceil`, not `floor`: the grid is `rows * cellH` tall, so flooring left
+      // an unpainted strip up to one cell high along the bottom edge — read as
+      // a stray band of padding under the terrain. Overdrawing by a partial
+      // row instead costs nothing, because the root clips with
+      // `overflow-hidden`. Same for columns and the right edge.
+      cols = Math.max(8, Math.ceil(width / cellW));
+      rows = Math.max(10, Math.ceil(height / cellH));
       horizonRow = Math.max(2, Math.floor(rows * 0.34));
       terrainRows = Math.max(1, rows - horizonRow);
 

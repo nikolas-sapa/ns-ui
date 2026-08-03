@@ -161,7 +161,7 @@ export function SavedLibrary({ items, slugs, initialFolders, handle }: { items: 
         </div>
       ) : null}
       {visible.length === 0 ? <p className="mt-6 text-sm text-muted">{selected === "all" ? "Nothing saved yet." : "This folder is empty."}</p> : (
-        <ul className="mt-6 grid gap-5 sm:grid-cols-2">
+        <ul className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
           {visible.map((item) => {
             const currentFolder = folders.find((entry) => entry.slugs.includes(item.name));
             const installCommand = `npx shadcn add ${REGISTRY_ORIGIN}/r/${item.name}.json`;

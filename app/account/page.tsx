@@ -80,49 +80,57 @@ export default async function AccountPage() {
     .filter((item): item is { name: string; title: string; description: string } => item !== undefined);
 
   return (
-    <main className="mx-auto flex max-w-5xl flex-col px-6 py-16 sm:px-10">
+    <main className="mx-auto flex max-w-6xl flex-col px-6 py-16 sm:px-10">
       <h1 className="text-xl font-medium text-foreground">Account</h1>
-      <div className="mt-6 space-y-1 text-sm">
-        {viewer?.displayName ? (
-          <p className="text-foreground">{viewer.displayName}</p>
-        ) : null}
-        {viewer?.email ? <p className="text-muted">{viewer.email}</p> : null}
+
+      <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,320px)_1fr] lg:gap-14">
+        <div className="flex flex-col gap-8">
+          <div className="space-y-1 text-sm">
+            {viewer?.displayName ? (
+              <p className="text-foreground">{viewer.displayName}</p>
+            ) : null}
+            {viewer?.email ? <p className="text-muted">{viewer.email}</p> : null}
+          </div>
+
+          <section>
+            <h2 className="text-sm font-medium text-foreground">Handle</h2>
+            <div className="mt-3">
+              <AccountHandle
+                handle={profile.handle}
+                canChange={profile.handleChangedAt === null}
+              />
+            </div>
+          </section>
+
+          <section>
+            <h2 className="text-sm font-medium text-foreground">Profile</h2>
+            <div className="mt-3">
+              <AccountProfileForm
+                initial={{
+                  displayName: profile.displayName,
+                  bio: profile.bio,
+                  url: profile.url,
+                  tags: profile.tags,
+                }}
+              />
+            </div>
+          </section>
+        </div>
+
+        <div className="flex flex-col gap-8">
+          <section>
+            <h2 className="text-sm font-medium text-foreground">Saved ({bookmarks.length})</h2>
+            <SavedLibrary items={bookmarks} slugs={slugs} initialFolders={library?.folders ?? []} handle={profile.handle} />
+          </section>
+
+          {/* Renders nothing unless the queue endpoint answers — i.e. unless
+              this viewer is in OWNER_EMAILS. No owner flag is sent to the
+              client. */}
+          <TestimonialModeration />
+        </div>
       </div>
 
-      <section className="mt-8">
-        <h2 className="text-sm font-medium text-foreground">Handle</h2>
-        <div className="mt-3">
-          <AccountHandle
-            handle={profile.handle}
-            canChange={profile.handleChangedAt === null}
-          />
-        </div>
-      </section>
-
-      <section className="mt-8">
-        <h2 className="text-sm font-medium text-foreground">Profile</h2>
-        <div className="mt-3">
-          <AccountProfileForm
-            initial={{
-              displayName: profile.displayName,
-              bio: profile.bio,
-              url: profile.url,
-              tags: profile.tags,
-            }}
-          />
-        </div>
-      </section>
-
-      <section className="mt-8">
-        <h2 className="text-sm font-medium text-foreground">Saved ({bookmarks.length})</h2>
-        <SavedLibrary items={bookmarks} slugs={slugs} initialFolders={library?.folders ?? []} handle={profile.handle} />
-      </section>
-
-      {/* Renders nothing unless the queue endpoint answers — i.e. unless this
-          viewer is in OWNER_EMAILS. No owner flag is sent to the client. */}
-      <TestimonialModeration />
-
-      <div className="mt-10 flex items-center justify-between">
+      <div className="mt-12 flex items-center justify-between border-t border-border pt-6">
         <AccountSignOut />
         <AccountDelete />
       </div>
