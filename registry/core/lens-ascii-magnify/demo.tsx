@@ -13,8 +13,8 @@ export default function AsciiMagnifyLensDemo() {
 
       <AsciiMagnifyLens
         key={key}
-        text={"MOVE THE LENS OVER\nTHIS DOT MATRIX TYPE\nTO RESOLVE IT DENSER"}
-        className="max-w-lg text-center text-2xl font-semibold tracking-[0.06em] sm:text-3xl"
+        text="MOVE THE LENS ACROSS THIS TYPE"
+        className="max-w-2xl text-center text-2xl font-semibold tracking-[0.06em] sm:text-3xl"
       />
 
       <button
