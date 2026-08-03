@@ -14,6 +14,7 @@ import { AccountProfileForm } from "@/app/_components/account-profile-form";
 import { AccountDelete } from "@/app/_components/account-delete";
 import { AccountHandle } from "@/app/_components/account-handle";
 import { SavedLibrary } from "@/app/_components/saved-library";
+import { TestimonialModeration } from "@/app/_components/testimonial-moderation";
 // Same source `app/page.tsx:28` reads to filter FEATURED against what
 // actually exists in the registry (§3's "slug gate") — not a second slug
 // list. A save whose slug no longer resolves degrades silently: it's
@@ -116,6 +117,10 @@ export default async function AccountPage() {
         <h2 className="text-sm font-medium text-foreground">Saved ({bookmarks.length})</h2>
         <SavedLibrary items={bookmarks} slugs={slugs} initialFolders={library?.folders ?? []} />
       </section>
+
+      {/* Renders nothing unless the queue endpoint answers — i.e. unless this
+          viewer is in OWNER_EMAILS. No owner flag is sent to the client. */}
+      <TestimonialModeration />
 
       <div className="mt-10 flex items-center justify-between">
         <AccountSignOut />
