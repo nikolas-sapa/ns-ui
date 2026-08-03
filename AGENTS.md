@@ -216,6 +216,7 @@ to a commit:
 | `public/r/*.json` | `shadcn build` |
 | `public/llms.txt`, `public/llms-full.txt` | `scripts/build-llms.ts` |
 | `lib/autoplay.generated.json`, `lib/card-frame.generated.json` | `scripts/build-autoplay.ts` |
+| `lib/contributors.generated.json` | `scripts/build-contributors.ts` — slug -> GitHub login, from git history |
 
 All of them come from one command: `npm run registry:build`. It runs automatically
 before `dev`, `typecheck`, `verify` and `build`, so a fresh clone needs no extra step.

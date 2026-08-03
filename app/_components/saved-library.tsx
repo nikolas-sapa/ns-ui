@@ -5,13 +5,21 @@ import { useMemo, useState } from "react";
 import { CopyButton } from "./copy-button";
 import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
 
-type Folder = { id: string; name: string; slugs: string[] };
+type Folder = { id: string; name: string; slugs: string[]; isPublic: boolean };
 type Item = { name: string; title: string; description: string };
 
-export function SavedLibrary({ items, slugs, initialFolders }: { items: Item[]; slugs: string[]; initialFolders: Folder[] }) {
+export function SavedLibrary({ items, slugs, initialFolders, handle }: { items: Item[]; slugs: string[]; initialFolders: Folder[]; handle: string | null }) {
   const [folders, setFolders] = useState(initialFolders);
   const [selected, setSelected] = useState("all");
   const [pending, setPending] = useState<string | null>(null);
+  const [publishPending, setPublishPending] = useState(false);
+  // §8.1: "Publishing a collection prompts once, in plain words, that this
+  // also makes /u/<handle> visible." Turning publish OFF needs no such
+  // prompt — nothing new becomes visible by making something private again.
+  // Tracks which folder id is mid-confirmation, same two-step shape as
+  // `account-delete.tsx`'s `confirming` (a second, differently worded
+  // control in place of the first, no modal).
+  const [confirmingPublish, setConfirmingPublish] = useState<string | null>(null);
   const [newFolder, setNewFolder] = useState("");
   const [error, setError] = useState("");
   const byName = useMemo(() => new Map(items.map((item) => [item.name, item])), [items]);
@@ -30,9 +38,34 @@ export function SavedLibrary({ items, slugs, initialFolders }: { items: Item[]; 
       setError(data.error === "folder_exists" ? "That folder already exists." : "Could not create folder.");
       return;
     }
-    setFolders((current) => [...current, { id: data.id!, name: data.name!, slugs: [] }]);
+    setFolders((current) => [...current, { id: data.id!, name: data.name!, slugs: [], isPublic: false }]);
     setSelected(data.id);
     setNewFolder("");
+  }
+
+  async function togglePublish(folderId: string, nextIsPublic: boolean) {
+    setPublishPending(true);
+    setError("");
+    const response = await fetch("/api/folders", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "publish", folderId, isPublic: nextIsPublic }),
+    });
+    const data = (await response.json().catch(() => ({}))) as { isPublic?: boolean; error?: string };
+    if (!response.ok || typeof data.isPublic !== "boolean") {
+      setError(
+        data.error === "no_profile"
+          ? "Claim a handle before publishing a folder."
+          : "Could not update this folder's visibility.",
+      );
+      setPublishPending(false);
+      return;
+    }
+    setFolders((current) =>
+      current.map((entry) => (entry.id === folderId ? { ...entry, isPublic: data.isPublic! } : entry)),
+    );
+    setPublishPending(false);
+    setConfirmingPublish(null);
   }
 
   async function move(slug: string, folderId: string | null) {
@@ -59,6 +92,74 @@ export function SavedLibrary({ items, slugs, initialFolders }: { items: Item[]; 
         </form>
       </div>
       {error ? <p role="alert" className="mt-3 text-xs text-[var(--error)]">{error}</p> : null}
+      {folder ? (
+        <div className="mt-4 rounded-sm border border-border bg-surface px-3 py-2.5">
+          {folder.isPublic ? (
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="flex items-center gap-2 text-xs text-foreground">
+                {/* Decorative only — "Unpublish" below is the real,
+                    operable control. A `role="switch"` here with no handler
+                    would announce a switch a screen reader user can't
+                    actually flip. */}
+                <span aria-hidden="true" className="inline-flex h-4 w-4 items-center justify-center rounded-sm border border-accent bg-accent text-white">
+                  <svg viewBox="0 0 12 12" aria-hidden="true" className="h-2.5 w-2.5"><path d="M2 6l3 3 5-6" stroke="currentColor" strokeWidth="1.5" fill="none" /></svg>
+                </span>
+                Published — anyone with the link can view this folder and your profile
+              </span>
+              {handle ? (
+                <Link href={`/u/${handle}`} className="rounded-sm px-2 py-1 text-xs text-accent outline-none hover:underline focus-visible:ring-2 focus-visible:ring-accent">
+                  View public profile
+                </Link>
+              ) : null}
+              <button
+                type="button"
+                disabled={publishPending}
+                onClick={() => void togglePublish(folder.id, false)}
+                className="rounded-sm border border-border px-2.5 py-1.5 text-xs text-foreground outline-none transition-colors hover:border-muted focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
+              >
+                {publishPending ? "Unpublishing…" : "Unpublish"}
+              </button>
+            </div>
+          ) : confirmingPublish === folder.id ? (
+            <div className="space-y-2">
+              <p className="text-xs text-foreground">
+                Publishing “{folder.name}” makes it — and your public profile page at{" "}
+                <span className="font-mono">/u/{handle ?? "…"}</span> (display name, bio, url, tags,
+                avatar) — visible to anyone with the link. Nothing else you saved becomes visible.
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  disabled={publishPending}
+                  onClick={() => void togglePublish(folder.id, true)}
+                  className="rounded-sm border border-accent bg-accent px-3 py-1.5 text-xs font-medium text-white outline-none transition-colors hover:opacity-90 focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
+                >
+                  {publishPending ? "Publishing…" : "Publish"}
+                </button>
+                <button
+                  type="button"
+                  disabled={publishPending}
+                  onClick={() => setConfirmingPublish(null)}
+                  className="rounded-sm border border-border px-3 py-1.5 text-xs text-foreground outline-none transition-colors hover:border-muted focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 text-xs text-muted">
+              <span>Not published — only you can see this folder</span>
+              <button
+                type="button"
+                onClick={() => setConfirmingPublish(folder.id)}
+                className="rounded-sm border border-border px-2.5 py-1.5 text-xs text-foreground outline-none transition-colors hover:border-muted focus-visible:ring-2 focus-visible:ring-accent"
+              >
+                Publish…
+              </button>
+            </div>
+          )}
+        </div>
+      ) : null}
       {visible.length === 0 ? <p className="mt-6 text-sm text-muted">{selected === "all" ? "Nothing saved yet." : "This folder is empty."}</p> : (
         <ul className="mt-6 grid gap-5 sm:grid-cols-2">
           {visible.map((item) => {

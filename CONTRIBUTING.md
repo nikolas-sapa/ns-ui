@@ -2,9 +2,13 @@
 
 Thanks for looking. This is a curated registry, so the bar for a new component
 is "an interaction that does not already exist here", not "a component that
-works". Everything below applies equally to humans and to agents; an agent
-editing this repo should also read [AGENTS.md](AGENTS.md), which carries the
-deeper detail on autoplay descriptors, the verify gate, and prop extraction.
+works". This file is the mechanical how-to; [/guidelines](https://design.helpmarq.com/guidelines)
+is the taste document — what that bar actually means, why both themes are
+non-negotiable, why the card matters as much as the preview, and what gets
+rejected. Read that one first. Everything below applies equally to humans and
+to agents; an agent editing this repo should also read
+[AGENTS.md](AGENTS.md), which carries the deeper detail on autoplay
+descriptors, the verify gate, and prop extraction.
 
 ## Setup
 
@@ -39,6 +43,7 @@ them, so committing them means guaranteed conflicts in files nobody wrote.
 | `public/r/*.json` | `shadcn build` |
 | `public/llms.txt`, `public/llms-full.txt` | `scripts/build-llms.ts` |
 | `lib/autoplay.generated.json`, `lib/card-frame.generated.json` | `scripts/build-autoplay.ts` |
+| `lib/contributors.generated.json` | `scripts/build-contributors.ts` |
 
 If something in the generated output is wrong, fix `meta.json` or the component
 source and rebuild. Hand edits are silently overwritten.
@@ -211,8 +216,9 @@ catastrophic component bug.
 Keep the diff to one component or one concern. Include the dark and light
 resting-state screenshots. Confirm `typecheck` and `verify` are clean, that you
 have looked at the component in both themes and on the homepage card, and that
-no generated file is in the diff. CI runs `registry:build`, `typecheck` and
-`build` on every PR; `verify` stays local because it needs a server.
+no generated file is in the diff. CI runs `registry:build`, `typecheck`,
+`build` and a DCO sign-off check on every PR; `verify` stays local because it
+needs a server.
 
 ## Reporting problems
 
@@ -221,4 +227,37 @@ through [SECURITY.md](SECURITY.md), privately, not a public issue.
 
 By contributing you agree your work is licensed under the
 [MIT License](LICENSE), and to the
-[Code of Conduct](CODE_OF_CONDUCT.md).
+[Code of Conduct](CODE_OF_CONDUCT.md). Contributing a component is public git
+history under the GitHub identity that opened the PR — it survives deleting
+any account you may later create on the site, because it isn't data the site
+stores about you.
+
+## Sign-off (DCO)
+
+Every commit must carry a `Signed-off-by` trailer certifying the
+[Developer Certificate of Origin](DCO) — that you wrote the contribution, or
+otherwise have the right to submit it under this project's license. Add it
+with `-s`:
+
+```bash
+git commit -s -m "your message"
+```
+
+That appends a line matching your git `user.name`/`user.email`:
+
+```
+Signed-off-by: Your Name <you@example.com>
+```
+
+CI rejects a PR containing an unsigned commit. If you forgot, sign off the
+commits already on the branch and force-push:
+
+```bash
+git commit --amend -s --no-edit          # most recent commit
+# or, for several commits:
+git rebase --signoff HEAD~<n>
+git push --force-with-lease
+```
+
+The PR template's DCO checkbox is a reminder, not the enforcement — the CI
+check reading each commit's trailer is.

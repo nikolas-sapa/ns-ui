@@ -408,6 +408,12 @@ export function SiteShell({
             Community
           </Link>
           <Link
+            href="/guidelines"
+            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            Guidelines
+          </Link>
+          <Link
             href="/connect"
             className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
           >

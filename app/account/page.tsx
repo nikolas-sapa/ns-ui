@@ -115,7 +115,7 @@ export default async function AccountPage() {
 
       <section className="mt-8">
         <h2 className="text-sm font-medium text-foreground">Saved ({bookmarks.length})</h2>
-        <SavedLibrary items={bookmarks} slugs={slugs} initialFolders={library?.folders ?? []} />
+        <SavedLibrary items={bookmarks} slugs={slugs} initialFolders={library?.folders ?? []} handle={profile.handle} />
       </section>
 
       {/* Renders nothing unless the queue endpoint answers — i.e. unless this
