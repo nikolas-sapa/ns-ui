@@ -158,6 +158,61 @@ export default defineSchema({
     count: v.number(),
   }).index("by_userId", ["userId"]),
 
+  // Phase C (docs/community-spec.md §2/§4 group D). Metadata-only audit trail
+  // for the PR-opening submission portal (`/submit`) — the ACTUAL component
+  // code is never written here. It goes browser -> `/api/submit` -> the
+  // GitHub API directly (fork/branch/commit/PR) and is never imported, built,
+  // rendered or persisted on this origin (D1, non-goal #1). This table exists
+  // only so D4's "max 1 submission per user per 10 minutes" is durable and
+  // race-free (mirrors `saveRateLimits`'s reasoning exactly: an in-memory
+  // counter in the route handler is wrong on serverless) and so there is an
+  // audit trail of who opened what PR, for abuse review.
+  //
+  // No version field (docs/decisions/2026-08-03-component-versioning.md) —
+  // a contributor bumps nothing; the registry's version is `CHANGELOG.md`
+  // alone. `prUrl` is null until the GitHub call chain finishes; a failed
+  // attempt is recorded as `status: "failed"` rather than deleted, so a
+  // retry pattern (or abuse pattern) is visible to whoever reviews this
+  // table, matching how `testimonials` keeps rejected rows rather than
+  // deleting them — EXCEPT via `deleteAccount` (convex/account.ts), which
+  // deletes a caller's own rows here regardless of status, `"failed"`
+  // included. That's a deliberate exception to this table's own retention
+  // preference, not a contradiction of it: see the comment on
+  // `deleteAccount`'s header for why the deletion right wins.
+  //
+  // Now IN the `deleteAccount` cascade (added for security-review finding
+  // #6 — this table and `submissionRateLimits` below were both missing from
+  // it since Phase C shipped), indexed on `userId` here for exactly that.
+  submissions: defineTable({
+    userId: v.id("users"),
+    slug: v.string(),
+    collection: v.union(v.literal("core"), v.literal("loud")),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("opened"),
+      v.literal("failed"),
+    ),
+    prUrl: v.union(v.string(), v.null()),
+    createdAt: v.number(),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_slug", ["slug"]),
+
+  // D4's durable rate limit, same shape and same reasoning as
+  // `saveRateLimits` above: check-and-increment happens inside the same
+  // mutation as the write it guards (`submissions.create` in
+  // convex/submissions.ts), so Convex's serializable-mutation guarantee
+  // makes the read-check-increment-write atomic. Now IN the `deleteAccount`
+  // cascade (security-review finding #6) alongside `submissions` above —
+  // §6.7 and A9 in docs/community-spec.md still describe the ten-table
+  // shape from before Phase C added these two and haven't been updated to
+  // match (flagged in the task report, not silently rewritten here).
+  submissionRateLimits: defineTable({
+    userId: v.id("users"),
+    windowStart: v.number(),
+    count: v.number(),
+  }).index("by_userId", ["userId"]),
+
   testimonials: defineTable({
     userId: v.id("users"),
     name: v.string(),

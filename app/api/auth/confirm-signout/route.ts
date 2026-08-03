@@ -30,10 +30,23 @@
 // failure here must never leave someone stuck signed in. The only thing
 // this does is put the mismatch somewhere someone will actually see it:
 // the server log, not a browser console that closes with the tab.
+//
+// Also the seam for finding #1's OTHER half (session binding, above, is the
+// first): `app/_components/account-signout.tsx` calls this route BEFORE
+// the library's own `signOut()`, which only clears the `__Host-` cookies —
+// it has no idea `ns_ui_submit_gh_token`/`ns_ui_submit_gh_state`/
+// `ns_ui_submit_gh_binding` exist, so those would otherwise survive a
+// sign-out for up to an hour. Cleared here, unconditionally, before any
+// other check in this handler — sign-out must clear them whether or not
+// this route's own Convex confirmation succeeds, has a valid token to
+// check, or even comes from an allowed Origin (a forged cross-origin call
+// can only make a browser clear ITS OWN cookies early, which is at most an
+// inconvenience, never a security regression).
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchMutation } from "convex/nextjs";
 import { NextResponse, type NextRequest } from "next/server";
 import { api } from "@/convex/_generated/api";
+import { clearSubmitOAuthCookies } from "@/lib/submit-oauth-cookies";
 
 export const dynamic = "force-dynamic";
 
@@ -47,17 +60,26 @@ function originIsAllowed(request: NextRequest): boolean {
 }
 
 export async function POST(request: NextRequest) {
+  // Build the response object first so the submit-cookie clearing below can
+  // attach to whichever body/status this handler ends up returning — every
+  // return path clears the same three cookies, unconditionally.
+  const respond = (body: Record<string, unknown>, status?: number) => {
+    const response = NextResponse.json(body, status !== undefined ? { status } : undefined);
+    clearSubmitOAuthCookies(response, request.headers.get("host"));
+    return response;
+  };
+
   // No cookie: there's nothing to confirm. Not itself the anomaly this
   // route exists to catch (that requires a token that's *present* but
   // doesn't resolve) — mirrors `/api/me` and `/api/saves`'s no-cookie fast
   // path, no Convex round trip.
   const token = await convexAuthNextjsToken();
   if (!token) {
-    return NextResponse.json({ checked: false });
+    return respond({ checked: false });
   }
 
   if (!originIsAllowed(request)) {
-    return NextResponse.json({ error: "origin_not_allowed" }, { status: 403 });
+    return respond({ error: "origin_not_allowed" }, 403);
   }
 
   try {
@@ -70,12 +92,12 @@ export async function POST(request: NextRequest) {
         `api/auth/confirm-signout: sign-out about to no-op server-side (${result.reason}) — the session row was not deleted by this request`,
       );
     }
-    return NextResponse.json({ checked: true, ...result });
+    return respond({ checked: true, ...result });
   } catch (error) {
     // The mutation call itself failing (network, Convex error) is exactly
     // as loud — the caller still gets signed out client-side right after
     // this, and here is the only record that the DB row may have survived.
     console.error("api/auth/confirm-signout: confirmSignOut call failed", error);
-    return NextResponse.json({ checked: false, error: "confirm_failed" });
+    return respond({ checked: false, error: "confirm_failed" });
   }
 }

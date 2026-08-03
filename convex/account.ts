@@ -4,16 +4,32 @@
 // from `getAuthUserId(ctx)`, and there is no caller-supplied id — a caller
 // can only ever delete their own account.
 //
-// Ten tables reachable by `userId` (§6.7, corrected 2026-08-02 — the section
-// originally listed nine of these plus `authVerifiers`, and predated
-// `saveRateLimits`; see the comment on `saveRateLimits` in schema.ts), plus
-// `authVerifiers`, which is NOT one of the ten and is scoped by the caller's
-// own session ids instead — see the comment on that block below for why.
+// Twelve tables reachable by `userId` (§6.7 as originally corrected
+// 2026-08-02 enumerated ten — this file's docs/community-spec.md prose and
+// A9 have NOT yet been updated to match past that point; see the security
+// review report for finding #6 for the two added here: `submissions` and
+// `submissionRateLimits`, both added when Phase C shipped, after §6.7 was
+// last corrected, on the same keyed-by-`userId` shape as `saveRateLimits`),
+// plus `authVerifiers`, which is NOT one of the twelve and is scoped by the
+// caller's own session ids instead — see the comment on that block below
+// for why.
 //
 //   users, authAccounts, authSessions, authRefreshTokens,
 //   authVerificationCodes, profiles, saves, collections,
-//   collectionItems (via owning collections), saveRateLimits
+//   collectionItems (via owning collections), saveRateLimits,
+//   submissions, submissionRateLimits
 //   — plus authVerifiers, scoped by session, not userId
+//
+// Note on `submissions` specifically: rows with `status: "failed"` (a GitHub
+// call chain that never became a public PR) are deleted here along with
+// everything else, even though `submissions`'s own schema.ts comment frames
+// keeping failed rows as deliberate abuse-review signal, matching how
+// `testimonials` keeps rejected rows. Account deletion is a stronger claim
+// than that retention preference — someone who deletes their account
+// specifically to remove traces of an abandoned/failed submission attempt
+// should not still have one sitting in this table under their former
+// identity. This is a real tension, not an oversight; flagged rather than
+// silently resolved.
 //
 // `otpRequestLimits` stays OUT of this list on purpose (schema.ts's own
 // comment on that table) — it is keyed on an unrecoverable HMAC of an
@@ -165,6 +181,25 @@ export const deleteAccount = mutation({
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .unique();
     if (rateLimit !== null) await ctx.db.delete(rateLimit._id);
+
+    // Finding #6: `submissions` and `submissionRateLimits` were missing
+    // from this cascade entirely — same shape as `saves`/`saveRateLimits`
+    // just above, both indexed on `userId` already (schema.ts). See the
+    // comment on this mutation's header for the `status: "failed"` rows
+    // tension this resolves in favor of the deletion right.
+    const submissions = await ctx.db
+      .query("submissions")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .collect();
+    for (const submission of submissions) {
+      await ctx.db.delete(submission._id);
+    }
+
+    const submissionRateLimit = await ctx.db
+      .query("submissionRateLimits")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+    if (submissionRateLimit !== null) await ctx.db.delete(submissionRateLimit._id);
 
     // `users` last — every other table above is reached via `userId`, so
     // deleting the `users` doc first would not break anything here (Convex

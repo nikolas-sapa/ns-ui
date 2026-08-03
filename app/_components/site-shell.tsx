@@ -414,6 +414,12 @@ export function SiteShell({
             Guidelines
           </Link>
           <Link
+            href="/submit"
+            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            Submit
+          </Link>
+          <Link
             href="/connect"
             className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
           >
