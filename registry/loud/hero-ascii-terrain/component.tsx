@@ -360,10 +360,17 @@ export function ScarpHorizon({
     };
   }, [cellSize]);
 
+  // `h-full` matters as much as the min-height below: a min-height only sets a
+  // FLOOR. Dropped into a stretched grid/flex item taller than that floor — an
+  // auth panel whose other column carries more copy — the root stopped at its
+  // min-height and the canvas ended partway down, leaving a band of dead
+  // background under the terrain. `h-full` resolves to `auto` when the parent
+  // has no definite height (so the min-height still governs a standalone
+  // hero) and fills the parent when it does.
   return (
     <div
       ref={rootRef}
-      className={`relative isolate w-full overflow-hidden bg-background font-mono ${
+      className={`relative isolate h-full w-full overflow-hidden bg-background font-mono ${
         /\bmin-h-/.test(className) ? "" : "min-h-screen"
       } ${className}`}
     >
