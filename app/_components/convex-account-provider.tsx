@@ -1,8 +1,8 @@
 "use client";
 
-// Client half of the auth provider pair for `/account` and `/welcome` — the
-// only two routes in Phase A that mount the Convex auth client (§6.1,
-// §7.3). `storage="inMemory"` is set on `ConvexAuthNextjsServerProvider`,
+// Client half of the auth provider pair for `/account`, `/welcome` and
+// (Phase C) `/submit` — the only routes that mount the Convex auth client
+// (§6.1, §7.3). `storage="inMemory"` is set on `ConvexAuthNextjsServerProvider`,
 // the server half in `app/account/layout.tsx`; that prop does NOT forward
 // through this client component (§6.1's own caution: `ConvexAuthNextjsProvider`
 // — `dist/nextjs/index.js:31-34` — takes only `client` and `children`).

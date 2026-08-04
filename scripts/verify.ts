@@ -244,20 +244,51 @@ async function verifyComponent(page: Page, name: string, dir: string, meta: Meta
       }
     }
 
-    // interaction states: first VISIBLE interactive element, if any
+    // interaction states: first VISIBLE interactive element, if any.
+    //
+    // The list below is wider than `button, a, [role=button]` for a measured
+    // reason: 18 of 266 components expose NO button or link at all — their
+    // primary control is an `<input>`, a slider, a checkbox or a radio
+    // (sliders, checkbox runs, radio groups, search fields, a time picker, a
+    // tag input, and several ASCII instruments). For every one of those, this
+    // block used to find nothing, so hover/press/focus were never exercised
+    // and `GATE: PASS` meant only "renders, not blank, dark != light". That is
+    // the same shape as the failure that let three real defects sit in
+    // production for months: a gate that reports success for a check it never
+    // ran. Widening the selector is what makes the pass mean what it says.
     const interactive = page
-      .locator("button, a, [role=button]")
+      .locator(
+        "button, a, [role=button], input:not([type=hidden]), select, textarea, " +
+          "[role=slider], [role=switch], [role=checkbox], [role=radio], [contenteditable]",
+      )
       .filter({ visible: true })
       .first();
     if (await interactive.count()) {
-      await interactive.hover({ timeout: 5000 });
+      // "hover must change pixels" is an AFFORDANCE rule for things that look
+      // clickable — a button or a link that reacts to nothing reads as dead.
+      // It is not a rule about text inputs, sliders or checkboxes: a bare
+      // `<input>` that only changes on focus is correct, not broken. Asserting
+      // it against those manufactures findings (measured: 5 of the 18
+      // input-driven components fail it while being visually fine). So the
+      // assertion stays scoped to button-likes, while the widened selector
+      // above still drives press and — the part that actually matters — the
+      // keyboard-focus check on every one of them.
+      const isButtonLike = await interactive.evaluate((el) =>
+        el.matches("button, a, [role=button]"),
+      );
+      // `force` because the first visible control can legitimately sit under
+      // an overlay or be pointer-events:none (a styled proxy input behind a
+      // real control). Three components timed out on a strict hover for
+      // exactly that reason, which is a harness artifact, not a defect.
+      await interactive.hover({ timeout: 5000, force: true }).catch(() => {});
       await page.waitForTimeout(400);
       await shoot(page, dir, theme, "hover");
-      // hover must actually change pixels, else the state is dead
       const [def, hov] = ["default", "hover"].map((s) =>
         readFileSync(join(dir, "screenshots", `${theme}-${s}.png`))
       );
-      if (def.equals(hov)) fail(name, theme, "hover", "state identical to default");
+      if (isButtonLike && def.equals(hov)) {
+        fail(name, theme, "hover", "state identical to default");
+      }
 
       await page.mouse.down();
       await page.waitForTimeout(250);

@@ -157,6 +157,53 @@
   }
 }
 
+/* Homepage catalog gate. `html.catalog-filtered`/`html.catalog-sorted` are
+   set by the no-flash script (lib/catalog-gate.ts) before hydration, from the
+   same URL a returning or shared-link visitor arrived on — so the blocks
+   that only belong to the unfiltered, Featured-first view are never painted
+   in the first place, instead of being painted then removed once React
+   corrects its state (the source of this repo's worst measured CLS).
+   `.catalog-gate-hide` covers the Featured rail and the "All components"
+   heading (app/_components/showcase.tsx) — both hidden whenever a filter is
+   active OR the sort was changed. `.catalog-gate-clear` is CatalogControls'
+   "Clear" button, which only ever appears for an actual filter, not a bare
+   sort change. Plain `display: none`, no transition, same reasoning as
+   `.sidebar-restore` above: these elements are meant to never have been
+   visible, not to visibly animate away. */
+html.catalog-filtered .catalog-gate-hide,
+html.catalog-sorted .catalog-gate-hide {
+  display: none;
+}
+
+html.catalog-filtered .catalog-gate-clear {
+  display: flex;
+}
+
+/* The grid itself. The Featured rail was only the shift the RUM selector
+   named; the larger one is the 265 cards inside `ul.catalog-gate-grid` being
+   reordered or replaced wholesale once React reads the URL. Measured on a
+   production build, 1440x900, with the rail already gated: `/?sort=oldest`
+   0.158 and `/?sort=newest` 0.332, while the `<ul>`'s own top stayed fixed at
+   493px throughout — the shift sources were the cards' stretched-link
+   `::after` boxes, not the list. CSS cannot reorder or filter arbitrary DOM,
+   so the only first paint that shifts nothing is one that never shows the
+   wrong grid. `.catalog-gate-standin` (app/_components/showcase.tsx) holds
+   the space, viewport-tall so nothing below it is on screen to be moved.
+   Both classes retire together once `urlSynced` flips. */
+html.catalog-filtered .catalog-gate-grid,
+html.catalog-sorted .catalog-gate-grid {
+  display: none;
+}
+
+.catalog-gate-standin {
+  display: none;
+}
+
+html.catalog-filtered .catalog-gate-standin,
+html.catalog-sorted .catalog-gate-standin {
+  display: block;
+}
+
 /* MCP popup entrance — transform only, no opacity. The card sits over a
    featured card's live content (poster/video/iframe), so fading it in would
    mean it's genuinely translucent — and therefore see-through to whatever is

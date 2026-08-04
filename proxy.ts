@@ -37,7 +37,19 @@ import { NextResponse, type NextRequest } from "next/server";
 // `dist/nextjs/server/cookies.js:21-22` (prefix gated on that check) —
 // not re-derived, copied so the two never drift silently.
 const SAVES_PATHNAME = "/api/saves";
-const LOCALHOST_HOST = /(localhost|127\.0\.0\.1):\d+/;
+// Anchored (finding #4, LOW — same fix as `lib/submit-oauth-cookies.ts`'s
+// own copy, and kept duplicated on purpose per that file's own comment on
+// why this isn't factored into a shared import: this file runs in the
+// middleware/Edge runtime and must not gain a dependency on anything that
+// could pull in a Node-only module transitively). Unanchored, a `Host` of
+// `localhost:3000.evil.example` matched as a substring, misclassifying a
+// non-local request as local. Read from installed `@convex-dev/auth@0.0.94`
+// — `dist/server/utils.js`'s own `isLocalHost` is ALSO unanchored, so this
+// file's comment above claiming to mirror it was correct about the source
+// but the source itself has the same gap; anchoring our copy regardless
+// since we control it. Behavior is unchanged for every host string that
+// matched before — only the substring-match case is now rejected.
+const LOCALHOST_HOST = /^(localhost|127\.0\.0\.1):\d+$/;
 
 function authCookiePresent(request: NextRequest): boolean {
   const isLocal = LOCALHOST_HOST.test(request.headers.get("host") ?? "");

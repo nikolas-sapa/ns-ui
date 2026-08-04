@@ -319,7 +319,15 @@ export function LitmusWick({
           onChange={(e) => handleChange(e.target.value)}
           aria-invalid={status === "invalid"}
           aria-describedby={msgId}
-          className="w-full bg-transparent px-0 py-2 text-sm text-foreground outline-none placeholder:text-muted disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          // `focus-visible:ring-*`, not `focus-visible:outline-*`: the previous
+          // pair set `outline-none` (which is `outline-style: none`) and then
+          // only a focus WIDTH and COLOR — never a style — so the outline had
+          // nothing to draw and this input rendered no visible focus state at
+          // all. It went unnoticed because the gate's interaction block only
+          // looked for `button, a, [role=button]`, and this component exposes
+          // neither, so focus was never checked here. Ring is what the rest of
+          // the codebase uses and it composes with `outline-none`.
+          className="w-full bg-transparent px-0 py-2 text-sm text-foreground outline-none placeholder:text-muted disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-accent"
         />
 
         {/* baseline border — the field's resting bottom edge */}
