@@ -3,6 +3,30 @@
 Single source of truth for the /changelog page. Each entry is a `## vX.Y.Z - YYYY-MM-DD`
 heading, a `###` title, then one paragraph of body. Newest first.
 
+## v0.20.0 - 2026-08-04
+
+### Install URLs that had quietly stopped working, and 38 more components
+
+Every install command published in the CLI and MCP packages had been returning 404. The
+223-slug rename shipped after those packages were built, not before, so both were handing
+out addresses that no longer existed — and because a failed `npx shadcn add` happens in
+someone else's terminal, nothing here would ever have reported it. Every old address now
+redirects to its current one, and both packages have been republished with correct data,
+so old installs keep working and new ones resolve directly. The registry grew from 228 to
+266 components, most of them ASCII instruments: dithered bar, line, funnel, radar,
+scatter, waterfall and box-plot charts, a choropleth, sankey, treemap and flow diagram, a
+patchbay, seatmap, keymap and spreadsheet range, plus new ASCII backgrounds and heroes.
+The catalog's own "Newest" sort had been putting new components last instead of first,
+which is fixed. Scrolling the catalog could flip the whole site between light and dark:
+the theme-toggle demo shared a storage key with the site itself, and autoplay pressed it
+as you scrolled. The homepage no longer shifts its layout while it loads. `/community`,
+`/guidelines` and `/submit` are new: the first two are written, and `/submit` opens a pull
+request against this repo under your own GitHub account, which needs one more callback URL
+registered before it can complete. The screenshot suite that guards every component was
+skipping hover, press and focus entirely on 18 of them — anything whose main control is an
+input, slider, checkbox or radio — and closing that gap immediately turned up a text field
+with no visible keyboard focus state.
+
 ## v0.19.0 - 2026-08-02
 
 ### Optional accounts, and component pages worth landing on
