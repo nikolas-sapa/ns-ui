@@ -12,7 +12,18 @@ export default function ThemeToggleAsciiDemo() {
         <span className="font-mono text-xs uppercase tracking-[0.3em] text-muted">
           appearance
         </span>
-        <ThemeToggleAscii />
+        {/* `storageKey` is overridden and NOT left at its default, which is
+            `ns-ui-theme` — byte-identical to this site's own
+            THEME_STORAGE_KEY (lib/theme.ts). The catalog renders every demo
+            in a same-origin iframe and the autoplay driver presses this
+            control on a loop, so the default key had each pass overwrite the
+            visitor's real theme preference. localStorage is shared across
+            same-origin frames, so the iframe boundary does not contain it:
+            the site read the mutated value and flipped light/dark seemingly
+            at random while scrolling the catalog. Keeping `syncDocument` on
+            is deliberate — it is the component's actual behaviour and worth
+            demonstrating — it just must not write the key the host reads. */}
+        <ThemeToggleAscii storageKey="ns-ui-theme-demo" />
       </div>
       <p className="max-w-md text-center text-xs text-muted">
         The chip is painted in the negative of the current theme's real
