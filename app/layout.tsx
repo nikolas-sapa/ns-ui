@@ -4,6 +4,7 @@ import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { ThemeSync } from "./_components/theme-sync";
 import { SiteAnalytics } from "./_components/site-analytics";
+import { InpProbe } from "./_components/inp-probe";
 import { SiteShell } from "./_components/site-shell";
 import { NO_FLASH_SCRIPT } from "@/lib/theme";
 import { NO_FLASH_SIDEBAR_SCRIPT } from "@/lib/sidebar";
@@ -84,6 +85,7 @@ export default function RootLayout({
             Vercel deployment, so local dev is unaffected. Skipped inside card
             iframes — see the component. */}
         <SiteAnalytics />
+        <InpProbe />
       </body>
     </html>
   );

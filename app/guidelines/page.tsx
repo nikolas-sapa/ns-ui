@@ -151,6 +151,29 @@ export default function GuidelinesPage() {
 
       <section className="mt-10 max-w-2xl">
         <h2 className="text-lg font-medium tracking-[-0.02em] text-foreground">
+          What the accessibility check doesn't cover
+        </h2>
+        <p className="mt-2 text-sm leading-6 text-ns-muted">
+          The rejections above are real, but narrower than they sound. The
+          audit checks that an accessible name exists, not whether it's a
+          good one — a control named after its own icon passes the same as
+          one named for what it does. It checks that keyboard focus renders
+          visibly differently from unfocused, not that the difference meets
+          any contrast ratio. And it deliberately does not assert per-element
+          tab order: a roving-tabindex chip group or a spinner button whose
+          input owns the keyboard is legitimate and would false-fail that
+          check, so instead it asserts something weaker but honest — if a
+          component renders any control at all, Tab from a blurred page must
+          land on something in it. The audit itself also runs once per
+          component, on the dark pass only, since it's theme-independent; and
+          it only ever sees the resting state plus whichever "open" state a
+          component declares for its gate, not every state a person might
+          drive it into by hand.
+        </p>
+      </section>
+
+      <section className="mt-10 max-w-2xl">
+        <h2 className="text-lg font-medium tracking-[-0.02em] text-foreground">
           License and sign-off
         </h2>
         <p className="mt-2 text-sm leading-6 text-ns-muted">

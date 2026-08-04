@@ -152,7 +152,13 @@ export function DeviceMockupAsciiScreen({ className = "" }: DeviceMockupAsciiScr
         if (d <= 0) continue;
         const ch = d > 0.85 ? "#" : d > 0.55 ? "=" : d > 0.3 ? "-" : ".";
         ctx.fillStyle = nearScan ? accent : fg;
-        ctx.globalAlpha = nearScan ? 1 : 0.65 + d * 0.3;
+        // tiered alpha bucketed to the same glyph tiers as `ch`, the same
+        // idea as background-ascii-caustics' ALPHA_BUCKETS: contrast comes
+        // from real void (d <= 0 draws nothing, above) plus pushing drawn
+        // ink UP toward opaque, not compressing every band into a narrow
+        // mid-grey range — a continuous curve that dims already-faint bands
+        // further is the opposite of legible structure
+        ctx.globalAlpha = nearScan ? 1 : d > 0.85 ? 1 : d > 0.55 ? 0.78 : d > 0.3 ? 0.55 : 0.32;
         ctx.fillText(ch, gx * cellW + rowShear, gy * cellH);
       }
     }

@@ -63,6 +63,8 @@ const DEFAULT_FIELDS: TeletypeFieldSpec[] = [
   },
 ];
 
+const LEADER = ".".repeat(80);
+
 interface Entry {
   id: number;
   field: string;
@@ -146,14 +148,34 @@ export function ContactFormTeletype({
   return (
     <div className={`ns-cft w-full ${className}`}>
       <style>{CSS}</style>
+      <p aria-hidden="true" className="mb-4 select-none border-b border-border pb-2 font-mono text-[11px] uppercase tracking-[0.2em] text-ns-muted">
+        — contact —
+      </p>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
-        {fields.map((field) => {
+        {fields.map((field, idx) => {
           const fieldId = `${uid}-${field.name}`;
           return (
-            <div key={field.name} className="flex flex-col gap-1.5">
-              <label htmlFor={fieldId} className="font-mono text-xs uppercase tracking-widest text-ns-muted">
-                {field.label}
-              </label>
+            <div key={field.name} className="group flex flex-col gap-1.5">
+              <div className="flex items-baseline gap-2">
+                <span aria-hidden="true" className="font-mono text-[10px] text-ns-muted/50">
+                  {String(idx + 1).padStart(2, "0")}
+                </span>
+                <label htmlFor={fieldId} className="font-mono text-xs uppercase tracking-widest text-ns-muted">
+                  {field.label}
+                </label>
+                <span
+                  aria-hidden="true"
+                  className="ns-cft-leader flex-1 overflow-hidden whitespace-nowrap font-mono text-xs tracking-widest text-ns-muted/30"
+                >
+                  {LEADER}
+                </span>
+                <span
+                  aria-hidden="true"
+                  className="ns-cft-caret hidden font-mono text-xs text-ns-accent group-focus-within:inline-block"
+                >
+                  █
+                </span>
+              </div>
               {field.type === "textarea" ? (
                 <textarea
                   id={fieldId}
@@ -240,4 +262,9 @@ function ReceiptLine({ entry, reduced }: { entry: Entry; reduced: boolean }) {
 
 const CSS = `
 .ns-cft-struck { text-decoration: line-through; text-decoration-thickness: 1px; opacity: 0.55; transition: opacity 200ms ease; }
+.ns-cft-caret { animation: ns-cft-blink 1s step-end infinite; }
+@keyframes ns-cft-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .ns-cft-caret { animation: none; }
+}
 `;

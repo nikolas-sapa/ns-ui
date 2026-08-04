@@ -21,15 +21,47 @@ import { useEffect, useRef } from "react";
 // strength ramps in while the pointer is over the field and eases back out
 // when it leaves — particles visibly swirl around the cursor rather than
 // being repelled or painted.
+//
+// The potential used to be an additive blend of two noise octaves, whose
+// gradient magnitude (and therefore curl speed) is nearly uniform everywhere
+// noise gradients average out fast — measured std of the per-cell normalized
+// speed was ~0.17 with most mass bunched mid-range, i.e. the whole canvas
+// read as one uniform density regardless of any brightness curve layered on
+// top afterward. The fix is in the field itself: the second octave is
+// resampled at much lower frequency and reshaped with a power curve into an
+// ENVELOPE that multiplies the first octave — the same multiplicative,
+// power-sharpened structure background-ascii-caustics uses to turn wave
+// products into thin filaments, applied here to modulate flow speed instead
+// of ink density. Because curl-of-a-scalar-potential is always
+// divergence-free, tracer POSITION density can't literally converge
+// (Liouville: incompressible advection preserves area), so this doesn't
+// create real particle bunching — envelope troughs are genuine slow zones
+// where trails fade toward invisible, envelope peaks are genuine fast zones
+// where trails read at full brightness, and the visual effect (busy fast
+// channels against calm empty stretches) is what "convergence" reads as.
+// Both the ambient glyphs and the particle trails were also normalizing
+// brightness against the WRONG reference: ambient divided by each frame's
+// own max speed, which one rare speed spike could crush everything else
+// under; particles divided by a constant tuned for a speed scale roughly
+// 30-50x larger than what curlVel actually produces at its eps, pinning
+// every trail near the same floor regardless of true relative speed. Both
+// now use a fixed, empirically-measured reference plus a gamma curve, the
+// same frame-independent absolute-threshold approach caustics uses.
 // ---------------------------------------------------------------------------
 
 const DIR_CHARS = ["-", "|", "/", "\\"] as const;
 const NOISE_FREQ = 0.05; // spatial frequency of the potential field
+const ENVELOPE_FREQ = NOISE_FREQ * 0.3; // much lower — large, slow-moving speed zones
+const ENVELOPE_POW = 2.0; // higher = envelope mostly near ENVELOPE_MIN, rare sharp peaks
+const ENVELOPE_MIN = 0.12; // floor speed multiplier in the slowest zones
 const FIELD_SPEED = 0.06; // t units/s the potential drifts
 const CURL_SCALE = 46; // maps potential gradient to px/s particle speed
 const AMBIENT_STEP = 3; // ambient direction glyph sampled every N cells
 const AMBIENT_ALPHA_MAX = 0.55;
-const AMBIENT_CUTOFF = 0.4; // below this normalized speed, draw nothing — real negative space
+const AMBIENT_REF = 1.4; // px/s (at ambient's eps) — measured p90-ish of the new field's speed range
+const AMBIENT_GAMMA = 1.8; // sharpens speed->brightness the way CAUSTIC_POW sharpens caustics
+const PARTICLE_REF = 0.55; // px/s (at particle-step's larger eps) — measured p95-ish reference
+const PARTICLE_GAMMA = 1.8;
 const PARTICLE_COUNT_MIN = 60;
 const PARTICLE_COUNT_MAX = 130;
 const TRAIL_LEN = 4;
@@ -64,8 +96,16 @@ function noise2D(x: number, y: number, seed: number): number {
 
 function potential(x: number, y: number, t: number): number {
   const n1 = noise2D(x * NOISE_FREQ, y * NOISE_FREQ + t, 11.3);
-  const n2 = noise2D(x * NOISE_FREQ * 2.3 - t * 0.6, y * NOISE_FREQ * 2.3, 47.9);
-  return n1 * 0.7 + n2 * 0.3;
+  // Low-frequency, slow-drifting envelope source — same noise2D cost as the
+  // old second octave, just resampled coarser so it carves out large zones
+  // instead of adding fine detail.
+  const n2 = noise2D(
+    x * ENVELOPE_FREQ + t * 0.05,
+    y * ENVELOPE_FREQ - t * 0.05,
+    47.9
+  );
+  const envelope = ENVELOPE_MIN + (1 - ENVELOPE_MIN) * Math.pow(n2, ENVELOPE_POW);
+  return n1 * envelope;
 }
 
 // curl of the scalar potential field -> divergence-free velocity
@@ -221,48 +261,26 @@ export function Slipstream({ cellSize = 14, className = "" }: SlipstreamProps) {
 
     const drawAmbient = (t: number) => {
       ctx.fillStyle = muted;
-      // Every ambient sample used to draw at the same fixed faint alpha
-      // regardless of how fast the field moved there — the whole background
-      // read as an even sprinkle of dashes with no shape and no negative
-      // space. A fixed CURL_SCALE-based reference speed turned out to be the
-      // wrong normalizer too: this potential field's gradient magnitude is
-      // fairly uniform canvas-wide, so nearly every cell landed on the same
-      // side of any fixed cutoff and the fix was invisible. Normalizing
-      // against THIS FRAME's own actual max speed (two passes: measure, then
-      // draw) guarantees real contrast regardless of the field's absolute
-      // scale — cells at the local max always reach full brightness, cells
-      // near the local min always fall below the cutoff into true negative
-      // space, same as the frame-relative sharpening background-ascii-caustics
-      // uses.
-      // Single pass: curlVel is 4 potential() calls (8 noise2D) per sample —
-      // computing it twice per cell every frame forever was a real perf
-      // regression, not just inelegant. Cache vx/vy/speed once, normalize
-      // against the max found in this same pass.
-      const vxs: number[] = [];
-      const vys: number[] = [];
-      const speeds: number[] = [];
-      let maxSpeed = 1e-6;
+      // Speed now genuinely varies across space (the envelope carves real
+      // slow/fast zones — see the header note), so brightness can be keyed
+      // off a fixed absolute reference instead of each frame's own max: a
+      // frame-relative max is fragile here because the envelope's peaks are
+      // rare and sharp, and a single outlier cell would crush every other
+      // cell's normalized value toward zero. AMBIENT_REF/AMBIENT_GAMMA were
+      // picked from the field's actual measured speed distribution, the
+      // same frame-independent absolute-threshold approach
+      // background-ascii-caustics uses (pow(v, CAUSTIC_POW) with no
+      // per-frame rescaling). One curlVel call per sampled cell, same as
+      // before.
       for (let gy = 0; gy < rows; gy += AMBIENT_STEP) {
         for (let gx = 0; gx < cols; gx += AMBIENT_STEP) {
           const [vx, vy] = curlVel(gx * cellW, gy * cellH, t, 1.5);
           const speed = Math.hypot(vx, vy);
-          vxs.push(vx);
-          vys.push(vy);
-          speeds.push(speed);
-          if (speed > maxSpeed) maxSpeed = speed;
-        }
-      }
-      let i = 0;
-      for (let gy = 0; gy < rows; gy += AMBIENT_STEP) {
-        for (let gx = 0; gx < cols; gx += AMBIENT_STEP) {
-          const norm = speeds[i]! / maxSpeed;
-          if (norm >= AMBIENT_CUTOFF) {
-            const shaped = Math.pow((norm - AMBIENT_CUTOFF) / (1 - AMBIENT_CUTOFF), 2.2);
-            ctx.globalAlpha = shaped * AMBIENT_ALPHA_MAX;
-            const ch = dirChar(vxs[i]!, vys[i]!);
-            ctx.fillText(ch, gx * cellW + cellW / 2, gy * cellH + cellH / 2);
-          }
-          i++;
+          const shaped = Math.pow(Math.min(1, speed / AMBIENT_REF), AMBIENT_GAMMA);
+          if (shaped < 0.02) continue; // true negative space
+          ctx.globalAlpha = shaped * AMBIENT_ALPHA_MAX;
+          const ch = dirChar(vx, vy);
+          ctx.fillText(ch, gx * cellW + cellW / 2, gy * cellH + cellH / 2);
         }
       }
     };
@@ -276,15 +294,17 @@ export function Slipstream({ cellSize = 14, className = "" }: SlipstreamProps) {
       for (let i = 0; i < particleCount; i++) {
         const ch = dirChar(velX[i]!, velY[i]!);
         const live = histLive[i]!;
-        // A particle sitting in a slow patch of the field used to draw at
-        // the exact same brightness as one riding the fastest current —
-        // every trail was equally bright regardless of how much it was
-        // actually moving, which is most of why the whole canvas read as
-        // one uniform density of dashes. Riding the same curl speed the
-        // vortex/advection math already computes, a slow particle now fades
-        // toward the background instead of matching the fast ones 1:1.
-        const speedNorm = Math.min(1, Math.hypot(velX[i]!, velY[i]!) / (CURL_SCALE * 0.6));
-        const speedGain = 0.35 + 0.65 * speedNorm;
+        // Speed-keyed brightness here used to normalize against
+        // CURL_SCALE * 0.6, a reference roughly 30-50x larger than what
+        // curlVel actually produces at the particle-step eps — every trail
+        // was pinned near the 0.35 floor regardless of true relative speed,
+        // a scale bug independent of (and compounding) the field's own low
+        // variance. PARTICLE_REF/PARTICLE_GAMMA are tuned from the field's
+        // measured speed distribution, and the floor is low enough that a
+        // genuinely slow particle now fades to near-invisible while a fast
+        // one reaches full brightness — real contrast, not a fixed offset.
+        const speedNorm = Math.min(1, Math.hypot(velX[i]!, velY[i]!) / PARTICLE_REF);
+        const speedGain = 0.04 + 0.96 * Math.pow(speedNorm, PARTICLE_GAMMA);
         for (let s = 0; s < live; s++) {
           const slot = (histHead[i]! - s + TRAIL_LEN * 4) % TRAIL_LEN;
           const alpha = (1 - s / TRAIL_LEN) * speedGain;

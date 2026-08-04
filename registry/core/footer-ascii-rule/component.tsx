@@ -16,6 +16,7 @@ import { useEffect, useRef } from "react";
 // ---------------------------------------------------------------------------
 
 const RAIL_ROWS = 6;
+const INITIAL_RAIL = Array.from({ length: RAIL_ROWS }, (_, i) => (i === 0 ? "●" : "│")).join("\n");
 const SPRING_K = 120;
 const SPRING_C = 22;
 const SETTLE_POS_EPS = 0.6;
@@ -40,6 +41,7 @@ export interface FooterAsciiRuleProps {
 
 export function FooterAsciiRule({ brand = "ns-ui", columns, className = "" }: FooterAsciiRuleProps) {
   const railRef = useRef<HTMLPreElement>(null);
+  const pctRef = useRef<HTMLSpanElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const flightRef = useRef<{ raf: number; cancel: () => void } | null>(null);
 
@@ -57,6 +59,7 @@ export function FooterAsciiRule({ brand = "ns-ui", columns, className = "" }: Fo
       const lines: string[] = [];
       for (let i = 0; i < RAIL_ROWS; i++) lines.push(i === carRow ? "●" : "│");
       rail.textContent = lines.join("\n");
+      if (pctRef.current) pctRef.current.textContent = `${Math.round(progress * 100)}%`.padStart(4, " ");
     };
 
     let ticking = false;
@@ -179,11 +182,18 @@ export function FooterAsciiRule({ brand = "ns-ui", columns, className = "" }: Fo
             aria-label="Back to top"
             className="group inline-flex items-center gap-2 rounded-sm border border-border px-2.5 py-1.5 font-mono text-xs text-foreground transition-colors hover:border-foreground/25 hover:text-ns-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
-            <pre
-              ref={railRef}
-              aria-hidden
-              className="pointer-events-none whitespace-pre text-center leading-[1.1] text-ns-muted transition-colors group-hover:text-ns-accent"
-            />
+            <span className="flex flex-col items-center gap-0.5">
+              <pre
+                ref={railRef}
+                aria-hidden
+                className="pointer-events-none whitespace-pre text-center leading-[1.1] text-ns-muted transition-colors group-hover:text-ns-accent"
+              >
+                {INITIAL_RAIL}
+              </pre>
+              <span ref={pctRef} aria-hidden className="pointer-events-none text-[9px] tabular-nums text-ns-muted/60">
+                0%
+              </span>
+            </span>
             <span>back to top</span>
           </button>
         </div>

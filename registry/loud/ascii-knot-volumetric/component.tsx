@@ -40,7 +40,10 @@ const Q = 2; // times the curve winds around the tube (P,Q coprime -> trefoil)
 const R_MAJOR = 1.55; // ring radius the knot's centerline winds around
 const R_MINOR = 0.75; // how far the centerline bulges from that ring
 const TUBE_R = 0.34; // volumetric tube radius swept around the centerline
-const K2 = 6.4; // viewer distance, world units
+// viewer distance: ratio-matched to ascii-torus-donut's K2/maxRadius so the
+// knot claims the same fraction of the frame the torus does (was 6.4, which
+// left the subject tiny inside a mostly-dead render area)
+const K2 = 4.0; // viewer distance, world units
 const RAMP = ".,-~:;=!*#$@"; // 12-step Lambertian density ramp
 const DT = 1e-3; // finite-difference step for tangent/curvature
 
@@ -234,7 +237,7 @@ export function KnotRender({ cellSize = 13, className = "" }: KnotRenderProps) {
       renderCx = rMinCol * cellW + renderW / 2;
       renderCy = rMinRow * cellH + renderH / 2;
       const minRenderPx = Math.min(renderW, renderH);
-      K1 = minRenderPx * 0.3;
+      K1 = minRenderPx * 0.45;
 
       // capped low: a torus knot's crossings are legible well below the
       // torus's own sample density, and this is the component most at risk
