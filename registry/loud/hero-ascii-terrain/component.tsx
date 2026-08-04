@@ -29,7 +29,8 @@ interface Layer {
   freq: number; // spatial frequency in noise-space, per column
   baseFrac: number; // fraction of terrain band the ridge's average sits at
   ampFrac: number; // fraction of terrain band the ridge swings by
-  parallax: number; // 0..1, how much this layer answers to pointer/idle drift
+  parallax: number; // 0..1, how much this layer answers to the pointer
+  drift: number; // idle ambient pan, in GRID COLUMNS/s (not noise-space)
   alpha: number; // resting opacity, haze (far) -> ink (near)
   charIdx: number; // index into RAMP
   seedA: number;
@@ -41,16 +42,27 @@ interface Layer {
 // Amplitude is large relative to the gap between layers on purpose: a ridge
 // silhouette only reads as terrain if it has real peaks and valleys, not a
 // nearly flat line with a haze tint.
+//
+// `drift` used to be one global constant (IDLE_DRIFT) multiplied through
+// `parallax`, same as the pointer offset. That reads as "barely moving" no
+// matter how large the constant gets: the ridge only repaints when the
+// sampled noise crosses into a different grid COLUMN, and with parallax
+// spanning 0.05 -> 0.95 the resulting pace was ~1 column every 125s on the
+// farthest layer and ~1 column every 6.6s even on the nearest — both well
+// below what a glance registers, confirmed at 0% of cells changing per
+// second measured over a 6s sample at rest. `drift` is now authored directly
+// in columns/second, decoupled from `parallax` (which still governs only the
+// pointer response): the near layer crosses a column every ~0.3s, the far
+// layer keeps drifting slowly rather than being effectively frozen.
 const LAYERS: Layer[] = [
-  { freq: 0.012, baseFrac: 0.0, ampFrac: 0.11, parallax: 0.05, alpha: 0.24, charIdx: 1, seedA: 11, seedB: 511 },
-  { freq: 0.018, baseFrac: 0.14, ampFrac: 0.16, parallax: 0.18, alpha: 0.44, charIdx: 3, seedA: 23, seedB: 727 },
-  { freq: 0.026, baseFrac: 0.32, ampFrac: 0.2, parallax: 0.38, alpha: 0.64, charIdx: 5, seedA: 47, seedB: 941 },
-  { freq: 0.038, baseFrac: 0.52, ampFrac: 0.24, parallax: 0.62, alpha: 0.84, charIdx: 7, seedA: 71, seedB: 1153 },
-  { freq: 0.055, baseFrac: 0.74, ampFrac: 0.27, parallax: 0.95, alpha: 1, charIdx: 9, seedA: 97, seedB: 1381 },
+  { freq: 0.012, baseFrac: 0.0, ampFrac: 0.11, parallax: 0.05, drift: 0.45, alpha: 0.24, charIdx: 1, seedA: 11, seedB: 511 },
+  { freq: 0.018, baseFrac: 0.14, ampFrac: 0.16, parallax: 0.18, drift: 0.9, alpha: 0.44, charIdx: 3, seedA: 23, seedB: 727 },
+  { freq: 0.026, baseFrac: 0.32, ampFrac: 0.2, parallax: 0.38, drift: 1.7, alpha: 0.64, charIdx: 5, seedA: 47, seedB: 941 },
+  { freq: 0.038, baseFrac: 0.52, ampFrac: 0.24, parallax: 0.62, drift: 2.8, alpha: 0.84, charIdx: 7, seedA: 71, seedB: 1153 },
+  { freq: 0.055, baseFrac: 0.74, ampFrac: 0.27, parallax: 0.95, drift: 4.5, alpha: 1, charIdx: 9, seedA: 97, seedB: 1381 },
 ];
 
 const STAR_CHARS = [1, 2, 3]; // RAMP indices used for stars
-const IDLE_DRIFT = 0.16; // world-units/s of ambient pan, scaled per-layer
 const CURSOR_EASE = 0.08;
 const MAX_PARALLAX_COLS = 46; // world-unit shift at full pointer travel
 const MAX_PARALLAX_ROWS = 5;
@@ -213,11 +225,11 @@ export function ScarpHorizon({
       resizeTimer = setTimeout(() => {
         resizeTimer = null;
         resize();
-        if (reduced) draw(0, 0, 0, 0);
+        if (reduced) draw(0, 0, 0);
       }, 150);
     };
 
-    const draw = (t: number, offX: number, offY: number, driftX: number) => {
+    const draw = (t: number, offX: number, offY: number) => {
       if (!sized) return;
       const w = cols * cellW;
       const h = rows * cellH;
@@ -228,7 +240,12 @@ export function ScarpHorizon({
       // -- terrain: far -> near, each layer overwrites the cells it covers --
       for (let li = 0; li < LAYERS.length; li++) {
         const layer = LAYERS[li];
-        const worldOffX = (offX + driftX) * layer.parallax;
+        // pointer parallax and idle drift are two different units on
+        // purpose: pointer offset is already in grid columns (scaled by
+        // proximity), idle drift is authored directly in columns/s per
+        // layer — see the comment on `LAYERS` for why they used to share
+        // one constant and why that read as motionless.
+        const worldOffX = offX * layer.parallax + t * layer.drift;
         const worldOffY = offY * layer.parallax * 0.6;
         for (let c = 0; c < cols; c++) {
           const nx = (c + worldOffX) * layer.freq;
@@ -257,7 +274,7 @@ export function ScarpHorizon({
       // -- sky: sparse breathing stars, drawn directly (no grid buffer) -----
       ctx.fillStyle = muted;
       for (let i = 0; i < starCount; i++) {
-        const twinkle = 0.6 + 0.4 * Math.sin(t * 0.6 + starPhase[i]);
+        const twinkle = 0.5 + 0.5 * Math.sin(t * 1.1 + starPhase[i]);
         ctx.globalAlpha = starAlpha[i] * twinkle;
         ctx.fillText(
           RAMP[starChar[i]],
@@ -298,7 +315,7 @@ export function ScarpHorizon({
       t += dt;
       cursor.x += (cursor.tx - cursor.x) * CURSOR_EASE;
       cursor.y += (cursor.ty - cursor.y) * CURSOR_EASE;
-      draw(t, cursor.x, cursor.y, t * IDLE_DRIFT);
+      draw(t, cursor.x, cursor.y);
       if (!document.hidden) raf = requestAnimationFrame(loop);
     };
 
@@ -322,7 +339,7 @@ export function ScarpHorizon({
     };
     const mo = new MutationObserver(() => {
       readTokens();
-      if (reduced) draw(0, 0, 0, 0);
+      if (reduced) draw(0, 0, 0);
     });
     mo.observe(document.documentElement, {
       attributes: true,
@@ -335,7 +352,7 @@ export function ScarpHorizon({
       resize();
       ready = true;
       if (reduced) {
-        draw(0, 0, 0, 0);
+        draw(0, 0, 0);
       } else {
         raf = requestAnimationFrame(loop);
       }

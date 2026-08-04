@@ -55,6 +55,35 @@ export default async function CommunityPage() {
         it appears here.
       </p>
 
+      <section className="mt-12 max-w-2xl border-t border-border pt-10">
+        <h2 className="text-lg font-medium tracking-[-0.02em] text-foreground">
+          What this is for
+        </h2>
+        <p className="mt-2 text-sm leading-6 text-muted">
+          This registry is a shared reference of single-interaction components
+          that people actually use, not a showcase of everything that could be
+          built. The goal for the community side of it is the same: a place
+          to hear how those components get used in practice, and a way for
+          anyone who contributes one to be credited for it.
+        </p>
+        <p className="mt-3 text-sm leading-6 text-muted">
+          Contributing means opening a pull request, the same as any open
+          source project — there is no submission form that runs your code on
+          this site. What you submit is read by a person against a real bar
+          (see{" "}
+          <Link
+            href="/guidelines"
+            className="underline decoration-border underline-offset-4 outline-none hover:decoration-foreground focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            Guidelines
+          </Link>
+          ), and a merged component carries your GitHub identity in its
+          history for good. This page isn&rsquo;t a forum: there are no
+          comments, ratings, or discussion threads, just the testimonials
+          people chose to write and the credit contributors earned.
+        </p>
+      </section>
+
       <section className="mt-12">
         <h2 className="sr-only">Experiences</h2>
         <CommunityTestimonials items={items} />

@@ -370,9 +370,11 @@ export function SubmitForm() {
             checked={dcoAgreed}
             onChange={(e) => setDcoAgreed(e.target.checked)}
             disabled={pending}
-            className="mt-0.5 size-4 rounded-sm border-border text-accent outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="mt-0.5 size-4 shrink-0 rounded-sm border-border text-accent outline-none focus-visible:ring-2 focus-visible:ring-accent"
           />
-          I certify the DCO for this contribution and agree it is licensed under the MIT License.
+          <span>
+            I certify the DCO for this contribution and agree it is licensed under the MIT License.
+          </span>
         </label>
       </div>
 
@@ -382,10 +384,18 @@ export function SubmitForm() {
           checked={verifyAttested}
           onChange={(e) => setVerifyAttested(e.target.checked)}
           disabled={pending}
-          className="mt-0.5 size-4 rounded-sm border-border text-accent outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="mt-0.5 size-4 shrink-0 rounded-sm border-border text-accent outline-none focus-visible:ring-2 focus-visible:ring-accent"
         />
-        I ran <code className="font-mono">npm run verify</code> locally for this component and it
-        passed. I'll attach the screenshots it produced to the PR myself.
+        {/* The copy has to be ONE element. The label is `flex`, so every child
+            is a flex item — and this sentence used to be three of them (text,
+            <code>, text). Flex laid them out as three columns, so the label
+            rendered as "I" / "npm run" / "locally for this component…" stacked
+            beside each other instead of as a sentence. The DCO checkbox above
+            escaped it only by having a single text node. */}
+        <span>
+          I ran <code className="font-mono">npm run verify</code> locally for this component and it
+          passed. I&apos;ll attach the screenshots it produced to the PR myself.
+        </span>
       </label>
 
       <button
