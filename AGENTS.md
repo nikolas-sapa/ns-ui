@@ -238,3 +238,25 @@ server: with several agents hitting one dev server, Turbopack serves corrupted c
 on 15-50% of loads, the page never hydrates, and components render at their unhydrated
 JSX defaults — which looks exactly like a catastrophic component bug. Measured 0/12
 failures against a production build versus 15-50% on dev.
+
+## `/submit` — required environment (Phase C)
+
+`/submit` opens a PR **as the submitting user**, so it needs its own GitHub credentials on the
+**Next.js side**, separate from the copies on the Convex deployment. Six variables, and they must
+exist in **every** deploy target — Production *and* Preview:
+
+| Variable | What it is |
+|---|---|
+| `AUTH_GITHUB_ID` / `AUTH_GITHUB_SECRET` | The GitHub app's client credentials. The same app the Convex auth flow uses is fine: it is a GitHub App (client id `Ov23li…`), which accepts multiple callback URLs, and `https://<origin>/api/submit/github/callback` is accepted — verified by probing GitHub's authorize endpoint, which returned the sign-in page with our `redirect_uri` intact rather than a `redirect_uri is not associated` error. Do not assume this of an OAuth *App*, which allows only one callback host. |
+| `SUBMIT_TOKEN_BINDING_SECRET` | HMAC key binding the GitHub token cookie to the Convex user id. Closes a HIGH finding: without it the token survived sign-out and a second account on the same browser could open a PR under the first user's identity. |
+| `GITHUB_REPO_OWNER` / `GITHUB_REPO_NAME` / `GITHUB_DEFAULT_BRANCH` | The upstream a submission targets. |
+
+**It fails closed.** A missing `SUBMIT_TOKEN_BINDING_SECRET` makes both the mint and the verify path
+return `github_not_configured` rather than issuing an unbound token — `/submit` stops working, it
+does not silently weaken. That is deliberate; do not "fix" it by defaulting the secret.
+
+Setting these requires a **redeploy** to take effect: Vercel binds env vars into a deployment at
+build time, so changing one has no effect on the deployment already serving traffic.
+
+Preview variables in this project must be branch-scoped, and the CLI refuses to scope them to the
+production branch. Use the dashboard's "All Preview branches" option.
