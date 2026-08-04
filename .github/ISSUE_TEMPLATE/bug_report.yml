@@ -55,6 +55,18 @@ body:
         - label: Dark
         - label: Light
 
+  - type: input
+    id: react-version
+    attributes:
+      label: React version
+      placeholder: "19.2.7"
+
+  - type: input
+    id: tailwind-version
+    attributes:
+      label: Tailwind version
+      placeholder: "4.3.2"
+
   - type: textarea
     id: env
     attributes:
@@ -62,4 +74,4 @@ body:
       placeholder: |
         Browser: Chrome 141
         OS: macOS 15.2
-        React / Next versions:
+        Next version:
