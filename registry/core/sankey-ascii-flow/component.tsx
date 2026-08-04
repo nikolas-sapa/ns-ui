@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 // ---------------------------------------------------------------------------
 // AsciiSankeyFlow — a weighted, branching multi-stage flow diagram where the
@@ -97,41 +97,21 @@ function stageCol(stage: number): number {
   return 1 + stage * (NODE_W + BAND_W);
 }
 
-interface Tokens {
-  fg: string;
-  bg: string;
-  muted: string;
-  border: string;
-  accent: string;
-}
-
-function readTokens(): Tokens {
-  const cs = getComputedStyle(document.documentElement);
-  const get = (name: string, fallback: string) => cs.getPropertyValue(name).trim() || fallback;
-  return {
-    fg: get("--foreground", "#171717"),
-    bg: get("--background", "#ffffff"),
-    muted: get("--muted", "#4d4d4d"),
-    border: get("--border", "#ebebeb"),
-    accent: get("--accent", "#006bff"),
-  };
-}
-
-function useTokens(): Tokens {
-  const [tokens, setTokens] = useState<Tokens>(() =>
-    typeof document === "undefined"
-      ? { fg: "#171717", bg: "#ffffff", muted: "#4d4d4d", border: "#ebebeb", accent: "#006bff" }
-      : readTokens()
-  );
-  useEffect(() => {
-    const sync = () => setTokens(readTokens());
-    sync();
-    const mo = new MutationObserver(sync);
-    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class", "style"] });
-    return () => mo.disconnect();
-  }, []);
-  return tokens;
-}
+// This used to read --foreground/--background/etc via getComputedStyle at
+// mount, hold them in state, and apply the result as raw hex through inline
+// `style` — a real bug, not a style choice, see diagram-ascii-flow's
+// component.tsx for the full story. Short version: SSR always renders with
+// no `document`, so the FIRST markup bakes in the light-theme fallback hex,
+// and because the client-computed value never CHANGES across renders (this
+// component recomputes the same "correct" dark hex every time), React never
+// patches it into the DOM — it only writes an attribute when the new
+// render's value differs from the PREVIOUS render's, not from what's
+// actually painted. Confirmed live here too: on a fresh load with dark mode
+// already saved (the anti-flash script sets `.dark` on `<html>` before
+// hydration), every node rendered background rgb(255,255,255) against a
+// rgb(10,10,10) page. Tailwind classes bound to the same custom properties
+// sidestep the whole bug class: the cascade resolves --background per theme
+// at PAINT time, no JS or hydration step involved.
 
 // Every node reachable from `id` by walking edges backward (ancestors) or
 // forward (descendants) — the "isolate" set is {id} union both directions,
@@ -158,7 +138,6 @@ export function AsciiSankeyFlow({
   links = DEFAULT_LINKS,
   className = "",
 }: AsciiSankeyFlowProps) {
-  const tokens = useTokens();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [hoverId, setHoverId] = useState<string | null>(null);
 
@@ -254,8 +233,8 @@ export function AsciiSankeyFlow({
             row until bands land under the wrong node entirely. */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{ color: tokens.muted, fontSize: 10 }}
+          className="pointer-events-none absolute inset-0 text-muted"
+          style={{ fontSize: 10 }}
         >
           {rows.map((line, y) => (
             <div key={y} style={{ height: CELL_H, lineHeight: `${CELL_H}px`, whiteSpace: "nowrap" }}>
@@ -283,15 +262,18 @@ export function AsciiSankeyFlow({
               aria-label={`${n.label}: ${n.value.toLocaleString()}, ${connectionsCount(n.id)} connection${
                 connectionsCount(n.id) === 1 ? "" : "s"
               }. Press Enter to isolate its upstream and downstream flow.`}
-              className="ns-saf-node absolute overflow-hidden border text-left text-[10px] transition-colors duration-150 motion-reduce:transition-none"
+              className={`ns-saf-node absolute overflow-hidden border bg-background text-left text-[10px] transition-colors duration-150 motion-reduce:transition-none ${
+                selected
+                  ? "border-accent text-foreground"
+                  : hovered
+                    ? "border-accent/40 text-foreground"
+                    : "border-border text-muted"
+              }`}
               style={{
                 left: col * CELL_W,
                 top: span.top * CELL_H,
                 width: NODE_W * CELL_W,
                 height: (span.bottom - span.top) * CELL_H,
-                background: tokens.bg,
-                borderColor: selected ? tokens.accent : hovered ? `color-mix(in srgb, ${tokens.accent} 40%, ${tokens.border})` : tokens.border,
-                color: selected || hovered ? tokens.fg : tokens.muted,
               }}
               onPointerEnter={() => setHoverId(n.id)}
               onPointerLeave={() => setHoverId((c) => (c === n.id ? null : c))}
