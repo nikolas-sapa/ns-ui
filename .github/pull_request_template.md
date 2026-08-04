@@ -11,6 +11,7 @@
 - [ ] Colors come from CSS custom properties, not hardcoded hex, including in canvas/SVG draw code
 - [ ] No generated file is in the diff (`registry.json`, `registry/index.tsx`, `public/r/*`, `public/llms*.txt`, `lib/*.generated.json`)
 - [ ] Every commit is signed off (`git commit -s`) per the [DCO](../DCO)
+- [ ] Accessibility basics: reachable and operable by keyboard, a visible focus state, and no motion that ignores `prefers-reduced-motion`
 
 ## Screenshots
 
