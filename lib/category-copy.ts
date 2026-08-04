@@ -71,4 +71,9 @@ export const CATEGORY_COPY: Record<string, { h1: string; intro: string }> = {
     intro:
       "Larger layout blocks — pricing tables, changelogs, kanban boards, accordions and split panes — that structure a page rather than perform one action. Use these as the building blocks between a hero and a footer.",
   },
+  other: {
+    h1: "Other React components",
+    intro:
+      "Components whose tags don't match any of the categories above — this page exists so every published component stays reachable by clicking, not because these components share a common purpose. Reach for it when you already know the specific component you're after and it isn't listed elsewhere.",
+  },
 };

@@ -22,6 +22,7 @@ registerHooks({
 });
 
 const { categoryPages } = await import("../lib/category-pages.ts");
+const { CATEGORY_COPY } = await import("../lib/category-copy.ts");
 const registry = (await import("../registry.json", { with: { type: "json" } })).default;
 
 // The reachability invariant: every published component sits in at least one
@@ -32,6 +33,18 @@ const reachable = new Set(pages.flatMap((p) => p.members.map((m) => m.name)));
 const unreachable = registry.items.map((i: { name: string }) => i.name).filter((n: string) => !reachable.has(n));
 assert.deepEqual(unreachable, [], `components in zero categories: ${unreachable.join(", ")}`);
 
+// The invariant that actually matters: `app/categories/[id]/page.tsx` 404s
+// any id `categoryPages()` returns but `CATEGORY_COPY` doesn't cover — so a
+// category can be "reachable" by this script's member count while its route
+// is dead in production. Assert copy coverage directly, per id, or this test
+// can pass while a page 404s (as it did for `other` before this entry).
+const missingCopy = pages.map((p) => p.id).filter((id) => !CATEGORY_COPY[id]);
+assert.deepEqual(
+  missingCopy,
+  [],
+  `categories with no CATEGORY_COPY entry (their route 404s): ${missingCopy.join(", ")}`,
+);
+
 // id/label must stay verbatim identical to `lib/nav-data.ts`, or tree, chips
 // and `/categories/<id>` disagree about the same bucket.
 const other = pages.find((p) => p.id === "other");
@@ -39,5 +52,5 @@ assert.ok(other, "no `other` page — the catch-all regressed");
 assert.equal(other.label, "Other");
 
 console.log(
-  `category coverage: pass (${registry.items.length} reachable, ${other.members.length} in Other)`,
+  `category coverage: pass (${registry.items.length} reachable, ${other.members.length} in Other, ${pages.length} categories all have copy)`,
 );
