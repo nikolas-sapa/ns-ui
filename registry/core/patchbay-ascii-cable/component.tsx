@@ -143,44 +143,25 @@ function tracePolyline(points: [number, number][], grid: Map<string, number>) {
   }
 }
 
-interface Tokens {
-  fg: string;
-  bg: string;
-  muted: string;
-  border: string;
-  accent: string;
-}
-function readTokens(): Tokens {
-  const cs = getComputedStyle(document.documentElement);
-  const get = (name: string, fallback: string) => cs.getPropertyValue(name).trim() || fallback;
-  return {
-    fg: get("--foreground", "#171717"),
-    bg: get("--background", "#ffffff"),
-    muted: get("--muted", "#4d4d4d"),
-    border: get("--border", "#ebebeb"),
-    accent: get("--accent", "#006bff"),
-  };
-}
-function useTokens(): Tokens {
-  const [tokens, setTokens] = useState<Tokens>(() =>
-    typeof document === "undefined"
-      ? { fg: "#171717", bg: "#ffffff", muted: "#4d4d4d", border: "#ebebeb", accent: "#006bff" }
-      : readTokens()
-  );
-  useEffect(() => {
-    const sync = () => setTokens(readTokens());
-    sync();
-    const mo = new MutationObserver(sync);
-    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class", "style"] });
-    return () => mo.disconnect();
-  }, []);
-  return tokens;
-}
+// No JS token reads here on purpose — see diagram-ascii-flow's component.tsx
+// for the full story. Short version: this component used to hold
+// getComputedStyle(--foreground/--background/etc) in state and apply it via
+// inline `style`, and that's a real bug, not a style choice — SSR always
+// renders with no `document`, so the FIRST markup bakes in the light-theme
+// fallback hex, and React's hydration does not force a mismatched inline
+// style property to the client's value the way it does for text content. On
+// a genuinely dark-themed load, a value that never CHANGES across renders
+// (this component's own render logic recomputes the same "correct" dark hex
+// every time) never gets patched into the DOM, because React only writes an
+// attribute when it differs from the PREVIOUS render's value, not from
+// what's actually painted — confirmed live, reproducibly, on the sibling
+// component. Tailwind classes bound to the same custom properties sidestep
+// the whole bug class: the cascade resolves --background per theme at PAINT
+// time, no JS or hydration step involved.
 
 type Patch = [string, string];
 
 export function AsciiPatchbay({ jacks = DEFAULT_JACKS, className = "" }: AsciiPatchbayProps) {
-  const tokens = useTokens();
   const [patches, setPatches] = useState<Patch[]>([
     ["a", "2"],
     ["c", "1"],
@@ -369,7 +350,7 @@ export function AsciiPatchbay({ jacks = DEFAULT_JACKS, className = "" }: AsciiPa
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
       >
-        <div aria-hidden className="pointer-events-none absolute inset-0" style={{ color: tokens.muted, fontSize: 11 }}>
+        <div aria-hidden className="pointer-events-none absolute inset-0 text-muted" style={{ fontSize: 11 }}>
           {rows.map((line, y) => (
             <div key={y} style={{ height: CELL_H, lineHeight: `${CELL_H}px`, whiteSpace: "nowrap" }}>
               {line.split("").map((ch, x) => (
@@ -388,8 +369,8 @@ export function AsciiPatchbay({ jacks = DEFAULT_JACKS, className = "" }: AsciiPa
               markerRefs.current[i] = el;
             }}
             aria-hidden
-            className="ns-pac-pulse pointer-events-none absolute rounded-full"
-            style={{ width: 6, height: 6, marginLeft: CELL_W / 2 - 3, marginTop: CELL_H / 2 - 3, background: tokens.accent }}
+            className="ns-pac-pulse pointer-events-none absolute rounded-full bg-accent"
+            style={{ width: 6, height: 6, marginLeft: CELL_W / 2 - 3, marginTop: CELL_H / 2 - 3 }}
           />
         ))}
 
@@ -404,15 +385,20 @@ export function AsciiPatchbay({ jacks = DEFAULT_JACKS, className = "" }: AsciiPa
               key={jack.id}
               type="button"
               data-patchbay-jack={jack.id}
-              className="ns-pac-jack absolute flex items-center justify-center border text-[11px] transition-colors duration-150"
+              className={`ns-pac-jack absolute flex items-center justify-center border bg-background text-[11px] transition-colors duration-150 ${
+                armed
+                  ? "border-accent text-foreground"
+                  : hovered
+                    ? "border-accent/40 text-foreground"
+                    : patched
+                      ? "border-border text-foreground"
+                      : "border-border text-muted"
+              }`}
               style={{
                 left: col * CELL_W,
                 top: row * CELL_H,
                 width: JACK_W * CELL_W,
                 height: JACK_H * CELL_H,
-                background: tokens.bg,
-                borderColor: armed ? tokens.accent : hovered ? `color-mix(in srgb, ${tokens.accent} 40%, ${tokens.border})` : tokens.border,
-                color: armed || patched ? tokens.fg : tokens.muted,
               }}
               aria-label={`Jack ${jack.label}${patched ? `, patched to ${byId.get(partnerOf(jack.id)!)?.label}` : ", unpatched"}. Press Enter to ${
                 armedId && armedId !== jack.id ? "complete the patch" : armed ? "cancel" : "arm this jack"

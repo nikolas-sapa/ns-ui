@@ -91,6 +91,12 @@ function routeGlyphs(
   const glyphs: Glyph[] = [];
   let step = 0;
 
+  // Anchor dot right on the source cell's own edge — without an explicit
+  // mark here the connector's first glyph was drawn centered ON the
+  // boundary line (half hidden behind the card), so the wire read as
+  // fading into nothing rather than visibly plugging into the cell.
+  glyphs.push({ x: ax, y: aEdgeY, ch: "●", kind: "corner", dist: step++ });
+
   // vertical run from the source cell's gutter-facing edge to the gutter line
   const v1Steps = Math.max(1, Math.round(Math.abs(gutterY - aEdgeY) / PITCH));
   for (let i = 1; i <= v1Steps; i++) {
@@ -125,6 +131,11 @@ function routeGlyphs(
     const y = gutterY + ((bEdgeY - gutterY) * i) / v2Steps;
     glyphs.push({ x: bx, y, ch: "│", kind: "v", dist: step++ });
   }
+
+  // Anchor dot on the target cell's edge, same reasoning as the source
+  // anchor — this is the glyph that reads "arrived", so it's also the
+  // first thing to fade on leave (retraction runs target -> source).
+  glyphs.push({ x: bx, y: bEdgeY, ch: "●", kind: "corner", dist: step++ });
 
   return glyphs;
 }
@@ -264,8 +275,12 @@ export function FeatureGridAsciiRule({ items, cols = 3, className = "" }: Featur
                 opacity = 1 - easeOutCubic(t);
               }
               if (opacity <= 0.01) continue;
-              ctx.fillStyle = tokens.fg;
-              ctx.globalAlpha = Math.min(1, Math.max(0, opacity)) * 0.85;
+              // Anchor dots draw in --accent so both ends read as a clear
+              // "plugged in" terminal against the fg-colored border glyphs;
+              // the run between them stays --foreground so the accent reads
+              // as an endpoint marker, not a wash over the whole wire.
+              ctx.fillStyle = g.ch === "●" ? tokens.accent : tokens.fg;
+              ctx.globalAlpha = Math.min(1, Math.max(0, opacity)) * (g.ch === "●" ? 1 : 0.9);
               ctx.fillText(g.ch, g.x, g.y);
             }
           }

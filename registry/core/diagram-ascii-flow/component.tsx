@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 // ---------------------------------------------------------------------------
 // AsciiFlowDiagram — a box-drawing flowchart where dragging a node re-routes
@@ -180,48 +180,28 @@ function rectsOverlap(a: Pos, b: Pos, buffer: number): boolean {
   );
 }
 
-interface Tokens {
-  fg: string;
-  bg: string;
-  muted: string;
-  border: string;
-  accent: string;
-}
-
-function readTokens(): Tokens {
-  const cs = getComputedStyle(document.documentElement);
-  const get = (name: string, fallback: string) => cs.getPropertyValue(name).trim() || fallback;
-  return {
-    fg: get("--foreground", "#171717"),
-    bg: get("--background", "#ffffff"),
-    muted: get("--muted", "#4d4d4d"),
-    border: get("--border", "#ebebeb"),
-    accent: get("--accent", "#006bff"),
-  };
-}
-
-function useTokens(): Tokens {
-  const [tokens, setTokens] = useState<Tokens>(() =>
-    typeof document === "undefined"
-      ? { fg: "#171717", bg: "#ffffff", muted: "#4d4d4d", border: "#ebebeb", accent: "#006bff" }
-      : readTokens()
-  );
-  useEffect(() => {
-    const sync = () => setTokens(readTokens());
-    sync();
-    const mo = new MutationObserver(sync);
-    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class", "style"] });
-    return () => mo.disconnect();
-  }, []);
-  return tokens;
-}
-
+// This component used to color every node via JS: read --foreground/
+// --background/etc with getComputedStyle at mount, hold them in state, patch
+// a MutationObserver on <html> to react to theme flips, and apply the result
+// as raw hex through inline `style`. That's a real bug, not just an unusual
+// choice: SSR always runs with no `document`, so the FIRST server-rendered
+// markup is baked with the light-theme fallback hex; React's hydration does
+// not force every mismatched inline-style property to the client's value the
+// way it does for text content, so on a genuinely dark-themed load the
+// node's `background` inline style silently stayed the SSR-fallback white
+// forever — confirmed live: the component's own render logged the correct
+// dark hex on every pass while the DOM's computed background-color stayed
+// white indefinitely, because that particular value never CHANGED between
+// renders (React only patches a DOM attribute when the new render's value
+// differs from the previous render's, not from whatever's actually painted).
+// Tailwind classes bound to the same custom properties sidestep the whole
+// class of bug: the cascade resolves --background per theme at PAINT time,
+// with no JS/hydration step in the loop at all.
 export function AsciiFlowDiagram({
   nodes = DEFAULT_NODES,
   edges = DEFAULT_EDGES,
   className = "",
 }: AsciiFlowDiagramProps) {
-  const tokens = useTokens();
   const [positions, setPositions] = useState<Record<string, Pos>>(() => {
     const init: Record<string, Pos> = {};
     nodes.forEach((n) => {
@@ -334,7 +314,7 @@ export function AsciiFlowDiagram({
             on the SAME px grid the absolutely-positioned node buttons use —
             a flowing string drifts column alignment cumulatively across the
             row until connectors miss the node edges they're meant to touch. */}
-        <div aria-hidden className="pointer-events-none absolute inset-0" style={{ color: tokens.muted, fontSize: 11 }}>
+        <div aria-hidden className="pointer-events-none absolute inset-0 text-muted" style={{ fontSize: 11 }}>
           {rows.map((line, y) => (
             <div key={y} style={{ height: CELL_H, lineHeight: `${CELL_H}px`, whiteSpace: "nowrap" }}>
               {line.split("").map((ch, x) => (
@@ -355,15 +335,18 @@ export function AsciiFlowDiagram({
               key={n.id}
               type="button"
               data-diagram-node={n.id}
-              className="ns-daf-node absolute flex items-center justify-center border text-[11px] transition-colors duration-150 motion-reduce:transition-none"
+              className={`ns-daf-node absolute flex items-center justify-center border bg-background text-[11px] transition-colors duration-150 motion-reduce:transition-none ${
+                selected
+                  ? "border-accent text-foreground"
+                  : hovered
+                    ? "border-accent/40 text-foreground"
+                    : "border-border text-muted"
+              }`}
               style={{
                 left: pos.col * CELL_W,
                 top: pos.row * CELL_H,
                 width: NODE_W * CELL_W,
                 height: NODE_H * CELL_H,
-                background: tokens.bg,
-                borderColor: selected ? tokens.accent : hovered ? `color-mix(in srgb, ${tokens.accent} 40%, ${tokens.border})` : tokens.border,
-                color: selected || hovered ? tokens.fg : tokens.muted,
                 cursor: "grab",
               }}
               aria-label={`${n.label} node, ${connectionsFor(n.id)} connection${connectionsFor(n.id) === 1 ? "" : "s"}. Press Enter to select, arrow keys to move.`}
