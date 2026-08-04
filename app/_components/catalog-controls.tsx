@@ -41,6 +41,9 @@ export function CatalogControls({
   onQuery,
   sort,
   onSort,
+  newOnly,
+  onNewOnly,
+  newCount,
   categories,
   category,
   onCategory,
@@ -56,6 +59,10 @@ export function CatalogControls({
   onQuery: (q: string) => void;
   sort: Sort;
   onSort: (s: Sort) => void;
+  /** Narrows the grid to the cohort the cards mark with the `new` chip. */
+  newOnly: boolean;
+  onNewOnly: (v: boolean) => void;
+  newCount: number;
   categories: { id: string; label: string; count: number }[];
   category: string | null;
   onCategory: (id: string | null) => void;
@@ -145,6 +152,33 @@ export function CatalogControls({
         </div>
 
         <div className="flex w-full min-w-0 items-center gap-2 sm:w-auto sm:gap-3">
+          {/* Sits in row one beside the tabs, not in the category-chip row
+              below: that row is a two-column grid under `sm`, and a fourth
+              shrink-0 child there re-created the wrapped-chip-label
+              regression this file's header already records. It also isn't a
+              category, so it must not live under that group's
+              "Filter by what the component is for" label.
+
+              Styled as the collection tabs' selected state, not the chips'
+              accent fill. It is a filter, so the accent rule at the top of
+              this file would permit blue — but one accent pill floating next
+              to a deliberately quiet sort select reads as a competing
+              control, and this needs to read as kin to the equally quiet
+              `new` chip on the cards it reveals. */}
+          <button
+            type="button"
+            aria-pressed={newOnly}
+            onClick={() => onNewOnly(!newOnly)}
+            className={`min-h-11 shrink-0 rounded-sm border px-2.5 py-1 text-sm outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-accent sm:min-h-0 ${
+              newOnly
+                ? "border-border bg-surface font-medium text-foreground"
+                : "border-transparent text-muted hover:text-foreground"
+            }`}
+          >
+            New
+            <span className="ml-1.5 font-mono text-xs text-muted">{newCount}</span>
+          </button>
+
           <div className="search-trace-field relative w-full min-w-0 flex-1 rounded-sm sm:w-auto sm:flex-none">
             <label htmlFor="component-search" className="sr-only">
               Search catalog

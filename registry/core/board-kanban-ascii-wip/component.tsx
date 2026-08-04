@@ -12,17 +12,12 @@ import {
 } from "react";
 
 // ---------------------------------------------------------------------------
-// WipBoard — a kanban board whose column frames are real box-drawing glyphs and
-// whose top rule is a WIP-limit meter. The horizontal run between a column's
-// title and its `count/limit` readout is a ruler R characters wide: the first
-// `round(count/limit * R)` characters are heavy (━), the rest light (─), and
-// once count exceeds limit the `count-limit` characters at the ruler's right
-// end become ╳ while the whole frame and its counter switch from the resting
-// muted ink to the accent token. No fill colour, no red, no amber — the overload is
-// carried by glyph weight plus one accent ink. Dragging a card renders a ╌╌╌╌
-// placeholder at the live insertion point and drives the TARGET column's
-// counter and ruler with the PREDICTED count while the card is still in the
-// air, so the limit is crossed on screen before the pointer is released.
+// WipBoard — a kanban board whose column frames are real box-drawing glyphs.
+// Each column header reads `┌─ In Progress ───── 3/3 ─┐`; when the card count
+// exceeds the limit the counter gains a `▲1` suffix and the whole frame
+// switches from the resting muted ink to the accent token. Dragging a card
+// renders a ╌╌╌╌ placeholder at the live insertion point and drives the TARGET
+// column's counter with the PREDICTED count while the card is still in the air.
 // Over-limit drops are allowed: a WIP limit is a policy signal, not a lock, and
 // `onOverLimit` lets the consumer decide. Plain React state, no rAF loop and no
 // canvas; the only motion is a 120ms FLIP transform on card reflow, skipped
@@ -60,9 +55,6 @@ export interface WipBoardProps {
 
 const DRAG_THRESHOLD = 4; // px of travel before a pointerdown becomes a live drag
 const REFLOW_MS = 120;
-const HEAVY = "━";
-const LIGHT = "─";
-const OVER = "╳";
 const DASH = "╌";
 // the resting frame ink. NOT `text-border` — --border is tuned for 1px
 // hairlines and is invisible as type on the light theme (#ebebeb on #ffffff),
@@ -71,23 +63,12 @@ const DASH = "╌";
 // card text in the hierarchy.
 const FRAME_INK = "text-muted/55";
 
-/** `┌─ In Progress ━━━━━━━━━    3/3 ─┐` — exactly `width` characters wide. */
+/** `┌─ In Progress ───────── 3/3 ─┐` — exactly `width` characters wide. */
 function headerLine(title: string, count: number, limit: number, width: number) {
   const over = Math.max(0, count - limit);
   const label = over > 0 ? `${count}/${limit} ▲${over}` : `${count}/${limit}`;
-  // reserve the width of the first over-limit label so the ruler does not
-  // shorten by three characters the moment a column tips over
-  const field = `${limit + 1}/${limit} ▲1`.length;
-  const padded = label.padStart(Math.max(field, label.length));
-  const R = Math.max(1, width - 8 - title.length - padded.length);
-  const fill = Math.min(R, Math.max(0, Math.round((count / Math.max(1, limit)) * R)));
-  const overCells = Math.min(over, R);
-  let ruler = "";
-  for (let i = 0; i < R; i++) {
-    if (overCells > 0 && i >= R - overCells) ruler += OVER;
-    else ruler += i < fill ? HEAVY : LIGHT;
-  }
-  return `┌─ ${title} ${ruler} ${padded} ─┐`;
+  const rule = "─".repeat(Math.max(1, width - 8 - title.length - label.length));
+  return `┌─ ${title} ${rule} ${label} ─┐`;
 }
 
 function moveCard(

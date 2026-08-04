@@ -13,16 +13,12 @@ export default function ShockTrainDemo() {
           ns-ui / hero-ascii-shock-diamonds
         </span>
         <h1 className="max-w-xl text-4xl font-semibold tracking-tight text-foreground sm:text-6xl">
-          Five cells of standing shock.
+          Three cells of standing shock.
         </h1>
         <p className="max-w-md text-sm text-muted sm:text-base">
-          An underexpanded jet turns through a fan, overshoots, and is turned
-          back by an oblique shock that leaves the lip at the Mach angle. It
-          reflects off the free boundary and repeats every 1.30&nbsp;D&nbsp;
-          &radic;(M&sup2;&minus;1) &mdash; the two families cross on the
-          centreline and print the diamonds. Move the pointer across the frame
-          to work the throttle: right raises the pressure ratio and pulls the
-          train apart, left compresses it.
+          Move the pointer across the frame to work the throttle: right raises
+          the nozzle pressure ratio and pulls the diamonds apart, left
+          compresses them.
         </p>
         <a
           href="#docs"

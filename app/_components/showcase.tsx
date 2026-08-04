@@ -66,6 +66,7 @@ const STOPWORDS = new Set([
 ]);
 
 const FILTER_PARAM = "collection";
+const NEW_PARAM = "new";
 const CATEGORY_PARAM = "category";
 const QUERY_PARAM = "q";
 
@@ -82,6 +83,10 @@ export function Showcase({
 }) {
   const [filter, setFilterState] = useState<Filter>("all");
   const [category, setCategoryState] = useState<string | null>(null);
+  // Narrows to the same cohort the cards chip as `new` — `entry.isNew`, the
+  // NEW_COUNT most recently added slugs (app/page.tsx). A filter, not a sort:
+  // "Newest" already covers ordering, and a sort that removed rows would lie.
+  const [newOnly, setNewOnlyState] = useState(false);
   const [query, setQueryState] = useState("");
   const [saved, setSaved] = useState<Set<string>>(new Set());
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
@@ -161,6 +166,7 @@ export function Showcase({
     }
     const categoryFromUrl = params.get(CATEGORY_PARAM);
     if (categoryFromUrl) setCategoryState(categoryFromUrl);
+    if (params.get(NEW_PARAM) === "1") setNewOnlyState(true);
     const queryFromUrl = params.get(QUERY_PARAM);
     if (queryFromUrl) setQueryState(queryFromUrl);
     setUrlSynced(true);
@@ -201,6 +207,13 @@ export function Showcase({
     },
     [setParam],
   );
+  const setNewOnly = useCallback(
+    (next: boolean) => {
+      setNewOnlyState(next);
+      setParam(NEW_PARAM, next ? "1" : null);
+    },
+    [setParam],
+  );
   const setQuery = useCallback(
     (next: string) => {
       setQueryState(next);
@@ -212,11 +225,15 @@ export function Showcase({
   const counts = useMemo(() => {
     let core = 0;
     let loud = 0;
+    let fresh = 0;
     for (const i of items) {
       if (i.collection === "loud") loud += 1;
       else core += 1;
+      // Counted off `isNew` rather than re-importing NEW_COUNT, so the
+      // control can never claim more than the order snapshot actually marks.
+      if (i.isNew) fresh += 1;
     }
-    return { all: items.length, core, loud };
+    return { all: items.length, core, loud, new: fresh };
   }, [items]);
 
   /** name -> category ids, computed once from the components' own tags. */
@@ -303,6 +320,7 @@ export function Showcase({
     const inScope = items.filter(
       (i) =>
         (filter === "all" || i.collection === filter) &&
+        (!newOnly || i.isNew) &&
         (!category ||
           (category === "other"
             ? !memberships.get(i.name)?.length
@@ -332,7 +350,7 @@ export function Showcase({
       visibleItems: scored.map((s) => s.item),
       loose: scored.length > 0,
     };
-  }, [items, filter, category, query, haystacks, memberships]);
+  }, [items, filter, newOnly, category, query, haystacks, memberships]);
 
   // Applied on top of the filter/search result, independent of it, so the
   // sort survives filtering and search (owner requirement). "Featured" is a
@@ -359,9 +377,11 @@ export function Showcase({
   }, [filteredItems, sort]);
 
   const activeCategory = categories.find((c) => c.id === category);
-  const filtered = filter !== "all" || category !== null || query !== "";
+  const filtered =
+    filter !== "all" || newOnly || category !== null || query !== "";
   const clearAll = () => {
     setFilter("all");
+    setNewOnly(false);
     setCategory(null);
     setQuery("");
   };
@@ -460,6 +480,9 @@ export function Showcase({
         onQuery={setQuery}
         sort={sort}
         onSort={setSort}
+        newOnly={newOnly}
+        onNewOnly={setNewOnly}
+        newCount={counts.new}
         categories={categories}
         category={category}
         onCategory={setCategory}

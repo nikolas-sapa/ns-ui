@@ -37,6 +37,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${REGISTRY_ORIGIN}/categories`,
       lastModified: new Date(),
     },
+    {
+      url: `${REGISTRY_ORIGIN}/status`,
+      lastModified: new Date(),
+    },
     ...categoryPages().map((c) => ({
       url: `${REGISTRY_ORIGIN}/categories/${c.id}`,
       lastModified: new Date(),

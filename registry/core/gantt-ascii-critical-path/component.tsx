@@ -5,17 +5,21 @@ import { useEffect, useMemo, useRef, useState } from "react";
 // ---------------------------------------------------------------------------
 // GanttAsciiCriticalPath — a project schedule whose critical path is COMPUTED,
 // not annotated. A real CPM pass (Kahn topological order -> ES/EF forward ->
-// LS/LF backward -> totalFloat = LS - ES) runs in one useMemo and decides what
-// every glyph is: a task with zero float draws the heavy set (┝━━┥) so the
-// critical chain survives a pure-monochrome screenshot, and every other task
-// draws the light set (├──┤) followed by literal `·` cells, one per day of
-// slack. Float is not a tooltip, it is the run of dots after the bar. Dragging
-// a bar re-runs the pass on the same frame, so handing slack to a different
-// chain visibly swaps the bar weights mid-gesture.
+// LS/LF backward -> totalFloat = LS - ES) runs in one useMemo and decides one
+// thing: a task with zero float draws the heavy accented set (┝━━┥), every
+// other task the light set (├──┤). Dragging a bar re-runs the pass on the same
+// frame, so handing slack to a different chain swaps the weights mid-gesture.
 //
 // No canvas, no rAF: every recompute is a direct response to pointer or key
 // input. Empty timeline cells render nothing at all — the ink sits in the bars,
-// the slack runs, the week ticks and the one `┊` today column.
+// the week ticks and the one `┊` today column.
+//
+// NO DEPENDENCY ARROWS. A connector lane anchored to the successor's row can
+// place a predecessor's corner glyph at the right COLUMN but never at the right
+// ROW, so every edge reads as leaving whatever task sits directly above. Doing
+// it truthfully needs vertical routing across intervening rows — more apparatus
+// than the edge earns: the bar WEIGHT already says which chain the ship date
+// rides on, and that reads at rest with no pointer.
 //
 // PITCH: the timeline grid is laid out in `ch` units, not pixels. In a
 // monospace face 1ch is exactly one advance width, so consecutive `─`/`━`
@@ -228,39 +232,10 @@ export function GanttAsciiCriticalPath({
     const c = plan.get(id) as Computed;
     const start = Math.min(cols - 2, Math.max(0, colOf(c.es)));
     const len = Math.max(2, Math.min(cols - start, Math.round((c.ef - c.es) / scale)));
-    const dots = c.critical
-      ? 0
-      : Math.max(0, Math.min(Math.floor(c.float / scale), cols - start - len));
-    return { start, len, dots, c };
+    return { start, len, c };
   };
 
   const active = hovered ?? focused;
-
-  // connector row above row i, drawn only for the active task
-  const connectorFor = (index: number): (string | null)[] | null => {
-    if (!active) return null;
-    const t = tasks[index];
-    if (t.id !== active) return null;
-    const c = plan.get(t.id) as Computed;
-    if (c.cyclic) return null;
-    const row: (string | null)[] = Array.from({ length: cols }, () => null);
-    const b = geom(t.id).start;
-    for (const dep of t.deps ?? []) {
-      const p = plan.get(dep);
-      if (!p || p.cyclic) continue;
-      const pi = tasks.findIndex((x) => x.id === dep);
-      const pg = geom(dep);
-      const a = Math.min(cols - 1, pg.start + pg.len - 1);
-      if (b > a) {
-        row[a] = pi < index ? "└" : "┌";
-        for (let k = a + 1; k < b; k++) row[k] = "─";
-      }
-      // U+25B8, not U+25B6: the latter carries an emoji presentation in some
-      // font stacks and would arrive as a colour glyph.
-      if (b >= 0 && b < cols) row[b] = "▸";
-    }
-    return row;
-  };
 
   const readout = (() => {
     if (!active) {
@@ -291,7 +266,7 @@ export function GanttAsciiCriticalPath({
       <div className="flex items-baseline justify-between gap-6">
         <span className="text-[11px] uppercase tracking-[0.18em] text-muted">{title}</span>
         <span className="text-[10px] uppercase tracking-[0.18em] text-muted">
-          <span className="text-accent">━</span> critical &nbsp; ─ has float &nbsp; · slack day
+          <span className="text-accent">━</span> critical &nbsp; ─ has float
         </span>
       </div>
 
@@ -343,144 +318,111 @@ export function GanttAsciiCriticalPath({
           </div>
         </div>
 
-        {tasks.map((t, i) => {
-          const { start, len, dots, c } = geom(t.id);
+        {tasks.map((t) => {
+          const { start, len, c } = geom(t.id);
           const isActive = active === t.id;
-          const conn = connectorFor(i);
           const barGlyphs = c.critical
             ? `┝${"━".repeat(Math.max(0, len - 2))}┥`
             : `├${"─".repeat(Math.max(0, len - 2))}┤`;
-          const todayFree = todayCol < start || todayCol >= start + len + dots;
+          const todayFree = todayCol < start || todayCol >= start + len;
 
           return (
-            <div key={t.id} className="contents">
-              {/* connector lane — zero ink at rest, so the frame stays clean */}
-              <div className="flex h-[0.85em] items-center" aria-hidden>
-                <span className="shrink-0" style={labelStyle} />
-                <span className={cell} style={cellStyle} />
-                <div className="flex">
-                  {conn
-                    ? conn.map((ch, k) => (
-                        <span key={k} className={`${cell} text-accent`} style={cellStyle}>
-                          {ch ?? " "}
-                        </span>
-                      ))
-                    : null}
-                </div>
-              </div>
-
-              <div
-                data-task-row={t.id}
-                className="flex items-center"
-                onPointerEnter={() => setHovered(t.id)}
-                onPointerLeave={() => setHovered((h) => (h === t.id ? null : h))}
+            <div
+              key={t.id}
+              data-task-row={t.id}
+              className="flex items-center"
+              onPointerEnter={() => setHovered(t.id)}
+              onPointerLeave={() => setHovered((h) => (h === t.id ? null : h))}
+            >
+              <span
+                className={`shrink-0 whitespace-pre text-[13px] transition-colors duration-[140ms] motion-reduce:transition-none ${
+                  isActive || c.critical ? "text-foreground" : "text-muted"
+                }`}
+                style={labelStyle}
               >
-                <span
-                  className={`shrink-0 whitespace-pre text-[13px] transition-colors duration-[140ms] motion-reduce:transition-none ${
-                    isActive || c.critical ? "text-foreground" : "text-muted"
-                  }`}
-                  style={labelStyle}
-                >
-                  {padLabel(t.label)}
-                </span>
-                <span className={`${cell} text-border`} style={cellStyle}>
-                  │
-                </span>
+                {padLabel(t.label)}
+              </span>
+              <span className={`${cell} text-border`} style={cellStyle}>
+                │
+              </span>
 
-                {c.cyclic ? (
-                  <span className="whitespace-pre pl-1 text-[13px] text-muted">
-                    ×  cycle — excluded
-                  </span>
-                ) : (
-                  <div className="relative grid" style={trackStyle}>
-                    <button
-                      type="button"
-                      role="slider"
-                      aria-orientation="horizontal"
-                      aria-valuemin={0}
-                      aria-valuemax={cols * scale}
-                      aria-valuenow={c.es}
-                      aria-valuetext={`starts day ${c.es}, ends day ${c.ef}, ${
-                        c.critical ? "on the critical path, no float" : `${c.float} days of float`
-                      }`}
-                      aria-label={`${t.label} schedule. Drag or use arrow keys to reschedule.`}
-                      className="flex cursor-ew-resize items-center rounded-[2px] outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent"
-                      style={{ gridColumn: `${start + 1} / span ${len}`, gridRow: 1 }}
-                      onFocus={() => setFocused(t.id)}
-                      onBlur={() => setFocused((f) => (f === t.id ? null : f))}
-                      onPointerDown={(e) => {
-                        // Measure the real pitch off the laid-out track instead
-                        // of trusting a px constant to match the font metric.
-                        const track = e.currentTarget.parentElement;
-                        const w = track ? track.getBoundingClientRect().width : 0;
-                        dragRef.current = {
-                          id: t.id,
-                          startX: e.clientX,
-                          startOffset: offsets[t.id] ?? 0,
-                          prev: offsets[t.id] ?? 0,
-                          cellPx: w > 0 ? w / cols : 9,
-                        };
-                        setDragId(t.id);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "ArrowLeft") {
-                          e.preventDefault();
-                          nudge(t.id, -1);
-                        } else if (e.key === "ArrowRight") {
-                          e.preventDefault();
-                          nudge(t.id, 1);
-                        } else if (e.key === "Escape" && !dragId) {
-                          // Guarded on !dragId: mid-drag the window keydown
-                          // listener owns Escape (it restores the pre-drag
-                          // offset) and both firing would fight.
-                          e.preventDefault();
-                          setOffsets((o) => ({ ...o, [t.id]: 0 }));
-                        }
+              {c.cyclic ? (
+                <span className="whitespace-pre pl-1 text-[13px] text-muted">
+                  ×  cycle — excluded
+                </span>
+              ) : (
+                <div className="relative grid" style={trackStyle}>
+                  <button
+                    type="button"
+                    role="slider"
+                    aria-orientation="horizontal"
+                    aria-valuemin={0}
+                    aria-valuemax={cols * scale}
+                    aria-valuenow={c.es}
+                    aria-valuetext={`starts day ${c.es}, ends day ${c.ef}, ${
+                      c.critical ? "on the critical path, no float" : `${c.float} days of float`
+                    }`}
+                    aria-label={`${t.label} schedule. Drag or use arrow keys to reschedule.`}
+                    className="flex cursor-ew-resize items-center rounded-[2px] outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent"
+                    style={{ gridColumn: `${start + 1} / span ${len}`, gridRow: 1 }}
+                    onFocus={() => setFocused(t.id)}
+                    onBlur={() => setFocused((f) => (f === t.id ? null : f))}
+                    onPointerDown={(e) => {
+                      // Measure the real pitch off the laid-out track instead
+                      // of trusting a px constant to match the font metric.
+                      const track = e.currentTarget.parentElement;
+                      const w = track ? track.getBoundingClientRect().width : 0;
+                      dragRef.current = {
+                        id: t.id,
+                        startX: e.clientX,
+                        startOffset: offsets[t.id] ?? 0,
+                        prev: offsets[t.id] ?? 0,
+                        cellPx: w > 0 ? w / cols : 9,
+                      };
+                      setDragId(t.id);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "ArrowLeft") {
+                        e.preventDefault();
+                        nudge(t.id, -1);
+                      } else if (e.key === "ArrowRight") {
+                        e.preventDefault();
+                        nudge(t.id, 1);
+                      } else if (e.key === "Escape" && !dragId) {
+                        // Guarded on !dragId: mid-drag the window keydown
+                        // listener owns Escape (it restores the pre-drag
+                        // offset) and both firing would fight.
+                        e.preventDefault();
+                        setOffsets((o) => ({ ...o, [t.id]: 0 }));
+                      }
+                    }}
+                  >
+                    {barGlyphs.split("").map((ch, k) => (
+                      <span
+                        key={k}
+                        className={`${cell} ${c.critical ? "text-accent" : "text-muted"}`}
+                        style={cellStyle}
+                      >
+                        {ch}
+                      </span>
+                    ))}
+                  </button>
+
+                  {todayFree && todayCol >= 0 && todayCol < cols && (
+                    <span
+                      aria-hidden
+                      className={`${cell} text-foreground`}
+                      style={{
+                        gridColumn: `${todayCol + 1} / span 1`,
+                        gridRow: 1,
+                        width: "1ch",
                       }}
                     >
-                      {barGlyphs.split("").map((ch, k) => (
-                        <span
-                          key={k}
-                          className={`${cell} ${c.critical ? "text-accent" : "text-muted"}`}
-                          style={cellStyle}
-                        >
-                          {ch}
-                        </span>
-                      ))}
-                    </button>
-
-                    {dots > 0 && (
-                      <span
-                        aria-hidden
-                        className={`flex transition-colors duration-[140ms] motion-reduce:transition-none ${
-                          isActive ? "text-accent" : "text-muted/50"
-                        }`}
-                        style={{ gridColumn: `${start + len + 1} / span ${dots}`, gridRow: 1 }}
-                      >
-                        {Array.from({ length: dots }, (_, k) => (
-                          <span key={k} className={cell} style={cellStyle}>
-                            ·
-                          </span>
-                        ))}
-                      </span>
-                    )}
-
-                    {todayFree && todayCol >= 0 && todayCol < cols && (
-                      <span
-                        aria-hidden
-                        className={`${cell} text-foreground`}
-                        style={{
-                          gridColumn: `${todayCol + 1} / span 1`,
-                          gridRow: 1,
-                          width: "1ch",
-                        }}
-                      >
-                        ┊
-                      </span>
-                    )}
-                  </div>
-                )}
-              </div>
+                      ┊
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
           );
         })}

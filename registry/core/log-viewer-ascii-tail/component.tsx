@@ -12,8 +12,7 @@ import {
 
 // ---------------------------------------------------------------------------
 // TailPane — a `tail -f` log viewer with a real bounded ring buffer, an ASCII
-// severity column, a density gutter and follow-mode that detaches the instant
-// you scroll up.
+// severity column and follow-mode that detaches the instant you scroll up.
 //
 // The three things that make it honest rather than a log-shaped animation:
 //  1. memory is bounded — appends overwrite the oldest slot of a fixed
@@ -51,10 +50,7 @@ export interface LogViewerAsciiTailProps {
   "aria-label"?: string;
 }
 
-const RAMP = " .:-=+*#%@";
 const ROW_H = 18; // px — fixed, which is what makes windowing trivial
-const CHUNK = 16; // lines per density-gutter cell (grows to keep MAX_CELLS)
-const MAX_CELLS = 48; // gutter cells stay tall enough to read and to hit
 const OVERSCAN = 6; // rows rendered beyond the viewport, each side
 const NEAR_BOTTOM = 8; // px — inside this, follow re-attaches
 const SERVICE_W = 11; // chars, padded so the pipes form true vertical rules
@@ -342,26 +338,6 @@ export function LogViewerAsciiTail({
     );
   }, [lines, minLevel, query]);
 
-  const chunks = useMemo(() => {
-    // one cell per CHUNK lines, but the chunk grows once the buffer would
-    // otherwise push the index past MAX_CELLS — a 2000-line ring at a fixed 16
-    // would be 125 cells of ~3px, unreadable and untappable.
-    const size = Math.max(CHUNK, Math.ceil(rows.length / MAX_CELLS));
-    const out: { start: number; size: number; glyph: string; errors: number; warns: number }[] = [];
-    for (let i = 0; i < rows.length; i += size) {
-      let errors = 0;
-      let warns = 0;
-      const stop = Math.min(i + size, rows.length);
-      for (let j = i; j < stop; j++) {
-        if (rows[j]!.sev === "ERROR") errors++;
-        else if (rows[j]!.sev === "WARN") warns++;
-      }
-      const idx = Math.min(9, errors * 3 + warns);
-      out.push({ start: i, size: stop - i, glyph: RAMP[idx]!, errors, warns });
-    }
-    return out;
-  }, [rows]);
-
   // --- scroll plumbing -----------------------------------------------------
   const measure = useCallback(() => {
     const el = paneRef.current;
@@ -557,45 +533,12 @@ export function LogViewerAsciiTail({
           </div>
         </div>
 
-        {/* density gutter — a severity index, one cell per 16-line chunk */}
-        <div
-          role="group"
-          aria-label="Severity density index"
-          className="flex w-5 shrink-0 flex-col border-l border-border bg-surface/40 py-1"
-        >
-          {chunks.map((c) => {
-            const weight =
-              c.errors > 0
-                ? "text-accent"
-                : c.warns > 1
-                  ? "text-foreground"
-                  : c.warns > 0
-                    ? "text-muted"
-                    : FAINT;
-            return (
-              <button
-                key={c.start}
-                type="button"
-                onClick={() => {
-                  const el = paneRef.current;
-                  if (!el) return;
-                  el.scrollTop = c.start * ROW_H;
-                }}
-                aria-label={`Jump to lines ${c.start + 1} to ${c.start + c.size}, ${c.errors} errors and ${c.warns} warnings`}
-                className={`flex min-h-0 flex-1 items-center justify-center overflow-hidden leading-none transition-colors duration-100 hover:bg-surface hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent ${weight}`}
-              >
-                {c.glyph === " " ? "·" : c.glyph}
-              </button>
-            );
-          })}
-        </div>
-
         {/* detach bar — the count of what arrived while you were reading */}
         {!follow && (
           <button
             type="button"
             onClick={attach}
-            className="absolute right-5 bottom-0 left-0 border-t border-border bg-surface py-1.5 text-center whitespace-pre text-muted transition-colors duration-100 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent"
+            className="absolute inset-x-0 bottom-0 border-t border-border bg-surface py-1.5 text-center whitespace-pre text-muted transition-colors duration-100 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent"
           >
             {"└─ "}
             <span className="tabular-nums text-accent">{newCount}</span>

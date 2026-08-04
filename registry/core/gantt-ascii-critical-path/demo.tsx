@@ -13,10 +13,8 @@ export default function GanttAsciiCriticalPathDemo() {
           <GanttAsciiCriticalPath />
         </div>
         <p className="max-w-xl text-center text-xs leading-relaxed text-muted">
-          The heavy accented bars are the zero-float chain the ship date actually rides on. Every
-          other bar trails one dot per day of slack. Drag a bar, or focus one and press
-          Arrow&nbsp;Left / Arrow&nbsp;Right — the forward and backward pass reruns and criticality
-          moves to whichever chain went tight.
+          The heavy accented bars are the critical path. Drag one, or nudge it with the arrow keys,
+          to reschedule.
         </p>
       </div>
     </main>

@@ -8,7 +8,9 @@ export default function StrikeFigureDemo() {
       {/* hold the pointer anywhere over the field — it becomes the electrode
           the next branches fork toward; leave, and the growth returns to its
           own statistics */}
-      <StrikeFigure>
+      {/* the copy sits bottom-left, so that rectangle of the dielectric is
+          held at lower field strength and the discharge grows away from it */}
+      <StrikeFigure quiet={{ x: 0.02, y: 0.46, w: 0.48, h: 0.46 }}>
         <span className="font-mono text-xs tracking-[0.25em] text-muted">
           ns-ui / hero-ascii-lichtenberg
         </span>

@@ -23,6 +23,7 @@ registry/index.tsx
 lib/autoplay.generated.json
 lib/card-frame.generated.json
 lib/contributors.generated.json
+lib/status.generated.json
 public/llms.txt
 public/llms-full.txt
 

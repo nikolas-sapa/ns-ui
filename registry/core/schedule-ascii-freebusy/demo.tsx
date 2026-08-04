@@ -10,8 +10,7 @@ export default function ScheduleAsciiFreebusyDemo() {
       </p>
       <ScheduleAsciiFreebusy title="Design sync — Thu 16 Apr" />
       <p className="max-w-md text-center text-xs text-muted">
-        Six calendars, one skyline of how booked the day is, and the earliest hour everyone required
-        is free. Click a name to make them optional and watch the window move.
+        The accent window is the earliest slot everyone required is free.
       </p>
     </div>
   );

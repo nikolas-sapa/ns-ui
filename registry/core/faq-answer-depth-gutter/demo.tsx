@@ -66,18 +66,12 @@ export default function FaqDepthGutterDemo() {
       </p>
 
       <div className="w-full max-w-2xl">
-        {/* One answer open at rest: the idle frame has to show BOTH halves of
-            the mechanic at once — the short --border ticks scaled from answers
-            nobody has opened, and one --accent tick locked at the exact height
-            of the answer it just delivered. Closed-only would read as a plain
-            accordion with a hairline. */}
+        {/* One answer open at rest, so the idle frame reads as an FAQ. */}
         <FaqDepthGutter items={ITEMS} defaultOpen={["data"]} />
       </div>
 
       <p className="max-w-md text-center text-xs text-muted">
-        Every tick is drawn from the exact pixel height its answer will occupy,
-        so the closed column is a bar chart of answer length. The open one is
-        the same measurement at full scale.
+        An FAQ accordion. One answer is open at a time.
       </p>
     </div>
   );

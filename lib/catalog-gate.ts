@@ -3,7 +3,7 @@
 // Showcase always mounts with `filter="all"`, `category=null`, `query=""`,
 // `sort="featured"` — the server-rendered defaults — then reads
 // `location.search` inside a `useEffect` and flips state to match a shared
-// URL (?q=, ?collection=, ?category=, ?sort=). Any visitor who arrives on
+// URL (?q=, ?collection=, ?category=, ?new=, ?sort=). Any visitor who arrives on
 // such a URL therefore gets two renders: the default one the server painted,
 // then the corrected one seconds later once React hydrates. Two blocks are
 // only present in the default render — the Featured rail and the "All
@@ -27,4 +27,11 @@
 // sort !== "featured"` (see app/globals.css). Collapsing them into one class
 // would make the Clear button appear for a plain ?sort=newest link, which
 // Showcase itself never does.
-export const CATALOG_GATE_SCRIPT = `(function(){try{var p=new URLSearchParams(window.location.search);var collection=p.get("collection");var filtered=collection==="core"||collection==="loud"||!!p.get("category")||!!p.get("q");var sort=p.get("sort");var sorted=sort==="newest"||sort==="oldest";var cl=document.documentElement.classList;if(filtered)cl.add("catalog-filtered");if(sorted)cl.add("catalog-sorted");}catch(e){}})();`;
+//
+// ponytail: the `filtered` predicate stays duplicated here and in
+// showcase.tsx rather than shared. Ceiling: the two can silently diverge when
+// a filter is added — the `new` toggle is the second one that had to be
+// written in both places. Upgrade path: export one predicate taking a
+// URLSearchParams, import it in Showcase and stringify it into this script;
+// worth doing once a third filter lands.
+export const CATALOG_GATE_SCRIPT = `(function(){try{var p=new URLSearchParams(window.location.search);var collection=p.get("collection");var filtered=collection==="core"||collection==="loud"||p.get("new")==="1"||!!p.get("category")||!!p.get("q");var sort=p.get("sort");var sorted=sort==="newest"||sort==="oldest";var cl=document.documentElement.classList;if(filtered)cl.add("catalog-filtered");if(sorted)cl.add("catalog-sorted");}catch(e){}})();`;

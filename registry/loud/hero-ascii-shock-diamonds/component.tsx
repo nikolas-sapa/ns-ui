@@ -16,9 +16,15 @@ import type { ReactNode } from "react";
 // phase lands near an integer. Where BOTH land near an integer the two
 // families cross, and that crossing is the diamond node — it is inked 1.9x
 // harder, which is the whole reason the frame reads as a string of bright X's
-// on the centreline rather than a diagonal hatch. Everything else is blank:
-// the shocks are hard-masked to the plume's own waisted envelope, and the
-// plume's interior between shocks is empty. The pointer is the THROTTLE — its
+// on the centreline rather than a diagonal hatch. The design Mach number is
+// LOW (1.5) on purpose: the Mach angle is then 42 degrees, so the two families
+// cross at close to a right angle and the arms read as chevrons instead of
+// merging into horizontal streaks, and the shorter cell length lets D grow to
+// 0.28*H so the train is a tall band rather than a thin line. Everything else
+// is blank: the shocks are hard-masked to the plume's own waisted envelope,
+// and the plume's interior between shocks is empty. The plume rides HIGH in
+// the frame — axis at 0.26*H — because the hero copy is anchored bottom-left
+// and the two must not overlap. The pointer is the THROTTLE — its
 // x position sets the nozzle pressure ratio, M is re-solved from it
 // isentropically, and since L scales with sqrt(M^2 - 1) the diamonds visibly
 // stretch apart to the right and compress to the left. Pointer y vectors the
@@ -30,13 +36,18 @@ const ALPHA_BUCKETS = 6;
 const SHOCK_TOL = 0.035; // phase half-width of a shock, in cell lengths
 const SHOCK_POW = 1.6; // line profile sharpness
 const NODE_GAIN = 1.9; // crossing multiplier — makes the X's the picture
-const INK_DECAY = 3.4; // shock strength e-folding, in cell lengths
-const ENV_DECAY = 3.1; // plume envelope e-folding, in cell lengths
+const INK_DECAY = 6.0; // shock strength e-folding, in cell lengths
+const ENV_DECAY = 4.5; // plume envelope e-folding, in cell lengths
 const PLUME_END = 6.0; // stop evaluating past this many cells
 const THROTTLE_TAU = 0.6; // s — pointer easing time constant
 const PULSE_A = 0.018; // resting breath in cell spacing
 const PULSE_B = 0.008;
-const CELLS_ACROSS = 4.4; // design: shock cells that fit the frame at rest
+const CELLS_ACROSS = 3.2; // design: shock cells that fit the frame at rest
+const AXIS_FRAC = 0.26; // jet axis height — copy owns the bottom of the frame
+const D_MAX_FRAC = 0.28; // hard cap on nozzle diameter, as a fraction of H
+const VECTOR_FRAC = 0.04; // thrust-vector travel, as a fraction of H
+const NPR_LO = 0.66; // throttle window, as a multiple of the design NPR
+const NPR_HI = 2.13;
 const DT_MAX = 0.05;
 
 /** isentropic (gamma 1.4) Mach number from a nozzle pressure ratio */
@@ -68,7 +79,7 @@ export interface ShockTrainProps {
 
 export function ShockTrain({
   cellSize = 12,
-  mach = 2.4,
+  mach = 1.5,
   children,
   className = "",
 }: ShockTrainProps) {
@@ -88,8 +99,8 @@ export function ShockTrain({
 
     const machDesign = Math.min(4.5, Math.max(1.2, mach));
     const nprDesign = nprFromMach(machDesign);
-    const nprMin = nprDesign * 0.41;
-    const nprMax = nprDesign * 2.05;
+    const nprMin = nprDesign * NPR_LO;
+    const nprMax = nprDesign * NPR_HI;
 
     let fg = "currentColor";
     let cellW = cellSize;
@@ -151,20 +162,22 @@ export function ShockTrain({
       // exactly at y = yc, and if that lands between two rows the brightest
       // cell in the whole picture is never sampled and the train degrades into
       // a chevron hatch. Snapping is what keeps the X's on the centreline.
-      axisY = Math.round((h * 0.5 - cellH / 2) / cellH) * cellH + cellH / 2;
-      vectorMax = h * 0.06;
-      // D is the one free geometric parameter: pick it so that at the DESIGN
-      // Mach number the Prandtl-Pack cell length lays ~4.4 shock cells across
-      // the frame (five to six visible crossings counting the lip). Capped at
-      // 0.20*H so a very wide frame never blows the plume out of the viewport.
+      axisY =
+        Math.round((h * AXIS_FRAC - cellH / 2) / cellH) * cellH + cellH / 2;
+      vectorMax = h * VECTOR_FRAC;
+      // D is the one free geometric parameter and it sets how TALL the train
+      // is: the shock band is about 1.5*D high, so D is pushed as large as the
+      // frame allows — up to 0.28*H — and the cell count is what gives way.
+      // Only ~3.5 cells lay across the frame (three crossings and the lip),
+      // which is the point: three legible diamonds beat six horizontal dashes.
       // Pinned to machDesign, never the live Mach — D is the hardware, and it
       // is precisely because D is fixed that a throttle change moves L.
       const kDesign = 1.3 * Math.sqrt(machDesign * machDesign - 1);
       nozzleD = Math.min(
-        h * 0.2,
+        h * D_MAX_FRAC,
         ((w - nozzleX) * 0.98) / (CELLS_ACROSS * kDesign)
       );
-      nozzleD = Math.max(nozzleD, cellH * 3.2);
+      nozzleD = Math.max(nozzleD, cellH * 8);
 
       charBuf = new Uint8Array(cols * rows);
       sized = true;

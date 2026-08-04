@@ -5,8 +5,7 @@ import { useCallback, useMemo, useRef, useState } from "react";
 // ---------------------------------------------------------------------------
 // ScheduleAsciiFreebusy — a meeting-time finder that shows its own work.
 //
-// One row of block glyphs per attendee over 18 half-hour slots (09:00–18:00),
-// a density skyline summing how many required people are busy in each column,
+// One row of block glyphs per attendee over 18 half-hour slots (09:00–18:00)
 // and an underlined accent window marking the earliest slot where everyone
 // required is actually free. The solver is a bitwise AND of the required
 // attendees' inverted busy masks followed by a single left-to-right
@@ -54,9 +53,6 @@ const DEFAULT_ATTENDEES: Attendee[] = [
   { id: "tobias", name: "Tobias", day: [B, F, F, F, F, F, B, F, F, B, F, B, B, F, F, F, B, B] },
   { id: "wei", name: "Wei", day: [F, F, F, F, F, B, B, B, F, B, F, F, F, B, T, F, F, O] },
 ];
-
-/** ink-density ramp, shared with the ASCII field components in this registry */
-const RAMP = " .:-=+*#%@";
 
 const GLYPH: Record<SlotStatus, string> = {
   free: "·",
@@ -148,15 +144,6 @@ export function ScheduleAsciiFreebusy({
       mask.push(required.length > 0 && required.every((a) => !isBlocked(a.day[k] ?? "out")));
     }
     return mask;
-  }, [required, slots]);
-
-  /** how many required attendees are blocked in column k — drives the skyline */
-  const busyCount = useMemo(() => {
-    const counts: number[] = [];
-    for (let k = 0; k < slots; k++) {
-      counts.push(required.reduce((n, a) => n + (isBlocked(a.day[k] ?? "out") ? 1 : 0), 0));
-    }
-    return counts;
   }, [required, slots]);
 
   const runs = useMemo(() => maximalRuns(freeMask, durationSlots), [freeMask, durationSlots]);
@@ -407,31 +394,6 @@ export function ScheduleAsciiFreebusy({
               {k === 0 ? "├" : k === slots - 1 ? "┤" : "─"}
             </div>
           ))}
-        </div>
-
-        {/* density skyline: ink where the team is booked */}
-        <div role="row" className="contents">
-          <div
-            role="rowheader"
-            className="flex h-[1.35em] items-center pr-2 text-[10px] uppercase tracking-[0.14em] text-muted"
-          >
-            load
-          </div>
-          {Array.from({ length: slots }, (_, k) => {
-            const n = required.length;
-            const idx = n === 0 ? 0 : Math.round((busyCount[k] / n) * 9);
-            return (
-              <div
-                key={k}
-                role="gridcell"
-                aria-label={`${timeAt(k)}, ${busyCount[k]} of ${n} busy`}
-                onPointerEnter={() => setHoverCol(k)}
-                className={`${cell} text-foreground ${colTint(k)}`}
-              >
-                {RAMP[idx]}
-              </div>
-            );
-          })}
         </div>
 
         {/* every qualifying window underlined; the best one in accent */}

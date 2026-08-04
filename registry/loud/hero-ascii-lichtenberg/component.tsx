@@ -37,6 +37,11 @@ import type { ReactNode } from "react";
 // back out and later branching returns to its undisturbed statistics.
 // Already-grown channel stays exactly where it is: a discharge does not
 // un-happen.
+//
+// The optional `quiet` rect is a patch of dielectric held at lower field
+// strength: its scale multiplies the growth weight, so fewer channels grow
+// there and the figure thins out to nothing across the falloff band. Overlaid
+// copy therefore reads against bare background without a scrim over the field.
 // ---------------------------------------------------------------------------
 
 /** '-' horizontal link, '|' vertical, '/' and '\' the two diagonals, '+' a fork */
@@ -110,6 +115,13 @@ export interface StrikeFigureProps {
   cellSize?: number;
   /** DBM growth exponent — 1 is a fat blob, 3 the sparse forked lightning figure */
   eta?: number;
+  /**
+   * Rect of lowered field strength in normalized frame coords (0..1 from the
+   * top-left) — pass the rect the overlaid copy occupies. Growth weight is
+   * scaled to zero inside it and ramps back to full just outside, so the
+   * discharge grows fewer channels there instead of being masked afterwards.
+   */
+  quiet?: { x: number; y: number; w: number; h: number };
   children?: ReactNode;
   className?: string;
 }
@@ -117,9 +129,16 @@ export interface StrikeFigureProps {
 export function StrikeFigure({
   cellSize = 12,
   eta = 3.0,
+  quiet,
   children,
   className = "",
 }: StrikeFigureProps) {
+  // primitives, not the object: an inline literal from the parent would
+  // otherwise be a fresh identity every render and rebuild the whole figure
+  const qx = quiet ? quiet.x : 0;
+  const qy = quiet ? quiet.y : 0;
+  const qw = quiet ? quiet.w : 0;
+  const qh = quiet ? quiet.h : 0;
   const rootRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -144,6 +163,9 @@ export function StrikeFigure({
     let disposed = false;
 
     let phi = new Float32Array(0);
+    // per-cell field scale: 1 everywhere by default, 0 inside the quiet rect,
+    // smoothstepped back up across the falloff band so there is no contour
+    let quietMask: Float32Array | null = null;
     let pool: Strike[] = [];
     let live: Strike[] = [];
     let poolCursor = 0;
@@ -191,6 +213,37 @@ export function StrikeFigure({
     // Neumann on top and bottom, phi = 0 inside the channel.
     const resetField = () => {
       phi.fill(1);
+    };
+
+    /**
+     * A region of the dielectric held at lower field strength grows fewer
+     * channels — that is all this is. The scale multiplies the growth weight,
+     * so the tree thins out and stops at the edge of the rect on its own
+     * rather than being covered up after the fact.
+     */
+    const buildQuietMask = () => {
+      if (qw <= 0 || qh <= 0) {
+        quietMask = null;
+        return;
+      }
+      const x0 = qx * cols;
+      const x1 = (qx + qw) * cols;
+      const y0 = qy * rows;
+      const y1 = (qy + qh) * rows;
+      // the falloff band, 5% of the frame width and never under 2 cells: a
+      // hard edge would read as the panel this whole approach exists to avoid
+      const band = Math.max(2, 0.05 * cols);
+      const m = new Float32Array(cols * rows);
+      for (let y = 0; y < rows; y++) {
+        const dy = y < y0 ? y0 - y : y > y1 ? y - y1 : 0;
+        for (let x = 0; x < cols; x++) {
+          const dx = x < x0 ? x0 - x : x > x1 ? x - x1 : 0;
+          const d = Math.sqrt(dx * dx + dy * dy) / band;
+          const f = d < 1 ? d : 1;
+          m[y * cols + x] = f * f * (3 - 2 * f); // smoothstep
+        }
+      }
+      quietMask = m;
     };
 
     const electrode = { gx: -1e5, gy: -1e5, has: false, strength: 0 };
@@ -325,10 +378,12 @@ export function StrikeFigure({
       const cands = s.cands;
       const n = cands.length;
       if (n === 0 || s.count >= target) return false;
+      const q = quietMask;
       let total = 0;
       for (let k = 0; k < n; k++) {
-        const p = phi[cands[k]!]!;
-        if (p > 0) total += Math.pow(p, eta);
+        const c = cands[k]!;
+        const p = phi[c]!;
+        if (p > 0) total += Math.pow(p, eta) * (q ? q[c]! : 1);
       }
       let li: number;
       if (total > 1e-12) {
@@ -336,8 +391,9 @@ export function StrikeFigure({
         let acc = 0;
         li = n - 1;
         for (let k = 0; k < n; k++) {
-          const p = phi[cands[k]!]!;
-          if (p > 0) acc += Math.pow(p, eta);
+          const c = cands[k]!;
+          const p = phi[c]!;
+          if (p > 0) acc += Math.pow(p, eta) * (q ? q[c]! : 1);
           if (acc >= r) {
             li = k;
             break;
@@ -477,6 +533,7 @@ export function StrikeFigure({
         Math.min(MAX_SITES, Math.round(cols * SITES_PER_COL))
       );
       phi = new Float32Array(cols * rows);
+      buildQuietMask();
       rng = mulberry32(0x1ec47);
       seedFlip = 0;
       pool = [makeStrike(), makeStrike()];
@@ -613,7 +670,7 @@ export function StrikeFigure({
       root.removeEventListener("pointerleave", onPointerLeave);
       document.removeEventListener("visibilitychange", onVis);
     };
-  }, [cellSize, eta]);
+  }, [cellSize, eta, qx, qy, qw, qh]);
 
   // `h-full` matters as much as the min-height: a min-height is only a floor,
   // so a stretched grid/flex parent taller than it would leave a band of dead

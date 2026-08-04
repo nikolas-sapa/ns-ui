@@ -425,6 +425,12 @@ export function SiteShell({
           >
             Connect
           </Link>
+          <Link
+            href="/status"
+            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            Status
+          </Link>
           {/* Hydration-only — see site-auth.tsx for why it fetches nothing
               until after paint and never flashes a different state than the
               signed-out default already rendered here. */}
