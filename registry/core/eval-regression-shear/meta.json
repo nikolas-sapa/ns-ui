@@ -1,0 +1,32 @@
+{
+  "name": "eval-regression-shear",
+  "title": "Eval Regression Shear",
+  "description": "Two eval runs compared as a shear profile — every case is a hairline anchored at the left and offset at its right end by the score delta, sorted so the whole suite resolves into one signed curve with a flat, quiet middle and two tapering tails.",
+  "collection": "core",
+  "tags": [
+    "agent",
+    "llm",
+    "eval",
+    "regression",
+    "benchmark",
+    "data-viz",
+    "mono",
+    "dashboard",
+    "comparison",
+    "accessibility"
+  ],
+  "useWhen": "two runs of the same eval suite need to be compared case by case and the question is where the candidate moved rather than what the headline average is — the sorted shear profile makes the count of real gains and real regressions countable at a glance and shows how little of the suite actually moved; pick diff-unified-viewer or approval-inline-diff when the diff is textual rather than scored, compare-table-reach-rule when the comparison is a small table of named features, and stat-row-baseline-spark when a single aggregate metric against its baseline is all that matters.",
+  "autoplay": {
+    "mode": "pointer-path",
+    "path": "orbit",
+    "target": "[data-shear-rows]",
+    "period": 5200,
+    "delay": 600
+  },
+  "card": {
+    "focus": "[data-shear-panel]",
+    "padding": 0.06
+  },
+  "instruction": "Build <ShearProfile cases tieEps? passThreshold? shearScale? label? className?> as a per-case comparison of two eval runs drawn as a SHEAR rather than as paired bars. DATA: `cases` is {id, suite, baseline, candidate}[] with scores in 0..1; delta = candidate − baseline. Cases are grouped by suite, sorted by delta DESCENDING inside each suite, and the suites themselves are ordered by their own delta sum descending — so the stack still reads improved-at-top to regressed-at-bottom while each suite keeps a self-contained signed profile and can carry its own rule and sum. GEOMETRY: row pitch is 7px and every row is a single 1px hairline whose LEFT end is anchored on a fixed 1px --border rail at x=0; the RIGHT end is displaced horizontally by dx = clamp(delta * shearScale, −56, +56) with shearScale defaulting to 260 px per 1.0 of delta, so a row's rendered length is zeroX + dx and the right terminus of the sorted stack traces a monotone signed profile — an S that bows right at the top, runs dead straight through a long waist, and bows left at the bottom. A 1px --border vertical zero line marks the unsheared right edge at zeroX (computed as container width − 232px label gutter − 56px shear headroom), with −t / 0 / +t mono ticks where t = min(0.20, 56 / shearScale) so the printed tick value is derived from the same number that positions the tick and can never overstate the scale at a large shearScale and a 'Δ score · candidate − baseline' caption beneath the stack so the scale is stated, not guessed. SIGN IS SHAPE-CODED, NEVER COLOR-CODED: improvements shear right and render solid var(--foreground) at 0.55 alpha; regressions shear left and render as a repeating-linear-gradient stipple on a 2px-on / 2px-off period (the DOM equivalent of stroke-dasharray '2 2') at 0.7 alpha; |delta| < tieEps (default 0.005) is forced flush to the zero line at 0.18 alpha. Because most cases in a real suite tie, roughly 70–85% of the frame is a deliberately quiet near-invisible band and all the ink concentrates in the two tails — that sparsity is data-driven, not decorative, and it is what makes the tails countable at a glance. NEW FAILURES: a case with baseline >= passThreshold (default 0.5) and candidate < passThreshold gets a 2px × 7px cap glyph at its sheared terminus and a 3600ms ease-in-out opacity 0.5→1 breathe with a deterministic per-row animation-delay jitter of ±240ms derived from an FNV-1a hash of the case id (never Math.random, so SSR and client agree) — this is the ONLY ambient motion in the component. CALIPER: the pointer is a caliper. On pointermove the row under the cursor and its neighbours fan apart — target pitch per row is 7 + 8 * exp(−(i − hoverIndex)² / 2.2) * a, where `a` is a 0..1 fan amount, and every pitch is then multiplied by (n * 7) / Σ(pitch) so the stack's TOTAL height never changes and the rest of the rows compress to pay for the fan. Both `a` and a continuous hover index ease toward their targets on a 0.14s exponential time constant inside one rAF loop that shuts itself off on convergence; layout is written straight to the DOM (transform + height + label opacity per row) with zero React state on the hot path. Fanned rows reveal case id and 'baseline → candidate' in Geist Mono at their sheared end, opacity ramped off the same gaussian weight so only the two or three rows under the caliper are labelled, and a 1px --accent caliper line pins to the centre row. Pointerleave eases the fan back to a uniform 7px pitch over the same 0.14s constant and drops the labels. KEYBOARD: the case list is a real role=listbox of role=option rows with roving tabindex — exactly one row carries tabIndex 0, ArrowUp/ArrowDown move the caliper with the identical fan and label reveal, Home/End jump to the extremes of the profile, each row focuses with preventScroll and shows a 2px --accent focus ring, and every row carries an aria-label naming its suite, id, both scores, the signed delta and whether it is a new failure. HEADER: a font-mono tabular-nums 'n improved / n regressed / n unchanged / n new failures' legend in a role=status aria-live=polite region, each count preceded by an aria-hidden swatch drawn in the row's own idiom (solid, stippled, faint, cap) so the encoding is stated by example rather than by caption. REDUCED MOTION: prefers-reduced-motion drops the breathe animation entirely and sets the easing constant to instant so the fan snaps rather than glides — nothing is hidden and every state stays fully legible static. COLORS: --foreground for hairlines and caps, --border for the rail, the zero line, the suite rules and the axis ticks, --muted for labels and sums, --accent only for the caliper line and the focus ring. No canvas, no SVG, no dependencies — the whole profile is absolutely positioned DOM, so it themes from tokens alone with no getComputedStyle read.",
+  "dependencies": []
+}
