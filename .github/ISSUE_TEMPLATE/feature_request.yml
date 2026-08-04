@@ -1,0 +1,31 @@
+name: Feature request
+description: Propose a change to the CLI, MCP server, registry site, or tooling.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: >
+        Proposing a new component? Use "Component request" instead — this
+        template is for the CLI, the MCP server, the registry/preview site,
+        or the build tooling.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: What are you trying to do that isn't possible, or is awkward, today?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: As concrete as you can make it — a command, a flag, an API shape.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
