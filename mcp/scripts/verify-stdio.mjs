@@ -4,11 +4,19 @@
 // tool), and asserts every tool returns a non-empty result. Framing is
 // newline-delimited JSON, not LSP Content-Length headers.
 import { spawn } from "node:child_process";
-import { join, dirname } from "node:path";
+import { existsSync } from "node:fs";
+import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const ENTRY = join(ROOT, "src", "index.ts");
+// Default to the shipped artifact so a broken build cannot publish clean;
+// pass a path (e.g. src/index.ts) to verify the source checkout instead.
+const ENTRY = process.argv[2] ? resolve(process.argv[2]) : join(ROOT, "dist", "index.js");
+
+if (!existsSync(ENTRY)) {
+  console.error(`verify-stdio: ${ENTRY} missing — run npm run build first`);
+  process.exit(1);
+}
 
 const child = spawn(process.execPath, [ENTRY], {
   stdio: ["pipe", "pipe", "pipe"],

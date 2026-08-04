@@ -613,11 +613,14 @@ is the whole dependency.
 
 Requirements before you use any of these:
 - Colors MUST come from CSS custom properties already in scope: --background --foreground
-  --muted --border --accent. Never hardcode hex — these components are light/dark
-  theme-reactive only if those tokens exist in the host app's globals.css.
+  --muted --border --accent --surface --error --warning. Never hardcode hex — these
+  components are light/dark theme-reactive only if those tokens exist in the host app's
+  globals.css.
 - Peer deps: react 19+, Tailwind CSS v4 (components are styled entirely with Tailwind
   utility classes — no shipped CSS file). Fonts assumed Geist Sans / Geist Mono (components
-  inherit font-family, they don't set it). Per-component npm deps listed below as "deps".
+  inherit font-family, they don't set it; where a monospace face is set explicitly they read
+  the font tokens --font-mono or --font-geist-mono). Per-component npm deps listed below as
+  "deps".
 
 Full behavioral detail (long form, one paragraph per component): ${HOMEPAGE}/llms-full.txt
 

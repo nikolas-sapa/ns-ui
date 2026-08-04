@@ -36,7 +36,8 @@ export default async function CommunityPage() {
   try {
     const approved = await fetchQuery(api.testimonials.approved, {});
     submitted = approved.map((row) => ({ ...row, id: row.id as string }));
-  } catch {
+  } catch (error) {
+    console.error("community: testimonials unavailable", error);
     submitted = [];
   }
 

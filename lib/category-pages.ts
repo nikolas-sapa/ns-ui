@@ -25,13 +25,25 @@ export function categoryPages(): CategoryPageData[] {
   }));
   const memberships = categorize(items);
 
-  return CATEGORIES.map((c) => {
+  const pages = CATEGORIES.map((c) => {
     const members = items
       .filter((i) => memberships.get(i.name)?.includes(c.id))
       .sort((a, b) => recency(a.name) - recency(b.name))
       .map((i) => ({ name: i.name, title: i.title, description: i.description }));
     return { id: c.id, label: c.label, members };
   });
+
+  // Same `["other"]` catch-all the sidebar already applies (`lib/nav-data.ts`),
+  // with the id/label copied verbatim so tree, chips and hub pages agree. A
+  // component whose tags hit no category is otherwise in zero categories and
+  // unreachable by clicking.
+  const orphans = items
+    .filter((i) => !memberships.get(i.name)?.length)
+    .sort((a, b) => recency(a.name) - recency(b.name))
+    .map((i) => ({ name: i.name, title: i.title, description: i.description }));
+  if (orphans.length) pages.push({ id: "other", label: "Other", members: orphans });
+
+  return pages;
 }
 
 /** A single component's category memberships (ids + labels), for linking

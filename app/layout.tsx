@@ -28,6 +28,13 @@ export const metadata: Metadata = {
   metadataBase: new URL(REGISTRY_ORIGIN),
   title,
   description,
+  alternates: {
+    types: {
+      "application/rss+xml": [
+        { url: "/changelog/feed.xml", title: "ns-ui changelog" },
+      ],
+    },
+  },
   openGraph: {
     title: socialTitle,
     description,

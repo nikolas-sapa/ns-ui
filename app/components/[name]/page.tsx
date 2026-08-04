@@ -170,6 +170,12 @@ export default async function ComponentPage({
                 label={`Copy install command for ${item.title}`}
               />
             </div>
+            <Link
+              href={`/preview/${name}/play`}
+              className="mt-2 inline-block rounded-sm font-mono text-[11px] uppercase tracking-[0.14em] text-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+            >
+              View source and playground
+            </Link>
           </div>
 
           {categories.length ? (
@@ -190,11 +196,13 @@ export default async function ComponentPage({
           {item.meta?.tags?.length ? (
             <ul className="mt-3 flex flex-wrap gap-1.5">
               {item.meta.tags.map((tag) => (
-                <li
-                  key={tag}
-                  className="rounded-sm border border-border px-1.5 py-px font-mono text-[10px] uppercase tracking-wider text-muted"
-                >
-                  {tag}
+                <li key={tag}>
+                  <Link
+                    href={`/?q=${encodeURIComponent(tag)}`}
+                    className="block rounded-sm border border-border px-1.5 py-px font-mono text-[10px] uppercase tracking-wider text-muted outline-none transition-colors hover:border-foreground hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+                  >
+                    {tag}
+                  </Link>
                 </li>
               ))}
             </ul>

@@ -29,6 +29,11 @@ The preview site has three routes worth knowing:
 - `/preview/<name>` renders the identical component, chrome-less. This is the
   screenshot gate's fixture, not a page anyone is meant to link to.
 
+Those three routes run on a bare clone, so component work needs none of the
+Convex configuration. Only the account and submission surfaces need
+`NEXT_PUBLIC_CONVEX_URL`, which comes from the project's own Convex deployment
+(see `.env.example`).
+
 ## Generated files never go in a diff
 
 These are rebuilt from `meta.json` sidecars by `npm run registry:build`, which

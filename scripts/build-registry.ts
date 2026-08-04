@@ -9,13 +9,25 @@ import { REGISTRY_ORIGIN } from "../lib/registry-origin.ts";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 const items = [];
+const mismatched: { folder: string; metaName: string }[] = [];
 for (const collection of ["core", "loud"]) {
   const dir = join(ROOT, "registry", collection);
   if (!existsSync(dir)) continue;
   for (const name of readdirSync(dir).sort()) {
     const metaPath = join(dir, name, "meta.json");
     if (!existsSync(metaPath)) continue;
-    const meta = JSON.parse(readFileSync(metaPath, "utf8"));
+    // Hard failure, but name the file: a bare JSON.parse here reports only
+    // "Unexpected token" across 285+ sidecars, so one trailing comma takes
+    // down the build with no way to tell which folder did it.
+    let meta;
+    try {
+      meta = JSON.parse(readFileSync(metaPath, "utf8"));
+    } catch (e) {
+      throw new Error(
+        `${metaPath}: ${e instanceof Error ? e.message : String(e)}`
+      );
+    }
+    if (meta.name !== name) mismatched.push({ folder: name, metaName: meta.name });
     items.push({
       name: meta.name,
       type: "registry:ui",
@@ -36,6 +48,27 @@ for (const collection of ["core", "loud"]) {
       },
     });
   }
+}
+
+// Loud guard: build-registry keys items by meta.name while build-index keys
+// demos by folder name, so a mismatch ships an installable /r/<name>.json
+// whose preview has no demo — installable but unpreviewable.
+//
+// Warning rather than a build failure on purpose, following the order guard
+// below: the in-flight registry batch must not be blocked by a hard gate.
+// ponytail: ceiling — a warning can be scrolled past in CI, so a mismatch can
+// still ship. Upgrade path: flip to `throw` once the batch lands and the tree
+// is known-clean.
+if (mismatched.length > 0) {
+  console.warn(
+    `\n  WARNING: ${mismatched.length} meta.json name(s) do not match their folder.\n` +
+      `  The demo is keyed by folder, so /r/<name>.json installs with no preview.\n` +
+      `  Fix: set "name" in meta.json to the folder name (or rename the folder)\n` +
+      `  Mismatched: ${mismatched
+        .slice(0, 12)
+        .map((m) => `${m.folder} (name: ${m.metaName})`)
+        .join(", ")}${mismatched.length > 12 ? `, +${mismatched.length - 12} more` : ""}\n`
+  );
 }
 
 writeFileSync(

@@ -56,6 +56,9 @@ function featuredNames(): string[] {
 const only = process.argv.slice(2);
 const names = only.length ? only : featuredNames();
 
+// Rebuilt from scratch each time so a slug dropped from or renamed in FEATURED
+// does not leave a stale preview shipping forever.
+rmSync(OUT, { recursive: true, force: true });
 mkdirSync(OUT, { recursive: true });
 rmSync(RAW, { recursive: true, force: true });
 mkdirSync(RAW, { recursive: true });
@@ -100,8 +103,8 @@ for (const name of names) {
         { stdio: "pipe" },
       );
       done++;
-    } catch {
-      failed.push(`${name}/${theme}`);
+    } catch (e) {
+      failed.push(`${name}/${theme}: ${e instanceof Error ? e.message : String(e)}`);
     } finally {
       rmSync(stage, { recursive: true, force: true });
     }
@@ -112,3 +115,5 @@ for (const name of names) {
 await browser.close();
 rmSync(RAW, { recursive: true, force: true });
 console.log(`previews: ${done} written${failed.length ? `, ${failed.length} failed (${failed.slice(0, 4).join(", ")})` : ""}`);
+
+if (failed.length) process.exit(1);
