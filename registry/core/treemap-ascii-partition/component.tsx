@@ -98,41 +98,18 @@ function layoutSlice(nodes: TreemapNode[], x: number, y: number, w: number, h: n
   });
 }
 
-interface Tokens {
-  fg: string;
-  bg: string;
-  muted: string;
-  border: string;
-  accent: string;
-}
-
-function readTokens(): Tokens {
-  const cs = getComputedStyle(document.documentElement);
-  const get = (name: string, fallback: string) => cs.getPropertyValue(name).trim() || fallback;
-  return {
-    fg: get("--foreground", "#171717"),
-    bg: get("--background", "#ffffff"),
-    muted: get("--muted", "#4d4d4d"),
-    border: get("--border", "#ebebeb"),
-    accent: get("--accent", "#006bff"),
-  };
-}
-
-function useTokens(): Tokens {
-  const [tokens, setTokens] = useState<Tokens>(() =>
-    typeof document === "undefined"
-      ? { fg: "#171717", bg: "#ffffff", muted: "#4d4d4d", border: "#ebebeb", accent: "#006bff" }
-      : readTokens()
-  );
-  useEffect(() => {
-    const sync = () => setTokens(readTokens());
-    sync();
-    const mo = new MutationObserver(sync);
-    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class", "style"] });
-    return () => mo.disconnect();
-  }, []);
-  return tokens;
-}
+// This used to read --foreground/--background/etc via getComputedStyle at
+// mount, hold them in state, and apply the result as raw hex through inline
+// `style` — a real bug, not a style choice, see diagram-ascii-flow's
+// component.tsx for the full story. Short version: SSR always renders with
+// no `document`, so the FIRST markup bakes in the light-theme fallback hex,
+// and because the client-computed value never CHANGES across renders (this
+// component recomputes the same "correct" dark hex every time), React never
+// patches it into the DOM — it only writes an attribute when the new
+// render's value differs from the PREVIOUS render's, not from what's
+// actually painted. Tailwind classes bound to the same custom properties
+// sidestep the whole bug class: the cascade resolves --background per theme
+// at PAINT time, no JS or hydration step involved.
 
 function buildMap(nodes: TreemapNode[], map: Map<string, TreemapNode>) {
   for (const n of nodes) {
@@ -146,7 +123,6 @@ function rampLine(char: string, count: number): string {
 }
 
 export function AsciiPartition({ data = DEFAULT_DATA, className = "" }: AsciiPartitionProps) {
-  const tokens = useTokens();
   const [path, setPath] = useState<string[]>([]);
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [focusIndex, setFocusIndex] = useState(0);
@@ -273,21 +249,22 @@ export function AsciiPartition({ data = DEFAULT_DATA, className = "" }: AsciiPar
               aria-label={`${r.node.label}: ${r.node.value.toLocaleString()}${
                 hasChildren ? ", press Enter to open" : ""
               }`}
-              className="ns-tap-rect absolute overflow-hidden border text-left transition-colors duration-150 motion-reduce:transition-none"
+              className={`ns-tap-rect absolute overflow-hidden border bg-background text-left transition-colors duration-150 motion-reduce:transition-none ${
+                hovered ? "border-accent/40" : "border-border"
+              } ${hasChildren ? "cursor-pointer" : "cursor-default"}`}
               style={{
                 left: r.x * CELL_W,
                 top: r.y * CELL_H,
                 width: r.w * CELL_W,
                 height: r.h * CELL_H,
-                borderColor: hovered ? `color-mix(in srgb, ${tokens.accent} 45%, ${tokens.border})` : tokens.border,
-                background: tokens.bg,
-                cursor: hasChildren ? "pointer" : "default",
               }}
             >
               <div
                 aria-hidden
-                className="absolute inset-0 select-none overflow-hidden whitespace-pre leading-[15px]"
-                style={{ color: hovered ? tokens.fg : tokens.muted, fontSize: 10 }}
+                className={`absolute inset-0 select-none overflow-hidden whitespace-pre leading-[15px] ${
+                  hovered ? "text-foreground" : "text-muted"
+                }`}
+                style={{ fontSize: 10 }}
               >
                 {Array.from({ length: lines }).map((_, row) => (
                   <div key={row}>{lineText}</div>
@@ -295,13 +272,10 @@ export function AsciiPartition({ data = DEFAULT_DATA, className = "" }: AsciiPar
               </div>
               <div
                 aria-hidden
-                className="relative z-10 truncate px-1 py-0.5 text-[10px]"
-                style={{ background: `color-mix(in srgb, ${tokens.bg} 78%, transparent)`, color: tokens.fg }}
+                className="relative z-10 truncate bg-background/78 px-1 py-0.5 text-[10px] text-foreground"
               >
                 {r.node.label}
-                <span className="ml-1" style={{ color: tokens.muted }}>
-                  {r.node.value.toLocaleString()}
-                </span>
+                <span className="ml-1 text-muted">{r.node.value.toLocaleString()}</span>
               </div>
             </button>
           );
