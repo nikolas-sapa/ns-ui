@@ -1,0 +1,31 @@
+{
+  "name": "router-tier-cascade",
+  "title": "Router Tier Cascade",
+  "description": "Model routing drawn as a cascade of weirs — one hairline row per model tier, each with a spill notch at its cost ceiling, so a request that a cheap tier can't hold visibly spills down a row and every escalation and its price are readable in one still frame.",
+  "collection": "core",
+  "tags": [
+    "agent",
+    "llm",
+    "routing",
+    "cost",
+    "model",
+    "meter",
+    "data-viz",
+    "mono",
+    "dashboard",
+    "escalation"
+  ],
+  "useWhen": "the panel that shows where an LLM router actually sent traffic and what each tier cost, with the escalation itself drawn as a spill over a weir notch you can drag to re-route settled traffic. Pick sankey-ascii-flow when the subject is proportional flow between arbitrary stages rather than an ordered price ladder, chart-funnel-stage-drop when the subject is attrition through a fixed funnel, and meter-quota-rule when there is one budget rather than a cascade of tiers.",
+  "autoplay": {
+    "mode": "pointer-path",
+    "path": "sweep",
+    "target": "[data-tier-row]",
+    "period": 5000
+  },
+  "instruction": "Build <RouterTierCascade tiers requests decayMs? onCeilingChange? formatCost? ariaLabel? className?> as a weir cascade: one 34px row per model tier from `tiers: {id,label,ceiling,pricePer1k}[]`, cheapest first, laid out as a 112px / 1fr / 132px grid (tier label + price · track · cost gutter). GEOMETRY: each row's track carries a 1px --border baseline that is CUT at x = ceiling — two absolutely positioned segments leaving a 10px gap — and that gap is flanked by two 1px --foreground vertical lips 4px tall, one hanging above the line on the left edge and one below on the right, which is the weir notch and the only thing that distinguishes one tier from another (no color coding anywhere; tier identity is row position and notch x, never hue). CASCADE: a request from `requests: {id,difficulty,tokens,acceptedTier?}[]` enters row 0 as a 3px --foreground square at x=0 and travels right at 90px/s (converted to normalized track units against a ResizeObserver-measured width, so the speed is real px/s at any container size). If it reaches its row's notch x while difficulty > that row's ceiling it SPILLS: translateY(+34px) over 260ms on cubic-bezier(0.33,0,0.15,1), overshooting by 3px and easing that overshoot back out over the final 60ms, then it resumes rightward on the next row. It comes to rest at x = difficulty on the first row whose ceiling can hold it (last row otherwise) and becomes a settled tick. All in-flight glyphs share ONE rAF loop writing style.left/transform directly on refs — React state holds only the settled ticks — and the glyph layer lives inside row 0's track with z-index 5 so the same element can translate down across every row below it. DECAY: a settled tick's opacity runs 1 -> 0.25 linearly over `decayMs` (default 45000) as a pure CSS animation on a wrapper element, so it needs no timer and no re-render; ticks are capped FIFO at 40 per row. The FIRST batch of requests is treated as history rather than live traffic — it lands settled with no travel, and each tick gets a negative animation-delay spread along the decay ramp in arrival order, so the resting frame reads as accumulated traffic (a dense scatter thinning down the rows) rather than forty simultaneous arrivals. Sparsity is the design: the frame is n hairlines plus a scatter, never a fill. COST: the right gutter is font-mono tabular-nums showing the accepted count and cumulative spend (sum(tokens)/1000 * pricePer1k) plus a 1px --foreground bar scaled to the busiest row's spend, so routing and price sit on the same geometry. INTERACTION: pointerover on a row (via bubbling pointerover/pointerout, not enter/leave, so the autoplay driver's hit-tested dispatch onto a child still reaches the row) expands that row's ticks 3px -> 5px and its notch lips 4px -> 10px while every other row eases to 0.18 opacity on a 0.16s constant, and swaps that row's gutter from cumulative spend to the per-request MEDIAN; pointerleave on the container relaxes everything back over the same constant. Each notch is a real role=slider (tabIndex 0, aria-valuemin 0.02 / aria-valuemax 0.98 matching the real clamps / aria-valuenow / aria-valuetext in percent, aria-describedby pointing at that row's sr-only summary, visible focus-visible outline in --accent) that can be dragged horizontally with pointer capture or arrow-keyed at 0.01 steps (PageUp/Down 0.1, Home/End to the 0.02..0.98 clamps), snapped to 0.01, firing onCeilingChange(tierId, ceiling). Because each settled tick stores its difficulty and its row is DERIVED from the live ceilings on every render rather than frozen at arrival, moving a notch re-cascades every tick that now falls on the wrong side of it, animated by a CSS transition on the same 260ms cubic-bezier(0.33,0,0.15,1) curve the live spill uses. `acceptedTier` on a request is advisory and deliberately ignored for that reason. AMBIENT MOTION: only the newest settled tick breathes, opacity 0.55 -> 1 on a 3.4s ease-in-out alternate loop with a deterministic ±180ms delay jitter seeded from its sequence index; the cascade animation plays only when a request actually arrives in props. prefers-reduced-motion: arriving requests are placed directly at their resting x on their accepting row with zero travel, the rAF loop never starts, and every transition, the decay fade and the pulse are all disabled — routing, hover, drag and keyboard all still work, they just resolve instantly. Every stroke and fill is a token (bg-foreground, bg-border, text-muted, outline-accent) — no hex, no canvas, DOM + CSS only. Each row also carries an sr-only sentence spelling out its ceiling, accepted count and spend, because a scatter of squares says nothing to a screen reader. Props: tiers, requests, decayMs (default 45000), onCeilingChange, formatCost (default $ with 4 decimals below 1), ariaLabel (default 'Model routing cascade'), className.",
+  "dependencies": [],
+  "card": {
+    "focus": "[role=group]",
+    "padding": 0.28
+  }
+}

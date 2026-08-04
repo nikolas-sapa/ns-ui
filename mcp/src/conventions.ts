@@ -14,7 +14,7 @@ element in the same UI.
 Colors come from CSS custom properties already in scope on the host app —
 never a hardcoded hex, in JSX/markup OR in canvas/SVG draw code:
 
-  --background   --foreground   --muted   --border   --accent
+  --background   --foreground   --muted   --border   --accent   --surface   --error   --warning
 
 If a component derives ink for a <canvas>, it reads these via
 getComputedStyle at mount and on theme change, it does not bake in a color
@@ -28,7 +28,9 @@ Both themes must render correctly and are not byte-identical.
 - Tailwind CSS v4 — components are styled entirely with Tailwind utility
   classes, no shipped CSS file, no CSS-in-JS.
 - Fonts assumed Geist Sans / Geist Mono. Components inherit font-family from
-  the host app rather than setting it themselves.
+  the host app rather than setting it themselves; where one needs a monospace
+  face explicitly (canvas text, tabular labels) it reads the font tokens
+  --font-mono or --font-geist-mono, with a generic monospace fallback.
 - "use client" on every component; each ships with zero or minimal npm
   dependencies (per-component deps are returned by get_component /
   search_components).

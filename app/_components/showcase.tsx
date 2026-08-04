@@ -222,15 +222,22 @@ export function Showcase({
   /** name -> category ids, computed once from the components' own tags. */
   const memberships = useMemo(() => categorize(items), [items]);
 
-  const categories = useMemo(
-    () =>
-      CATEGORIES.map((c) => ({
-        ...c,
-        count: items.filter((i) => memberships.get(i.name)?.includes(c.id))
-          .length,
-      })).filter((c) => c.count > 0),
-    [items, memberships],
-  );
+  const categories = useMemo(() => {
+    const named = CATEGORIES.map((c) => ({
+      ...c,
+      count: items.filter((i) => memberships.get(i.name)?.includes(c.id))
+        .length,
+    })).filter((c) => c.count > 0);
+
+    // Same `["other"]` catch-all the sidebar already applies
+    // (`lib/nav-data.ts`), id/label verbatim so tree, chips and
+    // `/categories/<id>` agree. Without it a component whose tags hit no
+    // category is in zero chips and unreachable by clicking.
+    const orphans = items.filter((i) => !memberships.get(i.name)?.length).length;
+    return orphans > 0
+      ? [...named, { id: "other", label: "Other", tags: [], count: orphans }]
+      : named;
+  }, [items, memberships]);
 
   /**
    * One lowercase string per component to match against. 206 items, so this
@@ -296,7 +303,10 @@ export function Showcase({
     const inScope = items.filter(
       (i) =>
         (filter === "all" || i.collection === filter) &&
-        (!category || memberships.get(i.name)?.includes(category)),
+        (!category ||
+          (category === "other"
+            ? !memberships.get(i.name)?.length
+            : memberships.get(i.name)?.includes(category))),
     );
     if (terms.length === 0) return { visibleItems: inScope, loose: false };
 

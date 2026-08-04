@@ -3,6 +3,7 @@
 // stdio transport. All non-protocol output goes to stderr — stdout carries
 // only JSON-RPC frames, and a stray console.log here corrupts the stream
 // for the client.
+import { createRequire } from "node:module";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
@@ -21,9 +22,16 @@ if (major < 18) {
   process.exit(1);
 }
 
+// Single source of truth for both the handshake version and the catalog size:
+// the package's own package.json and the bundled snapshot. Hardcoding either
+// one is how they drifted: a stale handshake version and a stale component count.
+const require = createRequire(import.meta.url);
+const { version } = require("../package.json") as { version: string };
+const snapshot = loadSnapshot();
+
 const server = new McpServer({
   name: "ns-ui",
-  version: "0.1.0",
+  version,
 });
 
 function text(s: string) {
@@ -39,7 +47,7 @@ server.registerTool(
   {
     title: "Search ns-ui components",
     description:
-      "Search the ns-ui registry (223 self-contained React/Tailwind components) by " +
+      `Search the ns-ui registry (${snapshot.components.length} self-contained React/Tailwind components) by ` +
       "name, title, description, tags and selection guidance ('use when'). Returns " +
       "compact results — name, title, one-line description, category, collection — " +
       "not full source. Call get_component with a result's name for the full detail " +
@@ -122,6 +130,39 @@ server.registerTool(
 );
 
 server.registerTool(
+  "list_components",
+  {
+    title: "List every ns-ui component",
+    description:
+      `The complete ns-ui catalog (${snapshot.components.length} components), one entry per component: ` +
+      "name, title, collection and categories only — selection guidance and source are " +
+      "deliberately omitted so the response stays bounded. Call get_component with any " +
+      "name for the full detail and real source; use search_components when you already " +
+      "know what you're looking for.",
+    inputSchema: {
+      collection: z
+        .enum(["core", "loud"])
+        .optional()
+        .describe(
+          "Restrict to one collection: 'core' (restrained, production-facing) or 'loud' (deliberately flashy showcase)."
+        ),
+    },
+  },
+  async ({ collection }) => {
+    const snapshot = loadSnapshot();
+    const components = snapshot.components
+      .filter((c) => !collection || c.collection === collection)
+      .map((c) => ({
+        name: c.name,
+        title: c.title,
+        collection: c.collection,
+        categories: c.categories,
+      }));
+    return json({ total: components.length, components });
+  }
+);
+
+server.registerTool(
   "list_categories",
   {
     title: "List ns-ui categories",
@@ -138,6 +179,7 @@ server.registerTool(
       count: snapshot.components.filter((c) => c.collection === collection).length,
     }));
     return json({
+      generatedAt: snapshot.generatedAt,
       total: snapshot.components.length,
       categories: snapshot.categories,
       collections: byCollection,

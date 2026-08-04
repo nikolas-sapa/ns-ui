@@ -1,0 +1,28 @@
+{
+  "name": "announcement-bar-relay",
+  "title": "Announcement Bar Relay",
+  "description": "A queued announcement bar that hands off honestly: dismissing one notice shears it upward while the next arrives from below AND the bar's own height eases between the two measured heights, so the page reflows with the message instead of snapping under it, and the queue pips physically shorten by one.",
+  "collection": "core",
+  "tags": [
+    "announcement",
+    "banner",
+    "queue",
+    "dismiss",
+    "page-furniture",
+    "marketing"
+  ],
+  "useWhen": "Pick announcement-bar-relay when several notices have to share one page-width bar and you care that the content below doesn't jump as they hand off — it measures the next message's height before the swap and eases the bar between the two, and shows a pip row so a visitor knows how many notices are left. Pick banner-tear-stub instead for a single dismissible notice the user may want back (it leaves a reopenable stub), or toast-gravity-stack when the notices are transient and self-dismissing rather than page furniture.",
+  "card": {
+    "focus": "[data-announcement-bar]",
+    "padding": 0.12,
+    "maxZoom": 2
+  },
+  "autoplay": {
+    "mode": "press",
+    "target": "[data-announcement-dismiss]",
+    "hold": 200,
+    "period": 3000
+  },
+  "instruction": "Build <AnnouncementBarRelay items storageKeyPrefix=\"ns-announcement-bar-relay:\" resetOnMount=false onExhausted? className?> where items is ({ id, message, action?: { label, href }, tone?: 'muted' | 'accent' })[]. STRUCTURE: a <div role=region> labelled 'Announcements' by an sr-only span, carrying the current message and its optional inline action link on the left, and on the right a queue readout plus a dismiss control — a <button data-announcement-dismiss aria-label=\"Dismiss: {message}\"> with an SVG cross. The readout is a row of 6px pips, one per remaining item, the head one filled with --foreground and the rest hollow 1px --border rings, followed by a Geist Mono tabular-nums counter reading position/total (`1/3`), with an sr-only 'Announcement 1 of 3' carrying the same fact to a screen reader while the pips and counter are aria-hidden — that sr-only line lives INSIDE the aria-live=polite message column, so the new position is spoken with the new message instead of changing silently. THE MECHANIC — the reason this exists: an ordinary banner queue swaps the DOM and the page below jumps by whatever the height delta happens to be. Here a hidden mirror row (aria-hidden, visibility:hidden, position:absolute, inset-x-0) renders the NEXT message at the bar's exact content width, so its height h1 is a measured fact before the handoff begins. On dismiss the live height h0 is read from the bar's border box, the chrome delta (bar.offsetHeight − content.offsetHeight, i.e. the hairline rule) is added to the mirror's offsetHeight to get h1 in the same box model, h0 is written to the bar as an explicit px height, and then in one requestAnimationFrame — after the start poses have actually painted, otherwise the browser coalesces start and end and nothing moves — three clocks start together: (a) the outgoing message transitions to translateY(-100%) skewX(-3deg) opacity 0 over 240ms cubic-bezier(0.4,0,0.2,1); (b) the incoming message, rendered at translateY(100%) skewX(3deg) opacity 0 with transition:none, releases to identity over 240ms with a 60ms lead-in delay; (c) the BAR ITSELF eases height h0 → h1 over 300ms on the same curve, deliberately outlasting the swap so the content below the bar travels continuously rather than snapping at the instant the DOM changes. The 3deg shear is the whole point of the pairing — it makes the two messages read as one carriage travelling past a window rather than a crossfade. On settle the explicit height is cleared back to auto so the bar is fluid again. Simultaneously the leaving pip collapses from 6px to 0 width with its 6px right margin and its border going with it over 200ms, so the queue is visibly one dot shorter rather than silently re-rendering. LAST ITEM: the same outgoing shear, but h1 is 0, the bar eases to zero height and the region unmounts on the height transitionend, guarded by a 400ms fallback timer so a transitionend that never fires (tab hidden mid-flight) can't strand a zero-height region in the document; onExhausted fires there. PERSISTENCE: each dismissed id is written as `${storageKeyPrefix}${id}` = '1', and storage is read in a useEffect and never during render, so the server markup and the first client paint agree — item 0 renders optimistically and is swapped after hydration if it turns out to be already dismissed. Every storage access is try/caught, so private mode or a denied origin degrades to a session-only bar instead of throwing. resetOnMount clears this queue's own keys at mount, which is what a demo or preview should pass (with its own namespaced prefix) so a replaying page cannot permanently empty itself or collide with any key the host reads. Reduced motion: no shear, no height easing, no pip collapse — the message swaps in a single paint and the bar height changes instantly, and the dismissal still persists. Pure DOM/CSS/SVG, zero dependencies, no canvas. Tokens only — --border, --foreground, --muted, --surface, --accent — with accent restricted to the action link and the focus rings; tone:'accent' shifts only the 2px leading rule down the bar's left edge, never the bar's background, so a whole row of notices never turns into a colour-coded traffic light. The dismiss button and the action link both carry a visible focus-visible ring in --accent, and the dismiss button is keyboard-operable as an ordinary button, so the entire queue can be walked with Tab and Enter alone.",
+  "dependencies": []
+}
