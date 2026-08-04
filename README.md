@@ -1,8 +1,11 @@
 # ns-ui
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Live registry](https://img.shields.io/badge/registry-design.helpmarq.com-006bff)](https://design.helpmarq.com)
-[![CI](https://github.com/nikolas-sapa/ns-ui/actions/workflows/ci.yml/badge.svg)](https://github.com/nikolas-sapa/ns-ui/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-0B0B0D?style=flat-square&labelColor=0B0B0D&color=0B0B0D)](LICENSE)
+[![React 19](https://img.shields.io/badge/react-19-0B0B0D?style=flat-square&labelColor=0B0B0D&color=0B0B0D)](package.json)
+[![Tailwind v4](https://img.shields.io/badge/tailwind-v4-0B0B0D?style=flat-square&labelColor=0B0B0D&color=0B0B0D)](package.json)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-0B0B0D?style=flat-square&labelColor=0B0B0D&color=0B0B0D)](CONTRIBUTING.md)
+[![Live registry](https://img.shields.io/badge/registry-design.helpmarq.com-0B0B0D?style=flat-square&labelColor=0B0B0D&color=0B0B0D)](https://design.helpmarq.com)
+[![CI](https://github.com/nikolas-sapa/ns-ui/actions/workflows/ci.yml/badge.svg?style=flat-square)](https://github.com/nikolas-sapa/ns-ui/actions/workflows/ci.yml)
 
 <!-- generated:count start -->266<!-- generated:count end --> React components you install by URL, no package to depend on. Every one is
 built around a single interaction and gated by a Playwright suite that refuses
