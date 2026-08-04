@@ -12,11 +12,16 @@ import { useEffect, useMemo, useRef, useState } from "react";
 // COMBINATION and swallows the keydown — a rehearsal aid, no accumulation,
 // no decay, no legend) and from heatmap-year-stipple (density via jittered
 // dot count, not a character ramp, and driven by a canned yearly dataset,
-// not live keystrokes). Density here is rendered as a big background glyph
-// from a fixed ASCII ramp (" .:-=+*#%@"), never color or dot count, which
-// is what keeps it visually its own thing next to both neighbors. No
-// canvas: every glyph is a real DOM span, colored from --foreground via a
-// Tailwind opacity utility, no hex.
+// not live keystrokes). The ramp (" .:-=+*#%@") still names each of the 10
+// heat steps in the legend, but a key's OWN cell never draws that ramp
+// character behind its letter — two glyphs sharing one small cell just
+// overlaid into an illegible mess (a real bug this component shipped with:
+// hammer A/S/D/F and the ramp character stacks on the letterform itself).
+// Heat instead reads as a flat --foreground fill behind the letter, opacity
+// scaled 0 -> ~0.55 by the key's decayed ink over the live max, so every key
+// shows exactly one legible glyph at every heat level, in both themes. No
+// canvas: every cell is real DOM, colored from --foreground via a Tailwind
+// opacity utility, no hex.
 // ---------------------------------------------------------------------------
 
 const RAMP = [" ", ".", ":", "-", "=", "+", "*", "#", "%", "@"];
@@ -126,11 +131,12 @@ export function KeymapAsciiHeat({
     if (key) pulse(key);
   };
 
-  const glyphFor = (key: string): string => {
+  const MAX_FILL_OPACITY = 0.55;
+
+  const heatOpacityFor = (key: string): number => {
     const v = levels[key] ?? 0;
-    if (maxInk <= SLEEP_EPS) return RAMP[0]!;
-    const idx = Math.min(RAMP.length - 1, Math.round((v / maxInk) * (RAMP.length - 1)));
-    return RAMP[idx]!;
+    if (maxInk <= SLEEP_EPS) return 0;
+    return Math.min(1, v / maxInk) * MAX_FILL_OPACITY;
   };
 
   const legend = useMemo(() => RAMP.join(""), []);
@@ -146,9 +152,11 @@ export function KeymapAsciiHeat({
         wide ? "w-40" : "w-9"
       }`}
     >
-      <span className="pointer-events-none absolute inset-0 flex select-none items-center justify-center text-lg leading-none text-foreground/70">
-        {glyphFor(key)}
-      </span>
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-0 rounded-sm bg-foreground"
+        style={{ opacity: heatOpacityFor(key) }}
+      />
       <span className="relative z-10 select-none text-[11px] font-semibold tracking-wide">
         {key === "SPACE" ? "␣" : key}
       </span>

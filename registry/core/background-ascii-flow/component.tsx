@@ -28,9 +28,10 @@ const NOISE_FREQ = 0.05; // spatial frequency of the potential field
 const FIELD_SPEED = 0.06; // t units/s the potential drifts
 const CURL_SCALE = 46; // maps potential gradient to px/s particle speed
 const AMBIENT_STEP = 3; // ambient direction glyph sampled every N cells
-const AMBIENT_ALPHA = 0.16;
-const PARTICLE_COUNT_MIN = 90;
-const PARTICLE_COUNT_MAX = 260;
+const AMBIENT_ALPHA_MAX = 0.55;
+const AMBIENT_CUTOFF = 0.4; // below this normalized speed, draw nothing — real negative space
+const PARTICLE_COUNT_MIN = 60;
+const PARTICLE_COUNT_MAX = 130;
 const TRAIL_LEN = 4;
 const VORTEX_RADIUS = 120; // px
 const VORTEX_STRENGTH = 2.4; // px/s per unit falloff, at full ramp
@@ -220,12 +221,48 @@ export function Slipstream({ cellSize = 14, className = "" }: SlipstreamProps) {
 
     const drawAmbient = (t: number) => {
       ctx.fillStyle = muted;
-      ctx.globalAlpha = AMBIENT_ALPHA;
+      // Every ambient sample used to draw at the same fixed faint alpha
+      // regardless of how fast the field moved there — the whole background
+      // read as an even sprinkle of dashes with no shape and no negative
+      // space. A fixed CURL_SCALE-based reference speed turned out to be the
+      // wrong normalizer too: this potential field's gradient magnitude is
+      // fairly uniform canvas-wide, so nearly every cell landed on the same
+      // side of any fixed cutoff and the fix was invisible. Normalizing
+      // against THIS FRAME's own actual max speed (two passes: measure, then
+      // draw) guarantees real contrast regardless of the field's absolute
+      // scale — cells at the local max always reach full brightness, cells
+      // near the local min always fall below the cutoff into true negative
+      // space, same as the frame-relative sharpening background-ascii-caustics
+      // uses.
+      // Single pass: curlVel is 4 potential() calls (8 noise2D) per sample —
+      // computing it twice per cell every frame forever was a real perf
+      // regression, not just inelegant. Cache vx/vy/speed once, normalize
+      // against the max found in this same pass.
+      const vxs: number[] = [];
+      const vys: number[] = [];
+      const speeds: number[] = [];
+      let maxSpeed = 1e-6;
       for (let gy = 0; gy < rows; gy += AMBIENT_STEP) {
         for (let gx = 0; gx < cols; gx += AMBIENT_STEP) {
           const [vx, vy] = curlVel(gx * cellW, gy * cellH, t, 1.5);
-          const ch = dirChar(vx, vy);
-          ctx.fillText(ch, gx * cellW + cellW / 2, gy * cellH + cellH / 2);
+          const speed = Math.hypot(vx, vy);
+          vxs.push(vx);
+          vys.push(vy);
+          speeds.push(speed);
+          if (speed > maxSpeed) maxSpeed = speed;
+        }
+      }
+      let i = 0;
+      for (let gy = 0; gy < rows; gy += AMBIENT_STEP) {
+        for (let gx = 0; gx < cols; gx += AMBIENT_STEP) {
+          const norm = speeds[i]! / maxSpeed;
+          if (norm >= AMBIENT_CUTOFF) {
+            const shaped = Math.pow((norm - AMBIENT_CUTOFF) / (1 - AMBIENT_CUTOFF), 2.2);
+            ctx.globalAlpha = shaped * AMBIENT_ALPHA_MAX;
+            const ch = dirChar(vxs[i]!, vys[i]!);
+            ctx.fillText(ch, gx * cellW + cellW / 2, gy * cellH + cellH / 2);
+          }
+          i++;
         }
       }
     };
@@ -239,9 +276,18 @@ export function Slipstream({ cellSize = 14, className = "" }: SlipstreamProps) {
       for (let i = 0; i < particleCount; i++) {
         const ch = dirChar(velX[i]!, velY[i]!);
         const live = histLive[i]!;
+        // A particle sitting in a slow patch of the field used to draw at
+        // the exact same brightness as one riding the fastest current —
+        // every trail was equally bright regardless of how much it was
+        // actually moving, which is most of why the whole canvas read as
+        // one uniform density of dashes. Riding the same curl speed the
+        // vortex/advection math already computes, a slow particle now fades
+        // toward the background instead of matching the fast ones 1:1.
+        const speedNorm = Math.min(1, Math.hypot(velX[i]!, velY[i]!) / (CURL_SCALE * 0.6));
+        const speedGain = 0.35 + 0.65 * speedNorm;
         for (let s = 0; s < live; s++) {
           const slot = (histHead[i]! - s + TRAIL_LEN * 4) % TRAIL_LEN;
-          const alpha = 1 - s / TRAIL_LEN;
+          const alpha = (1 - s / TRAIL_LEN) * speedGain;
           if (alpha <= 0.05) continue;
           ctx.globalAlpha = alpha;
           ctx.fillText(
