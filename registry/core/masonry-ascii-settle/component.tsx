@@ -230,7 +230,14 @@ export function MasonryAsciiSettle({ tiles, className = "" }: MasonryAsciiSettle
     ctx.textBaseline = "middle";
     for (let gy = 0; gy < rows; gy++) {
       for (let gx = 0; gx < cols; gx++) {
-        const v = Math.min(1, Math.max(0, noise2(gx * 0.3 + seed * 13.7, gy * 0.3 + seed * 5.1)));
+        const raw = Math.min(1, Math.max(0, noise2(gx * 0.3 + seed * 13.7, gy * 0.3 + seed * 5.1)));
+        // Raw value-noise clusters tightly around the middle of the ramp —
+        // every cell prints some mid-weight character and the tile reads as
+        // uniform static, no negative space, no filaments. Power-sharpening
+        // the same field (same seed, same mechanic) pushes most cells to
+        // blank and only real peaks to the top of the ramp, so a tile reads
+        // as sparse bright structure on paper rather than gray noise.
+        const v = Math.pow(raw, 2.4);
         const idx = Math.min(RAMP.length - 1, Math.floor(v * RAMP.length));
         const ch = RAMP[idx];
         if (!ch || ch === " ") continue;
