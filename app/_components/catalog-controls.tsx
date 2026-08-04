@@ -264,15 +264,24 @@ export function CatalogControls({
           {activeCategory ? ` · ${activeCategory.label}` : ""}
         </p>
 
-        {filtered ? (
-          <button
-            type="button"
-            onClick={onClearAll}
-            className="flex min-h-11 shrink-0 items-center rounded-sm px-1.5 py-1 text-xs text-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent sm:min-h-0"
-          >
-            Clear
-          </button>
-        ) : null}
+        {/* Always rendered, never conditionally mounted: `hidden` here is the
+            React-driven state (matches `filtered`, same as before), and
+            `catalog-gate-clear` is the pre-hydration equivalent (see
+            app/globals.css and lib/catalog-gate.ts). A shared `?collection=`
+            or `?q=` link renders this button unfiltered by default, then
+            React flips it visible once the URL is read — if it only existed
+            in the DOM when `filtered` was already true, no CSS rule could
+            have made it appear before hydration, and the chip row above it
+            would still reflow (and shift) the moment it does. */}
+        <button
+          type="button"
+          onClick={onClearAll}
+          className={`flex min-h-11 shrink-0 items-center rounded-sm px-1.5 py-1 text-xs text-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent sm:min-h-0 catalog-gate-clear ${
+            filtered ? "" : "hidden"
+          }`}
+        >
+          Clear
+        </button>
       </div>
     </div>
   );

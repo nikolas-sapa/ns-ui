@@ -1,0 +1,25 @@
+{
+  "name": "sheet-ascii-range",
+  "title": "Sheet ASCII Range",
+  "description": "A spreadsheet-style rectangular cell range select where the border draws itself in real box-drawing glyphs (┌─┐│└┘) and a live ASCII status bar prints the aggregate — count, sum, mean, min, max — as the range grows by drag or Shift+Arrow.",
+  "collection": "core",
+  "tags": ["spreadsheet", "grid", "selection", "ascii", "mono", "box-drawing", "keyboard-navigation", "data-visualization"],
+  "useWhen": "a rectangular multi-cell range selection over tabular numeric data where the aggregate of the current selection should read live, spreadsheet-style — pick this over table-heat-shimmer when the selection itself is the point, not a fixed row's status. table-heat-shimmer's rows aren't selectable at all; its mechanic is which rows shimmer, not which cells are chosen.",
+  "gate": {
+    "openBy": "[data-r=\"1\"][data-c=\"1\"]",
+    "expect": "[data-glyph=\"corner-tl\"]"
+  },
+  "card": {
+    "focus": "[role=\"grid\"]",
+    "padding": 0.25
+  },
+  "instruction": "Build <SheetAsciiRange data rowLabels colLabels unit title className> over a rows x cols numeric grid (default a 6x8 synthetic shipment log). MECHANIC: pointerdown on a cell sets both the drag anchor and the live focus cell to it; while the pointer is down (no setPointerCapture — this deliberately relies on native hover/enter events firing on whichever cell the pointer is currently over, exactly like a real spreadsheet drag, and a global window 'pointerup' listener ends the drag regardless of what element the pointer released over), each subsequent cell's onPointerEnter updates only the focus corner, and the selection rectangle is the min/max of anchor and focus on both axes — recomputed on every cell gained or lost, not just on release. A bare pointerdown+pointerup on one cell with no movement commits a 1x1 rectangle immediately, so the mechanic has a resting, gate-visible non-drag path too. KEYBOARD: one roving-tabindex button per cell (tabIndex 0 only on the current focus cell); plain ArrowKeys move the active cell and collapse the selection to it (spreadsheet cursor behavior); Shift+ArrowKeys (preventDefault, so the page never scrolls under the extend) keep the anchor fixed and move only the focus corner, extending or shrinking the rectangle exactly like a mouse drag would, and the aggregate recomputes on every keystroke. BORDER: every cell on the rectangle's perimeter renders one absolutely-positioned, aria-hidden box-drawing glyph seated on the seam at its own edge/corner of the CELL (not a separate overlay grid) — ┌┐└┘ at the four corners (priority: a cell that is simultaneously top+left is the top-left corner, etc.), ─ centered on the outer edge of top/bottom perimeter cells, │ centered on the outer edge of left/right perimeter cells — so the whole rectangle's boundary reads as a real drawn box even though every glyph belongs to its own cell's DOM. Selected cells (including interior ones) get a flat --accent-derived tint (bg-accent/[0.09], via Tailwind's arbitrary-opacity utility over the token, never a literal hex) with no glyph. STATUS BAR: a visible (not sr-only — it doubles as its own accessible live region via aria-live=polite) monospace line beneath the grid prints 'n=<count> Σ=<sum> x̄=<mean> min=<min> max=<max> <unit>' whenever the rectangle is non-empty, or a plain 'n=0 — click a cell or drag a range' placeholder at rest. A11Y: role=grid on the container, role=gridcell + aria-selected on every cell, and each cell's aria-label states its row label, column label and raw value/unit so a screen reader can navigate the sheet cell-by-cell independent of the visual rectangle. Colors are token-only (--foreground/--muted/--border/--background/--accent via Tailwind utility classes) — no canvas, no hex, so there's nothing to re-derive on theme change. No motion beyond a 100ms background-color transition on hover/selection, skipped under prefers-reduced-motion via motion-reduce:transition-none; there is no rAF loop anywhere in this component.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "drag",
+    "target": "[role=\"grid\"]",
+    "from": [0.25, 0.3],
+    "to": [0.7, 0.75],
+    "period": 3600
+  }
+}

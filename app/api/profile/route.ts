@@ -11,6 +11,7 @@ import { fetchMutation } from "convex/nextjs";
 import { ConvexError } from "convex/values";
 import { NextResponse, type NextRequest } from "next/server";
 import { api } from "@/convex/_generated/api";
+import { clearSubmitOAuthCookies } from "@/lib/submit-oauth-cookies";
 
 export const dynamic = "force-dynamic";
 
@@ -155,14 +156,26 @@ export async function DELETE(request: NextRequest) {
   }
 
   await fetchMutation(api.account.deleteAccount, {}, { token });
-  // Cookie clearing is deliberately NOT done here. `convex/account.ts`
-  // already deletes the caller's `authSessions`/`authRefreshTokens` rows;
-  // the client (`app/_components/account-delete.tsx`) calls the library's
-  // own `signOut()` immediately after this resolves, which clears the
-  // `__Host-`-prefixed cookies through the same isLocalhost-aware logic
-  // `dist/nextjs/server/cookies.js` uses everywhere else (`convex/session.ts`
-  // documents that this proxy clears cookies whether or not the session it
-  // is asked to delete still exists) — hand-rolling the cookie name/prefix
-  // a second time here would be a second place for that logic to drift.
-  return NextResponse.json({ ok: true });
+  // `__Host-`-prefixed cookie clearing is deliberately NOT done here.
+  // `convex/account.ts` already deletes the caller's `authSessions`/
+  // `authRefreshTokens` rows; the client (`app/_components/account-
+  // delete.tsx`) calls the library's own `signOut()` immediately after this
+  // resolves, which clears those cookies through the same isLocalhost-aware
+  // logic `dist/nextjs/server/cookies.js` uses everywhere else
+  // (`convex/session.ts` documents that this proxy clears cookies whether
+  // or not the session it is asked to delete still exists) — hand-rolling
+  // the cookie name/prefix a second time here would be a second place for
+  // that logic to drift.
+  //
+  // The submit-flow cookies are a DIFFERENT case (finding #1): the library's
+  // `signOut()` has no idea `ns_ui_submit_gh_token`/`_state`/`_binding`
+  // exist — they're on a different path, a different name, and nothing
+  // convex-auth owns — so nothing else in this deletion flow ever clears
+  // them. Without this, a deleted account's GitHub token cookie would
+  // survive deletion for up to an hour, on a browser some OTHER identity
+  // could sign into next, exactly the scenario finding #1 closes for
+  // sign-out; account deletion needed the identical fix.
+  const response = NextResponse.json({ ok: true });
+  clearSubmitOAuthCookies(response, request.headers.get("host"));
+  return response;
 }

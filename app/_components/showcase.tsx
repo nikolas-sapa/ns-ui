@@ -146,6 +146,9 @@ export function Showcase({
   // so a click into a component's playground and back doesn't reset it, and
   // so a filtered view is a link someone can actually share.
   const [sort, setSortState] = useState<Sort>("featured");
+  // Flips once this effect has run, so the retirement effect below can wait
+  // for it — see that effect's comment for why the two can't be merged.
+  const [urlSynced, setUrlSynced] = useState(false);
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const fromUrl = params.get(SORT_PARAM);
@@ -160,7 +163,12 @@ export function Showcase({
     if (categoryFromUrl) setCategoryState(categoryFromUrl);
     const queryFromUrl = params.get(QUERY_PARAM);
     if (queryFromUrl) setQueryState(queryFromUrl);
+    setUrlSynced(true);
   }, []);
+
+  // `urlSynced` is consumed by the effect that retires the pre-hydration gate
+  // (lib/catalog-gate.ts, `html.catalog-*`), which lives further down beside
+  // the search memo it guards. See it for why it is a separate effect.
 
   /** Writes one param, dropping it entirely at its default value so the URL
    *  stays clean when nothing is filtered. `replaceState`, same as sort —
@@ -244,6 +252,44 @@ export function Showcase({
     }
     return map;
   }, [items]);
+
+  // A `useDeferredValue(query)` sat here, feeding the memo below so a
+  // keystroke's own render stayed synchronous while the 265-card grid
+  // re-rendered at lower priority. It was aimed at the 624ms INP Speed
+  // Insights reports for this search box. It was measured and removed:
+  // production build, 4x CPU throttle, six keystrokes typed with no gap,
+  // three runs each — worst interaction 104/104/104ms deferred against
+  // 104/104/120ms without it. No effect at this scale, and the local worst
+  // case never got near 624ms in the first place, so the condition that
+  // produces that number in the field was not reproduced here and this
+  // change could not be shown to address it. It also cost something real:
+  // because the deferred value lags by one render, the post-hydration render
+  // on a `?q=` URL still held the unfiltered grid, so the gate below retired
+  // over the *wrong* grid and `/?q=toggle` measured 0.3330 with the rest of
+  // the fix already in place. Same trade as `solari-flap` in
+  // docs/perf-audit-2026-07.md — added coupling for no measurable gain — and
+  // reverted for the same reason.
+
+  // Retires the pre-hydration gate (lib/catalog-gate.ts, `html.catalog-*`,
+  // app/globals.css) once React's own state has read the URL — from here on
+  // the component's own conditional render and `filtered ? "" : "hidden"` are
+  // the only things deciding visibility, the same way ThemeToggle and the
+  // sidebar toggle drop their own no-flash markers once they take over.
+  // Without retirement the classes are never cleared, and clearing a filter
+  // or switching back to Featured mid-session would leave the rail, heading
+  // and Clear button stuck in whatever visibility the *original* URL implied.
+  //
+  // Kept out of the URL-reading effect above, not appended to it: that
+  // effect's `setState` calls commit *after* the current paint, so removing
+  // the classes inline there would repaint the gated blocks one frame before
+  // the corrected state does — reintroducing the very shift this exists to
+  // prevent. As a separate effect it only runs once that corrected render has
+  // already committed, which is exactly the point the grid becomes safe to
+  // reveal.
+  useEffect(() => {
+    if (!urlSynced) return;
+    document.documentElement.classList.remove("catalog-filtered", "catalog-sorted");
+  }, [urlSynced]);
 
   const { visibleItems: filteredItems, loose } = useMemo(() => {
     const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
@@ -425,8 +471,15 @@ export function Showcase({
           stop of its own. */}
       <div id="catalog" tabIndex={-1} className="outline-none" />
 
+      {/* `catalog-gate-hide` is the pre-hydration twin of this condition —
+          see app/globals.css and lib/catalog-gate.ts. This block always
+          renders in the server-painted default (filtered=false,
+          sort="featured"), so a shared `?q=`/`?sort=` link paints it and
+          then unmounts it once React reads the URL; the CSS class keeps it
+          invisible from the very first paint instead, so nothing below it
+          jumps when React's own unmount happens moments later. */}
       {!filtered && sort === "featured" && featuredItems.length > 0 ? (
-        <section className="mt-14" aria-labelledby="featured-heading">
+        <section className="catalog-gate-hide mt-14" aria-labelledby="featured-heading">
           <h2
             id="featured-heading"
             className="font-mono text-xs font-normal uppercase tracking-[0.18em] text-muted"
@@ -457,8 +510,12 @@ export function Showcase({
         </section>
       ) : null}
 
+      {/* Same gate as the Featured rail above — this heading only makes
+          sense as a header for the rest of the grid *after* a curated
+          Featured section, so it shares that section's condition exactly
+          and needs the same pre-hydration cover. */}
       {!filtered && sort === "featured" && featuredItems.length > 0 ? (
-        <h2 className="mt-24 font-mono text-xs font-normal uppercase tracking-[0.18em] text-muted">
+        <h2 className="catalog-gate-hide mt-24 font-mono text-xs font-normal uppercase tracking-[0.18em] text-muted">
           All components
         </h2>
       ) : null}
@@ -519,9 +576,35 @@ export function Showcase({
         </p>
       ) : null}
 
+      {/* Stand-in for the grid on a URL that carries a filter or a non-default
+          sort. Hiding the Featured rail was only half the shift: the grid's
+          own children are what move. The server renders the unfiltered,
+          featured-order list — 265 cards — and React then replaces or reorders
+          every one of them once it reads the URL. Measured on a production
+          build at 1440x900: `/?sort=oldest` shifted 0.158 and `/?sort=newest`
+          0.332 with the rail already gated and the `<ul>` itself provably
+          never moving (its top stayed at 493px throughout); the shift sources
+          were the cards' own stretched-link `::after` boxes. No pre-hydration
+          script can fix that, because CSS cannot reorder or filter arbitrary
+          DOM — the only first paint that shifts nothing is one that does not
+          show the wrong grid at all.
+
+          So on those URLs the grid is `display: none` until React's state has
+          read the URL, and this wordless box holds its place. `min-h-screen`
+          is the load-bearing part: it must be at least a viewport tall at
+          every width, so that the CTA and footer below it stay off-screen and
+          therefore cannot shift when the real grid swaps in. Cards arriving
+          are new nodes, and new nodes are not a layout shift.
+
+          Both classes retire together in the `urlSynced` effect above, so
+          nothing here survives into the interactive page. On a bare `/` the
+          script sets no class, this stays `display: none`, and the grid paints
+          immediately exactly as before — measured 0.0000. */}
+      <div aria-hidden className="catalog-gate-standin mt-10 min-h-screen" />
+
       <ul
         aria-label={`${visibleItems.length} component${visibleItems.length === 1 ? "" : "s"}`}
-        className="mt-10 grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-2 2xl:grid-cols-3"
+        className="catalog-gate-grid mt-10 grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-2 2xl:grid-cols-3"
       >
         {visibleItems.map((entry) => (
           <li key={entry.name}>

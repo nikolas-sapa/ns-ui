@@ -1,0 +1,16 @@
+{
+  "name": "waveform-ascii-scrub",
+  "title": "Waveform ASCII Scrub",
+  "description": "An audio-style waveform rendered as columns of ASCII density glyphs with a draggable playhead — dragging (or hovering, or holding keyboard focus) subdivides the glyph columns nearest the cursor into finer sub-columns that re-ink the region at higher resolution, while the rest of the strip stays coarse.",
+  "collection": "core",
+  "tags": ["waveform", "ascii", "audio", "canvas", "scrub", "slider", "drag", "accessibility"],
+  "useWhen": "a scrub position control over a waveform where the region under the pointer should visibly resolve to finer detail while the rest stays a coarse print — a spatial resolution effect, not a hover brighten; pick voice-recorder-meter instead for a real Web Audio capture meter with no scrub/drag at all, or scrubber-film-strip for a playback scrubber whose mechanic is discrete frame-snap vs. continuous glide rather than local resolution.",
+  "autoplay": {
+    "mode": "drag",
+    "target": "[role=slider]",
+    "from": [0.15, 0.5],
+    "to": [0.75, 0.5]
+  },
+  "instruction": "<WaveformAsciiScrub value? defaultValue? duration? onValueChange? label? className?> draws a fixed-width canvas waveform from a locally synthesised (no audio API, no network) layered-sine amplitude function sampled peak-in-bucket across 64 base glyph columns, each rendered as a Geist Mono density character from ' .:-=+*#%@' stacked into a symmetric bar mirrored above and below the centerline. At rest every column is exactly that one coarse sample. Dragging the accent playhead (a role=slider div overlaying the canvas, pointer and keyboard driven), hovering anywhere over the strip, or holding it in keyboard focus subdivides the ~6 base columns nearest that position into 3 finer sub-columns apiece, each independently re-sampling its own narrower time span — genuinely finer detail, not an interpolated blur — while columns outside that radius stay at base resolution; the radius eases in and out over roughly 250ms rather than snapping, and collapses back to zero (fully coarse) the instant nothing is hovered, dragged or focused. Keyboard: ArrowLeft/Right step 1%, PageUp/PageDown step 5%, Home/End jump to the ends; aria-valuenow/aria-valuetext (an M:SS derived from the duration prop) update on every commit. Colors read live from --foreground/--border/--accent via getComputedStyle, resynced on a documentElement class MutationObserver — no hardcoded hex. Under prefers-reduced-motion the resolution radius snaps instantly with no eased rAF loop. Zero dependencies.",
+  "dependencies": []
+}
