@@ -271,6 +271,41 @@ on 15-50% of loads, the page never hydrates, and components render at their unhy
 JSX defaults — which looks exactly like a catastrophic component bug. Measured 0/12
 failures against a production build versus 15-50% on dev.
 
+## Convex is a SEPARATE deploy. Vercel does not do it for you.
+
+`npm run build` is `registry:build && next build`. It does **not** touch Convex, and there is no
+`vercel.json`, so nothing in the pipeline ships `convex/*.ts`. A green Vercel deploy therefore
+proves only that the FRONTEND shipped.
+
+This has already caused a live outage. On 2026-08-04 the production Convex deployment was found to
+be missing every function added after Phase A — `users.currentUserId`, all of `submissions`, all of
+`testimonials`, `profiles.publicProfile`, `profiles.publicAvatarSource`,
+`saves.setCollectionVisibility`. The pages that call them were live and returning 200, so the site
+looked healthy, while `/submit`, community testimonial submission, moderation and `/u/<handle>`
+publishing were all non-functional. The symptom was an opaque `{"error":"unauthenticated"}` from
+the OAuth callback: `fetchQuery(api.users.currentUserId, ...)` threw because the function did not
+exist, and the catch returned 401.
+
+**After changing anything under `convex/`, deploy it:**
+
+```bash
+npx convex deploy          # production
+npx convex dev --once      # dev deployment / codegen only — NOT production
+```
+
+`convex dev --once` regenerates types and targets the DEV deployment. It is not a deploy. Confirm
+what is actually live rather than assuming:
+
+```bash
+npx convex function-spec --prod | grep -oE '"[a-z]+\.js:[a-zA-Z]+"' | sort -u
+```
+
+**Better, and not yet done:** set `CONVEX_DEPLOY_KEY` (Convex dashboard → Settings → Deploy Keys)
+in Vercel, then change the Vercel Build Command to
+`npx convex deploy --cmd 'npm run build'`. That makes the two deploys atomic and removes the human
+step entirely. Do NOT make that change before the key exists in every deploy target — the build
+would fail outright.
+
 ## `/submit` — required environment (Phase C)
 
 `/submit` opens a PR **as the submitting user**, so it needs its own GitHub credentials on the
