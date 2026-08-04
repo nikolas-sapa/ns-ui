@@ -107,9 +107,9 @@ export function SiteShell({
   const activeRef = useRef<HTMLAnchorElement | null>(null);
   const isFiltering = query.trim().length > 0;
 
-  const active = pathname.startsWith("/preview/")
-    ? pathname.split("/")[2]
-    : null;
+  // Both the playground and the component detail page point at the same
+  // component, so both should light up the tree.
+  const active = /^\/(?:preview|components)\/([^/]+)/.exec(pathname)?.[1] ?? null;
 
   // Where the active component lives in the tree, computed from the same
   // pathname both the server and the client already agree on — nothing here
@@ -281,8 +281,11 @@ export function SiteShell({
 
         {/* pl-14 clears the fixed mobile toggle button (44px, left-3 top-3),
             which otherwise sits directly on top of the wordmark once the
-            drawer is open. Not needed at lg — the toggle is hidden there. */}
-        <div className="flex items-center justify-between gap-2 pb-3 pl-14 pr-4 pt-4 lg:pl-4 lg:pt-5">
+            drawer is open. Not needed at lg — the toggle is hidden there.
+            pt-7 does the same vertically: the button's 56px footprint (top-3 +
+            44px) otherwise overlapped the filter field below, clipping its
+            top-left corner. pt-6 lands flush, so pt-7 for visible daylight. */}
+        <div className="flex items-center justify-between gap-2 pb-3 pl-14 pr-4 pt-7 lg:pl-4 lg:pt-5">
           <Link
             href="/"
             className="rounded-sm font-mono text-sm tracking-tight outline-none focus-visible:ring-2 focus-visible:ring-accent"
@@ -577,6 +580,11 @@ function NavLink({
   activeRef: React.RefObject<HTMLAnchorElement | null>;
 }) {
   const on = item.name === active;
+  // The link points at /preview/<name>/play, so only claim "current page" when
+  // that is where we actually are — on /components/<name> the row is styled
+  // active but the link still goes somewhere else.
+  const pathname = usePathname();
+  const isCurrentPage = on && pathname.startsWith("/preview/");
   return (
     <li>
       <Link
@@ -589,7 +597,7 @@ function NavLink({
         // 126 wasted CDN round trips. The target is prerendered, so the click
         // is fast without them.
         prefetch={false}
-        aria-current={on ? "page" : undefined}
+        aria-current={isCurrentPage ? "page" : undefined}
         className={`${LINK} ${on ? "bg-surface font-medium text-accent" : "text-muted"}`}
       >
         {item.title}

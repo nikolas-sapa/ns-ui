@@ -1,15 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import registry from "@/registry.json";
 import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
 import { jsonLdScript } from "@/lib/json-ld";
 import { categoryPages } from "@/lib/category-pages";
 import { CATEGORY_COPY } from "@/lib/category-copy";
 import { ThemeToggle } from "../_components/theme-toggle";
 
+// Same `registry.items.length` the home page and sidebar count from, so the
+// hub can never quote a total the rest of the site disagrees with.
+const COMPONENT_COUNT = registry.items.length;
+
 export const metadata: Metadata = {
   title: "Categories — ns-ui",
-  description:
-    "Browse ns-ui's 228 React components by category — heroes, navigation, forms, charts, feedback and more.",
+  description: `Browse ns-ui's ${COMPONENT_COUNT} React components by category — heroes, navigation, forms, charts, feedback and more.`,
 };
 
 /**
@@ -68,7 +72,7 @@ export default function CategoriesIndexPage() {
           Categories.
         </h1>
         <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted">
-          228 components grouped by the role a developer already has a word
+          {COMPONENT_COUNT} components grouped by the role a developer already has a word
           for — pick one to see everything in it.
         </p>
       </header>

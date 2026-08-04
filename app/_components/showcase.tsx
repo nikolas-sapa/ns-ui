@@ -397,6 +397,21 @@ export function Showcase({
     [featured, byName],
   );
 
+  // Under the featured gate, `visibleItems` opens with exactly the four the
+  // rail above already rendered, in the same order — the first screen of a
+  // 298-item catalog would repeat itself. Excluded from the grid only under
+  // that same gate, and keyed off `featuredItems` (what is actually rendered)
+  // rather than the 36-slug `featured` list, which would delete 32 curated
+  // components that never appeared in the rail. Derived from state, so the
+  // pre-hydration catalog gate's first paint is untouched.
+  const gridItems = useMemo(() => {
+    if (filtered || sort !== "featured" || featuredItems.length === 0) {
+      return visibleItems;
+    }
+    const shown = new Set(featuredItems.map((i) => i.name));
+    return visibleItems.filter((i) => !shown.has(i.name));
+  }, [visibleItems, featuredItems, filtered, sort]);
+
   return (
     <main className="mx-auto w-full max-w-[1600px] px-6 pb-32 sm:px-10">
       {/* First focusable element on the page. Lands past the header, install
@@ -636,10 +651,10 @@ export function Showcase({
       <div aria-hidden className="catalog-gate-standin mt-10 min-h-screen" />
 
       <ul
-        aria-label={`${visibleItems.length} component${visibleItems.length === 1 ? "" : "s"}`}
+        aria-label={`${gridItems.length} component${gridItems.length === 1 ? "" : "s"}`}
         className="catalog-gate-grid mt-10 grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-2 2xl:grid-cols-3"
       >
-        {visibleItems.map((entry) => (
+        {gridItems.map((entry) => (
           <li key={entry.name}>
             <PreviewCard
               entry={entry}

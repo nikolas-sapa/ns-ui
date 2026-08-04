@@ -100,7 +100,7 @@ export default async function PlaygroundPage({
 
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-[1400px] flex-col px-6 pb-16 pt-6 sm:px-10 lg:pt-8">
-      <header className="flex items-start justify-between gap-4 pl-14 lg:pl-0">
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4 pl-14 lg:pl-0">
         <div className="min-w-0">
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
@@ -230,7 +230,7 @@ export default async function PlaygroundPage({
           href="/"
           className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
         >
-          Back to the grid
+          Back to the catalog
         </Link>
         <a
           href="https://nikolas.helpmarq.com"

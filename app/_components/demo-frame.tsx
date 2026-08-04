@@ -18,11 +18,21 @@ export function DemoFrame({
   embed,
   autoplay,
   interactive,
+  bounded,
 }: {
   name: string;
   embed?: string;
   autoplay?: string;
   interactive?: string;
+  /**
+   * `/components/<name>` only. The demo sits directly under the header there,
+   * so a full `min-h-screen` box — with most demo roots being
+   * `flex min-h-screen items-center justify-center` — centres the component in
+   * a viewport-tall well and pushes it out of the first screen. Bounds the box
+   * and top-aligns the demo root instead. The preview/recording fixture keeps
+   * the untouched full-height render.
+   */
+  bounded?: boolean;
 }) {
   const Demo = demos[name];
   if (!Demo) notFound();
@@ -62,7 +72,11 @@ export function DemoFrame({
 
   return (
     <div
-      className="min-h-screen"
+      className={
+        bounded
+          ? "min-h-[420px] [&>*]:min-h-0! [&>*]:items-start!"
+          : "min-h-screen"
+      }
       inert={embedded && !interactiveEmbed}
       data-autoplay-root={spec ? "" : undefined}
     >

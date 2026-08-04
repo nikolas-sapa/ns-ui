@@ -143,7 +143,24 @@ export default async function ComponentPage({
           <p className="mt-4 max-w-[65ch] text-[17px] leading-[1.75] text-foreground/90">
             {item.description}
           </p>
+        </header>
+      ) : null}
 
+      {/* The subject first: the demo sits directly under the title and
+          description, so the component itself is in the opening viewport.
+          Everything that describes it (use-when, install, links, chips) is
+          below — deliberately not hoisted above the demo, where three wrapped
+          install lines on mobile would push it off screen again. */}
+      <DemoFrame
+        name={name}
+        embed={embed}
+        autoplay={autoplay}
+        interactive={interactive}
+        bounded
+      />
+
+      {item ? (
+        <section className="mx-auto w-full max-w-3xl px-6 pt-10 sm:px-10">
           {useWhen ? (
             <p className="mt-4 max-w-[65ch] text-sm leading-relaxed text-muted">
               <span className="font-mono text-[11px] uppercase tracking-wider text-foreground">
@@ -172,7 +189,7 @@ export default async function ComponentPage({
             </div>
             <Link
               href={`/preview/${name}/play`}
-              className="mt-2 inline-block rounded-sm font-mono text-[11px] uppercase tracking-[0.14em] text-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+              className="mt-2 inline-block rounded-sm py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-muted underline underline-offset-2 outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
             >
               View source and playground
             </Link>
@@ -207,10 +224,8 @@ export default async function ComponentPage({
               ))}
             </ul>
           ) : null}
-        </header>
+        </section>
       ) : null}
-
-      <DemoFrame name={name} embed={embed} autoplay={autoplay} interactive={interactive} />
 
       {item ? (
         <section className="mx-auto w-full max-w-3xl px-6 pb-24 sm:px-10">
