@@ -279,7 +279,7 @@ export function DeedStroke({ prompt = "Sign to authorize", onConfirm, className 
           type="button"
           onClick={toggleMode}
           disabled={confirmed}
-          className="ns-ds-link font-mono text-[11px] text-ns-muted underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent disabled:cursor-not-allowed disabled:opacity-40"
+          className="ns-ds-link font-mono text-[11px] text-ns-muted underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent disabled:cursor-not-allowed disabled:opacity-40 disabled:pointer-events-none"
         >
           {mode === "draw" ? "Type your name instead" : "Draw signature instead"}
         </button>
@@ -342,7 +342,7 @@ export function DeedStroke({ prompt = "Sign to authorize", onConfirm, className 
           type="button"
           onClick={reset}
           disabled={!hasStroke && typedName.length === 0 && !confirmed}
-          className="font-mono text-xs text-ns-muted underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent disabled:cursor-not-allowed disabled:opacity-40"
+          className="font-mono text-xs text-ns-muted underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent disabled:cursor-not-allowed disabled:opacity-40 disabled:pointer-events-none"
         >
           Clear
         </button>
@@ -350,7 +350,7 @@ export function DeedStroke({ prompt = "Sign to authorize", onConfirm, className 
           type="button"
           onClick={handleConfirm}
           disabled={!confirmEnabled}
-          className="rounded-[6px] border border-border bg-foreground px-4 py-1.5 font-mono text-xs text-background hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent disabled:cursor-not-allowed disabled:border-border disabled:bg-transparent disabled:text-ns-muted disabled:opacity-60"
+          className="rounded-[6px] border border-border bg-foreground px-4 py-1.5 font-mono text-xs text-background hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent disabled:cursor-not-allowed disabled:border-border disabled:bg-transparent disabled:text-ns-muted disabled:opacity-60 disabled:pointer-events-none"
         >
           {confirmed ? "Authorized" : "Confirm"}
         </button>

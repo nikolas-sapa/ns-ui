@@ -155,6 +155,31 @@ npm run verify           # requires dev server running; screenshots every compon
 A component (or a change to one) isn't done until `npm run verify` passes and the idle/default-state
 screenshot has actually been looked at — that's the state the owner judges first and hardest.
 
+```bash
+npm run test:source-invariants   # static; no server, no browser. Runs in CI (verify can't).
+```
+
+`scripts/test-source-invariants.ts` reads `app/**`, `lib/**` and `registry/**` and fails on the defect
+CLASSES `verify.ts` structurally cannot see — it drives `/preview/<component>`, so it never visits the
+site itself, and it only catches what shows up in a screenshot diff. Eighteen checks, each one a class
+that already shipped green through the screenshot gate at least once: `var(--x)` naming a custom
+property nothing defines (after the `--muted`/`--accent` -> `--ns-*` rename a stale name resolves to
+NOTHING and the element quietly inherits), a Tailwind token utility whose `--color-*` no longer
+exists, a build-generated `--color-*` alias referenced from component source, base `outline-none`
+killing a `focus-visible:outline-*` ring, a focus ring painted in the element's own fill colour,
+`disabled:opacity-*` with an unguarded `hover:`, a bare `animate-*` with no reduced-motion guard, an
+arbitrary `transition-[…]` list omitting a property a hover utility on the same element changes, a
+hover colour change with no transition in `app/**`, `onClick` on a non-interactive element, colour-only
+selected state, an icon-only control with no accessible name, `${n} stars`, a mutating `await fetch`
+with no in-flight flag, a `:root` token with no `.dark` value, a missing `color-scheme`, a route with
+no `<main>`, and the whole site containing zero `prefers-color-scheme` listeners.
+
+Every check is proven to bite: inject the defect it names into any scanned file and the gate exits
+non-zero naming that file. When a check fires on something that is genuinely fine, add the exemption
+WITH the reason (`aria-hidden` subtrees, an interactive ancestor, a guard one level up) rather than
+loosening the pattern — the comments in that file are a log of exactly which false accusation forced
+each one.
+
 ### What the gate actually checks
 
 Per component × theme: console errors, blank render, hover differs from default, keyboard focus

@@ -25,7 +25,25 @@ export function ThemeSync() {
       document.documentElement.classList.toggle("dark", dark);
     }
     window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
+
+    // With no stored choice the theme *is* the OS preference, so it has to
+    // keep tracking it — otherwise a visitor whose system flips to dark
+    // (manually or at sunset) sits on the stale theme until a reload.
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    function onScheme() {
+      try {
+        if (localStorage.getItem(THEME_STORAGE_KEY)) return;
+      } catch {
+        // Storage unavailable — same as no stored choice: follow the OS.
+      }
+      document.documentElement.classList.toggle("dark", mq.matches);
+    }
+    mq.addEventListener("change", onScheme);
+
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      mq.removeEventListener("change", onScheme);
+    };
   }, []);
 
   return null;

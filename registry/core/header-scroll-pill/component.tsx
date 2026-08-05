@@ -297,6 +297,7 @@ export function ScrollIsland({
             <a
               key={s.id}
               href={`#${s.id}`}
+              aria-current={s.id === active ? "location" : undefined}
               tabIndex={compact ? -1 : 0}
               className={`whitespace-nowrap text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent ${
                 s.id === active ? "text-foreground" : "text-ns-muted hover:text-foreground"

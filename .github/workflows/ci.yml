@@ -38,6 +38,15 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      # Static source gate. Reads `app/**`, `lib/**`, `registry/**` — no server,
+      # no browser, no build output — so it runs in CI where `npm run verify`
+      # (which needs a running site and Playwright browsers) cannot. It covers
+      # the classes verify.ts structurally cannot see: dead CSS tokens after the
+      # `--ns-*` rename, the outline-none/focus-visible trap, mouse-only click
+      # handlers, colour-only state, unguarded animations, missing landmarks.
+      - name: Source invariants
+        run: npm run test:source-invariants
+
       - name: Build site
         run: npm run build
 

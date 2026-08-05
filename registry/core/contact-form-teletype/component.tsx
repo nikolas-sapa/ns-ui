@@ -141,7 +141,7 @@ export function ContactFormTeletype({
   }
 
   const fieldCls =
-    "ns-cft-field w-full rounded-sm border border-border bg-background px-3 py-2 font-mono text-sm text-foreground outline-none transition-colors duration-150 placeholder:text-ns-muted/60 hover:border-ns-muted focus-visible:border-ns-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent";
+    "ns-cft-field w-full rounded-sm border border-border bg-background px-3 py-2 font-mono text-sm text-foreground transition-colors duration-150 placeholder:text-ns-muted/60 hover:border-ns-muted focus-visible:border-ns-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent";
 
   return (
     <div className={`ns-cft w-full ${className}`}>

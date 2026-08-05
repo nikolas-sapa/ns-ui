@@ -98,7 +98,7 @@ export function SiteAuth() {
     return (
       <Link
         href="/account"
-        className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
+        className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent transition-colors"
       >
         Sign in
       </Link>
@@ -117,7 +117,7 @@ export function SiteAuth() {
     <Link
       href="/account"
       title={label}
-      className="flex w-full basis-full items-center gap-1.5 rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
+      className="flex w-full basis-full items-center gap-1.5 rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent transition-colors"
     >
       <AccountBadge me={me} />
       <span className="min-w-0 flex-1 truncate">{label}</span>

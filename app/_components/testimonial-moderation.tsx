@@ -135,7 +135,7 @@ export function TestimonialModeration() {
                   type="button"
                   disabled={busy === row.id || row.status === "approved"}
                   onClick={() => act(row.id, "approve")}
-                  className="rounded-sm border border-border px-2.5 py-1 text-xs text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-40"
+                  className="rounded-sm border border-border px-2.5 py-1 text-xs text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none disabled:opacity-40"
                 >
                   Approve
                 </button>
@@ -143,7 +143,7 @@ export function TestimonialModeration() {
                   type="button"
                   disabled={busy === row.id || row.status === "rejected"}
                   onClick={() => act(row.id, "reject")}
-                  className="rounded-sm border border-border px-2.5 py-1 text-xs text-ns-muted outline-none transition-colors hover:border-ns-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-40"
+                  className="rounded-sm border border-border px-2.5 py-1 text-xs text-ns-muted outline-none transition-colors hover:border-ns-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none disabled:opacity-40"
                 >
                   Reject
                 </button>

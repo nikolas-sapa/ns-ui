@@ -21,19 +21,34 @@ export function SavedLibrary({ items, slugs, initialFolders, handle }: { items: 
   // control in place of the first, no modal).
   const [confirmingPublish, setConfirmingPublish] = useState<string | null>(null);
   const [newFolder, setNewFolder] = useState("");
+  const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
   const byName = useMemo(() => new Map(items.map((item) => [item.name, item])), [items]);
   const folder = folders.find((entry) => entry.id === selected);
   const visibleSlugs = selected === "all" ? slugs : folder?.slugs ?? [];
   const visible = visibleSlugs.map((slug) => byName.get(slug)).filter((item): item is Item => item !== undefined);
+  // Counts must come from the same registry-resolved set the grid renders,
+  // otherwise a save whose slug no longer resolves shows as "All saves 3"
+  // above "Nothing saved yet."
+  const resolvedCount = (list: string[]) => list.filter((slug) => byName.has(slug)).length;
 
   async function createFolder(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
     const name = newFolder.trim();
-    if (!name) return;
-    const response = await fetch("/api/folders", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name }) });
-    const data = (await response.json().catch(() => ({}))) as { id?: string; name?: string; error?: string };
+    if (!name || creating) return;
+    setCreating(true);
+    let response: Response;
+    let data: { id?: string; name?: string; error?: string };
+    try {
+      response = await fetch("/api/folders", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name }) });
+      data = (await response.json().catch(() => ({}))) as { id?: string; name?: string; error?: string };
+    } catch {
+      setError("Could not create folder.");
+      setCreating(false);
+      return;
+    }
+    setCreating(false);
     if (!response.ok || !data.id || !data.name) {
       setError(data.error === "folder_exists" ? "That folder already exists." : "Could not create folder.");
       return;
@@ -83,12 +98,12 @@ export function SavedLibrary({ items, slugs, initialFolders, handle }: { items: 
   return (
     <div className="mt-5">
       <div className="flex flex-wrap items-center gap-2 border-b border-border pb-4">
-        <button type="button" onClick={() => setSelected("all")} className={`rounded-sm px-2.5 py-1.5 text-xs outline-none focus-visible:ring-2 focus-visible:ring-ns-accent ${selected === "all" ? "bg-foreground text-background" : "border border-border text-ns-muted hover:text-foreground"}`}>All saves <span className="font-mono">{slugs.length}</span></button>
-        {folders.map((entry) => <button key={entry.id} type="button" onClick={() => setSelected(entry.id)} className={`rounded-sm px-2.5 py-1.5 text-xs outline-none focus-visible:ring-2 focus-visible:ring-ns-accent ${selected === entry.id ? "bg-foreground text-background" : "border border-border text-ns-muted hover:text-foreground"}`}>{entry.name} <span className="font-mono">{entry.slugs.length}</span></button>)}
+        <button type="button" aria-pressed={selected === "all"} onClick={() => setSelected("all")} className={`rounded-sm px-2.5 py-1.5 text-xs outline-none focus-visible:ring-2 focus-visible:ring-ns-accent ${selected === "all" ? "bg-foreground text-background" : "border border-border text-ns-muted hover:text-foreground"} transition-colors`}>All saves <span className="font-mono">{resolvedCount(slugs)}</span></button>
+        {folders.map((entry) => <button key={entry.id} type="button" aria-pressed={selected === entry.id} onClick={() => setSelected(entry.id)} className={`rounded-sm px-2.5 py-1.5 text-xs outline-none focus-visible:ring-2 focus-visible:ring-ns-accent ${selected === entry.id ? "bg-foreground text-background" : "border border-border text-ns-muted hover:text-foreground"} transition-colors`}>{entry.name} <span className="font-mono">{resolvedCount(entry.slugs)}</span></button>)}
         <form onSubmit={createFolder} className="ml-auto flex items-center gap-1.5">
           <label htmlFor="new-folder" className="sr-only">New folder name</label>
-          <input id="new-folder" value={newFolder} onChange={(event) => setNewFolder(event.target.value)} maxLength={40} placeholder="New folder" className="w-28 rounded-sm border border-border bg-background px-2.5 py-1.5 text-xs text-foreground outline-none placeholder:text-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent" />
-          <button type="submit" className="rounded-sm border border-border px-2.5 py-1.5 text-xs text-foreground outline-none hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent">Add</button>
+          <input id="new-folder" value={newFolder} onChange={(event) => setNewFolder(event.target.value)} disabled={creating} maxLength={40} placeholder="New folder" className="w-28 rounded-sm border border-border bg-background px-2.5 py-1.5 text-xs text-foreground outline-none placeholder:text-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60" />
+          <button type="submit" disabled={creating} className="rounded-sm border border-border px-2.5 py-1.5 text-xs text-foreground outline-none hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none disabled:opacity-60 transition-colors">{creating ? "Adding…" : "Add"}</button>
         </form>
       </div>
       {error ? <p role="alert" className="mt-3 text-xs text-[var(--error)]">{error}</p> : null}
@@ -115,7 +130,7 @@ export function SavedLibrary({ items, slugs, initialFolders, handle }: { items: 
                 type="button"
                 disabled={publishPending}
                 onClick={() => void togglePublish(folder.id, false)}
-                className="rounded-sm border border-border px-2.5 py-1.5 text-xs text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
+                className="rounded-sm border border-border px-2.5 py-1.5 text-xs text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none disabled:opacity-60"
               >
                 {publishPending ? "Unpublishing…" : "Unpublish"}
               </button>
@@ -132,7 +147,7 @@ export function SavedLibrary({ items, slugs, initialFolders, handle }: { items: 
                   type="button"
                   disabled={publishPending}
                   onClick={() => void togglePublish(folder.id, true)}
-                  className="rounded-sm border border-ns-accent bg-ns-accent px-3 py-1.5 text-xs font-medium text-white outline-none transition-colors hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
+                  className="rounded-sm border border-ns-accent bg-ns-accent px-3 py-1.5 text-xs font-medium text-white outline-none transition-colors hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:opacity-60 disabled:pointer-events-none"
                 >
                   {publishPending ? "Publishing…" : "Publish"}
                 </button>
@@ -140,7 +155,7 @@ export function SavedLibrary({ items, slugs, initialFolders, handle }: { items: 
                   type="button"
                   disabled={publishPending}
                   onClick={() => setConfirmingPublish(null)}
-                  className="rounded-sm border border-border px-3 py-1.5 text-xs text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
+                  className="rounded-sm border border-border px-3 py-1.5 text-xs text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none disabled:opacity-60"
                 >
                   Cancel
                 </button>
@@ -181,7 +196,7 @@ export function SavedLibrary({ items, slugs, initialFolders, handle }: { items: 
                     {folders.map((entry) => <option key={entry.id} value={entry.id}>{entry.name}</option>)}
                   </select>
                   <CopyButton value={installCommand} label={`Copy install command for ${item.title}`} />
-                  <Link href={`/preview/${item.name}/play`} className="rounded-sm px-2 py-1 text-xs text-ns-muted outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent">Open preview</Link>
+                  <Link href={`/preview/${item.name}/play`} className="rounded-sm px-2 py-1 text-xs text-ns-muted outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent transition-colors">Open preview</Link>
                 </div>
               </li>
             );

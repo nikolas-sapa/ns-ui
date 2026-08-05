@@ -113,7 +113,7 @@ export default async function ComponentPage({
     : null;
 
   return (
-    <>
+    <main>
       {softwareSourceCodeJsonLd ? (
         <script
           type="application/ld+json"
@@ -291,13 +291,13 @@ export default async function ComponentPage({
           <div className="mt-10 border-t border-border pt-8">
             <Link
               href="/"
-              className="rounded-sm font-mono text-xs uppercase tracking-wider text-ns-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
+              className="rounded-sm font-mono text-xs uppercase tracking-wider text-ns-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent transition-colors"
             >
               Back to the catalog
             </Link>
           </div>
         </section>
       ) : null}
-    </>
+    </main>
   );
 }

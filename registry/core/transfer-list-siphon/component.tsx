@@ -658,7 +658,7 @@ export function SiphonLift({
               type="button"
               disabled={flowActive || sourceItems.length === 0}
               onClick={toggleSelectAll}
-              className="shrink-0 rounded-sm border border-border bg-background px-2.5 py-1 text-[11px] font-medium text-foreground outline-none transition-colors hover:border-foreground/25 focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
+              className="shrink-0 rounded-sm border border-border bg-background px-2.5 py-1 text-[11px] font-medium text-foreground outline-none transition-colors hover:border-foreground/25 focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 disabled:pointer-events-none"
             >
               {allSourceSelected ? "Clear selection" : "Select all"}
             </button>
@@ -788,7 +788,7 @@ export function SiphonLift({
           data-sl-move
           disabled={flowActive || selected.size === 0}
           onClick={onMoveClick}
-          className="rounded-sm border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground outline-none transition-colors hover:border-foreground/25 focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-sm border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground outline-none transition-colors hover:border-foreground/25 focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 disabled:pointer-events-none"
         >
           Move selected to {destinationLabel}
         </button>

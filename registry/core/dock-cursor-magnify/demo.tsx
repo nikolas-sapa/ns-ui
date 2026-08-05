@@ -9,7 +9,7 @@ export default function MagneticDockDemo() {
     <div className="relative flex min-h-[420px] items-center justify-center overflow-hidden">
       <div
         aria-hidden
-        className="absolute inset-0 [background-image:radial-gradient(circle,var(--color-border)_1px,transparent_1px)] [background-size:24px_24px]"
+        className="absolute inset-0 [background-image:radial-gradient(circle,var(--border)_1px,transparent_1px)] [background-size:24px_24px]"
       />
       <div className="relative">
         <div className="relative rounded-md border border-black/10 bg-white/60 p-3 shadow-[0_16px_40px_-12px_rgba(0,0,0,0.35)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.06]">

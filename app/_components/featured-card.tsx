@@ -190,7 +190,7 @@ export function FeaturedCard({
         />
         <div
           aria-hidden
-          className="absolute inset-0 [background-image:radial-gradient(circle,var(--color-border)_1px,transparent_1px)] [background-size:16px_16px] motion-safe:animate-pulse"
+          className="absolute inset-0 [background-image:radial-gradient(circle,var(--border)_1px,transparent_1px)] [background-size:16px_16px] motion-safe:animate-pulse"
           style={{ opacity: loaded ? 0 : 1 }}
         />
         {/* The still. Two files rather than one theme-aware source because the
@@ -257,7 +257,7 @@ export function FeaturedCard({
             inert
             aria-hidden
             onLoad={() => setLoaded(true)}
-            className="pointer-events-none absolute left-0 top-0 origin-top-left border-0 bg-transparent transition-opacity duration-300 ease-out motion-reduce:transition-none"
+            className="pointer-events-none absolute left-0 top-0 origin-top-left border-0 bg-transparent transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none"
             style={{
               width: FRAME_W,
               height: FRAME_H,

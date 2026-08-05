@@ -48,7 +48,7 @@ export function EmailCapture({ className = "" }: { className?: string }) {
         <button
           type="submit"
           disabled={pending}
-          className="shrink-0 rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
+          className="shrink-0 rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none disabled:opacity-60"
         >
           {pending ? "Adding…" : "Subscribe"}
         </button>

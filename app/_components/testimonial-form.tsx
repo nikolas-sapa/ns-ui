@@ -120,7 +120,7 @@ export function TestimonialForm() {
         <button
           type="submit"
           disabled={pending}
-          className="inline-flex items-center rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:cursor-wait disabled:opacity-60"
+          className="inline-flex items-center rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:cursor-wait disabled:opacity-60 disabled:pointer-events-none"
         >
           {pending ? "Submitting…" : "Submit for review"}
         </button>

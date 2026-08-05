@@ -16,7 +16,7 @@ export function SignInSavePopover({ id }: { id: string }) {
       // `invisible` (not just opacity-0) keeps it out of the hit-test and
       // the a11y tree while hidden — an opacity-0 overlay still swallows
       // clicks aimed at the card underneath it.
-      className="pointer-events-none invisible absolute right-0 top-full z-30 mt-1.5 w-max max-w-[12rem] rounded-sm border border-border bg-surface px-2 py-1.5 text-left opacity-0 shadow-sm transition-opacity duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100"
+      className="pointer-events-none invisible absolute right-0 top-full z-30 mt-1.5 w-max max-w-[12rem] rounded-sm border border-border bg-surface px-2 py-1.5 text-left opacity-0 shadow-sm transition-[opacity,visibility] duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100"
     >
       <span className="block text-[11px] leading-4 text-foreground">
         Sign in to save.

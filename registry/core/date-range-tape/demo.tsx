@@ -43,7 +43,7 @@ export default function SpanTapeDemo() {
           <button
             type="button"
             disabled={!range}
-            className="rounded-sm border border-border px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-foreground/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent disabled:cursor-not-allowed disabled:opacity-40"
+            className="rounded-sm border border-border px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-foreground/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent disabled:cursor-not-allowed disabled:opacity-40 disabled:pointer-events-none"
           >
             Reserve
           </button>

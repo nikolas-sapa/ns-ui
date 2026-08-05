@@ -450,7 +450,7 @@ export function ScreePour({
   const refresh = () => setLastUpdated(new Date().toLocaleTimeString());
 
   const triggerClass =
-    "inline-flex items-center gap-1.5 rounded-sm border border-ns-accent px-3 py-1.5 text-xs font-medium text-ns-accent transition-colors hover:text-ns-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent disabled:opacity-60";
+    "inline-flex items-center gap-1.5 rounded-sm border border-ns-accent px-3 py-1.5 text-xs font-medium text-ns-accent transition-colors hover:text-ns-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent disabled:opacity-60 disabled:pointer-events-none";
 
   return (
     <div
@@ -551,7 +551,7 @@ export function ScreePour({
             data-scree-toggle="to-overview"
             disabled={phase === "pouring"}
             onClick={() => trigger("overview")}
-            className="inline-flex w-fit items-center gap-1.5 rounded-sm px-1 py-1 text-xs font-medium text-ns-accent transition-colors hover:text-ns-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent disabled:opacity-60"
+            className="inline-flex w-fit items-center gap-1.5 rounded-sm px-1 py-1 text-xs font-medium text-ns-accent transition-colors hover:text-ns-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent disabled:opacity-60 disabled:pointer-events-none"
           >
             <svg viewBox="0 0 16 16" width="11" height="11" fill="none" aria-hidden>
               <path

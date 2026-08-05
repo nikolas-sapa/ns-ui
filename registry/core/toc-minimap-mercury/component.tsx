@@ -269,10 +269,10 @@ export function MercuryMinimap({
         if (on) reach = i;
         const dot = dotRefs.current[i];
         if (dot) {
-          dot.setAttribute("fill", on ? "var(--color-foreground, #ededed)" : "none");
+          dot.setAttribute("fill", on ? "var(--foreground)" : "none");
           dot.setAttribute(
             "stroke",
-            on ? "var(--color-foreground, #ededed)" : "var(--color-ns-muted, #8f8f8f)"
+            on ? "var(--foreground)" : "var(--ns-muted)"
           );
         }
       }
@@ -340,7 +340,7 @@ export function MercuryMinimap({
             y={railTop}
             width={2}
             height={0}
-            fill="var(--color-foreground, #ededed)"
+            fill="var(--foreground)"
           />
           {items.map((s, i) => (
             <circle
@@ -352,7 +352,7 @@ export function MercuryMinimap({
               cy={ticks[i] ?? 0}
               r={4}
               fill="none"
-              stroke="var(--color-ns-muted, #8f8f8f)"
+              stroke="var(--ns-muted)"
               strokeWidth={1.5}
             />
           ))}
@@ -394,13 +394,13 @@ export function MercuryMinimap({
               cy={ticks[i] ?? 0}
               r={4}
               fill="none"
-              stroke="var(--color-ns-muted, #8f8f8f)"
+              stroke="var(--ns-muted)"
               strokeWidth={1.5}
               style={{ transition: "opacity 150ms ease-out" }}
             />
           ))}
           {/* liquid layer — everything in here gooey-merges */}
-          <g filter={`url(#${fid})`} fill="var(--color-foreground, #ededed)">
+          <g filter={`url(#${fid})`} fill="var(--foreground)">
             {/* 8px wide: survives the blur-4 → ×19−9 alpha threshold (4px would vanish) */}
             <rect ref={colRef} x={CX - 4} y={railTop} width={8} height={0} rx={4} />
             {items.map((s, i) => (

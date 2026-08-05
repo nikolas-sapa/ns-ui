@@ -86,7 +86,7 @@ export function AccountSignIn() {
           type="button"
           onClick={() => startOAuth("github")}
           disabled={oauthPending !== null}
-          className="w-full rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
+          className="w-full rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none disabled:opacity-60"
         >
           {oauthPending === "github" ? "Redirecting…" : "Continue with GitHub"}
         </button>
@@ -94,7 +94,7 @@ export function AccountSignIn() {
           type="button"
           onClick={() => startOAuth("google")}
           disabled={oauthPending !== null}
-          className="w-full rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
+          className="w-full rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none disabled:opacity-60"
         >
           {oauthPending === "google" ? "Redirecting…" : "Continue with Google"}
         </button>
@@ -126,7 +126,7 @@ export function AccountSignIn() {
           <button
             type="submit"
             disabled={pending}
-            className="w-full rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
+            className="w-full rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none disabled:opacity-60"
           >
             {pending ? "Sending…" : "Send a code"}
           </button>
@@ -155,7 +155,7 @@ export function AccountSignIn() {
           <button
             type="submit"
             disabled={pending}
-            className="w-full rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
+            className="w-full rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none disabled:opacity-60"
           >
             {pending ? "Verifying…" : "Verify code"}
           </button>

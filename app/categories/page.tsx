@@ -103,7 +103,7 @@ export default function CategoriesIndexPage() {
       <div className="mt-16 border-t border-border pt-6">
         <Link
           href="/"
-          className="rounded-sm font-mono text-xs uppercase tracking-wider text-ns-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
+          className="rounded-sm font-mono text-xs uppercase tracking-wider text-ns-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent transition-colors"
         >
           Back to the catalog
         </Link>

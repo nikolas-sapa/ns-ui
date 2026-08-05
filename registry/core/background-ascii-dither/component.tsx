@@ -46,7 +46,11 @@ export function AsciiDitherMedia({
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     // glyph color from the surrounding theme; canvas bg stays transparent
-    const fg = getComputedStyle(canvas).color;
+    let fg = "";
+    const readTokens = () => {
+      fg = getComputedStyle(canvas).color;
+    };
+    readTokens();
 
     let cols = 0;
     let rows = 0;
@@ -181,6 +185,16 @@ export function AsciiDitherMedia({
       cursor.ty = -1e4;
     };
 
+    // theme flip only swaps the .dark class — re-read the ink, no remount
+    const mo = new MutationObserver(() => {
+      readTokens();
+      if (reduced) draw();
+    });
+    mo.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
     resize();
     window.addEventListener("resize", onResize);
     canvas.addEventListener("pointermove", onPointer);
@@ -192,6 +206,7 @@ export function AsciiDitherMedia({
     }
     return () => {
       cancelAnimationFrame(raf);
+      mo.disconnect();
       if (resizeTimer) clearTimeout(resizeTimer);
       window.removeEventListener("resize", onResize);
       canvas.removeEventListener("pointermove", onPointer);

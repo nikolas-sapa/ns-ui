@@ -174,7 +174,7 @@ function TimelineView() {
             <span className="w-16 shrink-0 font-mono text-xs text-ns-muted">
               {t.id}
             </span>
-            <div className="relative h-7 flex-1 overflow-hidden rounded-sm [background-image:repeating-linear-gradient(to_right,var(--color-border)_0_1px,transparent_1px_10%)]">
+            <div className="relative h-7 flex-1 overflow-hidden rounded-sm [background-image:repeating-linear-gradient(to_right,var(--border)_0_1px,transparent_1px_10%)]">
               <div
                 className={`absolute top-1 bottom-1 flex items-center gap-2 overflow-hidden rounded-sm border border-border px-2 ${
                   t.status === "Done" ? "bg-foreground/15" : "bg-background"

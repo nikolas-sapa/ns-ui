@@ -185,7 +185,7 @@ function RowList({ nodes, onOpen }: { nodes: Node[]; onOpen: (n: Node) => void }
             type="button"
             data-drill-row
             onClick={() => onOpen(n)}
-            className="flex w-full items-center justify-between gap-3 rounded-sm px-3 py-2 text-left text-sm text-foreground outline-none transition-colors hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
+            className="flex w-full items-center justify-between gap-3 rounded-sm px-3 py-2 text-left text-sm text-foreground transition-colors hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             <span className="truncate">{n.title}</span>
             <span className="flex shrink-0 items-center gap-2">

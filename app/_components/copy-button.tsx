@@ -47,7 +47,7 @@ export function CopyButton({
   const base =
     "inline-flex shrink-0 items-center justify-center rounded-sm text-ns-muted " +
     "outline-none transition-colors motion-reduce:transition-none " +
-    "hover:bg-border/60 hover:text-foreground " +
+    "hover:bg-border/60 hover:text-foreground  transition-colors" +
     "focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 " +
     "focus-visible:ring-offset-background";
 

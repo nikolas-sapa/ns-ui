@@ -89,7 +89,7 @@ export function GridBentoAscii({ cells, className = "" }: GridBentoAsciiProps) {
             aria-hidden={hiddenByHero || undefined}
             tabIndex={hiddenByHero ? -1 : 0}
             onClick={() => setHeroId(isHero ? null : cell.id)}
-            className={`group relative flex flex-col items-start justify-end overflow-hidden rounded-sm border border-border bg-surface p-3 text-left transition-[opacity] duration-150 motion-reduce:transition-none hover:border-foreground/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent ${
+            className={`group relative flex flex-col items-start justify-end overflow-hidden rounded-sm border border-border bg-surface p-3 text-left transition-[opacity,border-color] duration-150 motion-reduce:transition-none hover:border-foreground/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent ${
               hiddenByHero ? "pointer-events-none opacity-0" : "opacity-100"
             }`}
             style={{ gridColumn: style.col, gridRow: style.row }}

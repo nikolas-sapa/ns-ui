@@ -110,7 +110,7 @@ export default function ConnectPage() {
           above). Full command reference:{" "}
           <a
             href="https://github.com/nikolas-sapa/ns-ui/blob/main/cli/README.md"
-            className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
+            className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent transition-colors"
           >
             cli/README.md
           </a>
@@ -132,14 +132,14 @@ export default function ConnectPage() {
           For anything that just reads rather than calls tools:{" "}
           <a
             href="/llms.txt"
-            className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
+            className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent transition-colors"
           >
             /llms.txt
           </a>{" "}
           is the catalog index, and{" "}
           <a
             href="/llms-full.txt"
-            className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
+            className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent transition-colors"
           >
             /llms-full.txt
           </a>{" "}
@@ -156,13 +156,13 @@ export default function ConnectPage() {
       <footer className="mt-24 flex flex-wrap items-baseline gap-x-8 gap-y-2 border-t border-border pt-6 font-mono text-xs text-ns-muted">
         <Link
           href="/"
-          className="underline underline-offset-2 hover:text-foreground"
+          className="underline underline-offset-2 hover:text-foreground transition-colors"
         >
           Back to the grid
         </Link>
         <a
           href="https://nikolas.helpmarq.com"
-          className="underline underline-offset-2 hover:text-foreground"
+          className="underline underline-offset-2 hover:text-foreground transition-colors"
         >
           Built by Nikolas Sapa
         </a>

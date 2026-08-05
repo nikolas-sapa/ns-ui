@@ -102,7 +102,7 @@ export function NavSiteCondense({
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 sm:px-6">
           <a
             href="#top"
-            className={`shrink-0 rounded-sm font-mono font-semibold tracking-tight text-foreground transition-[font-size] duration-300 hover:text-ns-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ns-accent motion-reduce:transition-none ${
+            className={`shrink-0 rounded-sm font-mono font-semibold tracking-tight text-foreground transition-[font-size,color] duration-300 hover:text-ns-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ns-accent motion-reduce:transition-none ${
               condensed ? "text-sm" : "text-base"
             }`}
           >

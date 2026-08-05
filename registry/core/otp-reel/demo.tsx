@@ -70,7 +70,7 @@ export default function CipherReelOtpDemo() {
             type="button"
             disabled={verified || code.length < 6}
             onClick={() => verify(codeRef.current)}
-            className="mt-5 w-full rounded-sm bg-ns-accent px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-ns-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-5 w-full rounded-sm bg-ns-accent px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-ns-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 disabled:pointer-events-none"
           >
             {verified ? "Verified" : "Verify device"}
           </button>

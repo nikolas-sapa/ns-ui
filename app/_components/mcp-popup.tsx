@@ -122,7 +122,7 @@ export function McpPopup() {
           This registry also runs as an{" "}
           <Link
             href="/connect"
-            className="rounded-sm text-ns-accent outline-none underline underline-offset-2 hover:text-ns-accent-hover focus-visible:ring-2 focus-visible:ring-ns-accent"
+            className="rounded-sm text-ns-accent outline-none underline underline-offset-2 hover:text-ns-accent-hover focus-visible:ring-2 focus-visible:ring-ns-accent transition-colors"
           >
             MCP server
           </Link>

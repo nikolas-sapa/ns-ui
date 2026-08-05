@@ -8,7 +8,7 @@ export default function GlassButtonDemo() {
       {/* dot grid + ambient light orbs so the glass has something to refract */}
       <div
         aria-hidden
-        className="absolute inset-0 [background-image:radial-gradient(circle,var(--color-border)_1px,transparent_1px)] [background-size:24px_24px]"
+        className="absolute inset-0 [background-image:radial-gradient(circle,var(--border)_1px,transparent_1px)] [background-size:24px_24px]"
       />
       {/* neutral orb behind the button so the glass visibly blurs it
           (accent is interaction-only per design DNA, not scenery) */}

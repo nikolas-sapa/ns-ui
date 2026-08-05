@@ -142,11 +142,11 @@ export function AccountProfileForm({
                 disabled={pending}
                 onClick={() => toggleTag(c.id)}
                 aria-pressed={active}
-                className={`rounded-full border px-3 py-1 text-xs transition-colors focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60 ${
+                className={`rounded-full border px-3 py-1 text-xs transition-colors focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:opacity-60 ${
                   active
                     ? "border-ns-accent bg-ns-accent text-white"
                     : "border-border bg-surface text-foreground hover:border-ns-muted"
-                }`}
+                } disabled:pointer-events-none`}
               >
                 {c.label}
               </button>
@@ -159,7 +159,7 @@ export function AccountProfileForm({
         <button
           type="submit"
           disabled={pending}
-          className="rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
+          className="rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none disabled:opacity-60"
         >
           {pending ? "Saving…" : submitLabel}
         </button>
@@ -168,7 +168,7 @@ export function AccountProfileForm({
             type="button"
             disabled={pending}
             onClick={onSkip}
-            className="rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
+            className="rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none disabled:opacity-60"
           >
             Skip
           </button>

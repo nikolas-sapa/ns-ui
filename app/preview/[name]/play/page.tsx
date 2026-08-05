@@ -108,7 +108,7 @@ export default async function PlaygroundPage({
   const older = idx >= 0 && idx < slugs.length - 1 ? slugs[idx + 1] : null;
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-[1400px] flex-col px-6 pb-16 pt-6 sm:px-10 lg:pt-8">
+    <main className="mx-auto flex min-h-screen w-full max-w-[1400px] flex-col px-6 pb-16 pt-6 sm:px-10 lg:pt-8">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4 pl-14 lg:pl-0">
         <div className="min-w-0">
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
@@ -242,24 +242,24 @@ export default async function PlaygroundPage({
             one page that carries props, dependencies, save and metadata. */}
         <Link
           href={`/components/${name}`}
-          className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
+          className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent transition-colors"
         >
           Component page
         </Link>
         <Link
           href="/"
-          className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
+          className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent transition-colors"
         >
           Back to the catalog
         </Link>
         <a
           href="https://nikolas.helpmarq.com"
-          className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
+          className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent transition-colors"
         >
           Built by Nikolas Sapa
         </a>
       </footer>
-    </div>
+    </main>
   );
 }
 

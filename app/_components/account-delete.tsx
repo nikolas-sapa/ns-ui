@@ -44,7 +44,7 @@ export function AccountDelete() {
       <button
         type="button"
         onClick={() => setConfirming(true)}
-        className="text-sm text-ns-muted underline-offset-2 hover:text-[var(--error)] hover:underline"
+        className="text-sm text-ns-muted underline-offset-2 hover:text-[var(--error)] hover:underline transition-colors"
       >
         Delete account
       </button>
@@ -61,7 +61,7 @@ export function AccountDelete() {
           type="button"
           disabled={pending}
           onClick={deleteAccount}
-          className="rounded-sm border border-[var(--error)] bg-[var(--error)] px-3.5 py-2 text-sm font-medium text-white outline-none transition-colors hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
+          className="rounded-sm border border-[var(--error)] bg-[var(--error)] px-3.5 py-2 text-sm font-medium text-white dark:text-[var(--background)] outline-none transition-colors hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60 disabled:pointer-events-none"
         >
           {pending ? "Deleting…" : "Permanently delete"}
         </button>
@@ -69,7 +69,7 @@ export function AccountDelete() {
           type="button"
           disabled={pending}
           onClick={() => setConfirming(false)}
-          className="rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
+          className="rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none disabled:opacity-60"
         >
           Cancel
         </button>

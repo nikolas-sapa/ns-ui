@@ -311,7 +311,7 @@ export const SpineStack = forwardRef<SpineStackHandle, SpineStackProps>(function
                   pointerEvents: isActive ? "none" : undefined,
                   boxShadow: "inset -1px 0 0 0 color-mix(in srgb, var(--foreground) 22%, transparent)",
                 }}
-                className="ns-spine-face absolute inset-0 outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
+                className="ns-spine-face absolute inset-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
               >
                 <span
                   aria-hidden

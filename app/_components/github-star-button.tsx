@@ -39,7 +39,7 @@ export function GitHubStarButton({
   stars?: number | null;
 }) {
   const label = variant === "quiet" ? "Star ns-ui on GitHub" : "Star on GitHub";
-  const ariaLabel = stars !== null ? `${label}, ${stars.toLocaleString("en-US")} stars` : undefined;
+  const ariaLabel = stars !== null ? `${label}, ${stars.toLocaleString("en-US")} star${stars === 1 ? "" : "s"}` : undefined;
 
   if (variant === "quiet") {
     return (

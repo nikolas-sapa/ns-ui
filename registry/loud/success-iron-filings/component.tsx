@@ -408,7 +408,7 @@ export function IronFilings({ className = "" }: { className?: string }) {
           type="button"
           onClick={onClick}
           disabled={phase === "pending"}
-          className="rounded-sm bg-ns-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ns-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent disabled:opacity-60"
+          className="rounded-sm bg-ns-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ns-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent disabled:opacity-60 disabled:pointer-events-none"
         >
           {phase === "done"
             ? "Replay"

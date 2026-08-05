@@ -245,7 +245,7 @@ export function SiteShell({
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls="site-nav"
-        className="fixed left-3 top-3 z-50 inline-flex h-11 w-11 items-center justify-center rounded-md border border-border bg-background text-ns-muted outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent lg:hidden"
+        className="fixed left-3 top-3 z-50 inline-flex h-11 w-11 items-center justify-center rounded-md border border-border bg-background text-ns-muted outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent lg:hidden transition-colors"
       >
         <span className="sr-only">
           {open ? "Close component navigation" : "Open component navigation"}
@@ -263,8 +263,8 @@ export function SiteShell({
       <nav
         id="site-nav"
         aria-label="Components"
-        className={`fixed inset-y-0 left-0 z-40 flex w-[17rem] flex-col border-r border-border bg-background transition-transform lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 motion-reduce:transition-none ${
-          open ? "translate-x-0" : "-translate-x-full"
+        className={`fixed inset-y-0 left-0 z-40 flex w-[17rem] flex-col border-r border-border bg-background transition-[transform,translate,visibility] lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 motion-reduce:transition-none ${
+          open ? "translate-x-0" : "-translate-x-full invisible lg:visible"
         }`}
       >
         {/* Traveling light trace along the nav's own right hairline (the
@@ -327,6 +327,14 @@ export function SiteShell({
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              // Same Escape-to-clear as the catalog search, so the two
+              // near-identical fields don't answer the same key differently.
+              onKeyDown={(e) => {
+                if (e.key === "Escape" && query) {
+                  setQuery("");
+                  e.currentTarget.blur();
+                }
+              }}
               placeholder="Filter sidebar"
               aria-label="Filter sidebar"
               className="w-full rounded-md border border-border bg-surface px-2.5 py-1.5 text-sm outline-none placeholder:text-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent"
@@ -345,7 +353,7 @@ export function SiteShell({
           <button
             type="button"
             onClick={() => setOpenIds(new Set(allIds))}
-            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
+            className="rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
           >
             Expand all
           </button>
@@ -356,7 +364,7 @@ export function SiteShell({
               setOpenIds(empty);
               persistOpen(empty);
             }}
-            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
+            className="rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
           >
             Collapse all
           </button>
@@ -388,49 +396,49 @@ export function SiteShell({
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-border px-4 py-3 font-mono text-[11px] text-ns-muted">
           <Link
             href="/categories"
-            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
+            className="rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
           >
             Categories
           </Link>
           <Link
             href="/changelog"
-            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
+            className="rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
           >
             Changelog
           </Link>
           <Link
             href="/writing"
-            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
+            className="rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
           >
             Writing
           </Link>
           <Link
             href="/community"
-            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
+            className="rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
           >
             Community
           </Link>
           <Link
             href="/guidelines"
-            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
+            className="rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
           >
             Guidelines
           </Link>
           <Link
             href="/submit"
-            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
+            className="rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
           >
             Submit
           </Link>
           <Link
             href="/connect"
-            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
+            className="rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
           >
             Connect
           </Link>
           <Link
             href="/status"
-            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
+            className="rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
           >
             Status
           </Link>
@@ -503,8 +511,8 @@ function NavCategory({
       open={open}
       onToggle={(e) => onToggle(e.currentTarget.open)}
     >
-      <summary className="flex cursor-pointer list-none items-center justify-between rounded-sm px-2 py-1.5 outline-none [&::-webkit-details-marker]:hidden hover:bg-surface focus-visible:ring-2 focus-visible:ring-ns-accent">
-        <span className="flex items-center gap-1.5 text-[12px] text-ns-muted group-hover/cat:text-foreground">
+      <summary className="flex cursor-pointer list-none items-center justify-between rounded-sm px-2 py-1.5 outline-none transition-colors [&::-webkit-details-marker]:hidden hover:bg-surface focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none">
+        <span className="flex items-center gap-1.5 text-[12px] text-ns-muted transition-colors group-hover/cat:text-foreground motion-reduce:transition-none">
           <Chevron />
           {group.label}
         </span>
@@ -554,8 +562,8 @@ function NavKindGroup({
       open={open}
       onToggle={(e) => onToggle(e.currentTarget.open)}
     >
-      <summary className="flex cursor-pointer list-none items-center justify-between rounded-sm px-2 py-1 pl-3.5 text-xs outline-none [&::-webkit-details-marker]:hidden hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent">
-        <span className="flex items-center gap-1.5 text-ns-muted group-hover/kind:text-foreground">
+      <summary className="flex cursor-pointer list-none items-center justify-between rounded-sm px-2 py-1 pl-3.5 text-xs outline-none transition-colors [&::-webkit-details-marker]:hidden hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none">
+        <span className="flex items-center gap-1.5 text-ns-muted transition-colors group-hover/kind:text-foreground motion-reduce:transition-none">
           <Chevron small />
           {kind.label}
         </span>

@@ -98,7 +98,7 @@ export default async function CategoryPage({
           <p className="font-mono text-xs uppercase tracking-[0.18em] text-ns-muted">
             <Link
               href="/categories"
-              className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
+              className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent transition-colors"
             >
               ns-ui / categories
             </Link>
@@ -131,7 +131,7 @@ export default async function CategoryPage({
       <div className="mt-16 border-t border-border pt-6">
         <Link
           href="/categories"
-          className="rounded-sm font-mono text-xs uppercase tracking-wider text-ns-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
+          className="rounded-sm font-mono text-xs uppercase tracking-wider text-ns-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent transition-colors"
         >
           All categories
         </Link>

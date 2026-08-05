@@ -80,13 +80,13 @@ export default function ChangelogPage() {
       <footer className="mt-24 flex flex-wrap items-baseline gap-x-8 gap-y-2 border-t border-border pt-6 font-mono text-xs text-ns-muted">
         <Link
           href="/"
-          className="underline underline-offset-2 hover:text-foreground"
+          className="underline underline-offset-2 hover:text-foreground transition-colors"
         >
           Back to the grid
         </Link>
         <a
           href="https://nikolas.helpmarq.com"
-          className="underline underline-offset-2 hover:text-foreground"
+          className="underline underline-offset-2 hover:text-foreground transition-colors"
         >
           Built by Nikolas Sapa
         </a>

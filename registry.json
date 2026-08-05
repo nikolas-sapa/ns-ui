@@ -873,7 +873,8 @@
         },
         "dark": {
           "ns-muted": "#8f8f8f",
-          "surface": "#171717"
+          "surface": "#171717",
+          "error": "#ff6369"
         }
       },
       "meta": {
@@ -1864,7 +1865,8 @@
         },
         "dark": {
           "ns-muted": "#8f8f8f",
-          "surface": "#171717"
+          "surface": "#171717",
+          "error": "#ff6369"
         }
       },
       "meta": {
@@ -3039,7 +3041,8 @@
         },
         "dark": {
           "ns-muted": "#8f8f8f",
-          "surface": "#171717"
+          "surface": "#171717",
+          "error": "#ff6369"
         }
       },
       "meta": {
@@ -3334,11 +3337,12 @@
           "ns-muted": "#4d4d4d",
           "ns-accent": "#006bff",
           "surface": "#fafafa",
-          "warning": "#f5a623"
+          "warning": "#7a5200"
         },
         "dark": {
           "ns-muted": "#8f8f8f",
-          "surface": "#171717"
+          "surface": "#171717",
+          "warning": "#f5a623"
         }
       },
       "meta": {
@@ -3952,7 +3956,8 @@
         },
         "dark": {
           "ns-muted": "#8f8f8f",
-          "surface": "#171717"
+          "surface": "#171717",
+          "error": "#ff6369"
         }
       },
       "meta": {
@@ -4179,10 +4184,12 @@
           "ns-muted": "#4d4d4d",
           "ns-accent": "#006bff",
           "error": "#ea001d",
-          "success": "#47a447"
+          "success": "#2d7a2d"
         },
         "dark": {
-          "ns-muted": "#8f8f8f"
+          "ns-muted": "#8f8f8f",
+          "error": "#ff6369",
+          "success": "#47a447"
         }
       },
       "meta": {
@@ -4812,10 +4819,11 @@
         },
         "light": {
           "ns-muted": "#4d4d4d",
-          "warning": "#f5a623"
+          "warning": "#7a5200"
         },
         "dark": {
-          "ns-muted": "#8f8f8f"
+          "ns-muted": "#8f8f8f",
+          "warning": "#f5a623"
         }
       },
       "meta": {
@@ -5017,6 +5025,9 @@
       "cssVars": {
         "light": {
           "error": "#ea001d"
+        },
+        "dark": {
+          "error": "#ff6369"
         }
       },
       "meta": {
@@ -5058,7 +5069,8 @@
           "error": "#ea001d"
         },
         "dark": {
-          "ns-muted": "#8f8f8f"
+          "ns-muted": "#8f8f8f",
+          "error": "#ff6369"
         }
       },
       "meta": {
@@ -5182,7 +5194,8 @@
           "error": "#ea001d"
         },
         "dark": {
-          "ns-muted": "#8f8f8f"
+          "ns-muted": "#8f8f8f",
+          "error": "#ff6369"
         }
       },
       "meta": {
@@ -7398,7 +7411,8 @@
         },
         "dark": {
           "ns-muted": "#8f8f8f",
-          "surface": "#171717"
+          "surface": "#171717",
+          "error": "#ff6369"
         }
       },
       "meta": {
@@ -7651,7 +7665,8 @@
           "error": "#ea001d"
         },
         "dark": {
-          "ns-muted": "#8f8f8f"
+          "ns-muted": "#8f8f8f",
+          "error": "#ff6369"
         }
       },
       "meta": {
@@ -8538,10 +8553,12 @@
           "ns-muted": "#4d4d4d",
           "ns-accent": "#006bff",
           "error": "#ea001d",
-          "success": "#47a447"
+          "success": "#2d7a2d"
         },
         "dark": {
-          "ns-muted": "#8f8f8f"
+          "ns-muted": "#8f8f8f",
+          "error": "#ff6369",
+          "success": "#47a447"
         }
       },
       "meta": {
@@ -8817,12 +8834,15 @@
           "ns-accent": "#006bff",
           "surface": "#fafafa",
           "error": "#ea001d",
-          "warning": "#f5a623",
-          "success": "#47a447"
+          "warning": "#7a5200",
+          "success": "#2d7a2d"
         },
         "dark": {
           "ns-muted": "#8f8f8f",
-          "surface": "#171717"
+          "surface": "#171717",
+          "error": "#ff6369",
+          "warning": "#f5a623",
+          "success": "#47a447"
         }
       },
       "meta": {
@@ -9516,7 +9536,8 @@
         },
         "dark": {
           "ns-muted": "#8f8f8f",
-          "surface": "#171717"
+          "surface": "#171717",
+          "error": "#ff6369"
         }
       },
       "meta": {
@@ -9557,7 +9578,8 @@
           "error": "#ea001d"
         },
         "dark": {
-          "ns-muted": "#8f8f8f"
+          "ns-muted": "#8f8f8f",
+          "error": "#ff6369"
         }
       },
       "meta": {

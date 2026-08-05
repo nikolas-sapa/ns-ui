@@ -19,7 +19,7 @@ export default function BowWakeDemo() {
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden p-6">
       <div
         aria-hidden
-        className="absolute inset-0 [background-image:radial-gradient(circle,var(--color-border)_1px,transparent_1px)] [background-size:24px_24px]"
+        className="absolute inset-0 [background-image:radial-gradient(circle,var(--border)_1px,transparent_1px)] [background-size:24px_24px]"
       />
       <div className="relative w-full max-w-sm">
         <p className="mb-4 text-center font-mono text-xs text-ns-muted">ns-ui / reorder-drag-wake</p>

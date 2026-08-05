@@ -32,7 +32,7 @@ export type ShowcaseEntry = RegistryEntry & {
 };
 
 const FOOTER_LINK =
-  "rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent";
+  "rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent transition-colors";
 
 /**
  * How many demos may run at once.
@@ -164,8 +164,16 @@ export function Showcase({
     if (filterFromUrl === "core" || filterFromUrl === "loud") {
       setFilterState(filterFromUrl);
     }
+    // Validated like sort and collection above: an unknown id (stale link,
+    // renamed category) would otherwise match nothing and empty the catalog
+    // with no chip lit and no filter named in the zero-results copy.
     const categoryFromUrl = params.get(CATEGORY_PARAM);
-    if (categoryFromUrl) setCategoryState(categoryFromUrl);
+    if (
+      categoryFromUrl === "other" ||
+      CATEGORIES.some((c) => c.id === categoryFromUrl)
+    ) {
+      setCategoryState(categoryFromUrl);
+    }
     if (params.get(NEW_PARAM) === "1") setNewOnlyState(true);
     const queryFromUrl = params.get(QUERY_PARAM);
     if (queryFromUrl) setQueryState(queryFromUrl);
@@ -420,7 +428,7 @@ export function Showcase({
           and screen reader visitors actually want. */}
       <a
         href="#catalog"
-        className="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:left-4 focus-visible:top-4 focus-visible:z-50 focus-visible:rounded-sm focus-visible:bg-ns-accent focus-visible:px-3 focus-visible:py-2 focus-visible:text-sm focus-visible:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent-hover"
+        className="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:left-4 focus-visible:top-4 focus-visible:z-50 focus-visible:rounded-sm focus-visible:bg-ns-accent focus-visible:px-3 focus-visible:py-2 focus-visible:text-sm focus-visible:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         Skip to components
       </a>
@@ -596,6 +604,7 @@ export function Showcase({
                   setQuery(q);
                   setCategory(null);
                   setFilter("all");
+                  setNewOnly(false);
                 }}
                 className="rounded-full border border-border px-2.5 py-1 font-mono text-xs text-ns-muted outline-none transition-colors hover:border-ns-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
               >
@@ -606,7 +615,7 @@ export function Showcase({
           <button
             type="button"
             onClick={clearAll}
-            className="mt-5 rounded-sm px-2 py-1 font-mono text-xs text-ns-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
+            className="mt-5 rounded-sm px-2 py-1 font-mono text-xs text-ns-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent transition-colors"
           >
             Show all {items.length}
           </button>
@@ -773,7 +782,7 @@ function JumpToTop() {
       onClick={scrollUp}
       aria-label="Back to top"
       tabIndex={visible ? 0 : -1}
-      className={`fixed bottom-6 right-6 z-30 flex size-11 items-center justify-center rounded-full border border-border bg-surface text-ns-muted shadow-sm outline-none transition-[opacity,transform] duration-200 ease-out hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none sm:size-10 sm:bottom-8 sm:right-8 ${
+      className={`fixed bottom-6 right-6 z-30 flex size-11 items-center justify-center rounded-full border border-border bg-surface text-ns-muted shadow-sm outline-none transition-[opacity,transform,color] duration-200 ease-out hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none sm:size-10 sm:bottom-8 sm:right-8 ${
         visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-2 opacity-0"
       }`}
     >

@@ -276,7 +276,7 @@ export function CatalogControls({
                 type="button"
                 aria-pressed={on}
                 onClick={() => onCategory(on ? null : c.id)}
-                className={`flex min-h-11 items-center justify-center rounded-full border px-2.5 py-1 text-xs outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-ns-accent sm:min-h-0 sm:w-auto sm:shrink-0 sm:justify-start ${
+                className={`flex min-h-11 items-center justify-center rounded-full border px-2.5 py-1 text-xs outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:min-h-0 sm:w-auto sm:shrink-0 sm:justify-start ${
                   on
                     ? "border-ns-accent bg-ns-accent text-white"
                     : "border-border text-ns-muted hover:border-ns-muted hover:text-foreground"
@@ -312,7 +312,7 @@ export function CatalogControls({
           onClick={onClearAll}
           className={`flex min-h-11 shrink-0 items-center rounded-sm px-1.5 py-1 text-xs text-ns-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent sm:min-h-0 catalog-gate-clear ${
             filtered ? "" : "hidden"
-          }`}
+          } transition-colors`}
         >
           Clear
         </button>

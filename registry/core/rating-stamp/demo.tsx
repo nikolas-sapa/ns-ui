@@ -87,7 +87,7 @@ export default function ChopPressDemo() {
           </button>
           <button
             type="button"
-            className="rounded-sm bg-ns-accent px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-ns-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
+            className="rounded-sm bg-ns-accent px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-ns-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
           >
             Save triage
           </button>

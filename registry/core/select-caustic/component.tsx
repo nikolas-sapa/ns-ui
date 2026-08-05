@@ -720,7 +720,7 @@ export function CausticSelect({
         disabled={disabled}
         onClick={() => (open ? closeList(true) : openList())}
         onKeyDown={onTriggerKeyDown}
-        className="relative flex h-10 w-full items-center justify-between overflow-hidden rounded-sm border border-border text-left outline-none transition-colors hover:border-foreground/25 focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 motion-reduce:transition-none"
+        className="relative flex h-10 w-full items-center justify-between overflow-hidden rounded-sm border border-border text-left outline-none transition-colors hover:border-foreground/25 focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 motion-reduce:transition-none disabled:pointer-events-none"
       >
         {/* caustic light beneath the frost */}
         <canvas

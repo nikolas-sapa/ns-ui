@@ -245,14 +245,14 @@ export function ParticleHero({
         // static fallback when WebGL is unavailable
         <div
           aria-hidden
-          className="absolute inset-0 [background-image:radial-gradient(circle,var(--color-border)_1px,transparent_1px)] [background-size:22px_22px]"
+          className="absolute inset-0 [background-image:radial-gradient(circle,var(--border)_1px,transparent_1px)] [background-size:22px_22px]"
         />
       )}
       {/* vignette keeps edges quiet and text legible; pointer-events-none so
           the cursor reaches the canvas underneath (it blocked all hover) */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,transparent_30%,var(--color-background)_100%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,transparent_30%,var(--background)_100%)]"
       />
       <div className="relative z-10 mx-auto max-w-2xl px-6 text-center">
         <motion.p

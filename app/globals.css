@@ -3,6 +3,11 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
+  /* Tells the UA the document's theme so native chrome — page scrollbar, the
+     <select> dropdown panel, range tracks, autofill backgrounds — follows it.
+     Dark mode here is a `.dark` class, so without this the UA would keep
+     painting light-mode widgets on a #0a0a0a page. */
+  color-scheme: light;
   --background: #ffffff;
   --foreground: #171717;
   --surface: #fafafa;
@@ -17,17 +22,28 @@
      same hex as fallback; defining it here makes it a real themed token. */
   --error: #ea001d;
   /* Semantic status green / amber — status-only, never brand accents. Defined
-     as real tokens so status badges stop hardcoding the hex. */
-  --success: #47a447;
-  --warning: #f5a623;
+     as real tokens so status badges stop hardcoding the hex. Like --ns-muted
+     these are tuned per theme: #47a447 is only 3.15:1 on white and #f5a623
+     just 2.03:1, both far under AA for the small status text they carry. The
+     darker pair below clears 4.5:1 on white; the original values live in
+     .dark, where they read 6.29:1 / 9.77:1 on #0a0a0a. */
+  --success: #2d7a2d;
+  --warning: #7a5200;
 }
 
 .dark {
+  color-scheme: dark;
   --background: #0a0a0a;
   --foreground: #ededed;
   --surface: #171717;
   --border: #2e2e2e;
   --ns-muted: #8f8f8f;
+  /* #ea001d is only 4.26:1 on #0a0a0a and 3.86:1 on --surface — under AA for
+     the small error text every form renders. #ff6369 clears it (6.83:1 /
+     6.18:1). Success/amber keep their original values here, where they pass. */
+  --error: #ff6369;
+  --success: #47a447;
+  --warning: #f5a623;
 }
 
 @theme inline {

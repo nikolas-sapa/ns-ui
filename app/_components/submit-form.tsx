@@ -327,7 +327,7 @@ export function SubmitForm() {
             href="https://github.com/nikolas-sapa/ns-ui/blob/main/DCO"
             target="_blank"
             rel="noreferrer"
-            className="underline decoration-border underline-offset-2 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
+            className="underline decoration-border underline-offset-2 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent transition-colors"
           >
             Developer Certificate of Origin
           </a>{" "}
@@ -401,7 +401,7 @@ export function SubmitForm() {
       <button
         type="submit"
         disabled={pending || githubConnected !== true}
-        className="rounded-sm border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
+        className="rounded-sm border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none disabled:opacity-60"
       >
         {pending ? "Opening pull request…" : "Open pull request"}
       </button>
