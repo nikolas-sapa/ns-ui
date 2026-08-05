@@ -501,6 +501,18 @@ const NPM_REGISTRY = "https://registry.npmjs.org";
 const HOUR = 3600;
 
 /**
+ * Ceiling on any single external read. Next's per-page build budget is 60s and
+ * this page fires up to four independent chains (§3) that themselves make up
+ * to two sequential hops each (fetchPublishedIndex) — bounding every fetch
+ * here at 8s keeps the slowest possible chain (~16s) well inside that budget
+ * even if a host never answers, instead of hanging until the platform's own
+ * (much longer) default and taking the build down with it. A timeout collapses
+ * to the same `null` every other failure here does, so it renders as UNKNOWN,
+ * never as a fabricated failure or a fabricated pass.
+ */
+const FETCH_TIMEOUT_MS = 8_000;
+
+/**
  * R1: the live registry index, the exact artifact the component count claims.
  * `origin` is passed in (callers use REGISTRY_ORIGIN from lib/registry-origin)
  * so this module keeps its zero-import property.
@@ -515,6 +527,7 @@ export async function fetchLiveOriginCount(origin: string): Promise<number | nul
   try {
     const res = await fetch(`${origin}/r/registry.json`, {
       next: { revalidate: HOUR },
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     });
     if (!res.ok) return null;
     const data: unknown = await res.json();
@@ -535,6 +548,7 @@ export async function fetchPublishedVersion(pkg: string): Promise<string | null>
     const res = await fetch(`${NPM_REGISTRY}/${pkg}`, {
       headers: { Accept: "application/vnd.npm.install-v1+json" },
       next: { revalidate: HOUR },
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     });
     if (!res.ok) return null;
     const data: unknown = await res.json();
@@ -581,6 +595,10 @@ async function fetchPublishedIndex(
   // index is 412 KB and the MCP's snapshot is 5.8 MB, once an hour, server-side
   // only and never shipped to a client. The MCP file is over Next's 2 MB data
   // cache ceiling, so it is refetched per ISR revalidation rather than cached.
+  // Bounded by FETCH_TIMEOUT_MS on both hops now: unpkg was measured hanging
+  // past two minutes cold and taking the whole build down with it (Next's
+  // per-page budget is 60s); a slow host now times out into the same UNKNOWN
+  // this function already returns on any other failure, rather than hanging.
   // Upgrade path: emit the component count into each package's own manifest at
   // publish time and read it straight off the packument, dropping the second
   // host and both downloads entirely.
@@ -589,6 +607,7 @@ async function fetchPublishedIndex(
   try {
     const res = await fetch(`https://unpkg.com/${pkg}@${version}/${indexFile}`, {
       next: { revalidate: HOUR },
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     });
     if (!res.ok) return null;
     const data: unknown = await res.json();
