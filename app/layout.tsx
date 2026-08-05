@@ -5,6 +5,8 @@ import "./globals.css";
 import { ThemeSync } from "./_components/theme-sync";
 import { SiteAnalytics } from "./_components/site-analytics";
 import { SiteShell } from "./_components/site-shell";
+import { SmoothScroll } from "./_components/smooth-scroll";
+import { SmoothCursor } from "./_components/smooth-cursor";
 import { NO_FLASH_SCRIPT } from "@/lib/theme";
 import { NO_FLASH_SIDEBAR_SCRIPT } from "@/lib/sidebar";
 import { CATALOG_GATE_SCRIPT } from "@/lib/catalog-gate";
@@ -77,6 +79,13 @@ export default function RootLayout({
       </head>
       <body className="bg-background font-sans text-foreground antialiased">
         <ThemeSync />
+        {/* Both bail out inside an iframe (window.self !== window.top) — every
+            /preview/<slug> shape, every catalog/embed thumbnail, and every
+            component's own playground iframe render this same root layout
+            framed, and neither should touch that document's cursor or
+            scroll. See the components for the full reasoning. */}
+        <SmoothScroll />
+        <SmoothCursor />
         {/* Nav data is computed on the server once per build; the shell is a
             client component only because it needs the active pathname. */}
         <SiteShell groups={navGroups()}>{children}</SiteShell>

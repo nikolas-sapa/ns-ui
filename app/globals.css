@@ -70,6 +70,72 @@
   --radius-lg: 16px;
 }
 
+/* Smooth cursor — ported from the portfolio's globals.css. Fill/stroke are
+   theme tokens instead of the portfolio's fixed ink/white pair, since ns-ui
+   (unlike the portfolio) has a dark mode: --foreground/--background flip
+   together with .dark, so the cursor keeps the same ink-on-light-outline
+   contrast in both themes. */
+:root {
+  --cursor-fill: var(--foreground);
+  --cursor-stroke: var(--background);
+}
+
+/* Hide the native cursor only where we actually draw a replacement, and only
+   in the top-level document — smooth-cursor.tsx never adds this class inside
+   an iframe (see its window.self !== window.top guard), so this rule never
+   fires inside an embedded component's own document, and the native cursor
+   stays visible and usable there. */
+@media (hover: hover) and (pointer: fine) {
+  body.smooth-cursor-active,
+  body.smooth-cursor-active * {
+    cursor: none;
+  }
+}
+
+.smooth-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  pointer-events: none;
+  will-change: transform;
+  opacity: 0;
+  transition: opacity 150ms ease-out;
+}
+
+.smooth-cursor[data-visible="true"] {
+  opacity: 1;
+}
+
+.smooth-cursor-arrow,
+.smooth-cursor-hand {
+  display: block;
+  transition: opacity 120ms ease-out, scale 140ms cubic-bezier(0.2, 0.9, 0.3, 1.4);
+}
+
+/* Hand replaces arrow over clickables; the arrow keeps its steering rotation,
+   so they stack instead of swapping nodes. */
+/* Offset so the fingertip, not the SVG corner, sits on the pointer. */
+.smooth-cursor-hand {
+  position: absolute;
+  top: -2px;
+  left: -11px;
+  opacity: 0;
+}
+
+.smooth-cursor[data-hand="true"] .smooth-cursor-arrow {
+  opacity: 0;
+}
+
+.smooth-cursor[data-hand="true"] .smooth-cursor-hand {
+  opacity: 1;
+}
+
+.smooth-cursor[data-down="true"] .smooth-cursor-hand,
+.smooth-cursor[data-down="true"] .smooth-cursor-arrow {
+  scale: 0.82;
+}
+
 /* Sidebar hairline trace — a single soft accent band drifting down the nav's
    right border, looping. transform + opacity only (compositor, never
    layout/paint-heavy), so it costs nothing on the main thread; the element

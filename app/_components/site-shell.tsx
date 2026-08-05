@@ -370,7 +370,12 @@ export function SiteShell({
           </button>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-6">
+        {/* data-lenis-prevent: this tree scrolls independently of the page
+            (min-h-0 flex-1 overflow-y-auto). Without the attribute, the
+            window-level Lenis instance in the root layout would eat wheel
+            events over the sidebar and scroll the page behind it instead of
+            the nav tree. */}
+        <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-6" data-lenis-prevent>
           {isFiltering && shown === 0 ? (
             <p className="px-2 py-3 text-sm text-ns-muted">No match.</p>
           ) : null}
