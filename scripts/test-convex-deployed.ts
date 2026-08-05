@@ -201,7 +201,25 @@ for (const { mod, fn, kind } of found) console.log(`  ${mod}:${fn} (${kind})`);
 // not fall through on an EMPTY string, which is exactly how this env var
 // broke the build once already (a set-but-empty value looked configured and
 // was not) — check for blank explicitly rather than only undefined.
-const url = process.env.NEXT_PUBLIC_CONVEX_URL;
+// Node does not load .env.local the way `next` does, so run bare this guard
+// would SKIP on every developer machine — passing quietly in the one place it
+// is most likely to be run by hand. Fall back to reading the file directly.
+function urlFromEnvFile(): string | undefined {
+  for (const file of [".env.local", ".env"]) {
+    try {
+      const line = readFileSync(join(ROOT, file), "utf8")
+        .split("\n")
+        .find((l) => l.startsWith("NEXT_PUBLIC_CONVEX_URL="));
+      const value = line?.slice("NEXT_PUBLIC_CONVEX_URL=".length).trim().replace(/^["']|["']$/g, "");
+      if (value) return value;
+    } catch {
+      // file absent is normal — keep looking, then fall through to SKIP
+    }
+  }
+  return undefined;
+}
+
+const url = process.env.NEXT_PUBLIC_CONVEX_URL?.trim() || urlFromEnvFile();
 if (url === undefined || url.trim() === "") {
   console.log("");
   console.log("convex deployment guard: SKIPPED — NEXT_PUBLIC_CONVEX_URL is unset (or empty) in this environment.");
