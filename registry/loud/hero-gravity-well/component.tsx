@@ -70,7 +70,7 @@ export function SingularityText({
     const readTokens = () => {
       const cs = getComputedStyle(document.documentElement);
       fgColor = cs.getPropertyValue("--foreground").trim() || "#ededed";
-      guideColor = cs.getPropertyValue("--muted").trim() || "#8f8f8f";
+      guideColor = cs.getPropertyValue("--ns-muted").trim() || "#8f8f8f";
     };
 
     const init = () => {

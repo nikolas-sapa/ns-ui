@@ -6,7 +6,7 @@ export default function StrandlineDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-3xl">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">
+        <p className="mb-4 font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / timeline-changelog-wave
         </p>
 
@@ -15,11 +15,11 @@ export default function StrandlineDemo() {
             <h2 className="font-mono text-sm tracking-widest text-foreground">
               CHANGELOG / 2026
             </h2>
-            <p className="font-mono text-[10px] tracking-wider text-muted">
+            <p className="font-mono text-[10px] tracking-wider text-ns-muted">
               6 RELEASES · 1 MAJOR
             </p>
           </div>
-          <p className="mt-1.5 text-[13px] leading-relaxed text-muted">
+          <p className="mt-1.5 text-[13px] leading-relaxed text-ns-muted">
             The year as a rising tide — every release breaks further up the
             strand, and older marks collect tide-rings with each wash.
           </p>
@@ -27,16 +27,16 @@ export default function StrandlineDemo() {
           <Strandline className="mt-2 h-80" />
 
           <div className="mt-4 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-border pt-4">
-            <p className="font-mono text-[10px] tracking-wider text-muted">
+            <p className="font-mono text-[10px] tracking-wider text-ns-muted">
               SCRUB WITH THE ARROWS — EACH STEP LAUNCHES THE NEXT WAVE
             </p>
-            <p className="font-mono text-[10px] tracking-wider text-muted">
+            <p className="font-mono text-[10px] tracking-wider text-ns-muted">
               HOVER A MARK TO REPLAY ITS SWASH
             </p>
           </div>
         </div>
 
-        <p className="mt-3 font-mono text-[11px] text-muted">
+        <p className="mt-3 font-mono text-[11px] text-ns-muted">
           ring density is history — the oldest release, nearest the water, has
           been washed the most
         </p>

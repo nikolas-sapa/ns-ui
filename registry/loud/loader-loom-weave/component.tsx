@@ -50,7 +50,7 @@ export function LoomShuttle({
       const cs = getComputedStyle(document.documentElement);
       ink = {
         fg: cs.getPropertyValue("--foreground").trim() || "#888",
-        muted: cs.getPropertyValue("--muted").trim() || "#888",
+        muted: cs.getPropertyValue("--ns-muted").trim() || "#888",
         border: cs.getPropertyValue("--border").trim() || "#888",
       };
     };
@@ -299,7 +299,7 @@ export function LoomShuttle({
         <canvas ref={canvasRef} className="block h-40 w-full" />
       </div>
       <div className="mt-3 flex items-baseline justify-between">
-        <span className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+        <span className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
           {label}
         </span>
         <span

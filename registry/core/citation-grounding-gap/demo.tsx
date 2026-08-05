@@ -54,13 +54,13 @@ const SENTENCES: TrestleSentence[] = [
 export default function TrestleGapDemo() {
   return (
     <div className="mx-auto flex min-h-screen max-w-2xl flex-col justify-center gap-6 px-8 py-24">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / citation-grounding-gap — coverage you can see, not one you have to hover for
       </p>
       <div className="rounded-md border border-border bg-background p-6">
         <TrestleGap sentences={SENTENCES} />
       </div>
-      <p className="text-xs leading-relaxed text-muted">
+      <p className="text-xs leading-relaxed text-ns-muted">
         Click a solid plank to open its source. Click a gap — or focus it and press{" "}
         <kbd className="rounded-[3px] border border-border px-1 font-mono">f</kbd> — to search for support.
       </p>

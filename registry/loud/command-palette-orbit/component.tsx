@@ -155,7 +155,7 @@ function readTokens(el: HTMLElement) {
     parseHex(cs.getPropertyValue(name)) ?? fallback;
   return {
     fg: read("--foreground", [237, 237, 237]),
-    accent: read("--accent", [0, 107, 255]),
+    accent: read("--ns-accent", [0, 107, 255]),
     border: read("--border", [46, 46, 46]),
   };
 }
@@ -702,14 +702,14 @@ export function EventHorizonCommand({
           ? `flex cursor-pointer items-center justify-between px-4 py-2 text-sm transition-colors ${
               i === activeIdx
                 ? "bg-background text-foreground"
-                : "text-muted hover:bg-background/60 hover:text-foreground"
+                : "text-ns-muted hover:bg-background/60 hover:text-foreground"
             }`
           : undefined
       }
     >
       <span>{res.item.label}</span>
       {res.item.category ? (
-        <span className="font-mono text-[10px] uppercase tracking-widest text-muted">
+        <span className="font-mono text-[10px] uppercase tracking-widest text-ns-muted">
           {res.item.category}
         </span>
       ) : null}
@@ -746,7 +746,7 @@ export function EventHorizonCommand({
                   setHighlight(0);
                 }}
                 onKeyDown={onInputKeyDown}
-                className="w-full rounded-t-md border-b border-border bg-transparent px-4 py-3 text-sm text-foreground outline-none placeholder:text-muted focus:border-accent/60"
+                className="w-full rounded-t-md border-b border-border bg-transparent px-4 py-3 text-sm text-foreground outline-none placeholder:text-ns-muted focus:border-ns-accent/60"
               />
               <ul
                 id={listId}
@@ -777,7 +777,7 @@ export function EventHorizonCommand({
                   onClick={() => selectItem(c)}
                   className={`absolute left-1/2 top-1/2 flex cursor-pointer select-none items-center gap-2 whitespace-nowrap rounded-full border bg-surface/85 px-3 py-1 backdrop-blur-sm transition-colors will-change-transform ${
                     active?.item.id === c.id
-                      ? "border-accent ring-1 ring-accent"
+                      ? "border-ns-accent ring-1 ring-ns-accent"
                       : "border-border hover:border-foreground/30"
                   }`}
                   style={{
@@ -788,7 +788,7 @@ export function EventHorizonCommand({
                 >
                   <span className="text-xs text-foreground">{c.label}</span>
                   {c.category ? (
-                    <span className="font-mono text-[10px] uppercase tracking-widest text-muted">
+                    <span className="font-mono text-[10px] uppercase tracking-widest text-ns-muted">
                       {c.category}
                     </span>
                   ) : null}
@@ -807,12 +807,12 @@ export function EventHorizonCommand({
                     setHighlight(0);
                   }}
                   onKeyDown={onInputKeyDown}
-                  className="w-full rounded-full border border-border bg-surface/90 px-5 py-2.5 text-sm text-foreground shadow-lg outline-none backdrop-blur transition-colors placeholder:text-muted focus:border-accent/60 focus:ring-2 focus:ring-accent/25"
+                  className="w-full rounded-full border border-border bg-surface/90 px-5 py-2.5 text-sm text-foreground shadow-lg outline-none backdrop-blur transition-colors placeholder:text-ns-muted focus:border-ns-accent/60 focus:ring-2 focus:ring-ns-accent/25"
                 />
                 <ul id={listId} role="listbox" aria-label="Commands" className="sr-only">
                   {optionRows}
                 </ul>
-                <p className="pointer-events-none absolute left-0 right-0 top-full mt-3 text-center font-mono text-[10px] tracking-widest text-muted">
+                <p className="pointer-events-none absolute left-0 right-0 top-full mt-3 text-center font-mono text-[10px] tracking-widest text-ns-muted">
                   &uarr;&darr; orbit &middot; &crarr; consume &middot; esc close
                 </p>
               </div>
@@ -826,7 +826,7 @@ export function EventHorizonCommand({
             setOpenState(true);
             onOpenChange?.(true);
           }}
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-sm border border-border bg-surface px-3 py-1.5 font-mono text-xs text-muted transition-colors hover:border-foreground/30 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-sm border border-border bg-surface px-3 py-1.5 font-mono text-xs text-ns-muted transition-colors hover:border-foreground/30 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
         >
           <kbd className="mr-2 rounded-sm border border-border px-1">&#8984;K</kbd>
           open command palette

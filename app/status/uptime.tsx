@@ -10,10 +10,10 @@
  *
  * Colour:
  *   ok        → --success
- *   degraded  → --accent (the blue). Amber/orange is banned in this project,
+ *   degraded  → --ns-accent (the blue). Amber/orange is banned in this project,
  *               and --warning exists but is never spent here.
  *   down      → --error
- *   no data   → --muted at 25%, an inert grey that still reads as a bar. NOT
+ *   no data   → --ns-muted at 25%, an inert grey that still reads as a bar. NOT
  *               --border: that token is tuned to be a near-invisible hairline
  *               (#ebebeb on white) and a card of ninety of them would render
  *               blank in light mode, which is the day-one state.
@@ -55,9 +55,9 @@ export type BarState = "ok" | "degraded" | "down" | "nodata";
 
 const BAR: Record<BarState, string> = {
   ok: "bg-[var(--success)]",
-  degraded: "bg-accent",
+  degraded: "bg-ns-accent",
   down: "bg-[var(--error)]",
-  nodata: "bg-muted/25",
+  nodata: "bg-ns-muted/25",
 };
 
 /** The non-colour half of the encoding — see the note at the top of the file.
@@ -166,7 +166,7 @@ export function ServiceCard({
           {service.name}
         </h3>
         {service.subtitle ? (
-          <p className="font-mono text-xs text-muted">{service.subtitle}</p>
+          <p className="font-mono text-xs text-ns-muted">{service.subtitle}</p>
         ) : null}
       </div>
 
@@ -182,7 +182,7 @@ export function ServiceCard({
         ))}
       </div>
 
-      <div className="mt-3 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 font-mono text-[11px] text-muted">
+      <div className="mt-3 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 font-mono text-[11px] text-ns-muted">
         <span>90 days</span>
         <span className="tabular-nums">{figure}</span>
       </div>
@@ -200,7 +200,7 @@ export function ServiceCard({
 export function BarLegend() {
   const order: BarState[] = ["ok", "degraded", "down", "nodata"];
   return (
-    <ul className="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[11px] text-muted">
+    <ul className="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[11px] text-ns-muted">
       {order.map((state) => (
         <li key={state} className="flex items-center gap-2">
           <span aria-hidden className="flex h-2.5 w-2.5 items-end">
@@ -217,9 +217,9 @@ export type BannerState = "ok" | "degraded" | "down" | "unknown";
 
 const BANNER: Record<BannerState, { headline: string; dot: string }> = {
   ok: { headline: "Fully operational", dot: "bg-[var(--success)]" },
-  degraded: { headline: "Degraded", dot: "bg-accent" },
+  degraded: { headline: "Degraded", dot: "bg-ns-accent" },
   down: { headline: "Outage", dot: "bg-[var(--error)]" },
-  unknown: { headline: "Partially measured", dot: "bg-muted/25" },
+  unknown: { headline: "Partially measured", dot: "bg-ns-muted/25" },
 };
 
 /**
@@ -261,7 +261,7 @@ export function OverallBanner({
           {headline}
         </h2>
       </div>
-      <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{caption}</p>
+      <p className="mt-2 max-w-2xl text-sm leading-6 text-ns-muted">{caption}</p>
     </section>
   );
 }

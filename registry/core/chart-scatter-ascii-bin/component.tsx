@@ -17,7 +17,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 // grid cells, the raw points themselves, by exact distance to the brush
 // centre — so the readout ("N pts selected, mean x/y") is exact, not a cell
 // count. Every cell whose glyph is currently touched by the brush relinks
-// to var(--accent) ink in place, which is the only colour anywhere in the
+// to var(--ns-accent) ink in place, which is the only colour anywhere in the
 // piece and reserved for the live interaction the same way chart-bar-dither
 // reserves it for keyboard focus. Nothing else in the registry re-bins
 // against a live pointer radius.
@@ -64,9 +64,9 @@ function readTokens(): Tokens {
   return {
     fg: get("--foreground", "#171717"),
     bg: get("--background", "#ffffff"),
-    muted: get("--muted", "#4d4d4d"),
+    muted: get("--ns-muted", "#4d4d4d"),
     border: get("--border", "#ebebeb"),
-    accent: get("--accent", "#006bff"),
+    accent: get("--ns-accent", "#006bff"),
   };
 }
 
@@ -294,8 +294,8 @@ export function ChartScatterAsciiBin({
     <figure className={`ns-csab inline-block ${className}`} aria-label={`${title}, scatter plot`}>
       <style>{CSS}</style>
       <div className="flex items-center justify-between gap-3 pb-2">
-        <span className="font-mono text-xs tracking-widest text-muted">{title.toUpperCase()}</span>
-        <span className="font-mono text-[11px] text-muted tabular-nums" aria-live="off">
+        <span className="font-mono text-xs tracking-widest text-ns-muted">{title.toUpperCase()}</span>
+        <span className="font-mono text-[11px] text-ns-muted tabular-nums" aria-live="off">
           {selection ? `${selection.n} pts · mean (${selection.meanX.toFixed(1)}, ${selection.meanY.toFixed(1)})` : `${points.length} pts total`}
         </span>
       </div>
@@ -347,5 +347,5 @@ export function ChartScatterAsciiBin({
 }
 
 const CSS = `
-.ns-csab-hit:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ns-csab-hit:focus-visible { outline: 2px solid var(--ns-accent); outline-offset: 2px; }
 `;

@@ -34,7 +34,7 @@ const ROWS = Array.from({ length: ROW_COUNT }, (_, i) => genRow(i));
 
 function LogLines() {
   return (
-    <div className="font-mono text-[11px] text-muted">
+    <div className="font-mono text-[11px] text-ns-muted">
       {ROWS.map((r, i) => (
         <div
           key={i}
@@ -53,15 +53,15 @@ export default function ScissorReachDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-3xl">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">
+        <p className="mb-4 font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / minimap-pantograph
         </p>
         <div className="overflow-hidden rounded-md border border-border bg-surface">
           <header className="flex items-center justify-between gap-3 border-b border-border px-5 py-3">
-            <span className="font-mono text-xs tracking-widest text-muted">
+            <span className="font-mono text-xs tracking-widest text-ns-muted">
               REQUEST LOG — 400 ROWS
             </span>
-            <span className="rounded-full border border-border px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-muted">
+            <span className="rounded-full border border-border px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-ns-muted">
               live
             </span>
           </header>
@@ -81,7 +81,7 @@ export default function ScissorReachDemo() {
           </div>
 
           <div className="border-t border-border px-6 py-3">
-            <p className="font-mono text-[11px] text-muted">
+            <p className="font-mono text-[11px] text-ns-muted">
               drag the band, or focus it — arrows step a row, Page Up/Down a
               screenful, Home/End jump to the ends
             </p>

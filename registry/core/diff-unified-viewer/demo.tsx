@@ -54,7 +54,7 @@ function AnnotationCard({
   const label = kind === "ai" ? "Agent review" : kind === "review" ? "Comment · @priya" : "Suggested edit";
   return (
     <div className="rounded-sm border border-border bg-background px-3 py-2 text-[13px] leading-5 text-foreground">
-      <p className="mb-1 font-mono text-[11px] uppercase tracking-wide text-muted">{label}</p>
+      <p className="mb-1 font-mono text-[11px] uppercase tracking-wide text-ns-muted">{label}</p>
       <div className="text-[13px]">{children}</div>
     </div>
   );
@@ -87,7 +87,7 @@ export default function SeamDiffDemo() {
           </p>
           <button
             type="button"
-            className="rounded-sm border border-border px-2.5 py-1 font-mono text-[11px] text-foreground outline-none transition-colors hover:bg-foreground/[0.06] focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded-sm border border-border px-2.5 py-1 font-mono text-[11px] text-foreground outline-none transition-colors hover:bg-foreground/[0.06] focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             Apply suggestion
           </button>
@@ -100,9 +100,9 @@ export default function SeamDiffDemo() {
   return (
     <main className="flex min-h-screen flex-col items-center gap-8 bg-background px-6 py-16 text-foreground">
       <div className="flex w-full max-w-3xl flex-col gap-2">
-        <p className="font-mono text-xs uppercase tracking-[0.3em] text-muted">ns-ui / diff-unified-viewer</p>
+        <p className="font-mono text-xs uppercase tracking-[0.3em] text-ns-muted">ns-ui / diff-unified-viewer</p>
         <h1 className="text-2xl font-semibold tracking-tight">Pull request #482 — rate limiter</h1>
-        <p className="max-w-xl text-sm text-muted">
+        <p className="max-w-xl text-sm text-ns-muted">
           Left-rail markers stand in for red/green: a solid bar for additions, a
           hairline hatch for deletions, both derived from the same ink. Any
           line can carry a widget — an agent&apos;s review note, a teammate&apos;s

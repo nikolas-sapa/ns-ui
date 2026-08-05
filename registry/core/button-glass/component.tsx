@@ -66,7 +66,7 @@ export function GlassButton({
         "active:translate-y-0 active:scale-[0.96]",
         "data-[press=true]:translate-y-0 data-[press=true]:scale-[0.96]",
         "transition-[transform,background-color,border-color] duration-200 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
-        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent",
         "motion-reduce:transition-none motion-reduce:hover:translate-y-0",
         className,
       ].join(" ")}

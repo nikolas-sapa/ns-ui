@@ -13,7 +13,7 @@ import { useEffect, useMemo, useRef } from "react";
 // over 90ms ease-in, a hairline 1px --border chase rect scales 101% -> 100%
 // around the assembled block, the headline's text-shadow flashes
 // 0 1px 0 --border for ~80ms simulating an impression, and the subhead
-// prints beneath starting at --foreground before easing to --muted (the
+// prints beneath starting at --foreground before easing to --ns-muted (the
 // impression "drying"). After that the hero is completely static — no
 // ambient loop, no hover state; assembly is only the setup for the single
 // tightening moment where spacing, chase and press-shadow commit at once.
@@ -53,7 +53,7 @@ const LOCKED_TRACKING = -0.03; // em — resting + the -0.02em clunk delta
 const CLUNK_MS = 90;
 const CHASE_MS = 160;
 const IMPRESSION_MS = 80;
-const STAMP_HOLD_MS = 90; // impression dwell before it eases back to --muted
+const STAMP_HOLD_MS = 90; // impression dwell before it eases back to --ns-muted
 
 export function QuoinLock({
   eyebrow = "COMPOSING ROOM",
@@ -161,7 +161,7 @@ export function QuoinLock({
         line.style.textShadow = "0 0 0 transparent";
         subheadEl.style.transitionDuration = "320ms";
         subheadEl.style.transitionTimingFunction = "ease-out";
-        subheadEl.style.color = "var(--muted)";
+        subheadEl.style.color = "var(--ns-muted)";
       }, STAMP_HOLD_MS);
     };
 
@@ -175,7 +175,7 @@ export function QuoinLock({
       line.style.letterSpacing = `${LOCKED_TRACKING}em`;
       line.style.textShadow = "0 0 0 transparent";
       subheadEl.style.opacity = "1";
-      subheadEl.style.color = "var(--muted)";
+      subheadEl.style.color = "var(--ns-muted)";
 
       root.style.opacity = "0";
       root.style.transitionProperty = "opacity";
@@ -290,7 +290,7 @@ export function QuoinLock({
       <h1 className="sr-only">{headline}</h1>
       <div className="relative z-10 mx-auto flex w-full max-w-4xl flex-col items-center px-6 py-24 text-center sm:py-32">
         {eyebrow ? (
-          <p className="mb-6 font-mono text-[11px] tracking-widest text-muted">{eyebrow}</p>
+          <p className="mb-6 font-mono text-[11px] tracking-widest text-ns-muted">{eyebrow}</p>
         ) : null}
         <div className="relative inline-block">
           <span
@@ -325,7 +325,7 @@ export function QuoinLock({
         </div>
         <p
           ref={subheadRef}
-          className="mt-6 max-w-xl text-base leading-relaxed text-muted"
+          className="mt-6 max-w-xl text-base leading-relaxed text-ns-muted"
           style={{ opacity: 0 }}
         >
           {subhead}

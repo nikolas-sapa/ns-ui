@@ -38,7 +38,7 @@ import {
 // and all native keyboard + AT semantics; it is visually hidden (opacity: 0,
 // sized to cover the box) but stays in the tab order and keeps focus — never
 // aria-hidden. The SVG ink is aria-hidden. Colors: ink is --foreground, the
-// box border is --border; --accent appears only in the focus ring.
+// box border is --border; --ns-accent appears only in the focus ring.
 // prefers-reduced-motion disables every transition/animation here, so the
 // final ink for the current state is simply present or absent, instantly.
 // ---------------------------------------------------------------------------
@@ -250,7 +250,7 @@ export function NibCheck({
           ref={boxRef}
           data-state={state}
           aria-hidden
-          className={`ns-nib-box pointer-events-none absolute inset-0 rounded-[4px] border border-border peer-hover:border-foreground/30 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent ${
+          className={`ns-nib-box pointer-events-none absolute inset-0 rounded-[4px] border border-border peer-hover:border-foreground/30 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-ns-accent ${
             disabled ? "opacity-40" : ""
           }`}
         >

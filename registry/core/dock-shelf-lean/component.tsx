@@ -320,9 +320,9 @@ export function ShelfCant({
                 transitionTimingFunction: SPRING,
                 ...leanStyle,
               }}
-              className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-sm border font-mono text-sm text-muted transition-colors will-change-transform hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent motion-reduce:transition-colors ${
+              className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-sm border font-mono text-sm text-ns-muted transition-colors will-change-transform hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent motion-reduce:transition-colors ${
                 isPicked
-                  ? "border-accent bg-background text-foreground shadow-[0_10px_20px_-8px_rgba(0,0,0,0.35)]"
+                  ? "border-ns-accent bg-background text-foreground shadow-[0_10px_20px_-8px_rgba(0,0,0,0.35)]"
                   : reduced && isActive
                     ? "border-border bg-border text-foreground"
                     : "border-border bg-background"

@@ -303,7 +303,7 @@ export function KeyInterlock({
 `}</style>
 
       <div className="mb-4 flex items-end justify-between gap-4">
-        <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted">
+        <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-ns-muted">
           {title}
         </p>
         <p
@@ -311,7 +311,7 @@ export function KeyInterlock({
           className="shrink-0 font-mono text-[11px] text-foreground"
         >
           {seated}/{gates.length} keys
-          <span className="px-1.5 text-muted">·</span>
+          <span className="px-1.5 text-ns-muted">·</span>
           {released ? "output released" : "output held"}
         </p>
       </div>
@@ -345,7 +345,7 @@ export function KeyInterlock({
                 // would blank the strip on the very click that asked for it.
                 onClick={() => setActiveId(g.id)}
                 className={
-                  "ns-ilk-gate group flex w-16 flex-col items-center rounded-sm text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent " +
+                  "ns-ilk-gate group flex w-16 flex-col items-center rounded-sm text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ns-accent " +
                   (dim ? "opacity-30 " : "opacity-100 ") +
                   (lift ? "-translate-y-0.5" : "translate-y-0")
                 }
@@ -428,7 +428,7 @@ export function KeyInterlock({
                     "mt-2 block w-full break-all text-center font-mono text-[10px] leading-[1.15] " +
                     (g.state === "tripped"
                       ? "font-medium text-foreground"
-                      : "text-muted")
+                      : "text-ns-muted")
                   }
                   title={g.id}
                 >
@@ -523,7 +523,7 @@ export function KeyInterlock({
               />
             </svg>
           </span>
-          <span className="mt-2 block font-mono text-[9px] leading-none text-muted">
+          <span className="mt-2 block font-mono text-[9px] leading-none text-ns-muted">
             release lock
           </span>
         </div>
@@ -582,7 +582,7 @@ export function KeyInterlock({
       {/* ---- detail strip ------------------------------------------------ */}
       <div
         id={`${uid}-strip`}
-        className="ns-ilk-strip mt-4 h-[16px] font-mono text-[11px] leading-[16px] text-muted"
+        className="ns-ilk-strip mt-4 h-[16px] font-mono text-[11px] leading-[16px] text-ns-muted"
         style={{
           opacity: active ? 1 : 0,
           transform: active ? "translateY(0)" : "translateY(-2px)",
@@ -606,7 +606,7 @@ export function KeyInterlock({
               type="button"
               data-override={g.id}
               onClick={() => override(g)}
-              className="rounded-sm border border-border px-2.5 py-1 font-mono text-[11px] uppercase tracking-wide text-foreground transition-colors hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="rounded-sm border border-border px-2.5 py-1 font-mono text-[11px] uppercase tracking-wide text-foreground transition-colors hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
             >
               override {g.id}
             </button>
@@ -620,7 +620,7 @@ export function KeyInterlock({
           className="ns-ilk-veil rounded-md border border-border bg-surface p-4"
           style={{ opacity: released ? 1 : 0.35 }}
         >
-          <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
+          <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-ns-muted">
             model output
           </p>
           <p className="text-sm leading-relaxed text-foreground">{output}</p>
@@ -639,7 +639,7 @@ export function KeyInterlock({
       {/* ---- permanent audit trail --------------------------------------- */}
       {audit.length > 0 ? (
         <div className="mt-4 border-t border-border pt-3">
-          <p className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
+          <p className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-ns-muted">
             audit
           </p>
           {/* exactly three 17px lines + two 4px gaps — a partial clipped line

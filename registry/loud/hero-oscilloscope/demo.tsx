@@ -9,7 +9,7 @@ export default function OscilloCrestDemo() {
         <span className="font-mono text-sm font-semibold tracking-tight text-foreground">
           ns://ui
         </span>
-        <span className="font-mono text-xs tracking-[0.25em] text-muted">
+        <span className="font-mono text-xs tracking-[0.25em] text-ns-muted">
           ns-ui / hero-oscilloscope
         </span>
       </header>
@@ -21,10 +21,10 @@ export default function OscilloCrestDemo() {
         </h1>
       </OscilloCrest>
       <footer className="z-10 flex items-center justify-between border-t border-border px-6 py-3">
-        <span className="font-mono text-xs text-muted">
+        <span className="font-mono text-xs text-ns-muted">
           drag across the field to excite it
         </span>
-        <span className="font-mono text-xs text-muted">
+        <span className="font-mono text-xs text-ns-muted">
           three harmonics / canvas
         </span>
       </footer>

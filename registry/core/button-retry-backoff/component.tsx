@@ -10,8 +10,8 @@ import { useEffect, useId, useRef, useState } from "react";
 // rotates slowly backward as if under tension. Reaching full wind snaps the
 // button to "charged": the icon pops with one damped-spring overshoot, the
 // glyph un-tenses 5deg forward (a permanent correction, not a bounce-back),
-// and the button gains --accent text/border as its one legitimate accent use.
-// Every failure also drops a permanent 2px --muted notch tick at a fixed
+// and the button gains --ns-accent text/border as its one legitimate accent use.
+// Every failure also drops a permanent 2px --ns-muted notch tick at a fixed
 // angular slot on the ring (1st failure always the same slot, 2nd always the
 // next, etc.) — a live history of the episode, not just its current backoff.
 // A successful retry resolves the episode: notches and attempt count reset,
@@ -344,11 +344,11 @@ export function TorsionRetry({
         className={[
           "inline-flex items-center gap-2 rounded-sm border px-3 py-1.5 text-sm font-medium",
           "border-border bg-background text-foreground",
-          "hover:border-muted hover:bg-border/60",
+          "hover:border-ns-muted hover:bg-border/60",
           "disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-background",
           "transition-colors duration-150 motion-reduce:transition-none",
-          "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
-          status === "charged" ? "border-accent text-accent" : "",
+          "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent",
+          status === "charged" ? "border-ns-accent text-ns-accent" : "",
         ].join(" ")}
       >
         <span
@@ -384,7 +384,7 @@ export function TorsionRetry({
                     y1={y1}
                     x2={x2}
                     y2={y2}
-                    stroke="var(--muted)"
+                    stroke="var(--ns-muted)"
                     strokeWidth={2}
                     strokeLinecap="round"
                   />
@@ -415,7 +415,7 @@ export function TorsionRetry({
         id={descId}
         aria-live="polite"
         aria-atomic="true"
-        className="min-h-[1em] font-mono text-[11px] leading-tight text-muted"
+        className="min-h-[1em] font-mono text-[11px] leading-tight text-ns-muted"
       >
         {busy ? <span data-torsion-armed>{caption}</span> : caption}
       </p>

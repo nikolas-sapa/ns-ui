@@ -104,7 +104,7 @@ export function MeshTextDrag({
     const readTokens = () => {
       const cs = getComputedStyle(document.documentElement);
       fgColor = cs.getPropertyValue("--foreground").trim() || "#ededed";
-      accentColor = cs.getPropertyValue("--accent").trim() || "#006bff";
+      accentColor = cs.getPropertyValue("--ns-accent").trim() || "#006bff";
     };
 
     const rebuildOffscreen = () => {

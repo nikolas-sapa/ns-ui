@@ -179,7 +179,7 @@ export function StrikeFigure({
     const readTokens = () => {
       fg = getComputedStyle(canvas).color;
       const raw = getComputedStyle(document.documentElement)
-        .getPropertyValue("--accent")
+        .getPropertyValue("--ns-accent")
         .trim();
       accent = raw || fg;
     };

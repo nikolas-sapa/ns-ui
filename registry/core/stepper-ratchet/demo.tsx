@@ -11,14 +11,14 @@ export default function PawlLiftDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / stepper-ratchet — up is free, down needs a hold
       </p>
 
       <div className="w-full max-w-sm rounded-md border border-border bg-surface">
         <div className="border-b border-border px-6 py-5">
           <h2 className="text-sm font-semibold text-foreground">Workspace seats</h2>
-          <p className="mt-1 text-sm text-muted">
+          <p className="mt-1 text-sm text-ns-muted">
             Billed monthly at ${SEAT_PRICE}/seat. Removing a seat revokes access
             immediately, so it takes a deliberate hold.
           </p>
@@ -31,7 +31,7 @@ export default function PawlLiftDemo() {
             min={1}
             max={50}
           />
-          <div className="flex items-center justify-between font-mono text-xs text-muted">
+          <div className="flex items-center justify-between font-mono text-xs text-ns-muted">
             <span>{seats} seat{seats === 1 ? "" : "s"}</span>
             <span>${(seats * SEAT_PRICE).toFixed(0)}/mo</span>
           </div>
@@ -41,7 +41,7 @@ export default function PawlLiftDemo() {
       <div className="w-full max-w-sm rounded-md border border-border bg-surface">
         <div className="border-b border-border px-6 py-5">
           <h2 className="text-sm font-semibold text-foreground">GPU allocation</h2>
-          <p className="mt-1 text-sm text-muted">
+          <p className="mt-1 text-sm text-ns-muted">
             Units reserved for this project. Tap + to grab more; hold − and the
             pawl has to swing clear before it lets go of one.
           </p>
@@ -59,7 +59,7 @@ export default function PawlLiftDemo() {
         </div>
       </div>
 
-      <p className="max-w-sm text-center text-xs text-muted">
+      <p className="max-w-sm text-center text-xs text-ns-muted">
         Press + to add — instant, no arm delay, and holding it repeats,
         accelerating from 400ms toward 60ms between steps. Press and hold −
         instead: the pawl rotates clear over a quarter second before it

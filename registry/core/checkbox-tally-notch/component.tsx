@@ -173,12 +173,12 @@ export function TallyNotch({
       className={["w-full rounded-md border border-border bg-surface", className].join(" ")}
     >
       <header className="flex items-center justify-between gap-4 border-b border-border px-4 py-3">
-        <span className="font-mono text-xs tracking-widest text-muted uppercase">{label}</span>
+        <span className="font-mono text-xs tracking-widest text-ns-muted uppercase">{label}</span>
         <div className="flex items-center gap-3">
           <TallyCluster count={checked.size} max={items.length} reduced={reduced} />
           <span
             aria-live="polite"
-            className="min-w-[3ch] text-right font-mono text-xs tabular-nums text-muted"
+            className="min-w-[3ch] text-right font-mono text-xs tabular-nums text-ns-muted"
           >
             {checked.size}/{items.length}
           </span>
@@ -197,7 +197,7 @@ export function TallyNotch({
               className={[
                 "group flex cursor-pointer items-center gap-3 border-b border-border px-4 py-3 text-left last:border-b-0",
                 "transition-colors duration-150 hover:bg-border/40",
-                "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent",
+                "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ns-accent",
               ].join(" ")}
             >
               <NotchMark checked={isChecked} reduced={reduced} />
@@ -205,13 +205,13 @@ export function TallyNotch({
                 <span
                   className={[
                     "truncate text-sm transition-colors duration-200",
-                    isChecked ? "text-muted" : "text-foreground",
+                    isChecked ? "text-ns-muted" : "text-foreground",
                   ].join(" ")}
                 >
                   {it.label}
                 </span>
                 {it.hint ? (
-                  <span className="truncate font-mono text-[11px] text-muted">{it.hint}</span>
+                  <span className="truncate font-mono text-[11px] text-ns-muted">{it.hint}</span>
                 ) : null}
               </span>
             </button>

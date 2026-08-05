@@ -21,7 +21,7 @@ import { useEffect, useId, useMemo, useState } from "react";
 // 17 discrete ink-level patterns (0 empty, 16 solid) and duplicated verbatim
 // here so both chart-family members produce byte-identical density at the
 // same level. Pure var(--foreground) ink on var(--background) paper, no
-// --accent in the data channel, --accent reserved for keyboard focus only —
+// --ns-accent in the data channel, --ns-accent reserved for keyboard focus only —
 // the family's colour decision, matching heatmap-year-stipple's precedent.
 // ---------------------------------------------------------------------------
 
@@ -154,11 +154,11 @@ export function ChartDonutHalftone({
       <style>{CSS}</style>
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between gap-3">
-          <span className="font-mono text-xs tracking-widest text-muted">{title.toUpperCase()}</span>
+          <span className="font-mono text-xs tracking-widest text-ns-muted">{title.toUpperCase()}</span>
           <button
             type="button"
             onClick={() => setShowTable((s) => !s)}
-            className="ns-cdh-toggle rounded-sm border border-border px-2 py-1 font-mono text-[10px] tracking-widest text-muted transition-colors duration-150 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="ns-cdh-toggle rounded-sm border border-border px-2 py-1 font-mono text-[10px] tracking-widest text-ns-muted transition-colors duration-150 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
             aria-pressed={showTable}
           >
             {showTable ? "VIEW CHART" : "VIEW TABLE"}
@@ -170,13 +170,13 @@ export function ChartDonutHalftone({
             <caption className="sr-only">{title}</caption>
             <thead>
               <tr>
-                <th scope="col" className="border-b border-border px-2 py-1.5 text-left text-muted">
+                <th scope="col" className="border-b border-border px-2 py-1.5 text-left text-ns-muted">
                   Tier
                 </th>
-                <th scope="col" className="border-b border-border px-2 py-1.5 text-right text-muted tabular-nums">
+                <th scope="col" className="border-b border-border px-2 py-1.5 text-right text-ns-muted tabular-nums">
                   Value
                 </th>
-                <th scope="col" className="border-b border-border px-2 py-1.5 text-right text-muted tabular-nums">
+                <th scope="col" className="border-b border-border px-2 py-1.5 text-right text-ns-muted tabular-nums">
                   Share
                 </th>
               </tr>
@@ -268,7 +268,7 @@ export function ChartDonutHalftone({
 
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center" aria-hidden="true">
               <span className="font-sans text-2xl font-semibold text-foreground">{formatValue(centerValue)}</span>
-              <span className="mt-0.5 max-w-[6.5rem] truncate px-1 font-mono text-[10px] tracking-widest text-muted">
+              <span className="mt-0.5 max-w-[6.5rem] truncate px-1 font-mono text-[10px] tracking-widest text-ns-muted">
                 {centerLabel.toUpperCase()}
               </span>
             </div>
@@ -284,7 +284,7 @@ export function ChartDonutHalftone({
                 <rect width={14} height={14} rx={2} fill={`url(#${uid}-p${w.level})`} stroke="var(--border)" />
               </svg>
               <span className="text-foreground">{w.label}</span>
-              <span className="text-muted">{Math.round(w.frac * 100)}%</span>
+              <span className="text-ns-muted">{Math.round(w.frac * 100)}%</span>
             </li>
           ))}
         </ul>
@@ -295,7 +295,7 @@ export function ChartDonutHalftone({
 
 const CSS = `
 .ns-cdh-wedge { transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), opacity 420ms ease-out; cursor: pointer; outline: none; }
-.ns-cdh-wedge:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ns-cdh-wedge:focus-visible { outline: 2px solid var(--ns-accent); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) {
   .ns-cdh-wedge { transition: none; }
 }

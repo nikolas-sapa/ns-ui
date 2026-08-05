@@ -23,7 +23,7 @@ import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 // cooldown, not a sliver of it), the fill grows a diagonal hazard hatch and
 // breathes gently — a distinct, unmissable "dead" read, not just the same
 // warm tone held longer —
-// and the label itself dims toward --muted. Further presses no-op the actual
+// and the label itself dims toward --ns-muted. Further presses no-op the actual
 // action, instead getting a flat, dead 1px translateY dip that eases back
 // with no spring overshoot — an "overdamped" non-response, not a bigger
 // animation (the hazard breathing is a separate, deliberately ambient loop,
@@ -52,8 +52,8 @@ import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 // without any motion; the caption and aria-live text are identical either
 // way, already the non-motion channel for this state.
 //
-// Every color is a token: --border, --foreground and --muted only, mixed
-// with `color-mix()` — never --accent (interaction-only, reserved for the
+// Every color is a token: --border, --foreground and --ns-muted only, mixed
+// with `color-mix()` — never --ns-accent (interaction-only, reserved for the
 // focus ring), no hex, no canvas. DOM+CSS only.
 // ---------------------------------------------------------------------------
 
@@ -223,14 +223,14 @@ export function HeatSoak({ children, onPress, className = "" }: HeatSoakProps) {
 
 /* accumulated-heat fill: a bottom-up band reading the same --h the border
    and scale already use, so the gauge is legible even where the swelling
-   is subtle. Tone shifts from --muted (cool) toward --foreground (hot) as
-   --warm rises, never toward --accent — thermal state, not an affordance. */
+   is subtle. Tone shifts from --ns-muted (cool) toward --foreground (hot) as
+   --warm rises, never toward --ns-accent — thermal state, not an affordance. */
 .ns-button-cooldown-heat-fill{
   position: absolute;
   inset: 0;
   background-image: linear-gradient(to top,
-    color-mix(in srgb, var(--muted), var(--foreground) calc(var(--warm) * 45%)) 0%,
-    color-mix(in srgb, var(--muted), var(--foreground) calc(var(--warm) * 45%)) calc(var(--h) * 100%),
+    color-mix(in srgb, var(--ns-muted), var(--foreground) calc(var(--warm) * 45%)) 0%,
+    color-mix(in srgb, var(--ns-muted), var(--foreground) calc(var(--warm) * 45%)) calc(var(--h) * 100%),
     transparent calc(var(--h) * 100%),
     transparent 100%);
   opacity: calc(0.16 + var(--warm) * 0.16);
@@ -244,14 +244,14 @@ export function HeatSoak({ children, onPress, className = "" }: HeatSoakProps) {
       color-mix(in srgb, var(--foreground) 22%, transparent) 0 1px,
       transparent 1px 6px),
     linear-gradient(to top,
-      color-mix(in srgb, var(--muted), var(--foreground) 45%) 0%,
-      color-mix(in srgb, var(--muted), var(--foreground) 45%) calc(var(--h) * 100%),
+      color-mix(in srgb, var(--ns-muted), var(--foreground) 45%) 0%,
+      color-mix(in srgb, var(--ns-muted), var(--foreground) 45%) calc(var(--h) * 100%),
       transparent calc(var(--h) * 100%),
       transparent 100%);
   animation: ns-button-cooldown-heat-hazard 1.6s ease-in-out infinite;
 }
 .ns-button-cooldown-heat-btn[aria-disabled="true"] .ns-button-cooldown-heat-label{
-  color: color-mix(in srgb, var(--foreground), var(--muted) 35%);
+  color: color-mix(in srgb, var(--foreground), var(--ns-muted) 35%);
 }
 
 /* heat shimmer/haze: a soft band sweeping the surface, opacity gated to
@@ -262,7 +262,7 @@ export function HeatSoak({ children, onPress, className = "" }: HeatSoakProps) {
   inset: 0;
   background-image: linear-gradient(100deg,
     transparent 30%,
-    color-mix(in srgb, var(--muted), var(--foreground) 30%) 50%,
+    color-mix(in srgb, var(--ns-muted), var(--foreground) 30%) 50%,
     transparent 70%);
   background-size: 220% 100%;
   opacity: calc(var(--warm) * 0.35);
@@ -303,14 +303,14 @@ export function HeatSoak({ children, onPress, className = "" }: HeatSoakProps) {
         aria-disabled={soaked ? "true" : undefined}
         aria-describedby={descId}
         onClick={handleClick}
-        className="ns-button-cooldown-heat-btn inline-flex items-center justify-center rounded-sm border bg-background px-5 py-2.5 text-sm font-medium text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        className="ns-button-cooldown-heat-btn inline-flex items-center justify-center rounded-sm border bg-background px-5 py-2.5 text-sm font-medium text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
       >
         <span aria-hidden="true" className="ns-button-cooldown-heat-fill" />
         <span aria-hidden="true" className="ns-button-cooldown-heat-haze" />
         <span className="ns-button-cooldown-heat-label">{children}</span>
       </button>
 
-      <p id={descId} className="mt-1.5 font-mono text-[11px] text-muted">
+      <p id={descId} className="mt-1.5 font-mono text-[11px] text-ns-muted">
         {caption}
       </p>
 

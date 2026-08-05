@@ -579,7 +579,7 @@ export function FlockStack({
       role="group"
       aria-label={label}
       data-resolved="false"
-      className={`relative w-full rounded-sm border border-border/60 bg-background/40 transition-colors hover:border-foreground/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${className}`}
+      className={`relative w-full rounded-sm border border-border/60 bg-background/40 transition-colors hover:border-foreground/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent ${className}`}
     >
       {members.map((m, i) => (
         <div
@@ -592,7 +592,7 @@ export function FlockStack({
         >
           <div
             data-avatar
-            className="flex h-full w-full select-none items-center justify-center rounded-full border border-border bg-surface font-mono text-[9px] font-medium text-muted ring-2 ring-background transition-transform duration-200"
+            className="flex h-full w-full select-none items-center justify-center rounded-full border border-border bg-surface font-mono text-[9px] font-medium text-ns-muted ring-2 ring-background transition-transform duration-200"
           >
             {m.src ? (
               <img
@@ -616,7 +616,7 @@ export function FlockStack({
       {overflow > 0 && (
         <div
           ref={badgeRef}
-          className="absolute left-0 top-0 flex select-none items-center justify-center rounded-full border border-border bg-surface font-mono text-[10px] text-muted ring-2 ring-background transition-opacity duration-200"
+          className="absolute left-0 top-0 flex select-none items-center justify-center rounded-full border border-border bg-surface font-mono text-[10px] text-ns-muted ring-2 ring-background transition-opacity duration-200"
           style={{
             width: avatarSize,
             height: avatarSize,

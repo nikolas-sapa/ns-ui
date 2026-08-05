@@ -10,13 +10,13 @@ import { DecalPeel } from "./component";
 export default function DecalPeelDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / sticker-peel
       </p>
 
       <DecalPeel demo />
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Drag a corner to peel, or hold Space — release past 70% and the decal
         tears free, flutters, and re-adheres where it lands.
       </p>

@@ -283,7 +283,7 @@ export function ScrollIsland({
       >
         <a
           href="#top"
-          className="shrink-0 whitespace-nowrap font-mono text-sm font-medium tracking-tight text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="shrink-0 whitespace-nowrap font-mono text-sm font-medium tracking-tight text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
         >
           {wordmark}
         </a>
@@ -298,8 +298,8 @@ export function ScrollIsland({
               key={s.id}
               href={`#${s.id}`}
               tabIndex={compact ? -1 : 0}
-              className={`whitespace-nowrap text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
-                s.id === active ? "text-foreground" : "text-muted hover:text-foreground"
+              className={`whitespace-nowrap text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent ${
+                s.id === active ? "text-foreground" : "text-ns-muted hover:text-foreground"
               }`}
             >
               {s.label}

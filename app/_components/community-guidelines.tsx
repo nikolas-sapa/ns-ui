@@ -15,7 +15,7 @@ export function CommunityGuidelines() {
       >
         What we publish
       </h2>
-      <p className="mt-2 text-sm leading-6 text-muted">
+      <p className="mt-2 text-sm leading-6 text-ns-muted">
         Every submission is read by a person before it appears. Submitting does
         not guarantee publication.
       </p>
@@ -23,7 +23,7 @@ export function CommunityGuidelines() {
         {RULES.map((rule) => (
           <li
             key={rule}
-            className="flex gap-2.5 text-sm leading-6 text-muted"
+            className="flex gap-2.5 text-sm leading-6 text-ns-muted"
           >
             <span aria-hidden className="mt-2 size-1 shrink-0 rounded-full bg-border" />
             {rule}

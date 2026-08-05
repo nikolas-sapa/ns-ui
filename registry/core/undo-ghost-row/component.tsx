@@ -104,7 +104,7 @@ function Row({ item, onDelete }: { item: AfterImageItem; onDelete: () => void })
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm text-foreground">{item.title}</p>
           {item.subtitle ? (
-            <p className="truncate text-xs text-muted">{item.subtitle}</p>
+            <p className="truncate text-xs text-ns-muted">{item.subtitle}</p>
           ) : null}
         </div>
         <button
@@ -112,7 +112,7 @@ function Row({ item, onDelete }: { item: AfterImageItem; onDelete: () => void })
           data-afterimage-delete
           onClick={onDelete}
           aria-label={`Delete ${item.title}`}
-          className="shrink-0 rounded-sm p-1.5 text-muted transition-colors hover:bg-background hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="shrink-0 rounded-sm p-1.5 text-ns-muted transition-colors hover:bg-background hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
         >
           <TrashIcon />
         </button>
@@ -224,7 +224,7 @@ function GhostRow({
             data-afterimage-undo
             onClick={handleRestore}
             aria-label={`Undo delete: ${item.title}`}
-            className="flex min-w-0 flex-1 items-center gap-2 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="flex min-w-0 flex-1 items-center gap-2 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             <UndoIcon />
             <span className="truncate text-sm text-foreground/40">{item.title}</span>
@@ -238,12 +238,12 @@ function GhostRow({
                 onExpire();
               }}
               aria-label={`Dismiss: finish deleting ${item.title}`}
-              className="shrink-0 rounded-sm p-1.5 text-muted transition-colors hover:bg-background hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="shrink-0 rounded-sm p-1.5 text-ns-muted transition-colors hover:bg-background hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
             >
               <XIcon />
             </button>
           ) : (
-            <span className="shrink-0 font-mono text-[10px] uppercase tracking-wide text-muted">
+            <span className="shrink-0 font-mono text-[10px] uppercase tracking-wide text-ns-muted">
               Undo
             </span>
           )}
@@ -297,7 +297,7 @@ export function AfterImageList({
   return (
     <div className={className}>
       {rows.length === 0 ? (
-        <p className="rounded-md border border-dashed border-border px-4 py-6 text-center text-sm text-muted">
+        <p className="rounded-md border border-dashed border-border px-4 py-6 text-center text-sm text-ns-muted">
           Nothing here.
         </p>
       ) : (

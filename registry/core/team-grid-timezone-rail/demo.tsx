@@ -18,7 +18,7 @@ const VIEWER_OFFSET = 1;
 export default function TeamGridTimezoneRailDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-7 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / team-grid-timezone-rail
       </p>
 
@@ -29,7 +29,7 @@ export default function TeamGridTimezoneRailDemo() {
         className="max-w-[880px]"
       />
 
-      <p className="max-w-[52ch] text-center text-xs text-muted">
+      <p className="max-w-[52ch] text-center text-xs text-ns-muted">
         Six people, six timezones. The inked run on the UTC rail is the only window in which everyone
         is inside their own working hours at once — four hours, 13:00 to 17:00 UTC. Hover one person
         and the rail opens out to the hours just you two share; press to pin it.

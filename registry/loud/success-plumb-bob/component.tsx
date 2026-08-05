@@ -278,7 +278,7 @@ export function PlumbTrue({
               y1={ANCHOR_Y}
               x2={ANCHOR_X}
               y2={ANCHOR_Y}
-              stroke="color-mix(in srgb, var(--muted) 20%, transparent)"
+              stroke="color-mix(in srgb, var(--ns-muted) 20%, transparent)"
               strokeWidth="1"
             />
             <path ref={echo1BobRef} d={BOB_PATH} fill="color-mix(in srgb, var(--foreground) 20%, transparent)" />
@@ -290,7 +290,7 @@ export function PlumbTrue({
               y1={ANCHOR_Y}
               x2={ANCHOR_X}
               y2={ANCHOR_Y}
-              stroke="color-mix(in srgb, var(--muted) 20%, transparent)"
+              stroke="color-mix(in srgb, var(--ns-muted) 20%, transparent)"
               strokeWidth="1"
             />
             <path ref={echo2BobRef} d={BOB_PATH} fill="color-mix(in srgb, var(--foreground) 20%, transparent)" />
@@ -298,7 +298,7 @@ export function PlumbTrue({
 
           {/* the bob itself: fine string + filled teardrop, rotating about the anchor */}
           <g ref={groupRef} style={{ transformOrigin: `${ANCHOR_X}px ${ANCHOR_Y}px` }}>
-            <line ref={stringRef} x1={ANCHOR_X} y1={ANCHOR_Y} x2={ANCHOR_X} y2={ANCHOR_Y} stroke="var(--muted)" strokeWidth="1" />
+            <line ref={stringRef} x1={ANCHOR_X} y1={ANCHOR_Y} x2={ANCHOR_X} y2={ANCHOR_Y} stroke="var(--ns-muted)" strokeWidth="1" />
             <path ref={bobRef} d={BOB_PATH} fill="var(--foreground)" transform={`translate(${ANCHOR_X} ${ANCHOR_Y})`} />
           </g>
 
@@ -350,7 +350,7 @@ export function PlumbTrue({
       </div>
 
       <p
-        className="text-center text-sm text-muted"
+        className="text-center text-sm text-ns-muted"
         style={{ opacity: phase === "pending" ? 1 : 0, transition: "opacity 200ms ease-out" }}
       >
         {pendingCopy}
@@ -361,7 +361,7 @@ export function PlumbTrue({
           ref={buttonRef}
           type="button"
           onClick={handleClick}
-          className="rounded-sm border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-border/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="rounded-sm border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-border/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
         >
           {buttonLabel}
         </button>

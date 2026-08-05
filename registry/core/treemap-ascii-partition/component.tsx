@@ -174,7 +174,7 @@ export function AsciiPartition({ data = DEFAULT_DATA, className = "" }: AsciiPar
         <button
           type="button"
           onClick={() => ascendTo(0)}
-          className="ns-tap-crumb rounded-sm px-1.5 py-0.5 text-muted transition-colors duration-150 motion-reduce:transition-none hover:text-foreground"
+          className="ns-tap-crumb rounded-sm px-1.5 py-0.5 text-ns-muted transition-colors duration-150 motion-reduce:transition-none hover:text-foreground"
           aria-current={path.length === 0 ? "true" : undefined}
         >
           Root
@@ -187,7 +187,7 @@ export function AsciiPartition({ data = DEFAULT_DATA, className = "" }: AsciiPar
             <button
               type="button"
               onClick={() => ascendTo(i + 1)}
-              className="ns-tap-crumb rounded-sm px-1.5 py-0.5 text-muted transition-colors duration-150 motion-reduce:transition-none hover:text-foreground"
+              className="ns-tap-crumb rounded-sm px-1.5 py-0.5 text-ns-muted transition-colors duration-150 motion-reduce:transition-none hover:text-foreground"
               aria-current={i === crumbLabels.length - 1 ? "true" : undefined}
             >
               {label}
@@ -200,7 +200,7 @@ export function AsciiPartition({ data = DEFAULT_DATA, className = "" }: AsciiPar
             data-treemap-up
             onClick={() => ascendTo(path.length - 1)}
             aria-label={`Up one level to ${crumbLabels.length > 1 ? crumbLabels[crumbLabels.length - 2] : "Root"}`}
-            className="ns-tap-crumb ml-2 rounded-sm border border-border px-1.5 py-0.5 text-muted transition-colors duration-150 motion-reduce:transition-none hover:text-foreground hover:border-accent/40"
+            className="ns-tap-crumb ml-2 rounded-sm border border-border px-1.5 py-0.5 text-ns-muted transition-colors duration-150 motion-reduce:transition-none hover:text-foreground hover:border-ns-accent/40"
           >
             &lt; Up
           </button>
@@ -250,7 +250,7 @@ export function AsciiPartition({ data = DEFAULT_DATA, className = "" }: AsciiPar
                 hasChildren ? ", press Enter to open" : ""
               }`}
               className={`ns-tap-rect absolute overflow-hidden border bg-background text-left transition-colors duration-150 motion-reduce:transition-none ${
-                hovered ? "border-accent/40" : "border-border"
+                hovered ? "border-ns-accent/40" : "border-border"
               } ${hasChildren ? "cursor-pointer" : "cursor-default"}`}
               style={{
                 left: r.x * CELL_W,
@@ -262,7 +262,7 @@ export function AsciiPartition({ data = DEFAULT_DATA, className = "" }: AsciiPar
               <div
                 aria-hidden
                 className={`absolute inset-0 select-none overflow-hidden whitespace-pre leading-[15px] ${
-                  hovered ? "text-foreground" : "text-muted"
+                  hovered ? "text-foreground" : "text-ns-muted"
                 }`}
                 style={{ fontSize: 10 }}
               >
@@ -275,7 +275,7 @@ export function AsciiPartition({ data = DEFAULT_DATA, className = "" }: AsciiPar
                 className="relative z-10 truncate bg-background/78 px-1 py-0.5 text-[10px] text-foreground"
               >
                 {r.node.label}
-                <span className="ml-1 text-muted">{r.node.value.toLocaleString()}</span>
+                <span className="ml-1 text-ns-muted">{r.node.value.toLocaleString()}</span>
               </div>
             </button>
           );
@@ -286,6 +286,6 @@ export function AsciiPartition({ data = DEFAULT_DATA, className = "" }: AsciiPar
 }
 
 const CSS = `
-.ns-tap-rect:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-.ns-tap-crumb:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ns-tap-rect:focus-visible { outline: 2px solid var(--ns-accent); outline-offset: -2px; }
+.ns-tap-crumb:focus-visible { outline: 2px solid var(--ns-accent); outline-offset: 2px; }
 `;

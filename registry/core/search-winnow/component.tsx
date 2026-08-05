@@ -91,7 +91,7 @@ export function ChaffWinnow({
   return (
     <div className={["w-full rounded-md border border-border bg-surface", className].join(" ")}>
       <div className="flex items-center gap-2.5 border-b border-border px-4 py-3">
-        <svg aria-hidden width={15} height={15} viewBox="0 0 15 15" className="shrink-0 text-muted">
+        <svg aria-hidden width={15} height={15} viewBox="0 0 15 15" className="shrink-0 text-ns-muted">
           <circle cx={6.5} cy={6.5} r={4.5} fill="none" stroke="currentColor" strokeWidth={1.5} />
           <path d="M 10 10 L 13.5 13.5" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" />
         </svg>
@@ -114,9 +114,9 @@ export function ChaffWinnow({
             setActive(-1);
           }}
           onKeyDown={onKeyDown}
-          className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted"
+          className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-ns-muted"
         />
-        <span aria-live="polite" className="shrink-0 font-mono text-[11px] tabular-nums text-muted">
+        <span aria-live="polite" className="shrink-0 font-mono text-[11px] tabular-nums text-ns-muted">
           {visible.length}/{items.length}
         </span>
       </div>
@@ -164,7 +164,7 @@ export function ChaffWinnow({
                     <Highlight text={it.label} query={q} />
                   </span>
                   {it.hint ? (
-                    <span className="shrink-0 font-mono text-[11px] text-muted">
+                    <span className="shrink-0 font-mono text-[11px] text-ns-muted">
                       <Highlight text={it.hint} query={q} />
                     </span>
                   ) : null}
@@ -184,7 +184,7 @@ export function ChaffWinnow({
           }}
         >
           <div className="min-h-0 overflow-hidden">
-            <p className="px-4 py-2 font-mono text-[11px] text-muted">
+            <p className="px-4 py-2 font-mono text-[11px] text-ns-muted">
               nothing survives “{q}”
             </p>
           </div>

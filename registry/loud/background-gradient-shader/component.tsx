@@ -10,7 +10,7 @@ import { useEffect, useRef } from "react";
 // field, one ramp, one drift direction, kept deliberately simple so it reads
 // as a calm moving backdrop rather than a shader demo.
 //
-// Colors default to --accent, --background lightened, and --foreground
+// Colors default to --ns-accent, --background lightened, and --foreground
 // dimmed, all read via getComputedStyle at mount and re-read on a
 // MutationObserver watching documentElement's class attribute, so the tide
 // re-tints itself on a theme flip without a remount. An explicit `colors`
@@ -160,7 +160,7 @@ export function ChromaTide({ colors, speed = 1, scale = 1, className = "", style
         return;
       }
       const cs = getComputedStyle(document.documentElement);
-      const accent = parseHex(cs.getPropertyValue("--accent").trim()) ?? [0, 0.42, 1];
+      const accent = parseHex(cs.getPropertyValue("--ns-accent").trim()) ?? [0, 0.42, 1];
       const bg = parseHex(cs.getPropertyValue("--background").trim()) ?? [0, 0, 0];
       const fg = parseHex(cs.getPropertyValue("--foreground").trim()) ?? [1, 1, 1];
       c1 = mix3(bg, fg, 0.12);

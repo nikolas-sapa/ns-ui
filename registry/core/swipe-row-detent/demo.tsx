@@ -78,7 +78,7 @@ export default function DetentSwipeDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">ns-ui / swipe-row-detent</p>
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">ns-ui / swipe-row-detent</p>
 
       <div ref={containerRef} className="w-full max-w-md overflow-hidden rounded-[12px] border border-border">
         {ROWS.map((row) => (
@@ -86,7 +86,7 @@ export default function DetentSwipeDemo() {
         ))}
       </div>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Drag a row left — it clicks through Archive and Flag detents, then
         resists and arms Delete past the hard stop, with a 3s undo before it
         commits.

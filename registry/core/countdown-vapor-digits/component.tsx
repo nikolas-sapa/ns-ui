@@ -512,7 +512,7 @@ export function VaporCountdown({
         labels.map((label) => (
           <span
             key={label}
-            className="text-center font-mono text-[10px] tracking-[0.25em] text-muted"
+            className="text-center font-mono text-[10px] tracking-[0.25em] text-ns-muted"
           >
             {label}
           </span>

@@ -156,7 +156,7 @@ export function ScarpHorizon({
       fg = getComputedStyle(canvas).color;
       muted =
         getComputedStyle(document.documentElement)
-          .getPropertyValue("--muted")
+          .getPropertyValue("--ns-muted")
           .trim() || fg;
     };
 

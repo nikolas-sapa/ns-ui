@@ -243,13 +243,13 @@ export function ShuntTray({
                 />
               ))}
               {level.items.length === 0 && (
-                <p className="px-3 py-6 text-center text-xs text-muted">No items</p>
+                <p className="px-3 py-6 text-center text-xs text-ns-muted">No items</p>
               )}
             </div>
             {!isTopmost && (
               <div
                 aria-hidden
-                className="pointer-events-none absolute inset-0 rounded-md bg-muted/20 transition-opacity duration-150 motion-reduce:duration-100"
+                className="pointer-events-none absolute inset-0 rounded-md bg-ns-muted/20 transition-opacity duration-150 motion-reduce:duration-100"
               />
             )}
           </div>
@@ -262,7 +262,7 @@ export function ShuntTray({
           type="button"
           aria-label={`Back to ${levels[i].label}`}
           onClick={() => shuntTo(i)}
-          className="absolute inset-y-0 z-[100] bg-transparent transition-colors hover:bg-foreground/5 focus-visible:bg-foreground/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent"
+          className="absolute inset-y-0 z-[100] bg-transparent transition-colors hover:bg-foreground/5 focus-visible:bg-foreground/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ns-accent"
           style={{ left: i * EDGE, width: EDGE }}
         />
       ))}
@@ -339,12 +339,12 @@ function ShuntRow({
       tabIndex={isLevelActive ? 0 : -1}
       onClick={() => (hasChildren ? onOpen(item) : onSelect(item))}
       onKeyDown={handleKeyDown}
-      className="flex w-full items-center gap-2 rounded-sm px-2.5 py-2 text-left text-sm text-foreground transition-colors hover:bg-background focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent"
+      className="flex w-full items-center gap-2 rounded-sm px-2.5 py-2 text-left text-sm text-foreground transition-colors hover:bg-background focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ns-accent"
     >
       <span className="flex-1 truncate">{item.label}</span>
-      {item.hint && <span className="font-mono text-xs text-muted">{item.hint}</span>}
+      {item.hint && <span className="font-mono text-xs text-ns-muted">{item.hint}</span>}
       {hasChildren && (
-        <svg aria-hidden viewBox="0 0 16 16" className="h-3.5 w-3.5 shrink-0 text-muted">
+        <svg aria-hidden viewBox="0 0 16 16" className="h-3.5 w-3.5 shrink-0 text-ns-muted">
           <path
             d="M6 3l5 5-5 5"
             fill="none"

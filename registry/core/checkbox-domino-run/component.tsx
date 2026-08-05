@@ -43,7 +43,7 @@ import {
 // pressed in time.
 //
 // TOKENS: --foreground for ink (checkbox fill, the traveling tick),
-// --border for hairlines, --muted for secondary text, --accent for the
+// --border for hairlines, --ns-muted for secondary text, --ns-accent for the
 // focus ring only. Pure DOM/CSS, no canvas.
 // ---------------------------------------------------------------------------
 
@@ -338,7 +338,7 @@ export function ToppleRun({
         <span className="flex-1 text-[13px] font-medium text-foreground">
           {label}
         </span>
-        <span aria-hidden="true" className="font-mono text-[11px] text-muted">
+        <span aria-hidden="true" className="font-mono text-[11px] text-ns-muted">
           {checkedCount}/{total}
         </span>
       </label>
@@ -381,7 +381,7 @@ export function ToppleRun({
                     {row.label}
                   </span>
                   {row.description && (
-                    <span className="block truncate text-[12px] text-muted">
+                    <span className="block truncate text-[12px] text-ns-muted">
                       {row.description}
                     </span>
                   )}
@@ -394,13 +394,13 @@ export function ToppleRun({
 
       {undoAvailable && (
         <div className="flex items-center justify-between gap-3 border-t border-border px-4 py-3">
-          <span className="text-[12px] text-muted">
+          <span className="text-[12px] text-ns-muted">
             Batch applied — undo within {UNDO_MS / 1000}s.
           </span>
           <button
             type="button"
             onClick={handleUndo}
-            className="rounded-sm border border-border px-2.5 py-1 text-[12px] font-medium text-foreground transition-colors duration-150 hover:border-foreground/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="rounded-sm border border-border px-2.5 py-1 text-[12px] font-medium text-foreground transition-colors duration-150 hover:border-foreground/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             Undo
           </button>
@@ -424,7 +424,7 @@ function CheckboxVisual({
   return (
     <span
       aria-hidden="true"
-      className="relative inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-[6px] border border-border bg-background peer-checked:border-foreground peer-checked:bg-foreground peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent"
+      className="relative inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-[6px] border border-border bg-background peer-checked:border-foreground peer-checked:bg-foreground peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-ns-accent"
       style={{
         transition: `background-color ${springDuration} ${springEase}, border-color ${springDuration} ${springEase}`,
       }}

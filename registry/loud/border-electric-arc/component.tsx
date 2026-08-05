@@ -5,7 +5,7 @@ import { useEffect, useId, useRef } from "react";
 // ---------------------------------------------------------------------------
 // SparkGap — an electric border for a CTA. A rounded-rect outline crackles
 // like a live wire: feTurbulence -> feDisplacementMap jitters a 1.5px
-// --foreground stroke over a blurred --accent glow copy, with random
+// --foreground stroke over a blurred --ns-accent glow copy, with random
 // micro-arcs sparking off the corners every 1-3s. Near the cursor the border
 // OPENS a small gap at the pointer's nearest-edge projection and a short
 // bright arc jumps across it, tracking the pointer along the perimeter.
@@ -533,7 +533,7 @@ export function SparkGap({
           ref={glowRef}
           className="ns-sg-glow"
           fill="none"
-          stroke="var(--accent)"
+          stroke="var(--ns-accent)"
           strokeWidth={5}
           strokeLinecap="round"
           style={{
@@ -561,28 +561,28 @@ export function SparkGap({
           style={{
             opacity: 0,
             filter:
-              "drop-shadow(0 0 4px var(--accent)) drop-shadow(0 0 1.5px var(--accent))",
+              "drop-shadow(0 0 4px var(--ns-accent)) drop-shadow(0 0 1.5px var(--ns-accent))",
           }}
         />
         <path
           ref={sparkARef}
           className="ns-sg-spark"
           fill="none"
-          stroke="var(--accent)"
+          stroke="var(--ns-accent)"
           strokeWidth={1.3}
           strokeLinecap="round"
           strokeLinejoin="round"
-          style={{ opacity: 0, filter: "drop-shadow(0 0 3px var(--accent))" }}
+          style={{ opacity: 0, filter: "drop-shadow(0 0 3px var(--ns-accent))" }}
         />
         <path
           ref={sparkBRef}
           className="ns-sg-spark"
           fill="none"
-          stroke="var(--accent)"
+          stroke="var(--ns-accent)"
           strokeWidth={1.1}
           strokeLinecap="round"
           strokeLinejoin="round"
-          style={{ opacity: 0, filter: "drop-shadow(0 0 3px var(--accent))" }}
+          style={{ opacity: 0, filter: "drop-shadow(0 0 3px var(--ns-accent))" }}
         />
       </svg>
 
@@ -594,7 +594,7 @@ export function SparkGap({
           if (e.detail === 0) engineRef.current?.discharge();
           onClick?.();
         }}
-        className="ns-sg-btn relative z-[1] rounded-[6px] bg-background px-6 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-foreground/[0.08] active:bg-foreground/[0.14] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        className="ns-sg-btn relative z-[1] rounded-[6px] bg-background px-6 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-foreground/[0.08] active:bg-foreground/[0.14] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
       >
         {label}
       </button>
@@ -606,7 +606,7 @@ const CSS = `
 @media (prefers-reduced-motion: reduce){
   .ns-sg-glow,.ns-sg-arc,.ns-sg-spark{opacity:0 !important;transition:none !important;}
   .ns-sg-btn:hover,.ns-sg-btn:focus-visible{
-    box-shadow:0 0 14px 0 color-mix(in srgb, var(--accent) 45%, transparent);
+    box-shadow:0 0 14px 0 color-mix(in srgb, var(--ns-accent) 45%, transparent);
   }
 }
 `;

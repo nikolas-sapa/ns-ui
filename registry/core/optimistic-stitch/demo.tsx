@@ -31,30 +31,30 @@ export default function BasteStitchDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 py-16">
-      <p className="font-mono text-xs tracking-[0.2em] text-muted uppercase">
+      <p className="font-mono text-xs tracking-[0.2em] text-ns-muted uppercase">
         ns-ui / optimistic-stitch
       </p>
 
       <div className="w-full max-w-md overflow-hidden rounded-md border border-border bg-surface">
         <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
-          <span className="font-mono text-[11px] text-muted">sprint backlog</span>
-          <span className="font-mono text-[11px] text-muted">3 items</span>
+          <span className="font-mono text-[11px] text-ns-muted">sprint backlog</span>
+          <span className="font-mono text-[11px] text-ns-muted">3 items</span>
         </div>
 
         <div className="divide-y divide-border">
           <BasteStitch status="pending" itemLabel="item">
             <p className="truncate text-sm text-foreground">Add "Ship dark-mode audit"</p>
-            <p className="truncate font-mono text-[11px] text-muted">just now</p>
+            <p className="truncate font-mono text-[11px] text-ns-muted">just now</p>
           </BasteStitch>
 
           <BasteStitch status="committed" itemLabel="comment">
             <p className="truncate text-sm text-foreground">"Looks good, merging tonight."</p>
-            <p className="truncate font-mono text-[11px] text-muted">2m ago</p>
+            <p className="truncate font-mono text-[11px] text-ns-muted">2m ago</p>
           </BasteStitch>
 
           <BasteStitch status={renameStatus} onRetry={retry} itemLabel="rename">
             <p className="truncate text-sm text-foreground">Renamed to "Q3 roadmap review"</p>
-            <p className="truncate font-mono text-[11px] text-muted">
+            <p className="truncate font-mono text-[11px] text-ns-muted">
               {renameStatus === "pending"
                 ? "saving…"
                 : renameStatus === "committed"
@@ -65,7 +65,7 @@ export default function BasteStitchDemo() {
         </div>
       </div>
 
-      <p className="max-w-md text-center font-mono text-[10px] text-muted">
+      <p className="max-w-md text-center font-mono text-[10px] text-ns-muted">
         dashed = provisional, solid = acked, muted + dimmed = rolled back — press Retry
       </p>
     </div>

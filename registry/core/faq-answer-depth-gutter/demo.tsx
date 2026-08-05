@@ -61,7 +61,7 @@ const ITEMS: FaqDepthItem[] = [
 export default function FaqDepthGutterDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / faq-answer-depth-gutter
       </p>
 
@@ -70,7 +70,7 @@ export default function FaqDepthGutterDemo() {
         <FaqDepthGutter items={ITEMS} defaultOpen={["data"]} />
       </div>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         An FAQ accordion. One answer is open at a time.
       </p>
     </div>

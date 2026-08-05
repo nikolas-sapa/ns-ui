@@ -10,7 +10,7 @@ import { SignetDrop } from "./component";
 export default function SignetDropDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / confirm-hold-wax
       </p>
 
@@ -28,7 +28,7 @@ export default function SignetDropDemo() {
         </div>
       </div>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Press and hold Seal to pour wax. Release early and the blob slumps
         back; hold to the end and the signet stamps it, the wax cools, and the
         seal is permanent.

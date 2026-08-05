@@ -15,7 +15,7 @@ import {
 
 // IntentCoil — a hover-card trigger that has to be wound before it opens,
 // instead of firing the instant the pointer happens to cross it. A hairline
-// arc (an SVG circle, r=5, stroke --muted) coils clockwise around a 5px dot
+// arc (an SVG circle, r=5, stroke --ns-muted) coils clockwise around a 5px dot
 // appended after the trigger's label, its stroke-dashoffset driven straight
 // off dwell time on a rAF loop rather than a CSS transition, because the
 // wind has to be *interruptible mid-frame*: drift off before it completes
@@ -49,7 +49,7 @@ import {
 // prefers-reduced-motion drops the coil and the release outright: the arc
 // stays hidden, hover opens the card after the same dwell window via a
 // plain opacity fade, nothing measured in motion. Zero dependencies; every
-// color is a token (--background --foreground --muted --border --accent).
+// color is a token (--background --foreground --ns-muted --border --ns-accent).
 
 const WIND_MS = 350; // continuous hover needed to fully wind the coil
 const UNWIND_MULT = 2; // leaving mid-wind reverses at this multiple of the wind rate
@@ -302,7 +302,7 @@ export function IntentCoil({ href, children, preview, previewLabel, className = 
         className={[
           "rounded-sm underline decoration-border underline-offset-4 transition-colors duration-150 ease-out",
           "hover:decoration-foreground",
-          "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+          "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent",
         ].join(" ")}
         onPointerEnter={(e: ReactPointerEvent<HTMLAnchorElement>) => {
           if (e.pointerType === "touch") return;
@@ -363,7 +363,7 @@ export function IntentCoil({ href, children, preview, previewLabel, className = 
       >
         {children}
       </a>
-      <svg aria-hidden width={14} height={14} viewBox="0 0 14 14" className="ns-hover-card-dwell-dial ml-1 shrink-0 text-muted">
+      <svg aria-hidden width={14} height={14} viewBox="0 0 14 14" className="ns-hover-card-dwell-dial ml-1 shrink-0 text-ns-muted">
         <circle cx={7} cy={7} r={2} fill="currentColor" />
         <circle
           ref={arcRef}

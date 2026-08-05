@@ -64,7 +64,7 @@ function IconPause() {
 }
 
 const buttonClass =
-  "inline-flex h-9 w-9 items-center justify-center rounded-sm border border-border bg-transparent text-foreground transition-colors hover:border-foreground/30 hover:bg-foreground/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface";
+  "inline-flex h-9 w-9 items-center justify-center rounded-sm border border-border bg-transparent text-foreground transition-colors hover:border-foreground/30 hover:bg-foreground/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface";
 
 export default function LoupeSliderDemo() {
   const [pos, setPos] = useState(74);
@@ -83,14 +83,14 @@ export default function LoupeSliderDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / slider-loupe — the lens is the readout
       </p>
 
       <div className="w-full max-w-xl rounded-md border border-border bg-surface">
         {/* now playing */}
         <div className="flex items-center gap-4 border-b border-border px-6 py-5">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-sm border border-border bg-foreground/[0.04] text-muted">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-sm border border-border bg-foreground/[0.04] text-ns-muted">
             <svg
               width="20"
               height="20"
@@ -112,11 +112,11 @@ export default function LoupeSliderDemo() {
             <h2 className="truncate text-sm font-semibold text-foreground">
               Nocturne in Monochrome
             </h2>
-            <p className="truncate text-sm text-muted">
+            <p className="truncate text-sm text-ns-muted">
               Signal Terrain — Field Recordings, Vol. II
             </p>
           </div>
-          <span className="rounded-full border border-border px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-muted">
+          <span className="rounded-full border border-border px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-ns-muted">
             {playing ? "playing" : "paused"}
           </span>
         </div>
@@ -125,7 +125,7 @@ export default function LoupeSliderDemo() {
         <div className="px-6 pb-2 pt-5">
           <div className="flex items-baseline justify-between font-mono text-xs">
             <span className="tabular-nums text-foreground">{fmtTime(pos)}</span>
-            <span className="tabular-nums text-muted">{fmtTime(DURATION)}</span>
+            <span className="tabular-nums text-ns-muted">{fmtTime(DURATION)}</span>
           </div>
           <LoupeSlider
             value={pos}
@@ -155,7 +155,7 @@ export default function LoupeSliderDemo() {
           <button
             type="button"
             aria-label={playing ? "Pause" : "Play"}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border bg-foreground text-background transition-colors hover:bg-foreground/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border bg-foreground text-background transition-colors hover:bg-foreground/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
             onClick={() => setPlaying((p) => !p)}
           >
             {playing ? <IconPause /> : <IconPlay />}
@@ -177,7 +177,7 @@ export default function LoupeSliderDemo() {
               <h3 className="text-sm font-medium text-foreground">
                 Waveform zoom
               </h3>
-              <p className="mt-0.5 text-xs text-muted">
+              <p className="mt-0.5 text-xs text-ns-muted">
                 Magnification of the editor timeline.
               </p>
             </div>
@@ -200,7 +200,7 @@ export default function LoupeSliderDemo() {
         </div>
 
         <div className="border-t border-border px-6 py-3">
-          <p className="font-mono text-[11px] text-muted">
+          <p className="font-mono text-[11px] text-ns-muted">
             drag past either end for a rubber-band wobble · arrows / PageUp /
             Home steer the lens
           </p>

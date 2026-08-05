@@ -45,13 +45,13 @@ export default async function CommunityPage() {
 
   return (
     <main className="mx-auto flex max-w-5xl flex-col px-6 py-16 sm:px-10">
-      <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted">
+      <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-ns-muted">
         Community
       </p>
       <h1 className="mt-4 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">
         In their own words.
       </h1>
-      <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
+      <p className="mt-3 max-w-2xl text-sm leading-6 text-ns-muted">
         How developers and designers use ns-ui. Every submission is read before
         it appears here.
       </p>
@@ -60,21 +60,21 @@ export default async function CommunityPage() {
         <h2 className="text-lg font-medium tracking-[-0.02em] text-foreground">
           What this is for
         </h2>
-        <p className="mt-2 text-sm leading-6 text-muted">
+        <p className="mt-2 text-sm leading-6 text-ns-muted">
           This registry is a shared reference of single-interaction components
           that people actually use, not a showcase of everything that could be
           built. The goal for the community side of it is the same: a place
           to hear how those components get used in practice, and a way for
           anyone who contributes one to be credited for it.
         </p>
-        <p className="mt-3 text-sm leading-6 text-muted">
+        <p className="mt-3 text-sm leading-6 text-ns-muted">
           Contributing means opening a pull request, the same as any open
           source project — there is no submission form that runs your code on
           this site. What you submit is read by a person against a real bar
           (see{" "}
           <Link
             href="/guidelines"
-            className="underline decoration-border underline-offset-4 outline-none hover:decoration-foreground focus-visible:ring-2 focus-visible:ring-accent"
+            className="underline decoration-border underline-offset-4 outline-none hover:decoration-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             Guidelines
           </Link>
@@ -100,7 +100,7 @@ export default async function CommunityPage() {
         </h2>
         {authed ? (
           <>
-            <p className="mt-2 text-sm leading-6 text-muted">
+            <p className="mt-2 text-sm leading-6 text-ns-muted">
               Tell us how you use the registry. Submissions are reviewed before
               they appear.
             </p>
@@ -110,12 +110,12 @@ export default async function CommunityPage() {
           </>
         ) : (
           <>
-            <p className="mt-2 text-sm leading-6 text-muted">
+            <p className="mt-2 text-sm leading-6 text-ns-muted">
               Sign in to submit your experience.
             </p>
             <Link
               href="/account"
-              className="mt-6 inline-flex items-center rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-muted focus-visible:ring-2 focus-visible:ring-accent"
+              className="mt-6 inline-flex items-center rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent"
             >
               Sign in
             </Link>

@@ -219,7 +219,7 @@ export function TestimonialWallReflow({
                 aria-expanded={isExpanded}
                 aria-label={`${isExpanded ? "Read less" : "Read more"} of ${t.name}'s testimonial`}
                 onClick={() => toggle(t.id)}
-                className="mt-2 rounded-sm font-mono text-xs text-muted underline decoration-border underline-offset-4 transition-colors hover:text-foreground hover:decoration-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                className="mt-2 rounded-sm font-mono text-xs text-ns-muted underline decoration-border underline-offset-4 transition-colors hover:text-foreground hover:decoration-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
               >
                 {isExpanded ? "read less" : "read more"}
               </button>
@@ -227,7 +227,7 @@ export function TestimonialWallReflow({
             <figcaption className="mt-4 flex items-center gap-2.5 border-t border-border pt-3">
               <span
                 aria-hidden
-                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border bg-background font-mono text-[10px] text-muted"
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border bg-background font-mono text-[10px] text-ns-muted"
               >
                 {t.name
                   .split(/\s+/)
@@ -238,7 +238,7 @@ export function TestimonialWallReflow({
               </span>
               <span className="min-w-0">
                 <span className="block truncate text-xs font-medium text-foreground">{t.name}</span>
-                <span className="block truncate text-xs text-muted">{t.role}</span>
+                <span className="block truncate text-xs text-ns-muted">{t.role}</span>
               </span>
             </figcaption>
           </figure>

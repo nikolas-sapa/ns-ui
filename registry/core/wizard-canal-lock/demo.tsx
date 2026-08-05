@@ -32,7 +32,7 @@ export default function LockFlightDemo() {
       blockedMessage: "work email required",
       content: (
         <label className="flex flex-col gap-1.5">
-          <span className="font-mono text-[11px] uppercase tracking-[0.15em] text-muted">
+          <span className="font-mono text-[11px] uppercase tracking-[0.15em] text-ns-muted">
             Work email
           </span>
           <input
@@ -40,7 +40,7 @@ export default function LockFlightDemo() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@company.com"
-            className="rounded-sm border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded-sm border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ns-accent"
           />
         </label>
       ),
@@ -59,10 +59,10 @@ export default function LockFlightDemo() {
               role="radio"
               aria-checked={size === opt}
               onClick={() => setSize(opt)}
-              className={`rounded-sm border px-3 py-1.5 text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-accent ${
+              className={`rounded-sm border px-3 py-1.5 text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ns-accent ${
                 size === opt
-                  ? "border-accent text-foreground"
-                  : "border-border text-muted hover:bg-foreground/[0.03]"
+                  ? "border-ns-accent text-foreground"
+                  : "border-border text-ns-muted hover:bg-foreground/[0.03]"
               }`}
             >
               {opt}
@@ -85,10 +85,10 @@ export default function LockFlightDemo() {
               role="radio"
               aria-checked={plan === opt}
               onClick={() => setPlan(opt)}
-              className={`rounded-sm border px-3 py-1.5 text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-accent ${
+              className={`rounded-sm border px-3 py-1.5 text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ns-accent ${
                 plan === opt
-                  ? "border-accent text-foreground"
-                  : "border-border text-muted hover:bg-foreground/[0.03]"
+                  ? "border-ns-accent text-foreground"
+                  : "border-border text-ns-muted hover:bg-foreground/[0.03]"
               }`}
             >
               {opt}
@@ -114,7 +114,7 @@ export default function LockFlightDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 py-16">
-      <p className="max-w-md text-center font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="max-w-md text-center font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / wizard-canal-lock — a stepper where each gate only opens once the
         water equalizes
       </p>
@@ -123,7 +123,7 @@ export default function LockFlightDemo() {
         <LockFlight steps={steps} onComplete={() => setDone(true)} />
       </div>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Continue past &ldquo;Team&rdquo; and the next chamber fills right to
         the gate line. Try it again past &ldquo;Contact&rdquo; without an
         email — the level stalls short, and the gate stays shut until you

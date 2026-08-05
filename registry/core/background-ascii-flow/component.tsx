@@ -146,7 +146,7 @@ export function Slipstream({ cellSize = 14, className = "" }: SlipstreamProps) {
       fg = getComputedStyle(canvas).color;
       muted =
         getComputedStyle(document.documentElement)
-          .getPropertyValue("--muted")
+          .getPropertyValue("--ns-muted")
           .trim() || fg;
     };
 

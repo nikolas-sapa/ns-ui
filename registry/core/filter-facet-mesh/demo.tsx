@@ -27,13 +27,13 @@ export default function SieveFacetsDemo() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-8 bg-background px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / filter-facet-mesh
       </p>
       <div ref={wrapRef} className="w-full max-w-md">
         <SieveFacets />
       </div>
-      <p className="max-w-xs text-center text-xs text-muted">
+      <p className="max-w-xs text-center text-xs text-ns-muted">
         Toggle a facet — the mesh gains or loses a thread and the result
         count sifts to its new value.
       </p>

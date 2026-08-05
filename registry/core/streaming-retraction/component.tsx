@@ -68,7 +68,7 @@ function Scar({ content, live }: { content: string; live: boolean }) {
 
   if (!settled) {
     return (
-      <span aria-hidden className="ns-retract-strike text-muted">
+      <span aria-hidden className="ns-retract-strike text-ns-muted">
         {content}
       </span>
     );
@@ -87,7 +87,7 @@ function Scar({ content, live }: { content: string; live: boolean }) {
             : `Show retracted text (${words} ${words === 1 ? "word" : "words"} removed)`
         }
         onClick={() => setOpen((o) => !o)}
-        className="ns-retract-tick relative mx-[1px] inline-block h-[0.95em] w-[7px] translate-y-[0.12em] cursor-pointer rounded-[2px] align-text-bottom transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        className="ns-retract-tick relative mx-[1px] inline-block h-[0.95em] w-[7px] translate-y-[0.12em] cursor-pointer rounded-[2px] align-text-bottom transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
       >
         {/* the notch: a 1px kerf cut into the tick, the mark of something excised */}
         <span aria-hidden className="absolute left-0 right-0 top-1/2 h-px -translate-y-1/2 bg-background" />
@@ -95,7 +95,7 @@ function Scar({ content, live }: { content: string; live: boolean }) {
       {open && (
         <span
           data-retract-ghost
-          className="mx-0.5 rounded-sm bg-surface px-1 text-muted line-through decoration-muted/70"
+          className="mx-0.5 rounded-sm bg-surface px-1 text-ns-muted line-through decoration-ns-muted/70"
         >
           {content}
         </span>
@@ -149,7 +149,7 @@ export function RetractInk({ ops, streaming = true, className = "" }: RetractInk
           72%  { opacity: 0.35; }
           100% { background-size: 100% 1px; opacity: 0; }
         }
-        .ns-retract-tick { background-color: var(--muted); opacity: .5; }
+        .ns-retract-tick { background-color: var(--ns-muted); opacity: .5; }
         .ns-retract-tick:hover, .ns-retract-tick[aria-expanded="true"] { opacity: 1; background-color: var(--foreground); }
         @keyframes ns-retract-blink { 0%, 50% { opacity: 1 } 50.01%, 100% { opacity: .25 } }
         .ns-retract-caret { animation: ns-retract-blink 1s steps(1, end) infinite; }
@@ -168,7 +168,7 @@ export function RetractInk({ ops, streaming = true, className = "" }: RetractInk
       {streaming && (
         <span
           aria-hidden
-          className="ns-retract-caret ml-0.5 inline-block h-[1em] w-[0.55em] translate-y-[0.15em] rounded-[2px] bg-muted align-text-bottom"
+          className="ns-retract-caret ml-0.5 inline-block h-[1em] w-[0.55em] translate-y-[0.15em] rounded-[2px] bg-ns-muted align-text-bottom"
         />
       )}
       <span role="status" aria-live="polite" className="sr-only">

@@ -38,12 +38,12 @@ export default function SignalTerrainDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-3xl">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">
+        <p className="mb-4 font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / chart-ridgeline-terrain
         </p>
         <div className="overflow-hidden rounded-md border border-border bg-surface">
           <header className="flex items-center justify-between gap-4 border-b border-border px-5 py-3">
-            <span className="font-mono text-xs tracking-widest text-muted">
+            <span className="font-mono text-xs tracking-widest text-ns-muted">
               THROUGHPUT — LIVE
             </span>
             <div className="flex items-center gap-4">
@@ -53,7 +53,7 @@ export default function SignalTerrainDemo() {
               <button
                 type="button"
                 onClick={() => setLive((l) => !l)}
-                className="min-w-[4.5rem] rounded-sm border border-border px-3 py-1.5 font-mono text-[11px] tracking-widest text-muted transition-colors duration-200 hover:border-white/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                className="min-w-[4.5rem] rounded-sm border border-border px-3 py-1.5 font-mono text-[11px] tracking-widest text-ns-muted transition-colors duration-200 hover:border-white/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
               >
                 {live ? "PAUSE" : "RESUME"}
               </button>
@@ -61,7 +61,7 @@ export default function SignalTerrainDemo() {
           </header>
           <SignalTerrain series={series} className="h-[380px]" />
         </div>
-        <p className="mt-3 font-mono text-[11px] text-muted">
+        <p className="mt-3 font-mono text-[11px] text-ns-muted">
           move the cursor over the terrain, release for the rebound
         </p>
       </div>

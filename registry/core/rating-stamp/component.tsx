@@ -15,7 +15,7 @@ import {
 // Chosen levels are stamped solid with a short physical "thud" (scale
 // 1.15 -> 1.0, ease-out-expo) while a single concentric ring in --border
 // expands and fades outward, reading as paper taking the impression.
-// Unfilled levels wait as faint --muted outlines. Lowering the value drains
+// Unfilled levels wait as faint --ns-muted outlines. Lowering the value drains
 // marks right-to-left with a 30ms stagger, as if the ink is lifting off in
 // sequence. Hovering (or focusing) a level dashes the outline of whichever
 // marks would change if you committed there, without committing anything.
@@ -29,8 +29,8 @@ import {
 // drain instantly, no scale/ring/stagger.
 //
 // Pure DOM/SVG/CSS — no canvas. All ink is token-relative: --foreground for
-// the stamp body, --muted for resting outlines, --border for the impression
-// ring, --accent only for the keyboard focus ring.
+// the stamp body, --ns-muted for resting outlines, --border for the impression
+// ring, --ns-accent only for the keyboard focus ring.
 // ---------------------------------------------------------------------------
 
 const PRESS_MS = 140; // press-landing scale, ease-out-expo
@@ -289,7 +289,7 @@ export function ChopPress({
           background: color-mix(in oklab, var(--foreground) 4%, transparent);
         }
         .ns-cp-seal:focus-visible {
-          outline: 2px solid var(--accent);
+          outline: 2px solid var(--ns-accent);
           outline-offset: 2px;
         }
         .ns-cp-glyph {
@@ -304,7 +304,7 @@ export function ChopPress({
              and always interpolates smoothly. */
           fill: var(--foreground);
           fill-opacity: 0;
-          stroke: var(--muted);
+          stroke: var(--ns-muted);
           stroke-width: 1.5px;
           transition:
             fill-opacity var(--cp-fill-ms, 140ms) ease var(--cp-delay, 0ms),
@@ -317,7 +317,7 @@ export function ChopPress({
         }
         .ns-cp-base[data-preview] {
           stroke-dasharray: 3 2.5;
-          stroke: color-mix(in oklab, var(--foreground) 55%, var(--muted));
+          stroke: color-mix(in oklab, var(--foreground) 55%, var(--ns-muted));
         }
         .ns-cp-edge-hi,
         .ns-cp-edge-lo {

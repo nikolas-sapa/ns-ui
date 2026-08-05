@@ -24,7 +24,7 @@ export default function GnomonSetDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / time-picker-sundial
       </p>
 
@@ -32,7 +32,7 @@ export default function GnomonSetDemo() {
         <GnomonSet hour={current.hour} minute={current.minute} />
       </div>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Drag the outer ring for the hour, the inner ring for 5-minute
         detents. Keep dragging past 12 and the shadow lengthens into PM.
       </p>

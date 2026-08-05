@@ -12,12 +12,12 @@ export default function SelvageFoldDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-lg">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">
+        <p className="mb-4 font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / truncation-word-count
         </p>
         <div className="rounded-md border border-border bg-surface">
           <header className="border-b border-border px-5 py-3">
-            <span className="font-mono text-xs tracking-widest text-muted">
+            <span className="font-mono text-xs tracking-widest text-ns-muted">
               CHANGELOG · DB MIGRATION
             </span>
           </header>
@@ -28,7 +28,7 @@ export default function SelvageFoldDemo() {
             <SelvageFold lines={3}>{SHORT}</SelvageFold>
           </div>
         </div>
-        <p className="mt-3 font-mono text-[11px] text-muted">
+        <p className="mt-3 font-mono text-[11px] text-ns-muted">
           the fold states exactly what it hides — a measured word count, not an
           ellipsis. text that fits gets no control.
         </p>

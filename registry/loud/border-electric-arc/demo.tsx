@@ -61,7 +61,7 @@ export default function SparkGapDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-10 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / border-electric-arc
       </p>
 
@@ -69,7 +69,7 @@ export default function SparkGapDemo() {
         <SparkGap label="Get Started" />
       </div>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         A live-wire border: bring the cursor close and the stroke opens a gap
         that tracks you, with an arc jumping across it. Press for the full
         discharge — the wire flashes, then runs spent for two seconds.

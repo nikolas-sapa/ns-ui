@@ -28,7 +28,7 @@ function Knot() {
         cy={5}
         r={3.2}
         fill="none"
-        stroke="var(--muted)"
+        stroke="var(--ns-muted)"
         strokeWidth={1.5}
         pathLength={1}
         className="cinch-knot"
@@ -120,7 +120,7 @@ export function CinchBead({
       onClick={() => inputRef.current?.focus()}
       className={[
         "flex w-full cursor-text flex-wrap items-center rounded-md border border-border bg-surface px-3 py-2.5",
-        "transition-colors duration-150 focus-within:border-muted",
+        "transition-colors duration-150 focus-within:border-ns-muted",
         className,
       ].join(" ")}
     >
@@ -175,7 +175,7 @@ export function CinchBead({
                 e.stopPropagation();
                 unravel(tag);
               }}
-              className="grid size-4 cursor-pointer place-items-center rounded-full text-muted transition-colors duration-150 hover:bg-border hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent"
+              className="grid size-4 cursor-pointer place-items-center rounded-full text-ns-muted transition-colors duration-150 hover:bg-border hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ns-accent"
             >
               <svg aria-hidden width={8} height={8} viewBox="0 0 8 8">
                 <path
@@ -198,7 +198,7 @@ export function CinchBead({
         placeholder={tags.length === 0 ? placeholder : ""}
         onChange={(e) => setDraft(e.target.value)}
         onKeyDown={onKeyDown}
-        className="ml-1.5 min-w-[8ch] flex-1 bg-transparent py-0.5 text-sm text-foreground outline-none placeholder:text-muted"
+        className="ml-1.5 min-w-[8ch] flex-1 bg-transparent py-0.5 text-sm text-foreground outline-none placeholder:text-ns-muted"
       />
       <span aria-live="polite" className="sr-only">
         {tags.length} tags

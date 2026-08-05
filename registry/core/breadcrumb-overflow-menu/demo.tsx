@@ -20,7 +20,7 @@ const TRAIL: Crumb[] = [
 function Frame({ width, note, children }: { width: string; note: string; children: ReactNode }) {
   return (
     <div className="flex flex-col gap-2">
-      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted">{note}</p>
+      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ns-muted">{note}</p>
       <div className={`rounded-md border border-border bg-surface p-4 ${width}`}>{children}</div>
     </div>
   );
@@ -29,7 +29,7 @@ function Frame({ width, note, children }: { width: string; note: string; childre
 export default function WornPathDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-10 px-6">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / breadcrumb-overflow-menu — a trail that gives way from the middle
       </p>
 

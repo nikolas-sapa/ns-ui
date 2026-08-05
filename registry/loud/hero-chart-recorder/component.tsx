@@ -162,7 +162,7 @@ export function PenLag({
       const cs = getComputedStyle(document.documentElement);
       fg = parseColor(cs.getPropertyValue("--foreground")) ?? fg;
       bd = parseColor(cs.getPropertyValue("--border")) ?? bd;
-      mu = parseColor(cs.getPropertyValue("--muted")) ?? mu;
+      mu = parseColor(cs.getPropertyValue("--ns-muted")) ?? mu;
     };
     derive();
 
@@ -576,7 +576,7 @@ export function PenLag({
             aria-hidden
             className="motion-safe:animate-pulse inline-block h-1.5 w-1.5 rounded-full bg-foreground"
           />
-          <span className="font-mono text-[11px] tracking-widest text-muted">
+          <span className="font-mono text-[11px] tracking-widest text-ns-muted">
             {label.toUpperCase()}
           </span>
         </div>
@@ -587,10 +587,10 @@ export function PenLag({
           >
             {formatValue ? formatValue(value) : `${Math.round(value)}${unit}`}
           </span>
-          <span ref={trendRef} className="text-[11px] tabular-nums text-muted" />
+          <span ref={trendRef} className="text-[11px] tabular-nums text-ns-muted" />
           <span
             ref={rangeRef}
-            className="hidden text-[11px] tabular-nums text-muted sm:inline"
+            className="hidden text-[11px] tabular-nums text-ns-muted sm:inline"
           />
         </div>
       </div>
@@ -600,7 +600,7 @@ export function PenLag({
         aria-label={`${label} chart recorder strip`}
         tabIndex={0}
         style={{ touchAction: "pan-y", height: "calc(100% - 2.75rem)" }}
-        className="relative w-full cursor-crosshair overflow-hidden rounded-md border border-border transition-colors duration-200 hover:border-foreground/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        className="relative w-full cursor-crosshair overflow-hidden rounded-md border border-border transition-colors duration-200 hover:border-foreground/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
       >
         <canvas ref={canvasRef} aria-hidden className="absolute inset-0 h-full w-full" />
         <div
@@ -618,13 +618,13 @@ export function PenLag({
         <div
           ref={cursorLineRef}
           aria-hidden
-          className="pointer-events-none absolute inset-y-0 w-px bg-accent opacity-0"
+          className="pointer-events-none absolute inset-y-0 w-px bg-ns-accent opacity-0"
           style={{ left: 0 }}
         />
         <div
           ref={cursorLabelRef}
           aria-hidden
-          className="pointer-events-none absolute top-1 whitespace-nowrap rounded-sm border border-accent/40 bg-background px-1.5 py-0.5 font-mono text-[10px] tabular-nums text-accent opacity-0"
+          className="pointer-events-none absolute top-1 whitespace-nowrap rounded-sm border border-ns-accent/40 bg-background px-1.5 py-0.5 font-mono text-[10px] tabular-nums text-ns-accent opacity-0"
           style={{ left: 0 }}
         />
       </div>

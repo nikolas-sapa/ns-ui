@@ -214,7 +214,7 @@ export function BallotDrop({
               aria-checked={checked}
               tabIndex={checked || (!selected && opt.value === options[0]?.value) ? 0 : -1}
               onClick={() => choose(opt.value)}
-              className="group relative overflow-visible rounded-[6px] border border-border bg-[#f4f2ec] px-4 py-3 text-left outline-none transition-[transform,box-shadow] duration-150 ease-out motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              className="group relative overflow-visible rounded-[6px] border border-border bg-[#f4f2ec] px-4 py-3 text-left outline-none transition-[transform,box-shadow] duration-150 ease-out motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               {/* peeling corner: lifts on hover of an unselected slip */}
               <span

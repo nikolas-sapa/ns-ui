@@ -18,23 +18,23 @@ export function AccountSignedOut() {
         <div className="flex items-center justify-between gap-4">
           <Link
             href="/"
-            className="font-mono text-xs uppercase tracking-[0.16em] text-muted underline-offset-4 outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+            className="font-mono text-xs uppercase tracking-[0.16em] text-ns-muted underline-offset-4 outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             ns-ui
           </Link>
-          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
+          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ns-muted">
             Your library starts here
           </span>
         </div>
 
         <div className="mx-auto w-full max-w-sm py-10 lg:py-12">
-          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted">
+          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-ns-muted">
             Account
           </p>
           <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">
             Sign in to save.
           </h2>
-          <p className="mt-3 text-sm leading-6 text-muted">
+          <p className="mt-3 text-sm leading-6 text-ns-muted">
             Use GitHub, Google, or an email code. Your saved components stay
             close at hand.
           </p>
@@ -61,18 +61,18 @@ export function AccountSignedOut() {
                   href={ALEX_TESTIMONIAL.profileUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="font-medium text-foreground underline decoration-border underline-offset-4 outline-none hover:decoration-foreground focus-visible:ring-2 focus-visible:ring-accent"
+                  className="font-medium text-foreground underline decoration-border underline-offset-4 outline-none hover:decoration-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
                 >
                   {ALEX_TESTIMONIAL.name}
                 </Link>
-                <span className="block text-muted">
+                <span className="block text-ns-muted">
                   {ALEX_TESTIMONIAL.role} at{" "}
                   {ALEX_TESTIMONIAL.companyUrl ? (
                     <Link
                       href={ALEX_TESTIMONIAL.companyUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="underline decoration-border underline-offset-4 outline-none hover:decoration-foreground focus-visible:ring-2 focus-visible:ring-accent"
+                      className="underline decoration-border underline-offset-4 outline-none hover:decoration-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
                     >
                       {ALEX_TESTIMONIAL.company}
                     </Link>
@@ -85,7 +85,7 @@ export function AccountSignedOut() {
           </figure>
         </div>
 
-        <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+        <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-ns-muted">
           Built for developers and designers
         </p>
       </section>

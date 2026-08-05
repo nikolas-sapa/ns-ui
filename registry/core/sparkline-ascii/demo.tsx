@@ -10,7 +10,7 @@ const SERIES = [
 export default function RampTraceDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-10">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / sparkline-ascii
       </p>
       <RampTrace
@@ -19,7 +19,7 @@ export default function RampTraceDemo() {
         valueFormat={(v) => `$${v}k`}
         className="w-full max-w-2xl"
       />
-      <p className="max-w-md text-center font-mono text-xs text-muted">
+      <p className="max-w-md text-center font-mono text-xs text-ns-muted">
         hover a column, or focus the chart and use arrow keys
       </p>
     </div>

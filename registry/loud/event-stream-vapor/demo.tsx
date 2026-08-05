@@ -60,7 +60,7 @@ export default function CloudChamberDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-background px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / event-stream-vapor
       </p>
 
@@ -68,9 +68,9 @@ export default function CloudChamberDemo() {
         <div className="mb-4 flex items-center justify-between gap-3">
           <div>
             <h2 className="text-sm font-medium text-foreground">Production — system weather</h2>
-            <p className="text-xs text-muted">Deploys, errors and purchases as they happen</p>
+            <p className="text-xs text-ns-muted">Deploys, errors and purchases as they happen</p>
           </div>
-          <span className="shrink-0 font-mono text-[11px] text-muted">
+          <span className="shrink-0 font-mono text-[11px] text-ns-muted">
             {events.length} tracked
           </span>
         </div>
@@ -78,7 +78,7 @@ export default function CloudChamberDemo() {
         <CloudChamber events={events} label="Production event chamber" className="h-[380px]" />
       </div>
 
-      <p className="max-w-md text-center font-mono text-[10px] text-muted">
+      <p className="max-w-md text-center font-mono text-[10px] text-ns-muted">
         a quiet chamber vs. one full of long streaks tells you something before any threshold fires
       </p>
     </div>

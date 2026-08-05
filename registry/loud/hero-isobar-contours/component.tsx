@@ -7,7 +7,7 @@ import { useEffect, useRef } from "react";
 // bunch tightly around the primary CTA, so the composition physically leans
 // toward the one action that matters. Pure SVG: every ring is a <path> whose
 // `d` is recomputed directly (no canvas, no interpolation) on a throttled
-// rAF loop, so `stroke` can reference --border/--muted/--foreground natively
+// rAF loop, so `stroke` can reference --border/--ns-muted/--foreground natively
 // and both themes repaint for free — no getComputedStyle color parsing at
 // all. Line DENSITY (radial spacing that compresses near the CTA) is the
 // hierarchy device, not color or a gradient fill.
@@ -49,7 +49,7 @@ function ringWobble(theta: number, phase: number, seed: number) {
 // are CSS custom properties resolved natively by the browser (no JS parsing).
 function ringColor(i: number) {
   if (i < 2) return "color-mix(in srgb, var(--foreground) 25%, transparent)";
-  if (i < 5) return "var(--muted)";
+  if (i < 5) return "var(--ns-muted)";
   return "var(--border)";
 }
 
@@ -406,7 +406,7 @@ export function PressureFront({
   }, [rings, driftMs]);
 
   const ctaFocusRing =
-    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent";
 
   return (
     <section
@@ -432,7 +432,7 @@ export function PressureFront({
 
       <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center px-6 pb-16 pt-24 text-center sm:pb-24 sm:pt-32">
         {eyebrow ? (
-          <p className="mb-6 font-mono text-[11px] tracking-widest text-muted">
+          <p className="mb-6 font-mono text-[11px] tracking-widest text-ns-muted">
             {eyebrow}
           </p>
         ) : null}
@@ -451,7 +451,7 @@ export function PressureFront({
           ))}
         </h1>
         {subcopy ? (
-          <p className="mt-6 max-w-xl text-base leading-relaxed text-muted">
+          <p className="mt-6 max-w-xl text-base leading-relaxed text-ns-muted">
             {subcopy}
           </p>
         ) : null}
@@ -486,7 +486,7 @@ export function PressureFront({
               <a
                 href={secondaryCta.href}
                 onClick={secondaryCta.onClick}
-                className={`rounded-sm border border-border px-5 py-2.5 text-sm font-medium text-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground ${ctaFocusRing}`}
+                className={`rounded-sm border border-border px-5 py-2.5 text-sm font-medium text-ns-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground ${ctaFocusRing}`}
               >
                 {secondaryCta.label}
               </a>
@@ -494,7 +494,7 @@ export function PressureFront({
               <button
                 type="button"
                 onClick={secondaryCta.onClick}
-                className={`rounded-sm border border-border px-5 py-2.5 text-sm font-medium text-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground ${ctaFocusRing}`}
+                className={`rounded-sm border border-border px-5 py-2.5 text-sm font-medium text-ns-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground ${ctaFocusRing}`}
               >
                 {secondaryCta.label}
               </button>

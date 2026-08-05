@@ -312,7 +312,7 @@ export function Knockout404({
       const fg = parseColor(cs.getPropertyValue("--foreground")) ?? [237, 237, 237];
       const surface = parseColor(cs.getPropertyValue("--surface")) ?? [23, 23, 23];
       const border = parseColor(cs.getPropertyValue("--border")) ?? [46, 46, 46];
-      mutedRgb = parseColor(cs.getPropertyValue("--muted")) ?? [143, 143, 143];
+      mutedRgb = parseColor(cs.getPropertyValue("--ns-muted")) ?? [143, 143, 143];
       const lum = (0.2126 * bg[0] + 0.7152 * bg[1] + 0.0722 * bg[2]) / 255;
       // the void must read CLEARLY dimmer than the surface in BOTH themes:
       // dark crushes --background toward black; light pulls it a solid step
@@ -335,7 +335,7 @@ export function Knockout404({
     };
     derive();
 
-    // grain tile: recolor the cached noise field in --muted per theme
+    // grain tile: recolor the cached noise field in --ns-muted per theme
     let grainPattern: CanvasPattern | null = null;
     const buildGrain = () => {
       const f = noiseField();
@@ -757,17 +757,17 @@ export function Knockout404({
         className="absolute left-1/2 top-[46%] flex w-full max-w-md flex-col items-center gap-6 px-6 text-center"
         style={{ transform: "translate(-50%, calc(13vw + 28px))" }}
       >
-        <p className="font-mono text-sm text-muted">{message}</p>
+        <p className="font-mono text-sm text-ns-muted">{message}</p>
         <div className="flex flex-wrap items-center justify-center gap-3">
           <a
             href={primaryHref}
-            className="inline-flex items-center justify-center rounded-sm bg-accent px-4 py-2 text-sm font-medium text-white transition-colors duration-150 hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="inline-flex items-center justify-center rounded-sm bg-ns-accent px-4 py-2 text-sm font-medium text-white transition-colors duration-150 hover:bg-ns-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             {primaryLabel}
           </a>
           <a
             href={secondaryHref}
-            className="inline-flex items-center justify-center rounded-sm border border-border px-4 py-2 text-sm text-muted transition-colors duration-150 hover:border-foreground/40 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="inline-flex items-center justify-center rounded-sm border border-border px-4 py-2 text-sm text-ns-muted transition-colors duration-150 hover:border-foreground/40 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             {secondaryLabel}
           </a>

@@ -11,20 +11,20 @@ export default function StrikeFigureDemo() {
       {/* the copy sits bottom-left, so that rectangle of the dielectric is
           held at lower field strength and the discharge grows away from it */}
       <StrikeFigure quiet={{ x: 0.02, y: 0.46, w: 0.48, h: 0.46 }}>
-        <span className="font-mono text-xs tracking-[0.25em] text-muted">
+        <span className="font-mono text-xs tracking-[0.25em] text-ns-muted">
           ns-ui / hero-ascii-lichtenberg
         </span>
         <h1 className="max-w-xl text-4xl font-semibold tracking-tight text-foreground sm:text-6xl">
           Every path is the steepest one.
         </h1>
-        <p className="max-w-md text-sm text-muted sm:text-base">
+        <p className="max-w-md text-sm text-ns-muted sm:text-base">
           A dielectric breakdown solved live on the character grid. The channel
           only ever grows where the field is strongest, so the figure forks
           itself into existence.
         </p>
         <a
           href="#docs"
-          className="mt-2 inline-flex items-center justify-center rounded-sm bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors duration-150 hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="mt-2 inline-flex items-center justify-center rounded-sm bg-ns-accent px-5 py-2.5 text-sm font-medium text-white transition-colors duration-150 hover:bg-ns-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
         >
           Read the docs
         </a>

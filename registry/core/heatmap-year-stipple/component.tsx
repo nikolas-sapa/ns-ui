@@ -215,13 +215,13 @@ export function StippleYear({ values = {}, endDate, className = "" }: StippleYea
       >
         <g aria-hidden="true" className="font-mono" style={{ fontSize: 8.5 }}>
           {monthLabels.map((m, i) => (
-            <text key={i} x={LEFT_LABEL_W + m.col * STEP} y={TOP_LABEL_H - 4} fill="var(--muted)">
+            <text key={i} x={LEFT_LABEL_W + m.col * STEP} y={TOP_LABEL_H - 4} fill="var(--ns-muted)">
               {m.text}
             </text>
           ))}
           {WEEKDAY_LABELS.map((label, row) =>
             label ? (
-              <text key={row} x={0} y={TOP_LABEL_H + row * STEP + CELL - 2} fill="var(--muted)">
+              <text key={row} x={0} y={TOP_LABEL_H + row * STEP + CELL - 2} fill="var(--ns-muted)">
                 {label}
               </text>
             ) : null
@@ -357,7 +357,7 @@ export function StippleYear({ values = {}, endDate, className = "" }: StippleYea
 
 const CSS = `
 .ns-sy-cell { cursor: pointer; outline: none; transition: stroke 120ms ease-out; }
-.ns-sy-cell:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.ns-sy-cell:focus-visible { outline: 2px solid var(--ns-accent); outline-offset: 1px; }
 @keyframes ns-sy-zoom-in { from { transform: scale(0.55); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 .ns-sy-loupe { transform-origin: center; animation: ns-sy-zoom-in 160ms cubic-bezier(0.16, 1, 0.3, 1); }
 @keyframes ns-sy-ink-settle {

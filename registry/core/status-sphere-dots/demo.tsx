@@ -32,7 +32,7 @@ export default function GyreMoteDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-12 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / status-sphere-dots
       </p>
 
@@ -61,14 +61,14 @@ export default function GyreMoteDemo() {
             {ROWS.map((row) => (
               <li key={row.state} className="flex items-center gap-3">
                 <GyreMote state={row.state} size={26} />
-                <span className="text-xs text-muted">{row.text}</span>
+                <span className="text-xs text-ns-muted">{row.text}</span>
               </li>
             ))}
           </ul>
         </div>
       </div>
 
-      <p className="max-w-md text-center font-mono text-[10px] leading-relaxed text-muted">
+      <p className="max-w-md text-center font-mono text-[10px] leading-relaxed text-ns-muted">
         a depth-cued dot-sphere — motion is the signal: steady spin thinking, a
         sweeping band searching, a settling contraction on done
       </p>

@@ -2,7 +2,7 @@
 
 // ---------------------------------------------------------------------------
 // PhaseSwing — an indeterminate loader built as a physical pendulum wave.
-// A row of hairline pendulums (1px arm in --muted, 4px bob in --foreground)
+// A row of hairline pendulums (1px arm in --ns-muted, 4px bob in --foreground)
 // share one mount instant but each gets its own animation-duration —
 // periodMs / (BASE_OSCILLATIONS + i) — so pendulum i completes exactly
 // BASE_OSCILLATIONS+i whole swings in one periodMs cycle. Because that
@@ -95,7 +95,7 @@ const CSS = `
   position:absolute;
   inset:0;
   width:1px;
-  background:var(--muted);
+  background:var(--ns-muted);
 }
 .ns-ps-bob{
   position:absolute;
@@ -263,7 +263,7 @@ export function PhaseSwing({
           );
         })}
       </div>
-      <p className="font-mono text-xs text-muted">{statusText}</p>
+      <p className="font-mono text-xs text-ns-muted">{statusText}</p>
     </div>
   );
 }

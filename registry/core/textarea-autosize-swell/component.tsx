@@ -26,7 +26,7 @@ import {
 // (possibly mid-transition) height; if a fast edit has outrun the animation,
 // the wrapper snaps instantly to just behind the caret line first, then
 // animates the rest, so the caret is never left invisible under the clip.
-// A hairline bottom border brightens from --border toward --muted for the
+// A hairline bottom border brightens from --border toward --ns-muted for the
 // duration of a rise, via a class toggle, never a canvas or SVG.
 // prefers-reduced-motion: all of the above still runs (the target height is
 // still computed correctly), it just applies without a transition — the
@@ -296,10 +296,10 @@ export function ProofRise({
   transition-duration: ${GROW_MS}ms;
 }
 .ns-proof-wrap.ns-proof-rising {
-  border-color: var(--muted);
+  border-color: var(--ns-muted);
 }
 .ns-proof-wrap:focus-within {
-  border-color: var(--accent);
+  border-color: var(--ns-accent);
 }
 .ns-proof-textarea {
   display: block;
@@ -316,7 +316,7 @@ export function ProofRise({
       {label ? (
         <label
           htmlFor={fieldId}
-          className="mb-1.5 block text-xs text-muted"
+          className="mb-1.5 block text-xs text-ns-muted"
         >
           {label}
         </label>
@@ -335,7 +335,7 @@ export function ProofRise({
           ref={taRef}
           id={fieldId}
           rows={1}
-          className={`ns-proof-textarea ${sharedFont} placeholder:text-muted/70`}
+          className={`ns-proof-textarea ${sharedFont} placeholder:text-ns-muted/70`}
           defaultValue={defaultValue}
           value={value}
           onChange={onChange}

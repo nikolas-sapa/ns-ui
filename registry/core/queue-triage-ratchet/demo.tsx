@@ -50,7 +50,7 @@ const CARDS = [
 export default function PawlClickDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / queue-triage-ratchet — triage queue with a one-way ratchet
       </p>
       <PawlClick cards={CARDS} />

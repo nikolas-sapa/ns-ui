@@ -6,7 +6,7 @@ import { useEffect, useId, useRef, useState } from "react";
 // PatinaLedger — the "what does it think it knows about me right now" panel.
 // One 32px row per remembered fact, 13px Geist Mono, inside a 12px-radius
 // rail. Ink is literally time: an unreferenced row steps its color down a
-// four-stop ramp from --foreground toward --muted (fresh -> aging -> fading
+// four-stop ramp from --foreground toward --ns-muted (fresh -> aging -> fading
 // -> dormant) on a 600ms transition every turn it goes unused, so aging is
 // perceptible at each turn boundary rather than a silent jump. The moment the
 // agent actually cites a row in a reply, its color SNAPS back to --foreground
@@ -34,7 +34,7 @@ import { useEffect, useId, useRef, useState } from "react";
 // mid-collapse, whether the dormant drawer is open, and a short-lived
 // "just cited" flag used to drive the wipe + a single aria-live
 // announcement. Colors are CSS custom properties only (--foreground,
-// --muted, --border, --background) via color-mix(), never a literal, so
+// --ns-muted, --border, --background) via color-mix(), never a literal, so
 // both themes render correctly. Because color alone is invisible to a
 // screen reader, every row's accessible name spells the age out in words —
 // "remembers: prefers metric units — fading, 6 turns unused" — and pin/evict
@@ -270,9 +270,9 @@ export function PatinaLedger({
 .ns-patina-row-clip{overflow:hidden;min-height:0}
 .ns-patina-row + .ns-patina-row > .ns-patina-row-clip{border-top:1px solid var(--border)}
 .ns-patina-text{color:var(--foreground);transition:color 600ms ease-out}
-.ns-patina-row[data-age="1"] .ns-patina-text{color:color-mix(in srgb, var(--foreground) 68%, var(--muted))}
-.ns-patina-row[data-age="2"] .ns-patina-text{color:color-mix(in srgb, var(--foreground) 36%, var(--muted))}
-.ns-patina-row[data-age="3"] .ns-patina-text{color:var(--muted)}
+.ns-patina-row[data-age="1"] .ns-patina-text{color:color-mix(in srgb, var(--foreground) 68%, var(--ns-muted))}
+.ns-patina-row[data-age="2"] .ns-patina-text{color:color-mix(in srgb, var(--foreground) 36%, var(--ns-muted))}
+.ns-patina-row[data-age="3"] .ns-patina-text{color:var(--ns-muted)}
 .ns-patina-row[data-age="pinned"] .ns-patina-text{color:var(--foreground)}
 .ns-patina-row[data-justcited="true"] .ns-patina-text{transition:none}
 .ns-patina-wipe{position:absolute;left:0;right:0;bottom:-3px;height:1px;background:var(--foreground);opacity:0;transform:scaleX(0);transform-origin:left}
@@ -281,15 +281,15 @@ export function PatinaLedger({
 @keyframes ns-patina-wipe-out{from{opacity:1}to{opacity:0}}
 .ns-patina-dot{width:0;height:4px;border-radius:9999px;background:var(--foreground);opacity:0;transition:width 200ms ease-out,opacity 200ms ease-out}
 .ns-patina-dot[data-visible="true"]{width:4px;opacity:1}
-.ns-patina-btn{display:inline-flex;height:22px;width:22px;align-items:center;justify-content:center;border-radius:6px;color:var(--muted);transition:background-color 150ms ease-out,color 150ms ease-out,box-shadow 150ms ease-out}
+.ns-patina-btn{display:inline-flex;height:22px;width:22px;align-items:center;justify-content:center;border-radius:6px;color:var(--ns-muted);transition:background-color 150ms ease-out,color 150ms ease-out,box-shadow 150ms ease-out}
 .ns-patina-btn:hover{background:color-mix(in srgb, var(--foreground) 8%, transparent);color:var(--foreground)}
-.ns-patina-btn:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.ns-patina-btn:focus-visible{outline:2px solid var(--ns-accent);outline-offset:1px}
 .ns-patina-btn[data-active="true"]{color:var(--foreground)}
-.ns-patina-btn[data-armed="true"]{background:color-mix(in srgb, var(--accent) 18%, transparent);color:var(--accent);box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--accent) 55%, transparent)}
-.ns-patina-btn[data-armed="true"]:hover{background:color-mix(in srgb, var(--accent) 26%, transparent)}
-.ns-patina-dormant-btn{color:var(--muted);transition:color 150ms ease-out}
+.ns-patina-btn[data-armed="true"]{background:color-mix(in srgb, var(--ns-accent) 18%, transparent);color:var(--ns-accent);box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--ns-accent) 55%, transparent)}
+.ns-patina-btn[data-armed="true"]:hover{background:color-mix(in srgb, var(--ns-accent) 26%, transparent)}
+.ns-patina-dormant-btn{color:var(--ns-muted);transition:color 150ms ease-out}
 .ns-patina-dormant-btn:hover{color:var(--foreground)}
-.ns-patina-dormant-btn:focus-visible{outline:2px solid var(--accent);outline-offset:-1px;border-radius:6px}
+.ns-patina-dormant-btn:focus-visible{outline:2px solid var(--ns-accent);outline-offset:-1px;border-radius:6px}
 .ns-patina-chevron{transition:transform 200ms cubic-bezier(.22,1,.36,1)}
 .ns-patina-chevron[data-expanded="true"]{transform:rotate(90deg)}
 .ns-patina-dormant-wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows 300ms cubic-bezier(.22,1,.36,1)}

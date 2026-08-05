@@ -274,12 +274,12 @@ export function DeedStroke({ prompt = "Sign to authorize", onConfirm, className 
       </span>
 
       <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">{captionText}</p>
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">{captionText}</p>
         <button
           type="button"
           onClick={toggleMode}
           disabled={confirmed}
-          className="ns-ds-link font-mono text-[11px] text-muted underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-40"
+          className="ns-ds-link font-mono text-[11px] text-ns-muted underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent disabled:cursor-not-allowed disabled:opacity-40"
         >
           {mode === "draw" ? "Type your name instead" : "Draw signature instead"}
         </button>
@@ -292,7 +292,7 @@ export function DeedStroke({ prompt = "Sign to authorize", onConfirm, className 
               confirmed ? "ns-ds-embossed" : ""
             }`}
           >
-            <div aria-hidden="true" className="ns-ds-baseline absolute inset-x-4 bottom-9 h-px bg-muted" />
+            <div aria-hidden="true" className="ns-ds-baseline absolute inset-x-4 bottom-9 h-px bg-ns-muted" />
             <canvas
               ref={canvasRef}
               width={352}
@@ -310,7 +310,7 @@ export function DeedStroke({ prompt = "Sign to authorize", onConfirm, className 
             {!hasStroke && !replaying && (
               <p
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-x-0 bottom-2 text-center font-mono text-[10px] uppercase tracking-widest text-muted"
+                className="pointer-events-none absolute inset-x-0 bottom-2 text-center font-mono text-[10px] uppercase tracking-widest text-ns-muted"
               >
                 Draw here
               </p>
@@ -329,7 +329,7 @@ export function DeedStroke({ prompt = "Sign to authorize", onConfirm, className 
               onChange={(e) => setTypedName(e.target.value)}
               placeholder="Type your name"
               autoComplete="name"
-              className={`ns-ds-name-input w-full rounded-[6px] border border-border bg-transparent px-3 py-4 text-2xl text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
+              className={`ns-ds-name-input w-full rounded-[6px] border border-border bg-transparent px-3 py-4 text-2xl text-foreground placeholder:text-ns-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent ${
                 confirmed ? "ns-ds-embossed" : ""
               }`}
             />
@@ -342,7 +342,7 @@ export function DeedStroke({ prompt = "Sign to authorize", onConfirm, className 
           type="button"
           onClick={reset}
           disabled={!hasStroke && typedName.length === 0 && !confirmed}
-          className="font-mono text-xs text-muted underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-40"
+          className="font-mono text-xs text-ns-muted underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent disabled:cursor-not-allowed disabled:opacity-40"
         >
           Clear
         </button>
@@ -350,7 +350,7 @@ export function DeedStroke({ prompt = "Sign to authorize", onConfirm, className 
           type="button"
           onClick={handleConfirm}
           disabled={!confirmEnabled}
-          className="rounded-[6px] border border-border bg-foreground px-4 py-1.5 font-mono text-xs text-background hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:border-border disabled:bg-transparent disabled:text-muted disabled:opacity-60"
+          className="rounded-[6px] border border-border bg-foreground px-4 py-1.5 font-mono text-xs text-background hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent disabled:cursor-not-allowed disabled:border-border disabled:bg-transparent disabled:text-ns-muted disabled:opacity-60"
         >
           {confirmed ? "Authorized" : "Confirm"}
         </button>

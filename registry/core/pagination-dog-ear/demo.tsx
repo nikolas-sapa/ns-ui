@@ -30,12 +30,12 @@ export default function FolioTurnDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / pagination-dog-ear
       </p>
 
       <div className="flex w-full max-w-md flex-col gap-4 rounded-[12px] border border-border bg-background p-6">
-        <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted">
+        <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-ns-muted">
           Table of contents
         </span>
         <ul className="flex flex-col gap-2">
@@ -49,7 +49,7 @@ export default function FolioTurnDemo() {
 
       <FolioTurn page={page} count={COUNT} onChange={setPage} />
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Hover next/prev to peek the corner curl on the current page; visited
         pages keep a small permanent crease.
       </p>

@@ -216,7 +216,7 @@ export function BourseTape({ quotes, speed = 46, paused: pausedProp, onPausedCha
           aria-label={paused ? "Resume feed" : "Pause feed"}
           aria-pressed={paused}
           onClick={() => setPaused(!paused)}
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[6px] border border-border text-foreground hover:bg-border/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[6px] border border-border text-foreground hover:bg-border/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
         >
           {paused ? (
             <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
@@ -265,7 +265,7 @@ export function BourseTape({ quotes, speed = 46, paused: pausedProp, onPausedCha
                 }`}
               >
                 <span className="text-foreground">{chip.symbol}</span>
-                <span className="tabular-nums text-muted">{formatPrice(chip.price)}</span>
+                <span className="tabular-nums text-ns-muted">{formatPrice(chip.price)}</span>
                 <span
                   className="flex items-center gap-0.5 tabular-nums"
                   style={{ color: chip.changePct >= 0 ? "var(--success)" : "var(--error)" }}
@@ -285,7 +285,7 @@ export function BourseTape({ quotes, speed = 46, paused: pausedProp, onPausedCha
 const CSS = `
 .ns-tape-strip{will-change:transform;}
 .ns-tape-spliced{position:relative;}
-.ns-tape-spliced::before{content:"";position:absolute;left:0;top:0;bottom:0;width:1px;background:var(--accent);}
+.ns-tape-spliced::before{content:"";position:absolute;left:0;top:0;bottom:0;width:1px;background:var(--ns-accent);}
 .ns-tape-chip{animation:none;}
 @media (prefers-reduced-motion: reduce){
   .ns-tape-chip{animation:ns-tape-fade-in 260ms ease-out;}

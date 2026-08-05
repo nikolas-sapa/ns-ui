@@ -250,7 +250,7 @@ export function StringEnvelope({
   }, [points, multiplier]);
 
   const focusRing =
-    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent";
 
   return (
     <section
@@ -278,7 +278,7 @@ export function StringEnvelope({
 
       <div className="relative z-10 mx-auto flex w-full max-w-4xl flex-col items-center px-6 pb-16 pt-24 text-center sm:pb-24 sm:pt-32">
         {eyebrow ? (
-          <p className="mb-6 font-mono text-[11px] tracking-widest text-muted">
+          <p className="mb-6 font-mono text-[11px] tracking-widest text-ns-muted">
             {eyebrow}
           </p>
         ) : null}
@@ -297,7 +297,7 @@ export function StringEnvelope({
           ))}
         </h1>
         {subcopy ? (
-          <p className="mt-6 max-w-xl text-base leading-relaxed text-muted">
+          <p className="mt-6 max-w-xl text-base leading-relaxed text-ns-muted">
             {subcopy}
           </p>
         ) : null}
@@ -326,7 +326,7 @@ export function StringEnvelope({
               <a
                 href={secondaryCta.href}
                 onClick={secondaryCta.onClick}
-                className={`rounded-sm border border-border bg-background px-5 py-2.5 text-sm font-medium text-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground ${focusRing}`}
+                className={`rounded-sm border border-border bg-background px-5 py-2.5 text-sm font-medium text-ns-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground ${focusRing}`}
               >
                 {secondaryCta.label}
               </a>
@@ -334,7 +334,7 @@ export function StringEnvelope({
               <button
                 type="button"
                 onClick={secondaryCta.onClick}
-                className={`rounded-sm border border-border bg-background px-5 py-2.5 text-sm font-medium text-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground ${focusRing}`}
+                className={`rounded-sm border border-border bg-background px-5 py-2.5 text-sm font-medium text-ns-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground ${focusRing}`}
               >
                 {secondaryCta.label}
               </button>

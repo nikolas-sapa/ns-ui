@@ -21,7 +21,7 @@ import type { KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerE
 // cell, recoils it back to zero width (ease-out-expo, skipped under reduced
 // motion). All geometry is measured, not indexed — ticks are a
 // repeating-linear-gradient in --border sized to the measured cell pitch.
-// No canvas. Colors: --background --foreground --muted --border --accent
+// No canvas. Colors: --background --foreground --ns-muted --border --ns-accent
 // only, via Tailwind's token classes and opacity modifiers.
 // ---------------------------------------------------------------------------
 
@@ -472,7 +472,7 @@ export function SpanTape({
         <p
           id={readoutId}
           data-tape-readout
-          className="font-mono text-[11px] text-muted"
+          className="font-mono text-[11px] text-ns-muted"
         >
           {readoutText}
         </p>
@@ -484,7 +484,7 @@ export function SpanTape({
             type="button"
             aria-label="Previous month"
             onClick={() => moveFocus(addMonths(focusedDate, -1))}
-            className="flex h-7 w-7 items-center justify-center rounded-sm text-muted transition-colors hover:bg-foreground/[0.06] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="flex h-7 w-7 items-center justify-center rounded-sm text-ns-muted transition-colors hover:bg-foreground/[0.06] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <path d="m15 18-6-6 6-6" />
@@ -497,7 +497,7 @@ export function SpanTape({
             type="button"
             aria-label="Next month"
             onClick={() => moveFocus(addMonths(focusedDate, 1))}
-            className="flex h-7 w-7 items-center justify-center rounded-sm text-muted transition-colors hover:bg-foreground/[0.06] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="flex h-7 w-7 items-center justify-center rounded-sm text-ns-muted transition-colors hover:bg-foreground/[0.06] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <path d="m9 18 6-6-6-6" />
@@ -522,7 +522,7 @@ export function SpanTape({
                       key={i}
                       className={`ns-st-seg absolute rounded-full border-y ${
                         status === "confirmed"
-                          ? "border-accent/50 bg-accent/[0.12]"
+                          ? "border-ns-accent/50 bg-ns-accent/[0.12]"
                           : "border-border bg-foreground/[0.06]"
                       }`}
                       style={{
@@ -538,7 +538,7 @@ export function SpanTape({
                   ))}
                   <div
                     className={`ns-st-hook absolute -translate-x-1/2 -translate-y-1/2 rounded-full border ${
-                      status === "confirmed" ? "border-accent bg-accent/20" : "border-foreground/70 bg-background"
+                      status === "confirmed" ? "border-ns-accent bg-ns-accent/20" : "border-foreground/70 bg-background"
                     }`}
                     style={{
                       left: g.hook.left,
@@ -553,7 +553,7 @@ export function SpanTape({
                       data-tape-chip
                       className={`ns-st-chip pointer-events-auto absolute flex items-baseline gap-1 whitespace-nowrap rounded-sm border px-1.5 py-0.5 font-mono text-[11px] tabular-nums shadow-sm ${
                         status === "confirmed"
-                          ? "border-accent/50 bg-background text-accent"
+                          ? "border-ns-accent/50 bg-background text-ns-accent"
                           : "border-border bg-background text-foreground"
                       }`}
                       style={{
@@ -566,7 +566,7 @@ export function SpanTape({
                       }}
                     >
                       <span ref={countRef} className="ns-st-count">{nights}</span>
-                      <span className="text-muted">{nights === 1 ? "night" : "nights"}</span>
+                      <span className="text-ns-muted">{nights === 1 ? "night" : "nights"}</span>
                     </div>
                   )}
                 </>
@@ -588,7 +588,7 @@ export function SpanTape({
                   key={abbr}
                   role="columnheader"
                   aria-label={full}
-                  className="pb-1 text-center font-mono text-[10px] uppercase tracking-wider text-muted"
+                  className="pb-1 text-center font-mono text-[10px] uppercase tracking-wider text-ns-muted"
                 >
                   {abbr}
                 </div>
@@ -616,19 +616,19 @@ export function SpanTape({
                       aria-current={isToday ? "date" : undefined}
                       aria-label={`${fmtFull(date)}${isEndpoint && status !== "idle" ? ", selection endpoint" : ""}`}
                       onFocus={() => setFocusedDate(date)}
-                      className={`relative flex h-10 flex-col items-center justify-center rounded-sm pb-2 text-[13px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent ${
+                      className={`relative flex h-10 flex-col items-center justify-center rounded-sm pb-2 text-[13px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ns-accent ${
                         sel
                           ? status === "confirmed"
-                            ? "text-accent"
+                            ? "text-ns-accent"
                             : "text-foreground"
                           : inMonth
                             ? "text-foreground hover:bg-foreground/[0.06]"
-                            : "text-muted/60 hover:bg-foreground/[0.04]"
+                            : "text-ns-muted/60 hover:bg-foreground/[0.04]"
                       }`}
                     >
                       <span
                         className={
-                          isToday && !sel ? "underline decoration-muted underline-offset-[3px]" : ""
+                          isToday && !sel ? "underline decoration-ns-muted underline-offset-[3px]" : ""
                         }
                       >
                         {date.getDate()}

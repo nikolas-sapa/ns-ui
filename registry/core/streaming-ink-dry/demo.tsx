@@ -46,7 +46,7 @@ export default function WetInkDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / streaming-ink-dry
       </p>
 
@@ -56,8 +56,8 @@ export default function WetInkDemo() {
         onPointerLeave={() => setPaused(false)}
       >
         <div className="mb-4 flex items-center justify-between gap-3">
-          <span className="font-mono text-[11px] text-muted">assistant</span>
-          <span className="font-mono text-[11px] text-muted">
+          <span className="font-mono text-[11px] text-ns-muted">assistant</span>
+          <span className="font-mono text-[11px] text-ns-muted">
             {streaming ? "streaming" : "settled"}
           </span>
         </div>
@@ -69,12 +69,12 @@ export default function WetInkDemo() {
 
       <button
         onClick={() => setCount(0)}
-        className="rounded-sm border border-border px-4 py-2 font-mono text-xs text-muted transition-colors duration-150 hover:border-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        className="rounded-sm border border-border px-4 py-2 font-mono text-xs text-ns-muted transition-colors duration-150 hover:border-ns-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
       >
         restart stream
       </button>
 
-      <p className="font-mono text-[10px] text-muted">
+      <p className="font-mono text-[10px] text-ns-muted">
         hover the panel to pause the stream
       </p>
     </div>

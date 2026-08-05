@@ -14,7 +14,7 @@ export default function BurrChipDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / tag-input-pull — pull a chip loose, don&apos;t just delete it
       </p>
 
@@ -29,12 +29,12 @@ export default function BurrChipDemo() {
           inputLabel="Add recipient"
           placeholder="Add a recipient…"
         />
-        <p className="mt-3 font-mono text-xs text-muted">
+        <p className="mt-3 font-mono text-xs text-ns-muted">
           {tags.length} tag{tags.length === 1 ? "" : "s"}
         </p>
       </div>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Click a chip&apos;s × to watch it stretch and pop free — the row
         exhales closed after. Or grab a chip and pull; release past the
         threshold to commit, or let go early and it eases back. Focus a chip

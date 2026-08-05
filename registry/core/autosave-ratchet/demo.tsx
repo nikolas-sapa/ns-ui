@@ -35,7 +35,7 @@ export default function PawlTickDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / autosave-ratchet
       </p>
 
@@ -53,13 +53,13 @@ export default function PawlTickDemo() {
             <span
               key={glyph}
               aria-hidden="true"
-              className="flex h-7 w-7 items-center justify-center rounded-[6px] border border-transparent text-xs text-muted"
+              className="flex h-7 w-7 items-center justify-center rounded-[6px] border border-transparent text-xs text-ns-muted"
             >
               {glyph}
             </span>
           ))}
           <span className="mx-1 h-4 w-px bg-border" aria-hidden="true" />
-          <span aria-hidden="true" className="flex h-7 w-7 items-center justify-center rounded-[6px] text-xs text-muted">
+          <span aria-hidden="true" className="flex h-7 w-7 items-center justify-center rounded-[6px] text-xs text-ns-muted">
             ¶
           </span>
         </div>
@@ -72,7 +72,7 @@ export default function PawlTickDemo() {
         </div>
       </div>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Hover or focus the gear for the full status; a failed save kicks the
         wheel back half a tooth and holds until the next save lands.
       </p>

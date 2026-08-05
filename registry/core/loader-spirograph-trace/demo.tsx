@@ -38,7 +38,7 @@ export default function SpiroTraceDemo() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-12 bg-background px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / loader-spirograph-trace
       </p>
 
@@ -48,7 +48,7 @@ export default function SpiroTraceDemo() {
       >
         <SpiroTrace size={200} value={value} label="Building search index" />
         <p className="text-sm text-foreground">Building search index</p>
-        <p className="font-mono text-[11px] text-muted">
+        <p className="font-mono text-[11px] text-ns-muted">
           inked arc length = progress, on the full rosette
         </p>
       </div>
@@ -56,12 +56,12 @@ export default function SpiroTraceDemo() {
       <div className="flex flex-wrap items-center justify-center gap-10">
         <div className="flex flex-col items-center gap-3">
           <SpiroTrace size={112} label="Reticulating shard index" />
-          <p className="font-mono text-[11px] text-muted">no total yet — arc-length sweep</p>
+          <p className="font-mono text-[11px] text-ns-muted">no total yet — arc-length sweep</p>
         </div>
 
         <div className="flex flex-col items-center gap-3">
           <SpiroTrace size={112} value={100} label="Shaders compiled" />
-          <p className="font-mono text-[11px] text-muted">complete — the whole curve inked</p>
+          <p className="font-mono text-[11px] text-ns-muted">complete — the whole curve inked</p>
         </div>
       </div>
     </main>

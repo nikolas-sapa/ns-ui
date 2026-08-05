@@ -564,7 +564,7 @@ export function ErosionTrail({
         <div
           ref={readoutRef}
           aria-hidden
-          className="pointer-events-none absolute right-3 top-3 font-mono text-[10px] tracking-widest text-muted"
+          className="pointer-events-none absolute right-3 top-3 font-mono text-[10px] tracking-widest text-ns-muted"
         >
           GRID --·--
         </div>

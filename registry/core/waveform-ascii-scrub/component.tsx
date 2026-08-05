@@ -98,9 +98,9 @@ function readTokens(): Tokens {
   return {
     fg: get("--foreground", "#171717"),
     bg: get("--background", "#ffffff"),
-    muted: get("--muted", "#4d4d4d"),
+    muted: get("--ns-muted", "#4d4d4d"),
     border: get("--border", "#ebebeb"),
-    accent: get("--accent", "#006bff"),
+    accent: get("--ns-accent", "#006bff"),
   };
 }
 
@@ -319,5 +319,5 @@ export function WaveformAsciiScrub({
 }
 
 const CSS = `
-.ns-was-hit:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ns-was-hit:focus-visible { outline: 2px solid var(--ns-accent); outline-offset: 2px; }
 `;

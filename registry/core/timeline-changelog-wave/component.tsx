@@ -206,8 +206,8 @@ export function Strandline({
       const cs = getComputedStyle(document.documentElement);
       borderC = parseColor(cs.getPropertyValue("--border")) ?? borderC;
       fgC = parseColor(cs.getPropertyValue("--foreground")) ?? fgC;
-      mutedC = parseColor(cs.getPropertyValue("--muted")) ?? mutedC;
-      accentC = parseColor(cs.getPropertyValue("--accent")) ?? accentC;
+      mutedC = parseColor(cs.getPropertyValue("--ns-muted")) ?? mutedC;
+      accentC = parseColor(cs.getPropertyValue("--ns-accent")) ?? accentC;
     };
     derive();
 
@@ -532,7 +532,7 @@ export function Strandline({
       ctx.lineTo(w - 1.5, axisY + 14);
       ctx.stroke();
 
-      // residue tide-rings — one batched stroke, --muted alpha 0.12
+      // residue tide-rings — one batched stroke, --ns-muted alpha 0.12
       ctx.strokeStyle = rgba(mutedC, 0.12);
       ctx.lineWidth = 1;
       ctx.beginPath();
@@ -897,7 +897,7 @@ export function Strandline({
       {/* now-edge label */}
       <span
         aria-hidden
-        className="absolute right-2 top-[calc(62%-1.6rem)] font-mono text-[9px] tracking-widest text-muted"
+        className="absolute right-2 top-[calc(62%-1.6rem)] font-mono text-[9px] tracking-widest text-ns-muted"
       >
         NOW
       </span>
@@ -925,7 +925,7 @@ export function Strandline({
             className="group block rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground/60"
             style={{ transform: "scale(0.6)" }}
           >
-            <span className="flex h-6 w-6 items-center justify-center rounded-full border border-border bg-surface text-muted transition-colors duration-200 group-hover:border-foreground group-hover:text-foreground group-focus-visible:border-foreground group-focus-visible:text-foreground">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full border border-border bg-surface text-ns-muted transition-colors duration-200 group-hover:border-foreground group-hover:text-foreground group-focus-visible:border-foreground group-focus-visible:text-foreground">
               <svg viewBox="0 0 10 10" className="h-2.5 w-2.5" aria-hidden>
                 <circle
                   cx="5"
@@ -947,7 +947,7 @@ export function Strandline({
             <p className="font-mono text-[10px] leading-tight text-foreground">
               {ev.version}
             </p>
-            <p className="font-mono text-[9px] leading-tight tracking-wider text-muted">
+            <p className="font-mono text-[9px] leading-tight tracking-wider text-ns-muted">
               {ev.date}
             </p>
           </div>
@@ -968,7 +968,7 @@ export function Strandline({
       >
         <p
           ref={cardMetaRef}
-          className="font-mono text-[10px] tracking-wider text-muted"
+          className="font-mono text-[10px] tracking-wider text-ns-muted"
         />
         <p
           ref={cardTitleRef}
@@ -978,7 +978,7 @@ export function Strandline({
             the strip above the strand instead of clipping at the root's top */}
         <p
           ref={cardBodyRef}
-          className="mt-1 line-clamp-4 text-[11px] leading-relaxed text-muted"
+          className="mt-1 line-clamp-4 text-[11px] leading-relaxed text-ns-muted"
         />
       </div>
 
@@ -989,7 +989,7 @@ export function Strandline({
           type="button"
           aria-label="Previous release"
           onClick={() => apiRef.current?.retreat()}
-          className="flex h-7 w-7 items-center justify-center rounded-sm border border-border bg-surface text-muted transition-colors duration-200 hover:border-foreground/40 hover:text-foreground disabled:pointer-events-none disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground/60"
+          className="flex h-7 w-7 items-center justify-center rounded-sm border border-border bg-surface text-ns-muted transition-colors duration-200 hover:border-foreground/40 hover:text-foreground disabled:pointer-events-none disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground/60"
         >
           <svg viewBox="0 0 12 12" className="h-3 w-3" aria-hidden>
             <path
@@ -1004,7 +1004,7 @@ export function Strandline({
         </button>
         <span
           ref={counterRef}
-          className="min-w-[2.6rem] text-center font-mono text-[10px] text-muted"
+          className="min-w-[2.6rem] text-center font-mono text-[10px] text-ns-muted"
         >
           0 / {events.length}
         </span>
@@ -1013,7 +1013,7 @@ export function Strandline({
           type="button"
           aria-label="Next release"
           onClick={() => apiRef.current?.advance()}
-          className="flex h-7 w-7 items-center justify-center rounded-sm border border-border bg-surface text-muted transition-colors duration-200 hover:border-foreground/40 hover:text-foreground disabled:pointer-events-none disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground/60"
+          className="flex h-7 w-7 items-center justify-center rounded-sm border border-border bg-surface text-ns-muted transition-colors duration-200 hover:border-foreground/40 hover:text-foreground disabled:pointer-events-none disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground/60"
         >
           <svg viewBox="0 0 12 12" className="h-3 w-3" aria-hidden>
             <path

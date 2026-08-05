@@ -10,7 +10,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 // is a failed catch: the dial springs out to +8deg like a safe tumbler that
 // almost caught and slipped. Completing the dwell spring-snaps to exact
 // zero, both ticks thicken to --foreground, and the destructive button arms
-// (its one legitimate use of --accent). Because fine-motor precision is
+// (its one legitimate use of --ns-accent). Because fine-motor precision is
 // hostile to some users, an always-visible "type to confirm" disclosure
 // offers an equivalent path, and two failed catches auto-expand it. Direct-
 // DOM writes on the drag/spring hot path, React state only at the rare
@@ -312,7 +312,7 @@ export function TumblerGate({
     <div className={`flex flex-col items-center gap-6 ${className}`}>
       <div
         ref={knobRef}
-        className="tumbler-knob relative h-44 w-44 cursor-grab touch-none select-none rounded-full border border-border bg-surface active:cursor-grabbing focus-within:outline focus-within:outline-2 focus-within:outline-offset-4 focus-within:outline-accent"
+        className="tumbler-knob relative h-44 w-44 cursor-grab touch-none select-none rounded-full border border-border bg-surface active:cursor-grabbing focus-within:outline focus-within:outline-2 focus-within:outline-offset-4 focus-within:outline-ns-accent"
       >
         <input
           ref={inputRef}
@@ -363,11 +363,11 @@ export function TumblerGate({
         onClick={handleConfirm}
         className={[
           "rounded-sm border px-5 py-2.5 text-sm font-medium transition-colors duration-150",
-          "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+          "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent",
           "disabled:cursor-not-allowed disabled:opacity-40",
           armed
-            ? "border-accent bg-surface text-foreground enabled:hover:bg-border/60"
-            : "border-border bg-surface text-muted",
+            ? "border-ns-accent bg-surface text-foreground enabled:hover:bg-border/60"
+            : "border-border bg-surface text-ns-muted",
         ].join(" ")}
       >
         {confirmed ? doneLabel : destructiveLabel}
@@ -380,12 +380,12 @@ export function TumblerGate({
       >
         <summary
           data-tumbler-toggle=""
-          className="cursor-pointer select-none font-mono text-xs uppercase tracking-[0.15em] text-muted underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="cursor-pointer select-none font-mono text-xs uppercase tracking-[0.15em] text-ns-muted underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
         >
           Type to confirm instead
         </summary>
         <div className="mt-3 flex flex-col items-center gap-1.5">
-          <label htmlFor="tumbler-confirm-input" className="font-mono text-xs text-muted">
+          <label htmlFor="tumbler-confirm-input" className="font-mono text-xs text-ns-muted">
             Type &quot;{confirmWord}&quot; to enable
           </label>
           <input
@@ -395,13 +395,13 @@ export function TumblerGate({
             value={typedValue}
             onChange={handleTypedChange}
             autoComplete="off"
-            className="w-40 rounded-sm border border-border bg-background px-2 py-1 text-center text-sm text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="w-40 rounded-sm border border-border bg-background px-2 py-1 text-center text-sm text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           />
         </div>
       </details>
 
       {failedAttempts > 0 && !armed && (
-        <p aria-hidden className="font-mono text-[11px] text-muted">
+        <p aria-hidden className="font-mono text-[11px] text-ns-muted">
           {failedAttempts} failed {failedAttempts === 1 ? "attempt" : "attempts"}
         </p>
       )}

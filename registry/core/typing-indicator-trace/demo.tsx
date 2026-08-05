@@ -92,7 +92,7 @@ export default function TremorTraceDemo() {
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 py-16">
       <div className="w-full max-w-md rounded-md border border-border bg-background p-5 shadow-sm">
         <h2 className="text-sm font-medium text-foreground">Release thread</h2>
-        <p className="mt-1 text-xs text-muted">Who's typing, who's idle, who left — read from real cadence.</p>
+        <p className="mt-1 text-xs text-ns-muted">Who's typing, who's idle, who left — read from real cadence.</p>
 
         <div className="mt-4">
           <TremorTrace ref={traceRef} users={users} />
@@ -103,11 +103,11 @@ export default function TremorTraceDemo() {
           placeholder="Type here — your row spikes with your own cadence"
           aria-label="Message"
           onKeyDown={handleKeyDown}
-          className="mt-4 w-full resize-none rounded-sm border border-border bg-surface px-3 py-2 text-sm text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="mt-4 w-full resize-none rounded-sm border border-border bg-surface px-3 py-2 text-sm text-foreground placeholder:text-ns-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
         />
       </div>
 
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / typing-indicator-trace — cadence, not a canned pulse
       </p>
     </div>

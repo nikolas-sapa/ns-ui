@@ -626,7 +626,7 @@ export function SiphonLift({
 @keyframes sl-enter{from{grid-template-rows:0fr;opacity:0;}to{grid-template-rows:1fr;opacity:1;}}
 .sl-root .sl-dest-row[data-entering]{animation:sl-enter 320ms cubic-bezier(0.34,1.4,0.64,1) forwards;}
 .sl-root .sl-src-row{outline:none;border-radius:6px;}
-.sl-root .sl-src-row:focus-visible{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--accent);}
+.sl-root .sl-src-row:focus-visible{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--ns-accent);}
 .sl-root .sl-check{display:inline-flex;flex:none;align-items:center;justify-content:center;width:18px;height:18px;border-radius:6px;border:1px solid var(--border);color:var(--background);transition:background-color 140ms ease-out,border-color 140ms ease-out;}
 .sl-root .sl-check-on{background:var(--foreground);border-color:var(--foreground);}
 .sl-root .sl-tube-path{fill:none;stroke:var(--border);stroke-width:1;transition:opacity ${FADE_MS}ms ease-out;}
@@ -650,7 +650,7 @@ export function SiphonLift({
           <div className="flex items-start justify-between gap-3 border-b border-border px-4 py-3">
             <div>
               <h3 className="text-sm font-semibold text-foreground">{sourceLabel}</h3>
-              <p className="mt-0.5 font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
+              <p className="mt-0.5 font-mono text-[11px] uppercase tracking-[0.14em] text-ns-muted">
                 {selected.size} selected
               </p>
             </div>
@@ -658,7 +658,7 @@ export function SiphonLift({
               type="button"
               disabled={flowActive || sourceItems.length === 0}
               onClick={toggleSelectAll}
-              className="shrink-0 rounded-sm border border-border bg-background px-2.5 py-1 text-[11px] font-medium text-foreground outline-none transition-colors hover:border-foreground/25 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
+              className="shrink-0 rounded-sm border border-border bg-background px-2.5 py-1 text-[11px] font-medium text-foreground outline-none transition-colors hover:border-foreground/25 focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
             >
               {allSourceSelected ? "Clear selection" : "Select all"}
             </button>
@@ -710,14 +710,14 @@ export function SiphonLift({
                     </span>
                     <span className="min-w-0 flex-1 truncate text-sm text-foreground">{item.label}</span>
                     {item.hint ? (
-                      <span className="shrink-0 font-mono text-[11px] text-muted">{item.hint}</span>
+                      <span className="shrink-0 font-mono text-[11px] text-ns-muted">{item.hint}</span>
                     ) : null}
                   </div>
                 </li>
               );
             })}
             {sourceItems.length === 0 ? (
-              <li className="px-2.5 py-6 text-center text-xs text-muted">All items moved.</li>
+              <li className="px-2.5 py-6 text-center text-xs text-ns-muted">All items moved.</li>
             ) : null}
           </ul>
         </div>
@@ -725,12 +725,12 @@ export function SiphonLift({
         <div
           ref={destPanelRef}
           className={`sl-panel overflow-hidden rounded-md border bg-surface transition-colors ${
-            overDestination ? "border-accent" : "border-border"
+            overDestination ? "border-ns-accent" : "border-border"
           }`}
         >
           <div className="border-b border-border px-4 py-3">
             <h3 className="text-sm font-semibold text-foreground">{destinationLabel}</h3>
-            <p className="mt-0.5 font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
+            <p className="mt-0.5 font-mono text-[11px] uppercase tracking-[0.14em] text-ns-muted">
               {destItems.length} here
             </p>
           </div>
@@ -763,20 +763,20 @@ export function SiphonLift({
                   </span>
                   <span className="min-w-0 flex-1 truncate text-sm text-foreground">{item.label}</span>
                   {item.hint ? (
-                    <span className="shrink-0 font-mono text-[11px] text-muted">{item.hint}</span>
+                    <span className="shrink-0 font-mono text-[11px] text-ns-muted">{item.hint}</span>
                   ) : null}
                 </div>
               </li>
             ))}
             {destItems.length === 0 ? (
-              <li className="px-2.5 py-6 text-center text-xs text-muted">Nothing here yet.</li>
+              <li className="px-2.5 py-6 text-center text-xs text-ns-muted">Nothing here yet.</li>
             ) : null}
           </ul>
         </div>
       </div>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-        <p className="font-mono text-[11px] text-muted">
+        <p className="font-mono text-[11px] text-ns-muted">
           {flowActive
             ? sealed
               ? `Stopping — ${delivered} of ${total} made it across.`
@@ -788,7 +788,7 @@ export function SiphonLift({
           data-sl-move
           disabled={flowActive || selected.size === 0}
           onClick={onMoveClick}
-          className="rounded-sm border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground outline-none transition-colors hover:border-foreground/25 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-sm border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground outline-none transition-colors hover:border-foreground/25 focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
         >
           Move selected to {destinationLabel}
         </button>
@@ -823,7 +823,7 @@ export function SiphonLift({
           aria-label="Stop transfer"
           onClick={breakSeal}
           style={{ left: stopPos.x, top: stopPos.y }}
-          className="sl-stop-btn absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-border bg-surface text-foreground outline-none transition-colors hover:border-foreground/40 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          className="sl-stop-btn absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-border bg-surface text-foreground outline-none transition-colors hover:border-foreground/40 focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           <span aria-hidden className="sl-stop-icon" />
         </button>

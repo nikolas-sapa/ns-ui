@@ -75,7 +75,7 @@ export const revalidate = 3600;
 const firstSentence = (text: string) => text.split(/(?<=\.)\s/, 1)[0] ?? text;
 
 const SUMMARY =
-  "cursor-pointer select-none rounded-sm font-mono text-xs uppercase tracking-[0.14em] text-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none";
+  "cursor-pointer select-none rounded-sm font-mono text-xs uppercase tracking-[0.14em] text-ns-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none";
 
 export default async function PlaygroundPage({
   params,
@@ -116,15 +116,15 @@ export default async function PlaygroundPage({
               {item.title}
             </h1>
             {kind ? (
-              <span className="shrink-0 text-sm text-muted">{kind}</span>
+              <span className="shrink-0 text-sm text-ns-muted">{kind}</span>
             ) : null}
             {collection === "loud" ? (
-              <span className="shrink-0 rounded-sm border border-border px-1.5 py-px font-mono text-[10px] uppercase tracking-wider text-muted">
+              <span className="shrink-0 rounded-sm border border-border px-1.5 py-px font-mono text-[10px] uppercase tracking-wider text-ns-muted">
                 loud
               </span>
             ) : null}
           </div>
-          <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted">
+          <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-ns-muted">
             {summary}
           </p>
         </div>
@@ -176,7 +176,7 @@ export default async function PlaygroundPage({
             <summary className={SUMMARY}>Source</summary>
             <div className="mt-3">
               <div className="flex items-center justify-between gap-3">
-                <code className="font-mono text-[11px] text-muted">{source.file}</code>
+                <code className="font-mono text-[11px] text-ns-muted">{source.file}</code>
                 <CopyButton
                   variant="inline"
                   value={source.code}
@@ -196,12 +196,12 @@ export default async function PlaygroundPage({
           <details className="py-3">
             <summary className={SUMMARY}>Use when</summary>
             {hasMore ? (
-              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
+              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ns-muted">
                 {item.description}
               </p>
             ) : null}
             {useWhen ? (
-              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
+              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ns-muted">
                 {useWhen}
               </p>
             ) : null}
@@ -211,7 +211,7 @@ export default async function PlaygroundPage({
         {instruction ? (
           <details className="py-3">
             <summary className={SUMMARY}>Build spec</summary>
-            <p className="mt-3 max-w-3xl whitespace-pre-wrap font-mono text-xs leading-relaxed text-muted">
+            <p className="mt-3 max-w-3xl whitespace-pre-wrap font-mono text-xs leading-relaxed text-ns-muted">
               {instruction}
             </p>
           </details>
@@ -224,7 +224,7 @@ export default async function PlaygroundPage({
               {tags.map((t) => (
                 <span
                   key={t}
-                  className="rounded-full border border-border px-2 py-0.5 font-mono text-[11px] text-muted"
+                  className="rounded-full border border-border px-2 py-0.5 font-mono text-[11px] text-ns-muted"
                 >
                   {t}
                 </span>
@@ -234,7 +234,7 @@ export default async function PlaygroundPage({
         ) : null}
       </div>
 
-      <footer className="mt-8 flex flex-wrap items-baseline gap-x-6 gap-y-2 border-t border-border pt-4 font-mono text-xs text-muted">
+      <footer className="mt-8 flex flex-wrap items-baseline gap-x-6 gap-y-2 border-t border-border pt-4 font-mono text-xs text-ns-muted">
         {/* The canonical page for this component. Every card and sidebar row
             now links to /components/<name>, so anyone who lands here does so
             from that page's "view source and playground" link, an older
@@ -242,19 +242,19 @@ export default async function PlaygroundPage({
             one page that carries props, dependencies, save and metadata. */}
         <Link
           href={`/components/${name}`}
-          className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
         >
           Component page
         </Link>
         <Link
           href="/"
-          className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
         >
           Back to the catalog
         </Link>
         <a
           href="https://nikolas.helpmarq.com"
-          className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
         >
           Built by Nikolas Sapa
         </a>
@@ -273,7 +273,7 @@ function NavArrow({
   flip?: boolean;
 }) {
   const shared =
-    "inline-flex size-8 items-center justify-center rounded-sm text-muted";
+    "inline-flex size-8 items-center justify-center rounded-sm text-ns-muted";
   if (!href) {
     return (
       <span className={`${shared} opacity-30`} aria-hidden>
@@ -290,7 +290,7 @@ function NavArrow({
       // parallel browsing tree the consolidation removed.
       href={`/components/${href}`}
       aria-label={label}
-      className={`${shared} outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none`}
+      className={`${shared} outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none`}
     >
       <Chevron flip={flip} />
     </Link>

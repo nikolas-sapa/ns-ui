@@ -37,7 +37,7 @@ export default function BeaconCadenceDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-12 px-6">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / status-glyph-cadence
       </p>
 
@@ -46,7 +46,7 @@ export default function BeaconCadenceDemo() {
           <BeaconCadence state={active.state} size={60} />
           <div className="min-w-0">
             <p className="truncate text-sm text-foreground">{active.text}</p>
-            <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+            <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-ns-muted">
               current run
             </p>
           </div>
@@ -59,7 +59,7 @@ export default function BeaconCadenceDemo() {
               <span className="min-w-0 flex-1 truncate text-xs text-foreground">
                 {row.text}
               </span>
-              <span className="font-mono text-[10px] text-muted">
+              <span className="font-mono text-[10px] text-ns-muted">
                 {row.time}
               </span>
             </li>
@@ -67,7 +67,7 @@ export default function BeaconCadenceDemo() {
         </ul>
       </div>
 
-      <p className="font-mono text-[10px] text-muted">
+      <p className="font-mono text-[10px] text-ns-muted">
         motion is the signal — five distinct cadences, no color, no swapped icon
       </p>
     </div>

@@ -33,21 +33,21 @@ export default function PlimsollGaugeDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / gauge-capacity-waterline
       </p>
 
       <div className="flex w-full max-w-sm flex-col items-center gap-5 rounded-[16px] border border-border bg-background p-6">
         <div className="flex w-full items-center justify-between">
           <p className="text-sm text-foreground">Hold 3 — Bulk Cargo</p>
-          <p className={`font-mono text-xs ${overloaded ? "text-[var(--warning)]" : "text-muted"}`}>
+          <p className={`font-mono text-xs ${overloaded ? "text-[var(--warning)]" : "text-ns-muted"}`}>
             {Math.round(current.value)}% / {LIMIT}%
           </p>
         </div>
 
         <PlimsollGauge value={current.value} limit={LIMIT} />
 
-        <p className="text-center text-xs text-muted">
+        <p className="text-center text-xs text-ns-muted">
           Hover or focus the hull for an exact sounding; the S mark goes amber
           once the load passes the legal limit.
         </p>

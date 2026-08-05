@@ -43,7 +43,7 @@ const NODES: RuleNode[] = [
 export default function FoldingRuleDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-10 px-6">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / tree-hinge-fold — branches swing open on a hinge
       </p>
       <div className="w-full max-w-sm rounded-md border border-border bg-surface p-3">

@@ -298,7 +298,7 @@ export function WarpLattice({
         const prev = items[litIdx];
         if (prev) prev.style.borderColor = "";
         const next = items[nearest];
-        if (next) next.style.borderColor = "var(--accent)";
+        if (next) next.style.borderColor = "var(--ns-accent)";
         litIdx = nearest;
       }
 
@@ -441,9 +441,9 @@ export function WarpLattice({
         {labels.map((label) => (
           <div
             key={label}
-            className="flex min-h-28 items-end rounded-md border border-border bg-surface p-4 transition-colors duration-300 will-change-transform motion-reduce:hover:border-accent"
+            className="flex min-h-28 items-end rounded-md border border-border bg-surface p-4 transition-colors duration-300 will-change-transform motion-reduce:hover:border-ns-accent"
           >
-            <span className="font-mono text-xs text-muted">{label}</span>
+            <span className="font-mono text-xs text-ns-muted">{label}</span>
           </div>
         ))}
       </div>

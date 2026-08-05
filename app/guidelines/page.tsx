@@ -30,17 +30,17 @@ const REJECTED = [
 export default function GuidelinesPage() {
   return (
     <main className="mx-auto flex max-w-3xl flex-col px-6 py-16 sm:px-10">
-      <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted">
+      <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-ns-muted">
         Guidelines
       </p>
       <h1 className="mt-4 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">
         The taste, not the mechanics.
       </h1>
-      <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
+      <p className="mt-3 max-w-2xl text-sm leading-6 text-ns-muted">
         This page is what the repository asks of a submission and why.{" "}
         <Link
           href="https://github.com/nikolassapalidis/ns-ui/blob/main/CONTRIBUTING.md"
-          className="underline underline-offset-2 hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+          className="underline underline-offset-2 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
         >
           CONTRIBUTING.md
         </Link>{" "}
@@ -53,7 +53,7 @@ export default function GuidelinesPage() {
         <h2 className="text-lg font-medium tracking-[-0.02em] text-foreground">
           One interaction
         </h2>
-        <p className="mt-2 text-sm leading-6 text-muted">
+        <p className="mt-2 text-sm leading-6 text-ns-muted">
           The bar for a new component is an interaction that does not already
           exist here — not a component that merely works. A button styled
           differently from an existing button is not a new interaction. A
@@ -67,7 +67,7 @@ export default function GuidelinesPage() {
         <h2 className="text-lg font-medium tracking-[-0.02em] text-foreground">
           Both themes are non-negotiable
         </h2>
-        <p className="mt-2 text-sm leading-6 text-muted">
+        <p className="mt-2 text-sm leading-6 text-ns-muted">
           Every component ships in dark and light, and both are graded, not
           just the one your terminal defaults to. A component can read
           perfectly in dark and fall apart in light — a gradient that
@@ -82,7 +82,7 @@ export default function GuidelinesPage() {
         <h2 className="text-lg font-medium tracking-[-0.02em] text-foreground">
           The card matters as much as the preview
         </h2>
-        <p className="mt-2 text-sm leading-6 text-muted">
+        <p className="mt-2 text-sm leading-6 text-ns-muted">
           The homepage renders your component live, scaled down into a card
           roughly 660px wide. A demo that reads fine at full size can arrive
           in the grid as a speck of interface adrift in empty background, or
@@ -97,7 +97,7 @@ export default function GuidelinesPage() {
         <h2 className="text-lg font-medium tracking-[-0.02em] text-foreground">
           The token rule
         </h2>
-        <p className="mt-2 text-sm leading-6 text-muted">
+        <p className="mt-2 text-sm leading-6 text-ns-muted">
           Color comes from the CSS custom properties already in scope —{" "}
           <code className="rounded-sm bg-surface px-1 py-0.5 font-mono text-[13px] text-foreground">
             --background
@@ -108,7 +108,7 @@ export default function GuidelinesPage() {
           </code>
           ,{" "}
           <code className="rounded-sm bg-surface px-1 py-0.5 font-mono text-[13px] text-foreground">
-            --muted
+            --ns-muted
           </code>
           ,{" "}
           <code className="rounded-sm bg-surface px-1 py-0.5 font-mono text-[13px] text-foreground">
@@ -116,7 +116,7 @@ export default function GuidelinesPage() {
           </code>
           , and{" "}
           <code className="rounded-sm bg-surface px-1 py-0.5 font-mono text-[13px] text-foreground">
-            --accent
+            --ns-accent
           </code>
           — never a hardcoded hex, in markup or in canvas/SVG draw code. This
           broke the light theme across the whole registry once already. A
@@ -132,13 +132,13 @@ export default function GuidelinesPage() {
         <h2 className="text-lg font-medium tracking-[-0.02em] text-foreground">
           What gets rejected
         </h2>
-        <p className="mt-2 text-sm leading-6 text-muted">
+        <p className="mt-2 text-sm leading-6 text-ns-muted">
           A person reads every submission; the automated gate is the floor,
           not the bar. It hard-fails on:
         </p>
         <ul className="mt-5 flex flex-col gap-2.5">
           {REJECTED.map((reason) => (
-            <li key={reason} className="flex gap-2.5 text-sm leading-6 text-muted">
+            <li key={reason} className="flex gap-2.5 text-sm leading-6 text-ns-muted">
               <span
                 aria-hidden
                 className="mt-2 size-1 shrink-0 rounded-full bg-border"
@@ -153,7 +153,7 @@ export default function GuidelinesPage() {
         <h2 className="text-lg font-medium tracking-[-0.02em] text-foreground">
           License and sign-off
         </h2>
-        <p className="mt-2 text-sm leading-6 text-muted">
+        <p className="mt-2 text-sm leading-6 text-ns-muted">
           A merged submission is contributed under the repository's MIT
           license — you keep authorship, the project keeps the right to
           distribute it under those terms. Every pull request certifies its
@@ -170,19 +170,19 @@ export default function GuidelinesPage() {
         <h2 className="text-lg font-medium tracking-[-0.02em] text-foreground">
           Contributor credit and privacy
         </h2>
-        <p className="mt-2 text-sm leading-6 text-muted">
+        <p className="mt-2 text-sm leading-6 text-ns-muted">
           Nothing you save, and nothing you write on your profile, is visible
           to anyone unless you publish it. Publishing is per collection, and
           it is off until you turn it on.
         </p>
-        <p className="mt-3 text-sm leading-6 text-muted">
+        <p className="mt-3 text-sm leading-6 text-ns-muted">
           Contributing a component to the repository is different: it is
           public git history under the GitHub identity you opened the pull
           request with. It is not covered by the privacy setting above, it is
           not something this site stores about you, and it survives deleting
           your account.
         </p>
-        <p className="mt-3 text-sm leading-6 text-muted">
+        <p className="mt-3 text-sm leading-6 text-ns-muted">
           Credit for a contribution links to that contributor's profile only
           when one exists and is public. Otherwise it renders as their plain
           GitHub login, with no link — the same degradation a deleted account
@@ -190,16 +190,16 @@ export default function GuidelinesPage() {
         </p>
       </section>
 
-      <footer className="mt-16 flex flex-wrap items-baseline gap-x-8 gap-y-2 border-t border-border pt-6 font-mono text-xs text-muted">
+      <footer className="mt-16 flex flex-wrap items-baseline gap-x-8 gap-y-2 border-t border-border pt-6 font-mono text-xs text-ns-muted">
         <Link
           href="/"
-          className="underline underline-offset-2 hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+          className="underline underline-offset-2 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
         >
           Back to the grid
         </Link>
         <Link
           href="/community"
-          className="underline underline-offset-2 hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+          className="underline underline-offset-2 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
         >
           Community
         </Link>

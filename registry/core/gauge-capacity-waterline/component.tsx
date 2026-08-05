@@ -268,7 +268,7 @@ export function PlimsollGauge({ value, limit = 100, className = "" }: PlimsollGa
       onPointerLeave={onLeave}
       onFocus={onFocus}
       onBlur={onBlur}
-      className={`relative block rounded-[12px] border border-border bg-surface p-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${className}`}
+      className={`relative block rounded-[12px] border border-border bg-surface p-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent ${className}`}
       style={{ width: STAGE_W, height: STAGE_H }}
     >
       <style>{CSS}</style>
@@ -289,7 +289,7 @@ export function PlimsollGauge({ value, limit = 100, className = "" }: PlimsollGa
           {marks.map((m) => {
             const y = toY(m.percent);
             const flip = m.isLimit && overload;
-            const color = flip ? "var(--warning)" : "var(--muted)";
+            const color = flip ? "var(--warning)" : "var(--ns-muted)";
             return (
               <g key={m.key} className="ns-pg-mark">
                 <line

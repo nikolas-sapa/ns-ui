@@ -7,7 +7,7 @@ function Row({ title, meta }: { title: string; meta: string }) {
   return (
     <div className="flex h-full w-full items-center justify-between gap-4 rounded-md border border-border bg-background px-4">
       <p className="truncate text-sm font-medium text-foreground">{title}</p>
-      <p className="shrink-0 text-xs text-muted">{meta}</p>
+      <p className="shrink-0 text-xs text-ns-muted">{meta}</p>
     </div>
   );
 }
@@ -45,12 +45,12 @@ export default function EchoSoundDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / empty-state-sonar — a probe that the results interrupt
       </p>
 
       <div className="w-[420px] rounded-md border border-border bg-background p-6">
-        <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-muted">
+        <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-ns-muted">
           search · &ldquo;invoice&rdquo;
         </p>
         <EchoSound items={items} query="invoice" rowHeight={52} rowGap={10} stageRows={RESULTS.length} />

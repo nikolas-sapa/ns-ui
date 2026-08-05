@@ -90,7 +90,7 @@ export function SelvageFold({ children, lines = 3, className = "" }: SelvageFold
             aria-expanded={open}
             aria-label={open ? "Fold text back" : `Unfold ${metrics.hidden} more ${metrics.hidden === 1 ? "word" : "words"}`}
             onClick={() => setOpen((o) => !o)}
-            className="flex cursor-pointer items-center gap-1.5 rounded-sm px-1.5 py-0.5 font-mono text-[11px] tabular-nums text-muted transition-colors duration-150 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="flex cursor-pointer items-center gap-1.5 rounded-sm px-1.5 py-0.5 font-mono text-[11px] tabular-nums text-ns-muted transition-colors duration-150 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             <svg
               aria-hidden

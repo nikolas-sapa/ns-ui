@@ -7,7 +7,7 @@ import { useLayoutEffect, useRef, type CSSProperties } from "react";
 // "just now" renders heavy and tight; as the moment recedes, weight steps
 // down (~650 -> 500 -> 400 -> 300 across 4 discrete buckets keyed off log-ish
 // age ranges), letter-spacing opens 0 -> 0.04em, and ink steps from
-// --foreground toward --muted — the drift is felt in the glyphs before the
+// --foreground toward --ns-muted — the drift is felt in the glyphs before the
 // digits are read. Hover or focus crossfades (150ms, ease-out-expo) to the
 // exact ISO moment in Geist Mono; both layers sit in the same CSS grid cell
 // so the crossfade never reflows, and tabular-nums keeps every digit swap
@@ -46,7 +46,7 @@ const EASE_EXPO = "cubic-bezier(0.16, 1, 0.3, 1)";
 type Step = { weight: number; tracking: number; mix: number };
 
 // weight 650 -> 500 -> 400 -> 300, tracking 0 -> 0.04em, ink --foreground
-// -> --muted (mix = % of --muted blended in), stepped across four buckets.
+// -> --ns-muted (mix = % of --ns-muted blended in), stepped across four buckets.
 const STEPS: readonly Step[] = [
   { weight: 650, tracking: 0, mix: 0 },
   { weight: 500, tracking: 0.014, mix: 0.35 },
@@ -139,7 +139,7 @@ export function DriftStamp({
       }
       time.style.setProperty("--ds-wght", String(s.weight));
       time.style.letterSpacing = `${s.tracking}em`;
-      time.style.color = `color-mix(in srgb, var(--foreground), var(--muted) ${Math.round(s.mix * 100)}%)`;
+      time.style.color = `color-mix(in srgb, var(--foreground), var(--ns-muted) ${Math.round(s.mix * 100)}%)`;
       const ageSec = Math.max(0, (now - dateMs) / 1000);
       timer = window.setTimeout(applyStep, nextDelayMs(ageSec));
     };
@@ -203,7 +203,7 @@ export function DriftStamp({
 
   if (!valid) {
     return (
-      <time className={`font-sans text-muted ${className}`} aria-label="invalid date">
+      <time className={`font-sans text-ns-muted ${className}`} aria-label="invalid date">
         Invalid date
       </time>
     );
@@ -224,7 +224,7 @@ export function DriftStamp({
       aria-label={initialLabel}
       aria-description={isoDisplay(dateMs)}
       suppressHydrationWarning
-      className={`ns-time-ago-drift inline-grid cursor-default rounded-sm font-sans align-baseline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${className}`}
+      className={`ns-time-ago-drift inline-grid cursor-default rounded-sm font-sans align-baseline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent ${className}`}
       style={{ "--ds-wght": STEPS[0].weight } as CSSProperties}
     >
       <span

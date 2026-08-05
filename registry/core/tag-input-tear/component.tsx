@@ -79,7 +79,7 @@ function Perforation({
   jitterIndex: number | null;
   armed: boolean;
 }) {
-  const stroke = armed ? "var(--accent)" : "var(--border)";
+  const stroke = armed ? "var(--ns-accent)" : "var(--border)";
   return (
     <svg
       aria-hidden
@@ -468,7 +468,7 @@ export function TearTab({
         onClick={(e) => {
           if (!(e.target as HTMLElement).closest('[role="option"]')) inputRef.current?.focus();
         }}
-        className="w-full cursor-text rounded-md border border-border bg-surface px-3 py-2.5 transition-colors duration-150 focus-within:border-muted"
+        className="w-full cursor-text rounded-md border border-border bg-surface px-3 py-2.5 transition-colors duration-150 focus-within:border-ns-muted"
       >
         <ul
           role="listbox"
@@ -497,7 +497,7 @@ export function TearTab({
                 className={[
                   "tag-input-tear-chip inline-flex h-7 shrink-0 cursor-grab touch-none select-none items-stretch",
                   "overflow-visible rounded-md border border-l-0 border-border bg-background",
-                  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+                  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent",
                   isFading ? "tag-input-tear-fading" : "",
                 ].join(" ")}
                 style={{
@@ -528,7 +528,7 @@ export function TearTab({
           placeholder={placeholder}
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={onInputKeyDown}
-          className="w-full min-w-[8ch] bg-transparent py-0.5 text-sm text-foreground outline-none placeholder:text-muted"
+          className="w-full min-w-[8ch] bg-transparent py-0.5 text-sm text-foreground outline-none placeholder:text-ns-muted"
         />
       </div>
 

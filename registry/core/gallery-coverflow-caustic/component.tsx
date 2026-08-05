@@ -198,7 +198,7 @@ export function CausticCoverflow({
     const deriveTokens = () => {
       const cs = getComputedStyle(document.documentElement);
       fg = parseColor(cs.getPropertyValue("--foreground")) ?? fg;
-      mut = parseColor(cs.getPropertyValue("--muted")) ?? mut;
+      mut = parseColor(cs.getPropertyValue("--ns-muted")) ?? mut;
       brd = parseColor(cs.getPropertyValue("--border")) ?? brd;
       srf = parseColor(cs.getPropertyValue("--surface")) ?? srf;
       const bg = parseColor(cs.getPropertyValue("--background")) ?? srf;
@@ -742,7 +742,7 @@ export function CausticCoverflow({
         aria-roledescription="carousel"
         aria-label={ariaLabel}
         tabIndex={0}
-        className="relative w-full touch-pan-y select-none overflow-hidden rounded-md outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+        className="relative w-full touch-pan-y select-none overflow-hidden rounded-md outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ns-accent"
         style={{
           height: cardHeight + 48,
           perspective: "1200px",
@@ -805,7 +805,7 @@ export function CausticCoverflow({
                   <p className="text-sm font-semibold tracking-tight text-foreground">
                     {item.title}
                   </p>
-                  <p className="mt-1 font-mono text-[10px] tracking-widest text-muted">
+                  <p className="mt-1 font-mono text-[10px] tracking-widest text-ns-muted">
                     {item.meta ?? `NO. ${String(i + 1).padStart(2, "0")}`}
                   </p>
                 </div>
@@ -832,7 +832,7 @@ export function CausticCoverflow({
             type="button"
             data-active={i === start ? "true" : "false"}
             aria-label={`Go to ${item.title}`}
-            className="h-1.5 w-6 rounded-full bg-border transition-colors duration-200 hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent data-[active=true]:bg-foreground"
+            className="h-1.5 w-6 rounded-full bg-border transition-colors duration-200 hover:bg-ns-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent data-[active=true]:bg-foreground"
           />
         ))}
       </div>

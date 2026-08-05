@@ -22,13 +22,13 @@ export default function RationRuleDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-md">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">
+        <p className="mb-4 font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / meter-quota-rule
         </p>
         <h1 className="text-lg font-semibold text-foreground">
           Workspace usage
         </h1>
-        <p className="mt-1 text-sm leading-relaxed text-muted">
+        <p className="mt-1 text-sm leading-relaxed text-ns-muted">
           Every allowance on this page reads the same way: the number, then
           the rule underneath it. Used ground is solid, remaining ground is
           dashed, and a tick marks the warning line — crossing it thickens
@@ -74,21 +74,21 @@ export default function RationRuleDemo() {
             />
           </div>
           <div className="flex items-center justify-between gap-4 px-5 py-3">
-            <span className="font-mono text-[11px] text-muted">
+            <span className="font-mono text-[11px] text-ns-muted">
               advance the billing period
             </span>
             <button
               type="button"
               data-ration-cycle
               onClick={simulateUsage}
-              className="rounded-sm border border-border px-3 py-1.5 font-mono text-[11px] tracking-widest text-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="rounded-sm border border-border px-3 py-1.5 font-mono text-[11px] tracking-widest text-ns-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
             >
               SIMULATE USAGE
             </button>
           </div>
         </div>
 
-        <p className="mt-3 font-mono text-[11px] text-muted">
+        <p className="mt-3 font-mono text-[11px] text-ns-muted">
           the printed numbers are the whole reading — the rule is a footnote
           to them, not the other way around
         </p>

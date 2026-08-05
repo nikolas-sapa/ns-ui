@@ -85,7 +85,7 @@ export default function TackleBoardDemo() {
   return (
     <div className="flex min-h-screen items-center justify-center px-6 py-16">
       <div className="w-full max-w-xl rounded-md border border-border bg-background p-6">
-        <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.16em] text-muted">Agent / tools</p>
+        <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.16em] text-ns-muted">Agent / tools</p>
         <TackleBoard tools={TOOLS} invocations={invocations} />
       </div>
     </div>

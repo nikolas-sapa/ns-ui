@@ -9,10 +9,10 @@ export default function LiquidCollarDemo() {
   return (
     <div className="flex h-screen w-full flex-col items-center justify-center gap-14 bg-background px-6">
       <div className="flex flex-col items-center gap-2 text-center">
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
           ns-ui / border-chrome-ring
         </p>
-        <p className="text-xs text-muted">
+        <p className="text-xs text-ns-muted">
           Molten chrome wrapping a control — press it, the metal pools toward your cursor.
         </p>
       </div>

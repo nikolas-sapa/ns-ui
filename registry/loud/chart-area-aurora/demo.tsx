@@ -104,13 +104,13 @@ export default function AuroraFlowChartDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-6 py-20">
       <div className="w-full max-w-3xl">
-        <p className="font-mono text-xs tracking-[0.25em] text-muted">
+        <p className="font-mono text-xs tracking-[0.25em] text-ns-muted">
           ns-ui / chart-area-aurora
         </p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground">
           The fill is the phenomenon
         </h1>
-        <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">
+        <p className="mt-2 max-w-xl text-sm leading-relaxed text-ns-muted">
           An area chart whose fill is an aurora curtain: value drives curtain
           height, hue tracks local trend — falling runs cool, rising runs warm —
           and the noise-warped top edge drifts even at rest. New datapoints
@@ -121,19 +121,19 @@ export default function AuroraFlowChartDemo() {
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-mono text-xs uppercase tracking-[0.18em] text-muted">
+                <span className="font-mono text-xs uppercase tracking-[0.18em] text-ns-muted">
                   Request volume
                 </span>
                 <span className="relative flex h-1.5 w-1.5" aria-hidden>
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-muted/50 motion-reduce:hidden" />
-                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-muted" />
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-ns-muted/50 motion-reduce:hidden" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-ns-muted" />
                 </span>
               </div>
               <div className="mt-2 flex items-baseline gap-2">
                 <span className="text-3xl font-semibold tabular-nums tracking-tight text-foreground">
                   {lastV.toLocaleString("en-US")}
                 </span>
-                <span className="font-mono text-xs text-muted">
+                <span className="font-mono text-xs text-ns-muted">
                   req/min · {delta >= 0 ? "+" : "−"}
                   {Math.abs(delta).toLocaleString("en-US")} vs prev
                 </span>
@@ -151,10 +151,10 @@ export default function AuroraFlowChartDemo() {
                   type="button"
                   onClick={() => setRange(r)}
                   aria-pressed={range === r}
-                  className={`rounded-sm px-2.5 py-1 font-mono text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 ${
+                  className={`rounded-sm px-2.5 py-1 font-mono text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent/60 ${
                     range === r
                       ? "border border-foreground/15 bg-background text-foreground"
-                      : "border border-transparent text-muted hover:bg-foreground/5 hover:text-foreground"
+                      : "border border-transparent text-ns-muted hover:bg-foreground/5 hover:text-foreground"
                   }`}
                 >
                   {r}
@@ -171,7 +171,7 @@ export default function AuroraFlowChartDemo() {
             />
           </div>
 
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-border pt-3 font-mono text-[11px] text-muted">
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-border pt-3 font-mono text-[11px] text-ns-muted">
             <span>live — a datapoint pushes every 3 s and glides in</span>
             <span>hover for the crosshair · focus + arrow keys step points</span>
           </div>

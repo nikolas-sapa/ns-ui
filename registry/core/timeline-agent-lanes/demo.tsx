@@ -114,7 +114,7 @@ export default function RelayLaneDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / timeline-agent-lanes
       </p>
 
@@ -123,7 +123,7 @@ export default function RelayLaneDemo() {
           <h2 className="text-sm font-medium text-foreground">
             Fix flaky checkout test — orchestration
           </h2>
-          <span className="font-mono text-[11px] text-muted">
+          <span className="font-mono text-[11px] text-ns-muted">
             {running ? "in progress" : "settling"}
           </span>
         </div>
@@ -137,7 +137,7 @@ export default function RelayLaneDemo() {
         />
       </div>
 
-      <p className="max-w-md text-center font-mono text-[10px] text-muted">
+      <p className="max-w-md text-center font-mono text-[10px] text-ns-muted">
         orchestrator hands off to planner, planner fans out to three
         subagents running concurrently, then hands back — stepped connectors
         mark each baton pass with its duration

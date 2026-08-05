@@ -172,7 +172,7 @@ export function KeymapAsciiHeat({
         onKeyDown={onKeyDown}
         placeholder={placeholder}
         aria-label={label}
-        className="w-full rounded-sm border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors duration-100 motion-reduce:transition-none placeholder:text-muted focus-visible:ring-2 focus-visible:ring-accent"
+        className="w-full rounded-sm border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors duration-100 motion-reduce:transition-none placeholder:text-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent"
       />
 
       <div className="flex flex-col items-center gap-1.5 rounded-sm border border-border bg-surface p-3">
@@ -184,7 +184,7 @@ export function KeymapAsciiHeat({
         <div className="flex gap-1.5 pt-0.5">{renderKey("SPACE", true)}</div>
       </div>
 
-      <div className="flex items-center justify-between gap-3 rounded-sm border border-border bg-background px-3 py-1.5 text-[11px] text-muted">
+      <div className="flex items-center justify-between gap-3 rounded-sm border border-border bg-background px-3 py-1.5 text-[11px] text-ns-muted">
         <span data-legend className="tabular-nums">
           ink {legend} max={maxInk.toFixed(1)}
         </span>

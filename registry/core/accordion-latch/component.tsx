@@ -59,12 +59,12 @@ function HaspIcon({ open }: { open: boolean }) {
       <path
         d="M4.5 17.5 v3.6 a3 3 0 0 0 6 0 v-3.6"
         fill="none"
-        stroke="var(--muted)"
+        stroke="var(--ns-muted)"
         strokeWidth="1.4"
         strokeLinecap="round"
       />
       <g className="ns-hf-hasp" data-state={open ? "open" : "closed"}>
-        <circle cx="8" cy="4.5" r="1.5" fill="var(--muted)" />
+        <circle cx="8" cy="4.5" r="1.5" fill="var(--ns-muted)" />
         <line x1="8" y1="4.5" x2="8" y2="19.5" stroke="var(--foreground)" strokeWidth="1.5" strokeLinecap="round" />
         <rect
           x="4.6"
@@ -197,8 +197,8 @@ const CSS = `
   transform:translateY(-2px);
   transition-delay:130ms;
 }
-.ns-hf-header:hover{background:color-mix(in oklab, var(--muted) 8%, var(--background));}
-.ns-hf-header:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;}
+.ns-hf-header:hover{background:color-mix(in oklab, var(--ns-muted) 8%, var(--background));}
+.ns-hf-header:focus-visible{outline:2px solid var(--ns-accent);outline-offset:-2px;}
 .ns-hf-title{flex:1;min-width:0;}
 .ns-hf-icon{position:absolute;right:12px;top:50%;transform:translateY(-50%);}
 
@@ -222,7 +222,7 @@ const CSS = `
 .ns-hf-rows-inner{overflow:hidden;}
 .ns-hf-content{
   padding:0 16px 16px 16px;
-  color:var(--muted);
+  color:var(--ns-muted);
   font-size:13px;
   line-height:1.6;
   opacity:0;

@@ -369,7 +369,7 @@ export function SashWeight({
         <span
           key={d}
           aria-hidden
-          className="pointer-events-none absolute bg-muted"
+          className="pointer-events-none absolute bg-ns-muted"
           style={
             vertical
               ? { left: `${d}%`, top: 0, width: 1, height: 8, opacity: 0.45, transform: "translateX(-50%)" }
@@ -435,7 +435,7 @@ export function SashWeight({
         {engaged && (
           <span
             aria-hidden
-            className="pointer-events-none absolute rounded-full ring-2 ring-accent"
+            className="pointer-events-none absolute rounded-full ring-2 ring-ns-accent"
             style={
               vertical
                 ? { left: "50%", top: "50%", width: HIT, height: 40, transform: "translate(-50%, -50%)" }

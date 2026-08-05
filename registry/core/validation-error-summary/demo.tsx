@@ -40,14 +40,14 @@ export default function PunchListDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-md">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">ns-ui / validation-error-summary</p>
+        <p className="mb-4 font-mono text-xs tracking-widest text-ns-muted">ns-ui / validation-error-summary</p>
         <PunchList
           title="Request a quote"
           submitLabel="Send request"
           fields={FIELDS}
           onSubmit={(values) => console.log("validation-error-summary submit", values)}
         />
-        <p className="mt-3 font-mono text-[11px] text-muted">
+        <p className="mt-3 font-mono text-[11px] text-ns-muted">
           submit with the defaults to fail — pick an item to see the leader line, fix a field to
           strike it off
         </p>

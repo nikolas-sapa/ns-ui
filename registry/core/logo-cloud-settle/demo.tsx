@@ -9,7 +9,7 @@ export default function LogoCloudSettleDemo() {
         <span className="font-mono text-sm font-semibold tracking-tight text-foreground">
           ns://ui
         </span>
-        <span className="font-mono text-xs tracking-[0.25em] text-muted">
+        <span className="font-mono text-xs tracking-[0.25em] text-ns-muted">
           ns-ui / logo-cloud-settle
         </span>
       </header>
@@ -21,7 +21,7 @@ export default function LogoCloudSettleDemo() {
         </div>
       </section>
       <section className="flex h-[140vh] items-center justify-center border-t border-border p-6">
-        <p className="font-mono text-xs text-muted">scroll back up to watch it resettle</p>
+        <p className="font-mono text-xs text-ns-muted">scroll back up to watch it resettle</p>
       </section>
     </main>
   );

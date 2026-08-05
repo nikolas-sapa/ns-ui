@@ -35,13 +35,13 @@ export default function RespireFieldDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-6 text-foreground">
       <div className="w-full max-w-sm">
-        <p className="font-mono text-xs tracking-widest text-muted">
+        <p className="font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / input-focus-membrane
         </p>
         <h1 className="mt-3 text-2xl font-semibold tracking-tight">
           The field breathes.
         </h1>
-        <p className="mt-2 text-sm leading-relaxed text-muted">
+        <p className="mt-2 text-sm leading-relaxed text-ns-muted">
           Focus dilates the membrane. Every keystroke sends a pulse around it
           from the caret. An invalid submit makes it constrict and quiver, a
           valid one lets it exhale.
@@ -50,7 +50,7 @@ export default function RespireFieldDemo() {
         <form onSubmit={submit} noValidate className="mt-12">
           <label
             htmlFor="respire-email"
-            className="font-mono text-[11px] tracking-[0.2em] text-muted"
+            className="font-mono text-[11px] tracking-[0.2em] text-ns-muted"
           >
             EMAIL
           </label>
@@ -75,7 +75,7 @@ export default function RespireFieldDemo() {
           <div className="mt-5 flex items-center justify-between gap-4">
             <p
               className={`text-xs ${
-                error ? "text-[var(--error)]" : "text-muted"
+                error ? "text-[var(--error)]" : "text-ns-muted"
               }`}
               aria-live="polite"
             >

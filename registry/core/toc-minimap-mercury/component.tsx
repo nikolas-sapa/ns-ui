@@ -133,7 +133,7 @@ export function MercuryMinimap({
       labelRefs.current.forEach((el, i) => {
         if (!el) return;
         el.classList.toggle("text-foreground", i === idx);
-        el.classList.toggle("text-muted", i !== idx);
+        el.classList.toggle("text-ns-muted", i !== idx);
       });
     };
 
@@ -272,14 +272,14 @@ export function MercuryMinimap({
           dot.setAttribute("fill", on ? "var(--color-foreground, #ededed)" : "none");
           dot.setAttribute(
             "stroke",
-            on ? "var(--color-foreground, #ededed)" : "var(--color-muted, #8f8f8f)"
+            on ? "var(--color-foreground, #ededed)" : "var(--color-ns-muted, #8f8f8f)"
           );
         }
       }
       labelRefs.current.forEach((el, i) => {
         if (!el) return;
         el.classList.toggle("text-foreground", i === reach);
-        el.classList.toggle("text-muted", i !== reach);
+        el.classList.toggle("text-ns-muted", i !== reach);
       });
     };
     const onResize = () => {
@@ -318,14 +318,14 @@ export function MercuryMinimap({
           }
           onFocus={() => hoverCtl.current(i)}
           onBlur={() => hoverCtl.current(-1)}
-          className="absolute right-0 flex h-8 -translate-y-1/2 cursor-pointer items-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="absolute right-0 flex h-8 -translate-y-1/2 cursor-pointer items-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           style={{ top: ticks[i] ?? 0, paddingRight: RAIL_W }}
         >
           <span
             ref={(el) => {
               labelRefs.current[i] = el;
             }}
-            className="-translate-x-2 whitespace-nowrap pr-2 font-mono text-xs text-muted opacity-0 transition-[transform,opacity] duration-150 ease-out group-focus-within:translate-x-0 group-focus-within:opacity-100 group-hover:translate-x-0 group-hover:opacity-100 motion-reduce:transition-none"
+            className="-translate-x-2 whitespace-nowrap pr-2 font-mono text-xs text-ns-muted opacity-0 transition-[transform,opacity] duration-150 ease-out group-focus-within:translate-x-0 group-focus-within:opacity-100 group-hover:translate-x-0 group-hover:opacity-100 motion-reduce:transition-none"
           >
             {s.label}
           </span>
@@ -352,7 +352,7 @@ export function MercuryMinimap({
               cy={ticks[i] ?? 0}
               r={4}
               fill="none"
-              stroke="var(--color-muted, #8f8f8f)"
+              stroke="var(--color-ns-muted, #8f8f8f)"
               strokeWidth={1.5}
             />
           ))}
@@ -394,7 +394,7 @@ export function MercuryMinimap({
               cy={ticks[i] ?? 0}
               r={4}
               fill="none"
-              stroke="var(--color-muted, #8f8f8f)"
+              stroke="var(--color-ns-muted, #8f8f8f)"
               strokeWidth={1.5}
               style={{ transition: "opacity 150ms ease-out" }}
             />

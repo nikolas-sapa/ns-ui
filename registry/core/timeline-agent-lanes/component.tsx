@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 
 // A live multi-agent turn tracker: one hairline lane per agent, the lane
 // currently holding the turn brightened to --foreground, idle lanes resting
-// at --muted. This shows the PRESENT moment on a rolling `windowMs` window
+// at --ns-muted. This shows the PRESENT moment on a rolling `windowMs` window
 // (a "now" line pins the right edge) — it is not a post-hoc trace viewer, so
 // there is deliberately no scrub/seek control: adding one would turn this
 // back into exactly the span-tree debugger it's meant to differ from. Past
@@ -239,7 +239,7 @@ export function RelayLane({
     >
       <div
         aria-hidden="true"
-        className="mb-1 flex font-mono text-[9px] uppercase tracking-[0.14em] text-muted"
+        className="mb-1 flex font-mono text-[9px] uppercase tracking-[0.14em] text-ns-muted"
         style={{ paddingLeft: LABEL_W }}
       >
         <span className="flex-1 text-right">now</span>
@@ -265,18 +265,18 @@ export function RelayLane({
                 className={`h-1.5 w-1.5 shrink-0 rounded-full ${
                   open
                     ? "bg-foreground motion-safe:animate-pulse"
-                    : "bg-muted"
+                    : "bg-ns-muted"
                 }`}
               />
               <span
                 className={`min-w-0 flex-1 truncate text-sm ${
-                  open ? "text-foreground" : "text-muted"
+                  open ? "text-foreground" : "text-ns-muted"
                 }`}
               >
                 {a.label}
               </span>
               {elapsed !== null && (
-                <span className="shrink-0 font-mono text-[10px] tabular-nums text-muted">
+                <span className="shrink-0 font-mono text-[10px] tabular-nums text-ns-muted">
                   {formatDuration(elapsed)}
                 </span>
               )}
@@ -294,18 +294,18 @@ export function RelayLane({
               className={`h-1.5 w-1.5 shrink-0 rounded-full ${
                 overflowActiveCount > 0
                   ? "bg-foreground motion-safe:animate-pulse"
-                  : "bg-muted"
+                  : "bg-ns-muted"
               }`}
             />
             <span
               className={`min-w-0 flex-1 truncate text-sm ${
-                overflowActiveCount > 0 ? "text-foreground" : "text-muted"
+                overflowActiveCount > 0 ? "text-foreground" : "text-ns-muted"
               }`}
             >
               +{overflowAgents.length} more
             </span>
             {overflowActiveCount > 0 && (
-              <span className="shrink-0 font-mono text-[10px] tabular-nums text-muted">
+              <span className="shrink-0 font-mono text-[10px] tabular-nums text-ns-muted">
                 {overflowActiveCount} active
               </span>
             )}
@@ -327,14 +327,14 @@ export function RelayLane({
             <div
               key={a.id}
               aria-hidden="true"
-              className="absolute left-0 h-px w-full bg-muted"
+              className="absolute left-0 h-px w-full bg-ns-muted"
               style={{ top: i * ROW_PITCH + ROW_PITCH / 2 }}
             />
           ))}
           {hasOverflow && (
             <div
               aria-hidden="true"
-              className="absolute left-0 h-px w-full bg-muted"
+              className="absolute left-0 h-px w-full bg-ns-muted"
               style={{ top: visibleAgents.length * ROW_PITCH + ROW_PITCH / 2 }}
             />
           )}
@@ -420,7 +420,7 @@ export function RelayLane({
                   }}
                 />
                 <div
-                  className="absolute -translate-x-1/2 whitespace-nowrap rounded-sm border border-border bg-background px-1 py-0.5 font-mono text-[10px] tabular-nums text-muted"
+                  className="absolute -translate-x-1/2 whitespace-nowrap rounded-sm border border-border bg-background px-1 py-0.5 font-mono text-[10px] tabular-nums text-ns-muted"
                   style={{ left: `${midX}%`, top: chipTop }}
                 >
                   {formatDuration(h.durationMs)}

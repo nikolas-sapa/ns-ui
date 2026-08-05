@@ -33,7 +33,7 @@ export default function CipherReelOtpDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / otp-reel — every box is a slot reel
       </p>
 
@@ -42,7 +42,7 @@ export default function CipherReelOtpDemo() {
           <h2 className="text-sm font-semibold text-foreground">
             Two-factor authentication
           </h2>
-          <p className="mt-1 text-sm text-muted">
+          <p className="mt-1 text-sm text-ns-muted">
             We sent a 6-digit code to{" "}
             <span className="font-mono text-foreground">
               +1 (415) ••• ••32
@@ -70,7 +70,7 @@ export default function CipherReelOtpDemo() {
             type="button"
             disabled={verified || code.length < 6}
             onClick={() => verify(codeRef.current)}
-            className="mt-5 w-full rounded-sm bg-accent px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-5 w-full rounded-sm bg-ns-accent px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-ns-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50"
           >
             {verified ? "Verified" : "Verify device"}
           </button>
@@ -83,7 +83,7 @@ export default function CipherReelOtpDemo() {
         </div>
 
         <div className="flex items-center justify-between border-t border-border px-6 py-4">
-          <p className="font-mono text-xs text-muted">
+          <p className="font-mono text-xs text-ns-muted">
             {attempts === 0
               ? "attempt 1 of 5"
               : `attempt ${Math.min(attempts + 1, 5)} of 5`}
@@ -95,14 +95,14 @@ export default function CipherReelOtpDemo() {
               setCooldown(RESEND_S);
               setError(false);
             }}
-            className="rounded-sm font-mono text-xs text-foreground underline-offset-4 transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:text-muted disabled:no-underline"
+            className="rounded-sm font-mono text-xs text-foreground underline-offset-4 transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent disabled:cursor-not-allowed disabled:text-ns-muted disabled:no-underline"
           >
             {cooldown > 0 ? `Resend code in ${cooldown}s` : "Resend code"}
           </button>
         </div>
       </div>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Type to spin a reel into its detent, Backspace reverse-spins it out,
         paste a full code for the staggered cascade. Idle boxes keep a faint
         cipher drift.

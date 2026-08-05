@@ -67,12 +67,12 @@ export default function ImpulseCradleDemo() {
   }, [runSequence]);
 
   const buttonClass =
-    "cursor-pointer rounded-sm border border-border px-3 py-1.5 font-mono text-[11px] tracking-widest text-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+    "cursor-pointer rounded-sm border border-border px-3 py-1.5 font-mono text-[11px] tracking-widest text-ns-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent";
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-sm">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">
+        <p className="mb-4 font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / toast-newton-cradle
         </p>
         <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -92,7 +92,7 @@ export default function ImpulseCradleDemo() {
           </button>
         </div>
         <ImpulseCradle ref={stackRef} maxVisible={3} aria-label="Deploy notifications" />
-        <p className="mt-3 font-mono text-[11px] text-muted">
+        <p className="mt-3 font-mono text-[11px] text-ns-muted">
           {count} pushed · a new toast strikes the stack, the shunt travels
           down 35ms per row, and past 3 the oldest gets ejected — F6 jumps
           focus here, Escape dismisses, hover/focus pause the clock

@@ -9,7 +9,7 @@ export default function GlyphTideDemo() {
         <span className="font-mono text-sm font-semibold tracking-tight text-foreground">
           ns://ui
         </span>
-        <span className="font-mono text-xs tracking-[0.25em] text-muted">
+        <span className="font-mono text-xs tracking-[0.25em] text-ns-muted">
           ns-ui / background-ascii-plasma
         </span>
       </header>
@@ -17,10 +17,10 @@ export default function GlyphTideDemo() {
           relaxes back over a second or two */}
       <GlyphTide className="min-h-0 flex-1" />
       <footer className="z-10 flex items-center justify-between border-t border-border px-6 py-3">
-        <span className="font-mono text-xs text-muted">
+        <span className="font-mono text-xs text-ns-muted">
           drag to disturb the field
         </span>
-        <span className="font-mono text-xs text-muted">
+        <span className="font-mono text-xs text-ns-muted">
           three octaves / value noise
         </span>
       </footer>

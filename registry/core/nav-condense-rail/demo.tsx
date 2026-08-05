@@ -37,13 +37,13 @@ export default function NavCondenseRailDemo() {
 
       <div className="mx-auto flex max-w-3xl flex-col gap-24 px-6 pb-32 pt-40">
         <div className="flex flex-col gap-3">
-          <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
             ns-ui / nav-condense-rail
           </p>
           <h1 className="text-3xl font-semibold tracking-tight text-foreground">
             A site nav that condenses on measurement, not on a magic number
           </h1>
-          <p className="max-w-xl leading-relaxed text-muted">
+          <p className="max-w-xl leading-relaxed text-ns-muted">
             The distance this bar takes to go from roomy to dense is read off its own
             rendered height at each extreme — shrink the wordmark, change the font, resize
             the window, and the transition still ends exactly where the bar itself stops
@@ -54,7 +54,7 @@ export default function NavCondenseRailDemo() {
         {SECTIONS.map((s) => (
           <section key={s.id} id={s.id} className="flex flex-col gap-3 border-t border-border pt-8">
             <h2 className="text-xl font-medium text-foreground">{s.title}</h2>
-            <p className="max-w-xl leading-relaxed text-muted">{s.body}</p>
+            <p className="max-w-xl leading-relaxed text-ns-muted">{s.body}</p>
           </section>
         ))}
       </div>

@@ -95,10 +95,10 @@ export default async function CategoryPage({
 
       <header className="pt-20 sm:pt-28">
         <div className="flex items-center justify-between gap-4">
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-ns-muted">
             <Link
               href="/categories"
-              className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+              className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
             >
               ns-ui / categories
             </Link>
@@ -108,8 +108,8 @@ export default async function CategoryPage({
         <h1 className="mt-5 text-3xl font-semibold leading-[1.15] tracking-tight sm:text-4xl">
           {copy.h1}
         </h1>
-        <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted">{copy.intro}</p>
-        <p className="mt-4 font-mono text-xs text-muted">{category.members.length} components</p>
+        <p className="mt-4 max-w-xl text-sm leading-relaxed text-ns-muted">{copy.intro}</p>
+        <p className="mt-4 font-mono text-xs text-ns-muted">{category.members.length} components</p>
       </header>
 
       <ol className="mt-16 space-y-10">
@@ -117,12 +117,12 @@ export default async function CategoryPage({
           <li key={m.name} className="border-b border-border pb-10 last:border-none">
             <Link
               href={`/components/${m.name}`}
-              className="group block rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="group block rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
             >
-              <h2 className="text-lg font-medium tracking-tight text-foreground transition-colors group-hover:text-accent">
+              <h2 className="text-lg font-medium tracking-tight text-foreground transition-colors group-hover:text-ns-accent">
                 {m.title}
               </h2>
-              <p className="mt-2 text-sm leading-relaxed text-muted">{m.description}</p>
+              <p className="mt-2 text-sm leading-relaxed text-ns-muted">{m.description}</p>
             </Link>
           </li>
         ))}
@@ -131,7 +131,7 @@ export default async function CategoryPage({
       <div className="mt-16 border-t border-border pt-6">
         <Link
           href="/categories"
-          className="rounded-sm font-mono text-xs uppercase tracking-wider text-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded-sm font-mono text-xs uppercase tracking-wider text-ns-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
         >
           All categories
         </Link>

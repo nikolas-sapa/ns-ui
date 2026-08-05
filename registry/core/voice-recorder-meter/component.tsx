@@ -325,7 +325,7 @@ export function ReedVu({ label = "Voice note", onCapture, className = "" }: Reed
     else if (mode === "listening") stopCapture();
   }
 
-  const barColor = mode === "listening" || mode === "processing" ? "text-foreground" : "text-muted";
+  const barColor = mode === "listening" || mode === "processing" ? "text-foreground" : "text-ns-muted";
   const phaseLabel: Record<Mode, string> = {
     idle: "Idle",
     requesting: "Connecting",
@@ -358,8 +358,8 @@ export function ReedVu({ label = "Voice note", onCapture, className = "" }: Reed
 `}</style>
 
       <div className="mb-2 flex items-center justify-between gap-2">
-        <span className="font-mono text-[11px] uppercase tracking-wide text-muted">{label}</span>
-        <span className="shrink-0 rounded-full border border-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-muted">
+        <span className="font-mono text-[11px] uppercase tracking-wide text-ns-muted">{label}</span>
+        <span className="shrink-0 rounded-full border border-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-ns-muted">
           {phaseLabel[mode]}
         </span>
       </div>
@@ -374,8 +374,8 @@ export function ReedVu({ label = "Voice note", onCapture, className = "" }: Reed
           aria-describedby={mode === "error" ? errId : undefined}
           className={[
             "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition-colors duration-150",
-            mode === "listening" ? "border-accent text-accent" : "border-border text-muted hover:border-muted hover:text-foreground",
-            "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-60",
+            mode === "listening" ? "border-ns-accent text-ns-accent" : "border-border text-ns-muted hover:border-ns-muted hover:text-foreground",
+            "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent disabled:cursor-not-allowed disabled:opacity-60",
           ].join(" ")}
         >
           {mode === "error" ? <MicOffIcon /> : mode === "listening" ? <StopIcon /> : <MicIcon />}
@@ -411,7 +411,7 @@ export function ReedVu({ label = "Voice note", onCapture, className = "" }: Reed
         </div>
 
         {mode === "listening" ? (
-          <span ref={timeRef} className="shrink-0 font-mono text-[11px] tabular-nums text-muted">
+          <span ref={timeRef} className="shrink-0 font-mono text-[11px] tabular-nums text-ns-muted">
             00:00
           </span>
         ) : null}

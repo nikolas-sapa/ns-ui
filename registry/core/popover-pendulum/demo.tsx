@@ -7,7 +7,7 @@ function Avatar({ initials }: { initials: string }) {
   return (
     <div
       aria-hidden
-      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-background font-mono text-xs text-muted"
+      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-background font-mono text-xs text-ns-muted"
     >
       {initials}
     </div>
@@ -21,14 +21,14 @@ function ProfileCard() {
         <Avatar initials="RC" />
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-foreground">Rosa Cortez</p>
-          <p className="truncate font-mono text-xs text-muted">@rosacortez</p>
+          <p className="truncate font-mono text-xs text-ns-muted">@rosacortez</p>
         </div>
       </div>
-      <p className="mt-3 text-sm leading-relaxed text-muted">
+      <p className="mt-3 text-sm leading-relaxed text-ns-muted">
         Building developer tooling. Previously infra @ two seed-stage startups. Bikes further than
         is reasonable.
       </p>
-      <div className="mt-3 flex items-center gap-4 font-mono text-xs text-muted">
+      <div className="mt-3 flex items-center gap-4 font-mono text-xs text-ns-muted">
         <span>
           <span className="text-foreground">312</span> following
         </span>
@@ -38,7 +38,7 @@ function ProfileCard() {
       </div>
       <button
         type="button"
-        className="mt-3.5 w-full rounded-sm border border-border bg-background px-3 py-1.5 text-sm font-medium text-foreground outline-none transition-colors hover:border-foreground/25 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+        className="mt-3.5 w-full rounded-sm border border-border bg-background px-3 py-1.5 text-sm font-medium text-foreground outline-none transition-colors hover:border-foreground/25 focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
       >
         Follow
       </button>
@@ -58,7 +58,7 @@ function FilterPanel({
   const groupId = useId();
   return (
     <div className="p-3.5" role="group" aria-labelledby={groupId}>
-      <p id={groupId} className="px-1 pb-2 text-xs font-medium uppercase tracking-wide text-muted">
+      <p id={groupId} className="px-1 pb-2 text-xs font-medium uppercase tracking-wide text-ns-muted">
         Status
       </p>
       <div className="flex flex-col gap-0.5">
@@ -73,7 +73,7 @@ function FilterPanel({
                 type="checkbox"
                 checked={checked}
                 onChange={() => onToggle(f)}
-                className="h-3.5 w-3.5 rounded-[3px] border-border accent-accent outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1 focus-visible:ring-offset-surface"
+                className="h-3.5 w-3.5 rounded-[3px] border-border accent-ns-accent outline-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-1 focus-visible:ring-offset-surface"
               />
               {f}
             </label>
@@ -97,9 +97,9 @@ export default function PlumbSwayDemo() {
   return (
     <div className="flex min-h-screen items-start justify-center bg-background px-6 py-20 text-foreground">
       <div className="w-full max-w-xl">
-        <p className="font-mono text-xs uppercase tracking-widest text-muted">ns-ui / popover-pendulum</p>
+        <p className="font-mono text-xs uppercase tracking-widest text-ns-muted">ns-ui / popover-pendulum</p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight">Hangs like a plumb bob</h1>
-        <p className="mt-2 max-w-md text-sm leading-relaxed text-muted">
+        <p className="mt-2 max-w-md text-sm leading-relaxed text-ns-muted">
           A popover connected to its trigger by a hairline string. It drops in slightly off-vertical,
           sways twice on a damped pendulum, then settles perfectly plumb.
         </p>
@@ -113,7 +113,7 @@ export default function PlumbSwayDemo() {
               trigger={
                 <span className="inline-flex items-center gap-1.5 rounded-sm border border-border bg-background px-2.5 py-1 text-xs">
                   Filters
-                  <span className="font-mono text-muted">({active.size})</span>
+                  <span className="font-mono text-ns-muted">({active.size})</span>
                 </span>
               }
             >
@@ -127,14 +127,14 @@ export default function PlumbSwayDemo() {
               { id: "1187", title: "Add pagination cursor to /v1/deploys" },
             ].map((row) => (
               <div key={row.id} className="flex items-center gap-3 py-3 text-sm">
-                <span className="shrink-0 font-mono text-xs text-muted">#{row.id}</span>
+                <span className="shrink-0 font-mono text-xs text-ns-muted">#{row.id}</span>
                 <span className="min-w-0 flex-1 truncate">{row.title}</span>
               </div>
             ))}
             <div className="flex items-center gap-3 py-3 text-sm">
-              <span className="shrink-0 font-mono text-xs text-muted">#1204</span>
+              <span className="shrink-0 font-mono text-xs text-ns-muted">#1204</span>
               <span className="min-w-0 flex-1 truncate">Retry logic drops the last attempt&rsquo;s error</span>
-              <span className="shrink-0 text-xs text-muted">
+              <span className="shrink-0 text-xs text-ns-muted">
                 by{" "}
                 <PlumbSway interaction="hover" trigger="@rosacortez" triggerLabel="@rosacortez, view profile">
                   <ProfileCard />
@@ -144,7 +144,7 @@ export default function PlumbSwayDemo() {
           </div>
         </div>
 
-        <p className="mt-4 max-w-md text-xs leading-relaxed text-muted">
+        <p className="mt-4 max-w-md text-xs leading-relaxed text-ns-muted">
           The <span className="font-mono">Filters</span> button opens a non-modal popover — focus
           moves in, Escape or an outside click dismisses it. <span className="font-mono">@rosacortez</span>{" "}
           opens a hovercard on hover or keyboard focus, without stealing focus from the trigger — try

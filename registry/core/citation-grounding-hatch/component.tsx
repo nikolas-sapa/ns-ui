@@ -34,8 +34,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 // prose that is still streaming in. A summary line ("4 of 6 sentences
 // grounded, 1 contradiction") is aria-live=polite and IS the sighted
 // digest, not a hidden echo of it. Zero dependencies; no canvas; every
-// color is a token (--background --foreground --muted --border --accent),
-// --accent appearing only on focus rings and the two interactive
+// color is a token (--background --foreground --ns-muted --border --ns-accent),
+// --ns-accent appearing only on focus rings and the two interactive
 // highlights above. prefers-reduced-motion drops all transitions — the
 // final state is unaffected, just not eased into.
 
@@ -285,7 +285,7 @@ export function BedrockTrace({ sentences, sources = [], streaming = false, class
     <div className={["ns-citation-grounding-hatch", className].filter(Boolean).join(" ")}>
       <style>{`
 .ns-citation-grounding-hatch .ns-bedrock-highlight{box-shadow:none;transition:box-shadow 200ms ease-out}
-.ns-citation-grounding-hatch .ns-bedrock-highlight[data-active="true"]{box-shadow:inset 0 -2px 0 0 var(--accent)}
+.ns-citation-grounding-hatch .ns-bedrock-highlight[data-active="true"]{box-shadow:inset 0 -2px 0 0 var(--ns-accent)}
 .ns-citation-grounding-hatch .ns-bedrock-legend-mark .ns-bedrock-mark{transition:none !important}
 @media (prefers-reduced-motion: reduce){
   .ns-citation-grounding-hatch .ns-bedrock-mark,
@@ -315,7 +315,7 @@ export function BedrockTrace({ sentences, sources = [], streaming = false, class
         ))}
       </p>
 
-      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[10px] uppercase tracking-[0.08em] text-muted">
+      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[10px] uppercase tracking-[0.08em] text-ns-muted">
         {LEGEND.map(({ status, label }) => (
           <span key={status} className="inline-flex items-center gap-1.5">
             <LegendSwatch status={status} />
@@ -353,7 +353,7 @@ export function BedrockTrace({ sentences, sources = [], streaming = false, class
               style={{ flexGrow: Math.max(s.text.length, 8), flexBasis: 0, minWidth: 22 }}
               className={[
                 "relative rounded-sm",
-                "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+                "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent",
                 isActive || isHovered ? "opacity-100" : "opacity-80 hover:opacity-100",
               ].join(" ")}
             >
@@ -363,12 +363,12 @@ export function BedrockTrace({ sentences, sources = [], streaming = false, class
         })}
       </div>
 
-      <p aria-live="polite" className="mt-2 font-mono text-[11px] tracking-wide text-muted">
+      <p aria-live="polite" className="mt-2 font-mono text-[11px] tracking-wide text-ns-muted">
         {summaryText}
       </p>
 
       {activeSentence && (
-        <p className="mt-1 text-xs leading-snug text-muted">{detailLine(activeSentence, activeSource)}</p>
+        <p className="mt-1 text-xs leading-snug text-ns-muted">{detailLine(activeSentence, activeSource)}</p>
       )}
 
       <div
@@ -384,10 +384,10 @@ export function BedrockTrace({ sentences, sources = [], streaming = false, class
               style={{ backgroundColor: "color-mix(in srgb, var(--background) 78%, transparent)" }}
             >
               <div className="mb-1.5 flex items-center justify-between gap-2">
-                <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
+                <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-ns-muted">
                   {panelSource.label}
                 </span>
-                <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted">
+                <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-ns-muted">
                   {activeSentence?.status === "contradicted" ? "Contradicts" : "Supports"}
                 </span>
               </div>
@@ -396,7 +396,7 @@ export function BedrockTrace({ sentences, sources = [], streaming = false, class
                 {matchSpan && (
                   <mark
                     className="rounded-sm text-foreground"
-                    style={{ backgroundColor: "color-mix(in srgb, var(--accent) 18%, transparent)" }}
+                    style={{ backgroundColor: "color-mix(in srgb, var(--ns-accent) 18%, transparent)" }}
                   >
                     {matchSpan}
                   </mark>

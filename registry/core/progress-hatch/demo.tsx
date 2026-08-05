@@ -36,7 +36,7 @@ export default function HatchFillDemo() {
       data-hatch-card
       className="flex min-h-screen flex-col items-center justify-center gap-10 px-6"
     >
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / progress-hatch
       </p>
       <div className="flex flex-col gap-8 rounded-xl border border-border bg-surface px-10 py-12">

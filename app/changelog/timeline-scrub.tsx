@@ -66,7 +66,7 @@ export function TimelineScrub({
         tabIndex={0}
         role="group"
         aria-label="Release timeline, scrollable — use the arrow keys or the buttons above to scrub"
-        className="-mx-1 mt-1 overflow-x-auto px-1 outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="-mx-1 mt-1 overflow-x-auto px-1 outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
       >
         <div style={{ minWidth: `${minWidth}px` }}>{children}</div>
       </div>
@@ -91,7 +91,7 @@ function ScrubArrow({
       aria-label={label}
       title={label}
       onClick={onClick}
-      className="inline-flex size-7 items-center justify-center rounded-sm text-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none disabled:pointer-events-none disabled:opacity-30"
+      className="inline-flex size-7 items-center justify-center rounded-sm text-ns-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none disabled:pointer-events-none disabled:opacity-30"
     >
       {/* Same hand-drawn chevron the Sort select and the sidebar's <details>
           use, rotated to point left/right instead of redrawn. */}

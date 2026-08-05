@@ -552,10 +552,10 @@ export function MetaballMerge({
                 onPointerLeave={() => engineRef.current?.setHover(i, false)}
                 onFocus={() => engineRef.current?.setHover(i, true)}
                 onBlur={() => engineRef.current?.setHover(i, false)}
-                className={`flex items-center gap-2 rounded-full border px-3 py-1.5 font-mono text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+                className={`flex items-center gap-2 rounded-full border px-3 py-1.5 font-mono text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                   isMember
                     ? "border-foreground/40 text-foreground"
-                    : "border-border text-muted"
+                    : "border-border text-ns-muted"
                 }`}
               >
                 <span
@@ -573,7 +573,7 @@ export function MetaballMerge({
         <p
           aria-hidden
           data-merged={count}
-          className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted"
+          className="font-mono text-[10px] uppercase tracking-[0.18em] text-ns-muted"
         >
           {count} of {items.length} in {label}
         </p>

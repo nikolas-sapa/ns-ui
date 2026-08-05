@@ -130,7 +130,7 @@ export function BrailleSpin({
     >
       <style>{`
 .ns-braille-row{transition:color 260ms ease-out}
-.ns-braille-settled{color:var(--accent) !important}
+.ns-braille-settled{color:var(--ns-accent) !important}
 `}</style>
       <span
         ref={rowRef}

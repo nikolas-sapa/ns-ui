@@ -89,11 +89,11 @@ export default function StitchPickDemo() {
 
   return (
     <div ref={rootRef} className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">ns-ui / text-stitch-unpick</p>
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">ns-ui / text-stitch-unpick</p>
 
       <StitchPick text={TEXT} />
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Pass the seam ripper over a letter to pick its stitches loose; linger
         and it fully unravels into a pile you have to re-sew.
       </p>

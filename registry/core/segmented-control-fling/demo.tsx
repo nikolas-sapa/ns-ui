@@ -82,7 +82,7 @@ function StatusDot({ status }: { status: Status }) {
 
 function Avatar({ initials }: { initials: string }) {
   return (
-    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border bg-background font-mono text-[10px] text-muted">
+    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border bg-background font-mono text-[10px] text-ns-muted">
       {initials}
     </span>
   );
@@ -97,13 +97,13 @@ function ListView() {
           className="flex items-center gap-4 px-5 py-3 transition-colors hover:bg-foreground/[0.03]"
         >
           <StatusDot status={t.status} />
-          <span className="w-16 shrink-0 font-mono text-xs text-muted">
+          <span className="w-16 shrink-0 font-mono text-xs text-ns-muted">
             {t.id}
           </span>
           <span className="min-w-0 flex-1 truncate text-sm text-foreground">
             {t.title}
           </span>
-          <span className="hidden shrink-0 font-mono text-xs text-muted sm:block">
+          <span className="hidden shrink-0 font-mono text-xs text-ns-muted sm:block">
             {t.due}
           </span>
           <Avatar initials={t.owner} />
@@ -122,10 +122,10 @@ function BoardView() {
           <div key={col} className="min-w-0">
             <div className="mb-3 flex items-center gap-2">
               <StatusDot status={col} />
-              <span className="font-mono text-xs uppercase tracking-wider text-muted">
+              <span className="font-mono text-xs uppercase tracking-wider text-ns-muted">
                 {col}
               </span>
-              <span className="ml-auto font-mono text-xs text-muted">
+              <span className="ml-auto font-mono text-xs text-ns-muted">
                 {cards.length}
               </span>
             </div>
@@ -135,12 +135,12 @@ function BoardView() {
                   key={t.id}
                   className="rounded-sm border border-border bg-background p-3 transition-colors hover:border-foreground/25"
                 >
-                  <p className="font-mono text-[11px] text-muted">{t.id}</p>
+                  <p className="font-mono text-[11px] text-ns-muted">{t.id}</p>
                   <p className="mt-1 text-sm leading-snug text-foreground">
                     {t.title}
                   </p>
                   <div className="mt-3 flex items-center justify-between">
-                    <span className="font-mono text-[11px] text-muted">
+                    <span className="font-mono text-[11px] text-ns-muted">
                       {t.due}
                     </span>
                     <Avatar initials={t.owner} />
@@ -160,7 +160,7 @@ function TimelineView() {
     <div className="p-5">
       <div className="mb-2 flex">
         <span className="w-16 shrink-0" />
-        <div className="flex flex-1 justify-between font-mono text-[10px] text-muted">
+        <div className="flex flex-1 justify-between font-mono text-[10px] text-ns-muted">
           <span>Jul 14</span>
           <span>Jul 16</span>
           <span>Jul 18</span>
@@ -171,7 +171,7 @@ function TimelineView() {
       <div className="flex flex-col gap-2">
         {TASKS.map((t) => (
           <div key={t.id} className="flex items-center">
-            <span className="w-16 shrink-0 font-mono text-xs text-muted">
+            <span className="w-16 shrink-0 font-mono text-xs text-ns-muted">
               {t.id}
             </span>
             <div className="relative h-7 flex-1 overflow-hidden rounded-sm [background-image:repeating-linear-gradient(to_right,var(--color-border)_0_1px,transparent_1px_10%)]">
@@ -203,7 +203,7 @@ export default function FlingSegmentDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / segmented-control-fling — grab the pill, fling it
       </p>
 
@@ -213,13 +213,13 @@ export default function FlingSegmentDemo() {
             <h2 className="text-sm font-semibold text-foreground">
               Sprint 24 — Interaction polish
             </h2>
-            <p className="mt-0.5 font-mono text-xs text-muted">
+            <p className="mt-0.5 font-mono text-xs text-ns-muted">
               {TASKS.length} tasks · {inProgress} in progress
             </p>
           </div>
           <button
             type="button"
-            className="rounded-sm border border-border px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:border-foreground/25 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded-sm border border-border px-3 py-1.5 text-xs font-medium text-ns-muted transition-colors hover:border-foreground/25 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             Filter
           </button>
@@ -243,14 +243,14 @@ export default function FlingSegmentDemo() {
         </div>
 
         <div className="flex items-center justify-between border-t border-border px-5 py-3">
-          <p className="font-mono text-xs text-muted">
+          <p className="font-mono text-xs text-ns-muted">
             view / {view} · updated 2 min ago
           </p>
-          <p className="font-mono text-xs text-muted">sprint ends Jul 25</p>
+          <p className="font-mono text-xs text-ns-muted">sprint ends Jul 25</p>
         </div>
       </div>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Click a segment and it switches instantly. Or grab the pill (the raised
         tab with the grip dots), throw it, and it coasts, bounces off the ends,
         and snaps into the nearest segment. Arrow keys work too.

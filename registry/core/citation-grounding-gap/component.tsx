@@ -23,8 +23,8 @@ import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type 
 // left-to-right via stroke-dashoffset rather than popping solid. Sentences
 // carry the accessibility semantics (aria-description: "supported by <title>"
 // / "no source found"); the SVG is aria-hidden drawing underneath them, never
-// the other way around. Every stroke is --border/--muted/--foreground —
-// --accent is reserved for the sheet's focus ring and link, never the marks
+// the other way around. Every stroke is --border/--ns-muted/--foreground —
+// --ns-accent is reserved for the sheet's focus ring and link, never the marks
 // themselves. DOM+SVG+CSS only.
 
 export interface TrestleSource {
@@ -486,8 +486,8 @@ export function TrestleGap({ sentences, findSupport, className = "" }: TrestleGa
     <div className={["ns-trestle relative", className].filter(Boolean).join(" ")}>
       <style>{`
 .ns-trestle-sentence{ transition: background-color 150ms ease-out; }
-.ns-trestle-sentence:hover{ background-color: color-mix(in srgb, var(--muted) 16%, transparent); }
-.ns-trestle-sentence:focus-visible{ outline: 2px solid var(--accent); outline-offset: 2px; }
+.ns-trestle-sentence:hover{ background-color: color-mix(in srgb, var(--ns-muted) 16%, transparent); }
+.ns-trestle-sentence:focus-visible{ outline: 2px solid var(--ns-accent); outline-offset: 2px; }
 .ns-trestle-draw{ stroke-dashoffset: 1; animation: ns-trestle-draw-in ${DRAW_MS}ms cubic-bezier(0.16,1,0.3,1) forwards; }
 @keyframes ns-trestle-draw-in{ from{ stroke-dashoffset: 1; } to{ stroke-dashoffset: 0; } }
 .ns-trestle-searching{ animation: ns-trestle-pulse 1.1s ease-in-out infinite; }
@@ -569,7 +569,7 @@ export function TrestleGap({ sentences, findSupport, className = "" }: TrestleGa
                 type="button"
                 onClick={() => dialogRef.current?.close()}
                 aria-label="Close source"
-                className="ns-trestle-sentence shrink-0 rounded-[3px] border-0 bg-transparent p-1 text-muted outline-none hover:text-foreground"
+                className="ns-trestle-sentence shrink-0 rounded-[3px] border-0 bg-transparent p-1 text-ns-muted outline-none hover:text-foreground"
               >
                 <svg viewBox="0 0 16 16" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.6">
                   <path d="M3.5 3.5 12.5 12.5M12.5 3.5 3.5 12.5" strokeLinecap="round" />
@@ -578,7 +578,7 @@ export function TrestleGap({ sentences, findSupport, className = "" }: TrestleGa
             </div>
 
             <div ref={excerptWrapRef} className="relative">
-              <p ref={excerptRef} className="text-sm leading-relaxed text-muted">
+              <p ref={excerptRef} className="text-sm leading-relaxed text-ns-muted">
                 {activeSource.excerpt}
               </p>
               <svg
@@ -607,7 +607,7 @@ export function TrestleGap({ sentences, findSupport, className = "" }: TrestleGa
                 href={activeSource.url}
                 target="_blank"
                 rel="noreferrer"
-                className="ns-trestle-sentence inline-block w-fit rounded-[3px] font-mono text-xs text-muted underline decoration-border underline-offset-4 outline-none hover:text-foreground"
+                className="ns-trestle-sentence inline-block w-fit rounded-[3px] font-mono text-xs text-ns-muted underline decoration-border underline-offset-4 outline-none hover:text-foreground"
               >
                 {hostnameOf(activeSource.url)}
               </a>

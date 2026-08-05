@@ -337,17 +337,17 @@ export function MatCrop({ onChange, className = "" }: MatCropProps) {
               type="button"
               onClick={() => applyPreset(p.label, p.ratio)}
               aria-pressed={activePreset === p.label}
-              className={`rounded-[6px] border px-2.5 py-1 font-mono text-[11px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
+              className={`rounded-[6px] border px-2.5 py-1 font-mono text-[11px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent ${
                 activePreset === p.label
                   ? "border-foreground bg-foreground text-background"
-                  : "border-border text-muted hover:border-foreground hover:text-foreground"
+                  : "border-border text-ns-muted hover:border-foreground hover:text-foreground"
               }`}
             >
               {p.label}
             </button>
           ))}
         </div>
-        <p className={`ns-mc-readout-${autoId} font-mono text-xs text-muted`}>{readout}</p>
+        <p className={`ns-mc-readout-${autoId} font-mono text-xs text-ns-muted`}>{readout}</p>
       </div>
     </div>
   );
@@ -370,11 +370,11 @@ const CSS = `
 .ns-mc-grip-v{ width: 8px; }
 .ns-mc-grip-h::after{ content:""; position:absolute; left:0; right:0; top:50%; height:0; border-top: 2px solid transparent; transform: translateY(-1px); }
 .ns-mc-grip-v::after{ content:""; position:absolute; top:0; bottom:0; left:50%; width:0; border-left: 2px solid transparent; transform: translateX(-1px); }
-.ns-mc-grip:hover.ns-mc-grip-h::after, .ns-mc-grip:focus-visible.ns-mc-grip-h::after{ border-top-color: var(--accent); }
-.ns-mc-grip:hover.ns-mc-grip-v::after, .ns-mc-grip:focus-visible.ns-mc-grip-v::after{ border-left-color: var(--accent); }
+.ns-mc-grip:hover.ns-mc-grip-h::after, .ns-mc-grip:focus-visible.ns-mc-grip-h::after{ border-top-color: var(--ns-accent); }
+.ns-mc-grip:hover.ns-mc-grip-v::after, .ns-mc-grip:focus-visible.ns-mc-grip-v::after{ border-left-color: var(--ns-accent); }
 .ns-mc-grip:focus-visible{ outline: none; }
 .ns-mc-corner{ z-index: 6; }
-.ns-mc-corner:hover{ background: var(--accent); border-radius: 9999px; }
+.ns-mc-corner:hover{ background: var(--ns-accent); border-radius: 9999px; }
 @media (prefers-reduced-motion: reduce){
   .ns-mc-mat, .ns-mc-window{ transition: none !important; }
 }

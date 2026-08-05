@@ -74,20 +74,20 @@ export default function CompareTableReachRuleDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-6 py-16">
       <div className="w-full max-w-4xl">
-        <p className="mb-10 text-center font-mono text-xs tracking-widest text-muted">
+        <p className="mb-10 text-center font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / compare-table-reach-rule
         </p>
         <div className="mx-auto mb-10 max-w-xl text-center">
           <h1 className="text-4xl font-semibold tracking-tight text-foreground">
             Where each feature stops
           </h1>
-          <p className="mt-3 text-sm leading-relaxed text-muted">
+          <p className="mt-3 text-sm leading-relaxed text-ns-muted">
             Every row draws a rule that ends at the last plan that includes it,
             so the staircase is the comparison.
           </p>
         </div>
         <ReachRuleTable tiers={TIERS} rows={ROWS} title="Plan comparison" />
-        <p className="mt-10 text-center font-mono text-[11px] text-muted">
+        <p className="mt-10 text-center font-mono text-[11px] text-ns-muted">
           Hover or focus a row to redraw its rule. Click the label to pin it.
         </p>
       </div>

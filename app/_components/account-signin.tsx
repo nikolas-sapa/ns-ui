@@ -86,7 +86,7 @@ export function AccountSignIn() {
           type="button"
           onClick={() => startOAuth("github")}
           disabled={oauthPending !== null}
-          className="w-full rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-muted focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
+          className="w-full rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
         >
           {oauthPending === "github" ? "Redirecting…" : "Continue with GitHub"}
         </button>
@@ -94,13 +94,13 @@ export function AccountSignIn() {
           type="button"
           onClick={() => startOAuth("google")}
           disabled={oauthPending !== null}
-          className="w-full rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-muted focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
+          className="w-full rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
         >
           {oauthPending === "google" ? "Redirecting…" : "Continue with Google"}
         </button>
       </div>
 
-      <div className="flex items-center gap-3 text-xs text-muted">
+      <div className="flex items-center gap-3 text-xs text-ns-muted">
         <span className="h-px flex-1 bg-border" />
         or
         <span className="h-px flex-1 bg-border" />
@@ -121,19 +121,19 @@ export function AccountSignIn() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={pending}
-            className="w-full rounded-sm border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
+            className="w-full rounded-sm border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
           />
           <button
             type="submit"
             disabled={pending}
-            className="w-full rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-muted focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
+            className="w-full rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
           >
             {pending ? "Sending…" : "Send a code"}
           </button>
         </form>
       ) : (
         <form onSubmit={submitCode} className="space-y-2">
-          <p className="text-xs text-muted">
+          <p className="text-xs text-ns-muted">
             Enter the code sent to {email}.
           </p>
           <label htmlFor="account-code" className="sr-only">
@@ -150,19 +150,19 @@ export function AccountSignIn() {
             value={code}
             onChange={(e) => setCode(e.target.value)}
             disabled={pending}
-            className="w-full rounded-sm border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
+            className="w-full rounded-sm border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
           />
           <button
             type="submit"
             disabled={pending}
-            className="w-full rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-muted focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
+            className="w-full rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
           >
             {pending ? "Verifying…" : "Verify code"}
           </button>
           <button
             type="button"
             onClick={() => setStep("request")}
-            className="text-xs text-muted underline-offset-2 hover:underline"
+            className="text-xs text-ns-muted underline-offset-2 hover:underline"
           >
             Use a different email
           </button>

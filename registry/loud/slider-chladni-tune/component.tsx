@@ -522,7 +522,7 @@ export function ChladniTune({
           <div
             aria-hidden
             className={`pointer-events-none absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border border-border bg-foreground transition-shadow duration-150 ${
-              focused ? "ring-2 ring-accent ring-offset-2 ring-offset-background" : ""
+              focused ? "ring-2 ring-ns-accent ring-offset-2 ring-offset-background" : ""
             }`}
             style={{ left: `${pct}%` }}
           />
@@ -542,11 +542,11 @@ export function ChladniTune({
           />
         </div>
 
-        <div className="flex items-baseline justify-between font-mono text-xs text-muted tabular-nums">
+        <div className="flex items-baseline justify-between font-mono text-xs text-ns-muted tabular-nums">
           <span>VALUE {current.toFixed(1)}</span>
           <span>COHERENCE {String(Math.max(0, coherencePct)).padStart(3, "0")}%</span>
         </div>
-        <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted">
+        <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ns-muted">
           {bucket === "locked" ? "locked" : bucket === "converging" ? "converging" : "scattered"}
         </p>
 

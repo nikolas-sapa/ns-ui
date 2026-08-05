@@ -15,14 +15,14 @@ export default function VacuumSealDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / file-upload-seal — the gap between outline and card is the remaining upload
       </p>
 
       <div className="w-full max-w-lg rounded-md border border-border bg-surface">
         <div className="border-b border-border px-6 py-5">
           <h2 className="text-sm font-semibold text-foreground">Asset delivery</h2>
-          <p className="mt-1 text-sm text-muted">
+          <p className="mt-1 text-sm text-ns-muted">
             Drop the final files for this deliverable. Each one seals shut as it
             finishes — no bar, just the file itself pulling taut.
           </p>
@@ -39,19 +39,19 @@ export default function VacuumSealDemo() {
         </div>
 
         <div className="flex items-center justify-between border-t border-border px-6 py-4">
-          <p className="font-mono text-xs text-muted">
+          <p className="font-mono text-xs text-ns-muted">
             {count} {count === 1 ? "file" : "files"} · 1 failed, re-drop to retry
           </p>
           <button
             type="button"
-            className="rounded-sm bg-foreground px-3 py-1.5 text-xs font-medium text-background outline-none transition-colors hover:bg-foreground/90 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+            className="rounded-sm bg-foreground px-3 py-1.5 text-xs font-medium text-background outline-none transition-colors hover:bg-foreground/90 focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
           >
             Send to client
           </button>
         </div>
       </div>
 
-      <p className="max-w-lg text-center text-xs text-muted">
+      <p className="max-w-lg text-center text-xs text-ns-muted">
         Drop or browse a file: a loose dashed outline appears 24px outside the
         card and pulls tight as it uploads, clicking shut with a small pucker
         at 100%. A failed upload relaxes back out with a wobble instead of

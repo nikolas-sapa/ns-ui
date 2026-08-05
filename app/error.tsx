@@ -25,7 +25,7 @@ export default function Error({
       <header className="flex items-center justify-between gap-4 border-b border-border px-6 py-4 sm:px-10">
         <a
           href="/"
-          className="rounded-sm font-mono text-xs uppercase tracking-[0.18em] text-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none"
+          className="rounded-sm font-mono text-xs uppercase tracking-[0.18em] text-ns-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
         >
           ns-ui
         </a>
@@ -40,19 +40,19 @@ export default function Error({
           <button
             type="button"
             onClick={reset}
-            className="rounded-sm border border-border px-4 py-2 font-mono text-xs uppercase tracking-[0.18em] text-foreground outline-none transition-colors hover:text-accent focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none"
+            className="rounded-sm border border-border px-4 py-2 font-mono text-xs uppercase tracking-[0.18em] text-foreground outline-none transition-colors hover:text-ns-accent focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
           >
             Try again
           </button>
           <Link
             href="/"
-            className="rounded-sm px-4 py-2 font-mono text-xs uppercase tracking-[0.18em] text-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none"
+            className="rounded-sm px-4 py-2 font-mono text-xs uppercase tracking-[0.18em] text-ns-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
           >
             Back to components
           </Link>
         </div>
         {error.digest ? (
-          <p className="font-mono text-[10px] text-muted">{error.digest}</p>
+          <p className="font-mono text-[10px] text-ns-muted">{error.digest}</p>
         ) : null}
       </div>
     </main>

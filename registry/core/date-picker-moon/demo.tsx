@@ -9,7 +9,7 @@ export default function TerminatorDateFieldDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / date-picker-moon
       </p>
 
@@ -18,7 +18,7 @@ export default function TerminatorDateFieldDemo() {
           <h2 className="text-sm font-semibold text-foreground">
             New journal entry
           </h2>
-          <p className="mt-1 text-sm text-muted">
+          <p className="mt-1 text-sm text-ns-muted">
             The date picker doubles as a moon-phase almanac — every day cell
             carries its computed terminator, and committing a date runs a tiny
             eclipse across the numeral.
@@ -38,7 +38,7 @@ export default function TerminatorDateFieldDemo() {
               type="text"
               defaultValue="Night sky over the ridge"
               onChange={() => setSaved(false)}
-              className="h-9 w-full rounded-sm border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted/60 transition-colors hover:border-foreground/25 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/25"
+              className="h-9 w-full rounded-sm border border-border bg-background px-3 text-sm text-foreground placeholder:text-ns-muted/60 transition-colors hover:border-foreground/25 focus:border-ns-accent focus:outline-none focus:ring-2 focus:ring-ns-accent/25"
             />
           </div>
 
@@ -63,13 +63,13 @@ export default function TerminatorDateFieldDemo() {
               rows={3}
               defaultValue="Clear seeing after midnight. Terminator shadows sharp along the Apennines; worth dragging the dob out again tomorrow."
               onChange={() => setSaved(false)}
-              className="w-full resize-none rounded-sm border border-border bg-background px-3 py-2 text-sm leading-relaxed text-foreground placeholder:text-muted/60 transition-colors hover:border-foreground/25 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/25"
+              className="w-full resize-none rounded-sm border border-border bg-background px-3 py-2 text-sm leading-relaxed text-foreground placeholder:text-ns-muted/60 transition-colors hover:border-foreground/25 focus:border-ns-accent focus:outline-none focus:ring-2 focus:ring-ns-accent/25"
             />
           </div>
         </div>
 
         <div className="flex items-center justify-between border-t border-border px-6 py-4">
-          <p className="font-mono text-xs text-muted" aria-live="polite">
+          <p className="font-mono text-xs text-ns-muted" aria-live="polite">
             {saved
               ? "Entry saved"
               : date
@@ -83,14 +83,14 @@ export default function TerminatorDateFieldDemo() {
           <button
             type="button"
             onClick={() => setSaved(true)}
-            className="rounded-sm bg-accent px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+            className="rounded-sm bg-ns-accent px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-ns-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
           >
             Save entry
           </button>
         </div>
       </div>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Open the calendar (or press Arrow Down in the field), arrow through the
         month and watch the trailing moon track your focus. Enter commits with
         an eclipse transit across the chosen day.

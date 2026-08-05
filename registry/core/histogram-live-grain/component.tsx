@@ -138,10 +138,10 @@ export function GrainTally({
   return (
     <div className={`w-full ${className}`}>
       <div className="mb-2 flex items-baseline justify-between gap-4">
-        <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted">{label}</span>
+        <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-ns-muted">{label}</span>
         <span className="font-mono text-sm tabular-nums text-foreground">
           {last ? `${Math.round(last.value)}${unit}` : "—"}
-          <span className="ml-1.5 text-[10px] uppercase tracking-widest text-muted">last</span>
+          <span className="ml-1.5 text-[10px] uppercase tracking-widest text-ns-muted">last</span>
         </span>
       </div>
       <div
@@ -155,7 +155,7 @@ export function GrainTally({
           setInspect(Math.min(bins - 1, Math.max(0, Math.floor(((e.clientX - rect.left) / rect.width) * bins))));
         }}
         onPointerLeave={() => setInspect(null)}
-        className="relative w-full cursor-crosshair overflow-hidden rounded-sm border border-border bg-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        className="relative w-full cursor-crosshair overflow-hidden rounded-sm border border-border bg-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
         style={{ height }}
       >
         {/* baseline the grains land on */}
@@ -192,7 +192,7 @@ export function GrainTally({
                 style={{ transform: `translateX(${xOf(v)}px)` }}
               >
                 <div className="h-full w-px bg-foreground/35" />
-                <span className="absolute left-1 top-1 font-mono text-[9px] tracking-widest text-muted">
+                <span className="absolute left-1 top-1 font-mono text-[9px] tracking-widest text-ns-muted">
                   {q}
                 </span>
               </div>
@@ -200,7 +200,7 @@ export function GrainTally({
           </>
         )}
       </div>
-      <div className="mt-1.5 flex items-baseline justify-between font-mono text-[10px] tabular-nums text-muted">
+      <div className="mt-1.5 flex items-baseline justify-between font-mono text-[10px] tabular-nums text-ns-muted">
         <span>
           {min}
           {unit}

@@ -10,9 +10,9 @@
   /* #8f8f8f is the dark-mode muted (6.1:1 on #0a0a0a) but only ~3.2:1 on
      white — fails AA for the small text it's used on everywhere (card
      descriptions, footer, eyebrow). #4d4d4d clears 4.5:1 (8.45:1 on white). */
-  --muted: #4d4d4d;
-  --accent: #006bff;
-  --accent-hover: #0059d1;
+  --ns-muted: #4d4d4d;
+  --ns-accent: #006bff;
+  --ns-accent-hover: #0059d1;
   /* Semantic status red — several components reference var(--error) with this
      same hex as fallback; defining it here makes it a real themed token. */
   --error: #ea001d;
@@ -27,7 +27,7 @@
   --foreground: #ededed;
   --surface: #171717;
   --border: #2e2e2e;
-  --muted: #8f8f8f;
+  --ns-muted: #8f8f8f;
 }
 
 @theme inline {
@@ -35,9 +35,9 @@
   --color-foreground: var(--foreground);
   --color-surface: var(--surface);
   --color-border: var(--border);
-  --color-muted: var(--muted);
-  --color-accent: var(--accent);
-  --color-accent-hover: var(--accent-hover);
+  --color-ns-muted: var(--ns-muted);
+  --color-ns-accent: var(--ns-accent);
+  --color-ns-accent-hover: var(--ns-accent-hover);
 
   /* Literal family names — @theme inline resolves at parse time. The geist
      npm package registers "GeistSans"/"GeistMono" (verified via document.fonts).
@@ -108,7 +108,7 @@
   background: conic-gradient(
     from var(--search-trace-angle),
     transparent 0%,
-    color-mix(in srgb, var(--accent) 70%, transparent) 6%,
+    color-mix(in srgb, var(--ns-accent) 70%, transparent) 6%,
     transparent 16%
   );
   -webkit-mask:

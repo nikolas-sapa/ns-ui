@@ -109,17 +109,17 @@ export default function SprocketScrubDemo() {
 
   return (
     <div ref={rootRef} className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">ns-ui / scrubber-film-strip</p>
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">ns-ui / scrubber-film-strip</p>
 
       <div className="w-full max-w-lg rounded-[12px] border border-border bg-background p-5">
         <div className="mb-4 flex items-center justify-between gap-3">
           <span className="truncate text-sm text-foreground">Interview_master.mov</span>
-          <div className="flex items-center gap-2 font-mono text-xs tabular-nums text-muted">
+          <div className="flex items-center gap-2 font-mono text-xs tabular-nums text-ns-muted">
             <button
               type="button"
               aria-label={playing ? "Pause" : "Play"}
               onClick={() => setPlaying((p) => !p)}
-              className="flex h-7 w-7 items-center justify-center rounded-[6px] border border-border text-foreground hover:bg-border/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="flex h-7 w-7 items-center justify-center rounded-[6px] border border-border text-foreground hover:bg-border/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
             >
               {playing ? (
                 <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
@@ -141,7 +141,7 @@ export default function SprocketScrubDemo() {
         <SprocketScrub value={value} duration={DURATION} buffered={buffered} onValueChange={setValue} />
       </div>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Drag slowly to feel the claw catch each perforation; drag fast and it
         releases into a continuous glide.
       </p>

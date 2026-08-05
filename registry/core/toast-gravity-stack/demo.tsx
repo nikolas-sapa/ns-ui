@@ -87,25 +87,25 @@ export default function SedimentStackDemo() {
   }, [runSequence]);
 
   const buttonClass =
-    "cursor-pointer rounded-sm border border-border px-3 py-1.5 font-mono text-[11px] tracking-widest text-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+    "cursor-pointer rounded-sm border border-border px-3 py-1.5 font-mono text-[11px] tracking-widest text-ns-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent";
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-2xl">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">
+        <p className="mb-4 font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / toast-gravity-stack
         </p>
         <div className="overflow-hidden rounded-md border border-border bg-surface">
           <header className="flex items-center justify-between gap-4 border-b border-border px-5 py-3">
-            <span className="font-mono text-xs tracking-widest text-muted">
+            <span className="font-mono text-xs tracking-widest text-ns-muted">
               DEPLOY LOG — LIVE
             </span>
-            <span className="font-mono text-[11px] tabular-nums text-muted">
+            <span className="font-mono text-[11px] tabular-nums text-ns-muted">
               {count} events
             </span>
           </header>
           <div className="border-b border-border px-5 py-2">
-            <p className="truncate font-mono text-[11px] text-muted">
+            <p className="truncate font-mono text-[11px] text-ns-muted">
               <span className="text-foreground">feed</span> · {feed}
             </p>
           </div>
@@ -134,7 +134,7 @@ export default function SedimentStackDemo() {
             </button>
           </footer>
         </div>
-        <p className="mt-3 font-mono text-[11px] text-muted">
+        <p className="mt-3 font-mono text-[11px] text-ns-muted">
           errors thud in heavy and sink; hover pauses a toast&apos;s timer; swipe
           right or hit x to dismiss — the sediment above resettles
         </p>

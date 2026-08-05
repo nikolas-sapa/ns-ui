@@ -20,21 +20,21 @@ export default function RidgeWalkDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-6 py-16">
       <div className="w-full max-w-xl">
-        <p className="mb-10 text-center font-mono text-xs tracking-widest text-muted">
+        <p className="mb-10 text-center font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / picker-pareto-frontier
         </p>
         <div className="mx-auto mb-10 max-w-md text-center">
           <h1 className="text-4xl font-semibold tracking-tight text-foreground">
             Pick a point on the curve
           </h1>
-          <p className="mt-3 text-sm leading-relaxed text-muted">
+          <p className="mt-3 text-sm leading-relaxed text-ns-muted">
             The rising line is the frontier: you can&apos;t buy more quality
             without paying in cost and latency. Dominated models sit below it —
             strictly worse, still selectable.
           </p>
         </div>
         <RidgeWalk models={MODELS} scoreLabel="MMLU" />
-        <p className="mt-8 text-center font-mono text-[11px] text-muted">
+        <p className="mt-8 text-center font-mono text-[11px] text-ns-muted">
           Drag along the ridge, or arrow through the points — Home and End jump
           to the ends.
         </p>

@@ -180,8 +180,8 @@ export function RippleUnfold({
         foreground: readToken(probe, "--foreground", fb.foreground),
         surface: readToken(probe, "--surface", fb.surface),
         border: readToken(probe, "--border", fb.border),
-        muted: readToken(probe, "--muted", fb.muted),
-        accent: readToken(probe, "--accent", fb.accent),
+        muted: readToken(probe, "--ns-muted", fb.muted),
+        accent: readToken(probe, "--ns-accent", fb.accent),
       };
       probe.remove();
       borderStroke = css(pal.border, 1);

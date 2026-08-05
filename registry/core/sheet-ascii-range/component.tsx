@@ -149,8 +149,8 @@ export function SheetAsciiRange({
   return (
     <div className={`inline-flex flex-col gap-2 font-mono ${className}`}>
       <div className="flex items-center justify-between gap-3">
-        <span className="text-xs uppercase tracking-widest text-muted">{title}</span>
-        <span className="text-[10px] uppercase tracking-widest text-muted">drag or shift+arrow to select</span>
+        <span className="text-xs uppercase tracking-widest text-ns-muted">{title}</span>
+        <span className="text-[10px] uppercase tracking-widest text-ns-muted">drag or shift+arrow to select</span>
       </div>
 
       <div
@@ -164,14 +164,14 @@ export function SheetAsciiRange({
       >
         <div />
         {colLabels.map((label) => (
-          <div key={label} className="px-1 py-1 text-center text-[10px] text-muted">
+          <div key={label} className="px-1 py-1 text-center text-[10px] text-ns-muted">
             {label}
           </div>
         ))}
 
         {rowLabels.map((rowLabel, r) => (
           <div key={rowLabel} className="contents">
-            <div className="flex items-center px-1 text-[10px] text-muted">{rowLabel}</div>
+            <div className="flex items-center px-1 text-[10px] text-ns-muted">{rowLabel}</div>
             {Array.from({ length: cols }, (_, c) => {
               const value = data[r]?.[c] ?? 0;
               const selected = inRect(r, c);
@@ -212,8 +212,8 @@ export function SheetAsciiRange({
                   aria-selected={selected}
                   aria-label={`${rowLabel} ${colLabels[c]}: ${fmt(value)} ${unit}`}
                   tabIndex={isActive ? 0 : -1}
-                  className={`relative flex h-8 items-center justify-end px-1.5 text-xs tabular-nums text-foreground outline-none transition-colors duration-100 motion-reduce:transition-none hover:bg-foreground/[0.06] focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent ${
-                    selected ? "bg-accent/[0.09]" : ""
+                  className={`relative flex h-8 items-center justify-end px-1.5 text-xs tabular-nums text-foreground outline-none transition-colors duration-100 motion-reduce:transition-none hover:bg-foreground/[0.06] focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ns-accent ${
+                    selected ? "bg-ns-accent/[0.09]" : ""
                   }`}
                   onPointerDown={() => startDrag({ r, c })}
                   onPointerEnter={() => dragTo({ r, c })}
@@ -256,7 +256,7 @@ export function SheetAsciiRange({
       <div
         data-status-bar
         aria-live="polite"
-        className="rounded-sm border border-border bg-background px-3 py-1.5 text-[11px] tabular-nums text-muted"
+        className="rounded-sm border border-border bg-background px-3 py-1.5 text-[11px] tabular-nums text-ns-muted"
       >
         {stats.n > 0 ? (
           <>

@@ -36,7 +36,7 @@ export function SubmitSignedOut() {
   return (
     <main className="mx-auto flex max-w-md flex-col items-center px-6 py-16 text-center">
       <h1 className="text-xl font-medium text-foreground">Propose a component</h1>
-      <p className="mt-2 text-sm text-muted">
+      <p className="mt-2 text-sm text-ns-muted">
         Submitting opens a pull request under your own GitHub identity, so this needs a GitHub
         sign-in — Google and email sign-in have no GitHub account to open the PR as.
       </p>
@@ -44,7 +44,7 @@ export function SubmitSignedOut() {
         type="button"
         onClick={start}
         disabled={pending}
-        className="mt-6 inline-flex items-center gap-2 rounded-sm border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-muted focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
+        className="mt-6 inline-flex items-center gap-2 rounded-sm border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
       >
         <GitHubMark />
         {pending ? "Redirecting…" : "Sign in with GitHub"}
@@ -52,11 +52,11 @@ export function SubmitSignedOut() {
       <p aria-live="polite" className="mt-2 text-xs">
         {error ? <span className="text-[var(--error)]">{error}</span> : null}
       </p>
-      <p className="mt-6 text-xs text-muted">
+      <p className="mt-6 text-xs text-ns-muted">
         Read{" "}
         <Link
           href="/guidelines"
-          className="underline decoration-border underline-offset-2 hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+          className="underline decoration-border underline-offset-2 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
         >
           the guidelines
         </Link>{" "}

@@ -41,7 +41,7 @@ export default function RedlineParleyDemo() {
   return (
     <main className="flex min-h-screen justify-center bg-background px-6 py-16">
       <div className="w-full max-w-lg space-y-6">
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
           ns-ui / refusal-negotiation — negotiated refusal
         </p>
 
@@ -49,7 +49,7 @@ export default function RedlineParleyDemo() {
           <h2 className="text-sm font-medium text-foreground">
             Board note — refused
           </h2>
-          <p className="mt-1 text-sm leading-relaxed text-muted">
+          <p className="mt-1 text-sm leading-relaxed text-ns-muted">
             The draft tripped a data-handling guardrail. Flip a lever to see
             the flagged clause rewrite itself and the send button unlock.
           </p>
@@ -86,7 +86,7 @@ export default function RedlineParleyDemo() {
           <h2 className="text-sm font-medium text-foreground">
             Roster export — refused
           </h2>
-          <p className="mt-1 text-sm leading-relaxed text-muted">
+          <p className="mt-1 text-sm leading-relaxed text-ns-muted">
             A second, independent negotiation over a different clause and a
             smaller lever set.
           </p>

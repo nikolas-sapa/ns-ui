@@ -38,7 +38,7 @@ export function ThemeToggle() {
       aria-label={mounted ? (isDark ? "Switch to light theme" : "Switch to dark theme") : "Toggle theme"}
       aria-pressed={mounted ? isDark : undefined}
       suppressHydrationWarning
-      className="inline-flex size-8 shrink-0 items-center justify-center rounded-sm text-muted outline-none transition-colors motion-reduce:transition-none hover:bg-border/60 hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      className="inline-flex size-8 shrink-0 items-center justify-center rounded-sm text-ns-muted outline-none transition-colors motion-reduce:transition-none hover:bg-border/60 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
       <SunIcon className="dark:hidden" />
       <MoonIcon className="hidden dark:block" />

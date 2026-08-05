@@ -8,9 +8,9 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 // drives a drill bit descending through procedurally banded strata while
 // content panels crossfade per band and a mono HUD ticks depth in meters.
 // Strata grain (2-octave value noise, 3px cells, quantized to 3 gray levels
-// between --border and --muted, per-band thresholds) is rendered ONCE per
+// between --border and --ns-muted, per-band thresholds) is rendered ONCE per
 // resize/theme into an offscreen band atlas and blitted per frame. Exactly
-// one accent vein — a 1.5px --accent polyline at a fixed depth in band 4.
+// one accent vein — a 1.5px --ns-accent polyline at a fixed depth in band 4.
 // Direct-DOM rAF, refs only on the hot path; the loop sleeps when the eased
 // depth is within epsilon of target and the chip spray is empty.
 // ---------------------------------------------------------------------------
@@ -237,8 +237,8 @@ export function CoreSampleScroll({
       const cs = getComputedStyle(document.documentElement);
       fg = parseColor(cs.getPropertyValue("--foreground")) ?? fg;
       border = parseColor(cs.getPropertyValue("--border")) ?? border;
-      muted = parseColor(cs.getPropertyValue("--muted")) ?? muted;
-      accent = parseColor(cs.getPropertyValue("--accent")) ?? accent;
+      muted = parseColor(cs.getPropertyValue("--ns-muted")) ?? muted;
+      accent = parseColor(cs.getPropertyValue("--ns-accent")) ?? accent;
     };
     derive();
 
@@ -271,7 +271,7 @@ export function CoreSampleScroll({
       grain.height = gh;
       const img = gctx.createImageData(gw, gh);
       const px = img.data;
-      // 3 gray levels interpolated between --border and --muted
+      // 3 gray levels interpolated between --border and --ns-muted
       const levels: Vec3[] = [border, mix(border, muted, 0.5), muted];
       for (let gy = 0; gy < gh; gy++) {
         const f = ((gy + 0.5) * CELL) / sceneH;
@@ -312,7 +312,7 @@ export function CoreSampleScroll({
       }
       actx.globalAlpha = 1;
 
-      // exactly one accent vein: 1.5px --accent polyline at a fixed depth
+      // exactly one accent vein: 1.5px --ns-accent polyline at a fixed depth
       // inside band 4
       const vy =
         ((starts[veinIdx] ?? 0) + (fractions[veinIdx] ?? 0.2) * 0.55) * sceneH;
@@ -644,7 +644,7 @@ export function CoreSampleScroll({
             hoverRef.current = -1;
             wakeRef.current();
           }}
-          className="pointer-events-auto absolute left-4 -translate-y-1/2 rounded-sm bg-background/60 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-muted transition-colors hover:text-foreground focus-visible:text-foreground focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="pointer-events-auto absolute left-4 -translate-y-1/2 rounded-sm bg-background/60 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-ns-muted transition-colors hover:text-foreground focus-visible:text-foreground focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           style={{
             top: `${((starts[i] ?? 0) + (fractions[i] ?? 0) / 2) * overscan * 100}%`,
           }}
@@ -661,12 +661,12 @@ export function CoreSampleScroll({
       id={reduced ? `${uid}-panel-${i}` : undefined}
       className={`rounded-md border border-border bg-surface p-6 ${extra}`}
     >
-      <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted">
+      <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-ns-muted">
         {String(i + 1).padStart(2, "0")} / {b.label}
       </p>
       <h3 className="mt-3 text-xl font-semibold text-foreground">{b.title}</h3>
-      <p className="mt-2 text-sm leading-relaxed text-muted">{b.body}</p>
-      <p className="mt-4 border-t border-border pt-3 font-mono text-xs text-muted">
+      <p className="mt-2 text-sm leading-relaxed text-ns-muted">{b.body}</p>
+      <p className="mt-4 border-t border-border pt-3 font-mono text-xs text-ns-muted">
         {b.spec}
       </p>
     </article>
@@ -687,13 +687,13 @@ export function CoreSampleScroll({
           />
           {labelButtons}
           <div className="pointer-events-none absolute right-6 top-6 z-10 rounded-sm bg-background/60 p-3 text-right font-mono">
-            <p className="text-[10px] uppercase tracking-[0.25em] text-muted">
+            <p className="text-[10px] uppercase tracking-[0.25em] text-ns-muted">
               depth
             </p>
             <div className="mt-1 text-sm tabular-nums text-foreground">
               {`${totalDepth.toFixed(2).padStart(6, "0")} m`}
             </div>
-            <p className="mt-1 text-[10px] uppercase tracking-[0.2em] text-muted">
+            <p className="mt-1 text-[10px] uppercase tracking-[0.2em] text-ns-muted">
               full core · {bands.length} bands
             </p>
           </div>
@@ -724,7 +724,7 @@ export function CoreSampleScroll({
 
         {/* HUD — fixed stage corner, mono, ticks every frame while moving */}
         <div className="pointer-events-none absolute right-6 top-6 z-10 rounded-sm bg-background/60 p-3 text-right font-mono">
-          <p className="text-[10px] uppercase tracking-[0.25em] text-muted">
+          <p className="text-[10px] uppercase tracking-[0.25em] text-ns-muted">
             depth
           </p>
           <div
@@ -735,7 +735,7 @@ export function CoreSampleScroll({
           </div>
           <p
             className={`mt-1 text-[10px] uppercase tracking-[0.2em] transition-colors ${
-              active === veinIdx ? "text-accent" : "text-muted"
+              active === veinIdx ? "text-ns-accent" : "text-ns-muted"
             }`}
           >
             {bands[active]?.label ?? ""} · {active + 1}/{bands.length}

@@ -60,10 +60,10 @@ const crumbClass = (current: boolean) =>
   current
     ? "whitespace-nowrap px-1 py-0.5 text-sm font-medium text-foreground"
     : [
-        "whitespace-nowrap rounded-sm px-1 py-0.5 text-sm text-muted",
+        "whitespace-nowrap rounded-sm px-1 py-0.5 text-sm text-ns-muted",
         "transition-colors duration-150 ease-out",
         "hover:bg-surface hover:text-foreground",
-        "focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent",
+        "focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ns-accent",
       ].join(" ");
 
 export function WornPath({
@@ -316,10 +316,10 @@ export function WornPath({
               }
             }}
             className={[
-              "ns-wp-more rounded-sm border border-border px-1.5 py-0.5 text-sm leading-none text-muted",
+              "ns-wp-more rounded-sm border border-border px-1.5 py-0.5 text-sm leading-none text-ns-muted",
               "transition-colors duration-150 ease-out",
-              "hover:border-accent hover:bg-surface hover:text-foreground",
-              "focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent",
+              "hover:border-ns-accent hover:bg-surface hover:text-foreground",
+              "focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ns-accent",
             ].join(" ")}
           >
             …
@@ -340,10 +340,10 @@ export function WornPath({
                 >
                   {hiddenItems.map(({ item: hiddenItem, i }, pos) => {
                     const itemCls = [
-                      "block w-full rounded-sm px-2 py-1.5 text-left text-sm text-muted",
+                      "block w-full rounded-sm px-2 py-1.5 text-left text-sm text-ns-muted",
                       "transition-colors duration-150 ease-out",
                       "hover:bg-background hover:text-foreground",
-                      "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent",
+                      "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ns-accent",
                     ].join(" ");
                     const common = {
                       role: "menuitem" as const,
@@ -386,7 +386,7 @@ export function WornPath({
   row.forEach((node, i) => {
     if (i > 0) {
       withSeparators.push(
-        <li key={`sep-${i}`} aria-hidden className="select-none px-2 text-sm text-muted">
+        <li key={`sep-${i}`} aria-hidden className="select-none px-2 text-sm text-ns-muted">
           {separator}
         </li>
       );
@@ -473,7 +473,7 @@ function CurrentCrumb({ label }: { label: string }) {
           ref={ruleRef}
           aria-hidden
           style={{ width: 0 }}
-          className="ns-wp-rule absolute bottom-[-3px] left-0 h-[2px] rounded-[1px] bg-accent"
+          className="ns-wp-rule absolute bottom-[-3px] left-0 h-[2px] rounded-[1px] bg-ns-accent"
         />
       </span>
     </span>

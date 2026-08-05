@@ -25,10 +25,10 @@ const WORD: Record<CheckState, string> = {
 // the word alone separates them. Amber is banned here even though --warning
 // exists — accent blue carries drift; --error is spent only on a real failure.
 const TONE: Record<CheckState, string> = {
-  ok: "text-muted",
-  degraded: "text-accent",
+  ok: "text-ns-muted",
+  degraded: "text-ns-accent",
   down: "text-[var(--error)]",
-  unknown: "text-muted",
+  unknown: "text-ns-muted",
 };
 
 /** `2026-08-04 17:20 UTC`, sliced off the ISO string so the server and the
@@ -56,7 +56,7 @@ export function LedgerSection({
         <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-foreground">
           {heading}
         </h2>
-        {at ? <p className="font-mono text-[11px] text-muted">{stamp(at)}</p> : null}
+        {at ? <p className="font-mono text-[11px] text-ns-muted">{stamp(at)}</p> : null}
       </div>
       <div className="mt-4">
         {checks.map((check) => (
@@ -73,7 +73,7 @@ function LedgerRow({ check, sectionAt }: { check: StatusCheck; sectionAt?: strin
       <p className={`font-mono text-xs ${TONE[check.state]}`}>{WORD[check.state]}</p>
       <div>
         <p className="text-sm text-foreground">{check.label}</p>
-        <p className="mt-1 max-w-prose text-sm leading-6 text-muted">
+        <p className="mt-1 max-w-prose text-sm leading-6 text-ns-muted">
           {check.detail}
           {!sectionAt || check.measuredAt === sectionAt ? null : (
             <span className="font-mono text-[11px]"> · {stamp(check.measuredAt)}</span>

@@ -350,7 +350,7 @@ export function AsciiPatchbay({ jacks = DEFAULT_JACKS, className = "" }: AsciiPa
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
       >
-        <div aria-hidden className="pointer-events-none absolute inset-0 text-muted" style={{ fontSize: 11 }}>
+        <div aria-hidden className="pointer-events-none absolute inset-0 text-ns-muted" style={{ fontSize: 11 }}>
           {rows.map((line, y) => (
             <div key={y} style={{ height: CELL_H, lineHeight: `${CELL_H}px`, whiteSpace: "nowrap" }}>
               {line.split("").map((ch, x) => (
@@ -369,7 +369,7 @@ export function AsciiPatchbay({ jacks = DEFAULT_JACKS, className = "" }: AsciiPa
               markerRefs.current[i] = el;
             }}
             aria-hidden
-            className="ns-pac-pulse pointer-events-none absolute rounded-full bg-accent"
+            className="ns-pac-pulse pointer-events-none absolute rounded-full bg-ns-accent"
             style={{ width: 6, height: 6, marginLeft: CELL_W / 2 - 3, marginTop: CELL_H / 2 - 3 }}
           />
         ))}
@@ -387,12 +387,12 @@ export function AsciiPatchbay({ jacks = DEFAULT_JACKS, className = "" }: AsciiPa
               data-patchbay-jack={jack.id}
               className={`ns-pac-jack absolute flex items-center justify-center border bg-background text-[11px] transition-colors duration-150 ${
                 armed
-                  ? "border-accent text-foreground"
+                  ? "border-ns-accent text-foreground"
                   : hovered
-                    ? "border-accent/40 text-foreground"
+                    ? "border-ns-accent/40 text-foreground"
                     : patched
                       ? "border-border text-foreground"
-                      : "border-border text-muted"
+                      : "border-border text-ns-muted"
               }`}
               style={{
                 left: col * CELL_W,
@@ -418,7 +418,7 @@ export function AsciiPatchbay({ jacks = DEFAULT_JACKS, className = "" }: AsciiPa
         })}
       </div>
 
-      <div className="mt-3 min-h-[1.5em] font-mono text-xs text-muted">
+      <div className="mt-3 min-h-[1.5em] font-mono text-xs text-ns-muted">
         {armedId ? (
           <span data-patchbay-armed>
             Armed: <strong className="text-foreground">{byId.get(armedId)?.label}</strong> — select another jack to
@@ -433,7 +433,7 @@ export function AsciiPatchbay({ jacks = DEFAULT_JACKS, className = "" }: AsciiPa
 }
 
 const CSS = `
-.ns-pac-jack:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ns-pac-jack:focus-visible { outline: 2px solid var(--ns-accent); outline-offset: 2px; }
 .ns-pac-pulse { animation: ns-pac-blink 1.4s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) {
   .ns-pac-pulse { display: none; }

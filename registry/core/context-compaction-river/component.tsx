@@ -387,7 +387,7 @@ export function OxbowTurn({
             d={initialD}
             className={`ns-oxbow-channel${snap ? " ns-oxbow-snap" : ""}`}
             fill="none"
-            stroke="var(--muted)"
+            stroke="var(--ns-muted)"
             strokeWidth={1.5}
             strokeLinecap="round"
           />
@@ -403,7 +403,7 @@ export function OxbowTurn({
                   <path
                     d={`M ${-OFFSET} 0 Q ${-OFFSET * 0.5} -6 0 0`}
                     fill="none"
-                    stroke="var(--muted)"
+                    stroke="var(--ns-muted)"
                     strokeWidth={1}
                     strokeOpacity={0.55}
                   />
@@ -438,7 +438,7 @@ export function OxbowTurn({
               }}
               r={t.isLast ? DOT_R + 1 : DOT_R}
               className={t.isLast ? "ns-oxbow-dot-current" : "ns-oxbow-dot"}
-              fill={t.isLast ? undefined : "var(--muted)"}
+              fill={t.isLast ? undefined : "var(--ns-muted)"}
             >
               <title>{t.preview ? `${t.label}: ${t.preview}` : t.label}</title>
             </circle>
@@ -473,7 +473,7 @@ export function OxbowTurn({
                 data-context-compaction-river-btn
                 aria-label={accName}
                 aria-describedby={hasPreview ? turnTipId : undefined}
-                className="block h-4 w-4 cursor-default rounded-full bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                className="block h-4 w-4 cursor-default rounded-full bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
               />
               {hasPreview && (
                 <span
@@ -515,7 +515,7 @@ export function OxbowTurn({
                 aria-label={`Compacted ${turnsLabel(l.item.turns)}, ${formatTok(l.item.tokenCount)} tokens. Open summary and re-inject.`}
                 onClick={() => setOpenId(l.id)}
                 onKeyDown={onTriggerKeyDown(l)}
-                className="flex cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full border border-border px-2.5 py-1 font-mono text-[10px] tracking-wide text-muted transition-colors duration-150 hover:border-foreground/30 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                className="flex cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full border border-border px-2.5 py-1 font-mono text-[10px] tracking-wide text-ns-muted transition-colors duration-150 hover:border-foreground/30 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
                 style={{ background: "color-mix(in srgb, var(--foreground) 4%, var(--background))" }}
               >
                 <span aria-hidden>{l.item.turns.length}↩</span>
@@ -547,7 +547,7 @@ export function OxbowTurn({
                   >
                     {l.item.summary}
                   </p>
-                  <dl className="mt-2.5 space-y-1 font-mono text-[10px] uppercase tracking-wide text-muted">
+                  <dl className="mt-2.5 space-y-1 font-mono text-[10px] uppercase tracking-wide text-ns-muted">
                     <div className="flex justify-between gap-2">
                       <dt>Turns</dt>
                       <dd className="text-foreground">{turnsLabel(l.item.turns)}</dd>
@@ -572,7 +572,7 @@ export function OxbowTurn({
                       type="button"
                       data-oxbow-reinject
                       onClick={() => handleReinject(l)}
-                      className="w-full cursor-pointer rounded-sm px-2 py-1.5 text-left text-xs text-foreground transition-colors hover:bg-[color-mix(in_srgb,var(--foreground)_6%,transparent)] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent"
+                      className="w-full cursor-pointer rounded-sm px-2 py-1.5 text-left text-xs text-foreground transition-colors hover:bg-[color-mix(in_srgb,var(--foreground)_6%,transparent)] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ns-accent"
                     >
                       Re-inject into live context
                     </button>
@@ -584,7 +584,7 @@ export function OxbowTurn({
         })}
       </div>
 
-      <ul className="mt-3 space-y-1 font-mono text-[11px] leading-relaxed text-muted">
+      <ul className="mt-3 space-y-1 font-mono text-[11px] leading-relaxed text-ns-muted">
         <li>
           Live context, {turnCount} turn{turnCount === 1 ? "" : "s"}
         </li>

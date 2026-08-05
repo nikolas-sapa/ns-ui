@@ -124,21 +124,21 @@ export default function OxbowTurnDemo() {
   }, []);
 
   const buttonClass =
-    "cursor-pointer rounded-sm border border-border px-3 py-1.5 font-mono text-[11px] tracking-widest text-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+    "cursor-pointer rounded-sm border border-border px-3 py-1.5 font-mono text-[11px] tracking-widest text-ns-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent";
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-md">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">
+        <p className="mb-4 font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / context-compaction-river
         </p>
 
         <div className="rounded-md border border-border">
           <header className="flex items-center justify-between border-b border-border px-5 py-3">
-            <span className="font-mono text-xs uppercase tracking-widest text-muted">
+            <span className="font-mono text-xs uppercase tracking-widest text-ns-muted">
               CONTEXT RIVER
             </span>
-            <span className="font-mono text-[11px] tabular-nums text-muted">agent session</span>
+            <span className="font-mono text-[11px] tabular-nums text-ns-muted">agent session</span>
           </header>
 
           <div className="px-5 py-5">
@@ -146,7 +146,7 @@ export default function OxbowTurnDemo() {
           </div>
 
           <div className="border-t border-border px-5 py-2">
-            <p className="truncate font-mono text-[11px] text-muted">
+            <p className="truncate font-mono text-[11px] text-ns-muted">
               <span className="text-foreground">event</span> · {status}
             </p>
           </div>
@@ -163,7 +163,7 @@ export default function OxbowTurnDemo() {
             </button>
           </footer>
         </div>
-        <p className="mt-3 font-mono text-[11px] text-muted">
+        <p className="mt-3 font-mono text-[11px] text-ns-muted">
           the channel is a picture of what is still live — open an oxbow to read what
           left it, or re-inject to splice it back in
         </p>

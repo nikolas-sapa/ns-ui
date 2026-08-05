@@ -82,7 +82,7 @@ const ICONS: Record<ImpulseSeverity, ReactNode> = {
 function CardShell({ toast, onDismiss }: { toast: ToastRec; onDismiss: () => void }) {
   return (
     <div className="flex items-start gap-2.5 py-2.5 pl-3 pr-1.5">
-      <span className="mt-0.5 shrink-0 text-muted">{ICONS[toast.severity]}</span>
+      <span className="mt-0.5 shrink-0 text-ns-muted">{ICONS[toast.severity]}</span>
       <div className="min-w-0 flex-1">
         <p
           className={`truncate text-[13px] leading-tight text-foreground ${
@@ -92,7 +92,7 @@ function CardShell({ toast, onDismiss }: { toast: ToastRec; onDismiss: () => voi
           {toast.title}
         </p>
         {toast.message ? (
-          <p className="mt-0.5 truncate font-mono text-[11px] leading-tight text-muted">
+          <p className="mt-0.5 truncate font-mono text-[11px] leading-tight text-ns-muted">
             {toast.message}
           </p>
         ) : null}
@@ -101,7 +101,7 @@ function CardShell({ toast, onDismiss }: { toast: ToastRec; onDismiss: () => voi
         type="button"
         aria-label={`Dismiss: ${toast.title}`}
         onClick={onDismiss}
-        className="shrink-0 cursor-pointer rounded-sm p-1 text-muted transition-colors duration-150 hover:bg-foreground/10 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent"
+        className="shrink-0 cursor-pointer rounded-sm p-1 text-ns-muted transition-colors duration-150 hover:bg-foreground/10 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ns-accent"
       >
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
           <path d="M18 6 6 18M6 6l12 12" />
@@ -450,7 +450,7 @@ export const ImpulseCradle = forwardRef<
                 dismiss(t.id);
               }
             }}
-            className="overflow-hidden rounded-sm border border-border bg-background will-change-transform focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="overflow-hidden rounded-sm border border-border bg-background will-change-transform focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             <CardShell toast={t} onDismiss={() => dismiss(t.id)} />
           </div>
@@ -475,7 +475,7 @@ export const ImpulseCradle = forwardRef<
             aria-expanded={historyOpen}
             aria-controls={historyPanelId}
             onClick={() => setHistoryOpen((v) => !v)}
-            className="cursor-pointer rounded-sm border border-border px-2 py-1 font-mono text-[11px] tracking-wide text-muted transition-colors duration-150 hover:border-foreground/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="cursor-pointer rounded-sm border border-border px-2 py-1 font-mono text-[11px] tracking-wide text-ns-muted transition-colors duration-150 hover:border-foreground/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             History ({history.length})
           </button>
@@ -491,7 +491,7 @@ export const ImpulseCradle = forwardRef<
                   className="flex items-baseline justify-between gap-3 font-mono text-[11px]"
                 >
                   <span className="truncate text-foreground">{h.title}</span>
-                  <span className="shrink-0 text-muted">{h.reason}</span>
+                  <span className="shrink-0 text-ns-muted">{h.reason}</span>
                 </li>
               ))}
             </ul>

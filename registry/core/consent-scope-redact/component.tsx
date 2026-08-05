@@ -104,7 +104,7 @@ export function LampBlack({ scopes, record, className = "" }: LampBlackProps) {
       `}</style>
 
       <header className="border-b border-border px-5 py-3">
-        <span className="font-mono text-xs tracking-widest text-muted">
+        <span className="font-mono text-xs tracking-widest text-ns-muted">
           DATA SHARING PREVIEW
         </span>
       </header>
@@ -167,7 +167,7 @@ export function LampBlack({ scopes, record, className = "" }: LampBlackProps) {
                 <div id={labelId} className="text-sm text-foreground">
                   {scope.label}
                 </div>
-                {scope.hint && <div className="mt-0.5 text-xs text-muted">{scope.hint}</div>}
+                {scope.hint && <div className="mt-0.5 text-xs text-ns-muted">{scope.hint}</div>}
               </div>
               <button
                 type="button"
@@ -176,10 +176,10 @@ export function LampBlack({ scopes, record, className = "" }: LampBlackProps) {
                 aria-labelledby={labelId}
                 data-lampblack-switch={scope.id}
                 onClick={() => toggle(scope.id)}
-                className="ns-lampblack-track relative h-5 w-9 shrink-0 rounded-full border border-border p-0.5 outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+                className="ns-lampblack-track relative h-5 w-9 shrink-0 rounded-full border border-border p-0.5 outline-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
                 style={{
-                  backgroundColor: on ? "var(--accent)" : "var(--border)",
-                  borderColor: on ? "var(--accent)" : "var(--border)",
+                  backgroundColor: on ? "var(--ns-accent)" : "var(--border)",
+                  borderColor: on ? "var(--ns-accent)" : "var(--border)",
                 }}
               >
                 <span
@@ -193,7 +193,7 @@ export function LampBlack({ scopes, record, className = "" }: LampBlackProps) {
         })}
       </div>
 
-      <p aria-live="polite" className="border-t border-border px-5 py-3 text-xs text-muted">
+      <p aria-live="polite" className="border-t border-border px-5 py-3 text-xs text-ns-muted">
         {summary}
       </p>
     </div>

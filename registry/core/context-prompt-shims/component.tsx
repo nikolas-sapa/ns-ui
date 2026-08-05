@@ -559,7 +559,7 @@ export function ShimFit({
         {alertMsg}
       </p>
 
-      <div className="flex items-baseline justify-between font-mono text-[11px] text-muted">
+      <div className="flex items-baseline justify-between font-mono text-[11px] text-ns-muted">
         <span>budget {fmt(budget)} tok</span>
         <span className={remaining < 0 ? "text-foreground font-semibold" : ""}>
           {fmt(Math.max(0, remaining))} tok free
@@ -574,7 +574,7 @@ export function ShimFit({
           style={{ height: clearance }}
         >
           {clearance > 22 ? (
-            <span className="mt-1 font-mono text-[9px] uppercase tracking-[0.14em] text-muted/70">
+            <span className="mt-1 font-mono text-[9px] uppercase tracking-[0.14em] text-ns-muted/70">
               clearance
             </span>
           ) : null}
@@ -609,14 +609,14 @@ export function ShimFit({
                 onFocus={() => setActiveId(s.id)}
                 onKeyDown={(e) => handleRowKeyDown(e, s.id)}
                 data-shim-row
-                className={`relative flex items-center gap-2 border-t bg-muted/8 px-2 outline-none transition-colors hover:bg-muted/16 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-inset ${
-                  isLifted ? "border-t-accent bg-accent/5" : isPulsing ? "border-t-foreground" : "border-t-border"
+                className={`relative flex items-center gap-2 border-t bg-ns-muted/8 px-2 outline-none transition-colors hover:bg-ns-muted/16 focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-inset ${
+                  isLifted ? "border-t-ns-accent bg-ns-accent/5" : isPulsing ? "border-t-foreground" : "border-t-border"
                 } ${isPulsing && !reduced ? "context-prompt-shims-pulse" : ""}`}
                 style={{ height: h }}
               >
                 <div
                   aria-hidden="true"
-                  className="flex shrink-0 cursor-grab touch-none items-center justify-center self-stretch overflow-hidden px-0.5 text-muted/60 active:cursor-grabbing"
+                  className="flex shrink-0 cursor-grab touch-none items-center justify-center self-stretch overflow-hidden px-0.5 text-ns-muted/60 active:cursor-grabbing"
                   style={hairline ? { transform: `scale(${Math.min(1, Math.max(0.5, h / 14))})` } : undefined}
                   onPointerDown={(e) => beginDrag(s.id, e)}
                   onPointerMove={moveDrag}
@@ -629,7 +629,7 @@ export function ShimFit({
                   {s.label}
                 </span>
                 <span
-                  className={`shrink-0 font-mono tabular-nums text-muted ${hairline ? "text-[9px]" : "text-[10px]"}`}
+                  className={`shrink-0 font-mono tabular-nums text-ns-muted ${hairline ? "text-[9px]" : "text-[10px]"}`}
                 >
                   {fmt(s.tokens)}
                 </span>
@@ -666,14 +666,14 @@ export function ShimFit({
               <button
                 type="button"
                 onClick={() => trimToFit(rejection)}
-                className="rounded-sm px-2 py-1 text-[11px] font-medium text-foreground outline-none transition-colors hover:bg-foreground/10 focus-visible:ring-2 focus-visible:ring-accent"
+                className="rounded-sm px-2 py-1 text-[11px] font-medium text-foreground outline-none transition-colors hover:bg-foreground/10 focus-visible:ring-2 focus-visible:ring-ns-accent"
               >
                 Trim to fit
               </button>
               <button
                 type="button"
                 onClick={() => trimThird(rejection)}
-                className="rounded-sm px-2 py-1 text-[11px] text-muted outline-none transition-colors hover:bg-foreground/10 focus-visible:ring-2 focus-visible:ring-accent"
+                className="rounded-sm px-2 py-1 text-[11px] text-ns-muted outline-none transition-colors hover:bg-foreground/10 focus-visible:ring-2 focus-visible:ring-ns-accent"
               >
                 Trim 30%
               </button>
@@ -683,7 +683,7 @@ export function ShimFit({
             type="button"
             aria-label="Dismiss suggestion"
             onClick={clearRejection}
-            className="rounded-sm p-1 text-muted outline-none transition-colors hover:bg-foreground/10 focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded-sm p-1 text-ns-muted outline-none transition-colors hover:bg-foreground/10 focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
               <path d="M18 6 6 18M6 6l12 12" />
@@ -694,7 +694,7 @@ export function ShimFit({
 
       {tray.length > 0 ? (
         <div className="flex flex-col gap-1.5">
-          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">Tray</span>
+          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ns-muted">Tray</span>
           <div className="flex flex-col gap-1.5">
             {tray.map((c) => {
               const bouncing = bounceTrayId === c.id && !reduced;
@@ -707,7 +707,7 @@ export function ShimFit({
                   }`}
                 >
                   <span className="min-w-0 flex-1 truncate text-xs text-foreground">{c.label}</span>
-                  <span className="shrink-0 font-mono text-[10px] tabular-nums text-muted">{fmt(c.tokens)}</span>
+                  <span className="shrink-0 font-mono text-[10px] tabular-nums text-ns-muted">{fmt(c.tokens)}</span>
                   <button
                     type="button"
                     data-shim-insert
@@ -715,7 +715,7 @@ export function ShimFit({
                     {...(overflows ? { "data-shim-insert-oversized": "" } : {})}
                     onClick={() => attemptInsert(c.id)}
                     aria-label={`Insert ${c.label} (${fmt(c.tokens)} tokens)`}
-                    className="shrink-0 rounded-sm border border-border px-2 py-1 text-[11px] font-medium text-foreground outline-none transition-colors hover:border-accent hover:text-accent focus-visible:ring-2 focus-visible:ring-accent"
+                    className="shrink-0 rounded-sm border border-border px-2 py-1 text-[11px] font-medium text-foreground outline-none transition-colors hover:border-ns-accent hover:text-ns-accent focus-visible:ring-2 focus-visible:ring-ns-accent"
                   >
                     Insert
                   </button>

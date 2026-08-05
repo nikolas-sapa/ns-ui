@@ -61,13 +61,13 @@ function SettingSwitch({
       role="switch"
       aria-checked={checked}
       onClick={() => onChange(!checked)}
-      className="flex items-center gap-2 rounded-sm text-xs text-muted transition-colors duration-150 ease-out hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+      className="flex items-center gap-2 rounded-sm text-xs text-ns-muted transition-colors duration-150 ease-out hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
     >
       <span
         aria-hidden
         className={[
           "relative inline-flex h-4 w-7 shrink-0 items-center rounded-full border transition-colors duration-150 ease-out",
-          checked ? "border-accent bg-accent" : "border-border bg-background",
+          checked ? "border-ns-accent bg-ns-accent" : "border-border bg-background",
         ].join(" ")}
       >
         <span
@@ -89,7 +89,7 @@ export default function PencilHedgeDemo() {
   return (
     <div className="flex min-h-screen items-center justify-center px-6 py-16">
       <div className="w-full max-w-xl rounded-md border border-border bg-background p-6">
-        <p className="mb-1 font-mono text-[11px] uppercase tracking-[0.16em] text-muted">
+        <p className="mb-1 font-mono text-[11px] uppercase tracking-[0.16em] text-ns-muted">
           Generated reply · per-token confidence
         </p>
         <h2 className="mb-4 text-lg font-semibold tracking-tight text-foreground">
@@ -105,7 +105,7 @@ export default function PencilHedgeDemo() {
           <PencilHedge segments={SEGMENTS} verbose={verbose} daggerOnHighestDoubt={dagger} />
         </p>
 
-        <p className="mt-5 text-xs leading-relaxed text-muted">
+        <p className="mt-5 text-xs leading-relaxed text-ns-muted">
           Hover or focus a hatched word to see what the model almost said instead. Selecting an
           alternative rewrites the word in place and clears its marks.
         </p>

@@ -27,7 +27,7 @@ import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from 
 // a wide empty strip.
 //
 // DOM + CSS only, no canvas. Colors come from --background/--surface/
-// --foreground/--muted/--border/--accent only. prefers-reduced-motion swaps
+// --foreground/--ns-muted/--border/--ns-accent only. prefers-reduced-motion swaps
 // the rip for a plain crossfade (handled by the stylesheet below) and the
 // height change for a short linear resize instead of a spring (handled in
 // JS, since a spring is inherently a physical motion).
@@ -258,7 +258,7 @@ export function TearStub({
   }, [open]);
 
   const urgent = variant === "urgent";
-  const iconNode = icon ?? <NoticeIcon urgent={urgent} className={`h-4 w-4 shrink-0 ${urgent ? "text-foreground" : "text-muted"}`} />;
+  const iconNode = icon ?? <NoticeIcon urgent={urgent} className={`h-4 w-4 shrink-0 ${urgent ? "text-foreground" : "text-ns-muted"}`} />;
 
   return (
     <div
@@ -293,11 +293,11 @@ export function TearStub({
             // height — absolutely positioned it contributed none and the
             // whole notice collapsed to a flat border line. Negative x
             // margins keep the 44px touch target overhanging the 32px look.
-            className="ns-tearstub-stub relative flex min-h-11 w-11 flex-col items-center justify-center gap-1.5 rounded-sm p-1 py-2 outline-none transition-colors hover:bg-foreground/[0.06] focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-inset"
+            className="ns-tearstub-stub relative flex min-h-11 w-11 flex-col items-center justify-center gap-1.5 rounded-sm p-1 py-2 outline-none transition-colors hover:bg-foreground/[0.06] focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-inset"
             style={{ marginLeft: -STUB_HIT_OVERHANG, marginRight: -STUB_HIT_OVERHANG }}
           >
             {iconNode}
-            <span aria-hidden="true" className="ns-tearstub-label select-none font-mono text-[9px] uppercase tracking-widest text-muted">
+            <span aria-hidden="true" className="ns-tearstub-label select-none font-mono text-[9px] uppercase tracking-widest text-ns-muted">
               {title}
             </span>
           </button>
@@ -311,7 +311,7 @@ export function TearStub({
             <p id={titleId} className="text-sm font-medium leading-snug">
               {title}
             </p>
-            {description && <p className="mt-1 text-sm leading-relaxed text-muted">{description}</p>}
+            {description && <p className="mt-1 text-sm leading-relaxed text-ns-muted">{description}</p>}
           </div>
           <button
             ref={dismissRef}
@@ -319,7 +319,7 @@ export function TearStub({
             onClick={() => setOpen(false)}
             aria-describedby={hintId}
             data-tearstub-dismiss=""
-            className="shrink-0 rounded-sm px-2.5 py-1.5 font-mono text-[11px] uppercase tracking-wide text-muted outline-none transition-colors hover:bg-foreground/[0.06] hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-inset"
+            className="shrink-0 rounded-sm px-2.5 py-1.5 font-mono text-[11px] uppercase tracking-wide text-ns-muted outline-none transition-colors hover:bg-foreground/[0.06] hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-inset"
           >
             {dismissLabel}
           </button>

@@ -6,10 +6,10 @@ export default function PenroseInflateDemo() {
   return (
     <main className="min-h-screen bg-background">
       <header className="flex items-center justify-between gap-4 border-b border-border px-6 py-4">
-        <p className="font-mono text-xs tracking-widest text-muted">
+        <p className="font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / hero-penrose-inflate
         </p>
-        <p className="hidden font-mono text-[11px] text-muted sm:block">
+        <p className="hidden font-mono text-[11px] text-ns-muted sm:block">
           move the pointer — the tiling inflates one substitution level finer
           under the cursor
         </p>

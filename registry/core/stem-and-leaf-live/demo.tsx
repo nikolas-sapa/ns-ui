@@ -67,24 +67,24 @@ export default function StemSiftDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-md">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">ns-ui / stem-and-leaf-live</p>
+        <p className="mb-4 font-mono text-xs tracking-widest text-ns-muted">ns-ui / stem-and-leaf-live</p>
         <div className="rounded-md border border-border bg-surface p-5">
           <StemSift records={records} unit="ms" label="checkout · response time" />
           <div className="mt-4 flex items-center justify-between border-t border-border pt-3">
-            <span className="font-mono text-[10px] uppercase tracking-widest text-muted">
+            <span className="font-mono text-[10px] uppercase tracking-widest text-ns-muted">
               rolling window &middot; {WINDOW} samples
             </span>
             <button
               type="button"
               onClick={() => setPaused((p) => !p)}
               aria-pressed={paused}
-              className="cursor-pointer rounded-sm border border-border px-3 py-1 font-mono text-[11px] text-muted transition-colors duration-150 hover:border-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="cursor-pointer rounded-sm border border-border px-3 py-1 font-mono text-[11px] text-ns-muted transition-colors duration-150 hover:border-ns-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
             >
               {paused ? "resume feed" : "pause feed"}
             </button>
           </div>
         </div>
-        <p className="mt-3 font-mono text-[11px] text-muted">
+        <p className="mt-3 font-mono text-[11px] text-ns-muted">
           every arrival types its ones digit into the row for its tens &mdash; hover or focus any leaf
           for the record behind it
         </p>

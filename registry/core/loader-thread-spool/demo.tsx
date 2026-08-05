@@ -66,13 +66,13 @@ export default function WindSpoolDemo() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-10 bg-background p-6">
-      <p className="self-start font-mono text-xs tracking-widest text-muted">
+      <p className="self-start font-mono text-xs tracking-widest text-ns-muted">
         ns-ui / loader-thread-spool
       </p>
 
       <div className="flex flex-col items-center gap-6 rounded-md border border-border bg-background p-10">
         <WindSpool total={total} loaded={loaded} aria-label="Downloading update" />
-        <p className="font-mono text-[11px] text-muted">
+        <p className="font-mono text-[11px] text-ns-muted">
           {phase === "indeterminate"
             ? "waiting on response headers"
             : phase === "determinate"
@@ -85,7 +85,7 @@ export default function WindSpoolDemo() {
         type="button"
         data-wind-force
         onClick={revealTotal}
-        className="cursor-pointer rounded-sm border border-border px-4 py-1.5 font-mono text-[11px] tracking-widest text-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        className="cursor-pointer rounded-sm border border-border px-4 py-1.5 font-mono text-[11px] tracking-widest text-ns-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
       >
         SIMULATE HEADERS ARRIVING
       </button>

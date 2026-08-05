@@ -83,16 +83,16 @@ export default function MeniscusHoldDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-10 px-6">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / meter-latency-capillary
       </p>
 
       <div className="w-full max-w-sm rounded-xl border border-border bg-surface px-6 py-7">
         <div className="mb-6 flex items-center justify-between">
-          <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
+          <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-ns-muted">
             {model}
           </span>
-          <span className="font-mono text-[10px] text-muted">turn #{cycle + 1}</span>
+          <span className="font-mono text-[10px] text-ns-muted">turn #{cycle + 1}</span>
         </div>
 
         <MeniscusHold
@@ -106,7 +106,7 @@ export default function MeniscusHoldDemo() {
         />
       </div>
 
-      <p className="max-w-xs text-center font-mono text-[10px] text-muted">
+      <p className="max-w-xs text-center font-mono text-[10px] text-ns-muted">
         holds honestly at the p50 line, never fakes progress toward a line it
         hasn&apos;t earned
       </p>

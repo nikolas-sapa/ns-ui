@@ -14,7 +14,7 @@ element in the same UI.
 Colors come from CSS custom properties already in scope on the host app —
 never a hardcoded hex, in JSX/markup OR in canvas/SVG draw code:
 
-  --background   --foreground   --muted   --border   --accent   --surface   --error   --warning
+  --background   --foreground   --ns-muted   --border   --ns-accent   --surface   --error   --warning
 
 If a component derives ink for a <canvas>, it reads these via
 getComputedStyle at mount and on theme change, it does not bake in a color

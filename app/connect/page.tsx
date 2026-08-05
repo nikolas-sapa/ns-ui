@@ -27,7 +27,7 @@ export default function ConnectPage() {
     <main className="mx-auto w-full max-w-3xl px-6 pb-32 sm:px-10">
       <header className="pt-20 sm:pt-28">
         <div className="flex items-center justify-between gap-4">
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-ns-muted">
             ns-ui / connect
           </p>
           <ThemeToggle />
@@ -35,7 +35,7 @@ export default function ConnectPage() {
         <h1 className="mt-5 text-3xl font-semibold leading-[1.15] tracking-tight sm:text-4xl">
           Get the registry into an agent.
         </h1>
-        <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted">
+        <p className="mt-4 max-w-xl text-sm leading-relaxed text-ns-muted">
           Three ways in: an MCP server for tools an agent can call mid-task, a CLI for
           finding, inspecting and installing from a terminal, and the raw text feeds for
           anything that just reads.
@@ -44,7 +44,7 @@ export default function ConnectPage() {
 
       <section className="mt-16">
         <h2 className={SECTION_LABEL}>MCP server</h2>
-        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ns-muted">
           Five tools: search the catalog, get one component&apos;s full detail and real
           source, list categories, get the install command, and get the design-token
           conventions the components are built against. Ships a static snapshot of the
@@ -52,18 +52,18 @@ export default function ConnectPage() {
           this site.
         </p>
 
-        <p className="mt-6 font-mono text-[11px] uppercase tracking-wider text-muted">
+        <p className="mt-6 font-mono text-[11px] uppercase tracking-wider text-ns-muted">
           Add to your MCP client
         </p>
         <div className="mt-2">
           <ClientSwitcher clients={getMcpClients()} />
         </div>
-        <p className="mt-3 text-xs text-muted">Requires Node 18+.</p>
+        <p className="mt-3 text-xs text-ns-muted">Requires Node 18+.</p>
       </section>
 
       <section className="mt-14 border-t border-border pt-10">
         <h2 className={SECTION_LABEL}>CLI</h2>
-        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ns-muted">
           Finds and inspects components from a terminal, not just installs them: search
           narrows the catalog by name, description, tags and use-when guidance; info prints
           one component&apos;s props, dependencies and install command. add installs by
@@ -73,7 +73,7 @@ export default function ConnectPage() {
           down, so it still works offline.
         </p>
 
-        <p className="mt-4 font-mono text-[11px] uppercase tracking-wider text-muted">
+        <p className="mt-4 font-mono text-[11px] uppercase tracking-wider text-ns-muted">
           Find one
         </p>
         <div className={`mt-2 ${CODE_BLOCK}`}>
@@ -83,7 +83,7 @@ export default function ConnectPage() {
           <CopyButton variant="inline" value={CLI_SEARCH} label="Copy search command" />
         </div>
 
-        <p className="mt-4 font-mono text-[11px] uppercase tracking-wider text-muted">
+        <p className="mt-4 font-mono text-[11px] uppercase tracking-wider text-ns-muted">
           Read its props and install command
         </p>
         <div className={`mt-2 ${CODE_BLOCK}`}>
@@ -93,7 +93,7 @@ export default function ConnectPage() {
           <CopyButton variant="inline" value={CLI_INFO} label="Copy info command" />
         </div>
 
-        <p className="mt-4 font-mono text-[11px] uppercase tracking-wider text-muted">
+        <p className="mt-4 font-mono text-[11px] uppercase tracking-wider text-ns-muted">
           Install it
         </p>
         <div className={`mt-2 ${CODE_BLOCK}`}>
@@ -103,20 +103,20 @@ export default function ConnectPage() {
           <CopyButton variant="inline" value={CLI_INSTALL} label="Copy install command" />
         </div>
 
-        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ns-muted">
           Also: <code className="font-mono text-foreground">list</code>,{" "}
           <code className="font-mono text-foreground">categories</code>, and{" "}
           <code className="font-mono text-foreground">mcp</code> (prints the MCP config block
           above). Full command reference:{" "}
           <a
             href="https://github.com/nikolas-sapa/ns-ui/blob/main/cli/README.md"
-            className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             cli/README.md
           </a>
           .
         </p>
-        <p className="mt-3 max-w-2xl text-xs leading-relaxed text-muted">
+        <p className="mt-3 max-w-2xl text-xs leading-relaxed text-ns-muted">
           If <code className="font-mono text-foreground">npx</code> refuses either package with
           "No versions available", that's npm's own{" "}
           <code className="font-mono text-foreground">minimum-release-age</code> setting on your
@@ -128,18 +128,18 @@ export default function ConnectPage() {
 
       <section className="mt-14 border-t border-border pt-10">
         <h2 className={SECTION_LABEL}>Text feeds</h2>
-        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ns-muted">
           For anything that just reads rather than calls tools:{" "}
           <a
             href="/llms.txt"
-            className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             /llms.txt
           </a>{" "}
           is the catalog index, and{" "}
           <a
             href="/llms-full.txt"
-            className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             /llms-full.txt
           </a>{" "}
@@ -147,13 +147,13 @@ export default function ConnectPage() {
           generated from the same registry data as the MCP server and the site itself, so
           none of the three can drift from another.
         </p>
-        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ns-muted">
           Every install command resolves against{" "}
           <code className="font-mono text-foreground">{REGISTRY_ORIGIN}</code>.
         </p>
       </section>
 
-      <footer className="mt-24 flex flex-wrap items-baseline gap-x-8 gap-y-2 border-t border-border pt-6 font-mono text-xs text-muted">
+      <footer className="mt-24 flex flex-wrap items-baseline gap-x-8 gap-y-2 border-t border-border pt-6 font-mono text-xs text-ns-muted">
         <Link
           href="/"
           className="underline underline-offset-2 hover:text-foreground"

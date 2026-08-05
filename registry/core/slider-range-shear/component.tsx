@@ -364,7 +364,7 @@ export function ShearBand({
         {focusedThumb === "lo" && (
           <div
             aria-hidden
-            className="pointer-events-none absolute left-0 top-0 rounded-full ring-2 ring-accent ring-offset-2 ring-offset-background"
+            className="pointer-events-none absolute left-0 top-0 rounded-full ring-2 ring-ns-accent ring-offset-2 ring-offset-background"
             style={{
               transform: `translate3d(${loPx}px, ${TRACK_Y}px, 0) translate(-50%, -50%)`,
               height: 26,
@@ -375,7 +375,7 @@ export function ShearBand({
         {focusedThumb === "hi" && (
           <div
             aria-hidden
-            className="pointer-events-none absolute left-0 top-0 rounded-full ring-2 ring-accent ring-offset-2 ring-offset-background"
+            className="pointer-events-none absolute left-0 top-0 rounded-full ring-2 ring-ns-accent ring-offset-2 ring-offset-background"
             style={{
               transform: `translate3d(${hiPx}px, ${TRACK_Y}px, 0) translate(-50%, -50%)`,
               height: 26,

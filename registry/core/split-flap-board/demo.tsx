@@ -108,12 +108,12 @@ function colWidth(chars: number) {
 export default function SolariFlapDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / split-flap-board
       </p>
 
       <div className="ns-sf-departures inline-flex flex-col gap-4 rounded-[16px] border border-border bg-background p-8">
-        <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted">
+        <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-ns-muted">
           Departures
         </span>
 
@@ -122,7 +122,7 @@ export default function SolariFlapDemo() {
             <span
               key={col.label}
               style={{ width: colWidth(col.chars) }}
-              className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted"
+              className="font-mono text-[10px] uppercase tracking-[0.15em] text-ns-muted"
             >
               {col.label}
             </span>
@@ -136,7 +136,7 @@ export default function SolariFlapDemo() {
         </div>
       </div>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Hover the board to pause it; hover a single flap to lift it 22° and
         peek the glyph underneath.
       </p>

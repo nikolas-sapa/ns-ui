@@ -33,20 +33,20 @@ export default function BrailleSpinDemo() {
       data-braille-card
       className="flex min-h-screen flex-col items-center justify-center gap-14 px-6"
     >
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / loader-braille
       </p>
 
       <div className="flex w-full max-w-xl flex-col gap-10 rounded-xl border border-border bg-surface px-10 py-12">
         <div className="flex flex-col items-center gap-3">
-          <span className="font-mono text-[11px] uppercase tracking-widest text-muted">
+          <span className="font-mono text-[11px] uppercase tracking-widest text-ns-muted">
             indeterminate
           </span>
           <BrailleSpin aria-label="Loading" className="text-3xl" />
         </div>
 
         <div className="flex flex-col items-center gap-3">
-          <span className="font-mono text-[11px] uppercase tracking-widest text-muted">
+          <span className="font-mono text-[11px] uppercase tracking-widest text-ns-muted">
             determinate — {Math.round(value)}%
           </span>
           <BrailleSpin progress={value} aria-label="Upload progress" className="text-3xl" />

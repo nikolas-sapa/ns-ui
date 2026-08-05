@@ -27,10 +27,10 @@ const BREADCRUMB = [
 export default function VanishTaperDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-12 bg-background px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">ns-ui / truncation-taper-fade</p>
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">ns-ui / truncation-taper-fade</p>
 
       <div className="w-full max-w-xl space-y-2">
-        <p className="text-sm text-muted">Hover or focus a row to read its full name.</p>
+        <p className="text-sm text-ns-muted">Hover or focus a row to read its full name.</p>
         <div className="overflow-hidden rounded-md border border-border">
           <table className="w-full table-fixed border-collapse text-sm">
             <colgroup>
@@ -39,7 +39,7 @@ export default function VanishTaperDemo() {
               <col className="w-[19%]" />
             </colgroup>
             <thead>
-              <tr className="border-b border-border bg-surface text-left font-mono text-[11px] uppercase tracking-wide text-muted">
+              <tr className="border-b border-border bg-surface text-left font-mono text-[11px] uppercase tracking-wide text-ns-muted">
                 <th className="px-3 py-2 font-normal">Name</th>
                 <th className="px-3 py-2 font-normal">Size</th>
                 <th className="px-3 py-2 font-normal">Modified</th>
@@ -54,8 +54,8 @@ export default function VanishTaperDemo() {
                       className={i === 1 ? "vt-demo-target max-w-full" : "max-w-full"}
                     />
                   </td>
-                  <td className="px-3 py-2 text-muted">{f.size}</td>
-                  <td className="px-3 py-2 text-muted">{f.modified}</td>
+                  <td className="px-3 py-2 text-ns-muted">{f.size}</td>
+                  <td className="px-3 py-2 text-ns-muted">{f.modified}</td>
                 </tr>
               ))}
             </tbody>
@@ -67,7 +67,7 @@ export default function VanishTaperDemo() {
         <ol className="flex items-center gap-1 overflow-hidden rounded-sm border border-border bg-surface px-3 py-2">
           {BREADCRUMB.map((crumb, i) => (
             <li key={crumb} className="flex shrink-0 items-center gap-1">
-              {i > 0 && <span className="text-muted">/</span>}
+              {i > 0 && <span className="text-ns-muted">/</span>}
               <VanishTaper text={crumb} className="w-24" />
             </li>
           ))}
@@ -75,7 +75,7 @@ export default function VanishTaperDemo() {
       </nav>
 
       <div className="w-full max-w-xs space-y-1">
-        <p className="font-mono text-[11px] uppercase tracking-wide text-muted">Path</p>
+        <p className="font-mono text-[11px] uppercase tracking-wide text-ns-muted">Path</p>
         <div className="rounded-sm border border-border bg-surface px-3 py-2">
           <VanishTaper text="/Users/nikolassapalidis/Developer/misc/ns-ui/registry/core/truncation-taper-fade/component.tsx" />
         </div>

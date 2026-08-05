@@ -89,7 +89,7 @@ export function GridBentoAscii({ cells, className = "" }: GridBentoAsciiProps) {
             aria-hidden={hiddenByHero || undefined}
             tabIndex={hiddenByHero ? -1 : 0}
             onClick={() => setHeroId(isHero ? null : cell.id)}
-            className={`group relative flex flex-col items-start justify-end overflow-hidden rounded-sm border border-border bg-surface p-3 text-left transition-[opacity] duration-150 motion-reduce:transition-none hover:border-foreground/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
+            className={`group relative flex flex-col items-start justify-end overflow-hidden rounded-sm border border-border bg-surface p-3 text-left transition-[opacity] duration-150 motion-reduce:transition-none hover:border-foreground/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent ${
               hiddenByHero ? "pointer-events-none opacity-0" : "opacity-100"
             }`}
             style={{ gridColumn: style.col, gridRow: style.row }}
@@ -98,7 +98,7 @@ export function GridBentoAscii({ cells, className = "" }: GridBentoAsciiProps) {
               <span
                 aria-hidden
                 data-hero-badge
-                className="absolute right-2 top-2 select-none rounded-sm border border-border bg-background px-2 py-1 text-[10px] uppercase tracking-wider text-muted"
+                className="absolute right-2 top-2 select-none rounded-sm border border-border bg-background px-2 py-1 text-[10px] uppercase tracking-wider text-ns-muted"
               >
                 click to collapse
               </span>
@@ -106,7 +106,7 @@ export function GridBentoAscii({ cells, className = "" }: GridBentoAsciiProps) {
             {cell.content}
             <span className="text-sm font-semibold text-foreground">{cell.title}</span>
             {cell.description && (
-              <span className="mt-1 text-xs text-muted group-hover:text-foreground/80">
+              <span className="mt-1 text-xs text-ns-muted group-hover:text-foreground/80">
                 {cell.description}
               </span>
             )}

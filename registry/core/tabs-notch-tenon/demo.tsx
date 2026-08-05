@@ -5,7 +5,7 @@ import { MortiseSlip } from "./component";
 function StatRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between border-b border-border py-2.5 last:border-b-0">
-      <span className="text-sm text-muted">{label}</span>
+      <span className="text-sm text-ns-muted">{label}</span>
       <span className="font-mono text-sm text-foreground">{value}</span>
     </div>
   );
@@ -14,7 +14,7 @@ function StatRow({ label, value }: { label: string; value: string }) {
 function OverviewPanel() {
   return (
     <div className="p-5">
-      <p className="mb-3 text-sm leading-relaxed text-muted">
+      <p className="mb-3 text-sm leading-relaxed text-ns-muted">
         A quiet week — throughput held steady and nothing paged. The joint
         below marks which tab this content belongs to, at rest, with no
         motion needed to prove it.
@@ -41,7 +41,7 @@ function ActivityPanel() {
           key={i}
           className="flex items-baseline gap-3 border-b border-border py-2.5 last:border-b-0"
         >
-          <span className="w-9 shrink-0 font-mono text-xs text-muted">
+          <span className="w-9 shrink-0 font-mono text-xs text-ns-muted">
             {it.when}
           </span>
           <span className="text-sm text-foreground">
@@ -68,7 +68,7 @@ function MembersPanel() {
           className="rounded-md border border-border p-3"
         >
           <p className="text-sm font-medium text-foreground">{m.name}</p>
-          <p className="mt-0.5 font-mono text-xs text-muted">{m.role}</p>
+          <p className="mt-0.5 font-mono text-xs text-ns-muted">{m.role}</p>
         </div>
       ))}
     </div>
@@ -80,15 +80,15 @@ function SettingsPanel() {
     <div className="flex flex-col gap-3 p-5">
       <label className="flex items-center justify-between text-sm text-foreground">
         Email digests
-        <span className="font-mono text-xs text-muted">Weekly</span>
+        <span className="font-mono text-xs text-ns-muted">Weekly</span>
       </label>
       <label className="flex items-center justify-between text-sm text-foreground">
         Two-factor auth
-        <span className="font-mono text-xs text-muted">Enabled</span>
+        <span className="font-mono text-xs text-ns-muted">Enabled</span>
       </label>
       <label className="flex items-center justify-between text-sm text-foreground">
         API access
-        <span className="font-mono text-xs text-muted">Restricted</span>
+        <span className="font-mono text-xs text-ns-muted">Restricted</span>
       </label>
     </div>
   );
@@ -97,7 +97,7 @@ function SettingsPanel() {
 export default function MortiseSlipDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / tabs-notch-tenon — tabs as joinery
       </p>
 
@@ -113,7 +113,7 @@ export default function MortiseSlipDemo() {
         ]}
       />
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         The bottom rule is one path, missing a notch under the active tab; the
         panel below carries a raised nub that slots into that gap. Switch
         tabs — arrow keys work too — and the joint travels, tapping home.

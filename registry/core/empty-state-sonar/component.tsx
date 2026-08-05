@@ -287,7 +287,7 @@ export function EchoSound({
           )}
         </div>
 
-        <p id={labelId} className={phase === "empty" ? "text-center text-sm text-muted" : "sr-only"}>
+        <p id={labelId} className={phase === "empty" ? "text-center text-sm text-ns-muted" : "sr-only"}>
           {phase === "empty" ? emptyText : loadedText}
         </p>
       </div>

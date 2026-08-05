@@ -5,7 +5,7 @@ import { CrimpCopy } from "./component";
 export default function CrimpCopyDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / copy-field-crimp — click the value to copy
       </p>
       <div data-ns-cc-focus className="flex w-full max-w-sm flex-col gap-6">

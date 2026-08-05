@@ -28,13 +28,13 @@ export default function BallotDropDemo() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-8 bg-background px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / radio-ballot-drop
       </p>
       <div ref={wrapRef}>
         <BallotDrop />
       </div>
-      <p className="max-w-xs text-center text-xs text-muted">
+      <p className="max-w-xs text-center text-xs text-ns-muted">
         Pick a slip — it folds and drops through the slot. Choosing another
         pulls the old one back out first.
       </p>

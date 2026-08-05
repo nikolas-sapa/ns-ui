@@ -846,9 +846,9 @@ export function FrostbiteSwitch({
       aria-label={ariaLabel}
       disabled={disabled}
       onClick={toggle}
-      className={`relative h-[30px] w-[52px] shrink-0 overflow-hidden rounded-full border outline-none transition-[background-color,border-color,box-shadow] duration-200 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:transition-none ${
+      className={`relative h-[30px] w-[52px] shrink-0 overflow-hidden rounded-full border outline-none transition-[background-color,border-color,box-shadow] duration-200 focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:transition-none ${
         isChecked
-          ? "border-accent/40 bg-accent delay-150"
+          ? "border-ns-accent/40 bg-ns-accent delay-150"
           : "border-foreground/10 bg-border delay-0"
       } ${
         disabled ? "cursor-not-allowed" : "cursor-pointer hover:border-foreground/25"

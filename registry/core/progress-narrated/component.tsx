@@ -319,7 +319,7 @@ export function ChronicleBar({
         {/* leading-edge cursor block — the only accent on the page */}
         <div
           ref={cursorRef}
-          className="absolute -top-0.5 left-0 h-2 w-0.5 bg-accent transition-opacity duration-300"
+          className="absolute -top-0.5 left-0 h-2 w-0.5 bg-ns-accent transition-opacity duration-300"
         />
       </div>
 
@@ -328,11 +328,11 @@ export function ChronicleBar({
         {milestones.map((m) => (
           <div key={`${m.at}-${m.label}`} className="ns-chronicle-in">
             <span
-              className="absolute top-0 h-2 w-0.5 -translate-x-1/2 bg-muted"
+              className="absolute top-0 h-2 w-0.5 -translate-x-1/2 bg-ns-muted"
               style={{ left: `${m.at}%` }}
             />
             <span
-              className="absolute top-3 whitespace-nowrap font-mono text-[11px] tracking-wide text-muted"
+              className="absolute top-3 whitespace-nowrap font-mono text-[11px] tracking-wide text-ns-muted"
               style={{
                 left: `${m.at}%`,
                 transform:

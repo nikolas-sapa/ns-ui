@@ -9,10 +9,10 @@ export default function LogViewerAsciiTailDemo() {
     // to its full 3600px of rows instead of scrolling inside a bounded pane.
     <div className="flex h-screen flex-col gap-4 overflow-hidden bg-background px-6 py-6">
       <div className="flex items-baseline justify-between gap-4">
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
           ns-ui / log-viewer-ascii-tail
         </p>
-        <p className="font-mono text-[11px] text-muted">
+        <p className="font-mono text-[11px] text-ns-muted">
           edge fleet · eu-central-1 · streaming
         </p>
       </div>

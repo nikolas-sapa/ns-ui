@@ -572,7 +572,7 @@ export function FrostScrub({
           className="pointer-events-none absolute inset-y-0 right-4 z-10 flex flex-col items-center justify-center gap-4 font-mono md:right-8"
         >
           <span
-            className="text-[10px] uppercase tracking-[0.3em] text-muted"
+            className="text-[10px] uppercase tracking-[0.3em] text-ns-muted"
             style={{ writingMode: "vertical-rl" }}
           >
             {caption}

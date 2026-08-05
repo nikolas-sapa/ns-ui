@@ -72,16 +72,16 @@ export default function RetractInkDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-lg">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">
+        <p className="mb-4 font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / streaming-retraction
         </p>
         <div className="overflow-hidden rounded-md border border-border bg-surface">
           <header className="flex items-center justify-between gap-4 border-b border-border px-5 py-3">
-            <span className="font-mono text-xs tracking-widest text-muted">ASSISTANT</span>
+            <span className="font-mono text-xs tracking-widest text-ns-muted">ASSISTANT</span>
             <button
               type="button"
               onClick={run}
-              className="cursor-pointer rounded-sm border border-border px-3 py-1 font-mono text-[11px] text-muted transition-colors duration-150 hover:border-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="cursor-pointer rounded-sm border border-border px-3 py-1 font-mono text-[11px] text-ns-muted transition-colors duration-150 hover:border-ns-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
             >
               replay
             </button>
@@ -95,7 +95,7 @@ export default function RetractInkDemo() {
             </div>
           </div>
         </div>
-        <p className="mt-3 font-mono text-[11px] text-muted">
+        <p className="mt-3 font-mono text-[11px] text-ns-muted">
           retracted text strikes through and evaporates — the notched tick it
           leaves behind reopens the revision
         </p>

@@ -40,7 +40,7 @@ export default function FooterAsciiRuleDemo() {
   return (
     <div className="flex min-h-[130vh] flex-col">
       <main className="mx-auto max-w-5xl flex-1 px-4 py-16 sm:px-6">
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
           ns-ui / footer-ascii-rule
         </p>
         <h1 className="mt-4 max-w-lg text-2xl font-semibold text-foreground sm:text-3xl">
@@ -48,7 +48,7 @@ export default function FooterAsciiRuleDemo() {
           scroll readout the whole time, and the button springs the page
           back rather than jumping.
         </h1>
-        <p className="mt-4 max-w-lg text-sm leading-relaxed text-muted">
+        <p className="mt-4 max-w-lg text-sm leading-relaxed text-ns-muted">
           Grab the wheel mid-flight and the spring yields immediately.
         </p>
       </main>

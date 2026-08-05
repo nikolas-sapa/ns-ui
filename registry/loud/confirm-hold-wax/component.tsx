@@ -723,7 +723,7 @@ export function SignetDrop({
               height={38}
               rx={6}
               fill="var(--surface)"
-              stroke="var(--muted)"
+              stroke="var(--ns-muted)"
               strokeWidth={1.3}
             />
             <rect
@@ -733,7 +733,7 @@ export function SignetDrop({
               height={12}
               rx={6}
               fill="var(--surface)"
-              stroke="var(--muted)"
+              stroke="var(--ns-muted)"
               strokeWidth={1.3}
             />
             <line x1={124} y1={80} x2={156} y2={80} stroke="var(--border)" strokeWidth={1} />
@@ -746,12 +746,12 @@ export function SignetDrop({
           ref={btnRef}
           type="button"
           aria-disabled={sealed ? true : undefined}
-          className="select-none touch-none rounded-[6px] border border-border bg-surface px-5 py-2 text-sm font-medium text-foreground transition-[background-color,border-color,transform] duration-150 hover:border-muted hover:bg-border/60 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent aria-disabled:cursor-default aria-disabled:opacity-45 aria-disabled:hover:border-border aria-disabled:hover:bg-surface"
+          className="select-none touch-none rounded-[6px] border border-border bg-surface px-5 py-2 text-sm font-medium text-foreground transition-[background-color,border-color,transform] duration-150 hover:border-ns-muted hover:bg-border/60 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent aria-disabled:cursor-default aria-disabled:opacity-45 aria-disabled:hover:border-border aria-disabled:hover:bg-surface"
         >
           Seal
         </button>
         {sealed && (
-          <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted">
+          <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-ns-muted">
             Sealed
           </span>
         )}

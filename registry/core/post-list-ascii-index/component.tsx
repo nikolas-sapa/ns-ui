@@ -50,9 +50,9 @@ function readTokens(): Tokens {
   const get = (name: string, fallback: string) => cs.getPropertyValue(name).trim() || fallback;
   return {
     fg: get("--foreground", "#ededed"),
-    muted: get("--muted", "#8f8f8f"),
+    muted: get("--ns-muted", "#8f8f8f"),
     border: get("--border", "#2e2e2e"),
-    accent: get("--accent", "#006bff"),
+    accent: get("--ns-accent", "#006bff"),
   };
 }
 
@@ -272,15 +272,15 @@ export function PostListAsciiIndex({ posts, className = "" }: PostListAsciiIndex
                 onClick={() => focusIndex(i)}
                 onFocus={() => setActiveIndex(i)}
                 onKeyDown={onKeyDown}
-                className={`block w-full border-b border-border/60 px-4 py-3 text-left transition-colors duration-150 last:border-b-0 hover:bg-foreground/[0.06] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent ${
+                className={`block w-full border-b border-border/60 px-4 py-3 text-left transition-colors duration-150 last:border-b-0 hover:bg-foreground/[0.06] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ns-accent ${
                   isActive ? "bg-surface" : ""
                 }`}
               >
                 <div className="flex items-baseline justify-between gap-3">
                   <span className="truncate text-sm font-medium text-foreground">{post.title}</span>
-                  <span className="shrink-0 font-mono text-[10px] text-muted">{post.date}</span>
+                  <span className="shrink-0 font-mono text-[10px] text-ns-muted">{post.date}</span>
                 </div>
-                <p className="mt-1 truncate text-xs text-muted">{post.excerpt}</p>
+                <p className="mt-1 truncate text-xs text-ns-muted">{post.excerpt}</p>
               </button>
             );
           })}

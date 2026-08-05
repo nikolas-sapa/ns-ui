@@ -339,7 +339,7 @@ export function LigatureMelt({
       ref={rootRef}
       role="button"
       tabIndex={0}
-      className={`relative inline-block rounded-sm outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent ${className}`}
+      className={`relative inline-block rounded-sm outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ns-accent ${className}`}
     >
       {/* blur + alpha threshold: overlapping glyph edges fuse into necks */}
       <svg aria-hidden focusable="false" className="absolute h-0 w-0">

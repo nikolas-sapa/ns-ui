@@ -9,7 +9,7 @@ export default function NestedSlugDemo() {
         <span className="font-mono text-sm font-semibold tracking-tight text-foreground">
           ns://ui
         </span>
-        <span className="font-mono text-xs tracking-[0.25em] text-muted">
+        <span className="font-mono text-xs tracking-[0.25em] text-ns-muted">
           ns-ui / hero-recursive-type
         </span>
       </header>
@@ -23,10 +23,10 @@ export default function NestedSlugDemo() {
         />
       </div>
       <footer className="z-10 flex items-center justify-between border-t border-border px-6 py-3">
-        <span className="font-mono text-xs text-muted">
+        <span className="font-mono text-xs text-ns-muted">
           hover to read the interior
         </span>
-        <span className="font-mono text-xs text-muted">
+        <span className="font-mono text-xs text-ns-muted">
           recursive type / canvas
         </span>
       </footer>

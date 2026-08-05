@@ -42,7 +42,7 @@ import {
 // text, no role, no tabIndex, nothing to land on.
 //
 // Colors are the five registry tokens only (--background --foreground
-// --muted --border --accent), read as CSS custom properties directly in
+// --ns-muted --border --ns-accent), read as CSS custom properties directly in
 // SVG attributes — no canvas here, so no getComputedStyle dance is needed.
 // prefers-reduced-motion drops the settle transition; the rewrite still
 // happens instantly and is fully legible.
@@ -211,11 +211,11 @@ function DoubtSpan({
       onBlur={onBlur}
       onKeyDown={onKeyDown}
       onClick={openNow}
-      className="ns-ph-span relative inline-block cursor-default rounded-sm text-[inherit] text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+      className="ns-ph-span relative inline-block cursor-default rounded-sm text-[inherit] text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
     >
       {displayText}
       {daggerOnHighestDoubt && displayBucket === "cross-hatch" && (
-        <sup aria-hidden className="ml-0.5 select-none text-[0.7em] text-muted">
+        <sup aria-hidden className="ml-0.5 select-none text-[0.7em] text-ns-muted">
           †
         </sup>
       )}
@@ -244,22 +244,22 @@ function DoubtSpan({
           ].join(" ")}
         >
           <span className="flex items-baseline gap-2 px-1 py-0.5">
-            <span className="w-12 shrink-0 text-[10px] uppercase tracking-wide text-muted">said</span>
+            <span className="w-12 shrink-0 text-[10px] uppercase tracking-wide text-ns-muted">said</span>
             <span className="truncate text-foreground">{displayText}</span>
-            <span className="ml-auto shrink-0 tabular-nums text-muted">{token.said.toFixed(2)}</span>
+            <span className="ml-auto shrink-0 tabular-nums text-ns-muted">{token.said.toFixed(2)}</span>
           </span>
           {token.alternatives.map((alt, i) => (
             <button
               key={`${alt.text}-${i}`}
               type="button"
               onClick={() => selectAlternative(alt)}
-              className="flex w-full items-baseline gap-2 rounded-sm px-1 py-0.5 text-left transition-colors duration-150 ease-out hover:bg-foreground/[0.06] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent"
+              className="flex w-full items-baseline gap-2 rounded-sm px-1 py-0.5 text-left transition-colors duration-150 ease-out hover:bg-foreground/[0.06] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ns-accent"
             >
-              <span className="w-12 shrink-0 text-[10px] uppercase tracking-wide text-muted">
+              <span className="w-12 shrink-0 text-[10px] uppercase tracking-wide text-ns-muted">
                 {i === 0 ? "almost" : ""}
               </span>
               <span className="truncate text-foreground">{alt.text}</span>
-              <span className="ml-auto shrink-0 tabular-nums text-muted">{alt.prob.toFixed(2)}</span>
+              <span className="ml-auto shrink-0 tabular-nums text-ns-muted">{alt.prob.toFixed(2)}</span>
             </button>
           ))}
         </span>
@@ -314,19 +314,19 @@ export function PencilHedge({
       {/* One shared <defs> per instance: three diagonal-stroke patterns,
           density escalating sparse -> medium -> cross-hatch, like a
           draftsman going over a line once, then again, then crossed. Every
-          stroke is --muted so the hatching survives theme and color-vision
+          stroke is --ns-muted so the hatching survives theme and color-vision
           deficiency as a shape channel, never a hue. */}
       <svg width="0" height="0" aria-hidden focusable="false">
         <defs>
           <pattern id={`${patternPrefix}-sparse`} patternUnits="userSpaceOnUse" width="14" height="4">
-            <line x1="0" y1="4" x2="7" y2="0" stroke="var(--muted)" strokeWidth="1" />
+            <line x1="0" y1="4" x2="7" y2="0" stroke="var(--ns-muted)" strokeWidth="1" />
           </pattern>
           <pattern id={`${patternPrefix}-medium`} patternUnits="userSpaceOnUse" width="7" height="4">
-            <line x1="0" y1="4" x2="7" y2="0" stroke="var(--muted)" strokeWidth="1" />
+            <line x1="0" y1="4" x2="7" y2="0" stroke="var(--ns-muted)" strokeWidth="1" />
           </pattern>
           <pattern id={`${patternPrefix}-cross-hatch`} patternUnits="userSpaceOnUse" width="5" height="4">
-            <line x1="0" y1="4" x2="5" y2="0" stroke="var(--muted)" strokeWidth="1" />
-            <line x1="0" y1="0" x2="5" y2="4" stroke="var(--muted)" strokeWidth="1" />
+            <line x1="0" y1="4" x2="5" y2="0" stroke="var(--ns-muted)" strokeWidth="1" />
+            <line x1="0" y1="0" x2="5" y2="4" stroke="var(--ns-muted)" strokeWidth="1" />
           </pattern>
         </defs>
       </svg>

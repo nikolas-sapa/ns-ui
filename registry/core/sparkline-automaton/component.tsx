@@ -179,8 +179,8 @@ export function RuleSparkline({
     const derive = () => {
       const cs = getComputedStyle(document.documentElement);
       fg = parseColor(cs.getPropertyValue("--foreground")) ?? fg;
-      ac = parseColor(cs.getPropertyValue("--accent")) ?? ac;
-      mu = parseColor(cs.getPropertyValue("--muted")) ?? mu;
+      ac = parseColor(cs.getPropertyValue("--ns-accent")) ?? ac;
+      mu = parseColor(cs.getPropertyValue("--ns-muted")) ?? mu;
     };
     derive();
 
@@ -563,7 +563,7 @@ export function RuleSparkline({
       aria-label={ariaLabel}
       tabIndex={0}
       style={{ touchAction: "pan-y" }}
-      className={`relative w-full cursor-crosshair overflow-hidden rounded-sm outline-none transition-colors duration-200 hover:bg-foreground/[0.03] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${className}`}
+      className={`relative w-full cursor-crosshair overflow-hidden rounded-sm outline-none transition-colors duration-200 hover:bg-foreground/[0.03] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent ${className}`}
     >
       <canvas
         ref={canvasRef}

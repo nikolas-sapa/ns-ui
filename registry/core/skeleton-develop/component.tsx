@@ -7,7 +7,7 @@ import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 
 // a soft-edged alpha mask sweeps downward — the ghost blocks dissolve and
 // settle upward as the children un-blur behind them, top first. No swap, no
 // flash. While loading, each block carries a token-derived sweep (a recessed
-// --background trough followed by a --muted crest over a --border bed), not the
+// --background trough followed by a --ns-muted crest over a --border bed), not the
 // white-to-grey shine every skeleton on the internet ships.
 //
 // Layout comes from the declarative `blocks` prop — the children are never
@@ -56,7 +56,7 @@ const CSS = `
   background-image:linear-gradient(100deg,
     transparent 22%,
     color-mix(in oklab, var(--background) 55%, transparent) 39%,
-    color-mix(in oklab, var(--muted) 24%, transparent) 52%,
+    color-mix(in oklab, var(--ns-muted) 24%, transparent) 52%,
     transparent 74%);
   transform:translateX(-100%);
   /* the delay is a custom property, not animation-delay on the host element:

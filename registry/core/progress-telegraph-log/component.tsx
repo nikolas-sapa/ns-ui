@@ -11,7 +11,7 @@ import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 // an asymptotic curve, so a stall is visually self-evident — the timer keeps
 // counting and the underline keeps crawling while nothing new arrives.
 // Finished steps compress to a dense 20px ledger row with their true cost
-// frozen in --muted and a 1px check tick drawn in; a failed step pins at
+// frozen in --ns-muted and a 1px check tick drawn in; a failed step pins at
 // weight 600 with an indented stderr excerpt, no color signal (this
 // component's palette has no error hue). New lines slide up 8px + fade over
 // 250ms ease-out-expo; a top mask fades the ledger into its own scrollback.
@@ -78,7 +78,7 @@ function CheckTick({ reduced }: { reduced: boolean }) {
       height="8"
       viewBox="0 0 9 8"
       aria-hidden
-      className="shrink-0 text-muted"
+      className="shrink-0 text-ns-muted"
     >
       <path
         ref={pathRef}
@@ -140,7 +140,7 @@ function WireFeedRow({
           </span>
         ) : (
           <span
-            className={`shrink-0 tabular-nums text-muted ${isError ? "font-semibold" : ""}`}
+            className={`shrink-0 tabular-nums text-ns-muted ${isError ? "font-semibold" : ""}`}
           >
             {formatElapsed(frozen)}
           </span>
@@ -151,13 +151,13 @@ function WireFeedRow({
         <div className="relative mt-1.5 h-[3px] w-full overflow-hidden rounded-full bg-border/50">
           <div
             ref={registerUnderline}
-            className="absolute inset-y-0 left-0 w-0 rounded-full bg-accent"
+            className="absolute inset-y-0 left-0 w-0 rounded-full bg-ns-accent"
           />
         </div>
       )}
 
       {isError && detail && (
-        <div className="mt-1.5 ml-4 whitespace-pre-wrap break-words border-l border-border pl-2 text-[11px] leading-snug text-muted">
+        <div className="mt-1.5 ml-4 whitespace-pre-wrap break-words border-l border-border pl-2 text-[11px] leading-snug text-ns-muted">
           {detail}
         </div>
       )}
@@ -263,7 +263,7 @@ export function WireFeed({
       tabIndex={0}
       onScroll={onScroll}
       onKeyDown={onKeyDown}
-      className={`relative max-h-[280px] overflow-y-auto overflow-x-hidden rounded-md border border-border bg-background px-3 py-1 font-mono text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent ${className}`}
+      className={`relative max-h-[280px] overflow-y-auto overflow-x-hidden rounded-md border border-border bg-background px-3 py-1 font-mono text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ns-accent ${className}`}
       style={{
         maskImage: "linear-gradient(to bottom, transparent 0, black 20px)",
         WebkitMaskImage: "linear-gradient(to bottom, transparent 0, black 20px)",

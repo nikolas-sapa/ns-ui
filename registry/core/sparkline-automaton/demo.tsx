@@ -69,10 +69,10 @@ function MetricTile({
   return (
     <div className="p-5">
       <div className="flex items-baseline justify-between gap-4">
-        <span className="font-mono text-[11px] tracking-widest text-muted">
+        <span className="font-mono text-[11px] tracking-widest text-ns-muted">
           {label}
         </span>
-        <span className="font-mono text-[10px] tabular-nums text-muted">
+        <span className="font-mono text-[10px] tabular-nums text-ns-muted">
           RULE {rule} · CV {cv.toFixed(2)} · {mood}
         </span>
       </div>
@@ -122,13 +122,13 @@ export default function RuleSparklineDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-md">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">
+        <p className="mb-4 font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / sparkline-automaton
         </p>
         <h1 className="text-lg font-semibold text-foreground">
           The texture reads the data
         </h1>
-        <p className="mt-1 text-sm leading-relaxed text-muted">
+        <p className="mt-1 text-sm leading-relaxed text-ns-muted">
           Each sparkline grows an elementary cellular automaton beneath its
           line — one generation per data point, rule picked by volatility.
           Calm revenue stays sparse (rule 4); jittery latency knits (rule
@@ -159,19 +159,19 @@ export default function RuleSparklineDemo() {
             format={(v) => `${Math.round(v)}`}
           />
           <div className="flex items-center justify-between gap-4 px-5 py-3">
-            <span className="font-mono text-[11px] text-muted">
+            <span className="font-mono text-[11px] text-ns-muted">
               scrub a strip, or arrow-key it while focused
             </span>
             <button
               type="button"
               onClick={push}
-              className="rounded-sm border border-border px-3 py-1.5 font-mono text-[11px] tracking-widest text-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="rounded-sm border border-border px-3 py-1.5 font-mono text-[11px] tracking-widest text-ns-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
             >
               PUSH DATA
             </button>
           </div>
         </div>
-        <p className="mt-3 font-mono text-[11px] text-muted">
+        <p className="mt-3 font-mono text-[11px] text-ns-muted">
           identical data reproduces identical texture — the seed row is the
           first value&apos;s bits
         </p>

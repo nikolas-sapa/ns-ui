@@ -264,9 +264,9 @@ export function GanttAsciiCriticalPath({
       className={`inline-flex select-none flex-col gap-3 font-mono text-[15px] leading-none ${className}`}
     >
       <div className="flex items-baseline justify-between gap-6">
-        <span className="text-[11px] uppercase tracking-[0.18em] text-muted">{title}</span>
-        <span className="text-[10px] uppercase tracking-[0.18em] text-muted">
-          <span className="text-accent">━</span> critical &nbsp; ─ has float
+        <span className="text-[11px] uppercase tracking-[0.18em] text-ns-muted">{title}</span>
+        <span className="text-[10px] uppercase tracking-[0.18em] text-ns-muted">
+          <span className="text-ns-accent">━</span> critical &nbsp; ─ has float
         </span>
       </div>
 
@@ -282,7 +282,7 @@ export function GanttAsciiCriticalPath({
               return (
                 <span
                   key={i}
-                  className="whitespace-pre text-[10px] leading-none text-muted"
+                  className="whitespace-pre text-[10px] leading-none text-ns-muted"
                   style={{ gridColumn: `${i + 1} / span 4` }}
                 >
                   {`W${startWeek + day / 7}`}
@@ -307,7 +307,7 @@ export function GanttAsciiCriticalPath({
                 <span
                   key={i}
                   className={`${cell} ${
-                    isToday ? "text-foreground" : tick ? "text-muted" : "text-muted/40"
+                    isToday ? "text-foreground" : tick ? "text-ns-muted" : "text-ns-muted/40"
                   }`}
                   style={cellStyle}
                 >
@@ -336,7 +336,7 @@ export function GanttAsciiCriticalPath({
             >
               <span
                 className={`shrink-0 whitespace-pre text-[13px] transition-colors duration-[140ms] motion-reduce:transition-none ${
-                  isActive || c.critical ? "text-foreground" : "text-muted"
+                  isActive || c.critical ? "text-foreground" : "text-ns-muted"
                 }`}
                 style={labelStyle}
               >
@@ -347,7 +347,7 @@ export function GanttAsciiCriticalPath({
               </span>
 
               {c.cyclic ? (
-                <span className="whitespace-pre pl-1 text-[13px] text-muted">
+                <span className="whitespace-pre pl-1 text-[13px] text-ns-muted">
                   ×  cycle — excluded
                 </span>
               ) : (
@@ -363,7 +363,7 @@ export function GanttAsciiCriticalPath({
                       c.critical ? "on the critical path, no float" : `${c.float} days of float`
                     }`}
                     aria-label={`${t.label} schedule. Drag or use arrow keys to reschedule.`}
-                    className="flex cursor-ew-resize items-center rounded-[2px] outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent"
+                    className="flex cursor-ew-resize items-center rounded-[2px] outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ns-accent"
                     style={{ gridColumn: `${start + 1} / span ${len}`, gridRow: 1 }}
                     onFocus={() => setFocused(t.id)}
                     onBlur={() => setFocused((f) => (f === t.id ? null : f))}
@@ -400,7 +400,7 @@ export function GanttAsciiCriticalPath({
                     {barGlyphs.split("").map((ch, k) => (
                       <span
                         key={k}
-                        className={`${cell} ${c.critical ? "text-accent" : "text-muted"}`}
+                        className={`${cell} ${c.critical ? "text-ns-accent" : "text-ns-muted"}`}
                         style={cellStyle}
                       >
                         {ch}
@@ -430,7 +430,7 @@ export function GanttAsciiCriticalPath({
 
       <p
         aria-live="polite"
-        className="rounded-sm border border-border bg-background px-3 py-2 text-[11px] tabular-nums text-muted"
+        className="rounded-sm border border-border bg-background px-3 py-2 text-[11px] tabular-nums text-ns-muted"
       >
         {readout}
       </p>

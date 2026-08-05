@@ -67,7 +67,7 @@ function buildTeethPath() {
 const TEETH_PATH = buildTeethPath();
 
 const btnBase =
-  "flex h-11 w-11 shrink-0 select-none items-center justify-center rounded-sm border border-border bg-background text-foreground outline-none transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface";
+  "flex h-11 w-11 shrink-0 select-none items-center justify-center rounded-sm border border-border bg-background text-foreground outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface";
 const btnLive =
   "cursor-pointer hover:border-foreground/30 hover:bg-foreground/[0.06] active:bg-foreground/[0.1] data-[hover=true]:border-foreground/30 data-[hover=true]:bg-foreground/[0.06] data-[press=true]:bg-foreground/[0.1]";
 const btnDead = "cursor-default opacity-40";
@@ -312,10 +312,10 @@ export function PawlLift({
       className={`rounded-md border border-border bg-surface p-4 ${disabled ? "opacity-60" : ""} ${className}`}
     >
       <div className="mb-3 flex items-center justify-between">
-        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted">
+        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-ns-muted">
           {label}
         </span>
-        <span className="font-mono text-[10px] text-muted">
+        <span className="font-mono text-[10px] text-ns-muted">
           {min}&ndash;{max}
         </span>
       </div>
@@ -330,10 +330,10 @@ export function PawlLift({
         aria-valuetext={unit ? `${current} ${unit}` : String(current)}
         aria-disabled={disabled || undefined}
         onKeyDown={onKeyDown}
-        className="mb-3 w-full select-none rounded-sm text-center font-mono text-4xl font-semibold tracking-tight text-foreground outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+        className="mb-3 w-full select-none rounded-sm text-center font-mono text-4xl font-semibold tracking-tight text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
       >
         {current}
-        {unit ? <span className="ml-1.5 text-base font-normal text-muted">{unit}</span> : null}
+        {unit ? <span className="ml-1.5 text-base font-normal text-ns-muted">{unit}</span> : null}
       </div>
 
       <div className="relative h-11 w-full overflow-hidden rounded-sm border border-border bg-background">
@@ -356,7 +356,7 @@ export function PawlLift({
             <path
               d={TEETH_PATH}
               fill="none"
-              stroke="var(--muted)"
+              stroke="var(--ns-muted)"
               strokeWidth={1.5}
               strokeLinejoin="round"
               strokeLinecap="round"
@@ -369,7 +369,7 @@ export function PawlLift({
             <polygon
               points={`${PAWL_X},${PAWL_TIP_Y} ${PAWL_X - 5},${PAWL_TIP_Y - 14} ${PAWL_X + 5},${PAWL_TIP_Y - 14}`}
               fill="none"
-              stroke="var(--muted)"
+              stroke="var(--ns-muted)"
               strokeWidth={2}
               strokeLinejoin="round"
             />

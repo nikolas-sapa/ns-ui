@@ -32,7 +32,7 @@ export type ShowcaseEntry = RegistryEntry & {
 };
 
 const FOOTER_LINK =
-  "rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent";
+  "rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent";
 
 /**
  * How many demos may run at once.
@@ -420,7 +420,7 @@ export function Showcase({
           and screen reader visitors actually want. */}
       <a
         href="#catalog"
-        className="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:left-4 focus-visible:top-4 focus-visible:z-50 focus-visible:rounded-sm focus-visible:bg-accent focus-visible:px-3 focus-visible:py-2 focus-visible:text-sm focus-visible:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-hover"
+        className="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:left-4 focus-visible:top-4 focus-visible:z-50 focus-visible:rounded-sm focus-visible:bg-ns-accent focus-visible:px-3 focus-visible:py-2 focus-visible:text-sm focus-visible:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent-hover"
       >
         Skip to components
       </a>
@@ -435,7 +435,7 @@ export function Showcase({
           (site-shell.tsx, `fixed left-3 top-3`, 44px) is hidden at lg, so it
           never climbs into that button's space at narrower widths. */}
       <div className="flex items-center justify-between gap-3 pt-20 sm:pt-28 lg:pt-10">
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">
+        <p className="font-mono text-xs uppercase tracking-[0.18em] text-ns-muted">
           ns-ui
         </p>
         <div className="flex items-center gap-3">
@@ -455,7 +455,7 @@ export function Showcase({
           <h1 className="max-w-3xl text-3xl font-semibold leading-[1.15] tracking-tight sm:text-4xl">
             A personal registry of {items.length} React components.
           </h1>
-          <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted">
+          <p className="mt-4 max-w-xl text-sm leading-relaxed text-ns-muted">
             Canvas, motion and glass — themed by your own CSS tokens, light and dark.
             Every card below is the real component running live. Click one to
             open it full size.
@@ -463,7 +463,7 @@ export function Showcase({
         </div>
 
         <div>
-          <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
+          <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-ns-muted">
             Install
           </p>
           <div className="mt-3 flex w-full items-start gap-2 rounded-md border border-border bg-surface py-2 pl-3.5 pr-1.5">
@@ -479,7 +479,7 @@ export function Showcase({
               label="Copy install command"
             />
           </div>
-          <p className="mt-2.5 text-xs leading-relaxed text-muted">
+          <p className="mt-2.5 text-xs leading-relaxed text-ns-muted">
             Runs as-is. Swap{" "}
             <span className="font-mono text-foreground">{EXAMPLE_NAME}</span>
             {" for any component name, or copy a card’s exact command."}
@@ -530,11 +530,11 @@ export function Showcase({
         <section className="catalog-gate-hide mt-14" aria-labelledby="featured-heading">
           <h2
             id="featured-heading"
-            className="font-mono text-xs font-normal uppercase tracking-[0.18em] text-muted"
+            className="font-mono text-xs font-normal uppercase tracking-[0.18em] text-ns-muted"
           >
             Featured
           </h2>
-          <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">
+          <p className="mt-2 max-w-xl text-sm leading-relaxed text-ns-muted">
             A curated set, live. Click any preview to open it full size and
             play with it.
           </p>
@@ -563,7 +563,7 @@ export function Showcase({
           Featured section, so it shares that section's condition exactly
           and needs the same pre-hydration cover. */}
       {!filtered && sort === "featured" && featuredItems.length > 0 ? (
-        <h2 className="catalog-gate-hide mt-24 font-mono text-xs font-normal uppercase tracking-[0.18em] text-muted">
+        <h2 className="catalog-gate-hide mt-24 font-mono text-xs font-normal uppercase tracking-[0.18em] text-ns-muted">
           All components
         </h2>
       ) : null}
@@ -573,7 +573,7 @@ export function Showcase({
           reading as a smudge. */}
       {visibleItems.length === 0 ? (
         <div className="mx-auto mt-24 max-w-md text-center">
-          <p className="text-sm text-muted">
+          <p className="text-sm text-ns-muted">
             Nothing matches{" "}
             {query ? (
               <span className="font-mono text-foreground">{query}</span>
@@ -583,7 +583,7 @@ export function Showcase({
             {activeCategory ? ` in ${activeCategory.label.toLowerCase()}` : ""}
             {filter === "all" ? "" : ` in ${filter}`}.
           </p>
-          <p className="mt-5 text-xs text-muted">
+          <p className="mt-5 text-xs text-ns-muted">
             Components here are named evocatively, so plain words are the way
             in. Try one:
           </p>
@@ -597,7 +597,7 @@ export function Showcase({
                   setCategory(null);
                   setFilter("all");
                 }}
-                className="rounded-full border border-border px-2.5 py-1 font-mono text-xs text-muted outline-none transition-colors hover:border-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none"
+                className="rounded-full border border-border px-2.5 py-1 font-mono text-xs text-ns-muted outline-none transition-colors hover:border-ns-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
               >
                 {q}
               </button>
@@ -606,7 +606,7 @@ export function Showcase({
           <button
             type="button"
             onClick={clearAll}
-            className="mt-5 rounded-sm px-2 py-1 font-mono text-xs text-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+            className="mt-5 rounded-sm px-2 py-1 font-mono text-xs text-ns-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             Show all {items.length}
           </button>
@@ -614,7 +614,7 @@ export function Showcase({
       ) : null}
 
       {loose ? (
-        <p className="mt-10 text-xs text-muted">
+        <p className="mt-10 text-xs text-ns-muted">
           Nothing matches every word of{" "}
           <span className="font-mono text-foreground">{query}</span> — showing
           the closest matches
@@ -675,7 +675,7 @@ export function Showcase({
           LiquidCollar — one WebGL context for the CTA is enough, and a
           repeated animated treatment would start reading as an ad. */}
       <div className="mt-24 flex flex-col items-center gap-3 border-t border-border pt-14 text-center">
-        <p className="text-sm text-muted">If any of this was useful, a star helps others find it.</p>
+        <p className="text-sm text-ns-muted">If any of this was useful, a star helps others find it.</p>
         <GitHubStarButton variant="quiet" stars={stars} />
       </div>
 
@@ -691,7 +691,7 @@ export function Showcase({
           rather than one footer. A bounded gap keeps the two link clusters
           close and lets the "built with" line sit apart without spanning
           the whole row to do it. */}
-      <footer className="mt-16 flex flex-wrap items-baseline gap-x-12 gap-y-3 border-t border-border pt-6 font-mono text-xs text-muted">
+      <footer className="mt-16 flex flex-wrap items-baseline gap-x-12 gap-y-3 border-t border-border pt-6 font-mono text-xs text-ns-muted">
         <div className="flex flex-wrap items-baseline gap-x-8 gap-y-3">
           <p>
             For AI agents:{" "}
@@ -773,7 +773,7 @@ function JumpToTop() {
       onClick={scrollUp}
       aria-label="Back to top"
       tabIndex={visible ? 0 : -1}
-      className={`fixed bottom-6 right-6 z-30 flex size-11 items-center justify-center rounded-full border border-border bg-surface text-muted shadow-sm outline-none transition-[opacity,transform] duration-200 ease-out hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none sm:size-10 sm:bottom-8 sm:right-8 ${
+      className={`fixed bottom-6 right-6 z-30 flex size-11 items-center justify-center rounded-full border border-border bg-surface text-ns-muted shadow-sm outline-none transition-[opacity,transform] duration-200 ease-out hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none sm:size-10 sm:bottom-8 sm:right-8 ${
         visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-2 opacity-0"
       }`}
     >

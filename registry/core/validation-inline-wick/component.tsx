@@ -300,7 +300,7 @@ export function LitmusWick({
 
       <label
         htmlFor={inputId}
-        className="block font-mono text-[11px] uppercase tracking-wide text-muted"
+        className="block font-mono text-[11px] uppercase tracking-wide text-ns-muted"
       >
         {label}
       </label>
@@ -327,7 +327,7 @@ export function LitmusWick({
           // looked for `button, a, [role=button]`, and this component exposes
           // neither, so focus was never checked here. Ring is what the rest of
           // the codebase uses and it composes with `outline-none`.
-          className="w-full bg-transparent px-0 py-2 text-sm text-foreground outline-none placeholder:text-muted disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-accent"
+          className="w-full bg-transparent px-0 py-2 text-sm text-foreground outline-none placeholder:text-ns-muted disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-ns-accent"
         />
 
         {/* baseline border — the field's resting bottom edge */}
@@ -358,7 +358,7 @@ export function LitmusWick({
       <p
         id={msgId}
         aria-live="polite"
-        className="mt-1.5 min-h-[1em] font-mono text-xs text-muted"
+        className="mt-1.5 min-h-[1em] font-mono text-xs text-ns-muted"
         style={messageStyle}
       >
         {message}

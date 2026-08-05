@@ -183,7 +183,7 @@ export function VanishTaper({ text, maxTailChars = MAX_TAIL_CHARS, className = "
            its own overflow — an outline here would itself get clipped away.
            An inset box-shadow paints inside instead, so it always shows. */
         .ns-vt:focus-visible {
-          box-shadow: inset 0 0 0 2px var(--accent);
+          box-shadow: inset 0 0 0 2px var(--ns-accent);
         }
         .ns-vt[data-vt-active="true"] {
           -webkit-mask-image: none !important;

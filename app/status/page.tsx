@@ -182,13 +182,13 @@ export default async function StatusPage() {
   return (
     <main className="mx-auto w-full max-w-3xl px-6 pb-32 sm:px-10">
       <header className="pt-20 sm:pt-28">
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">
+        <p className="font-mono text-xs uppercase tracking-[0.18em] text-ns-muted">
           ns-ui / status
         </p>
         <h1 className="mt-5 text-3xl font-semibold leading-[1.15] tracking-tight sm:text-4xl">
           What is actually working.
         </h1>
-        <p className="mt-5 max-w-2xl text-[15px] leading-7 text-muted">
+        <p className="mt-5 max-w-2xl text-[15px] leading-7 text-ns-muted">
           The banner states the worst of the live reads taken for this page. The
           strips under it are drawn only from snapshots that were recorded — a
           day with no snapshot is grey, nothing is backfilled, and an uptime
@@ -226,7 +226,7 @@ export default async function StatusPage() {
             <h2 className="text-lg font-medium tracking-[-0.02em] text-foreground">
               {a.question}
             </h2>
-            <p className="mt-3 max-w-2xl text-[15px] leading-7 text-muted">{a.answer}</p>
+            <p className="mt-3 max-w-2xl text-[15px] leading-7 text-ns-muted">{a.answer}</p>
           </div>
         ))}
       </section>
@@ -239,7 +239,7 @@ export default async function StatusPage() {
       <LedgerSection heading="Read live" at={services[0]?.measuredAt} checks={services} />
       <LedgerSection heading="Not measured, and why" checks={notMeasured} />
 
-      <p className="mt-16 max-w-2xl border-t border-border pt-6 text-sm leading-6 text-muted">
+      <p className="mt-16 max-w-2xl border-t border-border pt-6 text-sm leading-6 text-ns-muted">
         Build measurements were taken at {stamp(buildData.builtAt)} by{" "}
         <span className="font-mono text-foreground">scripts/build-status.ts</span> and
         ship with this deployment. Live reads come from{" "}

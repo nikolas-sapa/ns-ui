@@ -305,7 +305,7 @@ export function AuroraFlowChart({
       bgC = parseColor(get("--background", "#ffffff")) ?? [255, 255, 255];
       fgC = parseColor(get("--foreground", "#171717")) ?? [23, 23, 23];
       borderC = parseColor(get("--border", "#ebebeb")) ?? [235, 235, 235];
-      accentC = get("--accent", "#006bff");
+      accentC = get("--ns-accent", "#006bff");
       const lum = (0.2126 * bgC[0] + 0.7152 * bgC[1] + 0.0722 * bgC[2]) / 255;
       const dark = lum < 0.5;
       // ramp endpoints keyed to theme luminance: bright/saturated on dark,
@@ -708,7 +708,7 @@ export function AuroraFlowChart({
       role="group"
       aria-label={ariaLabel}
       aria-describedby={descId}
-      className={`relative w-full cursor-crosshair select-none overflow-hidden rounded-md outline-none focus-visible:ring-2 focus-visible:ring-accent/60 ${className}`}
+      className={`relative w-full cursor-crosshair select-none overflow-hidden rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ns-accent/60 ${className}`}
       style={{ height }}
     >
       <canvas
@@ -732,7 +732,7 @@ export function AuroraFlowChart({
         <span
           key={i}
           aria-hidden
-          className="absolute font-mono text-[10px] leading-none text-muted"
+          className="absolute font-mono text-[10px] leading-none text-ns-muted"
           style={{ left: 6, top: t.top - 4, width: PAD_L - 12, textAlign: "right" }}
         >
           {formatValue(t.value)}
@@ -743,7 +743,7 @@ export function AuroraFlowChart({
       {xLabels.length > 0 && (
         <div
           aria-hidden
-          className="absolute bottom-1.5 flex justify-between font-mono text-[10px] leading-none text-muted"
+          className="absolute bottom-1.5 flex justify-between font-mono text-[10px] leading-none text-ns-muted"
           style={{ left: PAD_L, right: PAD_R }}
         >
           {xLabels.map((l, i) => (
@@ -756,14 +756,14 @@ export function AuroraFlowChart({
       {showLegend && (
         <div
           aria-hidden
-          className="absolute right-3 top-2 flex items-center gap-3 font-mono text-[10px] leading-none text-muted"
+          className="absolute right-3 top-2 flex items-center gap-3 font-mono text-[10px] leading-none text-ns-muted"
         >
           <span className="flex items-center gap-1.5">
-            <span ref={coolSwatchRef} className="h-1 w-4 rounded-full bg-muted/40" />
+            <span ref={coolSwatchRef} className="h-1 w-4 rounded-full bg-ns-muted/40" />
             falling
           </span>
           <span className="flex items-center gap-1.5">
-            <span ref={warmSwatchRef} className="h-1 w-4 rounded-full bg-muted/40" />
+            <span ref={warmSwatchRef} className="h-1 w-4 rounded-full bg-ns-muted/40" />
             rising
           </span>
         </div>
@@ -775,9 +775,9 @@ export function AuroraFlowChart({
         aria-hidden
         className="pointer-events-none absolute left-0 top-0 z-10 whitespace-nowrap rounded-sm border border-border bg-surface px-2.5 py-1.5 font-mono text-[11px] leading-tight opacity-0 shadow-sm transition-opacity duration-150 will-change-transform motion-reduce:transition-none"
       >
-        <span ref={tipLabelRef} className="mr-2 text-muted" />
+        <span ref={tipLabelRef} className="mr-2 text-ns-muted" />
         <span ref={tipValueRef} className="text-foreground" />
-        <span ref={tipDeltaRef} className="ml-2 text-muted" />
+        <span ref={tipDeltaRef} className="ml-2 text-ns-muted" />
       </div>
     </div>
   );

@@ -22,7 +22,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 // bodies are filled with the family's shared ASCII ramp ' .:-=+*#%@' tiled
 // at a constant mid density — box height already encodes the interquartile
 // spread, so ink here is texture, not a second value channel — pure
-// var(--foreground), var(--accent) reserved for the focused/hovered group
+// var(--foreground), var(--ns-accent) reserved for the focused/hovered group
 // and the fence handle itself.
 // ---------------------------------------------------------------------------
 
@@ -118,9 +118,9 @@ function readTokens(): Tokens {
   return {
     fg: get("--foreground", "#171717"),
     bg: get("--background", "#ffffff"),
-    muted: get("--muted", "#4d4d4d"),
+    muted: get("--ns-muted", "#4d4d4d"),
     border: get("--border", "#ebebeb"),
-    accent: get("--accent", "#006bff"),
+    accent: get("--ns-accent", "#006bff"),
   };
 }
 
@@ -372,8 +372,8 @@ export function BoxplotAsciiWhisker({ groups, title = "Chart", className = "" }:
     <figure className={`ns-baw inline-block ${className}`} aria-label={`${title}, box plot`}>
       <style>{CSS}</style>
       <div className="flex items-center justify-between gap-3 pb-2">
-        <span className="font-mono text-xs tracking-widest text-muted">{title.toUpperCase()}</span>
-        <span className="font-mono text-[11px] text-muted tabular-nums">k = {k.toFixed(1)}× IQR</span>
+        <span className="font-mono text-xs tracking-widest text-ns-muted">{title.toUpperCase()}</span>
+        <span className="font-mono text-[11px] text-ns-muted tabular-nums">k = {k.toFixed(1)}× IQR</span>
       </div>
 
       <div className="relative" style={{ width: viewW, maxWidth: "100%" }}>
@@ -422,7 +422,7 @@ export function BoxplotAsciiWhisker({ groups, title = "Chart", className = "" }:
             }}
           >
             <strong className="text-foreground">{hovered.median.toFixed(1)}</strong>{" "}
-            <span className="text-muted">
+            <span className="text-ns-muted">
               med · Q1 {hovered.q1.toFixed(1)} · Q3 {hovered.q3.toFixed(1)} · {hoveredCut.outliers.length} out
             </span>
           </div>
@@ -430,7 +430,7 @@ export function BoxplotAsciiWhisker({ groups, title = "Chart", className = "" }:
       </div>
 
       <div className="mt-4 flex items-center gap-3">
-        <span className="font-mono text-[10px] tracking-widest text-muted">FENCE</span>
+        <span className="font-mono text-[10px] tracking-widest text-ns-muted">FENCE</span>
         <div
           ref={trackRef}
           className="ns-baw-track relative h-4 flex-1 cursor-pointer rounded-full bg-border/60"
@@ -459,7 +459,7 @@ export function BoxplotAsciiWhisker({ groups, title = "Chart", className = "" }:
           />
           <div
             aria-hidden="true"
-            className="ns-baw-thumb absolute top-1/2 h-3 w-3 -translate-y-1/2 rounded-full border-2 border-accent bg-background"
+            className="ns-baw-thumb absolute top-1/2 h-3 w-3 -translate-y-1/2 rounded-full border-2 border-ns-accent bg-background"
             style={{ left: `${((k - K_MIN) / (K_MAX - K_MIN)) * 100}%`, transform: "translate(-50%, -50%)" }}
           />
         </div>
@@ -470,6 +470,6 @@ export function BoxplotAsciiWhisker({ groups, title = "Chart", className = "" }:
 
 const CSS = `
 .ns-baw-hit { touch-action: manipulation; }
-.ns-baw-hit:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.ns-baw-range:focus-visible ~ .ns-baw-thumb { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ns-baw-hit:focus-visible { outline: 2px solid var(--ns-accent); outline-offset: 2px; }
+.ns-baw-range:focus-visible ~ .ns-baw-thumb { outline: 2px solid var(--ns-accent); outline-offset: 2px; }
 `;

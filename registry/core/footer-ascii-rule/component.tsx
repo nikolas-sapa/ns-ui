@@ -156,7 +156,7 @@ export function FooterAsciiRule({ brand = "ns-ui", columns, className = "" }: Fo
                   <li key={link.href}>
                     <a
                       href={link.href}
-                      className="rounded-sm text-sm text-muted transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                      className="rounded-sm text-sm text-ns-muted transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
                     >
                       {link.label}
                     </a>
@@ -168,7 +168,7 @@ export function FooterAsciiRule({ brand = "ns-ui", columns, className = "" }: Fo
         </div>
 
         <div className="mt-10 flex items-center justify-between gap-4 border-t border-border pt-6">
-          <p className="font-mono text-xs text-muted">
+          <p className="font-mono text-xs text-ns-muted">
             © {new Date().getFullYear()} {brand}
           </p>
 
@@ -177,12 +177,12 @@ export function FooterAsciiRule({ brand = "ns-ui", columns, className = "" }: Fo
             type="button"
             onClick={backToTop}
             aria-label="Back to top"
-            className="group inline-flex items-center gap-2 rounded-sm border border-border px-2.5 py-1.5 font-mono text-xs text-foreground transition-colors hover:border-foreground/25 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="group inline-flex items-center gap-2 rounded-sm border border-border px-2.5 py-1.5 font-mono text-xs text-foreground transition-colors hover:border-foreground/25 hover:text-ns-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             <pre
               ref={railRef}
               aria-hidden
-              className="pointer-events-none whitespace-pre text-center leading-[1.1] text-muted transition-colors group-hover:text-accent"
+              className="pointer-events-none whitespace-pre text-center leading-[1.1] text-ns-muted transition-colors group-hover:text-ns-accent"
             />
             <span>back to top</span>
           </button>

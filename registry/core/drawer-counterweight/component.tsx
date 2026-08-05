@@ -478,7 +478,7 @@ export function SashWeight({
                   {title}
                 </h2>
                 {description && (
-                  <p id={descId} className="mt-1 text-xs leading-relaxed text-muted">
+                  <p id={descId} className="mt-1 text-xs leading-relaxed text-ns-muted">
                     {description}
                   </p>
                 )}
@@ -487,7 +487,7 @@ export function SashWeight({
                 type="button"
                 onClick={handleClose}
                 aria-label="Close"
-                className="shrink-0 rounded-sm border border-border p-1.5 text-muted transition-colors duration-150 hover:border-foreground/25 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                className="shrink-0 rounded-sm border border-border p-1.5 text-ns-muted transition-colors duration-150 hover:border-foreground/25 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
               >
                 <svg aria-hidden viewBox="0 0 16 16" width="14" height="14" fill="none">
                   <path
@@ -531,7 +531,7 @@ export function SashWeight({
         aria-expanded={openState}
         aria-controls={dialogId}
         onClick={handleTriggerClick}
-        className="inline-flex items-center gap-2 rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground transition-colors duration-150 hover:border-foreground/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        className="inline-flex items-center gap-2 rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground transition-colors duration-150 hover:border-foreground/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
       >
         {trigger}
       </button>

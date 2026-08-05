@@ -72,8 +72,8 @@ export function FallowPanel({
       className={["relative isolate", className].join(" ")}
     >
       <style>{`@keyframes ns-fallow-drift{to{stroke-dashoffset:-36}}
-.ns-fallow-edge{stroke:var(--muted);opacity:.45;transition:stroke 320ms ease-out,opacity 320ms ease-out,transform 560ms cubic-bezier(.22,1,.36,1);transform-box:fill-box;animation:ns-fallow-drift 9s linear infinite}
-.ns-fallow-edge[data-near="true"]{stroke:var(--accent);opacity:.85;transform:scale(.965)}
+.ns-fallow-edge{stroke:var(--ns-muted);opacity:.45;transition:stroke 320ms ease-out,opacity 320ms ease-out,transform 560ms cubic-bezier(.22,1,.36,1);transform-box:fill-box;animation:ns-fallow-drift 9s linear infinite}
+.ns-fallow-edge[data-near="true"]{stroke:var(--ns-accent);opacity:.85;transform:scale(.965)}
 @media (prefers-reduced-motion: reduce){.ns-fallow-edge{animation:none;transition:stroke 320ms ease-out,opacity 320ms ease-out}.ns-fallow-edge[data-near="true"]{transform:none}}`}</style>
 
       {/* the boundary. overflow-visible so the stroke straddling the box edge
@@ -99,13 +99,13 @@ export function FallowPanel({
 
       <div className="flex flex-col items-center px-8 py-14 text-center">
         {icon ? (
-          <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-sm border border-border text-muted">
+          <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-sm border border-border text-ns-muted">
             {icon}
           </div>
         ) : null}
         <h2 className="text-base font-semibold tracking-tight text-foreground">{title}</h2>
         {description ? (
-          <p className="mt-2 max-w-[36ch] text-sm leading-relaxed text-muted">{description}</p>
+          <p className="mt-2 max-w-[36ch] text-sm leading-relaxed text-ns-muted">{description}</p>
         ) : null}
         {actionLabel ? (
           <button
@@ -117,12 +117,12 @@ export function FallowPanel({
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
             className={[
-              "mt-6 inline-flex items-center justify-center rounded-sm bg-accent px-4 py-2",
+              "mt-6 inline-flex items-center justify-center rounded-sm bg-ns-accent px-4 py-2",
               "text-sm font-medium text-white",
               "transition-[background-color,transform,box-shadow] duration-200 ease-out",
-              "hover:-translate-y-px hover:bg-accent-hover hover:shadow-[0_0_0_1px_var(--accent)]",
-              "active:translate-y-0 active:bg-accent-hover",
-              "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+              "hover:-translate-y-px hover:bg-ns-accent-hover hover:shadow-[0_0_0_1px_var(--ns-accent)]",
+              "active:translate-y-0 active:bg-ns-accent-hover",
+              "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent",
             ].join(" ")}
           >
             {actionLabel}

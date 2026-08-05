@@ -38,8 +38,8 @@ function FallbackSections() {
       {blocks.map(([title, copy]) => (
         <section key={title} data-section className="space-y-3">
           <h3 className="text-sm font-semibold text-foreground">{title}</h3>
-          <p className="text-sm leading-relaxed text-muted">{copy}</p>
-          <p className="text-sm leading-relaxed text-muted">{copy}</p>
+          <p className="text-sm leading-relaxed text-ns-muted">{copy}</p>
+          <p className="text-sm leading-relaxed text-ns-muted">{copy}</p>
         </section>
       ))}
     </div>
@@ -54,7 +54,7 @@ function FallbackSections() {
 // and the tick scale streaks with velocity-scaled motion blur. SVG + direct-
 // DOM rAF, refs only; the loop sleeps 150ms after the last scroll once every
 // spring settles. All ink is currentColor via token classes (text-border /
-// text-foreground / text-accent), so theme flips restyle the SVG live with
+// text-foreground / text-ns-accent), so theme flips restyle the SVG live with
 // no numeric getComputedStyle reads to re-derive.
 // ---------------------------------------------------------------------------
 export function ScrollCaliper({
@@ -290,12 +290,12 @@ export function ScrollCaliper({
     // 200ms accent flash of the readout label on section change
     const flash = () => {
       chipLabel.textContent = `SEC ${activeIdx + 1}/${total}`;
-      chipLabel.classList.remove("text-muted");
-      chipLabel.classList.add("text-accent");
+      chipLabel.classList.remove("text-ns-muted");
+      chipLabel.classList.add("text-ns-accent");
       if (flashTimer) clearTimeout(flashTimer);
       flashTimer = setTimeout(() => {
-        chipLabel.classList.remove("text-accent");
-        chipLabel.classList.add("text-muted");
+        chipLabel.classList.remove("text-ns-accent");
+        chipLabel.classList.add("text-ns-muted");
       }, 200);
     };
 
@@ -455,7 +455,7 @@ export function ScrollCaliper({
             />
           </g>
           {/* active-value marker — the only accent ink on the instrument */}
-          <g ref={markerRef} className="text-accent">
+          <g ref={markerRef} className="text-ns-accent">
             <path d={`M${W - 22} 0H${W}`} stroke="currentColor" strokeWidth={1.5} />
             <path d={`M${W - 22} 0l-5 -3.5v7z`} fill="currentColor" />
           </g>
@@ -465,15 +465,15 @@ export function ScrollCaliper({
         <div className="absolute bottom-3 right-14 rounded-sm border border-foreground/20 bg-surface px-2.5 py-1.5 font-mono text-[10px] leading-snug shadow-sm">
           <div
             ref={chipLabelRef}
-            className="tracking-widest text-muted transition-colors duration-200"
+            className="tracking-widest text-ns-muted transition-colors duration-200"
           >
             SEC —/—
           </div>
           <div className="tabular-nums text-foreground">
             <span ref={chipPxRef}>0.0</span>
-            <span className="text-muted"> PX · </span>
+            <span className="text-ns-muted"> PX · </span>
             <span ref={chipPctRef}>0</span>
-            <span className="text-muted">%</span>
+            <span className="text-ns-muted">%</span>
           </div>
         </div>
       </div>

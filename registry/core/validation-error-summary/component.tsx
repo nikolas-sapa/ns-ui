@@ -38,11 +38,11 @@ import {
 // remaining"). Reduced motion: lines and strikes render at their end state
 // instantly, no timers spent waiting on animation before state settles.
 //
-// Colors: --background/--foreground/--muted/--border/--accent throughout;
+// Colors: --background/--foreground/--ns-muted/--border/--ns-accent throughout;
 // error state reads the semantic --error custom property (house convention
 // for status-only red, e.g. validation-inline-wick / toast-gravity-stack / stepper-needle)
 // with a literal fallback so the component still reads correctly for a
-// consumer who hasn't set --error. --accent is reserved for the submit
+// consumer who hasn't set --error. --ns-accent is reserved for the submit
 // button and focus rings — never used to indicate the error itself.
 // ---------------------------------------------------------------------------
 
@@ -390,13 +390,13 @@ export function PunchList({
             role="alert"
             tabIndex={-1}
             data-punch-summary
-            className="sticky top-2 z-10 mb-4 rounded-md border border-border bg-background p-3 font-mono outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+            className="sticky top-2 z-10 mb-4 rounded-md border border-border bg-background p-3 font-mono outline-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
           >
             <div className="mb-2 flex items-center justify-between gap-3">
               <h2 className="text-[11px] uppercase tracking-wide text-foreground">
                 {title} — {orderedIds.length ? "unresolved" : "clear"}
               </h2>
-              <span className="relative inline-flex h-4 min-w-[2ch] items-center justify-end overflow-hidden text-[11px] tabular-nums text-muted">
+              <span className="relative inline-flex h-4 min-w-[2ch] items-center justify-end overflow-hidden text-[11px] tabular-nums text-ns-muted">
                 <span key={remaining} className={reducedRef.current ? "" : "ns-punch-settle"}>
                   {remaining} open
                 </span>
@@ -430,9 +430,9 @@ export function PunchList({
                           e.preventDefault();
                           selectItem(id);
                         }}
-                        className="flex items-baseline gap-2 rounded-sm px-2 py-1.5 text-sm text-foreground outline-none transition-colors hover:bg-border/40 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1 focus-visible:ring-offset-background"
+                        className="flex items-baseline gap-2 rounded-sm px-2 py-1.5 text-sm text-foreground outline-none transition-colors hover:bg-border/40 focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-1 focus-visible:ring-offset-background"
                       >
-                        <span className="shrink-0 text-muted tabular-nums">
+                        <span className="shrink-0 text-ns-muted tabular-nums">
                           {numberMap[id]}.
                         </span>
                         <span className="relative inline-block">
@@ -454,13 +454,13 @@ export function PunchList({
           const errId = `${field.id}-error`;
           const hasError = field.id in errors;
           const inputClassName =
-            "w-full rounded-sm border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface";
+            "w-full rounded-sm border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface";
           const inputStyle = hasError ? { borderColor: ERROR } : undefined;
           return (
             <div key={field.id} className="flex flex-col gap-1.5">
               <label
                 htmlFor={field.id}
-                className="font-mono text-[11px] uppercase tracking-wide text-muted"
+                className="font-mono text-[11px] uppercase tracking-wide text-ns-muted"
               >
                 {field.label}
               </label>
@@ -520,12 +520,12 @@ export function PunchList({
           <button
             type="submit"
             data-punch-submit
-            className="inline-flex items-center justify-center rounded-md bg-accent px-4 py-2 text-sm font-medium text-white outline-none transition-colors hover:bg-accent-hover focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+            className="inline-flex items-center justify-center rounded-md bg-ns-accent px-4 py-2 text-sm font-medium text-white outline-none transition-colors hover:bg-ns-accent-hover focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
           >
             {submitLabel}
           </button>
           {!showPanel && statusText ? (
-            <span className="font-mono text-[11px] text-muted">{statusText}</span>
+            <span className="font-mono text-[11px] text-ns-muted">{statusText}</span>
           ) : null}
         </div>
       </form>

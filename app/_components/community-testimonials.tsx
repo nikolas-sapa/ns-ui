@@ -15,7 +15,7 @@ export function CommunityTestimonials({ items }: { items: Testimonial[] }) {
   if (items.length === 0) {
     return (
       <div className="rounded-sm border border-border bg-surface px-6 py-8 text-center">
-        <p className="text-sm leading-6 text-muted">
+        <p className="text-sm leading-6 text-ns-muted">
           No experiences shared yet. Be the first to contribute.
         </p>
       </div>
@@ -47,18 +47,18 @@ export function CommunityTestimonials({ items }: { items: Testimonial[] }) {
                 href={item.profileUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="font-medium text-foreground underline decoration-border underline-offset-4 outline-none hover:decoration-foreground focus-visible:ring-2 focus-visible:ring-accent"
+                className="font-medium text-foreground underline decoration-border underline-offset-4 outline-none hover:decoration-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
               >
                 {item.name}
               </Link>
-              <span className="block text-muted">
+              <span className="block text-ns-muted">
                 {item.role} at{" "}
                 {item.companyUrl ? (
                   <Link
                     href={item.companyUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="underline decoration-border underline-offset-4 outline-none hover:decoration-foreground focus-visible:ring-2 focus-visible:ring-accent"
+                    className="underline decoration-border underline-offset-4 outline-none hover:decoration-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
                   >
                     {item.company}
                   </Link>

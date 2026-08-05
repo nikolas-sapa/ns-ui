@@ -108,13 +108,13 @@ export default function CrackCompareDemo() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-10 bg-background px-6 py-24 text-foreground">
       <div className="flex flex-col items-center gap-3 text-center">
-        <p className="font-mono text-xs uppercase tracking-[0.3em] text-muted">
+        <p className="font-mono text-xs uppercase tracking-[0.3em] text-ns-muted">
           ns-ui / compare-crack-seam
         </p>
         <h1 className="text-3xl font-semibold tracking-tight">
           The divider is a fracture
         </h1>
-        <p className="max-w-md text-sm text-muted">
+        <p className="max-w-md text-sm text-ns-muted">
           Drag the seam between the photo and its ASCII treatment. Fast drags
           splinter micro-fissures off the crack, slow drags heal them shut, and
           on release a specular glint runs the fracture.
@@ -147,7 +147,7 @@ export default function CrackCompareDemo() {
       <button
         type="button"
         onClick={() => setResetKey((k) => k + 1)}
-        className="font-mono text-xs text-muted underline underline-offset-4 transition-colors hover:text-foreground"
+        className="font-mono text-xs text-ns-muted underline underline-offset-4 transition-colors hover:text-foreground"
       >
         recenter seam
       </button>

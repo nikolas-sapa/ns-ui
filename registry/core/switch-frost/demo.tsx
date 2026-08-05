@@ -36,7 +36,7 @@ export default function FrostbiteSwitchDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / switch-frost — off freezes, on thaws
       </p>
 
@@ -45,7 +45,7 @@ export default function FrostbiteSwitchDemo() {
           <h2 className="text-sm font-semibold text-foreground">
             Cluster preferences
           </h2>
-          <p className="mt-1 text-sm text-muted">
+          <p className="mt-1 text-sm text-ns-muted">
             Cold-path controls for the storage tier. Switching off grows frost
             across the track; switching on melts it before the thumb slides.
           </p>
@@ -61,7 +61,7 @@ export default function FrostbiteSwitchDemo() {
                 <p className="text-sm font-medium text-foreground">
                   {row.label}
                 </p>
-                <p className="mt-0.5 text-sm text-muted">{row.desc}</p>
+                <p className="mt-0.5 text-sm text-ns-muted">{row.desc}</p>
               </div>
               <FrostbiteSwitch
                 checked={state[row.id] ?? false}
@@ -75,20 +75,20 @@ export default function FrostbiteSwitchDemo() {
         </ul>
 
         <div className="flex items-center justify-between border-t border-border px-6 py-4">
-          <p className="font-mono text-xs text-muted">
+          <p className="font-mono text-xs text-ns-muted">
             {active} of {ROWS.length} active
           </p>
           <button
             type="button"
             onClick={() => setState(defaults())}
-            className="rounded-sm border border-border px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-foreground/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded-sm border border-border px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-foreground/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             Restore defaults
           </button>
         </div>
       </div>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Click a switch or focus it and press Space. Regrowth is seeded, so each
         freeze traces a fresh dendrite pattern.
       </p>

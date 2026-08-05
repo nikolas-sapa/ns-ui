@@ -12,11 +12,11 @@ const CELLS: [BentoCell, BentoCell, BentoCell, BentoCell] = [
 export default function GridBentoAsciiDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / grid-bento-ascii
       </p>
       <GridBentoAscii cells={CELLS} />
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Click a tile: it re-spans across every track, seam included, and the
         ┼ junction has nowhere left to be drawn. Click again to collapse.
       </p>

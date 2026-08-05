@@ -34,13 +34,13 @@ export default function PenLagDemo() {
     <main className="min-h-screen bg-background p-6">
       <div className="mx-auto max-w-3xl">
         <div className="flex items-center justify-between gap-4">
-          <p className="font-mono text-xs tracking-widest text-muted">
+          <p className="font-mono text-xs tracking-widest text-ns-muted">
             ns-ui / hero-chart-recorder
           </p>
           <button
             type="button"
             onClick={triggerSpike}
-            className="rounded-sm border border-border px-3 py-1.5 font-mono text-[11px] tracking-widest text-muted transition-colors duration-200 hover:border-foreground/25 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="rounded-sm border border-border px-3 py-1.5 font-mono text-[11px] tracking-widest text-ns-muted transition-colors duration-200 hover:border-foreground/25 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             TRIGGER SPIKE
           </button>
@@ -48,7 +48,7 @@ export default function PenLagDemo() {
         <h1 className="mt-4 text-lg font-semibold text-foreground">
           The pen is honestly mechanical
         </h1>
-        <p className="mt-1 max-w-xl text-sm leading-relaxed text-muted">
+        <p className="mt-1 max-w-xl text-sm leading-relaxed text-ns-muted">
           It never teleports to the true value — it chases it through an
           underdamped spring, overshoots, quivers, and settles. Whatever the
           pen actually drew is what stays stamped on the paper, tremor
@@ -64,7 +64,7 @@ export default function PenLagDemo() {
             className="h-72"
           />
         </div>
-        <p className="mt-3 font-mono text-[11px] text-muted">
+        <p className="mt-3 font-mono text-[11px] text-ns-muted">
           focus the strip, then use ← / → to scrub the trace — hover does the
           same with a pointer
         </p>

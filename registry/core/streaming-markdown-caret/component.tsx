@@ -107,7 +107,7 @@ export function KerfCaret({ text, streaming = true, className = "" }: KerfCaretP
         <span
           key="caret"
           aria-hidden
-          className="ns-streaming-markdown-caret ml-0.5 inline-block h-[1em] w-[0.55em] translate-y-[0.15em] rounded-[2px] bg-muted align-text-bottom"
+          className="ns-streaming-markdown-caret ml-0.5 inline-block h-[1em] w-[0.55em] translate-y-[0.15em] rounded-[2px] bg-ns-muted align-text-bottom"
         />
       )}
       <span key="status" role="status" aria-live="polite" className="sr-only">

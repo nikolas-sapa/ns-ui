@@ -20,7 +20,7 @@ function makeTexture(): string {
   const styles = getComputedStyle(document.documentElement);
   const fg = styles.getPropertyValue("--foreground").trim() || "#ededed";
   const border = styles.getPropertyValue("--border").trim() || "#2e2e2e";
-  const accent = styles.getPropertyValue("--accent").trim() || "#006bff";
+  const accent = styles.getPropertyValue("--ns-accent").trim() || "#006bff";
 
   ctx.fillStyle = "#0a0a0a";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -91,7 +91,7 @@ export default function BoltUnfurlDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">ns-ui / reveal-cloth-unfurl</p>
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">ns-ui / reveal-cloth-unfurl</p>
 
       <div ref={sectionRef} className="w-full max-w-lg">
         {src && <BoltUnfurl src={src} alt="Geometric line-art study in ink, off-white, and blue" trigger={trigger} strips={14} />}
@@ -100,12 +100,12 @@ export default function BoltUnfurlDemo() {
       <button
         type="button"
         onClick={() => setTrigger((t) => t + 1)}
-        className="rounded-[6px] border border-border px-3 py-1.5 font-mono text-[11px] uppercase tracking-wide text-foreground hover:bg-border/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        className="rounded-[6px] border border-border px-3 py-1.5 font-mono text-[11px] uppercase tracking-wide text-foreground hover:bg-border/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
       >
         Replay
       </button>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Unrolls open like a bolt of cloth when it scrolls into view; the
         Replay button rolls it back up and unfurls it again.
       </p>

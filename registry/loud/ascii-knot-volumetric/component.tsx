@@ -193,7 +193,7 @@ export function KnotRender({ cellSize = 13, className = "" }: KnotRenderProps) {
     const readTokens = () => {
       fgCss = getComputedStyle(canvas).color;
       mutedCss =
-        getComputedStyle(document.documentElement).getPropertyValue("--muted").trim() || fgCss;
+        getComputedStyle(document.documentElement).getPropertyValue("--ns-muted").trim() || fgCss;
     };
 
     const measureCell = (fontFamily: string) => {

@@ -33,10 +33,10 @@ export default function AsciiDitherMediaDemo() {
               key={m}
               onClick={() => setMode(m)}
               aria-pressed={mode === m}
-              className={`rounded-sm px-3 py-1.5 font-mono text-xs transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
+              className={`rounded-sm px-3 py-1.5 font-mono text-xs transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent ${
                 mode === m
                   ? "bg-foreground text-background"
-                  : "text-muted hover:text-foreground"
+                  : "text-ns-muted hover:text-foreground"
               }`}
             >
               {m}
@@ -49,10 +49,10 @@ export default function AsciiDitherMediaDemo() {
               key={s}
               onClick={() => setSource(s)}
               aria-pressed={source === s}
-              className={`rounded-sm px-3 py-1.5 font-mono text-xs transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
+              className={`rounded-sm px-3 py-1.5 font-mono text-xs transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent ${
                 source === s
                   ? "bg-foreground text-background"
-                  : "text-muted hover:text-foreground"
+                  : "text-ns-muted hover:text-foreground"
               }`}
             >
               {s}

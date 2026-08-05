@@ -275,8 +275,8 @@ export function ClapperBell({ items, className = "" }: ClapperBellProps) {
             <path d="M10.4 19c.3 1.2 1.3 2 2.6 2s2.3-.8 2.6-2" fill="none" stroke="var(--foreground)" strokeWidth="1.3" strokeLinecap="round" />
           </g>
           <g ref={clapperRef} style={{ transformOrigin: "13px 11px" }}>
-            <line x1="13" y1="11" x2="13" y2="16.5" stroke="var(--muted)" strokeWidth="1.2" strokeLinecap="round" />
-            <circle cx="13" cy="17.4" r="1.5" fill="var(--muted)" />
+            <line x1="13" y1="11" x2="13" y2="16.5" stroke="var(--ns-muted)" strokeWidth="1.2" strokeLinecap="round" />
+            <circle cx="13" cy="17.4" r="1.5" fill="var(--ns-muted)" />
           </g>
         </svg>
         {badgeCount > 0 && (
@@ -324,7 +324,7 @@ const CSS = `
   background:var(--background);
   cursor:pointer;
 }
-.ns-cb-trigger:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+.ns-cb-trigger:focus-visible{outline:2px solid var(--ns-accent);outline-offset:2px;}
 .ns-cb-badge{
   position:absolute;top:2px;right:2px;
   min-width:16px;height:16px;padding:0 4px;
@@ -357,17 +357,17 @@ const CSS = `
   padding:10px;
   z-index:20;
 }
-.ns-cb-empty{margin:8px 4px;font-size:12px;color:var(--muted);}
+.ns-cb-empty{margin:8px 4px;font-size:12px;color:var(--ns-muted);}
 .ns-cb-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;}
 .ns-cb-row{padding:8px;border-radius:6px;font-size:13px;color:var(--foreground);}
-.ns-cb-row:hover{background:color-mix(in oklab, var(--muted) 10%, var(--background));}
+.ns-cb-row:hover{background:color-mix(in oklab, var(--ns-muted) 10%, var(--background));}
 .ns-cb-close{
   margin-top:8px;width:100%;
   padding:6px 0;
   border:1px solid var(--border);border-radius:6px;
-  background:var(--background);color:var(--muted);
+  background:var(--background);color:var(--ns-muted);
   font-size:12px;cursor:pointer;
 }
 .ns-cb-close:hover{color:var(--foreground);}
-.ns-cb-close:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+.ns-cb-close:focus-visible{outline:2px solid var(--ns-accent);outline-offset:1px;}
 `;

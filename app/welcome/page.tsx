@@ -75,7 +75,7 @@ export default async function WelcomePage() {
   return (
     <main className="mx-auto flex max-w-md flex-col items-center px-6 py-16">
       <h1 className="text-xl font-medium text-foreground">Welcome</h1>
-      <p className="mt-2 text-center text-sm text-muted">
+      <p className="mt-2 text-center text-sm text-ns-muted">
         Pick a handle. Everything else is optional.
       </p>
       <div className="mt-8">

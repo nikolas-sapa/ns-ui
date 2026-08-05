@@ -65,13 +65,13 @@ export default function RouterTierCascadeDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-3xl">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">
+        <p className="mb-4 font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / router-tier-cascade
         </p>
         <h1 className="text-lg font-semibold text-foreground">
           Support agent — model routing, last 15 minutes
         </h1>
-        <p className="mt-1 max-w-xl text-sm leading-relaxed text-muted">
+        <p className="mt-1 max-w-xl text-sm leading-relaxed text-ns-muted">
           Every request enters at the cheapest tier and runs right until it hits
           that tier&apos;s notch. If it is harder than the notch allows it spills
           one row down and keeps going. Where a request stops is what it cost.
@@ -88,7 +88,7 @@ export default function RouterTierCascadeDemo() {
           />
         </div>
 
-        <p className="mt-3 font-mono text-[11px] text-muted">
+        <p className="mt-3 font-mono text-[11px] text-ns-muted">
           {lastChange ?? "drag a notch (or Tab to it and use ← →) to re-route settled traffic"}
         </p>
       </div>

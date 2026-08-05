@@ -87,13 +87,13 @@ export default function EmbossPlateDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">ns-ui / card-number-emboss</p>
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">ns-ui / card-number-emboss</p>
 
       <div ref={containerRef} className="w-full max-w-sm">
         <EmbossPlate />
       </div>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Digits raise as embossed metal while you type; blurring an invalid
         card number flattens the last group and underlines it in error red.
       </p>

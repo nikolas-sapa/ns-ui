@@ -48,7 +48,7 @@ function readTokens(): Tokens {
   return {
     fg: get("--foreground", "#ededed"),
     border: get("--border", "#2e2e2e"),
-    accent: get("--accent", "#006bff"),
+    accent: get("--ns-accent", "#006bff"),
   };
 }
 
@@ -275,7 +275,7 @@ export function FeatureGridAsciiRule({ items, cols = 3, className = "" }: Featur
                 opacity = 1 - easeOutCubic(t);
               }
               if (opacity <= 0.01) continue;
-              // Anchor dots draw in --accent so both ends read as a clear
+              // Anchor dots draw in --ns-accent so both ends read as a clear
               // "plugged in" terminal against the fg-colored border glyphs;
               // the run between them stays --foreground so the accent reads
               // as an endpoint marker, not a wash over the whole wire.
@@ -329,7 +329,7 @@ export function FeatureGridAsciiRule({ items, cols = 3, className = "" }: Featur
               onPointerLeave={() => setActiveId((c) => (c === item.id ? null : c))}
               onFocus={() => setActiveId(item.id)}
               onBlur={() => setActiveId((c) => (c === item.id ? null : c))}
-              className={`group relative flex flex-col items-start gap-1.5 rounded-md border p-4 text-left transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
+              className={`group relative flex flex-col items-start gap-1.5 rounded-md border p-4 text-left transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent ${
                 isActive
                   ? "border-foreground/40 bg-surface"
                   : isRelated
@@ -337,11 +337,11 @@ export function FeatureGridAsciiRule({ items, cols = 3, className = "" }: Featur
                     : "border-border bg-surface hover:border-foreground/20"
               }`}
             >
-              <span className="font-mono text-[10px] uppercase tracking-widest text-muted">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-ns-muted">
                 {String(items.indexOf(item) + 1).padStart(2, "0")}
               </span>
               <span className="text-sm font-semibold text-foreground">{item.title}</span>
-              <span className="text-xs text-muted">{item.description}</span>
+              <span className="text-xs text-ns-muted">{item.description}</span>
             </button>
           );
         })}

@@ -97,7 +97,7 @@ export default async function PublicProfilePage({
           <h1 className="text-lg font-medium text-foreground">
             {profile.displayName ?? profile.handle}
           </h1>
-          <p className="font-mono text-xs text-muted">@{profile.handle}</p>
+          <p className="font-mono text-xs text-ns-muted">@{profile.handle}</p>
         </div>
       </div>
 
@@ -112,7 +112,7 @@ export default async function PublicProfilePage({
           href={profile.url}
           rel="noopener noreferrer nofollow ugc"
           target="_blank"
-          className="mt-3 inline-block w-fit rounded-sm text-sm text-accent outline-none hover:underline focus-visible:ring-2 focus-visible:ring-accent"
+          className="mt-3 inline-block w-fit rounded-sm text-sm text-ns-accent outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ns-accent"
         >
           {profile.url}
         </a>
@@ -133,7 +133,7 @@ export default async function PublicProfilePage({
 
       <div className="mt-12 space-y-10">
         {profile.collections.length === 0 ? (
-          <p className="text-sm text-muted">Nothing published yet.</p>
+          <p className="text-sm text-ns-muted">Nothing published yet.</p>
         ) : (
           profile.collections.map((collection) => {
             const items = collection.slugs
@@ -143,7 +143,7 @@ export default async function PublicProfilePage({
               <section key={collection.name}>
                 <h2 className="text-sm font-medium text-foreground">{collection.name}</h2>
                 {items.length === 0 ? (
-                  <p className="mt-3 text-sm text-muted">Nothing in this folder.</p>
+                  <p className="mt-3 text-sm text-ns-muted">Nothing in this folder.</p>
                 ) : (
                   <ul className="mt-4 grid gap-5 sm:grid-cols-2">
                     {items.map((item) => (
@@ -153,16 +153,16 @@ export default async function PublicProfilePage({
                       >
                         <Link
                           href={`/preview/${item.name}/play`}
-                          className="group block outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent"
+                          className="group block outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ns-accent"
                         >
                           <div className="px-4 py-5 transition-colors group-hover:bg-foreground/[0.03]">
-                            <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+                            <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-ns-muted">
                               ns-ui component
                             </p>
                             <h3 className="mt-2 text-sm font-semibold tracking-tight text-foreground">
                               {item.title}
                             </h3>
-                            <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted">
+                            <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-ns-muted">
                               {item.description}
                             </p>
                           </div>

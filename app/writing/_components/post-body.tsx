@@ -120,7 +120,7 @@ function renderInline(text: string): ReactNode[] {
             key={key++}
             href={link[2]}
             {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-            className="rounded-sm text-foreground underline decoration-border underline-offset-2 outline-none transition-colors hover:decoration-foreground focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded-sm text-foreground underline decoration-border underline-offset-2 outline-none transition-colors hover:decoration-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             {link[1]}
           </a>,

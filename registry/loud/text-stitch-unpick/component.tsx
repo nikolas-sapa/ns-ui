@@ -364,7 +364,7 @@ export function StitchPick({ text = "UNRAVEL", size = 56, dwellMs = 650, classNa
                   fontSize={fontSize}
                   fontWeight={700}
                   fill="none"
-                  stroke="var(--accent)"
+                  stroke="var(--ns-accent)"
                   strokeOpacity={bright ? 0.4 : 0.22}
                   strokeWidth={1}
                   strokeDasharray="3 2.4"
@@ -408,7 +408,7 @@ export function StitchPick({ text = "UNRAVEL", size = 56, dwellMs = 650, classNa
                     d={`M ${cx + advance * 0.22} ${baseline + 1}
                         q ${advance * 0.12} 8 ${advance * 0.3} 4`}
                     fill="none"
-                    stroke="var(--accent)"
+                    stroke="var(--ns-accent)"
                     strokeOpacity={0.3}
                     strokeWidth={1}
                     strokeDasharray="2 2"
@@ -424,7 +424,7 @@ export function StitchPick({ text = "UNRAVEL", size = 56, dwellMs = 650, classNa
       <button
         type="button"
         onClick={resewAll}
-        className="ns-stitch-resew rounded-[6px] border border-border px-3 py-1.5 font-mono text-[11px] uppercase tracking-wide text-foreground hover:bg-border/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        className="ns-stitch-resew rounded-[6px] border border-border px-3 py-1.5 font-mono text-[11px] uppercase tracking-wide text-foreground hover:bg-border/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
       >
         {anyUnraveled ? "Re-sew" : "Re-sew (nothing loose)"}
       </button>

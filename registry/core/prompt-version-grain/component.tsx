@@ -56,7 +56,7 @@ export function PromptVersionGrain({
   className = "",
 }: PromptVersionGrainProps) {
   const head =
-    "font-mono text-[10px] font-normal leading-none tracking-tight text-muted";
+    "font-mono text-[10px] font-normal leading-none tracking-tight text-ns-muted";
 
   return (
     <div className={className}>
@@ -94,7 +94,7 @@ export function PromptVersionGrain({
                   </span>
                 </td>
               ))}
-              <td className="border-t border-border py-2 pl-4 text-right font-mono text-[11px] tabular-nums text-muted">
+              <td className="border-t border-border py-2 pl-4 text-right font-mono text-[11px] tabular-nums text-ns-muted">
                 {v.tokens}
               </td>
             </tr>
@@ -102,7 +102,7 @@ export function PromptVersionGrain({
         </tbody>
       </table>
 
-      <p className="mt-4 flex items-center gap-2 font-mono text-[10px] text-muted">
+      <p className="mt-4 flex items-center gap-2 font-mono text-[10px] text-ns-muted">
         <Swatch />
         changed in this release
       </p>

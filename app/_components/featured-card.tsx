@@ -170,7 +170,7 @@ export function FeaturedCard({
     >
       <div
         ref={boxRef}
-        className="relative aspect-[16/10] w-full overflow-hidden rounded-md border border-border bg-surface transition-colors duration-200 group-hover:border-muted/60 group-has-[a:focus-visible]/focus:ring-2 group-has-[a:focus-visible]/focus:ring-accent group-has-[a:focus-visible]/focus:ring-offset-2 group-has-[a:focus-visible]/focus:ring-offset-background motion-reduce:transition-none"
+        className="relative aspect-[16/10] w-full overflow-hidden rounded-md border border-border bg-surface transition-colors duration-200 group-hover:border-ns-muted/60 group-has-[a:focus-visible]/focus:ring-2 group-has-[a:focus-visible]/focus:ring-ns-accent group-has-[a:focus-visible]/focus:ring-offset-2 group-has-[a:focus-visible]/focus:ring-offset-background motion-reduce:transition-none"
       >
         <div className="absolute right-3 top-3 z-20">
           <SaveButton
@@ -295,7 +295,7 @@ export function FeaturedCard({
             {/* Same caption as the grid cards — the name is a metaphor, this
                 says what it is. See lib/kind.ts. */}
             {entry.kind ? (
-              <span className="shrink-0 text-xs text-muted">{entry.kind}</span>
+              <span className="shrink-0 text-xs text-ns-muted">{entry.kind}</span>
             ) : null}
             {entry.isNew ? (
               <span className="shrink-0 rounded-sm border border-border px-1.5 py-px font-mono text-[10px] uppercase tracking-wider text-foreground">
@@ -303,14 +303,14 @@ export function FeaturedCard({
               </span>
             ) : null}
             {entry.collection === "loud" ? (
-              <span className="shrink-0 rounded-sm border border-border px-1.5 py-px font-mono text-[10px] uppercase tracking-wider text-muted">
+              <span className="shrink-0 rounded-sm border border-border px-1.5 py-px font-mono text-[10px] uppercase tracking-wider text-ns-muted">
                 loud
               </span>
             ) : null}
           </div>
           {/* Lifted above the title link's after:inset-0 overlay, same as
               preview-card.tsx, so this copy stays selectable. */}
-          <p className="relative z-10 mt-1 line-clamp-2 text-xs leading-relaxed text-muted">
+          <p className="relative z-10 mt-1 line-clamp-2 text-xs leading-relaxed text-ns-muted">
             {entry.description}
           </p>
         </div>

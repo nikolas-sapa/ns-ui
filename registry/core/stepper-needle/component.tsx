@@ -504,7 +504,7 @@ export function NeedleStepper({
   const atMin = current <= min;
   const atMax = current >= max;
   const btnBase =
-    "flex h-11 w-11 shrink-0 select-none items-center justify-center rounded-sm border border-border bg-background text-foreground outline-none transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface";
+    "flex h-11 w-11 shrink-0 select-none items-center justify-center rounded-sm border border-border bg-background text-foreground outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface";
   const btnLive =
     "cursor-pointer hover:border-foreground/30 hover:bg-foreground/[0.06] active:bg-foreground/[0.1] data-[hover=true]:border-foreground/30 data-[hover=true]:bg-foreground/[0.06] data-[press=true]:bg-foreground/[0.1]";
   const btnDead = "cursor-default opacity-40";
@@ -517,7 +517,7 @@ export function NeedleStepper({
       } ${className}`}
     >
       <div className="flex min-w-0 flex-1 flex-col justify-between gap-3 p-4">
-        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted">
+        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-ns-muted">
           {label}
         </span>
         <div className="flex items-center gap-3">
@@ -566,10 +566,10 @@ export function NeedleStepper({
               onKeyDown={onKeyDown}
               onBlur={commitFromText}
               style={{ width: `${Math.max(text.length, 1) + 1}ch` }}
-              className="max-w-full rounded-sm border border-transparent bg-transparent text-center font-mono text-3xl font-semibold tracking-tight text-foreground outline-none transition-colors hover:border-border focus-visible:border-accent focus-visible:ring-1 focus-visible:ring-accent disabled:cursor-not-allowed"
+              className="max-w-full rounded-sm border border-transparent bg-transparent text-center font-mono text-3xl font-semibold tracking-tight text-foreground outline-none transition-colors hover:border-border focus-visible:border-ns-accent focus-visible:ring-1 focus-visible:ring-ns-accent disabled:cursor-not-allowed"
             />
             {unit ? (
-              <span className="shrink-0 font-mono text-sm text-muted">
+              <span className="shrink-0 font-mono text-sm text-ns-muted">
                 {unit}
               </span>
             ) : null}
@@ -602,7 +602,7 @@ export function NeedleStepper({
             </svg>
           </button>
         </div>
-        <span className="font-mono text-[10px] text-muted">
+        <span className="font-mono text-[10px] text-ns-muted">
           min {min} · max {max} · step {step}
         </span>
       </div>
@@ -611,7 +611,7 @@ export function NeedleStepper({
         aria-hidden
         className="flex w-20 shrink-0 flex-col self-stretch border-l border-border bg-background"
       >
-        <span className="border-b border-border py-1 text-center font-mono text-[9px] uppercase tracking-[0.18em] text-muted">
+        <span className="border-b border-border py-1 text-center font-mono text-[9px] uppercase tracking-[0.18em] text-ns-muted">
           history
         </span>
         <div ref={drumRef} className="relative min-h-0 flex-1">

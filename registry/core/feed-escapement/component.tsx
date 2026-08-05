@@ -93,7 +93,7 @@ function AnchorFork({ innerRef }: { innerRef: (el: SVGSVGElement | null) => void
       height="22"
       viewBox="0 0 24 24"
       fill="none"
-      className="shrink-0 text-muted"
+      className="shrink-0 text-ns-muted"
       style={{ transformOrigin: "12px 12px" }}
     >
       <circle cx="12" cy="12" r="1.6" fill="currentColor" />
@@ -318,13 +318,13 @@ export const EscapementTick = forwardRef<
     >
       <div className="flex items-center gap-2.5 border-b border-border px-3.5 py-2.5">
         <AnchorFork innerRef={(el) => (anchorElRef.current = el)} />
-        <span className="font-mono text-[11px] tracking-wide text-muted">
+        <span className="font-mono text-[11px] tracking-wide text-ns-muted">
           <span ref={counterElRef}>0</span> queued
         </span>
         <button
           type="button"
           onClick={releaseAll}
-          className="ml-auto cursor-pointer rounded-sm border border-border px-2.5 py-1 font-mono text-[10px] tracking-widest text-muted transition-colors duration-150 hover:border-foreground/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="ml-auto cursor-pointer rounded-sm border border-border px-2.5 py-1 font-mono text-[10px] tracking-widest text-ns-muted transition-colors duration-150 hover:border-foreground/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
         >
           RELEASE ALL
         </button>
@@ -337,7 +337,7 @@ export const EscapementTick = forwardRef<
         className="flex flex-col overflow-hidden"
       >
         {entries.length === 0 ? (
-          <li className="px-3.5 py-6 text-center font-mono text-[11px] text-muted">
+          <li className="px-3.5 py-6 text-center font-mono text-[11px] text-ns-muted">
             {emptyLabel}
           </li>
         ) : (
@@ -350,12 +350,12 @@ export const EscapementTick = forwardRef<
             >
               <div className="flex items-baseline justify-between gap-3">
                 <p className="truncate text-[13px] text-foreground">{entry.title}</p>
-                <span className="shrink-0 font-mono text-[10px] tabular-nums text-muted">
+                <span className="shrink-0 font-mono text-[10px] tabular-nums text-ns-muted">
                   {entry.timestamp}
                 </span>
               </div>
               {entry.detail ? (
-                <p className="mt-0.5 truncate font-mono text-[11px] text-muted">{entry.detail}</p>
+                <p className="mt-0.5 truncate font-mono text-[11px] text-ns-muted">{entry.detail}</p>
               ) : null}
             </li>
           ))

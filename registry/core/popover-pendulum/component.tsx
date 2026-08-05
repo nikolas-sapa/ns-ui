@@ -364,7 +364,7 @@ export function PlumbSway({
               }
             : undefined
         }
-        className="inline-flex items-center gap-1.5 rounded-sm px-1 py-0.5 text-sm font-medium text-foreground outline-none transition-colors duration-150 ease-out hover:text-accent focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        className="inline-flex items-center gap-1.5 rounded-sm px-1 py-0.5 text-sm font-medium text-foreground outline-none transition-colors duration-150 ease-out hover:text-ns-accent focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         {trigger}
       </button>

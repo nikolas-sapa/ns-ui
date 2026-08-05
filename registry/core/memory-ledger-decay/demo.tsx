@@ -41,7 +41,7 @@ export default function PatinaLedgerDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 py-16">
       <div className="w-full max-w-md">
-        <p className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-muted">
+        <p className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
           ns-ui / memory-ledger-decay — turn {turn}
         </p>
 
@@ -57,21 +57,21 @@ export default function PatinaLedgerDemo() {
           <button
             type="button"
             onClick={advanceTurn}
-            className="rounded-md border border-border px-3 py-1.5 font-mono text-xs text-foreground transition-colors hover:bg-foreground/[0.06] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="rounded-md border border-border px-3 py-1.5 font-mono text-xs text-foreground transition-colors hover:bg-foreground/[0.06] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             Advance turn
           </button>
           <button
             type="button"
             onClick={() => agentCites("units")}
-            className="rounded-md bg-accent px-3 py-1.5 font-mono text-xs text-white transition-colors hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="rounded-md bg-ns-accent px-3 py-1.5 font-mono text-xs text-white transition-colors hover:bg-ns-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             Agent cites: metric units
           </button>
           <button
             type="button"
             onClick={() => agentCites("tz")}
-            className="rounded-md bg-accent px-3 py-1.5 font-mono text-xs text-white transition-colors hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="rounded-md bg-ns-accent px-3 py-1.5 font-mono text-xs text-white transition-colors hover:bg-ns-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             Agent cites: timezone
           </button>

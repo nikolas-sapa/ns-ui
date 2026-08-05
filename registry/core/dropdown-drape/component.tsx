@@ -747,11 +747,11 @@ export function DrapeMenu({
 
   const itemClass =
     "group flex items-center gap-2.5 rounded-sm px-3 text-left text-sm text-foreground outline-none " +
-    "hover:bg-surface focus-visible:bg-surface focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent";
+    "hover:bg-surface focus-visible:bg-surface focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ns-accent";
   const rail = (
     <span
       aria-hidden
-      className="absolute bottom-[7px] left-0 top-[7px] w-0.5 rounded-full bg-accent opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100"
+      className="absolute bottom-[7px] left-0 top-[7px] w-0.5 rounded-full bg-ns-accent opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100"
     />
   );
 
@@ -759,12 +759,12 @@ export function DrapeMenu({
     <>
       {rail}
       {item.icon && (
-        <span className="shrink-0 text-muted transition-colors duration-150 group-hover:text-foreground group-focus-visible:text-foreground">
+        <span className="shrink-0 text-ns-muted transition-colors duration-150 group-hover:text-foreground group-focus-visible:text-foreground">
           {item.icon}
         </span>
       )}
       <span className="min-w-0 flex-1 truncate">{item.label}</span>
-      {item.shortcut && <span className="shrink-0 font-mono text-xs text-muted">{item.shortcut}</span>}
+      {item.shortcut && <span className="shrink-0 font-mono text-xs text-ns-muted">{item.shortcut}</span>}
     </>
   );
 
@@ -778,12 +778,12 @@ export function DrapeMenu({
         aria-controls={mounted ? menuId : undefined}
         onClick={() => (open ? closeMenu(true) : openMenu())}
         onKeyDown={onTriggerKeyDown}
-        className="inline-flex items-center gap-2 rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground transition-colors hover:border-foreground/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        className="inline-flex items-center gap-2 rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground transition-colors hover:border-foreground/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
       >
         {label}
         <svg
           viewBox="0 0 16 16"
-          className={`h-3.5 w-3.5 text-muted transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          className={`h-3.5 w-3.5 text-ns-muted transition-transform duration-200 ${open ? "rotate-180" : ""}`}
           fill="none"
           stroke="currentColor"
           strokeWidth="1.5"

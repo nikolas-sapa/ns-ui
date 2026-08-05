@@ -606,7 +606,7 @@ export function LoupeSlider({
         aria-valuenow={current}
         aria-valuetext={fmtValue(current)}
         onKeyDown={onKeyDown}
-        className="absolute left-0 top-0 h-6 w-6 rounded-full outline-none will-change-transform focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        className="absolute left-0 top-0 h-6 w-6 rounded-full outline-none will-change-transform focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         <span
           aria-hidden

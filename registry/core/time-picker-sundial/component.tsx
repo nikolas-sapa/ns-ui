@@ -279,8 +279,8 @@ export function GnomonSet({
             const [nx, ny] = pointAt(a, R_NUMERAL);
             return (
               <g key={i}>
-                <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="var(--muted)" strokeWidth={1} />
-                <text x={nx} y={ny + 3} textAnchor="middle" className="font-mono" style={{ fontSize: 8 }} fill="var(--muted)">
+                <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="var(--ns-muted)" strokeWidth={1} />
+                <text x={nx} y={ny + 3} textAnchor="middle" className="font-mono" style={{ fontSize: 8 }} fill="var(--ns-muted)">
                   {i === 0 ? 12 : i}
                 </text>
               </g>
@@ -290,7 +290,7 @@ export function GnomonSet({
             const a = -90 + i * 30;
             const [x1, y1] = pointAt(a, R_IN_TICK_IN);
             const [x2, y2] = pointAt(a, R_IN_TICK_OUT);
-            return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="var(--muted)" strokeWidth={0.75} />;
+            return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="var(--ns-muted)" strokeWidth={0.75} />;
           })}
           <line ref={hoverTickRef} stroke="var(--foreground)" strokeWidth={1} opacity={0} className="ns-gs-hovertick" />
         </g>
@@ -400,7 +400,7 @@ export function GnomonSet({
 
 const CSS = `
 .ns-gs-ring { cursor: pointer; outline: none; touch-action: none; }
-.ns-gs-ring:focus-visible { stroke: color-mix(in srgb, var(--accent) 22%, transparent); }
+.ns-gs-ring:focus-visible { stroke: color-mix(in srgb, var(--ns-accent) 22%, transparent); }
 .ns-gs-wedge { transition: opacity 150ms ease-out; }
 .ns-gs-dial:hover .ns-gs-wedge { opacity: 0.42; }
 .ns-gs-hovertick { transition: opacity 150ms ease-out; }

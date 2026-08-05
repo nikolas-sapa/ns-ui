@@ -362,10 +362,10 @@ export function SlackRail({
               onPointerLeave={() =>
                 setHoverIndex((cur) => (cur === i ? null : cur))
               }
-              className={`rounded-sm px-3 py-2 text-sm transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
+              className={`rounded-sm px-3 py-2 text-sm transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent ${
                 isActive
                   ? "font-medium text-foreground"
-                  : "text-muted hover:text-foreground"
+                  : "text-ns-muted hover:text-foreground"
               }`}
             >
               {item.label}
@@ -404,7 +404,7 @@ export function SlackRail({
           aria-labelledby={`${baseId}-tab-${item.value}`}
           tabIndex={0}
           hidden={i !== activeIndex}
-          className="pt-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="pt-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
         >
           {item.content}
         </div>

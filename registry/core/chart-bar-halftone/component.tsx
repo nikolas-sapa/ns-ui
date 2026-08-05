@@ -11,8 +11,8 @@ import type { CSSProperties } from "react";
 // 0 = empty, 16 = solid), so a bar's height is redundant with its own ink
 // density: cover one channel and the other still carries the value. Density
 // is the family's only value channel — pure var(--foreground) ink on
-// var(--background) paper, no --accent in the data itself, exactly like
-// heatmap-year-stipple's choice. --accent is reserved for keyboard focus,
+// var(--background) paper, no --ns-accent in the data itself, exactly like
+// heatmap-year-stipple's choice. --ns-accent is reserved for keyboard focus,
 // same convention as every other component in the suite.
 //
 // Bars are SVG paths filled with `url(#pattern)`, one pattern per ink level,
@@ -121,11 +121,11 @@ export function ChartBarHalftone({ data = [], title = "Chart", className = "" }:
     <figure className={`ns-cbh inline-block ${className}`} aria-label={`${title}, bar chart`}>
       <style>{CSS}</style>
       <div className="flex items-center justify-between gap-3 pb-2">
-        <span className="font-mono text-xs tracking-widest text-muted">{title.toUpperCase()}</span>
+        <span className="font-mono text-xs tracking-widest text-ns-muted">{title.toUpperCase()}</span>
         <button
           type="button"
           onClick={() => setShowTable((s) => !s)}
-          className="ns-cbh-toggle rounded-sm border border-border px-2 py-1 font-mono text-[10px] tracking-widest text-muted transition-colors duration-150 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="ns-cbh-toggle rounded-sm border border-border px-2 py-1 font-mono text-[10px] tracking-widest text-ns-muted transition-colors duration-150 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           aria-pressed={showTable}
         >
           {showTable ? "VIEW CHART" : "VIEW TABLE"}
@@ -137,10 +137,10 @@ export function ChartBarHalftone({ data = [], title = "Chart", className = "" }:
           <caption className="sr-only">{title}</caption>
           <thead>
             <tr>
-              <th scope="col" className="border-b border-border px-2 py-1.5 text-left text-muted">
+              <th scope="col" className="border-b border-border px-2 py-1.5 text-left text-ns-muted">
                 Category
               </th>
-              <th scope="col" className="border-b border-border px-2 py-1.5 text-right text-muted tabular-nums">
+              <th scope="col" className="border-b border-border px-2 py-1.5 text-right text-ns-muted tabular-nums">
                 Value
               </th>
             </tr>
@@ -239,7 +239,7 @@ export function ChartBarHalftone({ data = [], title = "Chart", className = "" }:
                     y={baseY + AXIS_H + LABEL_H - 7}
                     textAnchor="middle"
                     className="font-mono"
-                    style={{ fontSize: 9.5, fill: "var(--muted)" }}
+                    style={{ fontSize: 9.5, fill: "var(--ns-muted)" }}
                   >
                     {b.label}
                   </text>
@@ -303,7 +303,7 @@ export function ChartBarHalftone({ data = [], title = "Chart", className = "" }:
               }}
             >
               <strong className="text-foreground">{formatValue(bars[hovered].value)}</strong>{" "}
-              <span className="text-muted">{bars[hovered].label}</span>
+              <span className="text-ns-muted">{bars[hovered].label}</span>
             </div>
           )}
         </div>
@@ -315,7 +315,7 @@ export function ChartBarHalftone({ data = [], title = "Chart", className = "" }:
 const CSS = `
 .ns-cbh-bar { transition: transform 480ms cubic-bezier(0.16, 1, 0.3, 1); }
 .ns-cbh-hit { cursor: pointer; outline: none; }
-.ns-cbh-hit:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ns-cbh-hit:focus-visible { outline: 2px solid var(--ns-accent); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) {
   .ns-cbh-bar { transition: none; }
 }

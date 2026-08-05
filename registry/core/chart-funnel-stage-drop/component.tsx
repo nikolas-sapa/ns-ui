@@ -14,7 +14,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 // particle count proportional to the actual drop, seeded per stage so a
 // replay of the same stage always looks identical. Nothing else in the
 // registry visualizes a delta as falling ink. Pure var(--foreground) ink on
-// var(--background) paper; var(--accent) is reserved for keyboard focus
+// var(--background) paper; var(--ns-accent) is reserved for keyboard focus
 // only, matching the rest of the family's colour rule.
 // ---------------------------------------------------------------------------
 
@@ -93,9 +93,9 @@ function readTokens(): Tokens {
   return {
     fg: get("--foreground", "#171717"),
     bg: get("--background", "#ffffff"),
-    muted: get("--muted", "#4d4d4d"),
+    muted: get("--ns-muted", "#4d4d4d"),
     border: get("--border", "#ebebeb"),
-    accent: get("--accent", "#006bff"),
+    accent: get("--ns-accent", "#006bff"),
   };
 }
 
@@ -316,11 +316,11 @@ export function ChartFunnelStageDrop({ data = [], title = "Chart", className = "
     <figure className={`ns-cfs inline-block ${className}`} aria-label={`${title}, funnel chart`}>
       <style>{CSS}</style>
       <div className="flex items-center justify-between gap-3 pb-2">
-        <span className="font-mono text-xs tracking-widest text-muted">{title.toUpperCase()}</span>
+        <span className="font-mono text-xs tracking-widest text-ns-muted">{title.toUpperCase()}</span>
         <button
           type="button"
           onClick={() => setShowTable((s) => !s)}
-          className="ns-cfs-toggle rounded-sm border border-border px-2 py-1 font-mono text-[10px] tracking-widest text-muted transition-colors duration-150 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="ns-cfs-toggle rounded-sm border border-border px-2 py-1 font-mono text-[10px] tracking-widest text-ns-muted transition-colors duration-150 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           aria-pressed={showTable}
         >
           {showTable ? "VIEW CHART" : "VIEW TABLE"}
@@ -332,13 +332,13 @@ export function ChartFunnelStageDrop({ data = [], title = "Chart", className = "
           <caption className="sr-only">{title}</caption>
           <thead>
             <tr>
-              <th scope="col" className="border-b border-border px-2 py-1.5 text-left text-muted">
+              <th scope="col" className="border-b border-border px-2 py-1.5 text-left text-ns-muted">
                 Stage
               </th>
-              <th scope="col" className="border-b border-border px-2 py-1.5 text-right text-muted tabular-nums">
+              <th scope="col" className="border-b border-border px-2 py-1.5 text-right text-ns-muted tabular-nums">
                 Value
               </th>
-              <th scope="col" className="border-b border-border px-2 py-1.5 text-right text-muted tabular-nums">
+              <th scope="col" className="border-b border-border px-2 py-1.5 text-right text-ns-muted tabular-nums">
                 Dropped
               </th>
             </tr>
@@ -413,7 +413,7 @@ export function ChartFunnelStageDrop({ data = [], title = "Chart", className = "
               }}
             >
               <strong className="text-foreground">{stages[hovered].drop.toLocaleString()}</strong>{" "}
-              <span className="text-muted">dropped</span>
+              <span className="text-ns-muted">dropped</span>
             </div>
           )}
         </div>
@@ -424,5 +424,5 @@ export function ChartFunnelStageDrop({ data = [], title = "Chart", className = "
 
 const CSS = `
 .ns-cfs-hit { touch-action: manipulation; }
-.ns-cfs-hit:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.ns-cfs-hit:focus-visible { outline: 2px solid var(--ns-accent); outline-offset: -2px; }
 `;

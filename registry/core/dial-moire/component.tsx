@@ -395,11 +395,11 @@ export function MoireDial({
         {/* fixed target index the ring's zero tick lines up with */}
         <span
           aria-hidden
-          className="absolute -top-3 left-1/2 h-2 w-px -translate-x-1/2 bg-muted"
+          className="absolute -top-3 left-1/2 h-2 w-px -translate-x-1/2 bg-ns-muted"
         />
         <div
           ref={knobRef}
-          className="relative h-40 w-40 cursor-grab touch-none select-none rounded-full border border-border bg-surface active:cursor-grabbing focus-within:outline focus-within:outline-2 focus-within:outline-offset-4 focus-within:outline-accent"
+          className="relative h-40 w-40 cursor-grab touch-none select-none rounded-full border border-border bg-surface active:cursor-grabbing focus-within:outline focus-within:outline-2 focus-within:outline-offset-4 focus-within:outline-ns-accent"
         >
           <input
             ref={inputRef}
@@ -446,7 +446,7 @@ export function MoireDial({
       <div
         ref={readoutRef}
         aria-hidden
-        className="font-mono text-xs tracking-[0.2em] text-muted tabular-nums"
+        className="font-mono text-xs tracking-[0.2em] text-ns-muted tabular-nums"
       >
         ALIGNMENT 000%
       </div>

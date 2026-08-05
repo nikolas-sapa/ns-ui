@@ -39,7 +39,7 @@ import {
 // nested <button> or <a> anywhere in a row — the disclosure chevron is a
 // decorative aria-hidden mark, and expand/select both live on the treeitem's
 // own click/Enter/Space. Stroke is --border at rest; the one branch whose
-// direct children include the currently focused row switches to --muted, so
+// direct children include the currently focused row switches to --ns-muted, so
 // the guide itself answers "what belongs to what" as you move through it.
 // Zero dependencies, no canvas. prefers-reduced-motion renders every path at
 // full length and every row already in place, no draw, no stagger.
@@ -212,7 +212,7 @@ export function TaprootTrace({
     <div id={id} className={className}>
       <style>{`
 .ns-tt-item{outline:none}
-.ns-tt-item:focus-visible > .ns-tt-row{outline:2px solid var(--accent);outline-offset:-2px}
+.ns-tt-item:focus-visible > .ns-tt-row{outline:2px solid var(--ns-accent);outline-offset:-2px}
 @media (prefers-reduced-motion: reduce){
   .ns-tt-row,.ns-tt-chevron,.ns-tt-path{transition:none !important}
 }
@@ -449,7 +449,7 @@ function TreeItem({
       <div
         className={[
           "ns-tt-row flex cursor-pointer items-center gap-1.5 rounded-sm py-1 pr-2 transition-colors duration-150 ease-out",
-          isSelected ? "bg-surface text-foreground" : "text-muted hover:bg-surface hover:text-foreground",
+          isSelected ? "bg-surface text-foreground" : "text-ns-muted hover:bg-surface hover:text-foreground",
         ].join(" ")}
         style={rowStyle}
       >
@@ -502,7 +502,7 @@ function TreeItem({
               stroke="currentColor"
               strokeWidth={STEM_WIDTH}
               strokeLinecap="round"
-              className={["ns-tt-path", highlightBranch ? "text-muted" : "text-border"].join(" ")}
+              className={["ns-tt-path", highlightBranch ? "text-ns-muted" : "text-border"].join(" ")}
               style={stemStyle}
             />
             {geometry.ticks.map((t, i) => (
@@ -516,7 +516,7 @@ function TreeItem({
                 stroke="currentColor"
                 strokeWidth={STEM_WIDTH}
                 strokeLinecap="round"
-                className={["ns-tt-path", highlightBranch ? "text-muted" : "text-border"].join(" ")}
+                className={["ns-tt-path", highlightBranch ? "text-ns-muted" : "text-border"].join(" ")}
                 style={
                   reducedMotion
                     ? undefined

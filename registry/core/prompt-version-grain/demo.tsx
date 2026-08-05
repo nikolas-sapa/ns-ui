@@ -45,7 +45,7 @@ const VERSIONS: PromptGrainVersion[] = CHANGED.map((ids, r) => ({
 export default function PromptVersionGrainDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / prompt-version-grain
       </p>
 
@@ -57,7 +57,7 @@ export default function PromptVersionGrainDemo() {
           <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-foreground">
             support-triage / system prompt
           </h2>
-          <span className="font-mono text-[10px] tabular-nums text-muted">
+          <span className="font-mono text-[10px] tabular-nums text-ns-muted">
             12 releases · v26 → v37
           </span>
         </div>
@@ -68,7 +68,7 @@ export default function PromptVersionGrainDemo() {
         />
       </div>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Which prompt blocks changed in each of the last twelve releases.
       </p>
     </div>

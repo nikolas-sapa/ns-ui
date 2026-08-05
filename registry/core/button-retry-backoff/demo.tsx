@@ -17,7 +17,7 @@ export default function TorsionWindDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / button-retry-backoff — rate-limited retry
       </p>
       <TorsionRetry

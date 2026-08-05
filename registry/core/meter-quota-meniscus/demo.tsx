@@ -18,11 +18,11 @@ export default function MeniscusMeterDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-2xl">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">
+        <p className="mb-4 font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / meter-quota-meniscus
         </p>
         <h1 className="text-lg font-semibold text-foreground">Quota vessels</h1>
-        <p className="mt-1 text-sm leading-relaxed text-muted">
+        <p className="mt-1 text-sm leading-relaxed text-ns-muted">
           The level rises normally under the soft limit — edge concave,
           climbing the walls. At the soft limit it flattens. Past it the
           level pins and the surface bulges convex above the rim instead:
@@ -55,14 +55,14 @@ export default function MeniscusMeterDemo() {
         </div>
 
         <div className="mt-4 flex items-center justify-between gap-4 rounded-md border border-border px-5 py-3">
-          <span className="font-mono text-[11px] text-muted">
+          <span className="font-mono text-[11px] text-ns-muted">
             simulate the next billing tick
           </span>
           <button
             type="button"
             data-meniscus-cycle
             onClick={() => setStep((s) => s + 1)}
-            className="rounded-sm border border-border px-3 py-1.5 font-mono text-[11px] tracking-widest text-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="rounded-sm border border-border px-3 py-1.5 font-mono text-[11px] tracking-widest text-ns-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             NEXT
           </button>

@@ -29,18 +29,18 @@ export default function NewsletterCadenceRailDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / newsletter-cadence-rail
       </p>
       <div className="w-full max-w-md rounded-md border border-border bg-background px-6 py-6">
         <h2 className="text-xl font-medium tracking-tight text-foreground">Baseline</h2>
-        <p className="mt-1 mb-5 text-sm text-muted">
+        <p className="mt-1 mb-5 text-sm text-ns-muted">
           A fortnightly letter on interface craft, written by the people shipping it.
         </p>
         <NewsletterCadenceRail anchorISO={anchor} intervalDays={14} issues={issues} />
       </div>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         The rail is six weeks of days at one character each — a dot per ordinary
         day, a bar on every issue day, the accent block on today. Count the gap
         between bars and you have read the cadence before typing anything.

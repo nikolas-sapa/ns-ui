@@ -232,7 +232,7 @@ export function WickRun({
 `}</style>
 
       <div className="mb-1.5 flex items-baseline justify-between gap-3">
-        <span id={labelId} className="font-mono text-xs text-muted">
+        <span id={labelId} className="font-mono text-xs text-ns-muted">
           {label}
         </span>
         {!indeterminate ? (

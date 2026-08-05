@@ -10,7 +10,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 // coarseIdx = (totalSteps-fineIdx)/10. Real vernier math: fine tick #fineIdx
 // coincides with main tick #(coarseIdx+fineIdx), not #coarseIdx — the
 // matching line drifts down the fixed scale as the reading grows, exactly
-// as on a physical caliper. That fine tick gets --accent plus a hairline
+// as on a physical caliper. That fine tick gets --ns-accent plus a hairline
 // back to its coincidence partner. Two drag zones on the same track: upper
 // half ("body") maps pointer position to value absolutely (fast, spans the
 // whole range); lower half (the vernier row itself) maps pointer DELTA to
@@ -334,7 +334,7 @@ export function VernierSlip({
       className={`w-full max-w-md rounded-md border border-border bg-surface p-4 font-mono ${className}`}
     >
       <div className="flex items-baseline justify-between gap-3 pb-3">
-        <span className="text-[10px] uppercase tracking-[0.2em] text-muted">
+        <span className="text-[10px] uppercase tracking-[0.2em] text-ns-muted">
           {label}
         </span>
         <div className="flex items-baseline gap-1">
@@ -344,11 +344,11 @@ export function VernierSlip({
           >
             {restStr}
             {digitStr ? (
-              <span className="text-accent">{digitStr}</span>
+              <span className="text-ns-accent">{digitStr}</span>
             ) : null}
           </span>
           {unit ? (
-            <span className="text-xs text-muted">{unit}</span>
+            <span className="text-xs text-ns-muted">{unit}</span>
           ) : null}
         </div>
       </div>
@@ -374,7 +374,7 @@ export function VernierSlip({
         onPointerMove={(e) => engineRef.current?.dragMove(e.clientX)}
         onPointerUp={() => engineRef.current?.dragEnd()}
         onPointerCancel={() => engineRef.current?.dragEnd()}
-        className="relative block w-full touch-none select-none overflow-x-auto rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+        className="relative block w-full touch-none select-none overflow-x-auto rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
       >
         <svg
           width={svgWidth}
@@ -421,7 +421,7 @@ export function VernierSlip({
                     x2={x}
                     y1={COARSE_BASELINE}
                     y2={tip}
-                    className={isMatch ? "text-accent" : "text-foreground/70"}
+                    className={isMatch ? "text-ns-accent" : "text-foreground/70"}
                     stroke="currentColor"
                     strokeWidth={isMatch ? 2 : 1}
                   />
@@ -432,8 +432,8 @@ export function VernierSlip({
                       textAnchor={x < 6 ? "start" : x > svgWidth - 6 ? "end" : "middle"}
                       className={
                         isMatch
-                          ? "fill-accent font-medium"
-                          : "fill-muted"
+                          ? "fill-ns-accent font-medium"
+                          : "fill-ns-muted"
                       }
                       style={{ fontSize: 9 }}
                     >
@@ -459,7 +459,7 @@ export function VernierSlip({
             ref={hairRef}
             y1={COARSE_TIP_MAJOR}
             y2={FINE_TIP}
-            className="text-accent"
+            className="text-ns-accent"
             stroke="currentColor"
             strokeWidth={1.25}
             strokeDasharray="2 2"
@@ -488,7 +488,7 @@ export function VernierSlip({
                     y2={isMatch ? FINE_TIP - 4 : FINE_TIP}
                     className={
                       isMatch
-                        ? "text-accent"
+                        ? "text-ns-accent"
                         : k <= 9
                           ? "text-foreground/70"
                           : "text-foreground/30"
@@ -502,7 +502,7 @@ export function VernierSlip({
                       y={FINE_LABEL_Y}
                       textAnchor="middle"
                       className={
-                        isMatch ? "fill-accent font-semibold" : "fill-muted"
+                        isMatch ? "fill-ns-accent font-semibold" : "fill-ns-muted"
                       }
                       style={{ fontSize: 9 }}
                     >
@@ -516,7 +516,7 @@ export function VernierSlip({
         </svg>
       </div>
 
-      <div className="flex items-center justify-between pt-2 font-mono text-[10px] text-muted">
+      <div className="flex items-center justify-between pt-2 font-mono text-[10px] text-ns-muted">
         <span>drag body to set · drag scale below to fine-tune</span>
         <span aria-hidden className="tabular-nums">
           {min.toFixed(Math.max(0, decimals - 1))}–{safeMax.toFixed(Math.max(0, decimals - 1))}

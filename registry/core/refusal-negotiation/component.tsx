@@ -7,14 +7,14 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 // itself (that's approval-inline-diff's job, for a different decision entirely: a
 // human approving an agent's already-permitted tool call). Here the request
 // was already refused. The offending span is echoed back struck through —
-// never a full-red block, just a --muted strikethrough bar that draws
+// never a full-red block, just a --ns-muted strikethrough bar that draws
 // left-to-right once on mount — with the reason beneath it and a small
 // group of narrowing levers (switches) that each rewrite the span. Flipping
 // any lever re-runs its rewrite against the *original* span, cross-fades the
 // old phrasing into the new one without changing the line's height, and
 // recomputes whether the rewritten request now clears `recheck`. Passing
 // retracts the strike (the same bar, animating the other direction) and is
-// the only moment --accent appears anywhere in this component: the resend
+// the only moment --ns-accent appears anywhere in this component: the resend
 // button's border. A visible status line always states "Blocked"/"Allowed"
 // in plain words too, so the outcome never rides on noticing a line move.
 //
@@ -212,7 +212,7 @@ export function RedlineParley({
               {displayFlagged}
               <span
                 aria-hidden
-                className="ns-rp-strike pointer-events-none absolute inset-x-0 top-1/2 h-[1.5px] bg-muted"
+                className="ns-rp-strike pointer-events-none absolute inset-x-0 top-1/2 h-[1.5px] bg-ns-muted"
                 style={{ transform: `translateY(-50%) scaleX(${barScale})` }}
               />
             </span>
@@ -220,11 +220,11 @@ export function RedlineParley({
           {currentSpan.after}
         </p>
 
-        <p className="mt-2 text-sm text-muted">{reason}</p>
+        <p className="mt-2 text-sm text-ns-muted">{reason}</p>
 
         <p
           data-redline-status={passed ? "allowed" : "blocked"}
-          className="mt-4 font-mono text-[11px] uppercase tracking-wide text-muted"
+          className="mt-4 font-mono text-[11px] uppercase tracking-wide text-ns-muted"
         >
           {passed ? "Allowed — ready to resend" : "Blocked"}
         </p>
@@ -249,14 +249,14 @@ export function RedlineParley({
                   "ns-rp-chip inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground/60 " +
                   (active
                     ? "border-foreground bg-foreground text-background"
-                    : "border-border text-muted hover:border-foreground/40 hover:text-foreground")
+                    : "border-border text-ns-muted hover:border-foreground/40 hover:text-foreground")
                 }
               >
                 <span
                   aria-hidden
                   className={
                     "h-1.5 w-1.5 rounded-full " +
-                    (active ? "bg-background" : "bg-muted")
+                    (active ? "bg-background" : "bg-ns-muted")
                   }
                 />
                 {r.label}
@@ -276,8 +276,8 @@ export function RedlineParley({
             disabled={!passed}
             onClick={handleSend}
             className={
-              "ns-rp-send rounded-sm border bg-background px-3 py-1.5 text-sm font-medium text-foreground disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent " +
-              (passed ? "border-accent" : "border-border")
+              "ns-rp-send rounded-sm border bg-background px-3 py-1.5 text-sm font-medium text-foreground disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent " +
+              (passed ? "border-ns-accent" : "border-border")
             }
           >
             {justSent ? "Sent" : "Resend request"}

@@ -424,7 +424,7 @@ export function RouterTierCascade({
 `}</style>
 
       <div role="group" aria-label={ariaLabel} className="w-full select-none">
-        <div className="grid grid-cols-[112px_1fr_132px] items-baseline gap-x-3 pb-2 font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+        <div className="grid grid-cols-[112px_1fr_132px] items-baseline gap-x-3 pb-2 font-mono text-[10px] uppercase tracking-[0.14em] text-ns-muted">
           <span>tier</span>
           <span>difficulty spill &rarr;</span>
           <span className="text-right">accepted · spend</span>
@@ -451,7 +451,7 @@ export function RouterTierCascade({
               >
                 <div className="flex items-baseline gap-1.5 overflow-hidden font-mono text-[11px]">
                   <span className="truncate text-foreground">{tier.label}</span>
-                  <span className="shrink-0 tabular-nums text-muted">
+                  <span className="shrink-0 tabular-nums text-ns-muted">
                     {formatCost(tier.pricePer1k)}
                   </span>
                 </div>
@@ -556,7 +556,7 @@ export function RouterTierCascade({
                     onPointerUp={onNotchUp(i)}
                     onPointerCancel={onNotchUp(i)}
                     onKeyDown={onNotchKey(i)}
-                    className="absolute top-0 h-full cursor-ew-resize rounded-[2px] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent"
+                    className="absolute top-0 h-full cursor-ew-resize rounded-[2px] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ns-accent"
                     style={{ left: `${c * 100}%`, width: 18, marginLeft: -9, touchAction: "none" }}
                   />
                 </div>
@@ -564,7 +564,7 @@ export function RouterTierCascade({
                 {/* cost gutter, same geometry as the routing */}
                 <div className="flex flex-col items-end gap-1 font-mono text-[11px] tabular-nums">
                   <span className="flex items-baseline gap-2">
-                    <span className="text-muted">{row.count}</span>
+                    <span className="text-ns-muted">{row.count}</span>
                     <span className="text-foreground">
                       {hot ? `~${formatCost(row.median)}` : formatCost(row.spend)}
                     </span>
@@ -586,7 +586,7 @@ export function RouterTierCascade({
           })}
         </div>
 
-        <p className="pt-2 font-mono text-[10px] text-muted">
+        <p className="pt-2 font-mono text-[10px] text-ns-muted">
           {hover === null
             ? "each row spills at its notch — median per request on hover"
             : `${tiers[hover]?.label ?? ""} · median per request`}

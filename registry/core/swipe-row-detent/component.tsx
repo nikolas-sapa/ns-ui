@@ -249,7 +249,7 @@ export function DetentSwipe({ title, subtitle, onArchive, onFlag, onDelete, clas
       // painted in a screenshot despite computed style reporting it), so the
       // outlined element and the overflow-clipping element must be different
       // nodes.
-      className={`ns-dtx-wrap relative focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${className}`}
+      className={`ns-dtx-wrap relative focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent ${className}`}
     >
       <style>{CSS}</style>
       <span role="status" aria-live="polite" aria-atomic="true" className="sr-only">
@@ -270,7 +270,7 @@ export function DetentSwipe({ title, subtitle, onArchive, onFlag, onDelete, clas
             if (armed) startUndo();
           }}
           style={{ visibility: armed ? "visible" : "hidden" }}
-          className="ns-dtx-action ns-dtx-delete flex w-[96px] items-center justify-center border-l font-mono text-[11px] uppercase tracking-wide focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent"
+          className="ns-dtx-action ns-dtx-delete flex w-[96px] items-center justify-center border-l font-mono text-[11px] uppercase tracking-wide focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ns-accent"
         >
           Delete
         </button>
@@ -281,7 +281,7 @@ export function DetentSwipe({ title, subtitle, onArchive, onFlag, onDelete, clas
             goRest(true);
           }}
           style={{ visibility: engagedIndex >= 2 ? "visible" : "hidden" }}
-          className={`ns-dtx-action flex w-[76px] items-center justify-center border-l font-mono text-[11px] uppercase tracking-wide text-foreground hover:bg-border/40 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent ${
+          className={`ns-dtx-action flex w-[76px] items-center justify-center border-l font-mono text-[11px] uppercase tracking-wide text-foreground hover:bg-border/40 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ns-accent ${
             engagedIndex >= 2 ? "border-l-foreground bg-border/20" : "border-l-border"
           }`}
         >
@@ -294,7 +294,7 @@ export function DetentSwipe({ title, subtitle, onArchive, onFlag, onDelete, clas
             goRest(true);
           }}
           style={{ visibility: engagedIndex >= 1 ? "visible" : "hidden" }}
-          className={`ns-dtx-action flex w-[76px] items-center justify-center border-l font-mono text-[11px] uppercase tracking-wide text-foreground hover:bg-border/40 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent ${
+          className={`ns-dtx-action flex w-[76px] items-center justify-center border-l font-mono text-[11px] uppercase tracking-wide text-foreground hover:bg-border/40 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ns-accent ${
             engagedIndex >= 1 ? "border-l-foreground bg-border/20" : "border-l-border"
           }`}
         >
@@ -314,24 +314,24 @@ export function DetentSwipe({ title, subtitle, onArchive, onFlag, onDelete, clas
         }`}
       >
         <span aria-hidden="true" className="ns-dtx-grip absolute left-1.5 flex flex-col gap-1 opacity-0">
-          <span className="h-1 w-1 rounded-full bg-muted" />
-          <span className="h-1 w-1 rounded-full bg-muted" />
-          <span className="h-1 w-1 rounded-full bg-muted" />
+          <span className="h-1 w-1 rounded-full bg-ns-muted" />
+          <span className="h-1 w-1 rounded-full bg-ns-muted" />
+          <span className="h-1 w-1 rounded-full bg-ns-muted" />
         </span>
         <span aria-hidden="true" className="h-9 w-9 shrink-0 rounded-full border border-border" />
         <span className="min-w-0 flex-1">
           <span className="block truncate text-sm text-foreground">{title}</span>
-          {subtitle && <span className="block truncate text-xs text-muted">{subtitle}</span>}
+          {subtitle && <span className="block truncate text-xs text-ns-muted">{subtitle}</span>}
         </span>
       </div>
 
       {pendingDelete && (
         <div className="absolute inset-0 flex items-center justify-between border-b border-border bg-background px-4">
-          <span className="font-mono text-xs text-muted">{title} deleted</span>
+          <span className="font-mono text-xs text-ns-muted">{title} deleted</span>
           <button
             type="button"
             onClick={cancelUndo}
-            className="font-mono text-xs text-foreground underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="font-mono text-xs text-foreground underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             Undo
           </button>

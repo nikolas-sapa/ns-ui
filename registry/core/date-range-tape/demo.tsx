@@ -18,14 +18,14 @@ export default function SpanTapeDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / date-range-tape
       </p>
 
       <div className="w-full max-w-sm rounded-md border border-border bg-background">
         <div className="border-b border-border px-6 py-5">
           <h2 className="text-sm font-semibold text-foreground">Cabin on Lake Verity</h2>
-          <p className="mt-1 text-sm text-muted">
+          <p className="mt-1 text-sm text-ns-muted">
             Pick your dates — the tape measures the stay as you drag, not after.
           </p>
         </div>
@@ -35,7 +35,7 @@ export default function SpanTapeDemo() {
         </div>
 
         <div className="flex items-center justify-between border-t border-border px-6 py-4">
-          <p className="font-mono text-xs text-muted">
+          <p className="font-mono text-xs text-ns-muted">
             {range
               ? `${n} night${n === 1 ? "" : "s"} · $${(n * NIGHTLY_RATE).toLocaleString()}`
               : "No dates selected"}
@@ -43,14 +43,14 @@ export default function SpanTapeDemo() {
           <button
             type="button"
             disabled={!range}
-            className="rounded-sm border border-border px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-foreground/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-40"
+            className="rounded-sm border border-border px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-foreground/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent disabled:cursor-not-allowed disabled:opacity-40"
           >
             Reserve
           </button>
         </div>
       </div>
 
-      <p className="max-w-sm text-center text-xs text-muted">
+      <p className="max-w-sm text-center text-xs text-ns-muted">
         Click a day to hook the tape, move toward another to extend it — the
         count prints on the free end. Click again (or Enter) to lock it,
         Escape to let it recoil back to zero.

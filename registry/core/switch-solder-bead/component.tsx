@@ -166,7 +166,7 @@ export function SolderBridge({
       aria-label={ariaLabel}
       disabled={disabled}
       onClick={toggle}
-      className={`relative inline-flex shrink-0 items-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+      className={`relative inline-flex shrink-0 items-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
         disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer group"
       } ${className}`}
       style={{ width: VIEW_W, height: VIEW_H }}

@@ -7,7 +7,7 @@ import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 // a silhouette painted where it hangs, so you know what belongs even with
 // nothing on the wall. Each unfilled slot renders the item's own card markup
 // (avatar circle, title bar, subtitle bar) recolored to a "shadow" — 1.5px
-// dashed --border outline, --muted fill at 40% opacity, a tiny inline-SVG
+// dashed --border outline, --ns-muted fill at 40% opacity, a tiny inline-SVG
 // hook notch overlapping its top edge — so the empty state previews the
 // exact spatial geometry future items will occupy instead of showing an
 // illustration. This is deliberately prescriptive, not dormant: compare
@@ -111,7 +111,7 @@ function CardShape({
     <div
       className={
         shadow
-          ? "flex items-center gap-3 rounded-md border-[1.5px] border-dashed border-border bg-muted/40 p-3"
+          ? "flex items-center gap-3 rounded-md border-[1.5px] border-dashed border-border bg-ns-muted/40 p-3"
           : "flex items-center gap-3 rounded-md border border-border bg-surface p-3"
       }
     >
@@ -119,7 +119,7 @@ function CardShape({
         className={
           shadow
             ? "h-9 w-9 shrink-0 rounded-full border-[1.5px] border-dashed border-border"
-            : "flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted/30 text-xs font-medium text-foreground"
+            : "flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ns-muted/30 text-xs font-medium text-foreground"
         }
       >
         {shadow ? null : avatar}
@@ -133,7 +133,7 @@ function CardShape({
         ) : (
           <>
             <p className="truncate text-sm font-medium leading-none text-foreground">{title}</p>
-            <p className="truncate text-xs leading-none text-muted">{subtitle}</p>
+            <p className="truncate text-xs leading-none text-ns-muted">{subtitle}</p>
           </>
         )}
       </div>
@@ -250,14 +250,14 @@ export function ShadowBoard({
         <div className="mb-4 flex items-start justify-between gap-4">
           <div>
             <h2 className="text-sm font-semibold text-foreground">{title}</h2>
-            <p id={descId} className="mt-1 text-xs text-muted">
+            <p id={descId} className="mt-1 text-xs text-ns-muted">
               {description}
             </p>
           </div>
           <button
             type="button"
             onClick={onCreate}
-            className="inline-flex shrink-0 items-center justify-center rounded-sm bg-accent px-3 py-1.5 text-xs font-medium text-white transition-[background-color,transform] duration-150 ease-out hover:-translate-y-px hover:bg-accent-hover active:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="inline-flex shrink-0 items-center justify-center rounded-sm bg-ns-accent px-3 py-1.5 text-xs font-medium text-white transition-[background-color,transform] duration-150 ease-out hover:-translate-y-px hover:bg-ns-accent-hover active:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             {createLabel}
           </button>
@@ -278,7 +278,7 @@ export function ShadowBoard({
           <button
             type="button"
             onClick={() => setDismissed(true)}
-            className="mt-3 rounded-sm px-1 text-xs text-muted underline decoration-border underline-offset-4 transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="mt-3 rounded-sm px-1 text-xs text-ns-muted underline decoration-border underline-offset-4 transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             Dismiss remaining
           </button>

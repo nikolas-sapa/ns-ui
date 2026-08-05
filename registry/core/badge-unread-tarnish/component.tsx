@@ -7,7 +7,7 @@ import { useEffect, useId, useRef, useState } from "react";
 // Its data-stage is derived from the newest item's timestamp, not the count:
 // fresh (< 1 day) is a solid --foreground fill with background-token digits,
 // waning (< 1 week) thins to a transparent fill with a 1.5px --foreground
-// ring, dormant (>= 1 week) settles into a 1px --muted ring with --muted
+// ring, dormant (>= 1 week) settles into a 1px --ns-muted ring with --ns-muted
 // digits — fill, outline weight and text tone all move together so the three
 // stages read apart under monochrome viewing, never by hue alone. Ordinary
 // aging (the interval tick, or a prop simply reflecting more elapsed time)
@@ -98,7 +98,7 @@ function useReducedMotion() {
 const STAGE_CLASSES: Record<PatinaPipStage, string> = {
   fresh: "bg-foreground text-background border border-foreground font-semibold",
   waning: "bg-transparent text-foreground border-[1.5px] border-foreground font-medium",
-  dormant: "bg-transparent text-muted border border-muted font-normal",
+  dormant: "bg-transparent text-ns-muted border border-ns-muted font-normal",
 };
 
 const BASE_CLASSES =

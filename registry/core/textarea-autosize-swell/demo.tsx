@@ -28,13 +28,13 @@ export default function ProofRiseDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-6 text-foreground">
       <div className="w-full max-w-md">
-        <p className="font-mono text-xs tracking-widest text-muted">
+        <p className="font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / textarea-autosize-swell
         </p>
         <h1 className="mt-3 text-2xl font-semibold tracking-tight">
           It rises like it&apos;s proofing.
         </h1>
-        <p className="mt-2 text-sm leading-relaxed text-muted">
+        <p className="mt-2 text-sm leading-relaxed text-ns-muted">
           Type and it swells open line by line. Paste a paragraph and it
           takes one slow continuous breath instead of popping open. Delete
           it back down and the fall is slower still, so nothing ever snaps
@@ -55,21 +55,21 @@ export default function ProofRiseDemo() {
             <button
               type="button"
               onClick={() => nativeInsert(LONG_COMMENT, true)}
-              className="rounded-sm border border-border px-3 py-1.5 font-mono text-[11px] tracking-widest text-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground"
+              className="rounded-sm border border-border px-3 py-1.5 font-mono text-[11px] tracking-widest text-ns-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground"
             >
               PASTE LONG COMMENT
             </button>
             <button
               type="button"
               onClick={() => nativeInsert("", false)}
-              className="font-mono text-[11px] tracking-widest text-muted transition-colors duration-200 hover:text-foreground"
+              className="font-mono text-[11px] tracking-widest text-ns-muted transition-colors duration-200 hover:text-foreground"
             >
               CLEAR
             </button>
           </div>
         </form>
 
-        <p className="mt-3 font-mono text-[11px] text-muted">
+        <p className="mt-3 font-mono text-[11px] text-ns-muted">
           grows in 180ms, shrinks in 320ms, a big paste breathes open over
           400ms — same curve, three different weights
         </p>

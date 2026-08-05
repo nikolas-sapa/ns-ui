@@ -68,13 +68,13 @@ const GLYPH: Record<LogSeverity, string> = {
 // glyph AND weight together, never hue alone. The faintest ink is a muted
 // tint, NOT `text-border` — --border is tuned for 1px hairlines and is
 // invisible as type on the light theme (#ebebeb on #ffffff).
-const FAINT = "text-muted/45";
+const FAINT = "text-ns-muted/45";
 
 const SEV_INK: Record<LogSeverity, string> = {
   DEBUG: FAINT,
-  INFO: "text-muted",
+  INFO: "text-ns-muted",
   WARN: "text-foreground font-medium",
-  ERROR: "text-accent font-semibold",
+  ERROR: "text-ns-accent font-semibold",
 };
 
 const DEFAULT_SERVICES = [
@@ -442,7 +442,7 @@ export function LogViewerAsciiTail({
     >
       {/* header: the level control doubles as the glyph legend */}
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-border px-3 py-2">
-        <span className="text-muted">
+        <span className="text-ns-muted">
           tail -f <span className="text-foreground">/var/log/edge.log</span>
         </span>
 
@@ -465,8 +465,8 @@ export function LogViewerAsciiTail({
                 aria-checked={on}
                 tabIndex={on ? 0 : -1}
                 onClick={() => setMinLevel(lv)}
-                className={`px-2 py-1 whitespace-pre transition-colors duration-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent ${
-                  on ? "bg-surface text-foreground" : "text-muted hover:text-foreground"
+                className={`px-2 py-1 whitespace-pre transition-colors duration-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ns-accent ${
+                  on ? "bg-surface text-foreground" : "text-ns-muted hover:text-foreground"
                 }`}
               >
                 <span className={on ? "" : SEV_INK[lv]}>{GLYPH[lv]}</span> {lv}
@@ -476,7 +476,7 @@ export function LogViewerAsciiTail({
         </div>
 
         <div className="flex items-center gap-2">
-          <label htmlFor={inputId} className="text-muted">
+          <label htmlFor={inputId} className="text-ns-muted">
             grep
           </label>
           <input
@@ -486,11 +486,11 @@ export function LogViewerAsciiTail({
             onChange={(e) => setQuery(e.target.value)}
             placeholder="502"
             spellCheck={false}
-            className="w-28 rounded-sm border border-border bg-surface px-2 py-1 font-mono text-xs text-foreground placeholder:text-muted/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent"
+            className="w-28 rounded-sm border border-border bg-surface px-2 py-1 font-mono text-xs text-foreground placeholder:text-ns-muted/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ns-accent"
           />
         </div>
 
-        <span className="ml-auto tabular-nums text-muted">
+        <span className="ml-auto tabular-nums text-ns-muted">
           {rows.length}/{lines.length} lines · ring {capacity}
         </span>
       </div>
@@ -506,13 +506,13 @@ export function LogViewerAsciiTail({
           tabIndex={0}
           onScroll={onScroll}
           onKeyDown={onKeyDown}
-          className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent"
+          className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ns-accent"
         >
           <div className="relative w-full" style={{ height: rows.length * ROW_H }}>
             {visible.map((l, i) => (
               <div
                 key={l.seq}
-                className="absolute inset-x-0 flex items-center whitespace-pre px-3 text-muted transition-colors duration-100 hover:bg-surface hover:text-foreground"
+                className="absolute inset-x-0 flex items-center whitespace-pre px-3 text-ns-muted transition-colors duration-100 hover:bg-surface hover:text-foreground"
                 style={{ top: (range.start + i) * ROW_H, height: ROW_H }}
               >
                 <span className="tabular-nums">{l.time}</span>
@@ -523,7 +523,7 @@ export function LogViewerAsciiTail({
                 <span className={FAINT}>{" │ "}</span>
                 <span>
                   {inkMatches(l.message, query.trim()).map((seg, k) => (
-                    <span key={k} className={seg.hit ? "text-accent" : undefined}>
+                    <span key={k} className={seg.hit ? "text-ns-accent" : undefined}>
                       {seg.text}
                     </span>
                   ))}
@@ -538,10 +538,10 @@ export function LogViewerAsciiTail({
           <button
             type="button"
             onClick={attach}
-            className="absolute inset-x-0 bottom-0 border-t border-border bg-surface py-1.5 text-center whitespace-pre text-muted transition-colors duration-100 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent"
+            className="absolute inset-x-0 bottom-0 border-t border-border bg-surface py-1.5 text-center whitespace-pre text-ns-muted transition-colors duration-100 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ns-accent"
           >
             {"└─ "}
-            <span className="tabular-nums text-accent">{newCount}</span>
+            <span className="tabular-nums text-ns-accent">{newCount}</span>
             {` new line${newCount === 1 ? "" : "s"} ─ End to follow ─┘`}
           </button>
         )}
@@ -549,7 +549,7 @@ export function LogViewerAsciiTail({
 
       {reduced && (
         <div className="flex items-center justify-between gap-3 border-t border-border px-3 py-2">
-          <span className="text-muted">
+          <span className="text-ns-muted">
             {running
               ? `stream running — ${lines.length} lines in the ring`
               : `stream paused — ${lines.length} lines loaded`}
@@ -557,7 +557,7 @@ export function LogViewerAsciiTail({
           <button
             type="button"
             onClick={() => setRunning((r) => !r)}
-            className="rounded-sm border border-border px-2 py-1 whitespace-pre text-muted transition-colors duration-100 hover:border-muted hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent"
+            className="rounded-sm border border-border px-2 py-1 whitespace-pre text-ns-muted transition-colors duration-100 hover:border-ns-muted hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ns-accent"
           >
             {running ? "■ pause stream" : "▸ resume stream"}
           </button>

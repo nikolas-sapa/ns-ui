@@ -27,12 +27,12 @@ import { useEffect, useRef, useState } from "react";
 //
 // A locked particle's target point and birth are baked in at that same scan;
 // past its lockBirth it eases from its ambient position onto the needle
-// over a short settle window, tinting from --muted toward --foreground as it
+// over a short settle window, tinting from --ns-muted toward --foreground as it
 // commits. Once every particle has finished settling the loop cancels itself
 // entirely — "frozen" is a real stopped rAF, not a slow one, matching the
 // brief's "freezing solid" rather than an animation that merely looks still.
 //
-// TOKENS: every drawn color is read from --muted / --foreground via
+// TOKENS: every drawn color is read from --ns-muted / --foreground via
 // getComputedStyle at mount and re-derived on a MutationObserver watching
 // documentElement class changes (both the live loop and a frozen redraw use
 // the same ref, so a theme flip repaints correctly whether mid-growth or
@@ -315,7 +315,7 @@ export function SeedCrystal({
     const e = engineRef.current;
 
     const syncColors = () => {
-      e.muted = readToken(panel, "--muted", e.muted);
+      e.muted = readToken(panel, "--ns-muted", e.muted);
       e.foreground = readToken(panel, "--foreground", e.foreground);
     };
 
@@ -392,7 +392,7 @@ export function SeedCrystal({
       }
 
       // particles: ambient shimmer until their needle passes, then settle
-      // onto it, tinting from --muted toward --foreground as they commit.
+      // onto it, tinting from --ns-muted toward --foreground as they commit.
       // (velocity/offset integration for the still-unlocked ones happens once
       // per frame in the caller, before this draw — this only reads state.)
       for (const p of e.particles) {
@@ -620,10 +620,10 @@ export function SeedCrystal({
 
         <div className="relative z-10 flex h-full flex-col justify-between gap-6">
           <div>
-            <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+            <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
               Secure checkout
             </p>
-            <p className="mt-1 text-sm text-muted">
+            <p className="mt-1 text-sm text-ns-muted">
               One-time confirmation — held in a supercooled state until you act.
             </p>
           </div>
@@ -634,7 +634,7 @@ export function SeedCrystal({
               type="button"
               onClick={(ev) => handleActivate(ev.clientX, ev.clientY)}
               aria-busy={status === "pending"}
-              className="inline-flex items-center gap-2 rounded-sm bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="inline-flex items-center gap-2 rounded-sm bg-ns-accent px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-ns-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
             >
               {status === "success" ? (
                 <>

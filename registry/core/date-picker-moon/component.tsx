@@ -662,7 +662,7 @@ export function TerminatorDateField({
         } ${
           disabled
             ? "cursor-not-allowed opacity-60"
-            : "focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/25 hover:border-foreground/25"
+            : "focus-within:border-ns-accent focus-within:ring-2 focus-within:ring-ns-accent/25 hover:border-foreground/25"
         }`}
       >
         <input
@@ -727,7 +727,7 @@ export function TerminatorDateField({
             if (text !== "" && parseMasked(text) === null)
               setText(selected ? fmt(selected) : "");
           }}
-          className="h-9 w-full bg-transparent font-mono text-sm text-foreground placeholder:text-muted/60 focus:outline-none disabled:cursor-not-allowed"
+          className="h-9 w-full bg-transparent font-mono text-sm text-foreground placeholder:text-ns-muted/60 focus:outline-none disabled:cursor-not-allowed"
         />
         <button
           type="button"
@@ -737,7 +737,7 @@ export function TerminatorDateField({
           aria-haspopup="grid"
           aria-controls={open ? popId : undefined}
           onClick={() => (open ? close(false) : openPopover())}
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm text-muted transition-colors hover:bg-foreground/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed"
+          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm text-ns-muted transition-colors hover:bg-foreground/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent disabled:cursor-not-allowed"
         >
           <canvas
             ref={iconCanvasRef}
@@ -749,7 +749,7 @@ export function TerminatorDateField({
         </button>
       </div>
 
-      <p id={helperId} className="mt-1.5 font-mono text-xs text-muted">
+      <p id={helperId} className="mt-1.5 font-mono text-xs text-ns-muted">
         {invalid
           ? "Not a valid date"
           : `${previewName} · ${Math.round(illumination(previewF) * 100)}% illuminated`}
@@ -774,7 +774,7 @@ export function TerminatorDateField({
               type="button"
               aria-label="Previous month"
               onClick={() => moveFocus(addMonths(focusedDate, -1))}
-              className="flex h-7 w-7 items-center justify-center rounded-sm text-muted transition-colors hover:bg-foreground/[0.06] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="flex h-7 w-7 items-center justify-center rounded-sm text-ns-muted transition-colors hover:bg-foreground/[0.06] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
             >
               <svg
                 width="14"
@@ -800,7 +800,7 @@ export function TerminatorDateField({
               type="button"
               aria-label="Next month"
               onClick={() => moveFocus(addMonths(focusedDate, 1))}
-              className="flex h-7 w-7 items-center justify-center rounded-sm text-muted transition-colors hover:bg-foreground/[0.06] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="flex h-7 w-7 items-center justify-center rounded-sm text-ns-muted transition-colors hover:bg-foreground/[0.06] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
             >
               <svg
                 width="14"
@@ -837,7 +837,7 @@ export function TerminatorDateField({
                     key={abbr}
                     role="columnheader"
                     aria-label={full}
-                    className="pb-1 text-center font-mono text-[10px] uppercase tracking-wider text-muted"
+                    className="pb-1 text-center font-mono text-[10px] uppercase tracking-wider text-ns-muted"
                   >
                     {abbr}
                   </div>
@@ -865,18 +865,18 @@ export function TerminatorDateField({
                         aria-label={`${MONTHS[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}. ${PHASE_NAMES[phaseIndex(f)]}.`}
                         onClick={() => commit(date, i)}
                         onFocus={() => setFocusedDate(date)}
-                        className={`relative flex h-11 flex-col items-center rounded-sm pt-[7px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent ${
+                        className={`relative flex h-11 flex-col items-center rounded-sm pt-[7px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ns-accent ${
                           isSel
-                            ? "bg-accent/10 text-accent"
+                            ? "bg-ns-accent/10 text-ns-accent"
                             : inMonth
                               ? "text-foreground hover:bg-foreground/[0.06]"
-                              : "text-muted/70 hover:bg-foreground/[0.04]"
+                              : "text-ns-muted/70 hover:bg-foreground/[0.04]"
                         }`}
                       >
                         <span
                           className={`text-[13px] leading-none ${
                             isToday && !isSel
-                              ? "underline decoration-muted underline-offset-[3px]"
+                              ? "underline decoration-ns-muted underline-offset-[3px]"
                               : ""
                           }`}
                         >

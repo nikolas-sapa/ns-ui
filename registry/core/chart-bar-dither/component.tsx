@@ -14,7 +14,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 // eases down to a fine 2px over ~360ms, a literal focus-pull from a rough
 // proof to a resolved print, while every other bar eases back up to coarse.
 // Density is still the only value channel (var(--foreground) ink on
-// var(--background) paper, --accent reserved for focus only, matching
+// var(--background) paper, --ns-accent reserved for focus only, matching
 // heatmap-year-stipple's precedent) — the focus-pull changes RESOLUTION,
 // never hue, so the family's colour rule survives untouched.
 // ---------------------------------------------------------------------------
@@ -79,9 +79,9 @@ function readTokens(): Tokens {
   return {
     fg: get("--foreground", "#171717"),
     bg: get("--background", "#ffffff"),
-    muted: get("--muted", "#4d4d4d"),
+    muted: get("--ns-muted", "#4d4d4d"),
     border: get("--border", "#ebebeb"),
-    accent: get("--accent", "#006bff"),
+    accent: get("--ns-accent", "#006bff"),
   };
 }
 
@@ -277,11 +277,11 @@ export function ChartBarDither({ data = [], title = "Chart", className = "" }: C
     <figure className={`ns-cbd inline-block ${className}`} aria-label={`${title}, bar chart`}>
       <style>{CSS}</style>
       <div className="flex items-center justify-between gap-3 pb-2">
-        <span className="font-mono text-xs tracking-widest text-muted">{title.toUpperCase()}</span>
+        <span className="font-mono text-xs tracking-widest text-ns-muted">{title.toUpperCase()}</span>
         <button
           type="button"
           onClick={() => setShowTable((s) => !s)}
-          className="ns-cbd-toggle rounded-sm border border-border px-2 py-1 font-mono text-[10px] tracking-widest text-muted transition-colors duration-150 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="ns-cbd-toggle rounded-sm border border-border px-2 py-1 font-mono text-[10px] tracking-widest text-ns-muted transition-colors duration-150 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           aria-pressed={showTable}
         >
           {showTable ? "VIEW CHART" : "VIEW TABLE"}
@@ -293,10 +293,10 @@ export function ChartBarDither({ data = [], title = "Chart", className = "" }: C
           <caption className="sr-only">{title}</caption>
           <thead>
             <tr>
-              <th scope="col" className="border-b border-border px-2 py-1.5 text-left text-muted">
+              <th scope="col" className="border-b border-border px-2 py-1.5 text-left text-ns-muted">
                 Category
               </th>
-              <th scope="col" className="border-b border-border px-2 py-1.5 text-right text-muted tabular-nums">
+              <th scope="col" className="border-b border-border px-2 py-1.5 text-right text-ns-muted tabular-nums">
                 Value
               </th>
             </tr>
@@ -364,7 +364,7 @@ export function ChartBarDither({ data = [], title = "Chart", className = "" }: C
               }}
             >
               <strong className="text-foreground">{formatValue(bars[hovered].value)}</strong>{" "}
-              <span className="text-muted">{bars[hovered].label}</span>
+              <span className="text-ns-muted">{bars[hovered].label}</span>
             </div>
           )}
         </div>
@@ -375,5 +375,5 @@ export function ChartBarDither({ data = [], title = "Chart", className = "" }: C
 
 const CSS = `
 .ns-cbd-hit { touch-action: manipulation; }
-.ns-cbd-hit:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ns-cbd-hit:focus-visible { outline: 2px solid var(--ns-accent); outline-offset: 2px; }
 `;

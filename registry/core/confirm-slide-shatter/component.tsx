@@ -553,7 +553,7 @@ export function SlideToShatter({
           confirmed ? "invisible" : ""
         }`}
       >
-        <span className="absolute inset-0 flex items-center justify-center pl-8 font-mono text-[11px] tracking-[0.25em] text-muted">
+        <span className="absolute inset-0 flex items-center justify-center pl-8 font-mono text-[11px] tracking-[0.25em] text-ns-muted">
           {label}
         </span>
       </div>
@@ -580,7 +580,7 @@ export function SlideToShatter({
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={0}
-        className={`absolute flex cursor-grab touch-none items-center justify-center rounded-sm border border-black/15 bg-black/[0.04] text-muted transition-colors duration-150 hover:border-black/25 hover:bg-black/[0.08] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background shadow-[inset_0_1px_0_0_rgba(255,255,255,0.6),0_2px_8px_-2px_rgba(0,0,0,0.25)] will-change-transform active:cursor-grabbing dark:border-white/15 dark:bg-white/10 dark:hover:border-white/30 dark:hover:bg-white/15 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.18),0_2px_8px_-2px_rgba(0,0,0,0.5)] ${
+        className={`absolute flex cursor-grab touch-none items-center justify-center rounded-sm border border-black/15 bg-black/[0.04] text-ns-muted transition-colors duration-150 hover:border-black/25 hover:bg-black/[0.08] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background shadow-[inset_0_1px_0_0_rgba(255,255,255,0.6),0_2px_8px_-2px_rgba(0,0,0,0.25)] will-change-transform active:cursor-grabbing dark:border-white/15 dark:bg-white/10 dark:hover:border-white/30 dark:hover:bg-white/15 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.18),0_2px_8px_-2px_rgba(0,0,0,0.5)] ${
           confirmed ? "invisible" : ""
         }`}
         style={{ left: INSET, top: INSET, width: thumbSize, height: thumbSize }}

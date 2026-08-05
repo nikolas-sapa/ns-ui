@@ -56,8 +56,8 @@ import {
 // legible and functional.
 //
 // Pure DOM/CSS, no canvas. Ink is token-relative only: --foreground for
-// the dot/line, --border for notches and the rail, --muted for resting
-// label text, --accent solely for the keyboard focus ring.
+// the dot/line, --border for notches and the rail, --ns-muted for resting
+// label text, --ns-accent solely for the keyboard focus ring.
 //
 // Distinct from segmented-control-fling: segmented-control-fling is a horizontal segmented
 // control with a draggable, flingable pill and release-velocity physics.
@@ -478,7 +478,7 @@ export function PinTumbler({
           background: color-mix(in oklab, var(--foreground) 4%, transparent);
         }
         .ns-pt-input:focus-visible + .ns-pt-visual {
-          outline: 2px solid var(--accent);
+          outline: 2px solid var(--ns-accent);
           outline-offset: 2px;
         }
         .ns-pt-rail-col {
@@ -508,7 +508,7 @@ export function PinTumbler({
         }
         .ns-pt-label-text {
           font-size: 0.875rem;
-          color: var(--muted);
+          color: var(--ns-muted);
           transition: color 160ms ease;
         }
         .ns-pt-label-text[data-checked] {
@@ -517,7 +517,7 @@ export function PinTumbler({
         }
         .ns-pt-desc {
           font-size: 0.75rem;
-          color: var(--muted);
+          color: var(--ns-muted);
         }
         .ns-pt-pin {
           /* left sits at the rail column's center and stays there via a

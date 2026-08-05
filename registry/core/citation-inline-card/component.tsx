@@ -34,8 +34,8 @@ import { createPortal } from "react-dom";
 // tech, not just sighted users watching the "1 / N" readout update.
 //
 // Zero dependencies beyond react-dom's createPortal. No canvas — the card is
-// plain DOM, and every color is a token (--background --foreground --muted
-// --border --accent) so both themes render correctly. Under
+// plain DOM, and every color is a token (--background --foreground --ns-muted
+// --border --ns-accent) so both themes render correctly. Under
 // prefers-reduced-motion the entrance animation is dropped via a CSS media
 // query; the card still opens instantly and is fully operable.
 
@@ -116,8 +116,8 @@ function LinkOutIcon() {
 }
 
 const iconBtnClass =
-  "inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-sm text-muted transition-colors duration-150 ease-out " +
-  "hover:bg-background hover:text-foreground focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent " +
+  "inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-sm text-ns-muted transition-colors duration-150 ease-out " +
+  "hover:bg-background hover:text-foreground focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ns-accent " +
   "disabled:pointer-events-none disabled:opacity-30";
 
 export function MarginCite({ sources, className = "" }: MarginCiteProps) {
@@ -254,10 +254,10 @@ export function MarginCite({ sources, className = "" }: MarginCiteProps) {
           "relative -top-[0.5em] ml-0.5 inline-flex items-center gap-0.5 rounded-full border px-1.5 py-0.5 align-baseline",
           "font-mono text-[0.65rem] leading-none",
           "transition-colors duration-150 ease-out",
-          "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+          "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent",
           open
             ? "border-foreground/30 bg-surface text-foreground"
-            : "border-border bg-surface text-muted hover:border-foreground/30 hover:text-foreground",
+            : "border-border bg-surface text-ns-muted hover:border-foreground/30 hover:text-foreground",
         ].join(" ")}
       >
         <span>{primaryHost}</span>
@@ -297,12 +297,12 @@ export function MarginCite({ sources, className = "" }: MarginCiteProps) {
             className="ns-citation-inline-card-panel z-50 max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-md border border-border bg-surface text-foreground shadow-lg outline-none"
           >
             <div className="flex items-center justify-between gap-2 border-b border-border px-3 py-2">
-              <span aria-hidden className="font-mono text-[11px] tabular-nums tracking-wide text-muted">
+              <span aria-hidden className="font-mono text-[11px] tabular-nums tracking-wide text-ns-muted">
                 {clampedIndex + 1}
                 {/* --border is tuned to disappear against a surface, which is
                     right for a hairline and wrong for a glyph: as `text-border`
                     this slash vanished and the readout rendered as "1  3". */}
-                <span className="mx-0.5 text-muted/50">/</span>
+                <span className="mx-0.5 text-ns-muted/50">/</span>
                 {n}
               </span>
               <div className="flex items-center gap-0.5">
@@ -343,12 +343,12 @@ export function MarginCite({ sources, className = "" }: MarginCiteProps) {
               <p id={titleId} className="text-sm font-semibold leading-snug text-foreground">
                 {current.title}
               </p>
-              <p className="line-clamp-3 text-sm leading-relaxed text-muted">{current.excerpt}</p>
+              <p className="line-clamp-3 text-sm leading-relaxed text-ns-muted">{current.excerpt}</p>
               <a
                 href={current.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-0.5 inline-flex w-fit items-center gap-1 font-mono text-xs text-muted transition-colors duration-150 ease-out hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                className="mt-0.5 inline-flex w-fit items-center gap-1 font-mono text-xs text-ns-muted transition-colors duration-150 ease-out hover:text-ns-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
               >
                 {hostnameOf(current.url)}
                 <LinkOutIcon />

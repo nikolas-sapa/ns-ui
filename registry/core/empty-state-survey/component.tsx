@@ -290,7 +290,7 @@ export function StakeLine({
               <g key={i} transform={`translate(${c.x + c.dx}, ${c.y + c.dy})`}>
                 <path
                   d="M0,3 L0,-8 M-3,-8 L3,-8"
-                  stroke="var(--muted)"
+                  stroke="var(--ns-muted)"
                   strokeWidth={1.5}
                   strokeLinecap="round"
                   fill="none"
@@ -349,7 +349,7 @@ export function StakeLine({
 
       <div className="relative z-10 mt-10 flex flex-col items-center px-6 pb-2 text-center">
         <h2 className="text-base font-semibold tracking-tight text-foreground">{title}</h2>
-        <p className="mt-2 max-w-[38ch] text-sm leading-relaxed text-muted">{description}</p>
+        <p className="mt-2 max-w-[38ch] text-sm leading-relaxed text-ns-muted">{description}</p>
         <button
           ref={ctaRef}
           type="button"
@@ -359,12 +359,12 @@ export function StakeLine({
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           className={[
-            "mt-6 inline-flex items-center justify-center rounded-sm bg-accent px-4 py-2",
+            "mt-6 inline-flex items-center justify-center rounded-sm bg-ns-accent px-4 py-2",
             "text-sm font-medium text-white",
             "transition-[background-color,transform,box-shadow] duration-200 ease-out",
-            "hover:-translate-y-px hover:bg-accent-hover hover:shadow-[0_0_0_1px_var(--accent)]",
-            "active:translate-y-0 active:bg-accent-hover",
-            "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+            "hover:-translate-y-px hover:bg-ns-accent-hover hover:shadow-[0_0_0_1px_var(--ns-accent)]",
+            "active:translate-y-0 active:bg-ns-accent-hover",
+            "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent",
           ].join(" ")}
         >
           {actionLabel}

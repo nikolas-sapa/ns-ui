@@ -28,7 +28,7 @@
 //
 // Pure DOM/SVG/CSS, no canvas. Colors are CSS custom properties only:
 // --foreground for ink/ the engaged tooth, --border for resting teeth and
-// hairlines, --muted for secondary text, --accent for focus rings only.
+// hairlines, --ns-muted for secondary text, --ns-accent for focus rings only.
 
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 
@@ -282,7 +282,7 @@ export function PawlClick({
         aria-activedescendant={topCard ? optionId(topCard.id) : undefined}
         tabIndex={0}
         onKeyDown={onKeyDown}
-        className="ns-pw-stack relative rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        className="ns-pw-stack relative rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         style={{ height: 176 }}
       >
         {stackVisible
@@ -306,7 +306,7 @@ export function PawlClick({
               >
                 <h3 className="text-sm font-semibold text-foreground">{card.title}</h3>
                 {card.subtitle && (
-                  <p className="text-xs text-muted">{card.subtitle}</p>
+                  <p className="text-xs text-ns-muted">{card.subtitle}</p>
                 )}
                 {card.body && isTop && (
                   <p className="mt-1 text-sm leading-relaxed text-foreground/90">{card.body}</p>
@@ -325,14 +325,14 @@ export function PawlClick({
           >
             <h3 className="text-sm font-semibold text-foreground">{exiting.card.title}</h3>
             {exiting.card.subtitle && (
-              <p className="text-xs text-muted">{exiting.card.subtitle}</p>
+              <p className="text-xs text-ns-muted">{exiting.card.subtitle}</p>
             )}
           </div>
         )}
 
         {!topCard && (
           <div className="absolute inset-0 flex items-center justify-center rounded-md border border-dashed border-border">
-            <p className="text-sm text-muted">Queue clear</p>
+            <p className="text-sm text-ns-muted">Queue clear</p>
           </div>
         )}
       </div>
@@ -410,7 +410,7 @@ export function PawlClick({
           type="button"
           onClick={() => commit("archived")}
           disabled={busyOrEmpty}
-          className="ns-pw-btn flex-1 rounded-sm border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground transition-colors hover:enabled:border-muted hover:enabled:bg-border/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-45"
+          className="ns-pw-btn flex-1 rounded-sm border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground transition-colors hover:enabled:border-ns-muted hover:enabled:bg-border/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent disabled:cursor-not-allowed disabled:opacity-45"
         >
           Archive
         </button>
@@ -418,7 +418,7 @@ export function PawlClick({
           type="button"
           onClick={() => commit("kept")}
           disabled={busyOrEmpty}
-          className="ns-pw-btn flex-1 rounded-sm border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground transition-colors hover:enabled:border-muted hover:enabled:bg-border/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-45"
+          className="ns-pw-btn flex-1 rounded-sm border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground transition-colors hover:enabled:border-ns-muted hover:enabled:bg-border/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent disabled:cursor-not-allowed disabled:opacity-45"
         >
           Keep
         </button>
@@ -426,13 +426,13 @@ export function PawlClick({
           type="button"
           data-pawl-undo
           onClick={undo}
-          className="ns-pw-btn rounded-sm border border-border bg-surface px-3 py-2 text-sm font-medium text-muted transition-colors hover:border-muted hover:bg-border/60 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="ns-pw-btn rounded-sm border border-border bg-surface px-3 py-2 text-sm font-medium text-ns-muted transition-colors hover:border-ns-muted hover:bg-border/60 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
         >
           Undo
         </button>
       </div>
 
-      <p className="text-xs text-muted">
+      <p className="text-xs text-ns-muted">
         Left/Right or J/K to triage, U (or Cmd/Ctrl+Z) to undo — undo lifts the pawl before the
         rack eases back.
       </p>

@@ -286,7 +286,7 @@ export function EmergeDialog({
               </h2>
             )}
             {description && (
-              <p id={descId} className="text-sm leading-relaxed text-muted">
+              <p id={descId} className="text-sm leading-relaxed text-ns-muted">
                 {description}
               </p>
             )}

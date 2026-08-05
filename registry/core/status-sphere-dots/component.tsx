@@ -10,7 +10,7 @@ import { useEffect, useRef } from "react";
 // axis, projected to 2D, then depth-sorted and repainted back-to-front every
 // frame. Depth is the whole signature: a dot near the viewer is larger, fully
 // opaque and inked with --foreground; a dot on the far side is smaller, dim,
-// and inked with --muted — that size+opacity ramp is what makes the field read
+// and inked with --ns-muted — that size+opacity ramp is what makes the field read
 // as a SPHERE and not a flat ring. Four states are distinct by MOTION, not
 // color: thinking = steady spin; searching = spin plus an accent latitude band
 // that sweeps pole to pole; done = the sphere contracts and decelerates to a
@@ -206,10 +206,10 @@ export function GyreMote({
         c.style.opacity = so[i]!.toFixed(3);
         c.style.fill =
           sf[i] === 2
-            ? "var(--accent)"
+            ? "var(--ns-accent)"
             : sf[i] === 1
               ? "var(--foreground)"
-              : "var(--muted)";
+              : "var(--ns-muted)";
       }
     };
 
@@ -345,12 +345,12 @@ export function GyreMote({
             cx={CX}
             cy={CY}
             r={1.5}
-            style={{ fill: "var(--muted)" }}
+            style={{ fill: "var(--ns-muted)" }}
           />
         ))}
       </svg>
       {showLabel ? (
-        <span className="text-sm text-muted">{text}</span>
+        <span className="text-sm text-ns-muted">{text}</span>
       ) : (
         <span className="sr-only">{text}</span>
       )}

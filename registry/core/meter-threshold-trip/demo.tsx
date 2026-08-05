@@ -17,13 +17,13 @@ export default function BimetalTripDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-md">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">
+        <p className="mb-4 font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / meter-threshold-trip
         </p>
         <h1 className="text-lg font-semibold text-foreground">
           Queue latency alert
         </h1>
-        <p className="mt-1 text-sm leading-relaxed text-muted">
+        <p className="mt-1 text-sm leading-relaxed text-ns-muted">
           The strip bows as latency climbs and snaps against the contact the
           instant it trips — then stays latched, unmoved by a value that
           only dips partway back. It only re-arms once latency falls all the
@@ -41,20 +41,20 @@ export default function BimetalTripDemo() {
         </div>
 
         <div className="mt-4 flex items-center justify-between gap-4 rounded-md border border-border px-5 py-3">
-          <span className="font-mono text-[11px] text-muted">
+          <span className="font-mono text-[11px] text-ns-muted">
             step the next latency sample
           </span>
           <button
             type="button"
             data-bimetal-cycle
             onClick={() => setStep((s) => s + 1)}
-            className="rounded-sm border border-border px-3 py-1.5 font-mono text-[11px] tracking-widest text-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="rounded-sm border border-border px-3 py-1.5 font-mono text-[11px] tracking-widest text-ns-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             NEXT
           </button>
         </div>
 
-        <p className="mt-3 font-mono text-[11px] text-muted">
+        <p className="mt-3 font-mono text-[11px] text-ns-muted">
           latched ≠ still over trip — it stays latched until the value clears
           the lower mark, not just drops below the trip point
         </p>

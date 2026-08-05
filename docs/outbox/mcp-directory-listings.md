@@ -45,8 +45,8 @@ The registry it serves has 228 items and the repo is public and MIT.
     signature, dependencies, install command, and the real `component.tsx` source.
   - `list_categories()` — the 12-category taxonomy with counts, plus per-collection counts.
   - `install_command(name)` — the exact `npx shadcn add …` string for one component.
-  - `get_conventions()` — the token contract (`--background`/`--foreground`/`--muted`/
-    `--border`/`--accent`, Tailwind v4, React 19, `prefers-reduced-motion`, accessibility
+  - `get_conventions()` — the token contract (`--background`/`--foreground`/`--ns-muted`/
+    `--border`/`--ns-accent`, Tailwind v4, React 19, `prefers-reduced-motion`, accessibility
     baseline).
 
 ---

@@ -78,13 +78,13 @@ export default function MatCropDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">ns-ui / image-crop-mat</p>
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">ns-ui / image-crop-mat</p>
 
       <div ref={containerRef}>
         <MatCrop />
       </div>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Drag a mat edge or corner to define the crop; a rule-of-thirds grid
         appears only while dragging. Ratio presets snap the mats to a settle.
       </p>

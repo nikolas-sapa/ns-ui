@@ -5,7 +5,7 @@ import { HingeTopple } from "./component";
 export default function HingeToppleDemo() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-10 bg-background px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-widest text-muted">
+      <p className="font-mono text-xs uppercase tracking-widest text-ns-muted">
         ns-ui / loader-die-tumble
       </p>
 
@@ -19,10 +19,10 @@ export default function HingeToppleDemo() {
 
       <div className="flex items-center gap-3 rounded-md border border-border bg-surface px-4 py-3">
         <HingeTopple size={22} label="Loading" />
-        <span className="text-xs text-muted">inline, at 22px</span>
+        <span className="text-xs text-ns-muted">inline, at 22px</span>
       </div>
 
-      <p className="max-w-sm text-center font-mono text-[10px] text-muted">
+      <p className="max-w-sm text-center font-mono text-[10px] text-ns-muted">
         each landing overshoots ~8deg then corrects on a spring — never a clean stop
       </p>
     </main>

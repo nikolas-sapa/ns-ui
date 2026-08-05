@@ -314,7 +314,7 @@ export function AsciiFlowDiagram({
             on the SAME px grid the absolutely-positioned node buttons use —
             a flowing string drifts column alignment cumulatively across the
             row until connectors miss the node edges they're meant to touch. */}
-        <div aria-hidden className="pointer-events-none absolute inset-0 text-muted" style={{ fontSize: 11 }}>
+        <div aria-hidden className="pointer-events-none absolute inset-0 text-ns-muted" style={{ fontSize: 11 }}>
           {rows.map((line, y) => (
             <div key={y} style={{ height: CELL_H, lineHeight: `${CELL_H}px`, whiteSpace: "nowrap" }}>
               {line.split("").map((ch, x) => (
@@ -337,10 +337,10 @@ export function AsciiFlowDiagram({
               data-diagram-node={n.id}
               className={`ns-daf-node absolute flex items-center justify-center border bg-background text-[11px] transition-colors duration-150 motion-reduce:transition-none ${
                 selected
-                  ? "border-accent text-foreground"
+                  ? "border-ns-accent text-foreground"
                   : hovered
-                    ? "border-accent/40 text-foreground"
-                    : "border-border text-muted"
+                    ? "border-ns-accent/40 text-foreground"
+                    : "border-border text-ns-muted"
               }`}
               style={{
                 left: pos.col * CELL_W,
@@ -400,7 +400,7 @@ export function AsciiFlowDiagram({
         })}
       </div>
 
-      <div className="mt-3 min-h-[1.5em] font-mono text-xs text-muted">
+      <div className="mt-3 min-h-[1.5em] font-mono text-xs text-ns-muted">
         {selectedId ? (
           <span data-diagram-selection>
             Selected: <strong className="text-foreground">{nodes.find((n) => n.id === selectedId)?.label}</strong> —{" "}
@@ -415,5 +415,5 @@ export function AsciiFlowDiagram({
 }
 
 const CSS = `
-.ns-daf-node:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ns-daf-node:focus-visible { outline: 2px solid var(--ns-accent); outline-offset: 2px; }
 `;

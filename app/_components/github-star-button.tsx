@@ -48,7 +48,7 @@ export function GitHubStarButton({
         target="_blank"
         rel="noopener noreferrer"
         aria-label={ariaLabel}
-        className={`inline-flex items-center gap-2 rounded-sm border border-border px-4 py-2 text-sm text-foreground outline-none transition-colors hover:border-muted hover:bg-surface focus-visible:ring-2 focus-visible:ring-accent ${className}`}
+        className={`inline-flex items-center gap-2 rounded-sm border border-border px-4 py-2 text-sm text-foreground outline-none transition-colors hover:border-ns-muted hover:bg-surface focus-visible:ring-2 focus-visible:ring-ns-accent ${className}`}
       >
         <StarIcon />
         {label}
@@ -70,7 +70,7 @@ export function GitHubStarButton({
         rel="noopener noreferrer"
         aria-label={ariaLabel}
         style={{ borderRadius: 6 }}
-        className="inline-flex items-center gap-2 bg-surface px-4 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:bg-border/60 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        className="inline-flex items-center gap-2 bg-surface px-4 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:bg-border/60 focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         <StarIcon />
         {label}
@@ -89,7 +89,7 @@ export function GitHubStarButton({
 function StarCount({ stars }: { stars: number | null }) {
   if (stars === null) return null;
   return (
-    <span aria-hidden className="ml-0.5 flex items-center gap-2 border-l border-border pl-2 font-mono text-xs tabular-nums text-muted">
+    <span aria-hidden className="ml-0.5 flex items-center gap-2 border-l border-border pl-2 font-mono text-xs tabular-nums text-ns-muted">
       {formatStarCount(stars)}
     </span>
   );

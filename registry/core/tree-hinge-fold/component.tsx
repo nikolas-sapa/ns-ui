@@ -173,10 +173,10 @@ function Branch({
       className="group/item cursor-pointer outline-none"
     >
       <div
-        className={`flex items-center gap-1.5 rounded-sm px-2 py-1.5 transition-colors duration-150 group-focus-visible/item:outline-2 group-focus-visible/item:-outline-offset-2 group-focus-visible/item:outline-accent ${
+        className={`flex items-center gap-1.5 rounded-sm px-2 py-1.5 transition-colors duration-150 group-focus-visible/item:outline-2 group-focus-visible/item:-outline-offset-2 group-focus-visible/item:outline-ns-accent ${
           isSelected
             ? "bg-surface text-foreground"
-            : "text-muted hover:bg-surface hover:text-foreground"
+            : "text-ns-muted hover:bg-surface hover:text-foreground"
         }`}
         style={{ paddingLeft: `${8 + depth * 20}px` }}
       >
@@ -255,7 +255,7 @@ function Branch({
               />
               <span
                 aria-hidden="true"
-                className="absolute top-0.5 z-10 h-[5px] w-[5px] rounded-full border border-muted bg-surface pointer-events-none"
+                className="absolute top-0.5 z-10 h-[5px] w-[5px] rounded-full border border-ns-muted bg-surface pointer-events-none"
                 style={{ left: `${13 + depth * 20 + 6}px` }}
               />
               {node.children!.map((child, i) => (

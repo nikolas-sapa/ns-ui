@@ -57,7 +57,7 @@ export default function GrainTallyDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-lg">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">
+        <p className="mb-4 font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / histogram-live-grain
         </p>
         <div className="rounded-md border border-border bg-surface p-5">
@@ -71,20 +71,20 @@ export default function GrainTallyDemo() {
             height={150}
           />
           <div className="mt-4 flex items-center justify-between border-t border-border pt-3">
-            <span className="font-mono text-[10px] uppercase tracking-widest text-muted">
+            <span className="font-mono text-[10px] uppercase tracking-widest text-ns-muted">
               rolling window · {WINDOW} samples
             </span>
             <button
               type="button"
               onClick={() => setPaused((p) => !p)}
               aria-pressed={paused}
-              className="cursor-pointer rounded-sm border border-border px-3 py-1 font-mono text-[11px] text-muted transition-colors duration-150 hover:border-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="cursor-pointer rounded-sm border border-border px-3 py-1 font-mono text-[11px] text-ns-muted transition-colors duration-150 hover:border-ns-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
             >
               {paused ? "resume feed" : "pause feed"}
             </button>
           </div>
         </div>
-        <p className="mt-3 font-mono text-[11px] text-muted">
+        <p className="mt-3 font-mono text-[11px] text-ns-muted">
           every sample falls as a grain into its bin — the heap is the
           histogram, and the P50/P90 fences slide as it shifts
         </p>

@@ -161,7 +161,7 @@ or `llms.txt`, and it changes nothing about the component, the demo, or
 ## The token rule
 
 Colors come from the CSS custom properties already in scope: `--background`,
-`--foreground`, `--muted`, `--border`, `--accent`. Never a hardcoded hex, in
+`--foreground`, `--ns-muted`, `--border`, `--ns-accent`. Never a hardcoded hex, in
 markup or in canvas/SVG draw code. This broke the light theme across the whole
 registry once. If a component derives ink for a `<canvas>`, read it via
 `getComputedStyle` at mount and on theme change.

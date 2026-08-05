@@ -45,7 +45,7 @@ export default function WipBoardDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-8 py-10">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / board-kanban-ascii-wip
       </p>
 
@@ -60,7 +60,7 @@ export default function WipBoardDemo() {
         }
       />
 
-      <p className="font-mono text-[11px] text-muted">
+      <p className="font-mono text-[11px] text-ns-muted">
         drag a card, or focus one and use the arrow keys &middot; {note}
       </p>
     </div>

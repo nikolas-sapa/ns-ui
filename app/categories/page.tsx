@@ -63,7 +63,7 @@ export default function CategoriesIndexPage() {
 
       <header className="pt-20 sm:pt-28">
         <div className="flex items-center justify-between gap-4">
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-ns-muted">
             ns-ui / categories
           </p>
           <ThemeToggle />
@@ -71,7 +71,7 @@ export default function CategoriesIndexPage() {
         <h1 className="mt-5 text-3xl font-semibold leading-[1.15] tracking-tight sm:text-4xl">
           Categories.
         </h1>
-        <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted">
+        <p className="mt-4 max-w-xl text-sm leading-relaxed text-ns-muted">
           {COMPONENT_COUNT} components grouped by the role a developer already has a word
           for — pick one to see everything in it.
         </p>
@@ -82,16 +82,16 @@ export default function CategoriesIndexPage() {
           <li key={c.id} className="border-b border-border pb-8 last:border-none">
             <Link
               href={`/categories/${c.id}`}
-              className="group block rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="group block rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
             >
               <div className="flex items-baseline justify-between gap-4">
-                <h2 className="text-lg font-medium tracking-tight text-foreground transition-colors group-hover:text-accent">
+                <h2 className="text-lg font-medium tracking-tight text-foreground transition-colors group-hover:text-ns-accent">
                   {CATEGORY_COPY[c.id]?.h1 ?? c.label}
                 </h2>
-                <span className="font-mono text-xs text-muted">{c.members.length}</span>
+                <span className="font-mono text-xs text-ns-muted">{c.members.length}</span>
               </div>
               {CATEGORY_COPY[c.id] ? (
-                <p className="mt-2 text-sm leading-relaxed text-muted">
+                <p className="mt-2 text-sm leading-relaxed text-ns-muted">
                   {CATEGORY_COPY[c.id].intro}
                 </p>
               ) : null}
@@ -103,7 +103,7 @@ export default function CategoriesIndexPage() {
       <div className="mt-16 border-t border-border pt-6">
         <Link
           href="/"
-          className="rounded-sm font-mono text-xs uppercase tracking-wider text-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded-sm font-mono text-xs uppercase tracking-wider text-ns-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
         >
           Back to the catalog
         </Link>

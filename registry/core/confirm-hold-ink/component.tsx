@@ -342,9 +342,9 @@ export function HoldToConfirm({
       className={[
         "relative isolate inline-flex select-none touch-none items-center justify-center overflow-hidden",
         "rounded-sm border border-border bg-surface px-5 py-2.5 text-sm font-medium text-foreground",
-        "hover:border-muted hover:bg-border/60",
+        "hover:border-ns-muted hover:bg-border/60",
         "transition-[border-color,background-color] duration-150",
-        "focus:border-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+        "focus:border-ns-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent",
         className,
       ].join(" ")}
     >

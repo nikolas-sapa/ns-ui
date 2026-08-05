@@ -19,17 +19,17 @@ export default function ChopPressDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / rating-stamp — stamp a level, no stars
       </p>
 
       <div className="w-full max-w-lg rounded-md border border-border bg-surface">
         <div className="border-b border-border px-5 py-4">
-          <p className="font-mono text-xs text-muted">BUG-1142</p>
+          <p className="font-mono text-xs text-ns-muted">BUG-1142</p>
           <h2 className="mt-1 text-sm font-semibold text-foreground">
             Sidebar collapses on window resize below 900px
           </h2>
-          <p className="mt-1 text-xs text-muted">
+          <p className="mt-1 text-xs text-ns-muted">
             Filed by A. Reyes &middot; 2 days ago
           </p>
         </div>
@@ -71,7 +71,7 @@ export default function ChopPressDemo() {
             />
           </div>
 
-          <p aria-live="polite" className="font-mono text-xs text-muted">
+          <p aria-live="polite" className="font-mono text-xs text-ns-muted">
             priority / {priorityWord} &middot; effort /{" "}
             {effort === 0 ? "not set" : EFFORT_NAMES[effort - 1] || effort} &middot;
             confidence / {confidence}/5
@@ -81,20 +81,20 @@ export default function ChopPressDemo() {
         <div className="flex items-center justify-end gap-2 border-t border-border px-5 py-3">
           <button
             type="button"
-            className="rounded-sm border border-border px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:border-foreground/25 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded-sm border border-border px-3 py-1.5 text-xs font-medium text-ns-muted transition-colors hover:border-foreground/25 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             Cancel
           </button>
           <button
             type="button"
-            className="rounded-sm bg-accent px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded-sm bg-ns-accent px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-ns-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             Save triage
           </button>
         </div>
       </div>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Click a seal to stamp that level, or focus the row and use arrow keys.
         Hovering (or tabbing to) a seal dashes the outline of whatever would
         change, before anything commits. Lowering the value drains the marks

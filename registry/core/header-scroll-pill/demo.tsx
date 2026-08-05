@@ -57,10 +57,10 @@ export default function ScrollIslandDemo() {
       <ScrollIsland wordmark="ns-ui" sections={SECTIONS} />
 
       <div className="flex flex-col items-center gap-2 px-6 pb-10 pt-28">
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
           ns-ui / header-scroll-pill
         </p>
-        <p className="max-w-md text-center text-xs text-muted">
+        <p className="max-w-md text-center text-xs text-ns-muted">
           Scroll to compress the bar into a pill; a fast upward scroll flicks
           it back open with overshoot.
         </p>
@@ -72,11 +72,11 @@ export default function ScrollIslandDemo() {
           id={s.id}
           className="flex h-[900px] flex-col items-center justify-center gap-4 border-t border-border px-6"
         >
-          <span className="font-mono text-xs uppercase tracking-wide text-muted">
+          <span className="font-mono text-xs uppercase tracking-wide text-ns-muted">
             Section {i + 1} of {SECTIONS.length}
           </span>
           <h2 className="text-3xl font-medium text-foreground">{s.label}</h2>
-          <p className="max-w-sm text-center text-sm text-muted">
+          <p className="max-w-sm text-center text-sm text-ns-muted">
             Fake page content for the scroll demo — the header above reacts
             to scroll position and this section's visibility.
           </p>

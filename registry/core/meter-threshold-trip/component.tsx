@@ -11,7 +11,7 @@ import { useEffect, useId, useRef, useState } from "react";
 // point, so there is always a real gap left for the latch to snap shut. That
 // crossing LATCHES: the strip stays pinned at full bow (heavier --foreground
 // stroke, filled contact pad — never
-// --accent, latching is data state, not interaction) regardless of value
+// --ns-accent, latching is data state, not interaction) regardless of value
 // wobbling anywhere between `clearAt` and `tripAt`. It only relaxes back
 // once value falls below `clearAt`, the lower re-arm mark — that gap between
 // where it trips and where it clears is hysteresis made visible, not implied
@@ -22,7 +22,7 @@ import { useEffect, useId, useRef, useState } from "react";
 // clearAt..tripAt on the same x-domain as the strip's own mounts, with a
 // live position marker and Geist Mono 'clears N / trips N' captions, so the
 // two thresholds are legible from a single still frame. Every stroke/fill is
-// a token class (text-foreground/text-muted/text-border) — no hex, no
+// a token class (text-foreground/text-ns-muted/text-border) — no hex, no
 // canvas. DOM+SVG+CSS only.
 // ---------------------------------------------------------------------------
 
@@ -195,7 +195,7 @@ export function BimetalTrip({
 `}</style>
 
       <div className="flex items-baseline justify-between gap-3">
-        <span id={labelId} className="font-mono text-[11px] tracking-wide text-muted">
+        <span id={labelId} className="font-mono text-[11px] tracking-wide text-ns-muted">
           {label.toUpperCase()}
         </span>
         <span
@@ -224,7 +224,7 @@ export function BimetalTrip({
         aria-valuenow={clamp(value, min, max)}
         aria-valuetext={valueText}
         tabIndex={0}
-        className="mt-3 rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+        className="mt-3 rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ns-accent"
       >
         <svg
           viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
@@ -239,7 +239,7 @@ export function BimetalTrip({
             width={Math.max(0, xTrip - xClear)}
             height={BAND_H}
             rx={2}
-            className="fill-current text-muted opacity-40"
+            className="fill-current text-ns-muted opacity-40"
           />
           <line
             x1={xClear}
@@ -327,7 +327,7 @@ export function BimetalTrip({
         </svg>
       </div>
 
-      <div className="mt-1.5 flex items-center justify-between font-mono text-[11px] text-muted">
+      <div className="mt-1.5 flex items-center justify-between font-mono text-[11px] text-ns-muted">
         <span>
           clears {fmt(clearAt)}
           {unit}
@@ -338,7 +338,7 @@ export function BimetalTrip({
         </span>
       </div>
 
-      <p id={descId} className="mt-2 text-center font-mono text-[11px] text-muted">
+      <p id={descId} className="mt-2 text-center font-mono text-[11px] text-ns-muted">
         {description}
       </p>
 

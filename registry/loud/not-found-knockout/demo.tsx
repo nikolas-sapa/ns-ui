@@ -10,13 +10,13 @@ export default function Knockout404Demo() {
           <span className="font-mono text-sm font-semibold tracking-tight text-foreground">
             ns://ui
           </span>
-          <span className="font-mono text-xs tracking-[0.25em] text-muted">
+          <span className="font-mono text-xs tracking-[0.25em] text-ns-muted">
             ns-ui / not-found-knockout
           </span>
         </div>
         <a
           href="#docs"
-          className="rounded-sm px-2 py-1 font-mono text-xs text-muted transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="rounded-sm px-2 py-1 font-mono text-xs text-ns-muted transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
         >
           docs
         </a>
@@ -27,10 +27,10 @@ export default function Knockout404Demo() {
       <Knockout404 className="min-h-0 flex-1" />
 
       <footer className="flex items-center justify-between border-t border-border px-6 py-3">
-        <span className="font-mono text-xs text-muted">
+        <span className="font-mono text-xs text-ns-muted">
           ERR 404 / route unresolved
         </span>
-        <span className="font-mono text-xs text-muted">
+        <span className="font-mono text-xs text-ns-muted">
           trace: surface plane carved / void exposed
         </span>
       </footer>

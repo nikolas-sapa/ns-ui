@@ -16,8 +16,8 @@
 import { useEffect, useState } from "react";
 
 const INPUT =
-  "w-full rounded-sm border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60";
-const LABEL = "text-xs text-muted";
+  "w-full rounded-sm border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60";
+const LABEL = "text-xs text-ns-muted";
 const CODE_INPUT = `${INPUT} font-mono text-xs whitespace-pre`;
 
 const ERROR_MESSAGES: Record<string, string> = {
@@ -149,11 +149,11 @@ export function SubmitForm() {
           href={prUrl}
           target="_blank"
           rel="noreferrer"
-          className="mt-2 inline-block text-sm text-accent underline decoration-border underline-offset-2 focus-visible:ring-2 focus-visible:ring-accent"
+          className="mt-2 inline-block text-sm text-ns-accent underline decoration-border underline-offset-2 focus-visible:ring-2 focus-visible:ring-ns-accent"
         >
           {prUrl}
         </a>
-        <p className="mt-2 text-xs text-muted">
+        <p className="mt-2 text-xs text-ns-muted">
           Attach your local <code className="font-mono">npm run verify</code> screenshots to the PR
           — CI runs there, not on this site.
         </p>
@@ -166,13 +166,13 @@ export function SubmitForm() {
       {githubConnected === false ? (
         <div className="rounded-sm border border-border bg-surface p-3">
           <p className="text-sm text-foreground">Connect GitHub to open pull requests</p>
-          <p className="mt-1 text-xs text-muted">
+          <p className="mt-1 text-xs text-ns-muted">
             A separate, narrower consent from sign-in — grants only permission to fork this repo
             and open a PR (<code className="font-mono">public_repo</code> scope), nothing broader.
           </p>
           <a
             href="/api/submit/github/authorize"
-            className="mt-2 inline-block rounded-sm border border-border bg-background px-3 py-1.5 text-sm font-medium text-foreground outline-none transition-colors hover:border-muted focus-visible:ring-2 focus-visible:ring-accent"
+            className="mt-2 inline-block rounded-sm border border-border bg-background px-3 py-1.5 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             Connect GitHub
           </a>
@@ -321,13 +321,13 @@ export function SubmitForm() {
       </div>
 
       <div className="rounded-sm border border-border bg-surface p-3">
-        <p className="text-xs text-muted">
+        <p className="text-xs text-ns-muted">
           Every commit needs a{" "}
           <a
             href="https://github.com/nikolas-sapa/ns-ui/blob/main/DCO"
             target="_blank"
             rel="noreferrer"
-            className="underline decoration-border underline-offset-2 hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+            className="underline decoration-border underline-offset-2 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             Developer Certificate of Origin
           </a>{" "}
@@ -370,7 +370,7 @@ export function SubmitForm() {
             checked={dcoAgreed}
             onChange={(e) => setDcoAgreed(e.target.checked)}
             disabled={pending}
-            className="mt-0.5 size-4 shrink-0 rounded-sm border-border text-accent outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="mt-0.5 size-4 shrink-0 rounded-sm border-border text-ns-accent outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
           />
           <span>
             I certify the DCO for this contribution and agree it is licensed under the MIT License.
@@ -384,7 +384,7 @@ export function SubmitForm() {
           checked={verifyAttested}
           onChange={(e) => setVerifyAttested(e.target.checked)}
           disabled={pending}
-          className="mt-0.5 size-4 shrink-0 rounded-sm border-border text-accent outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="mt-0.5 size-4 shrink-0 rounded-sm border-border text-ns-accent outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
         />
         {/* The copy has to be ONE element. The label is `flex`, so every child
             is a flex item — and this sentence used to be three of them (text,
@@ -401,7 +401,7 @@ export function SubmitForm() {
       <button
         type="submit"
         disabled={pending || githubConnected !== true}
-        className="rounded-sm border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-muted focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
+        className="rounded-sm border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
       >
         {pending ? "Opening pull request…" : "Open pull request"}
       </button>

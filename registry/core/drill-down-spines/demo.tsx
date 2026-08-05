@@ -163,7 +163,7 @@ function ChevronIcon() {
   return (
     <svg
       viewBox="0 0 16 16"
-      className="h-3.5 w-3.5 shrink-0 text-muted"
+      className="h-3.5 w-3.5 shrink-0 text-ns-muted"
       fill="none"
       stroke="currentColor"
       strokeWidth="1.5"
@@ -185,12 +185,12 @@ function RowList({ nodes, onOpen }: { nodes: Node[]; onOpen: (n: Node) => void }
             type="button"
             data-drill-row
             onClick={() => onOpen(n)}
-            className="flex w-full items-center justify-between gap-3 rounded-sm px-3 py-2 text-left text-sm text-foreground outline-none transition-colors hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="flex w-full items-center justify-between gap-3 rounded-sm px-3 py-2 text-left text-sm text-foreground outline-none transition-colors hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             <span className="truncate">{n.title}</span>
             <span className="flex shrink-0 items-center gap-2">
               {n.meta && (
-                <span className="font-mono text-[10px] uppercase tracking-wide text-muted">{n.meta}</span>
+                <span className="font-mono text-[10px] uppercase tracking-wide text-ns-muted">{n.meta}</span>
               )}
               <ChevronIcon />
             </span>
@@ -206,10 +206,10 @@ function DetailView({ node }: { node: Node }) {
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-2">
-        <span className="rounded-full border border-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-muted">
+        <span className="rounded-full border border-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-ns-muted">
           {node.detail.status}
         </span>
-        <span className="font-mono text-[10px] uppercase tracking-wide text-muted">
+        <span className="font-mono text-[10px] uppercase tracking-wide text-ns-muted">
           {node.detail.assignee}
         </span>
       </div>
@@ -243,7 +243,7 @@ export default function SpineStackDemo() {
   return (
     <div className="flex min-h-screen items-center justify-center px-6 py-16">
       <div className="w-full max-w-3xl">
-        <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.16em] text-muted">
+        <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.16em] text-ns-muted">
           Support workspace
         </p>
         <div className="h-[440px] overflow-hidden rounded-md border border-border bg-background p-2">

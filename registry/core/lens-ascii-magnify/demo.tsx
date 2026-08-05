@@ -7,7 +7,7 @@ export default function AsciiMagnifyLensDemo() {
   const [key, setKey] = useState(0);
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-10 px-6">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / lens-ascii-magnify
       </p>
 
@@ -19,7 +19,7 @@ export default function AsciiMagnifyLensDemo() {
 
       <button
         onClick={() => setKey((k) => k + 1)}
-        className="rounded-sm border border-border px-4 py-2 font-mono text-xs text-muted transition-colors duration-150 hover:border-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        className="rounded-sm border border-border px-4 py-2 font-mono text-xs text-ns-muted transition-colors duration-150 hover:border-ns-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
       >
         reset lens
       </button>

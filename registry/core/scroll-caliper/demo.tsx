@@ -64,12 +64,12 @@ export default function ScrollCaliperDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-3xl">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">
+        <p className="mb-4 font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / scroll-caliper
         </p>
         <div className="overflow-hidden rounded-md border border-border bg-surface">
           <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-3">
-            <span className="font-mono text-xs tracking-widest text-muted">
+            <span className="font-mono text-xs tracking-widest text-ns-muted">
               FIELD MANUAL — VERNIER MEASUREMENT
             </span>
             <nav className="flex items-center gap-1.5">
@@ -78,7 +78,7 @@ export default function ScrollCaliperDemo() {
                   key={s.id}
                   type="button"
                   onClick={() => jump(s.id)}
-                  className="rounded-sm border border-border px-2.5 py-1 font-mono text-[11px] tabular-nums text-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                  className="rounded-sm border border-border px-2.5 py-1 font-mono text-[11px] tabular-nums text-ns-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
                 >
                   {s.kicker}
                 </button>
@@ -95,14 +95,14 @@ export default function ScrollCaliperDemo() {
                   data-section
                   className="scroll-mt-6 space-y-4"
                 >
-                  <p className="font-mono text-[11px] tracking-widest text-muted">
+                  <p className="font-mono text-[11px] tracking-widest text-ns-muted">
                     {s.kicker}
                   </p>
                   <h2 className="text-xl font-semibold tracking-tight text-foreground">
                     {s.title}
                   </h2>
                   {s.body.map((p, i) => (
-                    <p key={i} className="text-sm leading-relaxed text-muted">
+                    <p key={i} className="text-sm leading-relaxed text-ns-muted">
                       {p}
                     </p>
                   ))}
@@ -113,13 +113,13 @@ export default function ScrollCaliperDemo() {
                   ) : null}
                 </section>
               ))}
-              <p className="border-t border-border pt-6 font-mono text-[11px] text-muted">
+              <p className="border-t border-border pt-6 font-mono text-[11px] text-ns-muted">
                 END OF MANUAL — the jaws should now be closed on section 04
               </p>
             </article>
           </ScrollCaliper>
         </div>
-        <p className="mt-3 font-mono text-[11px] text-muted">
+        <p className="mt-3 font-mono text-[11px] text-ns-muted">
           scroll the article, or jump between sections — stop to catch the
           needle wobble
         </p>

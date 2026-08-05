@@ -226,10 +226,10 @@ export function PointsThrow({
                 aria-controls={`${baseId}-panel-${tab.id}`}
                 tabIndex={selected ? 0 : -1}
                 onClick={() => setActive(tab.id)}
-                className={`relative rounded-sm px-4 py-2.5 text-sm transition-colors duration-150 hover:bg-foreground/[0.06] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent ${
+                className={`relative rounded-sm px-4 py-2.5 text-sm transition-colors duration-150 hover:bg-foreground/[0.06] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ns-accent ${
                   selected
                     ? "font-medium text-foreground"
-                    : "text-muted hover:text-foreground"
+                    : "text-ns-muted hover:text-foreground"
                 }`}
               >
                 {tab.label}
@@ -272,7 +272,7 @@ export function PointsThrow({
           id={`${baseId}-panel-${activeTab.id}`}
           aria-labelledby={`${baseId}-tab-${activeTab.id}`}
           tabIndex={0}
-          className="rounded-sm px-1 py-4 text-sm leading-relaxed text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="rounded-sm px-1 py-4 text-sm leading-relaxed text-ns-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
         >
           {activeTab.content}
         </div>

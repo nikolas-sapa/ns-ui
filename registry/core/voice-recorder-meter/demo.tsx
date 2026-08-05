@@ -20,12 +20,12 @@ export default function ReedVuDemo() {
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 py-16">
       <div className="w-full max-w-md rounded-md border border-border bg-background p-5 shadow-sm">
         <h2 className="text-sm font-medium text-foreground">New note</h2>
-        <p className="mt-1 text-xs text-muted">Dictate or type — both land in the same field.</p>
+        <p className="mt-1 text-xs text-ns-muted">Dictate or type — both land in the same field.</p>
 
         <textarea
           rows={3}
           placeholder="Start typing, or record a voice note below…"
-          className="mt-4 w-full resize-none rounded-sm border border-border bg-surface px-3 py-2 text-sm text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="mt-4 w-full resize-none rounded-sm border border-border bg-surface px-3 py-2 text-sm text-foreground placeholder:text-ns-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
         />
 
         <div className="mt-4">
@@ -33,7 +33,7 @@ export default function ReedVuDemo() {
         </div>
 
         {log.length ? (
-          <ul className="mt-3 space-y-1 font-mono text-[11px] text-muted">
+          <ul className="mt-3 space-y-1 font-mono text-[11px] text-ns-muted">
             {log.map((line, i) => (
               <li key={i}>{line}</li>
             ))}
@@ -41,7 +41,7 @@ export default function ReedVuDemo() {
         ) : null}
       </div>
 
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / voice-recorder-meter — real levels, or an honest error, never fake bars
       </p>
     </div>

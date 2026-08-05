@@ -61,7 +61,7 @@ export default function SashWeightDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / drawer-counterweight — drag the rail, watch the weight decide
       </p>
 
@@ -69,14 +69,14 @@ export default function SashWeightDemo() {
         <div className="flex flex-wrap items-center gap-3 border-b border-border px-5 py-4">
           <div className="min-w-0 flex-1">
             <h2 className="text-sm font-semibold text-foreground">Catalog</h2>
-            <p className="mt-0.5 font-mono text-xs text-muted">
+            <p className="mt-0.5 font-mono text-xs text-ns-muted">
               128 items · sorted by {sort === "relevance" ? "relevance" : "price"}
             </p>
           </div>
           <input
             type="search"
             placeholder="Search catalog…"
-            className="w-40 rounded-sm border border-border bg-background px-3 py-1.5 text-sm text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:w-56"
+            className="w-40 rounded-sm border border-border bg-background px-3 py-1.5 text-sm text-foreground placeholder:text-ns-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent sm:w-56"
           />
           <SashWeight
             open={open}
@@ -85,7 +85,7 @@ export default function SashWeightDemo() {
               <>
                 Filters
                 {activeCount > 0 && (
-                  <span className="rounded-full border border-border bg-background px-1.5 py-0.5 font-mono text-[10px] text-muted">
+                  <span className="rounded-full border border-border bg-background px-1.5 py-0.5 font-mono text-[10px] text-ns-muted">
                     {activeCount}
                   </span>
                 )}
@@ -96,7 +96,7 @@ export default function SashWeightDemo() {
           >
             <div className="flex flex-col gap-6">
               <fieldset className="flex flex-col gap-2.5">
-                <legend className="mb-1 font-mono text-[11px] uppercase tracking-wider text-muted">
+                <legend className="mb-1 font-mono text-[11px] uppercase tracking-wider text-ns-muted">
                   Category
                 </legend>
                 {CATEGORIES.map((c) => (
@@ -106,7 +106,7 @@ export default function SashWeightDemo() {
                         type="checkbox"
                         checked={checked[c] ?? false}
                         onChange={() => toggle(c)}
-                        className="peer h-4 w-4 cursor-pointer appearance-none rounded-[4px] border border-border bg-transparent transition-colors duration-150 checked:border-foreground checked:bg-foreground hover:border-foreground/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                        className="peer h-4 w-4 cursor-pointer appearance-none rounded-[4px] border border-border bg-transparent transition-colors duration-150 checked:border-foreground checked:bg-foreground hover:border-foreground/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
                       />
                       <svg
                         aria-hidden
@@ -129,14 +129,14 @@ export default function SashWeightDemo() {
               </fieldset>
 
               <div className="flex flex-col gap-2">
-                <label htmlFor="sash-sort" className="font-mono text-[11px] uppercase tracking-wider text-muted">
+                <label htmlFor="sash-sort" className="font-mono text-[11px] uppercase tracking-wider text-ns-muted">
                   Sort by
                 </label>
                 <select
                   id="sash-sort"
                   value={sort}
                   onChange={(e) => setSort(e.target.value)}
-                  className="rounded-sm border border-border bg-background px-2.5 py-1.5 text-sm text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                  className="rounded-sm border border-border bg-background px-2.5 py-1.5 text-sm text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
                 >
                   <option value="relevance">Relevance</option>
                   <option value="price-asc">Price: low to high</option>
@@ -148,14 +148,14 @@ export default function SashWeightDemo() {
                 <button
                   type="button"
                   onClick={() => handleOpenChange(false)}
-                  className="rounded-sm bg-accent px-4 py-2 text-sm font-medium text-white transition-colors duration-200 hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                  className="rounded-sm bg-ns-accent px-4 py-2 text-sm font-medium text-white transition-colors duration-200 hover:bg-ns-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
                 >
                   Apply filters
                 </button>
                 <button
                   type="button"
                   onClick={() => setChecked({})}
-                  className="rounded-sm border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors duration-200 hover:border-foreground/25 hover:bg-foreground/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                  className="rounded-sm border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors duration-200 hover:border-foreground/25 hover:bg-foreground/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
                 >
                   Reset
                 </button>
@@ -172,13 +172,13 @@ export default function SashWeightDemo() {
             >
               <div className="h-16 rounded-sm border border-border bg-foreground/[0.04]" />
               <p className="text-xs text-foreground">Item {i + 1}</p>
-              <p className="font-mono text-[11px] text-muted">${(29 + i * 6).toFixed(2)}</p>
+              <p className="font-mono text-[11px] text-ns-muted">${(29 + i * 6).toFixed(2)}</p>
             </div>
           ))}
         </div>
       </div>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Grab the thin rail on the drawer's left edge — the weight travels
         opposite your drag at 0.6x. Release above the tick and it pulls the
         drawer shut; past it, the weight bottoms out and the drawer holds

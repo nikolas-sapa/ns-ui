@@ -5,14 +5,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 // TackleBoard — the agent's tools hung on a board like fishing tackle: the
 // same chip is both the inventory ("what can this agent even do") and the
 // live activity indicator ("what is it doing right now"). At rest a tool is
-// a slim chip — name in Geist Mono, a one-line affordance in --muted, both
+// a slim chip — name in Geist Mono, a one-line affordance in --ns-muted, both
 // inline. When the tool is called, ITS chip lifts (translateY + a slight
 // rotate, spring-eased) and pays out a line beneath itself: a strip that
 // grows open (CSS grid-template-rows 0fr->1fr) and streams the call's
 // arguments in small mono type with a trailing caret. On completion the
 // strip collapses to a one-line summary — an inline check for success, a
 // hollow circle for error, shape-coded rather than color-coded so the two
-// states don't rely on --accent or any status hue. A 2px underline beneath
+// states don't rely on --ns-accent or any status hue. A 2px underline beneath
 // a just-finished call steps its opacity 100/66/33/0 across four 15s beats
 // (60s total) — recency fading back to quiet inventory. Simultaneous calls
 // simply lift multiple chips independently; nothing here choreographs
@@ -272,11 +272,11 @@ export function TackleBoard({ tools, invocations, decayMs = 60000, className = "
                 }}
                 className={[
                   "ns-tackle-chip relative flex h-7 shrink-0 items-center gap-1.5 self-start rounded-[6px] border border-border bg-background px-2.5 outline-none",
-                  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+                  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent",
                 ].join(" ")}
               >
                 <span className="whitespace-nowrap font-mono text-[12px] text-foreground">{tool.name}</span>
-                <span className="whitespace-nowrap text-[11px] text-muted">{tool.affordance}</span>
+                <span className="whitespace-nowrap text-[11px] text-ns-muted">{tool.affordance}</span>
               </button>
 
               <div
@@ -290,7 +290,7 @@ export function TackleBoard({ tools, invocations, decayMs = 60000, className = "
                   >
                     {isPending ? (
                       <div aria-hidden="true" className="flex min-w-0 items-center gap-1">
-                        <span className="truncate font-mono text-[11px] text-muted">{revealedArgs}</span>
+                        <span className="truncate font-mono text-[11px] text-ns-muted">{revealedArgs}</span>
                         {!streamDone && !reducedMotion && (
                           <span className="ns-tackle-caret font-mono text-[11px] text-foreground">▍</span>
                         )}
@@ -302,7 +302,7 @@ export function TackleBoard({ tools, invocations, decayMs = 60000, className = "
                           {summaryText}
                         </span>
                         {timeLabel && (
-                          <span className="shrink-0 font-mono text-[10px] text-muted">{timeLabel}</span>
+                          <span className="shrink-0 font-mono text-[10px] text-ns-muted">{timeLabel}</span>
                         )}
                       </div>
                     ) : null}

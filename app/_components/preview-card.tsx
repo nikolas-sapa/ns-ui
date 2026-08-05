@@ -203,7 +203,7 @@ export function PreviewCard({
       {/* Aspect-locked from first paint, so the frame arriving shifts nothing. */}
       <div
         ref={boxRef}
-        className="relative aspect-[16/10] w-full overflow-hidden rounded-md border border-border bg-surface transition-colors duration-200 group-hover:border-muted/60 group-has-[a:focus-visible]/focus:ring-2 group-has-[a:focus-visible]/focus:ring-accent group-has-[a:focus-visible]/focus:ring-offset-2 group-has-[a:focus-visible]/focus:ring-offset-background motion-reduce:transition-none"
+        className="relative aspect-[16/10] w-full overflow-hidden rounded-md border border-border bg-surface transition-colors duration-200 group-hover:border-ns-muted/60 group-has-[a:focus-visible]/focus:ring-2 group-has-[a:focus-visible]/focus:ring-ns-accent group-has-[a:focus-visible]/focus:ring-offset-2 group-has-[a:focus-visible]/focus:ring-offset-background motion-reduce:transition-none"
       >
         {/* A flat, non-gradient wash — the border brightening alone is easy
             to miss on a near-black full-bleed canvas/WebGL demo, which is
@@ -294,7 +294,7 @@ export function PreviewCard({
                 from being a riddle. Muted and after the title, so it reads as
                 a caption rather than competing with the name. */}
             {entry.kind ? (
-              <span className="shrink-0 text-xs text-muted">{entry.kind}</span>
+              <span className="shrink-0 text-xs text-ns-muted">{entry.kind}</span>
             ) : null}
             {entry.isNew ? (
               <span className="shrink-0 rounded-sm border border-border px-1.5 py-px font-mono text-[10px] uppercase tracking-wider text-foreground">
@@ -302,12 +302,12 @@ export function PreviewCard({
               </span>
             ) : null}
             {entry.collection === "loud" ? (
-              <span className="shrink-0 rounded-sm border border-border px-1.5 py-px font-mono text-[10px] uppercase tracking-wider text-muted">
+              <span className="shrink-0 rounded-sm border border-border px-1.5 py-px font-mono text-[10px] uppercase tracking-wider text-ns-muted">
                 loud
               </span>
             ) : null}
           </div>
-          <p className="relative z-10 mt-1 line-clamp-2 text-xs leading-relaxed text-muted">
+          <p className="relative z-10 mt-1 line-clamp-2 text-xs leading-relaxed text-ns-muted">
             {entry.description}
           </p>
         </div>

@@ -233,7 +233,7 @@ export function AsciiSankeyFlow({
             row until bands land under the wrong node entirely. */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 text-muted"
+          className="pointer-events-none absolute inset-0 text-ns-muted"
           style={{ fontSize: 10 }}
         >
           {rows.map((line, y) => (
@@ -264,10 +264,10 @@ export function AsciiSankeyFlow({
               }. Press Enter to isolate its upstream and downstream flow.`}
               className={`ns-saf-node absolute overflow-hidden border bg-background text-left text-[10px] transition-colors duration-150 motion-reduce:transition-none ${
                 selected
-                  ? "border-accent text-foreground"
+                  ? "border-ns-accent text-foreground"
                   : hovered
-                    ? "border-accent/40 text-foreground"
-                    : "border-border text-muted"
+                    ? "border-ns-accent/40 text-foreground"
+                    : "border-border text-ns-muted"
               }`}
               style={{
                 left: col * CELL_W,
@@ -283,13 +283,13 @@ export function AsciiSankeyFlow({
               }}
             >
               <span className="block truncate px-1 pt-0.5">{n.label}</span>
-              <span className="block px-1 text-muted">{n.value}</span>
+              <span className="block px-1 text-ns-muted">{n.value}</span>
             </button>
           );
         })}
       </div>
 
-      <div className="mt-3 min-h-[1.5em] font-mono text-xs text-muted">
+      <div className="mt-3 min-h-[1.5em] font-mono text-xs text-ns-muted">
         {selectedId ? (
           <span data-sankey-isolated className="inline-flex items-center gap-2">
             Isolated: <strong className="text-foreground">{nodes.find((n) => n.id === selectedId)?.label}</strong> —{" "}
@@ -297,7 +297,7 @@ export function AsciiSankeyFlow({
             <button
               type="button"
               onClick={() => setSelectedId(null)}
-              className="ns-saf-clear rounded-sm border border-border px-1.5 py-0.5 text-[10px] text-muted transition-colors duration-150 motion-reduce:transition-none hover:text-foreground"
+              className="ns-saf-clear rounded-sm border border-border px-1.5 py-0.5 text-[10px] text-ns-muted transition-colors duration-150 motion-reduce:transition-none hover:text-foreground"
             >
               Show all
             </button>
@@ -311,6 +311,6 @@ export function AsciiSankeyFlow({
 }
 
 const CSS = `
-.ns-saf-node:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.ns-saf-clear:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ns-saf-node:focus-visible { outline: 2px solid var(--ns-accent); outline-offset: 2px; }
+.ns-saf-clear:focus-visible { outline: 2px solid var(--ns-accent); outline-offset: 2px; }
 `;

@@ -110,7 +110,7 @@ function Row({
           data-uw-delete
           onClick={() => onDelete(rowRef.current?.getBoundingClientRect().height ?? 0)}
           aria-label={`Delete ${item.title}`}
-          className="shrink-0 rounded-sm p-1.5 text-muted transition-colors hover:bg-background hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="shrink-0 rounded-sm p-1.5 text-ns-muted transition-colors hover:bg-background hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
         >
           <TrashIcon />
         </button>
@@ -298,16 +298,16 @@ function BarRow({
             }}
             aria-label={`Deleted ${item.title}, undo, ${remaining} second${remaining === 1 ? "" : "s"} left`}
             className={[
-              "absolute left-0 top-0 inline-flex h-full max-w-[65%] items-center gap-1.5 overflow-hidden whitespace-nowrap rounded-sm border bg-surface px-2 font-mono text-xs text-muted",
+              "absolute left-0 top-0 inline-flex h-full max-w-[65%] items-center gap-1.5 overflow-hidden whitespace-nowrap rounded-sm border bg-surface px-2 font-mono text-xs text-ns-muted",
               "transition-colors duration-150 hover:text-foreground",
               flash ? "border-foreground" : "border-border hover:border-foreground/50",
-              "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+              "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent",
             ].join(" ")}
           >
             <ReturnArrowIcon />
             <span className="truncate">{item.title}</span>
             {reduced && (
-              <span aria-hidden className="tabular-nums text-muted">
+              <span aria-hidden className="tabular-nums text-ns-muted">
                 {remaining}s
               </span>
             )}
@@ -360,7 +360,7 @@ export function UndertowDrift({
   return (
     <div className={className}>
       {rows.length === 0 ? (
-        <p className="rounded-md border border-dashed border-border px-4 py-6 text-center text-sm text-muted">
+        <p className="rounded-md border border-dashed border-border px-4 py-6 text-center text-sm text-ns-muted">
           Nothing here.
         </p>
       ) : (

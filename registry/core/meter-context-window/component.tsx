@@ -14,7 +14,7 @@
 // vertical hatch that breathes gently while it's live. A 1px hairline
 // divider sits between every pair so the boundary reads even when two
 // tones land close together. Pure CSS, built from color-mix() against
-// --foreground and --background, never a hex literal and never --accent
+// --foreground and --background, never a hex literal and never --ns-accent
 // (accent is reserved for interaction, not decoration).
 //
 // Layout is plain flexbox: each segment's flex-basis is its share of
@@ -167,7 +167,7 @@ export function BallastContext({
       <p
         aria-live="polite"
         className={[
-          "mt-3 flex items-center gap-1.5 font-mono text-xs tabular-nums text-muted",
+          "mt-3 flex items-center gap-1.5 font-mono text-xs tabular-nums text-ns-muted",
           warn ? "font-semibold text-foreground" : "",
         ].join(" ")}
       >
@@ -195,7 +195,7 @@ export function BallastContext({
         </span>
       </p>
 
-      <ul className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1.5 font-mono text-[11px] tabular-nums text-muted">
+      <ul className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1.5 font-mono text-[11px] tabular-nums text-ns-muted">
         {ROLES.map(({ role, label }) => {
           const t = tokensByRole[role];
           return (
@@ -205,7 +205,7 @@ export function BallastContext({
                 data-role={role}
                 className="ns-ballast-seg h-2.5 w-2.5 shrink-0 rounded-[2px] border border-border"
               />
-              <span className="tracking-wide text-muted">{label}</span>
+              <span className="tracking-wide text-ns-muted">{label}</span>
               <span className="text-foreground">{formatTokens(t)}</span>
               <span>{formatPct(t, denom)}</span>
             </li>

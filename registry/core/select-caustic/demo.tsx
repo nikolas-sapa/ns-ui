@@ -28,7 +28,7 @@ export default function CausticSelectDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / select-caustic
       </p>
 
@@ -37,7 +37,7 @@ export default function CausticSelectDemo() {
           <h2 className="text-sm font-semibold text-foreground">
             Deployment settings
           </h2>
-          <p className="mt-1 text-sm text-muted">
+          <p className="mt-1 text-sm text-ns-muted">
             Where serverless functions execute. The select is frosted glass —
             open it and watch the caustics pool under the active row.
           </p>
@@ -47,7 +47,7 @@ export default function CausticSelectDemo() {
           <div>
             <label
               htmlFor="demo-project"
-              className="mb-1.5 block font-mono text-xs uppercase tracking-[0.14em] text-muted"
+              className="mb-1.5 block font-mono text-xs uppercase tracking-[0.14em] text-ns-muted"
             >
               Project
             </label>
@@ -56,7 +56,7 @@ export default function CausticSelectDemo() {
               type="text"
               defaultValue="atlas-api"
               spellCheck={false}
-              className="h-10 w-full rounded-sm border border-border bg-background px-3 text-sm text-foreground outline-none transition-colors hover:border-foreground/25 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              className="h-10 w-full rounded-sm border border-border bg-background px-3 text-sm text-foreground outline-none transition-colors hover:border-foreground/25 focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             />
           </div>
 
@@ -77,19 +77,19 @@ export default function CausticSelectDemo() {
         </div>
 
         <div className="flex items-center justify-between border-t border-border px-6 py-4">
-          <p className="font-mono text-xs text-muted">
+          <p className="font-mono text-xs text-ns-muted">
             functions → {regionLabel}
           </p>
           <button
             type="button"
-            className="rounded-sm bg-accent px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+            className="rounded-sm bg-ns-accent px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-ns-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
           >
             Save changes
           </button>
         </div>
       </div>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Open with Enter, Space, or the arrow keys. Arrow through the options and
         the light lens follows; type to jump by name; Esc closes and returns
         focus to the trigger.

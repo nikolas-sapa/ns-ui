@@ -8,7 +8,7 @@ export default function ShingleCourseDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / listbox-sticky-groups
       </p>
 
@@ -17,7 +17,7 @@ export default function ShingleCourseDemo() {
           <h2 className="text-sm font-semibold text-foreground">
             Schedule a deploy window
           </h2>
-          <p className="mt-1 text-sm text-muted">
+          <p className="mt-1 text-sm text-ns-muted">
             Scroll the list — passed regions compress into a stacked trail of
             headers at the top, still clickable, still labeled.
           </p>
@@ -28,17 +28,17 @@ export default function ShingleCourseDemo() {
         </div>
 
         <div className="flex items-center justify-between border-t border-border px-6 py-4">
-          <p className="font-mono text-xs text-muted">tz → {tz}</p>
+          <p className="font-mono text-xs text-ns-muted">tz → {tz}</p>
           <button
             type="button"
-            className="rounded-sm bg-accent px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+            className="rounded-sm bg-ns-accent px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-ns-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
           >
             Confirm window
           </button>
         </div>
       </div>
 
-      <p className="max-w-sm text-center text-xs text-muted">
+      <p className="max-w-sm text-center text-xs text-ns-muted">
         Arrow through options, type to jump by name — Home/End/PageUp/PageDown
         behave like a native select. Tab reaches each region header too;
         click one to ease back to the top of that group.

@@ -381,7 +381,7 @@ export function WindSpool({
           cy={CY}
           r={0.001}
           fill="none"
-          stroke="var(--muted)"
+          stroke="var(--ns-muted)"
           strokeWidth={1}
           strokeDasharray="3 3"
         />
@@ -415,7 +415,7 @@ export function WindSpool({
         aria-hidden="true"
         data-wind-caption
         data-phase={phase}
-        className="font-mono text-[11px] tracking-wide text-muted"
+        className="font-mono text-[11px] tracking-wide text-ns-muted"
       >
         {captionText}
       </span>

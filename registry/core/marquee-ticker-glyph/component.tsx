@@ -236,7 +236,7 @@ export function GlyphScrubTicker({
         aria-label={paused ? "Resume ticker" : "Pause ticker"}
         aria-pressed={paused}
         onClick={() => setPaused((p) => !p)}
-        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[6px] border border-border text-foreground transition-colors hover:bg-border/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[6px] border border-border text-foreground transition-colors hover:bg-border/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
       >
         {paused ? (
           <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
@@ -255,7 +255,7 @@ export function GlyphScrubTicker({
         role="list"
         aria-label={label}
         tabIndex={0}
-        className="relative h-9 flex-1 touch-none select-none overflow-hidden font-mono text-sm text-foreground [cursor:grab] active:[cursor:grabbing] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        className="relative h-9 flex-1 touch-none select-none overflow-hidden font-mono text-sm text-foreground [cursor:grab] active:[cursor:grabbing] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
       >
         <span
           ref={probeRef}

@@ -41,12 +41,12 @@ export function AccountHandle({
           <button
             type="button"
             onClick={() => setEditing(true)}
-            className="text-xs text-muted underline-offset-2 hover:underline"
+            className="text-xs text-ns-muted underline-offset-2 hover:underline"
           >
             Change (one-time)
           </button>
         ) : (
-          <span className="text-xs text-muted">
+          <span className="text-xs text-ns-muted">
             Already changed once — contact support to change again.
           </span>
         )}
@@ -88,12 +88,12 @@ export function AccountHandle({
         value={value}
         onChange={(e) => setValue(e.target.value)}
         disabled={pending}
-        className="w-40 rounded-sm border border-border bg-surface px-2.5 py-1.5 text-sm text-foreground outline-none transition-colors focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
+        className="w-40 rounded-sm border border-border bg-surface px-2.5 py-1.5 text-sm text-foreground outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
       />
       <button
         type="submit"
         disabled={pending}
-        className="rounded-sm border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground outline-none transition-colors hover:border-muted focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
+        className="rounded-sm border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
       >
         {pending ? "Saving…" : "Save"}
       </button>
@@ -104,7 +104,7 @@ export function AccountHandle({
           setValue(current);
           setEditing(false);
         }}
-        className="text-xs text-muted underline-offset-2 hover:underline"
+        className="text-xs text-ns-muted underline-offset-2 hover:underline"
       >
         Cancel
       </button>

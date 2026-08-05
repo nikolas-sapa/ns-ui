@@ -304,7 +304,7 @@ export function BoughIndex({
     >
       <style>{`
 .ns-bi-focusable{outline:none}
-.ns-bi-focusable:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.ns-bi-focusable:focus-visible{outline:2px solid var(--ns-accent);outline-offset:-2px}
 .ns-bi-line{transition:opacity 140ms ease,max-height 140ms ease}
 @media (prefers-reduced-motion: reduce){.ns-bi-line{transition:none !important}}
 `}</style>
@@ -368,7 +368,7 @@ export function BoughIndex({
                 }}
                 className={[
                   "ns-bi-focusable flex-1 truncate rounded-sm px-1 text-left transition-colors duration-150",
-                  isSelected ? "bg-surface text-foreground" : "text-muted hover:text-foreground",
+                  isSelected ? "bg-surface text-foreground" : "text-ns-muted hover:text-foreground",
                 ].join(" ")}
               >
                 {hasChildren ? (isOpen ? "▾ " : "▸ ") : "· "}

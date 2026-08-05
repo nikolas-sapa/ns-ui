@@ -45,13 +45,13 @@ export default function LitmusWickDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-6 text-foreground">
       <div className="w-full max-w-sm">
-        <p className="font-mono text-xs tracking-widest text-muted">
+        <p className="font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / validation-inline-wick
         </p>
         <h1 className="mt-3 text-2xl font-semibold tracking-tight">
           The border tells you where.
         </h1>
-        <p className="mt-2 text-sm leading-relaxed text-muted">
+        <p className="mt-2 text-sm leading-relaxed text-ns-muted">
           No instant red flash. The tint diffuses in from the exact character
           that broke the rule, slower and paler while still checking, faster
           and decisive once it's certain — and wicks back out the moment you

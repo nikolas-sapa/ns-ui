@@ -273,7 +273,7 @@ export function SprocketScrub({
         aria-valuemax={duration}
         aria-valuenow={Math.round(value)}
         aria-valuetext={formatTime(value)}
-        className="ns-sprocket-track relative h-16 w-full select-none overflow-hidden rounded-[12px] border border-border bg-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        className="ns-sprocket-track relative h-16 w-full select-none overflow-hidden rounded-[12px] border border-border bg-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMoveTrack}
         onPointerUp={onPointerUp}
@@ -346,7 +346,7 @@ export function SprocketScrub({
           aria-hidden="true"
           className="pointer-events-none absolute bottom-full left-0 z-10 mb-2 -translate-x-1/2 rounded-[6px] border border-border bg-background px-1.5 py-1 shadow-sm"
         >
-          <div className="mb-1 h-3 w-6 rounded-[2px]" style={{ backgroundColor: "var(--muted)", opacity: 0.3 }} />
+          <div className="mb-1 h-3 w-6 rounded-[2px]" style={{ backgroundColor: "var(--ns-muted)", opacity: 0.3 }} />
           <div className="font-mono text-[10px] tabular-nums text-foreground">{formatTime(previewValue)}</div>
         </div>
       )}

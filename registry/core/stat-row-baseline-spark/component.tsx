@@ -63,8 +63,8 @@ function Sparkline({
       viewBox={`0 0 ${W} ${H}`}
       preserveAspectRatio="none"
     >
-      <path d={areaD} className="fill-muted/10" />
-      <path d={lineD} className="fill-none stroke-muted" strokeWidth={1} vectorEffect="non-scaling-stroke" />
+      <path d={areaD} className="fill-ns-muted/10" />
+      <path d={lineD} className="fill-none stroke-ns-muted" strokeWidth={1} vectorEffect="non-scaling-stroke" />
       {/* baseline guide — only surfaces on hover/focus, alongside the reference dot below */}
       <line
         x1={baselineX}
@@ -80,11 +80,11 @@ function Sparkline({
         cx={baselineX}
         cy={baselineY}
         r={2}
-        className="fill-background stroke-muted opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100"
+        className="fill-background stroke-ns-muted opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100"
         strokeWidth={1}
         vectorEffect="non-scaling-stroke"
       />
-      <circle cx={x(lastIdx)} cy={y(points[lastIdx])} r={2.25} className={favorable ? "fill-accent" : "fill-foreground"} />
+      <circle cx={x(lastIdx)} cy={y(points[lastIdx])} r={2.25} className={favorable ? "fill-ns-accent" : "fill-foreground"} />
     </svg>
   );
 }
@@ -110,14 +110,14 @@ function Tile({ tile }: { tile: StatTileData }) {
     <button
       type="button"
       aria-label={ariaLabel}
-      className="group relative flex min-h-[128px] w-full flex-col justify-between overflow-hidden rounded-md border border-border bg-surface p-4 text-left transition-colors duration-150 hover:border-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+      className="group relative flex min-h-[128px] w-full flex-col justify-between overflow-hidden rounded-md border border-border bg-surface p-4 text-left transition-colors duration-150 hover:border-ns-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
     >
       <div className="relative z-10">
-        <p className="mb-2 font-mono text-[10px] uppercase tracking-widest text-muted">{tile.label}</p>
+        <p className="mb-2 font-mono text-[10px] uppercase tracking-widest text-ns-muted">{tile.label}</p>
         <p className="font-mono text-2xl tabular-nums text-foreground">{formatValue(tile.value, tile.unit, precision)}</p>
-        <p className={`mt-1 font-mono text-xs tabular-nums ${favorable ? "font-semibold text-accent" : "text-muted"}`}>
+        <p className={`mt-1 font-mono text-xs tabular-nums ${favorable ? "font-semibold text-ns-accent" : "text-ns-muted"}`}>
           <span aria-hidden>{arrow}</span> {deltaText}
-          <span className="ml-1 text-muted/80">vs {tile.baselineLabel}</span>
+          <span className="ml-1 text-ns-muted/80">vs {tile.baselineLabel}</span>
         </p>
       </div>
       <Sparkline points={points} baselineIndex={baselineIndex} favorable={favorable} />

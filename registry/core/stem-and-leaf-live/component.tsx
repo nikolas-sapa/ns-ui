@@ -38,8 +38,8 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 // the table stays fully readable and navigable either way.
 //
 // Pure DOM + CSS, no canvas. All ink is token-relative (--foreground digits
-// and staging box, --border rules and empty-row dashes, --muted labels,
-// --accent only on the keyboard focus ring).
+// and staging box, --border rules and empty-row dashes, --ns-muted labels,
+// --ns-accent only on the keyboard focus ring).
 // ---------------------------------------------------------------------------
 
 export interface StemSiftRecord {
@@ -330,7 +330,7 @@ export function StemSift({ records, unit = "", label = "Distribution", className
   return (
     <div className={`w-full ${className}`}>
       <div className="mb-2 flex items-baseline justify-between gap-4">
-        <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted">{label}</span>
+        <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-ns-muted">{label}</span>
         <span
           ref={stagingRef}
           aria-hidden="true"
@@ -425,7 +425,7 @@ export function StemSift({ records, unit = "", label = "Distribution", className
         </table>
       </div>
 
-      <div className="mt-1.5 flex items-baseline justify-between font-mono text-[10px] tabular-nums text-muted">
+      <div className="mt-1.5 flex items-baseline justify-between font-mono text-[10px] tabular-nums text-ns-muted">
         <span>n {stats.n}</span>
         <span className="text-foreground/80" aria-live="off">
           {detail
@@ -452,7 +452,7 @@ export function StemSift({ records, unit = "", label = "Distribution", className
           border-radius: 6px;
           font-family: var(--font-mono);
           font-size: 11px;
-          color: var(--muted);
+          color: var(--ns-muted);
           transition: color 200ms ease, border-color 200ms ease;
         }
         .ns-sift-staging[data-active] {
@@ -475,7 +475,7 @@ export function StemSift({ records, unit = "", label = "Distribution", className
           padding: 5px 10px 5px 8px;
           font-size: 11px;
           font-weight: 400;
-          color: var(--muted);
+          color: var(--ns-muted);
           border-right: 1px solid var(--border);
         }
         .ns-sift-cell {
@@ -487,7 +487,7 @@ export function StemSift({ records, unit = "", label = "Distribution", className
           padding: 20px 8px;
           text-align: center;
           font-size: 12px;
-          color: var(--muted);
+          color: var(--ns-muted);
         }
         .ns-sift-leaves {
           display: flex;
@@ -527,7 +527,7 @@ export function StemSift({ records, unit = "", label = "Distribution", className
           background: color-mix(in oklab, var(--foreground) 6%, transparent);
         }
         .ns-sift-leaf:focus-visible {
-          outline: 2px solid var(--accent);
+          outline: 2px solid var(--ns-accent);
           outline-offset: 2px;
           transform: translateY(-2px);
         }

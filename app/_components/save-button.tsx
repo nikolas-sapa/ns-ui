@@ -36,7 +36,7 @@ export function SaveButton({
           }
           onToggle(name);
         }}
-        className="relative z-20 inline-flex size-8 shrink-0 items-center justify-center rounded-sm border border-border bg-surface/90 text-foreground outline-none backdrop-blur-sm transition-colors hover:border-muted focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-wait disabled:opacity-60"
+        className="relative z-20 inline-flex size-8 shrink-0 items-center justify-center rounded-sm border border-border bg-surface/90 text-foreground outline-none backdrop-blur-sm transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:cursor-wait disabled:opacity-60"
       >
         <BookmarkIcon filled={saved} />
         <span className="sr-only">{pending ? "Saving…" : label}</span>

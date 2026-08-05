@@ -18,7 +18,7 @@ const ITEMS: ToppleRunItem[] = [
 export default function ToppleRunDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / checkbox-domino-run
       </p>
 
@@ -26,7 +26,7 @@ export default function ToppleRunDemo() {
         <ToppleRun items={ITEMS} label="Mark all as read" />
       </div>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Flip the master checkbox — a wavefront tips down the list, marking
         each row read as it passes. Click any row while the wave is live to
         halt it there; everything below stays untouched.

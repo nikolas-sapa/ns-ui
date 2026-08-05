@@ -32,7 +32,7 @@ import { useEffect, useRef, useState } from "react";
 // after the real request began) still lands on the correct phase and eases
 // in for whatever time remains, rather than replaying the whole rise from
 // zero. Pure DOM + CSS + SVG: the fill is a div, the meniscus is a 1-path SVG
-// riding its top edge, both colored from --foreground/--muted, no canvas.
+// riding its top edge, both colored from --foreground/--ns-muted, no canvas.
 // prefers-reduced-motion drops the rise/tremor/fade entirely and swaps in a
 // static three-segment strip (within-normal / slow / stalled) — the same
 // phase machine, same announcements, nothing depends on perceiving motion.
@@ -235,7 +235,7 @@ export function MeniscusHold({
                   className="absolute inset-x-0 bottom-0"
                   style={{
                     height: `${fillFrac * 100}%`,
-                    backgroundColor: "var(--muted)",
+                    backgroundColor: "var(--ns-muted)",
                     opacity: 0.25,
                     transition: `height ${fillMs}ms ${fillEase}`,
                   }}
@@ -283,7 +283,7 @@ export function MeniscusHold({
       </div>
 
       <div className="flex flex-col gap-2">
-        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ns-muted">
           {captionText}
         </span>
 
@@ -293,7 +293,7 @@ export function MeniscusHold({
               type="button"
               data-meniscus-retry
               onClick={onRetry}
-              className="rounded-sm border border-border px-2 py-1 font-mono text-[11px] text-foreground transition-colors hover:bg-foreground/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+              className="rounded-sm border border-border px-2 py-1 font-mono text-[11px] text-foreground transition-colors hover:bg-foreground/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ns-accent"
             >
               Retry
             </button>
@@ -301,7 +301,7 @@ export function MeniscusHold({
               type="button"
               data-meniscus-switch
               onClick={onSwitchModel}
-              className="rounded-sm border border-border px-2 py-1 font-mono text-[11px] text-muted transition-colors hover:bg-foreground/10 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+              className="rounded-sm border border-border px-2 py-1 font-mono text-[11px] text-ns-muted transition-colors hover:bg-foreground/10 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-ns-accent"
             >
               Switch model
             </button>
@@ -338,13 +338,13 @@ function Tick({
       }}
     >
       <span className="block" style={{ width: 5, height: 1, backgroundColor: "var(--foreground)" }} />
-      <span className="whitespace-nowrap font-mono text-[9px] text-muted">{label}</span>
+      <span className="whitespace-nowrap font-mono text-[9px] text-ns-muted">{label}</span>
     </div>
   );
 }
 
 // Static, motion-free fallback: three fixed segments, the current phase lit
-// from --muted to --foreground. Same phase machine drives this branch —
+// from --ns-muted to --foreground. Same phase machine drives this branch —
 // nothing here depends on perceiving a rise or a tremble.
 function ReducedIndicator({ phase }: { phase: MeniscusPhase }) {
   const segments: { key: "waiting" | "slow" | "stalled"; text: string }[] = [
@@ -364,11 +364,11 @@ function ReducedIndicator({ phase }: { phase: MeniscusPhase }) {
               style={{
                 width: TUBE_W,
                 height: TUBE_H - 10,
-                backgroundColor: active ? "var(--foreground)" : "var(--muted)",
+                backgroundColor: active ? "var(--foreground)" : "var(--ns-muted)",
                 opacity: active ? 0.55 : 0.15,
               }}
             />
-            <span className="font-mono text-[8px] uppercase tracking-[0.1em] text-muted">
+            <span className="font-mono text-[8px] uppercase tracking-[0.1em] text-ns-muted">
               {seg.text}
             </span>
           </div>

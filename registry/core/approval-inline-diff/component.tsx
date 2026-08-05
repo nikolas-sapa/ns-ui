@@ -214,11 +214,11 @@ export function AssayGate({
                 <p className="truncate font-mono text-sm font-medium text-foreground">
                   {toolName}
                 </p>
-                <p className="truncate font-mono text-[11px] text-muted">
+                <p className="truncate font-mono text-[11px] text-ns-muted">
                   requested by {requestedBy}
                 </p>
               </div>
-              <span className="shrink-0 rounded-full border border-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-muted">
+              <span className="shrink-0 rounded-full border border-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-ns-muted">
                 pending
               </span>
             </div>
@@ -232,7 +232,7 @@ export function AssayGate({
                   <div key={f.key}>
                     <label
                       htmlFor={id}
-                      className="block font-mono text-[11px] uppercase tracking-wide text-muted"
+                      className="block font-mono text-[11px] uppercase tracking-wide text-ns-muted"
                     >
                       {f.label}
                     </label>
@@ -243,16 +243,16 @@ export function AssayGate({
                       onChange={(e) =>
                         setValues((v) => ({ ...v, [f.key]: e.target.value }))
                       }
-                      className="mt-1 w-full rounded-sm border border-border bg-background px-2.5 py-1.5 font-mono text-sm text-foreground outline-none transition-colors focus-visible:border-accent"
+                      className="mt-1 w-full rounded-sm border border-border bg-background px-2.5 py-1.5 font-mono text-sm text-foreground outline-none transition-colors focus-visible:border-ns-accent"
                     />
                     {dirty ? (
                       <div className="mt-1.5 flex flex-wrap items-center gap-1.5 font-mono text-xs">
                         <span className="sr-only">changed from</span>
-                        <s className="break-all text-muted decoration-1">
+                        <s className="break-all text-ns-muted decoration-1">
                           {originals[f.key]}
                         </s>
                         <span className="sr-only">to</span>
-                        <span className="text-muted">
+                        <span className="text-ns-muted">
                           <ArrowIcon />
                         </span>
                         <span className="break-all text-foreground">
@@ -270,7 +270,7 @@ export function AssayGate({
                 type="button"
                 data-assay-deny
                 onClick={() => decide("denied")}
-                className="inline-flex items-center gap-1.5 rounded-sm border border-border px-3 py-1.5 text-sm text-foreground transition-colors hover:bg-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                className="inline-flex items-center gap-1.5 rounded-sm border border-border px-3 py-1.5 text-sm text-foreground transition-colors hover:bg-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
               >
                 <DenyIcon />
                 Deny
@@ -279,7 +279,7 @@ export function AssayGate({
                 type="button"
                 data-assay-approve
                 onClick={() => decide("approved")}
-                className="inline-flex items-center gap-1.5 rounded-sm bg-accent px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                className="inline-flex items-center gap-1.5 rounded-sm bg-ns-accent px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-ns-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
               >
                 <CheckIcon />
                 Approve
@@ -304,7 +304,7 @@ export function AssayGate({
                   "flex h-4 w-4 shrink-0 items-center justify-center rounded-full border " +
                   (approved
                     ? "border-foreground text-foreground"
-                    : "border-border text-muted")
+                    : "border-border text-ns-muted")
                 }
                 aria-hidden
               >
@@ -313,31 +313,31 @@ export function AssayGate({
               <span className={"shrink-0 " + (approved ? "font-medium" : "")}>
                 {receiptLabel}
               </span>
-              <span className="shrink-0 text-muted">·</span>
+              <span className="shrink-0 text-ns-muted">·</span>
               {/* the one variable-length field on this row — it truncates so a
                   long tool name can't shove the payload affordance into the
                   timestamp (ml-auto yields nothing once the row is full) */}
-              <span className="min-w-0 truncate text-muted">{toolName}</span>
-              <span className="shrink-0 text-muted">·</span>
+              <span className="min-w-0 truncate text-ns-muted">{toolName}</span>
+              <span className="shrink-0 text-ns-muted">·</span>
               {/* the actor is variable-length too (a console handle can be an
                   email or a long service identity): like the tool name it
                   gives rather than shoving the timestamp/payload off the row,
                   and the full string stays available on hover and in the
                   expanded payload's own header row below */}
               <span
-                className="min-w-0 truncate text-muted"
+                className="min-w-0 truncate text-ns-muted"
                 title={decision.actor}
               >
                 {decision.actor}
               </span>
-              <span className="shrink-0 text-muted">·</span>
+              <span className="shrink-0 text-ns-muted">·</span>
               {/* shrink-0 + nowrap: without it flex squeezed the stamp until
                   "4:33:04 PM" wrapped onto a second line and got clipped by the
                   row. The tool name above is the only field allowed to give. */}
-              <span className="shrink-0 whitespace-nowrap text-muted">
+              <span className="shrink-0 whitespace-nowrap text-ns-muted">
                 <TimeStamp ts={decision.timestamp} />
               </span>
-              <span className="ml-auto flex shrink-0 items-center gap-1 pl-3 text-muted">
+              <span className="ml-auto flex shrink-0 items-center gap-1 pl-3 text-ns-muted">
                 payload
                 <ChevronIcon />
               </span>
@@ -350,16 +350,16 @@ export function AssayGate({
                   line (the tool and the decider) are repeated here in full, so
                   ellipsizing them above never loses information */}
               <div className="flex gap-2 font-mono text-xs">
-                <span className="shrink-0 text-muted">tool</span>
+                <span className="shrink-0 text-ns-muted">tool</span>
                 <span className="break-all text-foreground">{toolName}</span>
               </div>
               <div className="flex gap-2 font-mono text-xs">
-                <span className="shrink-0 text-muted">decided by</span>
+                <span className="shrink-0 text-ns-muted">decided by</span>
                 <span className="break-all text-foreground">{decision.actor}</span>
               </div>
               {fields.map((f) => (
                 <div key={f.key} className="flex gap-2 font-mono text-xs">
-                  <span className="shrink-0 text-muted">{f.label}</span>
+                  <span className="shrink-0 text-ns-muted">{f.label}</span>
                   <span className="break-all text-foreground">
                     {values[f.key] ?? f.value}
                   </span>

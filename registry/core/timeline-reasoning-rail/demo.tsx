@@ -144,7 +144,7 @@ export default function SoundingRailDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / timeline-reasoning-rail
       </p>
 
@@ -154,12 +154,12 @@ export default function SoundingRailDemo() {
             Fix flaky checkout test
           </h2>
           <div className="flex shrink-0 items-center gap-3">
-            <span className="font-mono text-[11px] text-muted">
+            <span className="font-mono text-[11px] text-ns-muted">
               {finished ? "waiting" : "running"}
             </span>
             <button
               onClick={() => setFrame(0)}
-              className="rounded-sm border border-border px-2.5 py-1 font-mono text-[11px] text-muted transition-colors duration-150 hover:border-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="rounded-sm border border-border px-2.5 py-1 font-mono text-[11px] text-ns-muted transition-colors duration-150 hover:border-ns-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
             >
               restart run
             </button>
@@ -174,7 +174,7 @@ export default function SoundingRailDemo() {
         </div>
       </div>
 
-      <p className="font-mono text-[10px] text-muted">
+      <p className="font-mono text-[10px] text-ns-muted">
         hover the panel to pause · click a folded step to expand it
       </p>
     </div>

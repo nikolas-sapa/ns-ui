@@ -96,7 +96,7 @@ export function IronFilings({ className = "" }: { className?: string }) {
       const cs = getComputedStyle(document.documentElement);
       ink = {
         fg: cs.getPropertyValue("--foreground").trim() || "#888",
-        muted: cs.getPropertyValue("--muted").trim() || "#888",
+        muted: cs.getPropertyValue("--ns-muted").trim() || "#888",
       };
     };
     readInk();
@@ -390,7 +390,7 @@ export function IronFilings({ className = "" }: { className?: string }) {
             </p>
           )}
           {phase === "pending" && (
-            <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+            <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
               Processing
             </p>
           )}
@@ -402,13 +402,13 @@ export function IronFilings({ className = "" }: { className?: string }) {
           className={`transition-opacity duration-300 ${phase === "done" ? "opacity-40" : ""}`}
         >
           <p className="text-sm font-medium text-foreground">Order #1284</p>
-          <p className="font-mono text-xs text-muted">3 items · $148.00</p>
+          <p className="font-mono text-xs text-ns-muted">3 items · $148.00</p>
         </div>
         <button
           type="button"
           onClick={onClick}
           disabled={phase === "pending"}
-          className="rounded-sm bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-60"
+          className="rounded-sm bg-ns-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ns-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent disabled:opacity-60"
         >
           {phase === "done"
             ? "Replay"

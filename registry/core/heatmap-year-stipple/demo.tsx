@@ -87,7 +87,7 @@ export default function StippleYearDemo() {
 
   return (
     <div ref={rootRef} className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / heatmap-year-stipple
       </p>
 
@@ -95,7 +95,7 @@ export default function StippleYearDemo() {
         <StippleYear values={values} endDate={END_DATE} />
       </div>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Density is stippled ink, not color. Hover or arrow-key through days
         for the loupe and exact count.
       </p>

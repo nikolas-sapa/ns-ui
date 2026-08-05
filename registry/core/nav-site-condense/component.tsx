@@ -102,7 +102,7 @@ export function NavSiteCondense({
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 sm:px-6">
           <a
             href="#top"
-            className={`shrink-0 rounded-sm font-mono font-semibold tracking-tight text-foreground transition-[font-size] duration-300 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent motion-reduce:transition-none ${
+            className={`shrink-0 rounded-sm font-mono font-semibold tracking-tight text-foreground transition-[font-size] duration-300 hover:text-ns-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ns-accent motion-reduce:transition-none ${
               condensed ? "text-sm" : "text-base"
             }`}
           >
@@ -114,7 +114,7 @@ export function NavSiteCondense({
               <a
                 key={link.href}
                 href={link.href}
-                className="rounded-sm text-sm text-muted transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+                className="rounded-sm text-sm text-ns-muted transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ns-accent"
               >
                 {link.label}
               </a>
@@ -133,7 +133,7 @@ export function NavSiteCondense({
             aria-expanded={sheetOpen}
             aria-label="Open menu"
             onClick={() => setSheetOpen(true)}
-            className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-sm border border-border px-2 py-1.5 font-mono text-xs text-foreground transition-colors hover:border-foreground/25 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-sm border border-border px-2 py-1.5 font-mono text-xs text-foreground transition-colors hover:border-foreground/25 hover:text-ns-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             <span aria-hidden className="leading-none">
               [≡]
@@ -158,7 +158,7 @@ export function NavSiteCondense({
               type="button"
               onClick={closeSheet}
               aria-label="Close menu"
-              className="rounded-sm border border-border p-1.5 text-muted transition-colors hover:border-foreground/25 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="rounded-sm border border-border p-1.5 text-ns-muted transition-colors hover:border-foreground/25 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
             >
               <svg aria-hidden viewBox="0 0 16 16" width="14" height="14" fill="none">
                 <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -171,7 +171,7 @@ export function NavSiteCondense({
                 key={link.href}
                 href={link.href}
                 onClick={closeSheet}
-                className="rounded-sm px-3 py-3 font-mono text-sm text-foreground transition-colors hover:bg-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                className="rounded-sm px-3 py-3 font-mono text-sm text-foreground transition-colors hover:bg-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
               >
                 {link.label}
               </a>

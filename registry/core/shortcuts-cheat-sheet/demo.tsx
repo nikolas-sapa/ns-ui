@@ -59,19 +59,19 @@ export default function QuickKeyDemo() {
     <div className="relative flex min-h-screen flex-col items-center justify-between gap-10 px-8 py-24">
       <QuickKey sections={SECTIONS} open={open} onOpenChange={handleOpenChange} columns={2} />
 
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / shortcuts-cheat-sheet — the sheet presses its own keys
       </p>
 
       <div className="flex w-full max-w-md flex-col gap-3">
-        <label htmlFor="shortcuts-cheat-sheet-demo-search" className="text-xs text-muted">
+        <label htmlFor="shortcuts-cheat-sheet-demo-search" className="text-xs text-ns-muted">
           This field is what ⌘K would normally focus
         </label>
         <input
           id="shortcuts-cheat-sheet-demo-search"
           type="text"
           placeholder="Search the workspace…"
-          className="w-full rounded-sm border border-border bg-surface px-3 py-2 text-sm text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="w-full rounded-sm border border-border bg-surface px-3 py-2 text-sm text-foreground placeholder:text-ns-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
         />
       </div>
     </div>

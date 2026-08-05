@@ -123,7 +123,7 @@ function Particles({ still, visible }: { still: boolean; visible: RefObject<bool
       const u = material.current?.uniforms;
       if (!u) return;
       const cs = getComputedStyle(document.documentElement);
-      const base = parseColor(cs.getPropertyValue("--muted")) ?? [0.561, 0.561, 0.561];
+      const base = parseColor(cs.getPropertyValue("--ns-muted")) ?? [0.561, 0.561, 0.561];
       (u.uColor.value as THREE.Vector3).set(...base);
     };
     derive();
@@ -194,7 +194,7 @@ const reveal: Variants = {
 };
 
 const ctaClasses =
-  "inline-flex items-center justify-center rounded-sm bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors duration-150 hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+  "inline-flex items-center justify-center rounded-sm bg-ns-accent px-5 py-2.5 text-sm font-medium text-white transition-colors duration-150 hover:bg-ns-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent";
 
 const revealProps = (reduced: boolean, i: number) =>
   ({ variants: reveal, initial: reduced ? false : "hidden", animate: "show", custom: i }) as const;
@@ -256,7 +256,7 @@ export function ParticleHero({
       />
       <div className="relative z-10 mx-auto max-w-2xl px-6 text-center">
         <motion.p
-          className="font-mono text-xs uppercase tracking-[0.2em] text-muted"
+          className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted"
           {...revealProps(reduced, 0)}
         >
           {eyebrow}
@@ -268,7 +268,7 @@ export function ParticleHero({
           {headline}
         </motion.h1>
         <motion.p
-          className="mx-auto mt-5 max-w-lg text-base text-muted"
+          className="mx-auto mt-5 max-w-lg text-base text-ns-muted"
           {...revealProps(reduced, 2)}
         >
           {subline}

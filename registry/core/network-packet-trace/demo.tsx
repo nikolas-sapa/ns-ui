@@ -24,18 +24,18 @@ export default function PacketTraceDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / network-packet-trace
       </p>
 
       <div className="flex w-full max-w-md flex-col items-center gap-4 rounded-[12px] border border-border bg-background p-6">
         <PacketTrace state={current.state} />
-        <p className="font-mono text-[11px] uppercase tracking-wide text-muted">
+        <p className="font-mono text-[11px] uppercase tracking-wide text-ns-muted">
           state: {current.state}
         </p>
       </div>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Pulses branch across the network at random; in the error state they
         route toward the hub node and stack up instead of dispersing. Hover
         or focus a node for its live throughput.

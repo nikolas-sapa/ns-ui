@@ -308,7 +308,7 @@ export const CardioBaseline = forwardRef<
         <polyline
           ref={lineRef}
           fill="none"
-          style={{ stroke: "var(--muted)" }}
+          style={{ stroke: "var(--ns-muted)" }}
           strokeWidth="1.5"
           strokeLinejoin="round"
         />

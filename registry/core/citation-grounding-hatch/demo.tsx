@@ -83,7 +83,7 @@ export default function BedrockTraceDemo() {
   return (
     <div className="flex min-h-screen items-center justify-center px-6 py-16">
       <div className="w-full max-w-xl rounded-md border border-border bg-background p-6">
-        <p className="mb-1 font-mono text-[11px] uppercase tracking-[0.16em] text-muted">
+        <p className="mb-1 font-mono text-[11px] uppercase tracking-[0.16em] text-ns-muted">
           Assistant answer / grounding trace
         </p>
         <h2 className="mb-4 text-lg font-semibold tracking-tight text-foreground">

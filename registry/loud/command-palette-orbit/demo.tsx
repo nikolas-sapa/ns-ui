@@ -33,13 +33,13 @@ export default function EventHorizonCommandDemo() {
   return (
     <main className="min-h-screen bg-background px-6 py-16">
       <div className="mx-auto max-w-5xl">
-        <p className="font-mono text-xs tracking-[0.25em] text-muted">
+        <p className="font-mono text-xs tracking-[0.25em] text-ns-muted">
           ns-ui / command-palette-orbit
         </p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground">
           Event Horizon Command
         </h1>
-        <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">
+        <p className="mt-2 max-w-xl text-sm leading-relaxed text-ns-muted">
           A Cmd-K palette where results orbit the input — orbital radius is
           inverse match score, so ranking is the gravity sim. The query
           auto-types <span className="font-mono text-foreground">deploy</span>{" "}
@@ -61,7 +61,7 @@ export default function EventHorizonCommandDemo() {
                   <div
                     key={n}
                     className={`rounded-sm px-2 py-1.5 text-sm ${
-                      i === 1 ? "bg-background text-foreground" : "text-muted"
+                      i === 1 ? "bg-background text-foreground" : "text-ns-muted"
                     }`}
                   >
                     {n}
@@ -73,7 +73,7 @@ export default function EventHorizonCommandDemo() {
             {/* main pane */}
             <section className="min-w-0 flex-1 p-6">
               <header className="flex items-center justify-between border-b border-border pb-4">
-                <p className="font-mono text-xs text-muted">
+                <p className="font-mono text-xs text-ns-muted">
                   production &middot; iad1 &middot; next 15.4
                 </p>
                 <span className="h-6 w-6 rounded-full border border-border bg-background" />
@@ -86,7 +86,7 @@ export default function EventHorizonCommandDemo() {
                   ["Error rate", "0.12%"],
                 ].map(([k, v]) => (
                   <div key={k} className="rounded-md border border-border bg-background p-4">
-                    <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
+                    <p className="font-mono text-[10px] uppercase tracking-widest text-ns-muted">
                       {k}
                     </p>
                     <p className="mt-1 text-xl font-semibold text-foreground">{v}</p>
@@ -101,12 +101,12 @@ export default function EventHorizonCommandDemo() {
                     className="flex items-center gap-3 rounded-sm border border-border bg-background px-3 py-2 text-sm"
                   >
                     <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-foreground/40" />
-                    <span className="font-mono text-xs text-muted">{d.sha}</span>
+                    <span className="font-mono text-xs text-ns-muted">{d.sha}</span>
                     <span className="truncate text-foreground">{d.note}</span>
-                    <span className="ml-auto hidden font-mono text-xs text-muted md:inline">
+                    <span className="ml-auto hidden font-mono text-xs text-ns-muted md:inline">
                       {d.branch}
                     </span>
-                    <span className="shrink-0 font-mono text-xs text-muted">{d.when}</span>
+                    <span className="shrink-0 font-mono text-xs text-ns-muted">{d.when}</span>
                   </div>
                 ))}
               </div>
@@ -126,7 +126,7 @@ export default function EventHorizonCommandDemo() {
         </div>
 
         <div className="mt-6 flex items-center justify-between gap-4">
-          <p className="font-mono text-xs text-muted">
+          <p className="font-mono text-xs text-ns-muted">
             last run:{" "}
             <span className="text-foreground">
               {lastRun ? lastRun.label : "none — press Enter or click a pill"}
@@ -135,7 +135,7 @@ export default function EventHorizonCommandDemo() {
           <button
             type="button"
             onClick={() => setLastRun(null)}
-            className="rounded-sm border border-border bg-surface px-3 py-1.5 font-mono text-xs text-muted transition-colors hover:border-foreground/30 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="rounded-sm border border-border bg-surface px-3 py-1.5 font-mono text-xs text-ns-muted transition-colors hover:border-foreground/30 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             reset log
           </button>

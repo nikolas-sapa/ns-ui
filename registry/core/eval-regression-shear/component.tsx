@@ -61,7 +61,7 @@ export function EvalDeltaTable({
 
   return (
     <div className={["w-full font-sans text-foreground", className].filter(Boolean).join(" ")}>
-      <p className="mb-3 font-mono text-[11px] tabular-nums text-muted">
+      <p className="mb-3 font-mono text-[11px] tabular-nums text-ns-muted">
         {rows.length} cases · {up} improved · {down} regressed · {tie} unchanged
       </p>
 
@@ -76,19 +76,19 @@ export function EvalDeltaTable({
         </colgroup>
         <thead>
           <tr className="border-b border-border">
-            <th scope="col" className="pb-2 text-left font-mono text-[10px] font-normal uppercase tracking-[0.16em] text-muted">
+            <th scope="col" className="pb-2 text-left font-mono text-[10px] font-normal uppercase tracking-[0.16em] text-ns-muted">
               Case
             </th>
-            <th scope="col" className="pb-2 text-right font-mono text-[10px] font-normal uppercase tracking-[0.16em] text-muted">
+            <th scope="col" className="pb-2 text-right font-mono text-[10px] font-normal uppercase tracking-[0.16em] text-ns-muted">
               Base
             </th>
-            <th scope="col" className="pb-2 pr-4 text-right font-mono text-[10px] font-normal uppercase tracking-[0.16em] text-muted">
+            <th scope="col" className="pb-2 pr-4 text-right font-mono text-[10px] font-normal uppercase tracking-[0.16em] text-ns-muted">
               Cand
             </th>
-            <th scope="col" className="pb-2 text-left font-mono text-[10px] font-normal uppercase tracking-[0.16em] text-muted">
+            <th scope="col" className="pb-2 text-left font-mono text-[10px] font-normal uppercase tracking-[0.16em] text-ns-muted">
               Δ score
             </th>
-            <th scope="col" className="pb-2 text-right font-mono text-[10px] font-normal uppercase tracking-[0.16em] text-muted">
+            <th scope="col" className="pb-2 text-right font-mono text-[10px] font-normal uppercase tracking-[0.16em] text-ns-muted">
               Δ
             </th>
           </tr>
@@ -101,10 +101,10 @@ export function EvalDeltaTable({
                 <td className="py-[3px] pr-3">
                   <span className="block truncate font-mono text-[11px] text-foreground">{r.id}</span>
                 </td>
-                <td className="py-[3px] text-right font-mono text-[11px] tabular-nums text-muted">
+                <td className="py-[3px] text-right font-mono text-[11px] tabular-nums text-ns-muted">
                   {r.baseline.toFixed(2)}
                 </td>
-                <td className="py-[3px] pr-4 text-right font-mono text-[11px] tabular-nums text-muted">
+                <td className="py-[3px] pr-4 text-right font-mono text-[11px] tabular-nums text-ns-muted">
                   {r.candidate.toFixed(2)}
                 </td>
                 <td className="relative py-[3px]">
@@ -130,12 +130,12 @@ export function EvalDeltaTable({
         </tbody>
         <tfoot>
           <tr>
-            <td colSpan={3} className="pr-4 pt-2 align-top font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
+            <td colSpan={3} className="pr-4 pt-2 align-top font-mono text-[10px] uppercase tracking-[0.16em] text-ns-muted">
               Δ score · candidate − baseline
             </td>
             <td className="relative pt-2">
               <span className="block h-px w-full bg-border" />
-              <span className="mt-1 flex justify-between font-mono text-[10px] tabular-nums text-muted">
+              <span className="mt-1 flex justify-between font-mono text-[10px] tabular-nums text-ns-muted">
                 <span>{"−"}{max.toFixed(2)}</span>
                 <span>0</span>
                 <span>+{max.toFixed(2)}</span>

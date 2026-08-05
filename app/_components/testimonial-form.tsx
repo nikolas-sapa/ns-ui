@@ -93,7 +93,7 @@ export function TestimonialForm() {
       />
 
       <label className="flex flex-col gap-1.5">
-        <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
+        <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-ns-muted">
           Your experience
         </span>
         <textarea
@@ -102,10 +102,10 @@ export function TestimonialForm() {
           required
           rows={5}
           maxLength={MAX_QUOTE_LENGTH}
-          className="resize-y rounded-sm border border-border bg-surface px-3 py-2 text-sm leading-6 text-foreground outline-none transition-colors placeholder:text-muted hover:border-muted focus-visible:ring-2 focus-visible:ring-accent"
+          className="resize-y rounded-sm border border-border bg-surface px-3 py-2 text-sm leading-6 text-foreground outline-none transition-colors placeholder:text-ns-muted hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent"
         />
         <span
-          className={`font-mono text-[10px] ${remaining < 0 ? "text-[var(--error)]" : "text-muted"}`}
+          className={`font-mono text-[10px] ${remaining < 0 ? "text-[var(--error)]" : "text-ns-muted"}`}
         >
           {remaining} characters left
         </span>
@@ -120,11 +120,11 @@ export function TestimonialForm() {
         <button
           type="submit"
           disabled={pending}
-          className="inline-flex items-center rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-muted focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-wait disabled:opacity-60"
+          className="inline-flex items-center rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:cursor-wait disabled:opacity-60"
         >
           {pending ? "Submitting…" : "Submit for review"}
         </button>
-        <span className="text-xs text-muted">Reviewed before it appears.</span>
+        <span className="text-xs text-ns-muted">Reviewed before it appears.</span>
       </div>
     </form>
   );
@@ -142,13 +142,13 @@ function Field({
 } & Omit<React.InputHTMLAttributes<HTMLInputElement>, "value" | "onChange">) {
   return (
     <label className="flex flex-col gap-1.5">
-      <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
+      <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-ns-muted">
         {label}
       </span>
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="rounded-sm border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted hover:border-muted focus-visible:ring-2 focus-visible:ring-accent"
+        className="rounded-sm border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-ns-muted hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent"
         {...rest}
       />
     </label>

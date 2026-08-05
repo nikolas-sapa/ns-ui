@@ -426,7 +426,7 @@ export function HumpYard({
   return (
     <div className={`w-full ${className}`}>
       <div className="mb-3 flex items-center justify-between gap-3">
-        <span className="font-mono text-[11px] uppercase tracking-wide text-muted">
+        <span className="font-mono text-[11px] uppercase tracking-wide text-ns-muted">
           {ariaLabel}
         </span>
         <div
@@ -445,10 +445,10 @@ export function HumpYard({
                 aria-checked={selected}
                 tabIndex={selected ? 0 : -1}
                 onClick={() => requestView(opt.value)}
-                className={`rounded-[4px] px-2.5 py-1 font-mono text-[11px] uppercase tracking-wide outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-accent ${
+                className={`rounded-[4px] px-2.5 py-1 font-mono text-[11px] uppercase tracking-wide outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-ns-accent ${
                   selected
                     ? "bg-background text-foreground shadow-sm hover:ring-1 hover:ring-inset hover:ring-border"
-                    : "text-muted hover:text-foreground"
+                    : "text-ns-muted hover:text-foreground"
                 }`}
               >
                 {opt.label} view
@@ -477,7 +477,7 @@ export function HumpYard({
           <div
             key={h.label}
             aria-hidden
-            className="absolute font-mono text-[10px] uppercase tracking-wide text-muted"
+            className="absolute font-mono text-[10px] uppercase tracking-wide text-ns-muted"
             style={{ left: h.x, top: h.y, width: h.w }}
           >
             {h.label}
@@ -502,10 +502,10 @@ export function HumpYard({
                   {it.title}
                 </div>
                 {it.subtitle && (
-                  <div className="truncate text-[11px] text-muted">{it.subtitle}</div>
+                  <div className="truncate text-[11px] text-ns-muted">{it.subtitle}</div>
                 )}
               </div>
-              <span className="shrink-0 rounded-full border border-border px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wide text-muted">
+              <span className="shrink-0 rounded-full border border-border px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wide text-ns-muted">
                 {STATUS_LABEL[it.status]}
               </span>
             </div>

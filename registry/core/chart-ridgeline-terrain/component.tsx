@@ -190,7 +190,7 @@ export function SignalTerrain({
         parseColor(cs.getPropertyValue("--background")) ??
         fillRGB;
       strokeHighRGB = parseColor(cs.getPropertyValue("--foreground")) ?? strokeHighRGB;
-      strokeLowRGB = parseColor(cs.getPropertyValue("--muted")) ?? strokeLowRGB;
+      strokeLowRGB = parseColor(cs.getPropertyValue("--ns-muted")) ?? strokeLowRGB;
     };
     deriveTokens();
     // theme can flip after mount (class toggle on <html>, no remount) — without

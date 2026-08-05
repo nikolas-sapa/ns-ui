@@ -52,11 +52,11 @@ export default function StatTileRowDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-md">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">ns-ui / stat-row-baseline-spark</p>
+        <p className="mb-4 font-mono text-xs tracking-widest text-ns-muted">ns-ui / stat-row-baseline-spark</p>
         <div data-frame="stat-row" className="rounded-md border border-border bg-background p-5">
           <StatTileRow tiles={TILES} />
         </div>
-        <p className="mt-3 font-mono text-[11px] text-muted">
+        <p className="mt-3 font-mono text-[11px] text-ns-muted">
           hover or tab to a tile to see exactly where its baseline sits on the sparkline — the delta
           always states what it&apos;s measured against, and latency&apos;s fall reads as good news here
           precisely because a fall is what &quot;lower is better&quot; means for it, not because down is

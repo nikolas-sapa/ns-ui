@@ -48,7 +48,7 @@ interface CausticBlob {
   rf: number; // persistent per-blob randoms (radius / layout jitter)
   jx: number;
   jy: number;
-  mixT: number; // 0 = --accent, 1 = --foreground
+  mixT: number; // 0 = --ns-accent, 1 = --foreground
   alpha: number; // 0.06-0.10
 }
 
@@ -198,7 +198,7 @@ export function CausticSelect({
     let fg: Vec3 = [237, 237, 237];
     const derive = () => {
       const cs = getComputedStyle(document.documentElement);
-      accent = parseColor(cs.getPropertyValue("--accent")) ?? accent;
+      accent = parseColor(cs.getPropertyValue("--ns-accent")) ?? accent;
       fg = parseColor(cs.getPropertyValue("--foreground")) ?? fg;
     };
     derive();
@@ -704,7 +704,7 @@ export function CausticSelect({
     <div ref={rootRef} className={`relative ${className}`}>
       <span
         id={labelId}
-        className="mb-1.5 block font-mono text-xs uppercase tracking-[0.14em] text-muted"
+        className="mb-1.5 block font-mono text-xs uppercase tracking-[0.14em] text-ns-muted"
       >
         {label}
       </span>
@@ -720,7 +720,7 @@ export function CausticSelect({
         disabled={disabled}
         onClick={() => (open ? closeList(true) : openList())}
         onKeyDown={onTriggerKeyDown}
-        className="relative flex h-10 w-full items-center justify-between overflow-hidden rounded-sm border border-border text-left outline-none transition-colors hover:border-foreground/25 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 motion-reduce:transition-none"
+        className="relative flex h-10 w-full items-center justify-between overflow-hidden rounded-sm border border-border text-left outline-none transition-colors hover:border-foreground/25 focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 motion-reduce:transition-none"
       >
         {/* caustic light beneath the frost */}
         <canvas
@@ -736,7 +736,7 @@ export function CausticSelect({
         <span
           id={valueId}
           className={`relative z-[1] truncate px-3 text-sm ${
-            selected ? "text-foreground" : "text-muted"
+            selected ? "text-foreground" : "text-ns-muted"
           }`}
         >
           {selected ? selected.label : placeholder}
@@ -745,7 +745,7 @@ export function CausticSelect({
           aria-hidden
           viewBox="0 0 16 16"
           fill="none"
-          className={`relative z-[1] mr-3 h-4 w-4 shrink-0 text-muted transition-transform duration-200 motion-reduce:transition-none ${
+          className={`relative z-[1] mr-3 h-4 w-4 shrink-0 text-ns-muted transition-transform duration-200 motion-reduce:transition-none ${
             open ? "rotate-180" : ""
           }`}
         >
@@ -809,7 +809,7 @@ export function CausticSelect({
                 }}
                 className={`flex items-center justify-between gap-3 px-3 py-2 text-sm transition-colors duration-100 motion-reduce:transition-none ${
                   opt.disabled
-                    ? "cursor-not-allowed text-muted/60"
+                    ? "cursor-not-allowed text-ns-muted/60"
                     : isActive
                       ? "cursor-pointer bg-foreground/[0.07] text-foreground"
                       : "cursor-pointer text-foreground/85"
@@ -818,7 +818,7 @@ export function CausticSelect({
                 <span className="flex min-w-0 items-baseline gap-2">
                   <span className="truncate">{opt.label}</span>
                   {opt.hint ? (
-                    <span className="shrink-0 font-mono text-[11px] text-muted">
+                    <span className="shrink-0 font-mono text-[11px] text-ns-muted">
                       {opt.hint}
                     </span>
                   ) : null}
@@ -828,7 +828,7 @@ export function CausticSelect({
                     aria-hidden
                     viewBox="0 0 16 16"
                     fill="none"
-                    className="h-4 w-4 shrink-0 text-accent"
+                    className="h-4 w-4 shrink-0 text-ns-accent"
                   >
                     <path
                       d="M3.5 8.5l3 3 6-6.5"

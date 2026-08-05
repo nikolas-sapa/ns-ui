@@ -12,11 +12,11 @@ export default function VaporCountdownDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="flex w-full max-w-3xl flex-col items-center">
-        <p className="mb-10 self-start font-mono text-xs tracking-widest text-muted">
+        <p className="mb-10 self-start font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / countdown-vapor-digits
         </p>
 
-        <p className="mb-8 font-mono text-[11px] tracking-[0.25em] text-muted">
+        <p className="mb-8 font-mono text-[11px] tracking-[0.25em] text-ns-muted">
           LAUNCH WINDOW CLOSES IN
         </p>
 
@@ -35,13 +35,13 @@ export default function VaporCountdownDemo() {
               key={label}
               type="button"
               onClick={() => setTarget(Date.now() + offset)}
-              className="rounded-sm border border-border px-4 py-1.5 font-mono text-[11px] tracking-widest text-muted transition-colors duration-200 hover:border-white/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="rounded-sm border border-border px-4 py-1.5 font-mono text-[11px] tracking-widest text-ns-muted transition-colors duration-200 hover:border-white/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
             >
               {label}
             </button>
           ))}
         </div>
-        <p className="mt-4 font-mono text-[11px] text-muted">
+        <p className="mt-4 font-mono text-[11px] text-ns-muted">
           retarget to watch every digit sublimate and condense at once
         </p>
       </div>

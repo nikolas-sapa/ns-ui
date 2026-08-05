@@ -239,9 +239,9 @@ export function ScreePour({
           parseColor(cs.getPropertyValue("--foreground")),
           colorsRef.current.foreground
         ),
-        muted: rgbString(parseColor(cs.getPropertyValue("--muted")), colorsRef.current.muted),
+        muted: rgbString(parseColor(cs.getPropertyValue("--ns-muted")), colorsRef.current.muted),
         border: rgbString(parseColor(cs.getPropertyValue("--border")), colorsRef.current.border),
-        accent: rgbString(parseColor(cs.getPropertyValue("--accent")), colorsRef.current.accent),
+        accent: rgbString(parseColor(cs.getPropertyValue("--ns-accent")), colorsRef.current.accent),
       };
     };
     read();
@@ -450,7 +450,7 @@ export function ScreePour({
   const refresh = () => setLastUpdated(new Date().toLocaleTimeString());
 
   const triggerClass =
-    "inline-flex items-center gap-1.5 rounded-sm border border-accent px-3 py-1.5 text-xs font-medium text-accent transition-colors hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-60";
+    "inline-flex items-center gap-1.5 rounded-sm border border-ns-accent px-3 py-1.5 text-xs font-medium text-ns-accent transition-colors hover:text-ns-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent disabled:opacity-60";
 
   return (
     <div
@@ -472,12 +472,12 @@ export function ScreePour({
               Overview
             </h2>
             <div data-scree-id="meta" data-scree-tone="muted" className="flex items-center gap-2">
-              <span className="font-mono text-[11px] text-muted">Updated {lastUpdated}</span>
+              <span className="font-mono text-[11px] text-ns-muted">Updated {lastUpdated}</span>
               <button
                 type="button"
                 onClick={refresh}
                 aria-label="Refresh data"
-                className="rounded-sm border border-border p-1 text-muted transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                className="rounded-sm border border-border p-1 text-ns-muted transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
               >
                 <svg viewBox="0 0 16 16" width="12" height="12" fill="none" aria-hidden>
                   <path
@@ -498,7 +498,7 @@ export function ScreePour({
               data-scree-tone="foreground"
               className="flex flex-col justify-between rounded-md border border-border p-3"
             >
-              <span className="font-mono text-[11px] text-muted">Sessions</span>
+              <span className="font-mono text-[11px] text-ns-muted">Sessions</span>
               <span className="text-2xl font-medium tabular-nums text-foreground">12,482</span>
             </div>
             <div
@@ -506,7 +506,7 @@ export function ScreePour({
               data-scree-tone="foreground"
               className="flex flex-col justify-between rounded-md border border-border p-3"
             >
-              <span className="font-mono text-[11px] text-muted">Revenue</span>
+              <span className="font-mono text-[11px] text-ns-muted">Revenue</span>
               <span className="text-2xl font-medium tabular-nums text-foreground">$8.2k</span>
             </div>
             <div
@@ -514,7 +514,7 @@ export function ScreePour({
               data-scree-tone="foreground"
               className="flex flex-col justify-between rounded-md border border-border p-3"
             >
-              <span className="font-mono text-[11px] text-muted">Users</span>
+              <span className="font-mono text-[11px] text-ns-muted">Users</span>
               <span className="text-2xl font-medium tabular-nums text-foreground">3,014</span>
             </div>
           </div>
@@ -551,7 +551,7 @@ export function ScreePour({
             data-scree-toggle="to-overview"
             disabled={phase === "pouring"}
             onClick={() => trigger("overview")}
-            className="inline-flex w-fit items-center gap-1.5 rounded-sm px-1 py-1 text-xs font-medium text-accent transition-colors hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-60"
+            className="inline-flex w-fit items-center gap-1.5 rounded-sm px-1 py-1 text-xs font-medium text-ns-accent transition-colors hover:text-ns-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent disabled:opacity-60"
           >
             <svg viewBox="0 0 16 16" width="11" height="11" fill="none" aria-hidden>
               <path
@@ -586,7 +586,7 @@ export function ScreePour({
             <p
               data-scree-id="description"
               data-scree-tone="muted"
-              className="max-w-sm text-xs leading-relaxed text-muted"
+              className="max-w-sm text-xs leading-relaxed text-ns-muted"
             >
               Sessions across all surfaces, last 24 hours. Up 6.4% from the previous day, driven
               mostly by returning users on mobile.

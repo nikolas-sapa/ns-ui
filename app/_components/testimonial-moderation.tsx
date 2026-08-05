@@ -81,7 +81,7 @@ export function TestimonialModeration() {
       ) : null}
 
       {rows.length === 0 ? (
-        <p className="mt-3 text-sm text-muted">No submissions yet.</p>
+        <p className="mt-3 text-sm text-ns-muted">No submissions yet.</p>
       ) : (
         <ul className="mt-3 flex flex-col gap-3">
           {rows.map((row) => (
@@ -90,7 +90,7 @@ export function TestimonialModeration() {
               className="rounded-sm border border-border bg-surface px-4 py-3"
             >
               <div className="flex flex-wrap items-center gap-2">
-                <span className="font-mono text-[10px] uppercase tracking-wider text-muted">
+                <span className="font-mono text-[10px] uppercase tracking-wider text-ns-muted">
                   {row.status}
                 </span>
                 {row.spamFlags.map((flag) => (
@@ -101,14 +101,14 @@ export function TestimonialModeration() {
                     className={`rounded-sm border px-1.5 py-px font-mono text-[10px] ${
                       flag === "hate_or_harassment"
                         ? "border-[var(--error)] text-[var(--error)]"
-                        : "border-border text-muted"
+                        : "border-border text-ns-muted"
                     }`}
                   >
                     {flag}
                   </span>
                 ))}
                 {row.spamFlags.length > 0 ? (
-                  <span className="font-mono text-[10px] text-muted">
+                  <span className="font-mono text-[10px] text-ns-muted">
                     score {row.spamScore}
                   </span>
                 ) : null}
@@ -118,13 +118,13 @@ export function TestimonialModeration() {
                 &ldquo;{row.quote}&rdquo;
               </blockquote>
 
-              <p className="mt-2 text-xs text-muted">
+              <p className="mt-2 text-xs text-ns-muted">
                 {row.name} — {row.role} at {row.company} ·{" "}
                 <a
                   href={row.profileUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="underline decoration-border underline-offset-4 outline-none hover:decoration-foreground focus-visible:ring-2 focus-visible:ring-accent"
+                  className="underline decoration-border underline-offset-4 outline-none hover:decoration-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
                 >
                   profile
                 </a>
@@ -135,7 +135,7 @@ export function TestimonialModeration() {
                   type="button"
                   disabled={busy === row.id || row.status === "approved"}
                   onClick={() => act(row.id, "approve")}
-                  className="rounded-sm border border-border px-2.5 py-1 text-xs text-foreground outline-none transition-colors hover:border-muted focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-40"
+                  className="rounded-sm border border-border px-2.5 py-1 text-xs text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-40"
                 >
                   Approve
                 </button>
@@ -143,7 +143,7 @@ export function TestimonialModeration() {
                   type="button"
                   disabled={busy === row.id || row.status === "rejected"}
                   onClick={() => act(row.id, "reject")}
-                  className="rounded-sm border border-border px-2.5 py-1 text-xs text-muted outline-none transition-colors hover:border-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-40"
+                  className="rounded-sm border border-border px-2.5 py-1 text-xs text-ns-muted outline-none transition-colors hover:border-ns-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-40"
                 >
                   Reject
                 </button>

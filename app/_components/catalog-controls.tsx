@@ -138,14 +138,14 @@ export function CatalogControls({
                 type="button"
                 aria-pressed={selected}
                 onClick={() => onFilter(t.key)}
-                className={`min-h-11 rounded-sm px-2.5 py-1 text-sm outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-accent sm:min-h-0 ${
+                className={`min-h-11 rounded-sm px-2.5 py-1 text-sm outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-ns-accent sm:min-h-0 ${
                   selected
                     ? "bg-surface font-medium text-foreground"
-                    : "text-muted hover:text-foreground"
+                    : "text-ns-muted hover:text-foreground"
                 }`}
               >
                 {t.label}
-                <span className="ml-1.5 font-mono text-xs text-muted">{counts[t.key]}</span>
+                <span className="ml-1.5 font-mono text-xs text-ns-muted">{counts[t.key]}</span>
               </button>
             );
           })}
@@ -169,14 +169,14 @@ export function CatalogControls({
             type="button"
             aria-pressed={newOnly}
             onClick={() => onNewOnly(!newOnly)}
-            className={`min-h-11 shrink-0 rounded-sm border px-2.5 py-1 text-sm outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-accent sm:min-h-0 ${
+            className={`min-h-11 shrink-0 rounded-sm border px-2.5 py-1 text-sm outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-ns-accent sm:min-h-0 ${
               newOnly
                 ? "border-border bg-surface font-medium text-foreground"
-                : "border-transparent text-muted hover:text-foreground"
+                : "border-transparent text-ns-muted hover:text-foreground"
             }`}
           >
             New
-            <span className="ml-1.5 font-mono text-xs text-muted">{newCount}</span>
+            <span className="ml-1.5 font-mono text-xs text-ns-muted">{newCount}</span>
           </button>
 
           <div className="search-trace-field relative w-full min-w-0 flex-1 rounded-sm sm:w-auto sm:flex-none">
@@ -200,7 +200,7 @@ export function CatalogControls({
               placeholder="Search catalog"
               autoComplete="off"
               spellCheck={false}
-              className="min-h-11 w-full min-w-0 rounded-sm border border-border bg-surface py-1 pl-2 pr-6 text-sm text-foreground outline-none transition-colors placeholder:text-muted focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none sm:min-h-0 sm:w-56 sm:pl-2.5"
+              className="min-h-11 w-full min-w-0 rounded-sm border border-border bg-surface py-1 pl-2 pr-6 text-sm text-foreground outline-none transition-colors placeholder:text-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none sm:min-h-0 sm:w-56 sm:pl-2.5"
             />
             <span aria-hidden className="search-trace pointer-events-none motion-reduce:hidden" />
             {/* Hidden until search is unfocused-and-empty, so the "/" hint
@@ -208,7 +208,7 @@ export function CatalogControls({
             {!query ? (
               <kbd
                 aria-hidden
-                className="pointer-events-none absolute right-1.5 top-1/2 hidden -translate-y-1/2 rounded-sm border border-border px-1 font-mono text-[10px] text-muted sm:block"
+                className="pointer-events-none absolute right-1.5 top-1/2 hidden -translate-y-1/2 rounded-sm border border-border px-1 font-mono text-[10px] text-ns-muted sm:block"
               >
                 /
               </kbd>
@@ -230,7 +230,7 @@ export function CatalogControls({
               id="sort-order"
               value={sort}
               onChange={(e) => onSort(e.target.value as Sort)}
-              className="min-h-11 shrink-0 appearance-none rounded-sm border border-border bg-surface py-1 pl-1.5 pr-5 text-xs text-muted outline-none transition-colors focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none hover:text-foreground sm:min-h-0"
+              className="min-h-11 shrink-0 appearance-none rounded-sm border border-border bg-surface py-1 pl-1.5 pr-5 text-xs text-ns-muted outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none hover:text-foreground sm:min-h-0"
             >
               {SORTS.map((s) => (
                 <option key={s.key} value={s.key}>
@@ -241,7 +241,7 @@ export function CatalogControls({
             <svg
               viewBox="0 0 16 16"
               aria-hidden
-              className="pointer-events-none absolute right-1.5 top-1/2 size-2.5 -translate-y-1/2 text-muted"
+              className="pointer-events-none absolute right-1.5 top-1/2 size-2.5 -translate-y-1/2 text-ns-muted"
               fill="none"
               stroke="currentColor"
               strokeWidth="1.75"
@@ -276,14 +276,14 @@ export function CatalogControls({
                 type="button"
                 aria-pressed={on}
                 onClick={() => onCategory(on ? null : c.id)}
-                className={`flex min-h-11 items-center justify-center rounded-full border px-2.5 py-1 text-xs outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-accent sm:min-h-0 sm:w-auto sm:shrink-0 sm:justify-start ${
+                className={`flex min-h-11 items-center justify-center rounded-full border px-2.5 py-1 text-xs outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-ns-accent sm:min-h-0 sm:w-auto sm:shrink-0 sm:justify-start ${
                   on
-                    ? "border-accent bg-accent text-white"
-                    : "border-border text-muted hover:border-muted hover:text-foreground"
+                    ? "border-ns-accent bg-ns-accent text-white"
+                    : "border-border text-ns-muted hover:border-ns-muted hover:text-foreground"
                 }`}
               >
                 {c.label}
-                <span className={`ml-1.5 font-mono text-[11px] ${on ? "text-white/70" : "text-muted"}`}>
+                <span className={`ml-1.5 font-mono text-[11px] ${on ? "text-white/70" : "text-ns-muted"}`}>
                   {c.count}
                 </span>
               </button>
@@ -293,7 +293,7 @@ export function CatalogControls({
 
         {/* Single live region for the result count — was previously
             duplicated with a second "n shown" readout in row one. */}
-        <p aria-live="polite" className="shrink-0 whitespace-nowrap py-1 font-mono text-[11px] text-muted sm:text-xs">
+        <p aria-live="polite" className="shrink-0 whitespace-nowrap py-1 font-mono text-[11px] text-ns-muted sm:text-xs">
           {filtered ? `${visibleCount} of ${totalCount}` : `${totalCount} shown`}
           {activeCategory ? ` · ${activeCategory.label}` : ""}
         </p>
@@ -310,7 +310,7 @@ export function CatalogControls({
         <button
           type="button"
           onClick={onClearAll}
-          className={`flex min-h-11 shrink-0 items-center rounded-sm px-1.5 py-1 text-xs text-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent sm:min-h-0 catalog-gate-clear ${
+          className={`flex min-h-11 shrink-0 items-center rounded-sm px-1.5 py-1 text-xs text-ns-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent sm:min-h-0 catalog-gate-clear ${
             filtered ? "" : "hidden"
           }`}
         >

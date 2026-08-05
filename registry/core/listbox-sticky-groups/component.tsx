@@ -407,7 +407,7 @@ export function ShingleCourse({
     <div className={className}>
       <span
         id={labelId}
-        className="mb-1.5 block font-mono text-xs uppercase tracking-[0.14em] text-muted"
+        className="mb-1.5 block font-mono text-xs uppercase tracking-[0.14em] text-ns-muted"
       >
         {label}
       </span>
@@ -429,7 +429,7 @@ export function ShingleCourse({
             : undefined
         }
         onKeyDown={onListKeyDown}
-        className={`relative max-h-[420px] overflow-y-auto overscroll-contain rounded-md border border-border bg-background outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent ${
+        className={`relative max-h-[420px] overflow-y-auto overscroll-contain rounded-md border border-border bg-background outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ns-accent ${
           disabled ? "pointer-events-none opacity-50" : ""
         }`}
       >
@@ -464,9 +464,9 @@ export function ShingleCourse({
                 onClick={() => scrollGroupToTop(gi)}
                 aria-label={`Jump to ${g.label}`}
                 style={{ top: gi * HEADER_STEP, zIndex: gi + 1 }}
-                className={`sticky flex h-9 w-full items-center justify-between gap-3 border-border bg-background px-3 text-left outline-none transition-[color,background-color,font-size,letter-spacing,padding] duration-200 enabled:hover:bg-surface focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-inset disabled:cursor-not-allowed motion-reduce:transition-none ${
+                className={`sticky flex h-9 w-full items-center justify-between gap-3 border-border bg-background px-3 text-left outline-none transition-[color,background-color,font-size,letter-spacing,padding] duration-200 enabled:hover:bg-surface focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-inset disabled:cursor-not-allowed motion-reduce:transition-none ${
                   shingled
-                    ? "border-b text-[11px] font-medium uppercase tracking-[0.08em] text-muted"
+                    ? "border-b text-[11px] font-medium uppercase tracking-[0.08em] text-ns-muted"
                     : "text-xs font-semibold text-foreground"
                 }`}
               >
@@ -475,7 +475,7 @@ export function ShingleCourse({
                 </span>
                 <span
                   aria-hidden
-                  className="shrink-0 font-mono text-[10px] text-muted"
+                  className="shrink-0 font-mono text-[10px] text-ns-muted"
                 >
                   {g.options.length}
                 </span>
@@ -504,7 +504,7 @@ export function ShingleCourse({
                       }}
                       className={`flex items-center justify-between gap-3 px-3 py-1.5 text-sm transition-colors duration-100 motion-reduce:transition-none ${
                         opt.disabled
-                          ? "cursor-not-allowed text-muted/60"
+                          ? "cursor-not-allowed text-ns-muted/60"
                           : isActive
                             ? "cursor-pointer bg-foreground/[0.07] text-foreground"
                             : "cursor-pointer text-foreground/85"
@@ -516,7 +516,7 @@ export function ShingleCourse({
                           aria-hidden
                           viewBox="0 0 16 16"
                           fill="none"
-                          className="h-4 w-4 shrink-0 text-accent"
+                          className="h-4 w-4 shrink-0 text-ns-accent"
                         >
                           <path
                             d="M3.5 8.5l3 3 6-6.5"

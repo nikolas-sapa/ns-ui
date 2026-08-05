@@ -252,14 +252,14 @@ export function GitGraphAsciiLanes({
   const toneOf = (cell: Cell) => {
     if (ancestors) {
       if (!lit(cell.owner)) return "text-border";
-      if (cell.owner === headId && (cell.ch === "●" || cell.ch === "◍")) return "text-accent";
+      if (cell.owner === headId && (cell.ch === "●" || cell.ch === "◍")) return "text-ns-accent";
       return "text-foreground";
     }
-    if (cell.owner === headId && (cell.ch === "●" || cell.ch === "◍")) return "text-accent";
+    if (cell.owner === headId && (cell.ch === "●" || cell.ch === "◍")) return "text-ns-accent";
     // At rest the whole braid must be legible — the trunk reads at full ink and
-    // every other lane at --muted. --border is reserved for the DIMMED state
+    // every other lane at --ns-muted. --border is reserved for the DIMMED state
     // above, so "not an ancestor" stays visually distinct from "off-trunk".
-    return cell.lane === 0 ? "text-foreground" : "text-muted";
+    return cell.lane === 0 ? "text-foreground" : "text-ns-muted";
   };
 
   const glyphs = (cells: (Cell | null)[]) => (
@@ -310,7 +310,7 @@ export function GitGraphAsciiLanes({
             return (
               <div key={row.key} data-commit-group className="ns-gga-line flex items-center gap-3 select-none">
                 {glyphs(row.cells)}
-                <span className="text-muted">
+                <span className="text-ns-muted">
                   ⋯ {row.count} commits from {row.branch}
                 </span>
               </div>
@@ -322,9 +322,9 @@ export function GitGraphAsciiLanes({
           const c = row.commit;
           const dim = ancestors !== null && !ancestors.has(c.id);
           const isHead = c.id === headId;
-          const shaTone = dim ? "text-border" : isHead ? "text-accent" : "text-muted";
+          const shaTone = dim ? "text-border" : isHead ? "text-ns-accent" : "text-ns-muted";
           const subjectTone = dim ? "text-border" : "text-foreground";
-          const metaTone = dim ? "text-border" : "text-muted";
+          const metaTone = dim ? "text-border" : "text-ns-muted";
 
           return (
             <button
@@ -400,5 +400,5 @@ export function GitGraphAsciiLanes({
 const CSS = `
 .ns-gga-line { min-height: 20px; }
 .ns-gga-row { cursor: pointer; }
-.ns-gga-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.ns-gga-row:focus-visible { outline: 2px solid var(--ns-accent); outline-offset: -2px; }
 `;

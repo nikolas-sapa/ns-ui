@@ -16,11 +16,11 @@ export default function TallyNotchDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-md">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">
+        <p className="mb-4 font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / checkbox-tally-notch
         </p>
         <TallyNotch label="Launch checklist" items={ITEMS} defaultChecked={["dns", "cert", "env"]} />
-        <p className="mt-3 font-mono text-[11px] text-muted">
+        <p className="mt-3 font-mono text-[11px] text-ns-muted">
           each check carves a stroke into the tally — the fifth slashes across
           its group of four
         </p>

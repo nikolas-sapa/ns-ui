@@ -31,7 +31,7 @@ const WISP_WOBBLE_AMP = 6; // px
 const WISP_WOBBLE_PERIOD = 1.2; // s
 const WISP_LIFE_MIN = 1.5; // s
 const WISP_LIFE_MAX = 2.5; // s
-const WISP_ALPHA = 0.12; // peak alpha, from --accent
+const WISP_ALPHA = 0.12; // peak alpha, from --ns-accent
 // accepted-chip flight
 const BUOYANCY = 900; // px/s^2 upward boost
 const BUOY_T = 0.18; // boost window s
@@ -233,7 +233,7 @@ export function UpdraftDropzone({
     let accentInk: Vec3 = [0, 107, 255];
     const derive = () => {
       const cs = getComputedStyle(document.documentElement);
-      accentInk = parseColor(cs.getPropertyValue("--accent")) ?? accentInk;
+      accentInk = parseColor(cs.getPropertyValue("--ns-accent")) ?? accentInk;
     };
     derive();
 
@@ -730,9 +730,9 @@ export function UpdraftDropzone({
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
         onDrop={onDrop}
-        className={`relative flex min-h-[8.5rem] cursor-pointer flex-col items-center justify-center gap-1.5 overflow-hidden rounded-md border border-dashed px-6 py-8 text-center outline-none transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+        className={`relative flex min-h-[8.5rem] cursor-pointer flex-col items-center justify-center gap-1.5 overflow-hidden rounded-md border border-dashed px-6 py-8 text-center outline-none transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
           isOver
-            ? "border-accent bg-accent/[0.05]"
+            ? "border-ns-accent bg-ns-accent/[0.05]"
             : "border-border bg-surface hover:border-foreground/25"
         }`}
       >
@@ -750,7 +750,7 @@ export function UpdraftDropzone({
           strokeLinecap="round"
           strokeLinejoin="round"
           className={`relative z-[1] h-5 w-5 transition-colors duration-200 ${
-            isOver ? "text-accent" : "text-muted"
+            isOver ? "text-ns-accent" : "text-ns-muted"
           }`}
         >
           <path d="M12 16V4" />
@@ -765,14 +765,14 @@ export function UpdraftDropzone({
               e.stopPropagation();
               openPicker();
             }}
-            className="rounded-[4px] font-medium text-accent underline-offset-2 outline-none transition-colors hover:underline focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+            className="rounded-[4px] font-medium text-ns-accent underline-offset-2 outline-none transition-colors hover:underline focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
           >
             browse
           </button>
         </p>
         <p
           id={hintId}
-          className="relative z-[1] font-mono text-[11px] tracking-wide text-muted"
+          className="relative z-[1] font-mono text-[11px] tracking-wide text-ns-muted"
         >
           {hint}
         </p>
@@ -791,7 +791,7 @@ export function UpdraftDropzone({
               }}
               className="flex max-w-[11rem] items-center gap-1.5 rounded-sm border border-border bg-background px-2 py-1 shadow-sm"
             >
-              <span className="truncate text-[11px] text-muted line-through">
+              <span className="truncate text-[11px] text-ns-muted line-through">
                 {r.name}
               </span>
             </div>
@@ -830,7 +830,7 @@ export function UpdraftDropzone({
                   removeFile(f.id);
                 }
               }}
-              className="relative flex items-center gap-2 rounded-sm border border-border bg-surface py-1.5 pl-2.5 pr-1.5 outline-none transition-colors hover:border-foreground/25 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              className="relative flex items-center gap-2 rounded-sm border border-border bg-surface py-1.5 pl-2.5 pr-1.5 outline-none transition-colors hover:border-foreground/25 focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               <svg
                 aria-hidden
@@ -840,21 +840,21 @@ export function UpdraftDropzone({
                 strokeWidth="1.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="h-3.5 w-3.5 shrink-0 text-muted"
+                className="h-3.5 w-3.5 shrink-0 text-ns-muted"
               >
                 {typeIconPath(f.name, f.type)}
               </svg>
               <span className="max-w-[10rem] truncate text-xs text-foreground">
                 {f.name}
               </span>
-              <span className="font-mono text-[10px] text-muted">
+              <span className="font-mono text-[10px] text-ns-muted">
                 {formatSize(f.size)}
               </span>
               <button
                 type="button"
                 aria-label={`Remove ${f.name}`}
                 onClick={() => removeFile(f.id)}
-                className="rounded-[4px] p-0.5 text-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+                className="rounded-[4px] p-0.5 text-ns-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
               >
                 <svg
                   aria-hidden
@@ -877,7 +877,7 @@ export function UpdraftDropzone({
         id={liveId}
         role="status"
         aria-live="polite"
-        className="min-h-4 font-mono text-[11px] text-muted"
+        className="min-h-4 font-mono text-[11px] text-ns-muted"
       >
         {announce}
       </p>

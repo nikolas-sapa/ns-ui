@@ -14,10 +14,10 @@ export default function VortexStreetDemo() {
         <VortexStreet />
       </div>
       <div className="pointer-events-none absolute inset-x-0 top-8 flex flex-col items-center gap-2 text-center">
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
           ns-ui / hero-vortex-street
         </p>
-        <p className="text-xs text-muted">
+        <p className="text-xs text-ns-muted">
           Move the cursor to shed vortices; click to stir the field for 3s.
         </p>
       </div>

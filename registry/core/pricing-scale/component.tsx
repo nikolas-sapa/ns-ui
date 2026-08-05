@@ -25,7 +25,7 @@ export type CounterpoiseTier = {
   /** USD per month at monthly billing */
   monthlyPrice: number;
   cta: string;
-  /** primary tier gets the --accent CTA; accent appears nowhere else */
+  /** primary tier gets the --ns-accent CTA; accent appears nowhere else */
   primary?: boolean;
   features: CounterpoiseFeature[];
 };
@@ -473,8 +473,8 @@ export function CounterpoiseTiers({
 
   const segClass = (active: boolean) =>
     active
-      ? "rounded-[4px] border border-border bg-background px-3 py-1.5 font-mono text-[11px] tracking-widest text-foreground transition-colors duration-150 hover:border-foreground/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-      : "rounded-[4px] border border-transparent px-3 py-1.5 font-mono text-[11px] tracking-widest text-muted transition-colors duration-150 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+      ? "rounded-[4px] border border-border bg-background px-3 py-1.5 font-mono text-[11px] tracking-widest text-foreground transition-colors duration-150 hover:border-foreground/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
+      : "rounded-[4px] border border-transparent px-3 py-1.5 font-mono text-[11px] tracking-widest text-ns-muted transition-colors duration-150 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent";
 
   const renderCard = (side: "left" | "right") => {
     const tier = side === "left" ? left : right;
@@ -504,9 +504,9 @@ export function CounterpoiseTiers({
               <h3 className="font-mono text-xs tracking-widest text-foreground uppercase">
                 {tier.name}
               </h3>
-              <p className="mt-1 text-xs text-muted">{tier.tagline}</p>
+              <p className="mt-1 text-xs text-ns-muted">{tier.tagline}</p>
             </div>
-            <span className="rounded-sm border border-border px-1.5 py-0.5 font-mono text-[10px] tabular-nums tracking-wider text-muted">
+            <span className="rounded-sm border border-border px-1.5 py-0.5 font-mono text-[10px] tabular-nums tracking-wider text-ns-muted">
               wt {weight.toFixed(1)}
             </span>
           </header>
@@ -515,9 +515,9 @@ export function CounterpoiseTiers({
               <span className="text-3xl font-semibold tracking-tight tabular-nums text-foreground">
                 ${price}
               </span>
-              <span className="text-sm text-muted">/mo</span>
+              <span className="text-sm text-ns-muted">/mo</span>
             </div>
-            <p className="mt-1 h-3.5 font-mono text-[10px] tracking-widest text-muted uppercase">
+            <p className="mt-1 h-3.5 font-mono text-[10px] tracking-widest text-ns-muted uppercase">
               {billing === "annual" ? "billed annually" : "billed monthly"}
             </p>
           </div>
@@ -536,7 +536,7 @@ export function CounterpoiseTiers({
                           return next;
                         })
                       }
-                      className="peer h-4 w-4 cursor-pointer appearance-none rounded-[4px] border border-border bg-transparent transition-colors duration-150 checked:border-foreground checked:bg-foreground hover:border-foreground/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                      className="peer h-4 w-4 cursor-pointer appearance-none rounded-[4px] border border-border bg-transparent transition-colors duration-150 checked:border-foreground checked:bg-foreground hover:border-foreground/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
                     />
                     <svg
                       aria-hidden
@@ -555,7 +555,7 @@ export function CounterpoiseTiers({
                   </span>
                   <span
                     className={`text-[13px] transition-colors duration-150 ${
-                      checked[i] ? "text-foreground" : "text-muted"
+                      checked[i] ? "text-foreground" : "text-ns-muted"
                     }`}
                   >
                     {f.label}
@@ -567,14 +567,14 @@ export function CounterpoiseTiers({
           {tier.primary ? (
             <button
               type="button"
-              className="mt-1 rounded-sm bg-accent px-4 py-2 text-sm font-medium text-white transition-colors duration-200 hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="mt-1 rounded-sm bg-ns-accent px-4 py-2 text-sm font-medium text-white transition-colors duration-200 hover:bg-ns-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
             >
               {tier.cta}
             </button>
           ) : (
             <button
               type="button"
-              className="mt-1 rounded-sm border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors duration-200 hover:border-foreground/25 hover:bg-foreground/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="mt-1 rounded-sm border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors duration-200 hover:border-foreground/25 hover:bg-foreground/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
             >
               {tier.cta}
             </button>
@@ -621,7 +621,7 @@ export function CounterpoiseTiers({
         <p
           ref={captionRef}
           aria-live="polite"
-          className="absolute left-1/2 max-w-full -translate-x-1/2 overflow-hidden text-ellipsis whitespace-nowrap font-mono text-[11px] tracking-widest text-muted uppercase"
+          className="absolute left-1/2 max-w-full -translate-x-1/2 overflow-hidden text-ellipsis whitespace-nowrap font-mono text-[11px] tracking-widest text-ns-muted uppercase"
         />
       </div>
     </div>

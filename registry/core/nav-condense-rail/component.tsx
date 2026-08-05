@@ -88,7 +88,7 @@ function NavInner({
     >
       <a
         href="#top"
-        className="shrink-0 rounded-sm font-mono font-semibold tracking-tight text-foreground transition-colors duration-150 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+        className="shrink-0 rounded-sm font-mono font-semibold tracking-tight text-foreground transition-colors duration-150 hover:text-ns-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ns-accent"
         style={{ fontSize: 17 }}
       >
         <span ref={wordmarkRef} className="inline-block origin-left">
@@ -101,7 +101,7 @@ function NavInner({
           <a
             key={l.href}
             href={l.href}
-            className="whitespace-nowrap rounded-sm text-muted transition-colors duration-150 hover:text-foreground focus-visible:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+            className="whitespace-nowrap rounded-sm text-ns-muted transition-colors duration-150 hover:text-foreground focus-visible:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ns-accent"
             style={{ fontSize: linkSize }}
           >
             {l.label}
@@ -110,7 +110,7 @@ function NavInner({
         {cta && (
           <a
             href={cta.href}
-            className="shrink-0 whitespace-nowrap rounded-sm bg-accent font-medium text-white transition-colors duration-150 hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+            className="shrink-0 whitespace-nowrap rounded-sm bg-ns-accent font-medium text-white transition-colors duration-150 hover:bg-ns-accent-hover focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ns-accent"
             style={{ fontSize: linkSize, paddingInline: ctaPadX, paddingBlock: ctaPadY }}
           >
             {cta.label}

@@ -585,7 +585,7 @@ export function FlywheelPull({
           type="button"
           data-flywheel-refresh
           onClick={handleButtonRefresh}
-          className="inline-flex shrink-0 items-center gap-2 rounded-sm border border-border bg-background px-3 py-1.5 text-sm font-medium text-foreground outline-none transition-colors hover:border-foreground/25 focus-visible:ring-2 focus-visible:ring-accent"
+          className="inline-flex shrink-0 items-center gap-2 rounded-sm border border-border bg-background px-3 py-1.5 text-sm font-medium text-foreground outline-none transition-colors hover:border-foreground/25 focus-visible:ring-2 focus-visible:ring-ns-accent"
         >
           <svg
             aria-hidden="true"
@@ -608,7 +608,7 @@ export function FlywheelPull({
         </button>
         <p
           data-flywheel-status={phase}
-          className="min-w-0 flex-1 truncate font-mono text-xs text-muted"
+          className="min-w-0 flex-1 truncate font-mono text-xs text-ns-muted"
         >
           {statusText}
         </p>
@@ -645,7 +645,7 @@ export function FlywheelPull({
                 {item.title}
               </span>
               {item.meta && (
-                <span className="shrink-0 font-mono text-xs text-muted">
+                <span className="shrink-0 font-mono text-xs text-ns-muted">
                   {item.meta}
                 </span>
               )}

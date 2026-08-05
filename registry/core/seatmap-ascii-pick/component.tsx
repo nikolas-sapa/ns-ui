@@ -162,12 +162,12 @@ export function SeatmapAsciiPick({
   return (
     <div className={`inline-flex flex-col gap-2 font-mono ${className}`}>
       <div className="flex items-center justify-between gap-3">
-        <span className="text-xs uppercase tracking-widest text-muted">{sectionLabel}</span>
-        <span className="text-[10px] uppercase tracking-widest text-muted">drag to select a block</span>
+        <span className="text-xs uppercase tracking-widest text-ns-muted">{sectionLabel}</span>
+        <span className="text-[10px] uppercase tracking-widest text-ns-muted">drag to select a block</span>
       </div>
 
       <div className="flex flex-col items-center gap-1 rounded-sm border border-border bg-surface px-4 py-3">
-        <span className="mb-1 select-none text-[10px] tracking-[0.4em] text-muted">— STAGE —</span>
+        <span className="mb-1 select-none text-[10px] tracking-[0.4em] text-ns-muted">— STAGE —</span>
         <div
           ref={gridRef}
           className="grid gap-y-1"
@@ -175,7 +175,7 @@ export function SeatmapAsciiPick({
         >
           {seats.map((seatRow, r) => (
             <div key={r} className="contents">
-              <div className="flex items-center text-[10px] text-muted">{rowLabels[r]}</div>
+              <div className="flex items-center text-[10px] text-ns-muted">{rowLabels[r]}</div>
               {seatRow.map((status, c) => {
                 if (status === "aisle") {
                   return (
@@ -201,11 +201,11 @@ export function SeatmapAsciiPick({
                     aria-pressed={selected}
                     aria-label={`${rowLabels[r]} seat ${colLabels[c]}${status === "taken" ? ", taken" : selected ? ", selected" : ", available"}`}
                     tabIndex={isActive ? 0 : -1}
-                    className={`flex h-6 w-6 items-center justify-center rounded-[2px] text-xs outline-none transition-colors duration-100 motion-reduce:transition-none focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-accent ${
+                    className={`flex h-6 w-6 items-center justify-center rounded-[2px] text-xs outline-none transition-colors duration-100 motion-reduce:transition-none focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-ns-accent ${
                       status === "taken"
-                        ? "cursor-not-allowed text-muted/50"
+                        ? "cursor-not-allowed text-ns-muted/50"
                         : selected
-                          ? "bg-accent/[0.16] text-foreground hover:bg-accent/[0.24]"
+                          ? "bg-ns-accent/[0.16] text-foreground hover:bg-ns-accent/[0.24]"
                           : "text-foreground hover:bg-foreground/[0.08]"
                     }`}
                     onPointerDown={() => startDrag({ r, c })}
@@ -225,7 +225,7 @@ export function SeatmapAsciiPick({
       <div
         data-count-readout
         aria-live="polite"
-        className="rounded-sm border border-border bg-background px-3 py-1.5 text-[11px] tabular-nums text-muted"
+        className="rounded-sm border border-border bg-background px-3 py-1.5 text-[11px] tabular-nums text-ns-muted"
       >
         {run ? (
           <>

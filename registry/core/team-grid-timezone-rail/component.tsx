@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 // TeamGridTimezoneRail — a team grid that answers "who is reachable right now".
 //
 // A 24-cell UTC hour track sits above the cards. Every cell is either dead
-// (`·` in --border) or inked (`━` in --accent), and the inked run is the
+// (`·` in --border) or inked (`━` in --ns-accent), and the inked run is the
 // INTERSECTION of everybody's working window — the viewer's included — mapped
 // back onto UTC. At rest that run is the whole team's shared meeting window —
 // the tightest one there is. Hover or focus one person and the run opens out
@@ -312,10 +312,10 @@ export function TeamGridTimezoneRail({
       {/* ---- the rail ------------------------------------------------------ */}
       <div className="rounded-sm border border-border bg-surface px-4 py-3">
         <div className="flex items-baseline justify-between gap-4">
-          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted">
+          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-ns-muted">
             utc day
           </span>
-          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted">
+          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-ns-muted">
             core {pad2(whStart)}:00–{pad2(whEnd)}:00 local
           </span>
         </div>
@@ -330,13 +330,13 @@ export function TeamGridTimezoneRail({
                   <span key={i} className="relative inline-block w-[1ch] text-center">
                     <span
                       style={{ opacity: on ? 0 : 1 }}
-                      className={`block ${fade} ${divider ? "text-muted" : "text-border"}`}
+                      className={`block ${fade} ${divider ? "text-ns-muted" : "text-border"}`}
                     >
                       {divider ? "│" : "·"}
                     </span>
                     <span
                       style={{ opacity: on ? 1 : 0 }}
-                      className={`absolute inset-0 text-accent ${fade}`}
+                      className={`absolute inset-0 text-ns-accent ${fade}`}
                     >
                       ━
                     </span>
@@ -346,11 +346,11 @@ export function TeamGridTimezoneRail({
             </div>
             <span
               data-caret
-              className="absolute top-0 w-[1ch] text-center leading-none text-accent opacity-0"
+              className="absolute top-0 w-[1ch] text-center leading-none text-ns-accent opacity-0"
             >
               ▮
             </span>
-            <div className="relative mt-1 h-[1em] text-[10px] leading-none text-muted">
+            <div className="relative mt-1 h-[1em] text-[10px] leading-none text-ns-muted">
               {tickLabels.map((t) => (
                 <span
                   key={t.idx}
@@ -373,7 +373,7 @@ export function TeamGridTimezoneRail({
 
         <p
           aria-live="polite"
-          className={`mt-2 font-mono text-[11px] tabular-nums ${nearest ? "text-muted" : "text-foreground"}`}
+          className={`mt-2 font-mono text-[11px] tabular-nums ${nearest ? "text-ns-muted" : "text-foreground"}`}
         >
           {readout}
         </p>
@@ -396,17 +396,17 @@ export function TeamGridTimezoneRail({
             onFocus={() => enter(m.id)}
             onBlur={leave}
             onClick={() => setPinnedId((p) => (p === m.id ? null : m.id))}
-            className="flex items-center gap-3 rounded-sm border border-border bg-surface px-3 py-3 text-left outline-none transition-[opacity,border-color] duration-200 motion-reduce:transition-none hover:border-muted focus-visible:ring-2 focus-visible:ring-accent aria-pressed:border-foreground"
+            className="flex items-center gap-3 rounded-sm border border-border bg-surface px-3 py-3 text-left outline-none transition-[opacity,border-color] duration-200 motion-reduce:transition-none hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent aria-pressed:border-foreground"
           >
             <span
               aria-hidden
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm border border-border font-mono text-[11px] tracking-[0.06em] text-muted"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm border border-border font-mono text-[11px] tracking-[0.06em] text-ns-muted"
             >
               {m.initials}
             </span>
             <span className="min-w-0 flex-1">
               <span className="block truncate text-[13px] text-foreground">{m.name}</span>
-              <span className="block truncate text-[11px] text-muted">{m.role}</span>
+              <span className="block truncate text-[11px] text-ns-muted">{m.role}</span>
             </span>
             <span className="flex shrink-0 flex-col items-end gap-0.5">
               <span className="flex items-center gap-1.5 font-mono text-[13px] tabular-nums text-foreground">
@@ -415,7 +415,7 @@ export function TeamGridTimezoneRail({
                   ○
                 </span>
               </span>
-              <span className="font-mono text-[10px] tabular-nums text-muted">
+              <span className="font-mono text-[10px] tabular-nums text-ns-muted">
                 {fmtOffset(m.utcOffset)}
               </span>
             </span>

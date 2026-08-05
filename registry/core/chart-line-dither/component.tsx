@@ -15,7 +15,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 // own value (redundant with curve height, exactly like chart-bar-dither and
 // chart-bar-halftone before it) — the reticle changes RESOLUTION, never
 // hue, so the family's density-not-colour rule holds. Pure var(--foreground)
-// ink on var(--background) paper; var(--accent) is reserved for keyboard
+// ink on var(--background) paper; var(--ns-accent) is reserved for keyboard
 // focus only.
 // ---------------------------------------------------------------------------
 
@@ -76,9 +76,9 @@ function readTokens(): Tokens {
   return {
     fg: get("--foreground", "#171717"),
     bg: get("--background", "#ffffff"),
-    muted: get("--muted", "#4d4d4d"),
+    muted: get("--ns-muted", "#4d4d4d"),
     border: get("--border", "#ebebeb"),
-    accent: get("--accent", "#006bff"),
+    accent: get("--ns-accent", "#006bff"),
   };
 }
 
@@ -333,13 +333,13 @@ export function ChartLineDither({ data = [], title = "Chart", className = "" }: 
     <figure className={`ns-cld inline-block ${className}`} aria-label={`${title}, line chart`}>
       <style>{CSS}</style>
       <div className="flex items-center justify-between gap-3 pb-2">
-        <span className="font-mono text-xs tracking-widest text-muted">{title.toUpperCase()}</span>
+        <span className="font-mono text-xs tracking-widest text-ns-muted">{title.toUpperCase()}</span>
         <div className="flex items-center gap-3">
           <span className="font-mono text-[11px] text-foreground" aria-live="polite">
             {shownPoint ? (
               <>
                 <strong>{formatValue(shownPoint.value)}</strong>{" "}
-                <span className="text-muted">{shownPoint.label}</span>
+                <span className="text-ns-muted">{shownPoint.label}</span>
               </>
             ) : (
               " "
@@ -348,7 +348,7 @@ export function ChartLineDither({ data = [], title = "Chart", className = "" }: 
           <button
             type="button"
             onClick={() => setShowTable((s) => !s)}
-            className="ns-cld-toggle rounded-sm border border-border px-2 py-1 font-mono text-[10px] tracking-widest text-muted transition-colors duration-150 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="ns-cld-toggle rounded-sm border border-border px-2 py-1 font-mono text-[10px] tracking-widest text-ns-muted transition-colors duration-150 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
             aria-pressed={showTable}
           >
             {showTable ? "VIEW CHART" : "VIEW TABLE"}
@@ -361,10 +361,10 @@ export function ChartLineDither({ data = [], title = "Chart", className = "" }: 
           <caption className="sr-only">{title}</caption>
           <thead>
             <tr>
-              <th scope="col" className="border-b border-border px-2 py-1.5 text-left text-muted">
+              <th scope="col" className="border-b border-border px-2 py-1.5 text-left text-ns-muted">
                 Point
               </th>
-              <th scope="col" className="border-b border-border px-2 py-1.5 text-right text-muted tabular-nums">
+              <th scope="col" className="border-b border-border px-2 py-1.5 text-right text-ns-muted tabular-nums">
                 Value
               </th>
             </tr>
@@ -449,5 +449,5 @@ export function ChartLineDither({ data = [], title = "Chart", className = "" }: 
 
 const CSS = `
 .ns-cld-hit { touch-action: manipulation; }
-.ns-cld-hit:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ns-cld-hit:focus-visible { outline: 2px solid var(--ns-accent); outline-offset: 2px; }
 `;

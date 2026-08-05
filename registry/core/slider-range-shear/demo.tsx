@@ -32,7 +32,7 @@ export default function ShearBandDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / slider-range-shear — the span is one taut object, not two thumbs
       </p>
 
@@ -42,9 +42,9 @@ export default function ShearBandDemo() {
             <h2 className="text-sm font-semibold text-foreground">
               Filter listings
             </h2>
-            <p className="mt-1 text-sm text-muted">Monthly rent, London</p>
+            <p className="mt-1 text-sm text-ns-muted">Monthly rent, London</p>
           </div>
-          <span className="rounded-full border border-border px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-muted">
+          <span className="rounded-full border border-border px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-ns-muted">
             {matches.length} of {LISTINGS.length}
           </span>
         </div>
@@ -65,7 +65,7 @@ export default function ShearBandDemo() {
 
         <div className="max-h-64 overflow-y-auto border-t border-border">
           {matches.length === 0 ? (
-            <p className="px-6 py-8 text-center text-sm text-muted">
+            <p className="px-6 py-8 text-center text-sm text-ns-muted">
               No listings in this range.
             </p>
           ) : (
@@ -76,7 +76,7 @@ export default function ShearBandDemo() {
                   className="flex items-center justify-between gap-4 border-b border-border px-6 py-3 last:border-b-0"
                 >
                   <span className="truncate text-sm text-foreground">{l.name}</span>
-                  <span className="shrink-0 font-mono text-xs tabular-nums text-muted">
+                  <span className="shrink-0 font-mono text-xs tabular-nums text-ns-muted">
                     {fmtGBP(l.price)}/mo
                   </span>
                 </li>
@@ -86,7 +86,7 @@ export default function ShearBandDemo() {
         </div>
 
         <div className="border-t border-border px-6 py-3">
-          <p className="font-mono text-[11px] text-muted">
+          <p className="font-mono text-[11px] text-ns-muted">
             drag a grip fast — the band leans with it, then snaps flat
           </p>
         </div>
@@ -97,7 +97,7 @@ export default function ShearBandDemo() {
         <div className="flex items-baseline justify-between">
           <div>
             <h3 className="text-sm font-medium text-foreground">Stay window</h3>
-            <p className="mt-0.5 text-xs text-muted">
+            <p className="mt-0.5 text-xs text-ns-muted">
               Which nights the booking covers.
             </p>
           </div>

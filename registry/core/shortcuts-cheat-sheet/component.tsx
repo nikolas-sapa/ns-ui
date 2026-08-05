@@ -4,7 +4,7 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react"
 
 // A keyboard-shortcut cheat sheet that owns the keyboard while it is up.
 // Shortcuts render as physical keycaps; every real keydown that matches a
-// listed combo depresses that specific cap and flashes it in --accent, and the
+// listed combo depresses that specific cap and flashes it in --ns-accent, and the
 // event is swallowed (preventDefault + stopPropagation in the capture phase)
 // so the app's own handler behind the overlay does not also fire. You can
 // rehearse a shortcut and watch its keys press themselves — clicking a row
@@ -502,7 +502,7 @@ export function QuickKey({
           <h2 id={titleId} className="text-base font-semibold tracking-tight text-foreground">
             {title}
           </h2>
-          <p className="shrink-0 text-xs text-muted">Press a shortcut to try it</p>
+          <p className="shrink-0 text-xs text-ns-muted">Press a shortcut to try it</p>
         </header>
 
         <div
@@ -512,7 +512,7 @@ export function QuickKey({
             <section key={`${section.title}-${s}`} aria-labelledby={`${titleId}-s${s}`}>
               <h3
                 id={`${titleId}-s${s}`}
-                className="mb-2 px-2 text-[11px] font-medium uppercase tracking-[0.06em] text-muted"
+                className="mb-2 px-2 text-[11px] font-medium uppercase tracking-[0.06em] text-ns-muted"
               >
                 {section.title}
               </h3>
@@ -554,7 +554,7 @@ export function QuickKey({
         </div>
 
         <footer className="mt-2 flex items-center justify-between gap-4 border-t border-border px-6 py-3">
-          <p className="flex items-center gap-2 text-xs text-muted">
+          <p className="flex items-center gap-2 text-xs text-ns-muted">
             <kbd className="ns-qk-cap" aria-hidden>
               Esc
             </kbd>
@@ -615,17 +615,17 @@ export function QuickKey({
           border-color: var(--border);
         }
         .ns-qk-row:active {
-          background: color-mix(in oklab, var(--accent) 12%, transparent);
-          border-color: color-mix(in oklab, var(--accent) 45%, var(--border));
+          background: color-mix(in oklab, var(--ns-accent) 12%, transparent);
+          border-color: color-mix(in oklab, var(--ns-accent) 45%, var(--border));
         }
         .ns-qk-row:focus-visible {
-          outline: 2px solid var(--accent);
+          outline: 2px solid var(--ns-accent);
           outline-offset: 2px;
         }
 
         .ns-qk-then {
           font-size: 11px;
-          color: var(--muted);
+          color: var(--ns-muted);
           padding: 0 2px;
         }
 
@@ -653,9 +653,9 @@ export function QuickKey({
         .ns-qk-cap[data-pressed] {
           transform: translateY(2px);
           box-shadow: 0 0 0 var(--border);
-          border-color: var(--accent);
-          background: color-mix(in oklab, var(--accent) 14%, var(--surface));
-          color: var(--accent);
+          border-color: var(--ns-accent);
+          background: color-mix(in oklab, var(--ns-accent) 14%, var(--surface));
+          color: var(--ns-accent);
           /* press-in: immediate */
           transition: transform 60ms linear, box-shadow 60ms linear,
             background-color 60ms linear, border-color 60ms linear, color 60ms linear;
@@ -671,10 +671,10 @@ export function QuickKey({
           transition: background-color 140ms ease-out, border-color 140ms ease-out;
         }
         .ns-qk-close:hover {
-          border-color: var(--accent);
-          background: color-mix(in oklab, var(--accent) 10%, var(--background));
+          border-color: var(--ns-accent);
+          background: color-mix(in oklab, var(--ns-accent) 10%, var(--background));
         }
-        .ns-qk-close:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+        .ns-qk-close:focus-visible { outline: 2px solid var(--ns-accent); outline-offset: 2px; }
 
         @media (prefers-reduced-motion: reduce) {
           /* opacity only, one frame; the flash drops travel and becomes a pure

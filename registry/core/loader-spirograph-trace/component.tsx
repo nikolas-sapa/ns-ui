@@ -247,10 +247,10 @@ export function SpiroTrace({
           style={{ strokeDashoffset: indeterminate ? 0 : 1 - target }}
         />
         {/* the pen, riding the curve at the current position */}
-        <circle ref={penRef} r={2.2} cx={start.x} cy={start.y} fill="var(--accent)" />
+        <circle ref={penRef} r={2.2} cx={start.x} cy={start.y} fill="var(--ns-accent)" />
       </svg>
 
-      <span aria-hidden="true" className="font-mono text-sm tabular-nums text-muted">
+      <span aria-hidden="true" className="font-mono text-sm tabular-nums text-ns-muted">
         {indeterminate ? "———" : `${pct}%`}
       </span>
     </div>

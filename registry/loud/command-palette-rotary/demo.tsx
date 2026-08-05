@@ -31,13 +31,13 @@ export default function PeriscopeSweepDemo() {
   return (
     <main className="min-h-screen bg-background px-6 py-16">
       <div className="mx-auto max-w-2xl">
-        <p className="font-mono text-xs tracking-[0.25em] text-muted">
+        <p className="font-mono text-xs tracking-[0.25em] text-ns-muted">
           ns-ui / command-palette-rotary
         </p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground">
           Periscope Sweep
         </h1>
-        <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">
+        <p className="mt-2 max-w-xl text-sm leading-relaxed text-ns-muted">
           Every workspace lives at a fixed bearing on an invisible ring — drag,
           scroll, or use the arrow keys to sweep past them. Only the item under
           the reticle resolves fully; neighbors compress toward the edges of
@@ -56,13 +56,13 @@ export default function PeriscopeSweepDemo() {
         </div>
 
         <div className="mt-6 rounded-md border border-border bg-background p-5">
-          <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
+          <p className="font-mono text-[10px] uppercase tracking-widest text-ns-muted">
             now viewing
           </p>
           <h2 className="mt-1 text-lg font-semibold text-foreground">
             {WORKSPACES.find((w) => w.id === current)?.label}
           </h2>
-          <p className="mt-1.5 text-sm text-muted">{PANEL_COPY[current]}</p>
+          <p className="mt-1.5 text-sm text-ns-muted">{PANEL_COPY[current]}</p>
         </div>
       </div>
     </main>

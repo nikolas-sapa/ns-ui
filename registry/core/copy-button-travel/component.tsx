@@ -32,8 +32,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 // behave identically to a click (native button semantics, no custom key
 // handling needed). The label + icon revert to the resting state after 2s.
 //
-// Tokens only: --foreground for ink and the ghost, --muted for secondary
-// text, --border for the frame, --accent for the keyboard focus ring only.
+// Tokens only: --foreground for ink and the ghost, --ns-muted for secondary
+// text, --border for the frame, --ns-accent for the keyboard focus ring only.
 // Pure DOM/SVG/CSS — no canvas.
 // ---------------------------------------------------------------------------
 
@@ -351,7 +351,7 @@ export function CarbonLift({
           background: color-mix(in oklab, var(--foreground) 4%, transparent);
         }
         .ns-cl-button:focus-visible {
-          outline: 2px solid var(--accent);
+          outline: 2px solid var(--ns-accent);
           outline-offset: 2px;
         }
         .ns-cl-button[data-state="copied"] {

@@ -56,7 +56,7 @@ import { useEffect, useRef } from "react";
 // boundary is dithered instead of a visible circle.
 //
 // Ink is getComputedStyle(canvas).color, re-read on a documentElement class
-// MutationObserver. --accent appears only on the CTA focus rings, never in the
+// MutationObserver. --ns-accent appears only on the CTA focus rings, never in the
 // tiling. dpr clamped to 2, ResizeObserver, rAF paused on document.hidden.
 // prefers-reduced-motion: substitute once, draw exactly one frame at s = 1
 // with L = 0, no rAF, no pointer listeners.
@@ -542,7 +542,7 @@ export function PenroseInflate({
         className="pointer-events-none absolute inset-0 -z-10 h-full w-full text-foreground"
       />
       <div className="mx-auto w-full max-w-3xl">
-        <p className="font-mono text-[11px] tracking-[0.28em] text-muted">
+        <p className="font-mono text-[11px] tracking-[0.28em] text-ns-muted">
           {eyebrow}
         </p>
         <h1 className="mt-5 text-balance font-semibold tracking-tight text-foreground [font-size:clamp(2.5rem,7vw,4.75rem)] [line-height:1.02]">
@@ -552,21 +552,21 @@ export function PenroseInflate({
             </span>
           ))}
         </h1>
-        <p className="mt-6 max-w-xl text-pretty text-base leading-relaxed text-muted">
+        <p className="mt-6 max-w-xl text-pretty text-base leading-relaxed text-ns-muted">
           {subcopy}
         </p>
         <div className="mt-10 flex flex-wrap items-center gap-3">
           <a
             href={primaryCta.href}
             data-cta="primary"
-            className="rounded-sm bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="rounded-sm bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             {primaryCta.label}
           </a>
           <a
             href={secondaryCta.href}
             data-cta="secondary"
-            className="rounded-sm border border-border bg-background/70 px-5 py-2.5 text-sm font-medium text-foreground backdrop-blur-sm transition-colors hover:border-foreground/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="rounded-sm border border-border bg-background/70 px-5 py-2.5 text-sm font-medium text-foreground backdrop-blur-sm transition-colors hover:border-foreground/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             {secondaryCta.label}
           </a>

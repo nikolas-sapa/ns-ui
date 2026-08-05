@@ -147,8 +147,8 @@ export function TideGaugePassword({
     let accentC: Vec3 = [0, 107, 255];
     const derive = () => {
       const cs = getComputedStyle(document.documentElement);
-      mutedC = parseColor(cs.getPropertyValue("--muted")) ?? mutedC;
-      accentC = parseColor(cs.getPropertyValue("--accent")) ?? accentC;
+      mutedC = parseColor(cs.getPropertyValue("--ns-muted")) ?? mutedC;
+      accentC = parseColor(cs.getPropertyValue("--ns-accent")) ?? accentC;
     };
     derive();
 
@@ -484,11 +484,11 @@ export function TideGaugePassword({
         className="mb-1.5 block text-sm font-medium text-foreground"
       >
         {label}
-        {required ? <span className="text-muted"> *</span> : null}
+        {required ? <span className="text-ns-muted"> *</span> : null}
       </label>
       <div
         ref={frameRef}
-        className={`relative overflow-hidden rounded-sm border border-border bg-surface transition-colors focus-within:border-accent/60 focus-within:ring-2 focus-within:ring-accent/30 ${
+        className={`relative overflow-hidden rounded-sm border border-border bg-surface transition-colors focus-within:border-ns-accent/60 focus-within:ring-2 focus-within:ring-ns-accent/30 ${
           disabled ? "opacity-60" : "hover:border-foreground/25"
         }`}
       >
@@ -510,7 +510,7 @@ export function TideGaugePassword({
           spellCheck={false}
           {...(isControlled ? { value } : { defaultValue })}
           onChange={(e) => handleInput(e.currentTarget.value)}
-          className="relative z-10 w-full bg-transparent py-2 pl-3 pr-11 font-mono text-sm text-foreground outline-none placeholder:text-muted/70"
+          className="relative z-10 w-full bg-transparent py-2 pl-3 pr-11 font-mono text-sm text-foreground outline-none placeholder:text-ns-muted/70"
         />
         <button
           ref={toggleRef}
@@ -519,7 +519,7 @@ export function TideGaugePassword({
           aria-label={revealed ? "Hide password" : "Show password"}
           disabled={disabled}
           onClick={handleToggle}
-          className="absolute right-1.5 top-1/2 z-10 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-sm text-muted transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:pointer-events-none"
+          className="absolute right-1.5 top-1/2 z-10 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-sm text-ns-muted transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none"
         >
           {revealed ? (
             <svg
@@ -561,11 +561,11 @@ export function TideGaugePassword({
           aria-hidden
           className={`font-mono text-[11px] uppercase tracking-[0.14em] transition-colors ${
             band === "Strong"
-              ? "text-accent"
+              ? "text-ns-accent"
               : band === "Fair"
                 ? "text-foreground/70"
                 : band === "Weak"
-                  ? "text-muted"
+                  ? "text-ns-muted"
                   : "text-transparent"
           }`}
         >

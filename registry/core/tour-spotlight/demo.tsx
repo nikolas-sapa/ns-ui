@@ -63,21 +63,21 @@ export default function LeadingLightDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / tour-spotlight
       </p>
 
       <div className="w-full max-w-xl overflow-hidden rounded-[12px] border border-border bg-background">
         <div className="flex items-center gap-4 border-b border-border px-4 py-3">
           <span className="font-mono text-xs font-medium text-foreground">Basecamp</span>
-          <nav className="flex items-center gap-3 text-xs text-muted">
+          <nav className="flex items-center gap-3 text-xs text-ns-muted">
             <span id="ll-nav-projects" className="rounded-[6px] px-1.5 py-0.5 text-foreground">
               Projects
             </span>
             <span>Team</span>
             <span>Reports</span>
           </nav>
-          <span id="ll-status-save" className="ml-auto rounded-full border border-border px-2 py-0.5 font-mono text-[10px] text-muted">
+          <span id="ll-status-save" className="ml-auto rounded-full border border-border px-2 py-0.5 font-mono text-[10px] text-ns-muted">
             Saved
           </span>
         </div>
@@ -86,8 +86,8 @@ export default function LeadingLightDemo() {
           <span id="ll-toolbar-new" className="rounded-[6px] border border-border px-2.5 py-1 text-xs text-foreground">
             + New
           </span>
-          <span className="rounded-[6px] px-2.5 py-1 text-xs text-muted">Filter</span>
-          <span className="rounded-[6px] px-2.5 py-1 text-xs text-muted">Sort</span>
+          <span className="rounded-[6px] px-2.5 py-1 text-xs text-ns-muted">Filter</span>
+          <span className="rounded-[6px] px-2.5 py-1 text-xs text-ns-muted">Sort</span>
         </div>
 
         <div className="grid grid-cols-2 gap-3 p-4">
@@ -99,14 +99,14 @@ export default function LeadingLightDemo() {
           <div id="ll-card-invite" className="flex flex-col gap-2 rounded-[10px] border border-border p-3">
             <span className="text-xs font-medium text-foreground">Invite teammate</span>
             <span className="h-2 w-full rounded-full bg-border" aria-hidden="true" />
-            <span className="self-start rounded-[6px] border border-border px-2 py-0.5 text-[10px] text-muted">
+            <span className="self-start rounded-[6px] border border-border px-2 py-0.5 text-[10px] text-ns-muted">
               Send invite
             </span>
           </div>
         </div>
       </div>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         A 4-stop tour auto-advances through the mini-app above; the beam
         sweeps between each highlighted control while the rest dims.
       </p>

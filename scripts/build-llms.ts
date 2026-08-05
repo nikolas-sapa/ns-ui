@@ -613,7 +613,7 @@ is the whole dependency.
 
 Requirements before you use any of these:
 - Colors MUST come from CSS custom properties already in scope: --background --foreground
-  --muted --border --accent --surface --error --warning. Never hardcode hex — these
+  --ns-muted --border --ns-accent --surface --error --warning. Never hardcode hex — these
   components are light/dark theme-reactive only if those tokens exist in the host app's
   globals.css.
 - Peer deps: react 19+, Tailwind CSS v4 (components are styled entirely with Tailwind

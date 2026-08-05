@@ -123,9 +123,9 @@ export function SolargraphHero({
       const cs = getComputedStyle(document.documentElement);
       const bg = parseColor(cs.getPropertyValue("--background")) ?? [10, 10, 10];
       const fg = parseColor(cs.getPropertyValue("--foreground")) ?? [237, 237, 237];
-      const accent = parseColor(cs.getPropertyValue("--accent")) ?? [0, 107, 255];
+      const accent = parseColor(cs.getPropertyValue("--ns-accent")) ?? [0, 107, 255];
       const border = parseColor(cs.getPropertyValue("--border")) ?? [46, 46, 46];
-      const muted = parseColor(cs.getPropertyValue("--muted")) ?? [143, 143, 143];
+      const muted = parseColor(cs.getPropertyValue("--ns-muted")) ?? [143, 143, 143];
       const lum = (0.2126 * bg[0] + 0.7152 * bg[1] + 0.0722 * bg[2]) / 255;
       if (lum < 0.5) {
         // dark: trails lighten the surface — accent-led glow
@@ -134,7 +134,7 @@ export function SolargraphHero({
         canvas.style.mixBlendMode = "screen";
       } else {
         // light: screen would vanish on white — flip to multiply with ink
-        // derived from --muted/--border so trails darken instead
+        // derived from --ns-muted/--border so trails darken instead
         tintA = muted;
         tintB = mix(border, muted, 0.6);
         canvas.style.mixBlendMode = "multiply";

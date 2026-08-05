@@ -122,7 +122,7 @@ export function McpPopup() {
           This registry also runs as an{" "}
           <Link
             href="/connect"
-            className="rounded-sm text-accent outline-none underline underline-offset-2 hover:text-accent-hover focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded-sm text-ns-accent outline-none underline underline-offset-2 hover:text-ns-accent-hover focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             MCP server
           </Link>
@@ -132,7 +132,7 @@ export function McpPopup() {
           type="button"
           onClick={dismiss}
           aria-label="Dismiss"
-          className="inline-flex size-6 shrink-0 items-center justify-center rounded-sm text-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none"
+          className="inline-flex size-6 shrink-0 items-center justify-center rounded-sm text-ns-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
         >
           <svg
             viewBox="0 0 16 16"

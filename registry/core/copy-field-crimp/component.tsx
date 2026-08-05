@@ -22,7 +22,7 @@ import { useCallback, useEffect, useId, useRef, useState, type CSSProperties } f
 //
 // Once the wave finishes sweeping outward, a small inline check (stroked in
 // --foreground) scales into the icon slot with an ease-out-expo curve, holds
-// for 1.2s, and fades back out to the idle copy glyph (--muted) — no toast,
+// for 1.2s, and fades back out to the idle copy glyph (--ns-muted) — no toast,
 // no green flash, no layout shift, because the icon slot is reserved space
 // that never changes size.
 //
@@ -233,7 +233,7 @@ export function CrimpCopy({ value, label, masked = false, ariaLabel, onCopy, cla
           font-weight: 500;
           letter-spacing: 0.04em;
           text-transform: uppercase;
-          color: var(--muted);
+          color: var(--ns-muted);
         }
         .ns-cc-sr {
           position: absolute;
@@ -269,7 +269,7 @@ export function CrimpCopy({ value, label, masked = false, ariaLabel, onCopy, cla
           background: color-mix(in oklab, var(--foreground) 6%, var(--surface));
         }
         .ns-cc:focus-visible {
-          outline: 2px solid var(--accent);
+          outline: 2px solid var(--ns-accent);
           outline-offset: 2px;
         }
 
@@ -310,7 +310,7 @@ export function CrimpCopy({ value, label, masked = false, ariaLabel, onCopy, cla
           inset: 0;
         }
         .ns-cc-icon-copy {
-          color: var(--muted);
+          color: var(--ns-muted);
           opacity: 1;
           transform: scale(1);
           transition: opacity 200ms ease-out, transform 200ms cubic-bezier(0.16, 1, 0.3, 1);

@@ -44,12 +44,12 @@ export default function SolargraphHeroDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-4xl">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">
+        <p className="mb-4 font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / hero-long-exposure
         </p>
         <SolargraphHero className="rounded-md border border-border bg-surface">
           <div className="flex flex-col items-center px-8 py-16 text-center sm:px-14 sm:py-24">
-            <p className="mb-6 font-mono text-[11px] tracking-widest text-muted">
+            <p className="mb-6 font-mono text-[11px] tracking-widest text-ns-muted">
               LONG-EXPOSURE INTERFACES
             </p>
             <h1
@@ -62,7 +62,7 @@ export default function SolargraphHeroDemo() {
             >
               Infrastructure that develops over time
             </h1>
-            <p className="mt-5 max-w-xl text-base leading-relaxed text-muted">
+            <p className="mt-5 max-w-xl text-base leading-relaxed text-ns-muted">
               Solargraph records every deploy, rollback, and incident as a
               single accumulating exposure — your system&apos;s history burned
               into one picture instead of scattered across dashboards.
@@ -70,13 +70,13 @@ export default function SolargraphHeroDemo() {
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <a
                 href="#start"
-                className="rounded-sm bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors duration-200 hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                className="rounded-sm bg-ns-accent px-5 py-2.5 text-sm font-medium text-white transition-colors duration-200 hover:bg-ns-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
               >
                 Start exposure
               </a>
               <a
                 href="#docs"
-                className="rounded-sm border border-border px-5 py-2.5 text-sm font-medium text-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                className="rounded-sm border border-border px-5 py-2.5 text-sm font-medium text-ns-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
               >
                 Read the docs
               </a>
@@ -85,7 +85,7 @@ export default function SolargraphHeroDemo() {
               {MARKS.map((m) => (
                 <span
                   key={m.name}
-                  className="flex items-center gap-2 text-muted"
+                  className="flex items-center gap-2 text-ns-muted"
                 >
                   {m.glyph}
                   <span className="font-mono text-xs tracking-widest">
@@ -96,7 +96,7 @@ export default function SolargraphHeroDemo() {
             </div>
           </div>
         </SolargraphHero>
-        <p className="mt-3 font-mono text-[11px] text-muted">
+        <p className="mt-3 font-mono text-[11px] text-ns-muted">
           move the cursor across the card — streaks accumulate and fade on a 4s
           half-life, like a long-exposure photograph
         </p>

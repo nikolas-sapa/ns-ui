@@ -22,7 +22,7 @@ export default function PinTumblerDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-10 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / radio-group-pin — one pin, exactly one choice
       </p>
 
@@ -31,7 +31,7 @@ export default function PinTumblerDemo() {
           <h2 className="text-sm font-semibold text-foreground">
             Shipping speed
           </h2>
-          <p className="mt-1 text-xs text-muted">
+          <p className="mt-1 text-xs text-ns-muted">
             Farther choices, longer trip along the rail.
           </p>
           <div className="mt-4">
@@ -48,7 +48,7 @@ export default function PinTumblerDemo() {
           <h2 className="text-sm font-semibold text-foreground">
             Deploy target
           </h2>
-          <p className="mt-1 text-xs text-muted">
+          <p className="mt-1 text-xs text-ns-muted">
             Three environments, one armed at a time.
           </p>
           <div className="mt-4">
@@ -62,11 +62,11 @@ export default function PinTumblerDemo() {
         </div>
       </div>
 
-      <p aria-live="polite" className="font-mono text-xs text-muted">
+      <p aria-live="polite" className="font-mono text-xs text-ns-muted">
         shipping / {shipping} &middot; env / {env}
       </p>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Click a row, or focus the group and use arrow keys. The dot
         elongates into a line while it travels to whatever row you pick,
         then contracts back into a dot — no bounce. Reduced motion

@@ -83,7 +83,7 @@ export function AccountProfileForm({
   return (
     <form onSubmit={submit} className="w-full max-w-sm space-y-4">
       <div className="space-y-1">
-        <label htmlFor="profile-display-name" className="text-xs text-muted">
+        <label htmlFor="profile-display-name" className="text-xs text-ns-muted">
           Display name
         </label>
         <input
@@ -92,12 +92,12 @@ export function AccountProfileForm({
           onChange={(e) => setDisplayName(e.target.value)}
           maxLength={50}
           disabled={pending}
-          className="w-full rounded-sm border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
+          className="w-full rounded-sm border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
         />
       </div>
 
       <div className="space-y-1">
-        <label htmlFor="profile-bio" className="text-xs text-muted">
+        <label htmlFor="profile-bio" className="text-xs text-ns-muted">
           Bio
         </label>
         <textarea
@@ -107,15 +107,15 @@ export function AccountProfileForm({
           maxLength={280}
           rows={4}
           disabled={pending}
-          className="w-full whitespace-pre-wrap rounded-sm border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
+          className="w-full whitespace-pre-wrap rounded-sm border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
         />
-        <p className="text-right text-xs text-muted">
+        <p className="text-right text-xs text-ns-muted">
           {[...bio].length}/280
         </p>
       </div>
 
       <div className="space-y-1">
-        <label htmlFor="profile-url" className="text-xs text-muted">
+        <label htmlFor="profile-url" className="text-xs text-ns-muted">
           Website
         </label>
         <input
@@ -126,12 +126,12 @@ export function AccountProfileForm({
           maxLength={200}
           placeholder="https://…"
           disabled={pending}
-          className="w-full rounded-sm border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
+          className="w-full rounded-sm border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
         />
       </div>
 
       <div className="space-y-1">
-        <span className="text-xs text-muted">Tags (up to 3)</span>
+        <span className="text-xs text-ns-muted">Tags (up to 3)</span>
         <div className="flex flex-wrap gap-1.5">
           {CATEGORIES.map((c) => {
             const active = tags.includes(c.id);
@@ -142,10 +142,10 @@ export function AccountProfileForm({
                 disabled={pending}
                 onClick={() => toggleTag(c.id)}
                 aria-pressed={active}
-                className={`rounded-full border px-3 py-1 text-xs transition-colors focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60 ${
+                className={`rounded-full border px-3 py-1 text-xs transition-colors focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60 ${
                   active
-                    ? "border-accent bg-accent text-white"
-                    : "border-border bg-surface text-foreground hover:border-muted"
+                    ? "border-ns-accent bg-ns-accent text-white"
+                    : "border-border bg-surface text-foreground hover:border-ns-muted"
                 }`}
               >
                 {c.label}
@@ -159,7 +159,7 @@ export function AccountProfileForm({
         <button
           type="submit"
           disabled={pending}
-          className="rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-muted focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
+          className="rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
         >
           {pending ? "Saving…" : submitLabel}
         </button>
@@ -168,7 +168,7 @@ export function AccountProfileForm({
             type="button"
             disabled={pending}
             onClick={onSkip}
-            className="rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-muted focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
+            className="rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
           >
             Skip
           </button>

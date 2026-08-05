@@ -18,7 +18,7 @@ import { useEffect, useRef, useState } from "react";
 //
 // Marks are abstract, generated geometric glyphs (no real company logos or
 // wordmarks), so there is nothing here with trademark exposure. Every color
-// is a Tailwind token utility (text-muted / border-border / bg-surface),
+// is a Tailwind token utility (text-ns-muted / border-border / bg-surface),
 // never a literal, so both themes are correct without any getComputedStyle
 // bookkeeping — this is plain DOM, not canvas.
 // ---------------------------------------------------------------------------
@@ -156,7 +156,7 @@ export function LogoCloudSettle({
   return (
     <div className={className}>
       {label && (
-        <p className="mb-5 text-center font-mono text-xs uppercase tracking-widest text-muted">{label}</p>
+        <p className="mb-5 text-center font-mono text-xs uppercase tracking-widest text-ns-muted">{label}</p>
       )}
       <div
         ref={rootRef}
@@ -169,7 +169,7 @@ export function LogoCloudSettle({
           <div
             key={m.id}
             role="listitem"
-            className="flex flex-col items-center justify-center gap-2 rounded-md border border-border bg-surface px-4 py-6 text-muted"
+            className="flex flex-col items-center justify-center gap-2 rounded-md border border-border bg-surface px-4 py-6 text-ns-muted"
             style={{
               transitionProperty: "transform, opacity",
               transitionDuration: `${DURATION}ms`,

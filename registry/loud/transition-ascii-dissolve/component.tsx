@@ -74,9 +74,9 @@ function readTokens(): Tokens {
   const get = (name: string, fallback: string) => cs.getPropertyValue(name).trim() || fallback;
   return {
     fg: get("--foreground", "#171717"),
-    muted: get("--muted", "#4d4d4d"),
+    muted: get("--ns-muted", "#4d4d4d"),
     border: get("--border", "#ebebeb"),
-    accent: get("--accent", "#006bff"),
+    accent: get("--ns-accent", "#006bff"),
   };
 }
 
@@ -275,6 +275,6 @@ export function AsciiDissolveTransition({
 }
 
 const CSS = `
-.ns-tad-handle:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-.ns-tad-handle:hover { background: linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--accent) 8%, transparent) 50%, transparent 100%); }
+.ns-tad-handle:focus-visible { outline: 2px solid var(--ns-accent); outline-offset: -2px; }
+.ns-tad-handle:hover { background: linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--ns-accent) 8%, transparent) 50%, transparent 100%); }
 `;

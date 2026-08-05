@@ -14,13 +14,13 @@ export default function UmbraToggleDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / switch-eclipse
       </p>
 
       <div className="flex flex-col items-center gap-6 rounded-[12px] border border-border bg-background px-10 py-10">
         <UmbraToggle checked={checked} onCheckedChange={setChecked} />
-        <p className="max-w-xs text-center text-xs text-muted">
+        <p className="max-w-xs text-center text-xs text-ns-muted">
           A dark disc eclipses a bright one — the crescent and corona are
           computed geometry, not sprite frames.
         </p>

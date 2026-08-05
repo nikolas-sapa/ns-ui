@@ -15,7 +15,7 @@ import type { ReactNode } from "react";
 // row does a barely-there scaleX 0.995 -> 1 spring contraction: the stitch
 // visibly pulls taut. On failure the dash offset snaps outward fast (the
 // thread yanked loose), the pattern loosens into wider, frayed gaps, the
-// seam settles to --muted, and the row's own content dims beside a real
+// seam settles to --ns-muted, and the row's own content dims beside a real
 // inline Retry button — never a red/accent decoration, never a spinner.
 //
 // This is deliberately a *lifecycle* encoding (provisional / committed /
@@ -77,7 +77,7 @@ export function BasteStitch({
             <button
               type="button"
               onClick={onRetry}
-              className="ns-baste-retry shrink-0 rounded-sm border border-border px-2.5 py-1 font-mono text-[11px] whitespace-nowrap text-foreground transition-colors duration-150 hover:border-muted hover:bg-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="ns-baste-retry shrink-0 rounded-sm border border-border px-2.5 py-1 font-mono text-[11px] whitespace-nowrap text-foreground transition-colors duration-150 hover:border-ns-muted hover:bg-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
             >
               Retry {itemLabel}
             </button>
@@ -127,7 +127,7 @@ const CSS = `
 
 [data-status="failed"] .ns-baste-scale{ transform:scaleX(1); }
 [data-status="failed"] .ns-baste-seam-line{
-  stroke:var(--muted);
+  stroke:var(--ns-muted);
   stroke-dasharray:2 7 1 9 2 6;
   stroke-dashoffset:18;
   transition:

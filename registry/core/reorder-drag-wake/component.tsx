@@ -536,7 +536,7 @@ export function BowWake({
           >
             <div
               className={`flex h-full items-center gap-3 rounded-md border bg-surface px-3 transition-colors duration-150 ${
-                isArmed ? "border-accent" : "border-border hover:border-foreground/20"
+                isArmed ? "border-ns-accent" : "border-border hover:border-foreground/20"
               }`}
               style={{
                 boxShadow: `0 calc(6px + 10px * var(--bw-lift)) calc(16px + 10px * var(--bw-lift)) calc(-8px - 2px * var(--bw-lift)) rgba(0,0,0,calc(0.22 + 0.18 * var(--bw-lift)))`,
@@ -554,8 +554,8 @@ export function BowWake({
                 onPointerCancel={(e) => endDrag(id, e, true)}
                 onClick={() => armOrDrop(id)}
                 onKeyDown={(e) => onHandleKeyDown(id, e)}
-                className={`flex shrink-0 cursor-grab touch-none select-none items-center justify-center rounded-sm p-1.5 text-muted transition-colors duration-150 hover:bg-foreground/10 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:cursor-grabbing ${
-                  isArmed ? "bg-accent/10 text-accent" : ""
+                className={`flex shrink-0 cursor-grab touch-none select-none items-center justify-center rounded-sm p-1.5 text-ns-muted transition-colors duration-150 hover:bg-foreground/10 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent active:cursor-grabbing ${
+                  isArmed ? "bg-ns-accent/10 text-ns-accent" : ""
                 }`}
               >
                 <GripIcon />
@@ -563,10 +563,10 @@ export function BowWake({
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm text-foreground">{item.label}</p>
                 {item.subtitle ? (
-                  <p className="truncate font-mono text-xs text-muted">{item.subtitle}</p>
+                  <p className="truncate font-mono text-xs text-ns-muted">{item.subtitle}</p>
                 ) : null}
               </div>
-              <span className="shrink-0 rounded-full border border-border bg-background px-1.5 py-0.5 font-mono text-[10px] text-muted">
+              <span className="shrink-0 rounded-full border border-border bg-background px-1.5 py-0.5 font-mono text-[10px] text-ns-muted">
                 {pos}
               </span>
             </div>

@@ -12,7 +12,7 @@ import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 // halves — parts 4px up/down with a small spring overshoot, and the active
 // highlight glides through the opening into the new chamber. That highlight
 // is a 2px route along the bottom of the whole flight: a full-width
-// --border track div, plus a --accent segment div exactly one chamber wide
+// --border track div, plus a --ns-accent segment div exactly one chamber wide
 // (100/n%) — the actual "you are here" marker. The segment slides via
 // translateX by whole multiples of its own width, one chamber per step, so
 // at rest it never covers more than the current chamber's footprint —
@@ -283,7 +283,7 @@ export function LockFlight({
                     onClick={() => goTo(i)}
                     className={[
                       "relative block h-16 w-full overflow-hidden text-left outline-none transition-colors",
-                      "hover:bg-foreground/[0.03] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent",
+                      "hover:bg-foreground/[0.03] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ns-accent",
                       // outer chambers clip with the container's rounded
                       // corner (11px = 12px radius - 1px border) so the water
                       // never pokes square into the curve
@@ -350,7 +350,7 @@ export function LockFlight({
                     <span className="relative z-10 flex h-full flex-col justify-between p-2.5">
                       <span
                         className={`font-mono text-[10px] uppercase tracking-[0.15em] ${
-                          isCurrent ? "text-foreground" : "text-muted"
+                          isCurrent ? "text-foreground" : "text-ns-muted"
                         }`}
                       >
                         {String(i + 1).padStart(2, "0")}
@@ -360,7 +360,7 @@ export function LockFlight({
                           isCurrent
                             ? "font-medium text-foreground"
                             : locked
-                              ? "text-muted"
+                              ? "text-ns-muted"
                               : "text-foreground"
                         }`}
                       >
@@ -403,13 +403,13 @@ export function LockFlight({
             aria-hidden
             className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-0.5 bg-border"
           />
-          {/* the "you are here" marker: --accent, exactly one chamber's width,
+          {/* the "you are here" marker: --ns-accent, exactly one chamber's width,
               sliding one chamber per step. translateX percentages resolve
               against the segment's OWN width (100/n% of the row), so
               current * 100% lands it on the current chamber's footprint. */}
           <div
             aria-hidden
-            className="pointer-events-none absolute bottom-0 left-0 -z-10 h-0.5 bg-accent"
+            className="pointer-events-none absolute bottom-0 left-0 -z-10 h-0.5 bg-ns-accent"
             style={{
               width: `${connectorWidthPct}%`,
               transform: `translateX(${current * 100}%)`,
@@ -431,7 +431,7 @@ export function LockFlight({
         aria-live="polite"
         data-lockflight-status
         className={`mx-4 min-h-[1.25rem] py-2 font-mono text-[11px] transition-opacity duration-200 ${
-          status ? "text-muted opacity-100" : "opacity-0"
+          status ? "text-ns-muted opacity-100" : "opacity-0"
         }`}
       >
         {status}
@@ -441,7 +441,7 @@ export function LockFlight({
         <h3 id={`${uid}-heading`} className="text-sm font-semibold text-foreground">
           {step?.label}
         </h3>
-        {step?.content ? <div className="mt-3 text-sm text-muted">{step.content}</div> : null}
+        {step?.content ? <div className="mt-3 text-sm text-ns-muted">{step.content}</div> : null}
       </div>
 
       <div className="flex items-center justify-between gap-3 border-t border-border p-4">
@@ -449,7 +449,7 @@ export function LockFlight({
           type="button"
           onClick={goBack}
           disabled={current === 0}
-          className="rounded-sm border border-border bg-background px-4 py-2 text-sm text-foreground outline-none transition-colors hover:enabled:bg-foreground/[0.06] focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-40"
+          className="rounded-sm border border-border bg-background px-4 py-2 text-sm text-foreground outline-none transition-colors hover:enabled:bg-foreground/[0.06] focus-visible:ring-2 focus-visible:ring-ns-accent disabled:cursor-not-allowed disabled:opacity-40"
         >
           Back
         </button>
@@ -457,7 +457,7 @@ export function LockFlight({
           type="button"
           data-lockflight-continue
           onClick={attemptAdvance}
-          className="rounded-sm border border-border bg-foreground px-4 py-2 text-sm font-medium text-background outline-none transition-colors hover:bg-foreground/90 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+          className="rounded-sm border border-border bg-foreground px-4 py-2 text-sm font-medium text-background outline-none transition-colors hover:bg-foreground/90 focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
         >
           {isLast ? "Finish" : "Continue"}
         </button>

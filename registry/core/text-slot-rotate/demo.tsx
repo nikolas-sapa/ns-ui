@@ -5,7 +5,7 @@ import { SlotWordRotate } from "./component";
 export default function SlotWordRotateDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-10 px-6">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / text-slot-rotate
       </p>
 
@@ -17,7 +17,7 @@ export default function SlotWordRotateDemo() {
         />
       </div>
 
-      <p className="max-w-md text-center font-mono text-xs text-muted">
+      <p className="max-w-md text-center font-mono text-xs text-ns-muted">
         hover to pause the reel, or step it manually with the arrows
       </p>
     </div>

@@ -64,11 +64,11 @@ export default function BentoGridDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-3xl">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">ns-ui / grid-bento-dense</p>
+        <p className="mb-4 font-mono text-xs tracking-widest text-ns-muted">ns-ui / grid-bento-dense</p>
         <div className="rounded-md border border-border bg-background p-5">
           <BentoGrid cells={CELLS} cols={4} defaultFeaturedId="latency" />
         </div>
-        <p className="mt-3 font-mono text-[11px] text-muted">
+        <p className="mt-3 font-mono text-[11px] text-ns-muted">
           click or Enter/Space any tile to feature it — the rest of the grid re-packs around it, and
           arrow keys move by screen position, not markup order
         </p>

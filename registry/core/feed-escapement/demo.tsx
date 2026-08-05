@@ -47,19 +47,19 @@ export default function EscapementTickDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-sm">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">
+        <p className="mb-4 font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / feed-escapement
         </p>
         <EscapementTick ref={tickRef} aria-label="Deploy activity feed" />
         <div className="mt-3 flex items-center justify-between gap-3">
-          <p className="font-mono text-[11px] text-muted">
+          <p className="font-mono text-[11px] text-ns-muted">
             the fork releases one item at a time — never a dogpile
           </p>
           <button
             type="button"
             data-burst-trigger
             onClick={runBurst}
-            className="shrink-0 cursor-pointer rounded-sm border border-border px-2.5 py-1 font-mono text-[10px] tracking-widest text-muted transition-colors duration-150 hover:border-foreground/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="shrink-0 cursor-pointer rounded-sm border border-border px-2.5 py-1 font-mono text-[10px] tracking-widest text-ns-muted transition-colors duration-150 hover:border-foreground/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             SIMULATE BURST
           </button>

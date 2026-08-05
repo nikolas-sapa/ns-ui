@@ -492,11 +492,11 @@ export function CrackCompare({
     };
     const onFocus = () => {
       if (range.matches(":focus-visible")) {
-        grip.classList.add("outline", "outline-2", "outline-offset-2", "outline-accent");
+        grip.classList.add("outline", "outline-2", "outline-offset-2", "outline-ns-accent");
       }
     };
     const onBlur = () => {
-      grip.classList.remove("outline", "outline-2", "outline-offset-2", "outline-accent");
+      grip.classList.remove("outline", "outline-2", "outline-offset-2", "outline-ns-accent");
     };
 
     /** re-sample the seam color off the resolved --foreground token so the
@@ -588,7 +588,7 @@ export function CrackCompare({
       >
         <div
           ref={gripRef}
-          className="flex h-7 w-7 items-center justify-center rounded-sm border border-foreground/15 bg-foreground/10 text-muted shadow-[inset_0_1px_0_0_color-mix(in_srgb,var(--foreground)_18%,transparent),0_2px_8px_-2px_rgba(0,0,0,0.5)] backdrop-blur-md transition-colors duration-150 hover:border-foreground/30 hover:text-foreground"
+          className="flex h-7 w-7 items-center justify-center rounded-sm border border-foreground/15 bg-foreground/10 text-ns-muted shadow-[inset_0_1px_0_0_color-mix(in_srgb,var(--foreground)_18%,transparent),0_2px_8px_-2px_rgba(0,0,0,0.5)] backdrop-blur-md transition-colors duration-150 hover:border-foreground/30 hover:text-foreground"
         >
           <svg
             width="14"

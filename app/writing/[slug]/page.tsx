@@ -58,13 +58,13 @@ export default async function WritingPostPage({
         <div className="flex items-center justify-between gap-4">
           <Link
             href="/writing"
-            className="rounded-sm font-mono text-xs uppercase tracking-[0.18em] text-muted outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded-sm font-mono text-xs uppercase tracking-[0.18em] text-ns-muted outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             ns-ui / writing
           </Link>
           <ThemeToggle />
         </div>
-        <p className="mt-6 font-mono text-[11px] uppercase tracking-wider text-muted">
+        <p className="mt-6 font-mono text-[11px] uppercase tracking-wider text-ns-muted">
           {formatDate(post.iso)}
         </p>
         {/* 65–75ch measure, generous leading — this page is a reading
@@ -86,7 +86,7 @@ export default async function WritingPostPage({
       <div className="mt-12 flex flex-wrap items-center justify-between gap-6 border-t border-border pt-8">
         <Link
           href="/"
-          className="rounded-sm font-mono text-xs uppercase tracking-wider text-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded-sm font-mono text-xs uppercase tracking-wider text-ns-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
         >
           Back to the catalog
         </Link>

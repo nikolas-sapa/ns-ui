@@ -217,24 +217,24 @@ export function BentoGrid({ cells, cols = 4, defaultFeaturedId, className = "" }
               onClick={() => activate(cell.id)}
               onKeyDown={(e) => onKeyDown(e, cell.id)}
               onFocus={() => setActiveId(cell.id)}
-              className="group relative flex cursor-pointer flex-col justify-between overflow-hidden rounded-md border border-border bg-surface p-4 text-left transition-colors duration-150 hover:border-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="group relative flex cursor-pointer flex-col justify-between overflow-hidden rounded-md border border-border bg-surface p-4 text-left transition-colors duration-150 hover:border-ns-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
               style={{ gridColumn: `span ${c}`, gridRow: `span ${r}` }}
             >
               {isFeatured && (
-                <span aria-hidden className="absolute right-3 top-3 h-1.5 w-1.5 rounded-full bg-accent" />
+                <span aria-hidden className="absolute right-3 top-3 h-1.5 w-1.5 rounded-full bg-ns-accent" />
               )}
               <div>
                 {cell.meta && (
-                  <p className="mb-1 font-mono text-[10px] uppercase tracking-widest text-muted">{cell.meta}</p>
+                  <p className="mb-1 font-mono text-[10px] uppercase tracking-widest text-ns-muted">{cell.meta}</p>
                 )}
                 <h3 className={`font-medium text-foreground ${isFeatured ? "text-base" : "text-sm"}`}>
                   {cell.title}
                 </h3>
               </div>
-              {cell.body && <div className="mt-2 flex-1 text-sm text-muted">{cell.body}</div>}
+              {cell.body && <div className="mt-2 flex-1 text-sm text-ns-muted">{cell.body}</div>}
               <span
                 aria-hidden
-                className="pointer-events-none mt-2 block text-right font-mono text-[10px] uppercase tracking-widest text-muted opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100"
+                className="pointer-events-none mt-2 block text-right font-mono text-[10px] uppercase tracking-widest text-ns-muted opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100"
               >
                 {isFeatured ? "featured" : "feature this"}
               </span>

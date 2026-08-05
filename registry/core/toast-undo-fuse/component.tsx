@@ -18,7 +18,7 @@ import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 // Undo reads the current burn progress, cancels the forward animations, and
 // plays a reverse pair (same duration/4, ease-out-expo) back to unburnt
 // before the toast exits. Colors: --border for the unburnt line, --foreground
-// for the ember, --accent only on the Undo button — the toast surface is
+// for the ember, --ns-accent only on the Undo button — the toast surface is
 // --background with a 1px --border and 12px radius.
 //
 // prefers-reduced-motion: the line depletes in discrete steps (stepped
@@ -317,7 +317,7 @@ export function ShortFuse({
           type="button"
           data-toast-undo-fuse-undo=""
           onClick={handleUndo}
-          className="shrink-0 cursor-pointer rounded-[6px] px-2 py-1 text-xs font-medium tracking-wide text-accent transition-opacity duration-150 hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="shrink-0 cursor-pointer rounded-[6px] px-2 py-1 text-xs font-medium tracking-wide text-ns-accent transition-opacity duration-150 hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
         >
           {actionLabel}
         </button>

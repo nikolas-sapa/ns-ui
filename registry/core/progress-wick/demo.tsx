@@ -40,7 +40,7 @@ export default function WickRunDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-10 px-6">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / progress-wick
       </p>
 
@@ -60,11 +60,11 @@ export default function WickRunDemo() {
       <div className="flex flex-col items-center gap-3">
         <button
           onClick={() => setRun((r) => r + 1)}
-          className="rounded-sm border border-border px-4 py-2 font-mono text-xs text-muted transition-colors duration-150 hover:border-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="rounded-sm border border-border px-4 py-2 font-mono text-xs text-ns-muted transition-colors duration-150 hover:border-ns-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
         >
           restart upload
         </button>
-        <p className="font-mono text-[10px] text-muted">hover the panel to pause</p>
+        <p className="font-mono text-[10px] text-ns-muted">hover the panel to pause</p>
       </div>
     </div>
   );

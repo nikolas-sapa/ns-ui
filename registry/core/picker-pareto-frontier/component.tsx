@@ -15,7 +15,7 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 // a single rising polyline with solid --foreground nodes: the line itself IS
 // the tradeoff, you cannot climb in quality without moving right into cost.
 //
-// Dominated models are not hidden. Each is a hollow --muted node sitting below
+// Dominated models are not hidden. Each is a hollow --ns-muted node sitting below
 // the ridge, joined to it by a faint vertical connector whose LENGTH is the
 // quality you leave on the table by picking it — the single most legible way
 // to say "strictly worse". They stay fully selectable.
@@ -25,7 +25,7 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 // x-order. A drag anywhere on the plot snaps to the nearest node by 1D x
 // distance (a Voronoi partition) and commits on every zone crossing, so
 // dragging walks the selection node-to-node, never a free pointer echo. The
-// selected node is the only --accent in the component (a filled dot with a
+// selected node is the only --ns-accent in the component (a filled dot with a
 // soft accent halo), matching "accent = interaction only".
 //
 // Beneath the plot a caption names the selected model, prints its three raw
@@ -307,8 +307,8 @@ function ModeToggle({
             aria-label={AXIS_LABEL[m]}
             tabIndex={checked ? 0 : -1}
             onClick={() => onChange(m)}
-            className={`rounded-sm px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
-              checked ? "bg-foreground/[0.08] text-foreground" : "text-muted hover:text-foreground"
+            className={`rounded-sm px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent ${
+              checked ? "bg-foreground/[0.08] text-foreground" : "text-ns-muted hover:text-foreground"
             }`}
           >
             {AXIS_LABEL[m]}
@@ -450,7 +450,7 @@ export function RidgeWalk({
 
   if (models.length === 0 || !positions.has(committedId)) {
     return (
-      <p className={`font-mono text-xs text-muted ${className}`}>No models to compare.</p>
+      <p className={`font-mono text-xs text-ns-muted ${className}`}>No models to compare.</p>
     );
   }
 
@@ -489,7 +489,7 @@ export function RidgeWalk({
       {/* ---- plot ---- */}
       <div className="relative w-full" style={{ aspectRatio: "8 / 5" }}>
         {/* y-axis intent: cheap-and-excellent doesn't exist, so top-left is empty */}
-        <div className="pointer-events-none absolute left-0 top-0 flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+        <div className="pointer-events-none absolute left-0 top-0 flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.14em] text-ns-muted">
           <span aria-hidden="true">↑</span>
           {scoreWord}
         </div>
@@ -527,7 +527,7 @@ export function RidgeWalk({
                   x2={p.x}
                   y1={ry}
                   y2={p.y}
-                  className="text-muted"
+                  className="text-ns-muted"
                   stroke="currentColor"
                   strokeWidth={1}
                   strokeOpacity={0.4}
@@ -592,12 +592,12 @@ export function RidgeWalk({
                 tabIndex={checked ? 0 : -1}
                 onClick={() => commit(m.id)}
                 style={{ left: `${p.x}%`, top: `${p.y}%`, transition: nodeTransition }}
-                className="group absolute flex h-9 w-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-sm border-0 bg-transparent p-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                className="group absolute flex h-9 w-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-sm border-0 bg-transparent p-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
               >
                 {/* accent halo — selection only */}
                 <span
                   aria-hidden="true"
-                  className={`pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/15 transition-[width,height,opacity] duration-200 ${
+                  className={`pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-ns-accent/15 transition-[width,height,opacity] duration-200 ${
                     checked ? "h-[22px] w-[22px] opacity-100" : "h-2 w-2 opacity-0"
                   }`}
                 />
@@ -606,9 +606,9 @@ export function RidgeWalk({
                   aria-hidden="true"
                   className={`relative rounded-full transition-transform duration-150 ${
                     checked
-                      ? "h-3 w-3 bg-accent"
+                      ? "h-3 w-3 bg-ns-accent"
                       : dominated
-                        ? "h-2 w-2 border border-muted bg-background group-hover:scale-125"
+                        ? "h-2 w-2 border border-ns-muted bg-background group-hover:scale-125"
                         : "h-[9px] w-[9px] bg-foreground group-hover:scale-125"
                   }`}
                 />
@@ -619,7 +619,7 @@ export function RidgeWalk({
       </div>
 
       {/* ---- x-axis meaning ---- */}
-      <div className="mt-1.5 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
+      <div className="mt-1.5 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.12em] text-ns-muted">
         <span>cheaper · faster</span>
         <span>costlier · slower</span>
       </div>
@@ -632,7 +632,7 @@ export function RidgeWalk({
           </h3>
           <span
             className={`shrink-0 font-mono text-[10px] uppercase tracking-[0.12em] ${
-              isSelectedDominated ? "text-muted" : "text-foreground"
+              isSelectedDominated ? "text-ns-muted" : "text-foreground"
             }`}
           >
             {isSelectedDominated ? "dominated" : "on frontier"}
@@ -641,23 +641,23 @@ export function RidgeWalk({
 
         <dl className="mt-3 grid grid-cols-3 gap-2 tabular-nums">
           <div>
-            <dt className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted">Cost</dt>
+            <dt className="font-mono text-[9px] uppercase tracking-[0.14em] text-ns-muted">Cost</dt>
             <dd className="mt-0.5 font-mono text-sm text-foreground">
               {fmtCost(currModel.cost)}
-              <span className="text-muted"> /1k</span>
+              <span className="text-ns-muted"> /1k</span>
             </dd>
           </div>
           <div>
-            <dt className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted">
+            <dt className="font-mono text-[9px] uppercase tracking-[0.14em] text-ns-muted">
               Latency
             </dt>
             <dd className="mt-0.5 font-mono text-sm text-foreground">
               {currModel.latency.toFixed(1)}
-              <span className="text-muted">s</span>
+              <span className="text-ns-muted">s</span>
             </dd>
           </div>
           <div>
-            <dt className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted">
+            <dt className="font-mono text-[9px] uppercase tracking-[0.14em] text-ns-muted">
               {scoreWord}
             </dt>
             <dd className="mt-0.5 font-mono text-sm text-foreground">{Math.round(currModel.score)}</dd>
@@ -665,7 +665,7 @@ export function RidgeWalk({
         </dl>
 
         <p
-          className="mt-3 h-4 truncate font-mono text-[11px] text-muted"
+          className="mt-3 h-4 truncate font-mono text-[11px] text-ns-muted"
           aria-hidden="true"
         >
           {isSelectedDominated && currDominator
@@ -680,7 +680,7 @@ export function RidgeWalk({
 
       {/* ---- legend + axis toggle ---- */}
       <div className="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-        <div className="flex items-center gap-3 font-mono text-[10px] text-muted">
+        <div className="flex items-center gap-3 font-mono text-[10px] text-ns-muted">
           <span className="flex items-center gap-1.5">
             <span aria-hidden="true" className="h-[9px] w-[9px] rounded-full bg-foreground" />
             frontier
@@ -688,7 +688,7 @@ export function RidgeWalk({
           <span className="flex items-center gap-1.5">
             <span
               aria-hidden="true"
-              className="h-2 w-2 rounded-full border border-muted bg-background"
+              className="h-2 w-2 rounded-full border border-ns-muted bg-background"
             />
             dominated
           </span>

@@ -53,7 +53,7 @@ a problem with this one — wait out the window or override the policy locally.
 - **`install_command(name)`** — the exact
   `npx shadcn add https://design.helpmarq.com/r/<name>.json` string for one component.
 - **`get_conventions()`** — the token contract every component is built against
-  (`--background`/`--foreground`/`--muted`/`--border`/`--accent`, Tailwind v4, React 19,
+  (`--background`/`--foreground`/`--ns-muted`/`--border`/`--ns-accent`, Tailwind v4, React 19,
   `prefers-reduced-motion` handling, accessibility baseline). Read this once per session
   before writing code alongside an installed component, so it matches rather than
   fighting the design language.

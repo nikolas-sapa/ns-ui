@@ -20,10 +20,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 // region list (Tab into the map, then ArrowLeft/ArrowRight) ISOLATES that
 // region — every other region's cells drop to a fixed low "background"
 // density while the hovered region keeps its true density and gains a thin
-// var(--accent) boundary trace — and the legend rescales its domain to a
+// var(--ns-accent) boundary trace — and the legend rescales its domain to a
 // tight band around the hovered value instead of the global min/max,
 // highlighting exactly where that value falls. Losing hover/focus restores
-// the global view. Pure var(--foreground) ink; var(--accent) is reserved
+// the global view. Pure var(--foreground) ink; var(--ns-accent) is reserved
 // for the isolated region's boundary and the legend marker only.
 // ---------------------------------------------------------------------------
 
@@ -84,9 +84,9 @@ function readTokens(): Tokens {
   return {
     fg: get("--foreground", "#171717"),
     bg: get("--background", "#ffffff"),
-    muted: get("--muted", "#4d4d4d"),
+    muted: get("--ns-muted", "#4d4d4d"),
     border: get("--border", "#ebebeb"),
-    accent: get("--accent", "#006bff"),
+    accent: get("--ns-accent", "#006bff"),
   };
 }
 
@@ -335,8 +335,8 @@ export function MapChoroplethAscii({ regions, title = "Regional index", classNam
     <figure className={`ns-mca inline-block ${className}`} aria-label={`${title}, choropleth map`}>
       <style>{CSS}</style>
       <div className="flex items-center justify-between gap-3 pb-2">
-        <span className="font-mono text-xs tracking-widest text-muted">{title.toUpperCase()}</span>
-        <span className="font-mono text-[11px] text-muted tabular-nums">
+        <span className="font-mono text-xs tracking-widest text-ns-muted">{title.toUpperCase()}</span>
+        <span className="font-mono text-[11px] text-ns-muted tabular-nums">
           {hoveredRegion ? `${hoveredRegion.label} · ${hoveredRegion.value}` : `${data.length} sectors`}
         </span>
       </div>
@@ -388,5 +388,5 @@ export function MapChoroplethAscii({ regions, title = "Regional index", classNam
 }
 
 const CSS = `
-.ns-mca-hit:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ns-mca-hit:focus-visible { outline: 2px solid var(--ns-accent); outline-offset: 2px; }
 `;

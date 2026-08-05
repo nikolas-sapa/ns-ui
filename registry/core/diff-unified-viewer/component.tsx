@@ -307,7 +307,7 @@ function FullRow({ entry }: { entry: FileHeaderEntry | HunkEntry | MetaEntry }) 
           ? entry.newPath
           : (entry.oldPath ?? "unknown file");
     return (
-      <div className="flex items-center gap-2 border-y border-border bg-surface px-3 py-1.5 font-mono text-[12px] text-muted">
+      <div className="flex items-center gap-2 border-y border-border bg-surface px-3 py-1.5 font-mono text-[12px] text-ns-muted">
         <FileIcon className="h-3 w-3 shrink-0" />
         <span className="truncate">{label}</span>
       </div>
@@ -316,7 +316,7 @@ function FullRow({ entry }: { entry: FileHeaderEntry | HunkEntry | MetaEntry }) 
   if (entry.kind === "hunk") {
     if (entry.malformed) {
       return (
-        <div className="flex items-center gap-2 border-y border-dashed border-border px-3 py-1.5 text-[12px] text-muted">
+        <div className="flex items-center gap-2 border-y border-dashed border-border px-3 py-1.5 text-[12px] text-ns-muted">
           <WarnIcon className="h-3 w-3 shrink-0" />
           <span>
             Unparsable hunk header, showing following lines as-is:{" "}
@@ -326,13 +326,13 @@ function FullRow({ entry }: { entry: FileHeaderEntry | HunkEntry | MetaEntry }) 
       );
     }
     return (
-      <div className="border-y border-border bg-surface px-3 py-1 font-mono text-[12px] tabular-nums text-muted">
+      <div className="border-y border-border bg-surface px-3 py-1 font-mono text-[12px] tabular-nums text-ns-muted">
         {`@@ -${entry.oldStart},${entry.oldLines} +${entry.newStart},${entry.newLines} @@`}
         {entry.header ? ` ${entry.header}` : ""}
       </div>
     );
   }
-  return <div className="px-3 py-1 font-mono text-[11px] italic text-muted">{entry.text}</div>;
+  return <div className="px-3 py-1 font-mono text-[11px] italic text-ns-muted">{entry.text}</div>;
 }
 
 // Split mode cannot scroll a long line the way unified can: Tailwind's
@@ -354,16 +354,16 @@ function UnifiedLine({ entry }: { entry: LineEntry }) {
   return (
     <div className="grid grid-cols-[3px_4ch_4ch_1.5ch_1fr] items-stretch leading-5 transition-colors hover:bg-foreground/[0.05]">
       <span aria-hidden className={rail.className} style={rail.style} />
-      <span className={`select-none py-[3px] pr-2 text-right font-mono text-[12px] tabular-nums text-muted ${wash}`}>
+      <span className={`select-none py-[3px] pr-2 text-right font-mono text-[12px] tabular-nums text-ns-muted ${wash}`}>
         {entry.oldNo ?? ""}
       </span>
-      <span className={`select-none py-[3px] pr-2 text-right font-mono text-[12px] tabular-nums text-muted ${wash}`}>
+      <span className={`select-none py-[3px] pr-2 text-right font-mono text-[12px] tabular-nums text-ns-muted ${wash}`}>
         {entry.newNo ?? ""}
       </span>
       <span
         aria-hidden
         className={`select-none py-[3px] text-center font-mono text-[12px] ${wash} ${
-          entry.type === "add" || entry.type === "del" ? "text-foreground" : "text-muted"
+          entry.type === "add" || entry.type === "del" ? "text-foreground" : "text-ns-muted"
         }`}
       >
         {glyphFor(entry.type)}
@@ -418,13 +418,13 @@ function SplitHalf({ entry, side }: { entry: LineEntry | undefined; side: "old" 
   return (
     <div className="grid grid-cols-[3px_4ch_1.5ch_1fr] items-stretch leading-5 transition-colors group-hover:bg-foreground/[0.05]">
       <span aria-hidden className={rail.className} style={rail.style} />
-      <span className={`select-none py-[3px] pr-2 text-right font-mono text-[12px] tabular-nums text-muted ${wash}`}>
+      <span className={`select-none py-[3px] pr-2 text-right font-mono text-[12px] tabular-nums text-ns-muted ${wash}`}>
         {num ?? ""}
       </span>
       <span
         aria-hidden
         className={`select-none py-[3px] text-center font-mono text-[12px] ${wash} ${
-          entry.type === "add" || entry.type === "del" ? "text-foreground" : "text-muted"
+          entry.type === "add" || entry.type === "del" ? "text-foreground" : "text-ns-muted"
         }`}
       >
         {glyphFor(entry.type)}
@@ -513,7 +513,7 @@ function ModeToggle({ mode, onChange }: { mode: Mode; onChange: (m: Mode) => voi
             aria-checked={selected}
             tabIndex={selected ? 0 : -1}
             onClick={() => onChange(opt.value)}
-            className={`rounded-[4px] px-2.5 py-1 font-mono text-[11px] uppercase tracking-wide outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-accent ${
+            className={`rounded-[4px] px-2.5 py-1 font-mono text-[11px] uppercase tracking-wide outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-ns-accent ${
               // The *selected* segment needs a hover affordance too, not just the
               // unselected one: hovering the currently-active view was previously
               // a dead pixel-for-pixel no-op, which reads as an inert label
@@ -524,7 +524,7 @@ function ModeToggle({ mode, onChange }: { mode: Mode; onChange: (m: Mode) => voi
               // still wins over this when both apply.
               selected
                 ? "bg-background text-foreground shadow-sm hover:ring-1 hover:ring-inset hover:ring-border"
-                : "text-muted hover:text-foreground"
+                : "text-ns-muted hover:text-foreground"
             }`}
           >
             {opt.label}
@@ -612,12 +612,12 @@ export function SeamDiff({
     <div className={`flex flex-col overflow-hidden rounded-md border border-border bg-background text-foreground ${className}`}>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-surface px-3 py-2">
         <div className="flex min-w-0 items-center gap-2 font-mono text-[13px]">
-          <FileIcon className="h-3.5 w-3.5 shrink-0 text-muted" />
+          <FileIcon className="h-3.5 w-3.5 shrink-0 text-ns-muted" />
           <span className="truncate">
             {renamedFrom ? (
               <>
-                <span className="text-muted">{renamedFrom}</span>
-                <span className="mx-1 text-muted">{"→"}</span>
+                <span className="text-ns-muted">{renamedFrom}</span>
+                <span className="mx-1 text-ns-muted">{"→"}</span>
                 <span>{filePath}</span>
               </>
             ) : (
@@ -625,7 +625,7 @@ export function SeamDiff({
             )}
           </span>
           {(added > 0 || removed > 0) && (
-            <span className="ml-1 shrink-0 font-mono text-[12px] tabular-nums text-muted">
+            <span className="ml-1 shrink-0 font-mono text-[12px] tabular-nums text-ns-muted">
               +{added} {"−"}
               {removed}
             </span>
@@ -639,7 +639,7 @@ export function SeamDiff({
 
       {parsed.degraded ? (
         <div>
-          <div className="flex items-center gap-2 border-b border-dashed border-border px-3 py-1.5 text-[12px] text-muted">
+          <div className="flex items-center gap-2 border-b border-dashed border-border px-3 py-1.5 text-[12px] text-ns-muted">
             <WarnIcon className="h-3 w-3 shrink-0" />
             <span>This doesn&apos;t look like a unified diff, showing the raw text below.</span>
           </div>
@@ -654,7 +654,7 @@ export function SeamDiff({
           </div>
         </div>
       ) : parsed.entries.length === 0 ? (
-        <div className="px-3 py-6 text-center font-mono text-[13px] text-muted">Nothing to show.</div>
+        <div className="px-3 py-6 text-center font-mono text-[13px] text-ns-muted">Nothing to show.</div>
       ) : (
         <div role="region" aria-label={regionLabel} className="overflow-x-auto">
           {rows}

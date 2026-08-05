@@ -42,13 +42,13 @@ export async function AccountData() {
         <h1 className="text-xl font-medium text-foreground">
           One more thing
         </h1>
-        <p className="mt-2 text-center text-sm text-muted">
+        <p className="mt-2 text-center text-sm text-ns-muted">
           Claim a handle to finish setting up your account.
         </p>
         <div className="mt-8">
           <Link
             href="/welcome"
-            className="rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-muted focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             Claim a handle
           </Link>
@@ -75,7 +75,7 @@ export async function AccountData() {
             {viewer?.displayName ? (
               <p className="text-foreground">{viewer.displayName}</p>
             ) : null}
-            {viewer?.email ? <p className="text-muted">{viewer.email}</p> : null}
+            {viewer?.email ? <p className="text-ns-muted">{viewer.email}</p> : null}
           </div>
 
           <section>

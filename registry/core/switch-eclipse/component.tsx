@@ -231,7 +231,7 @@ export function UmbraToggle({
       <span
         aria-hidden="true"
         className={`font-mono text-xs uppercase tracking-wide transition-colors ${
-          !value ? "text-foreground" : "text-muted"
+          !value ? "text-foreground" : "text-ns-muted"
         }`}
       >
         Light
@@ -249,7 +249,7 @@ export function UmbraToggle({
         onPointerCancel={onPointerCancel}
         onKeyDown={onKeyDown}
         onMouseEnter={breathe}
-        className="ns-umbra-track relative shrink-0 overflow-hidden rounded-full border border-border transition-colors hover:border-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        className="ns-umbra-track relative shrink-0 overflow-hidden rounded-full border border-border transition-colors hover:border-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
         style={{
           width: TRACK_W,
           height: TRACK_H,
@@ -303,7 +303,7 @@ export function UmbraToggle({
       <span
         aria-hidden="true"
         className={`font-mono text-xs uppercase tracking-wide transition-colors ${
-          value ? "text-foreground" : "text-muted"
+          value ? "text-foreground" : "text-ns-muted"
         }`}
       >
         Dark

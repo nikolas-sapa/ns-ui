@@ -18,7 +18,7 @@ import {
 // several characters land at once (paste, or a full re-stamp). The flimsy
 // sheet sits visually offset 4px down-right from the primary, like a second
 // page peeking out from underneath — while linked its border and background
-// read as a thin under-sheet (color-mix toward --muted).
+// read as a thin under-sheet (color-mix toward --ns-muted).
 //
 // Editing the flimsy directly detaches it: the offset springs back to zero,
 // the border firms to --foreground at 30%, mirroring stops, and the value
@@ -187,14 +187,14 @@ export function CarbonFlimsy({
     >
       <style>{`
 .ns-cf-flimsy-box{transition:transform 340ms cubic-bezier(.34,1.56,.64,1),border-color 200ms ease,background-color 200ms ease,box-shadow 150ms ease}
-.ns-cf-flimsy-box[data-linked]{transform:translate(4px,4px);border-color:var(--border);background:color-mix(in oklab,var(--muted) 14%,var(--background))}
+.ns-cf-flimsy-box[data-linked]{transform:translate(4px,4px);border-color:var(--border);background:color-mix(in oklab,var(--ns-muted) 14%,var(--background))}
 .ns-cf-flimsy-box[data-detached]{transform:translate(0,0);border-color:color-mix(in oklab,var(--foreground) 30%,transparent);background:var(--background)}
-.ns-cf-flimsy-box:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in oklab,var(--accent) 18%,transparent)}
+.ns-cf-flimsy-box:focus-within{border-color:var(--ns-accent);box-shadow:0 0 0 3px color-mix(in oklab,var(--ns-accent) 18%,transparent)}
 .ns-cf-flimsy-input[data-linked]{color:transparent;caret-color:var(--foreground)}
 .ns-cf-char{display:inline-block;animation:ns-cf-stamp 120ms ease-out both;animation-delay:var(--cf-delay,0ms)}
 @keyframes ns-cf-stamp{0%{transform:translate(0,0);font-weight:600}45%{transform:translate(.4px,.4px);font-weight:500}100%{transform:translate(0,0);font-weight:400}}
-.ns-cf-primary-input:focus-visible,.ns-cf-flimsy-input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.ns-cf-relink:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.ns-cf-primary-input:focus-visible,.ns-cf-flimsy-input:focus-visible{outline:2px solid var(--ns-accent);outline-offset:2px}
+.ns-cf-relink:focus-visible{outline:2px solid var(--ns-accent);outline-offset:2px}
 .ns-cf-root[data-reduced] .ns-cf-char{animation:none;font-weight:400}
 .ns-cf-root[data-reduced] .ns-cf-flimsy-box{transition:none}
 @media (prefers-reduced-motion: reduce){
@@ -217,7 +217,7 @@ export function CarbonFlimsy({
           placeholder={placeholder}
           onChange={handlePrimaryChange}
           data-cf-role="primary"
-          className="ns-cf-primary-input h-9 rounded-[6px] border border-border bg-background px-3 text-sm text-foreground outline-none transition-colors duration-150 placeholder:text-muted/70 hover:border-foreground/25 focus:border-accent"
+          className="ns-cf-primary-input h-9 rounded-[6px] border border-border bg-background px-3 text-sm text-foreground outline-none transition-colors duration-150 placeholder:text-ns-muted/70 hover:border-foreground/25 focus:border-ns-accent"
         />
       </div>
 
@@ -230,7 +230,7 @@ export function CarbonFlimsy({
           <div className="flex items-center justify-between gap-2">
             <label
               htmlFor={derivedId}
-              className="text-[11px] font-medium uppercase tracking-[0.08em] text-muted"
+              className="text-[11px] font-medium uppercase tracking-[0.08em] text-ns-muted"
             >
               {derivedLabel}
             </label>
@@ -238,7 +238,7 @@ export function CarbonFlimsy({
               <button
                 type="button"
                 onClick={handleRelink}
-                className="ns-cf-relink inline-flex items-center gap-1 rounded-[6px] px-1.5 py-0.5 text-[11px] font-medium text-accent transition-colors hover:text-accent-hover"
+                className="ns-cf-relink inline-flex items-center gap-1 rounded-[6px] px-1.5 py-0.5 text-[11px] font-medium text-ns-accent transition-colors hover:text-ns-accent-hover"
               >
                 <svg aria-hidden="true" viewBox="0 0 12 12" className="h-[10px] w-[10px]">
                   <path
@@ -270,7 +270,7 @@ export function CarbonFlimsy({
               onChange={handleFlimsyChange}
               aria-describedby={hintId}
               data-linked={linked || undefined}
-              className="ns-cf-flimsy-input h-7 w-full border-0 bg-transparent p-0 font-mono text-[13px] leading-7 text-foreground outline-none placeholder:text-muted/70"
+              className="ns-cf-flimsy-input h-7 w-full border-0 bg-transparent p-0 font-mono text-[13px] leading-7 text-foreground outline-none placeholder:text-ns-muted/70"
             />
             {linked && (
               <div
@@ -295,7 +295,7 @@ export function CarbonFlimsy({
         </div>
       </div>
 
-      <p id={hintId} className="text-[12px] leading-4 text-muted">
+      <p id={hintId} className="text-[12px] leading-4 text-ns-muted">
         Auto-generated from {label}. Editing detaches it.
       </p>
 

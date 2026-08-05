@@ -78,7 +78,7 @@ export default function KeyInterlockDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-6 py-16">
       <div className="w-full max-w-2xl">
-        <p className="mb-8 font-mono text-xs uppercase tracking-[0.2em] text-muted">
+        <p className="mb-8 font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
           ns-ui / guardrail-interlock-keys — output guardrails
         </p>
 
@@ -86,7 +86,7 @@ export default function KeyInterlockDemo() {
           <h2 className="text-sm font-medium text-foreground">
             support-agent · reply to invoice #4471
           </h2>
-          <p className="mt-1 mb-6 max-w-lg text-sm leading-relaxed text-muted">
+          <p className="mt-1 mb-6 max-w-lg text-sm leading-relaxed text-ns-muted">
             Five policy gates each hold one key. The bolt only retracts when
             every key is seated, so a single tripped gate keeps the draft
             behind the lock.

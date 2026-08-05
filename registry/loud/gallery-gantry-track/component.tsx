@@ -188,7 +188,7 @@ export function GantryRun({ items = DEFAULT_ITEMS, className = "" }: GantryRunPr
     return (
       <section data-gallery-gantry-track data-gantry-viewport className={`bg-background px-6 py-16 ${className}`}>
         <div className="mx-auto flex max-w-4xl items-center justify-between pb-6">
-          <span className="font-mono text-xs uppercase tracking-widest text-muted">Gantry catalog</span>
+          <span className="font-mono text-xs uppercase tracking-widest text-ns-muted">Gantry catalog</span>
           <span className="font-mono text-xs tabular-nums text-foreground">{items.length} items</span>
         </div>
         <div className="mx-auto grid max-w-4xl grid-cols-2 gap-4 sm:grid-cols-4">
@@ -198,7 +198,7 @@ export function GantryRun({ items = DEFAULT_ITEMS, className = "" }: GantryRunPr
               data-gantry-card
               className="flex h-[220px] flex-col justify-between rounded-[12px] border border-border bg-surface p-4 shadow-sm"
             >
-              <span className="font-mono text-[10px] uppercase tracking-widest text-muted">{item.id}</span>
+              <span className="font-mono text-[10px] uppercase tracking-widest text-ns-muted">{item.id}</span>
               <div
                 aria-hidden
                 className="h-16 w-full rounded-sm border border-border"
@@ -209,7 +209,7 @@ export function GantryRun({ items = DEFAULT_ITEMS, className = "" }: GantryRunPr
               />
               <div>
                 <p className="truncate text-sm font-medium text-foreground">{item.title}</p>
-                {item.caption ? <p className="truncate text-xs text-muted">{item.caption}</p> : null}
+                {item.caption ? <p className="truncate text-xs text-ns-muted">{item.caption}</p> : null}
               </div>
             </div>
           ))}
@@ -235,10 +235,10 @@ export function GantryRun({ items = DEFAULT_ITEMS, className = "" }: GantryRunPr
                   cardRefs.current[i] = el;
                 }}
                 data-gantry-card
-                className="absolute flex h-[220px] w-[168px] -translate-x-1/2 -translate-y-1/2 flex-col justify-between rounded-[12px] border bg-surface p-4 shadow-sm transition-[border-color,box-shadow] duration-200 ease-out data-[focused=true]:border-accent data-[focused=true]:shadow-md"
+                className="absolute flex h-[220px] w-[168px] -translate-x-1/2 -translate-y-1/2 flex-col justify-between rounded-[12px] border bg-surface p-4 shadow-sm transition-[border-color,box-shadow] duration-200 ease-out data-[focused=true]:border-ns-accent data-[focused=true]:shadow-md"
                 style={{ borderColor: "var(--border)", transformStyle: "preserve-3d" }}
               >
-                <span className="font-mono text-[10px] uppercase tracking-widest text-muted">{item.id}</span>
+                <span className="font-mono text-[10px] uppercase tracking-widest text-ns-muted">{item.id}</span>
                 <div
                   aria-hidden
                   className="h-16 w-full rounded-sm border border-border"
@@ -249,7 +249,7 @@ export function GantryRun({ items = DEFAULT_ITEMS, className = "" }: GantryRunPr
                 />
                 <div>
                   <p className="truncate text-sm font-medium text-foreground">{item.title}</p>
-                  {item.caption ? <p className="truncate text-xs text-muted">{item.caption}</p> : null}
+                  {item.caption ? <p className="truncate text-xs text-ns-muted">{item.caption}</p> : null}
                 </div>
               </div>
             ))}
@@ -260,7 +260,7 @@ export function GantryRun({ items = DEFAULT_ITEMS, className = "" }: GantryRunPr
           <span ref={labelRef} className="font-mono text-xs tabular-nums text-foreground">
             {items[0] ? `${items[0].id} — ${items[0].title}` : ""}
           </span>
-          <p className="text-center font-mono text-[11px] tracking-widest text-muted">SCROLL TO RUN THE GANTRY</p>
+          <p className="text-center font-mono text-[11px] tracking-widest text-ns-muted">SCROLL TO RUN THE GANTRY</p>
         </div>
       </div>
     </section>

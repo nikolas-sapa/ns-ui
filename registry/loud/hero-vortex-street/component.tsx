@@ -99,9 +99,9 @@ export function VortexStreet({ className = "" }: VortexStreetProps) {
     const readInk = () => {
       const cs = getComputedStyle(document.documentElement);
       const fg = cs.getPropertyValue("--foreground").trim();
-      const muted = cs.getPropertyValue("--muted").trim();
+      const muted = cs.getPropertyValue("--ns-muted").trim();
       const bg = cs.getPropertyValue("--background").trim();
-      const accent = cs.getPropertyValue("--accent").trim();
+      const accent = cs.getPropertyValue("--ns-accent").trim();
       fgStyle = fg || "#888";
       mutedStyle = muted || "#888";
       bgStyle = bg || "#0a0a0a";

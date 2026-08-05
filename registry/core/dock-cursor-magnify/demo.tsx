@@ -18,7 +18,7 @@ export default function MagneticDockDemo() {
               <button
                 key={glyph}
                 aria-label={`item ${glyph}`}
-                className="flex h-12 w-12 items-center justify-center rounded-sm border border-black/10 bg-surface font-mono text-sm text-muted transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent dark:border-white/10"
+                className="flex h-12 w-12 items-center justify-center rounded-sm border border-black/10 bg-surface font-mono text-sm text-ns-muted transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent dark:border-white/10"
               >
                 {glyph}
               </button>

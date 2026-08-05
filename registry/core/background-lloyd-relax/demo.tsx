@@ -12,7 +12,7 @@ export default function LloydRelaxDemo() {
         <LloydRelax count={3600} />
       </div>
       <div className="pointer-events-none absolute inset-x-0 bottom-10 flex justify-center">
-        <p className="rounded-md border border-border bg-surface/80 px-4 py-2 font-mono text-xs text-muted backdrop-blur-md">
+        <p className="rounded-md border border-border bg-surface/80 px-4 py-2 font-mono text-xs text-ns-muted backdrop-blur-md">
           ns-ui / background-lloyd-relax — one Lloyd iteration per frame; the
           pointer opens a density well
         </p>

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 
 // ---------------------------------------------------------------------------
 // LooseType — a streaming-text surface where provisional tokens sit like
-// loose letterpress type (off-baseline, a hair rotated, --muted) and
+// loose letterpress type (off-baseline, a hair rotated, --ns-muted) and
 // physically lock into the chase the instant they're confirmed (snap to
 // baseline, --foreground, a stiff low-damping spring). A corrected token
 // slides out sideways as its replacement slides in, the freed width
@@ -281,7 +281,7 @@ export function LooseType({ tokens, className = "" }: LooseTypeProps) {
             return (
               <span
                 key={it.id}
-                className={it.committed ? "ns-streaming-token-settle-token text-foreground" : "ns-streaming-token-settle-token ns-streaming-token-settle-provisional text-muted"}
+                className={it.committed ? "ns-streaming-token-settle-token text-foreground" : "ns-streaming-token-settle-token ns-streaming-token-settle-provisional text-ns-muted"}
                 style={base}
               >
                 {it.text}
@@ -311,7 +311,7 @@ export function LooseType({ tokens, className = "" }: LooseTypeProps) {
                 ref={(node) => {
                   if (node) nodesRef.current.set(it.id, node);
                 }}
-                className={it.committed ? "ns-streaming-token-settle-token text-foreground" : "ns-streaming-token-settle-token ns-streaming-token-settle-provisional text-muted"}
+                className={it.committed ? "ns-streaming-token-settle-token text-foreground" : "ns-streaming-token-settle-token ns-streaming-token-settle-provisional text-ns-muted"}
                 style={style}
                 onTransitionEnd={(e) => onEnterTransitionEnd(it.id, e)}
               >
@@ -349,7 +349,7 @@ export function LooseType({ tokens, className = "" }: LooseTypeProps) {
                 ref={(node) => {
                   if (node) nodesRef.current.set(it.id, node);
                 }}
-                className={it.committed ? "ns-streaming-token-settle-token text-foreground" : "ns-streaming-token-settle-token ns-streaming-token-settle-provisional text-muted"}
+                className={it.committed ? "ns-streaming-token-settle-token text-foreground" : "ns-streaming-token-settle-token ns-streaming-token-settle-provisional text-ns-muted"}
                 style={style}
                 onTransitionEnd={(e) => onGhostTransitionEnd(it.id, e)}
               >
@@ -364,7 +364,7 @@ export function LooseType({ tokens, className = "" }: LooseTypeProps) {
           return (
             <span
               key={it.id}
-              className={it.committed ? "ns-streaming-token-settle-token text-foreground" : "ns-streaming-token-settle-token ns-streaming-token-settle-provisional text-muted"}
+              className={it.committed ? "ns-streaming-token-settle-token text-foreground" : "ns-streaming-token-settle-token ns-streaming-token-settle-provisional text-ns-muted"}
               style={{
                 ...base,
                 transform: it.committed ? "translateY(0) rotate(0deg)" : `translateY(${it.jitter.ty}px) rotate(${it.jitter.rot}deg)`,

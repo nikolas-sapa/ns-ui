@@ -36,7 +36,7 @@ export function AccountSignOut() {
         // component instead of a client-side auth-state read.
         router.refresh();
       }}
-      className="rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-muted focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
+      className="rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
     >
       {pending ? "Signing out…" : "Sign out"}
     </button>

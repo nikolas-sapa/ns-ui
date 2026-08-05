@@ -42,15 +42,15 @@ export function ChangelogEntryList({ entries }: { entries: ChangelogEntry[] }) {
                 goTo(i + 1);
               }
             }}
-            className="scroll-mt-24 rounded-md border border-border bg-surface p-5 outline-none transition-shadow focus-visible:ring-2 focus-visible:ring-accent sm:p-6"
+            className="scroll-mt-24 rounded-md border border-border bg-surface p-5 outline-none transition-shadow focus-visible:ring-2 focus-visible:ring-ns-accent sm:p-6"
           >
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                   <h2 className="text-base font-medium tracking-tight">{entry.title}</h2>
-                  <span className="font-mono text-xs text-muted">{entry.version}</span>
+                  <span className="font-mono text-xs text-ns-muted">{entry.version}</span>
                 </div>
-                <p className="mt-1 font-mono text-[11px] uppercase tracking-wider text-muted">
+                <p className="mt-1 font-mono text-[11px] uppercase tracking-wider text-ns-muted">
                   <time dateTime={entry.iso}>{entry.iso}</time>
                 </p>
               </div>
@@ -69,7 +69,7 @@ export function ChangelogEntryList({ entries }: { entries: ChangelogEntry[] }) {
                 />
               </div>
             </div>
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">{entry.body}</p>
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ns-muted">{entry.body}</p>
           </li>
         );
       })}
@@ -95,7 +95,7 @@ function NavArrow({
       aria-label={label}
       title={label}
       onClick={onClick}
-      className="inline-flex size-8 shrink-0 items-center justify-center rounded-sm text-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none disabled:pointer-events-none disabled:opacity-30"
+      className="inline-flex size-8 shrink-0 items-center justify-center rounded-sm text-ns-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none disabled:pointer-events-none disabled:opacity-30"
     >
       {/* Same hand-drawn chevron the Sort select and the sidebar's <details>
           use, rotated rather than redrawn — one icon language across the site. */}

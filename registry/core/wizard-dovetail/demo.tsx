@@ -48,9 +48,9 @@ export default function DovetailRunDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-md">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">ns-ui / wizard-dovetail</p>
+        <p className="mb-4 font-mono text-xs tracking-widest text-ns-muted">ns-ui / wizard-dovetail</p>
         <h1 className="text-lg font-semibold text-foreground">Checkout</h1>
-        <p className="mt-1 text-sm leading-relaxed text-muted">
+        <p className="mt-1 text-sm leading-relaxed text-ns-muted">
           Each completed step joins the rail as a physical dovetail chip. Submit clean and it
           seats with a spring; submit with a gap left in a field and the chip bounces off the
           joint instead of a red asterisk doing the talking.

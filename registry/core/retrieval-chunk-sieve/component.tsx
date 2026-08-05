@@ -28,7 +28,7 @@ import { useEffect, useRef, useState } from "react";
 // two zones on one shared 240ms transform+opacity transition — the reflow IS
 // the feedback, there is no separate readout animation.
 //
-// Ink is --foreground / --border / --muted throughout; --accent is spent only
+// Ink is --foreground / --border / --ns-muted throughout; --ns-accent is spent only
 // on focus rings. DOM + CSS only, no canvas, no SVG, no measurement pass.
 // ---------------------------------------------------------------------------
 
@@ -223,7 +223,7 @@ export function ChunkSieve({
       />
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute right-3 font-mono text-[9px] uppercase tracking-[0.18em] text-muted"
+        className="pointer-events-none absolute right-3 font-mono text-[9px] uppercase tracking-[0.18em] text-ns-muted"
         style={{ top: RAIL_TOP - 16 }}
       >
         answer
@@ -236,7 +236,7 @@ export function ChunkSieve({
            frame of a drag. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute right-3 z-10 font-mono text-[10px] tabular-nums text-muted"
+        className="pointer-events-none absolute right-3 z-10 font-mono text-[10px] tabular-nums text-ns-muted"
         style={{ top: lineY - 30 }}
       >
         {readout}
@@ -253,7 +253,7 @@ export function ChunkSieve({
           // on <button>, and stating them would race the retained card's own
           // `border border-border bg-background` in the generated stylesheet.
           const common =
-            "ns-sieve-flow absolute left-0 right-0 block p-0 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+            "ns-sieve-flow absolute left-0 right-0 block p-0 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent";
 
           if (retained) {
             const lift = Math.min(maxLift, (c.score - value) * LIFT_PER_SCORE);
@@ -294,7 +294,7 @@ export function ChunkSieve({
                     <span className="block truncate font-mono text-[10px] leading-none text-foreground">
                       {c.doc}
                     </span>
-                    <span className="block truncate font-mono text-[9px] leading-none tabular-nums text-muted">
+                    <span className="block truncate font-mono text-[9px] leading-none tabular-nums text-ns-muted">
                       {spanText}
                     </span>
                     <span
@@ -371,7 +371,7 @@ export function ChunkSieve({
         onPointerUp={endDrag}
         onPointerCancel={endDrag}
         onKeyDown={onKeyDown}
-        className="absolute left-0 right-0 z-20 flex h-10 -translate-y-1/2 cursor-ns-resize touch-none items-center focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent"
+        className="absolute left-0 right-0 z-20 flex h-10 -translate-y-1/2 cursor-ns-resize touch-none items-center focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ns-accent"
         style={{ top: lineY }}
       >
         <span
@@ -389,7 +389,7 @@ export function ChunkSieve({
           transform: `translateY(${hoveredChunk ? 0 : 6}px)`,
         }}
       >
-        <p className="truncate font-mono text-[10px] leading-relaxed text-muted">
+        <p className="truncate font-mono text-[10px] leading-relaxed text-ns-muted">
           {hoveredChunk ? (
             <>
               <span className="text-foreground">{hoveredChunk.doc}</span>
@@ -403,7 +403,7 @@ export function ChunkSieve({
                     : "retained, not cited"
                   : "below cutoff"}
               </span>
-              <span className="text-muted"> — {hoveredChunk.preview}</span>
+              <span className="text-ns-muted"> — {hoveredChunk.preview}</span>
             </>
           ) : (
             " "

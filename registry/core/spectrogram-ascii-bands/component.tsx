@@ -323,7 +323,7 @@ export function SpectrogramAsciiBands({
       fg = getComputedStyle(canvas).color;
       accent =
         getComputedStyle(document.documentElement)
-          .getPropertyValue("--accent")
+          .getPropertyValue("--ns-accent")
           .trim() || fg;
     };
 
@@ -633,7 +633,7 @@ export function SpectrogramAsciiBands({
             <span
               key={b}
               data-band={b}
-              className="absolute right-0 flex items-center justify-end pr-2 text-muted"
+              className="absolute right-0 flex items-center justify-end pr-2 text-ns-muted"
               style={{
                 top: (1 + (BANDS - 1 - b)) * cellSize,
                 height: cellSize,
@@ -660,7 +660,7 @@ export function SpectrogramAsciiBands({
       >
         <span
           ref={liveRef}
-          className="absolute inset-0 flex items-center px-3 text-muted"
+          className="absolute inset-0 flex items-center px-3 text-ns-muted"
         />
         <span
           ref={cursorTextRef}
@@ -674,7 +674,7 @@ export function SpectrogramAsciiBands({
 }
 
 const CSS = `
-.ns-sab-readout:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
-.ns-sab-readout:hover { border-color: var(--accent); }
+.ns-sab-readout:focus { outline: 2px solid var(--ns-accent); outline-offset: 2px; }
+.ns-sab-readout:hover { border-color: var(--ns-accent); }
 .ns-sab-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 `;

@@ -91,20 +91,20 @@ export default function BallastContextDemo() {
   const pctUsed = Math.round((used / CAPACITY) * 100);
 
   const buttonClass =
-    "cursor-pointer rounded-sm border border-border px-3 py-1.5 font-mono text-[11px] tracking-widest text-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+    "cursor-pointer rounded-sm border border-border px-3 py-1.5 font-mono text-[11px] tracking-widest text-ns-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent";
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-xl">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">
+        <p className="mb-4 font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / meter-context-window
         </p>
         <div className="overflow-hidden rounded-md border border-border bg-surface">
           <header className="flex items-center justify-between gap-4 border-b border-border px-5 py-3">
-            <span className="font-mono text-xs tracking-widest text-muted">
+            <span className="font-mono text-xs tracking-widest text-ns-muted">
               AGENT SESSION
             </span>
-            <span className="font-mono text-[11px] tabular-nums text-muted">
+            <span className="font-mono text-[11px] tabular-nums text-ns-muted">
               claude-4.5 · {fmt(CAPACITY)} ctx
             </span>
           </header>
@@ -121,7 +121,7 @@ export default function BallastContextDemo() {
           </div>
 
           <div className="border-t border-border px-5 py-2">
-            <p className="truncate font-mono text-[11px] text-muted">
+            <p className="truncate font-mono text-[11px] text-ns-muted">
               <span className="text-foreground">event</span> · {status}
             </p>
           </div>
@@ -149,12 +149,12 @@ export default function BallastContextDemo() {
             <button type="button" onClick={reset} className={buttonClass}>
               RESET SESSION
             </button>
-            <span className="ml-auto font-mono text-[11px] tabular-nums text-muted">
+            <span className="ml-auto font-mono text-[11px] tabular-nums text-ns-muted">
               {pctUsed}% of window
             </span>
           </footer>
         </div>
-        <p className="mt-3 font-mono text-[11px] text-muted">
+        <p className="mt-3 font-mono text-[11px] text-ns-muted">
           the bar is a picture of what the model can see right now — compact
           when history dominates and watch it resettle, not jump
         </p>

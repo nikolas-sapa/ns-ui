@@ -198,11 +198,11 @@ export function DeadLetter({
       </svg>
 
       <div className="w-full max-w-2xl">
-        <span className="font-mono text-xs tracking-[0.3em] text-muted">UNDELIVERABLE MAIL</span>
+        <span className="font-mono text-xs tracking-[0.3em] text-ns-muted">UNDELIVERABLE MAIL</span>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
           404 — page not found
         </h1>
-        <p className="mt-3 max-w-[60ch] font-mono text-xs leading-relaxed text-muted">
+        <p className="mt-3 max-w-[60ch] font-mono text-xs leading-relaxed text-ns-muted">
           Route attempted: <span className="break-all text-foreground">{path}</span> — failed at every
           hop ({hopSummary}) with no such address.
         </p>
@@ -214,7 +214,7 @@ export function DeadLetter({
           style={envelopeStyle}
         >
           <div className="border-b border-border pb-4">
-            <span className="font-mono text-[10px] uppercase tracking-widest text-muted">To</span>
+            <span className="font-mono text-[10px] uppercase tracking-widest text-ns-muted">To</span>
             <div className="mt-1 break-all font-mono text-sm text-foreground md:text-base">{path}</div>
           </div>
 
@@ -235,24 +235,24 @@ export function DeadLetter({
                       <path
                         d="M4,15 Q11,10 18,15 T32,15"
                         fill="none"
-                        stroke="var(--muted)"
+                        stroke="var(--ns-muted)"
                         strokeWidth={1}
                         strokeLinecap="round"
                       />
                       <path
                         d="M4,25 Q11,20 18,25 T32,25"
                         fill="none"
-                        stroke="var(--muted)"
+                        stroke="var(--ns-muted)"
                         strokeWidth={1}
                         strokeLinecap="round"
                       />
                     </g>
                   </svg>
-                  <span className="whitespace-nowrap font-mono text-[9px] uppercase tracking-wide text-muted">
+                  <span className="whitespace-nowrap font-mono text-[9px] uppercase tracking-wide text-ns-muted">
                     {hop.label}
                   </span>
                   {hop.detail && (
-                    <span className="whitespace-nowrap font-mono text-[8px] text-muted/70">{hop.detail}</span>
+                    <span className="whitespace-nowrap font-mono text-[8px] text-ns-muted/70">{hop.detail}</span>
                   )}
                 </div>
               </Fragment>
@@ -306,7 +306,7 @@ export function DeadLetter({
           className="mt-6 rounded-md border border-border bg-background p-5 md:p-6"
           style={peelStyle}
         >
-          <span className="font-mono text-[10px] uppercase tracking-widest text-muted">Forwarding address</span>
+          <span className="font-mono text-[10px] uppercase tracking-widest text-ns-muted">Forwarding address</span>
 
           <form
             role="search"
@@ -325,11 +325,11 @@ export function DeadLetter({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search"
-              className="h-9 flex-1 rounded-sm border border-border bg-background px-3 font-mono text-sm text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="h-9 flex-1 rounded-sm border border-border bg-background px-3 font-mono text-sm text-foreground placeholder:text-ns-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
             />
             <button
               type="submit"
-              className="h-9 rounded-sm border border-border px-3 font-mono text-xs text-foreground transition-colors hover:border-foreground/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="h-9 rounded-sm border border-border px-3 font-mono text-xs text-foreground transition-colors hover:border-foreground/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
             >
               Search
             </button>
@@ -339,7 +339,7 @@ export function DeadLetter({
             <li>
               <a
                 href={homeHref}
-                className="rounded-sm px-1 py-0.5 font-mono text-xs text-foreground underline decoration-border underline-offset-4 transition-colors hover:decoration-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                className="rounded-sm px-1 py-0.5 font-mono text-xs text-foreground underline decoration-border underline-offset-4 transition-colors hover:decoration-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
               >
                 Home
               </a>
@@ -349,7 +349,7 @@ export function DeadLetter({
                 <a
                   href={page.href || "#"}
                   onClick={page.href ? undefined : (e) => e.preventDefault()}
-                  className="rounded-sm px-1 py-0.5 font-mono text-xs text-muted underline decoration-border underline-offset-4 transition-colors hover:text-foreground hover:decoration-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                  className="rounded-sm px-1 py-0.5 font-mono text-xs text-ns-muted underline decoration-border underline-offset-4 transition-colors hover:text-foreground hover:decoration-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
                 >
                   {page.label}
                 </a>

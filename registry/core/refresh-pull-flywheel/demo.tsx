@@ -33,13 +33,13 @@ const SEED_ITEMS: FlywheelPullItem[] = [
 export default function FlywheelPullDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / refresh-pull-flywheel — wind it up, let it spin
       </p>
 
       <FlywheelPull defaultItems={SEED_ITEMS} label="Activity feed" />
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Grab the wheel and pull down — the rack, pinion and flywheel wind
         together, 1:1 with pull distance. Let go and the wheel spins on the
         energy you gave it, freewheeling through the request and braking to

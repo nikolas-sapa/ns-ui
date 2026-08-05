@@ -5,7 +5,7 @@ import { LathRack } from "./component";
 export default function LathRackDemo() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-10 bg-background px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-widest text-muted">
+      <p className="font-mono text-xs uppercase tracking-widest text-ns-muted">
         ns-ui / loader-spring-bars
       </p>
 
@@ -19,10 +19,10 @@ export default function LathRackDemo() {
 
       <div className="flex items-center gap-3 rounded-md border border-border bg-surface px-4 py-3">
         <LathRack count={4} height={18} label="Loading" />
-        <span className="text-xs text-muted">inline, at 18px</span>
+        <span className="text-xs text-ns-muted">inline, at 18px</span>
       </div>
 
-      <p className="max-w-sm text-center font-mono text-[10px] text-muted">
+      <p className="max-w-sm text-center font-mono text-[10px] text-ns-muted">
         one shared spring pulse, staggered per lath — a wave, not five bars animating alone
       </p>
     </main>

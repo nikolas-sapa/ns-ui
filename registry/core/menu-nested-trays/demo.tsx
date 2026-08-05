@@ -39,13 +39,13 @@ export default function ShuntTrayDemo() {
   return (
     <div className="flex min-h-screen items-start justify-center bg-background px-6 py-20 text-foreground">
       <div className="w-full max-w-3xl">
-        <p className="font-mono text-xs uppercase tracking-widest text-muted">
+        <p className="font-mono text-xs uppercase tracking-widest text-ns-muted">
           ns-ui / menu-nested-trays
         </p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight">
           Every ancestor stays on the rails
         </h1>
-        <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">
+        <p className="mt-2 max-w-xl text-sm leading-relaxed text-ns-muted">
           Open Share, then Slack: the parent tray doesn&apos;t vanish behind a
           flyout, it shunts back and dims, leaving a 12px edge. Click any
           exposed edge to jump straight back to that level — or use
@@ -60,7 +60,7 @@ export default function ShuntTrayDemo() {
             onSelect={(item) => setLastAction(item.label)}
           />
 
-          <div className="max-w-xs pt-2 text-sm leading-relaxed text-muted">
+          <div className="max-w-xs pt-2 text-sm leading-relaxed text-ns-muted">
             <p>
               <span className="font-medium text-foreground">Try it:</span>{" "}
               open <span className="text-foreground">Share</span> →{" "}
@@ -72,7 +72,7 @@ export default function ShuntTrayDemo() {
           </div>
         </div>
 
-        <p className="mt-6 font-mono text-xs text-muted" aria-live="polite">
+        <p className="mt-6 font-mono text-xs text-ns-muted" aria-live="polite">
           {lastAction ? `selected → ${lastAction}` : "selected → nothing yet"}
         </p>
       </div>

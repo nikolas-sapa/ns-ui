@@ -13,7 +13,7 @@ import {
 
 // ---------------------------------------------------------------------------
 // PawlTick — autosave status rendered as a mechanical ratchet, not a spinner
-// or a text swap. A 10-tooth gear (9 teeth in --muted, one index tooth in
+// or a text swap. A 10-tooth gear (9 teeth in --ns-muted, one index tooth in
 // --foreground so a one-tooth-width rotation is actually visible against the
 // gear's own 10-fold symmetry) sits under a fixed pawl triangle. Every
 // SUCCESSFUL save advances the gear exactly one tooth-width and folds into a
@@ -147,7 +147,7 @@ function setPawlPose(el: SVGPathElement | null, slipped: boolean, ms: number) {
       : "none";
   el.style.transform = slipped ? "translateY(-1.2px)" : "translateY(0)";
   el.style.strokeWidth = slipped ? "2" : "1.4";
-  el.style.stroke = slipped ? "var(--foreground)" : "var(--muted)";
+  el.style.stroke = slipped ? "var(--foreground)" : "var(--ns-muted)";
 }
 
 function buildTooltipText(
@@ -343,7 +343,7 @@ export function PawlTick({ status, size = 20, className = "" }: PawlTickProps) {
         type="button"
         aria-label="Autosave status"
         aria-describedby={open ? tooltipId : undefined}
-        className="inline-flex shrink-0 items-center justify-center rounded-[6px] p-0.5 text-foreground hover:bg-border/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        className="inline-flex shrink-0 items-center justify-center rounded-[6px] p-0.5 text-foreground hover:bg-border/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
         onPointerEnter={(e: ReactPointerEvent) => {
           if (e.pointerType === "touch") return;
           hoverRef.current = true;
@@ -400,7 +400,7 @@ export function PawlTick({ status, size = 20, className = "" }: PawlTickProps) {
                 y2={t.y2}
                 strokeWidth={1.6}
                 strokeLinecap="round"
-                stroke={t.index ? "var(--foreground)" : "var(--muted)"}
+                stroke={t.index ? "var(--foreground)" : "var(--ns-muted)"}
               />
             ))}
           </g>
@@ -409,7 +409,7 @@ export function PawlTick({ status, size = 20, className = "" }: PawlTickProps) {
             d={PAWL_PATH}
             className="ns-pt-pawl"
             fill="none"
-            stroke="var(--muted)"
+            stroke="var(--ns-muted)"
             strokeWidth={1.4}
             strokeLinejoin="round"
             strokeLinecap="round"

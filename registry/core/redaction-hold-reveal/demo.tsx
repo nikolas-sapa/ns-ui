@@ -6,15 +6,15 @@ export default function UnderInkDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-lg">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">
+        <p className="mb-4 font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / redaction-hold-reveal
         </p>
         <div className="rounded-md border border-border bg-surface">
           <header className="flex items-center justify-between border-b border-border px-5 py-3">
-            <span className="font-mono text-xs tracking-widest text-muted">
+            <span className="font-mono text-xs tracking-widest text-ns-muted">
               INCIDENT-4211 · POSTMORTEM
             </span>
-            <span className="rounded-full border border-border px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-muted">
+            <span className="rounded-full border border-border px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-ns-muted">
               redacted
             </span>
           </header>
@@ -33,7 +33,7 @@ export default function UnderInkDemo() {
             </p>
           </div>
         </div>
-        <p className="mt-3 font-mono text-[11px] text-muted">
+        <p className="mt-3 font-mono text-[11px] text-ns-muted">
           hold a bar to peek — the ink flows back after release. click to keep
           it lifted.
         </p>

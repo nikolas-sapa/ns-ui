@@ -201,10 +201,10 @@ export function BellowsCrumb({
 
           const controlClass = [
             "block w-full whitespace-nowrap rounded-sm px-2 py-1 text-sm",
-            "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent",
+            "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ns-accent",
             isCurrent
               ? "font-medium text-foreground"
-              : "text-muted transition-colors duration-150 hover:text-foreground",
+              : "text-ns-muted transition-colors duration-150 hover:text-foreground",
           ].join(" ");
 
           const labelStyle: CSSProperties = isExpanded
@@ -271,7 +271,7 @@ export function BellowsCrumb({
                 style={{ flexBasis: SEP_WIDTH }}
                 onPointerLeave={onLeaveSep}
               >
-                <Chevron className="text-muted" angle={expandedIndex > i ? 15 : -15} />
+                <Chevron className="text-ns-muted" angle={expandedIndex > i ? 15 : -15} />
               </li>
             );
           }

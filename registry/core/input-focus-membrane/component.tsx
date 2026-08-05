@@ -143,7 +143,7 @@ export function RespireField({
     };
     const deriveColors = () => {
       const root = getComputedStyle(document.documentElement);
-      mutC = parseColor(root.getPropertyValue("--muted"), [143, 143, 143]);
+      mutC = parseColor(root.getPropertyValue("--ns-muted"), [143, 143, 143]);
       fgC = parseColor(root.getPropertyValue("--foreground"), [237, 237, 237]);
       errC = parseColor(root.getPropertyValue("--error"), [234, 0, 29]);
     };
@@ -517,10 +517,10 @@ export function RespireField({
           reduced
             ? // reduced motion: canvas hidden, standard border + default ring;
               // error still visible via the border (canvas quiver is gone)
-              `w-full rounded-sm border bg-surface px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted/60 ${
+              `w-full rounded-sm border bg-surface px-3.5 py-2.5 text-sm text-foreground placeholder:text-ns-muted/60 ${
                 error ? "border-[#ea001d]" : "border-border"
               }`
-            : "w-full rounded-sm border border-transparent bg-surface px-3.5 py-2.5 text-sm text-foreground outline-none placeholder:text-muted/60"
+            : "w-full rounded-sm border border-transparent bg-surface px-3.5 py-2.5 text-sm text-foreground outline-none placeholder:text-ns-muted/60"
         }
       />
       {!reduced && (

@@ -23,7 +23,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 //
 // Bars keep the family's shared 4x4-Bayer-equivalent ASCII ramp
 // (' .:-=+*#%@') as a redundant density channel tracking |delta| — pure
-// var(--foreground) ink, var(--accent) reserved for the active/focused step.
+// var(--foreground) ink, var(--ns-accent) reserved for the active/focused step.
 // ---------------------------------------------------------------------------
 
 const RAMP = " .:-=+*#%@";
@@ -75,9 +75,9 @@ function readTokens(): Tokens {
   return {
     fg: get("--foreground", "#171717"),
     bg: get("--background", "#ffffff"),
-    muted: get("--muted", "#4d4d4d"),
+    muted: get("--ns-muted", "#4d4d4d"),
     border: get("--border", "#ebebeb"),
-    accent: get("--accent", "#006bff"),
+    accent: get("--ns-accent", "#006bff"),
   };
 }
 
@@ -352,8 +352,8 @@ export function ChartWaterfallAsciiStep({
     <figure className={`ns-cwas inline-block ${className}`} aria-label={`${title}, waterfall chart`}>
       <style>{CSS}</style>
       <div className="flex items-center justify-between gap-3 pb-2">
-        <span className="font-mono text-xs tracking-widest text-muted">{title.toUpperCase()}</span>
-        <span className="font-mono text-[10px] tracking-widest text-muted">
+        <span className="font-mono text-xs tracking-widest text-ns-muted">{title.toUpperCase()}</span>
+        <span className="font-mono text-[10px] tracking-widest text-ns-muted">
           {excluded.size > 0 ? `${excluded.size} STEP${excluded.size > 1 ? "S" : ""} EXCLUDED` : "ALL STEPS ACTIVE"}
         </span>
       </div>
@@ -430,7 +430,7 @@ export function ChartWaterfallAsciiStep({
             <strong className="text-foreground">
               {hovered.toggleable ? formatValue(hovered.delta) : formatValue(hovered.to)}
             </strong>{" "}
-            <span className="text-muted">
+            <span className="text-ns-muted">
               {hovered.toggleable ? `${formatValue(hovered.from)} → ${formatValue(hovered.to)}` : "running total"}
             </span>
           </div>
@@ -442,5 +442,5 @@ export function ChartWaterfallAsciiStep({
 
 const CSS = `
 .ns-cwas-hit { touch-action: manipulation; }
-.ns-cwas-hit:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ns-cwas-hit:focus-visible { outline: 2px solid var(--ns-accent); outline-offset: 2px; }
 `;

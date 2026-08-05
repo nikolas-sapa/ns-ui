@@ -108,7 +108,7 @@ export function DecryptText({
                 ? "text-foreground"
                 : state === "resolving"
                   ? "text-foreground brightness-150"
-                  : "text-muted/70"
+                  : "text-ns-muted/70"
             }
           >
             {c === " " ? " " : state === "locked" ? c : churn[i] || c}

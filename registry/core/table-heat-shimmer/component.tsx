@@ -211,13 +211,13 @@ export function HeatwaveLedger({
 
     const hotList = hot; // captured — effect re-runs when hotSig changes
 
-    // haze ink: --accent mixed 20% into --muted, derived at mount and
+    // haze ink: --ns-accent mixed 20% into --ns-muted, derived at mount and
     // re-derived live on documentElement class flips
     let haze: Vec3 = [114, 121, 145];
     const derive = () => {
       const cs = getComputedStyle(document.documentElement);
-      const muted = parseColor(cs.getPropertyValue("--muted")) ?? [143, 143, 143];
-      const accent = parseColor(cs.getPropertyValue("--accent")) ?? [0, 107, 255];
+      const muted = parseColor(cs.getPropertyValue("--ns-muted")) ?? [143, 143, 143];
+      const accent = parseColor(cs.getPropertyValue("--ns-accent")) ?? [0, 107, 255];
       haze = mix(muted, accent, 0.2);
     };
     derive();
@@ -424,7 +424,7 @@ export function HeatwaveLedger({
         <h2 className="text-sm font-semibold tracking-tight text-foreground">
           {title}
         </h2>
-        <span className="font-mono text-[11px] tracking-wider text-muted">
+        <span className="font-mono text-[11px] tracking-wider text-ns-muted">
           {timestamp}
         </span>
       </div>
@@ -496,8 +496,8 @@ export function HeatwaveLedger({
                     <button
                       type="button"
                       onClick={() => onSort(col.key)}
-                      className={`inline-flex items-center gap-1 rounded-sm font-mono text-[11px] uppercase tracking-widest transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
-                        active ? "text-foreground" : "text-muted hover:text-foreground"
+                      className={`inline-flex items-center gap-1 rounded-sm font-mono text-[11px] uppercase tracking-widest transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent ${
+                        active ? "text-foreground" : "text-ns-muted hover:text-foreground"
                       } ${col.numeric ? "flex-row-reverse" : ""}`}
                     >
                       {col.label}
@@ -527,10 +527,10 @@ export function HeatwaveLedger({
               if (isHot && !reduced) style.filter = `url(#${uid}-h${slot})`;
               const shadows: string[] = [];
               if (isHot && reduced)
-                shadows.push("inset 2px 0 0 0 var(--accent)"); // static heat rule
+                shadows.push("inset 2px 0 0 0 var(--ns-accent)"); // static heat rule
               if (isSel)
                 shadows.push(
-                  "inset 0 0 0 1px color-mix(in srgb, var(--foreground) 35%, var(--muted))"
+                  "inset 0 0 0 1px color-mix(in srgb, var(--foreground) 35%, var(--ns-muted))"
                 );
               if (shadows.length > 0) style.boxShadow = shadows.join(", ");
 
@@ -572,24 +572,24 @@ export function HeatwaveLedger({
                       onChange={() => toggleSelect(row.id)}
                       aria-label={`Select ${row.service}`}
                       className="block h-3.5 w-3.5 cursor-pointer"
-                      style={{ accentColor: "var(--accent)" }}
+                      style={{ accentColor: "var(--ns-accent)" }}
                     />
                   </td>
                   <td className="px-3 py-3 font-medium text-foreground">
                     {row.service}
                   </td>
-                  <td className="px-3 py-3 font-mono text-xs tracking-wide text-muted">
+                  <td className="px-3 py-3 font-mono text-xs tracking-wide text-ns-muted">
                     {row.region}
                   </td>
-                  <td className="px-3 py-3 text-right font-mono text-xs tabular-nums text-muted">
+                  <td className="px-3 py-3 text-right font-mono text-xs tabular-nums text-ns-muted">
                     {row.reqs.toLocaleString("en-US")}
                   </td>
-                  <td className="px-3 py-3 text-right font-mono text-xs tabular-nums text-muted">
+                  <td className="px-3 py-3 text-right font-mono text-xs tabular-nums text-ns-muted">
                     {row.p95.toLocaleString("en-US")}
                   </td>
                   <td
                     className={`px-3 py-3 pr-5 text-right font-mono text-xs tabular-nums ${
-                      isHot ? "font-medium text-foreground" : "text-muted"
+                      isHot ? "font-medium text-foreground" : "text-ns-muted"
                     }`}
                   >
                     {row.heat}
@@ -611,7 +611,7 @@ export function HeatwaveLedger({
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-border px-5 py-3">
-        <span className="font-mono text-[11px] tracking-wider text-muted">
+        <span className="font-mono text-[11px] tracking-wider text-ns-muted">
           {sorted.length} services · {hot.length} above threshold · {selected.size}{" "}
           selected
         </span>
@@ -619,15 +619,15 @@ export function HeatwaveLedger({
           <button
             type="button"
             disabled
-            className="rounded-sm border border-border px-2.5 py-1 font-mono text-[11px] text-muted opacity-50 transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="rounded-sm border border-border px-2.5 py-1 font-mono text-[11px] text-ns-muted opacity-50 transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             Prev
           </button>
-          <span className="font-mono text-[11px] tabular-nums text-muted">1 / 1</span>
+          <span className="font-mono text-[11px] tabular-nums text-ns-muted">1 / 1</span>
           <button
             type="button"
             disabled
-            className="rounded-sm border border-border px-2.5 py-1 font-mono text-[11px] text-muted opacity-50 transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="rounded-sm border border-border px-2.5 py-1 font-mono text-[11px] text-ns-muted opacity-50 transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             Next
           </button>

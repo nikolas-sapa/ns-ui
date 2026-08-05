@@ -239,9 +239,9 @@ function walk(
 function inkClass(self: number, total: number): string {
   const s = total > 0 ? self / total : 0;
   if (s < INK_BUCKETS[0]) return "text-border";
-  if (s < INK_BUCKETS[1]) return "text-muted";
+  if (s < INK_BUCKETS[1]) return "text-ns-muted";
   if (s < INK_BUCKETS[2]) return "text-foreground";
-  return "text-accent";
+  return "text-ns-accent";
 }
 
 function fit(name: string, width: number): string {
@@ -439,7 +439,7 @@ export function FlamegraphAsciiFrames({
                 aria-current={i === crumbs.length - 1 ? "location" : undefined}
                 aria-label={i === 0 ? "Zoom out to the whole graph" : `Zoom to ${c.name}`}
                 className={`ns-flame-crumb rounded-sm px-1.5 py-0.5 transition-colors duration-150 motion-reduce:transition-none hover:text-foreground ${
-                  i === crumbs.length - 1 ? "text-foreground" : "text-muted"
+                  i === crumbs.length - 1 ? "text-foreground" : "text-ns-muted"
                 }`}
               >
                 {i === 0 ? "root" : c.name}
@@ -473,7 +473,7 @@ export function FlamegraphAsciiFrames({
 
           if (f.fold) {
             // Aggregate marker: it has no self-fraction of its own, so it sits
-            // outside the four-bucket encoding at --muted, and is static text
+            // outside the four-bucket encoding at --ns-muted, and is static text
             // rather than a control — there is nothing to zoom into.
             return (
               <span
@@ -481,7 +481,7 @@ export function FlamegraphAsciiFrames({
                 role="img"
                 aria-label={`Depth ${f.depth}, ${f.foldCount} frames too narrow to draw, ${f.total.toLocaleString()} samples combined.`}
                 className={`ns-flame-fold absolute overflow-hidden whitespace-pre transition-colors duration-[120ms] motion-reduce:transition-none ${
-                  dim ? "text-border" : "text-muted"
+                  dim ? "text-border" : "text-ns-muted"
                 }`}
                 style={{ left, width, top: f.depth * rowHeight, lineHeight: `${rowHeight}px` }}
               >
@@ -533,7 +533,7 @@ export function FlamegraphAsciiFrames({
 
       <div
         data-flame-readout
-        className="mt-3 overflow-hidden whitespace-nowrap border-t border-border pt-2 text-[12px] text-muted transition-colors duration-[120ms] motion-reduce:transition-none"
+        className="mt-3 overflow-hidden whitespace-nowrap border-t border-border pt-2 text-[12px] text-ns-muted transition-colors duration-[120ms] motion-reduce:transition-none"
       >
         {readout && (
           <>
@@ -552,6 +552,6 @@ export function FlamegraphAsciiFrames({
 }
 
 const CSS = `
-.ns-flame-frame:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-.ns-flame-crumb:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ns-flame-frame:focus-visible { outline: 2px solid var(--ns-accent); outline-offset: -2px; }
+.ns-flame-crumb:focus-visible { outline: 2px solid var(--ns-accent); outline-offset: 2px; }
 `;

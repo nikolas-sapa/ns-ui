@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 // SlipCast — pour streaming, schema-shaped JSON into a visible mold. The
 // moment the schema is known (before a single token of data has arrived) the
 // full shape of the answer renders as a skeleton of empty slots: every key
-// already typeset in Geist Mono at --muted, sitting in a dashed 1px --border
+// already typeset in Geist Mono at --ns-muted, sitting in a dashed 1px --border
 // blank pre-sized by its declared type (numbers short, booleans a fixed
 // true/false width, strings full-row so a long value never reflows the row
 // that holds it). That skeleton IS the progress bar — there is no separate
@@ -16,7 +16,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 // ease-out-expo (border-style itself can't be animated, so this is two
 // stacked frames whose opacity crosses over, not a literal style
 // interpolation), the value drops in with a small spring overshoot
-// (translateY 3px -> 0), and a 4px corner tick fades --muted -> --foreground.
+// (translateY 3px -> 0), and a 4px corner tick fades --ns-muted -> --foreground.
 // Nested objects get the same dashed->solid treatment on their own
 // container, independent of whether their children have filled yet — a
 // nested object "sets" the instant its key exists in the stream, even with
@@ -46,8 +46,8 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 // while streaming, a visually-hidden aria-live=polite region that announces
 // batched "N of M fields complete" milestones (debounced, never per-token),
 // and exactly one focusable control per top-level object: a Copy JSON
-// button. Colors are tokens only (--background --foreground --muted
-// --border --accent); --accent appears only on the copy button's focus
+// button. Colors are tokens only (--background --foreground --ns-muted
+// --border --ns-accent); --ns-accent appears only on the copy button's focus
 // ring. prefers-reduced-motion drops every transition — slots simply appear
 // filled, nothing eases.
 
@@ -253,7 +253,7 @@ const CSS = `
 .ns-skeleton-schema .ns-slip-row > dd{flex:1;min-width:0;display:flex}
 .ns-skeleton-schema .ns-slip-key,.ns-skeleton-schema .ns-slip-index{
   flex:0 0 auto;min-width:64px;padding-top:3px;
-  font-family:var(--font-mono);font-size:11.5px;line-height:18px;color:var(--muted);white-space:nowrap;
+  font-family:var(--font-mono);font-size:11.5px;line-height:18px;color:var(--ns-muted);white-space:nowrap;
 }
 .ns-skeleton-schema .ns-slip-index{opacity:.75;min-width:32px}
 
@@ -278,7 +278,7 @@ const CSS = `
 .ns-skeleton-schema [data-state="set"] > .ns-slip-value{opacity:1;transform:translateY(0)}
 
 .ns-skeleton-schema .ns-slip-tick{
-  position:absolute;top:-1px;left:-1px;width:4px;height:4px;background:var(--muted);
+  position:absolute;top:-1px;left:-1px;width:4px;height:4px;background:var(--ns-muted);
 }
 .ns-skeleton-schema .ns-slip-value{position:relative;font-size:12.5px;color:var(--foreground);opacity:0;transform:translateY(3px)}
 
@@ -290,7 +290,7 @@ const CSS = `
 .ns-skeleton-schema.ns-slip-live .ns-slip-value{transition:transform 320ms cubic-bezier(.34,1.56,.64,1),opacity 200ms ease-out}
 
 .ns-skeleton-schema .ns-slip-copy{outline:none}
-.ns-skeleton-schema .ns-slip-copy:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.ns-skeleton-schema .ns-slip-copy:focus-visible{outline:2px solid var(--ns-accent);outline-offset:2px}
 
 @media (prefers-reduced-motion: reduce){
   .ns-skeleton-schema .ns-slip-edge,.ns-skeleton-schema .ns-slip-tick,.ns-skeleton-schema .ns-slip-value{transition:none !important}
@@ -350,10 +350,10 @@ export function SlipCast({ schema, value, streaming = false, label = "Structured
       <style>{CSS}</style>
 
       <div className="mb-3 flex items-center justify-between gap-3">
-        <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted">{label}</span>
+        <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-ns-muted">{label}</span>
         <button
           type="button"
-          className="ns-slip-copy rounded-sm border border-border px-2 py-1 font-mono text-[11px] text-muted transition-colors duration-150 hover:text-foreground"
+          className="ns-slip-copy rounded-sm border border-border px-2 py-1 font-mono text-[11px] text-ns-muted transition-colors duration-150 hover:text-foreground"
           onClick={handleCopy}
           aria-label={copied ? `${label} copied to clipboard` : `Copy ${label} as JSON`}
         >

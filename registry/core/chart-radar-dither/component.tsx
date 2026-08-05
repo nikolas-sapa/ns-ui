@@ -17,7 +17,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 // pins its two adjacent wedges to fine resolution regardless of where the
 // sweep currently is. Resolution is the only thing either mechanic changes;
 // colour never encodes data — pure var(--foreground) ink on
-// var(--background) paper, var(--accent) reserved for the sweep line and
+// var(--background) paper, var(--ns-accent) reserved for the sweep line and
 // keyboard focus only, matching the rest of the family.
 // ---------------------------------------------------------------------------
 
@@ -80,9 +80,9 @@ function readTokens(): Tokens {
   return {
     fg: get("--foreground", "#171717"),
     bg: get("--background", "#ffffff"),
-    muted: get("--muted", "#4d4d4d"),
+    muted: get("--ns-muted", "#4d4d4d"),
     border: get("--border", "#ebebeb"),
-    accent: get("--accent", "#006bff"),
+    accent: get("--ns-accent", "#006bff"),
   };
 }
 
@@ -304,13 +304,13 @@ export function ChartRadarDither({ data = [], title = "Chart", className = "" }:
     <figure className={`ns-crd inline-block ${className}`} aria-label={`${title}, radar chart`}>
       <style>{CSS}</style>
       <div className="flex items-center justify-between gap-3 pb-2">
-        <span className="font-mono text-xs tracking-widest text-muted">{title.toUpperCase()}</span>
+        <span className="font-mono text-xs tracking-widest text-ns-muted">{title.toUpperCase()}</span>
         <div className="flex items-center gap-3">
           <span className="font-mono text-[11px] text-foreground" aria-live="polite">
             {shownAxis ? (
               <>
                 <strong>{shownAxis.value.toLocaleString()}</strong>{" "}
-                <span className="text-muted">/ {shownAxis.max}</span>
+                <span className="text-ns-muted">/ {shownAxis.max}</span>
               </>
             ) : (
               " "
@@ -319,7 +319,7 @@ export function ChartRadarDither({ data = [], title = "Chart", className = "" }:
           <button
             type="button"
             onClick={() => setShowTable((s) => !s)}
-            className="ns-crd-toggle rounded-sm border border-border px-2 py-1 font-mono text-[10px] tracking-widest text-muted transition-colors duration-150 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="ns-crd-toggle rounded-sm border border-border px-2 py-1 font-mono text-[10px] tracking-widest text-ns-muted transition-colors duration-150 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
             aria-pressed={showTable}
           >
             {showTable ? "VIEW CHART" : "VIEW TABLE"}
@@ -332,10 +332,10 @@ export function ChartRadarDither({ data = [], title = "Chart", className = "" }:
           <caption className="sr-only">{title}</caption>
           <thead>
             <tr>
-              <th scope="col" className="border-b border-border px-2 py-1.5 text-left text-muted">
+              <th scope="col" className="border-b border-border px-2 py-1.5 text-left text-ns-muted">
                 Axis
               </th>
-              <th scope="col" className="border-b border-border px-2 py-1.5 text-right text-muted tabular-nums">
+              <th scope="col" className="border-b border-border px-2 py-1.5 text-right text-ns-muted tabular-nums">
                 Value
               </th>
             </tr>
@@ -398,5 +398,5 @@ export function ChartRadarDither({ data = [], title = "Chart", className = "" }:
 
 const CSS = `
 .ns-crd-hit { touch-action: manipulation; }
-.ns-crd-hit:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ns-crd-hit:focus-visible { outline: 2px solid var(--ns-accent); outline-offset: 2px; }
 `;

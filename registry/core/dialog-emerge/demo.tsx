@@ -53,13 +53,13 @@ export default function EmergeDialogDemo() {
           type="button"
           aria-pressed={keepCopy}
           onClick={() => setKeepCopy((v) => !v)}
-          className="flex items-center gap-3 rounded-sm border border-border bg-background px-3 py-2.5 text-left text-sm text-foreground transition-colors duration-150 hover:border-muted hover:bg-border/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="flex items-center gap-3 rounded-sm border border-border bg-background px-3 py-2.5 text-left text-sm text-foreground transition-colors duration-150 hover:border-ns-muted hover:bg-border/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
         >
           <span
             aria-hidden
             className={[
               "grid size-4 shrink-0 place-items-center rounded-[3px] border transition-colors duration-150",
-              keepCopy ? "border-accent bg-accent text-white" : "border-muted bg-transparent",
+              keepCopy ? "border-ns-accent bg-ns-accent text-white" : "border-ns-muted bg-transparent",
             ].join(" ")}
           >
             <svg viewBox="0 0 12 12" className="size-3" fill="none" stroke="currentColor" strokeWidth="2">
@@ -79,31 +79,31 @@ export default function EmergeDialogDemo() {
             type="button"
             data-close
             onClick={() => handleOpenChange(false)}
-            className="rounded-sm border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground transition-colors duration-150 hover:border-muted hover:bg-border/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="rounded-sm border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground transition-colors duration-150 hover:border-ns-muted hover:bg-border/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={() => handleOpenChange(false)}
-            className="rounded-sm bg-accent px-4 py-2 text-sm font-medium text-white transition-colors duration-150 hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="rounded-sm bg-ns-accent px-4 py-2 text-sm font-medium text-white transition-colors duration-150 hover:bg-ns-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             Delete draft
           </button>
         </div>
       </EmergeDialog>
 
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / dialog-emerge — the panel grows out of the control that opened it
       </p>
 
       <div className="flex w-full max-w-md items-center justify-between gap-6 rounded-md border border-border bg-surface px-4 py-3">
-        <span className="min-w-0 truncate font-mono text-xs text-muted">q3-launch-notes.md</span>
+        <span className="min-w-0 truncate font-mono text-xs text-ns-muted">q3-launch-notes.md</span>
         <button
           ref={triggerRef}
           type="button"
           onClick={() => handleOpenChange(true)}
-          className="shrink-0 rounded-sm border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground transition-colors duration-150 hover:border-muted hover:bg-border/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="shrink-0 rounded-sm border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground transition-colors duration-150 hover:border-ns-muted hover:bg-border/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
         >
           Delete draft
         </button>
@@ -116,8 +116,8 @@ export default function EmergeDialogDemo() {
             key={name}
             className="flex items-center justify-between gap-6 rounded-md border border-border bg-surface px-4 py-3"
           >
-            <span className="min-w-0 truncate font-mono text-xs text-muted">{name}</span>
-            <span className="shrink-0 rounded-sm border border-border bg-background px-3 py-1.5 text-xs font-medium text-muted">
+            <span className="min-w-0 truncate font-mono text-xs text-ns-muted">{name}</span>
+            <span className="shrink-0 rounded-sm border border-border bg-background px-3 py-1.5 text-xs font-medium text-ns-muted">
               Draft
             </span>
           </div>

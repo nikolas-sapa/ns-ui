@@ -262,7 +262,7 @@ export function StatTileAsciiArrive({
   return (
     <div className={`flex w-full min-w-0 flex-col items-start gap-2 ${className}`}>
       {label && (
-        <span className="font-mono text-[10px] uppercase tracking-widest text-muted">{label}</span>
+        <span className="font-mono text-[10px] uppercase tracking-widest text-ns-muted">{label}</span>
       )}
       <canvas ref={canvasRef} aria-hidden data-stat-canvas className="block font-mono" />
       <span className="sr-only" role="status" aria-live="polite" aria-atomic="true">

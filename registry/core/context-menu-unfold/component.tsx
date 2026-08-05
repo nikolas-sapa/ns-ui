@@ -279,8 +279,8 @@ function Blades({ items, anchor, label, onSelect, onClose, menuId }: BladesProps
           className="ns-jk-blade flex origin-left items-center justify-between gap-3 rounded-[6px] border border-transparent px-2.5 py-1.5 text-left text-xs text-foreground outline-none transition-colors hover:bg-border/40 focus-visible:bg-border/40 disabled:pointer-events-none disabled:opacity-40"
         >
           <span className="truncate">{item.label}</span>
-          {item.shortcut && <span className="shrink-0 font-mono text-[10px] text-muted">{item.shortcut}</span>}
-          {item.submenu && !item.shortcut && <span className="shrink-0 text-[10px] text-muted">{"›"}</span>}
+          {item.shortcut && <span className="shrink-0 font-mono text-[10px] text-ns-muted">{item.shortcut}</span>}
+          {item.submenu && !item.shortcut && <span className="shrink-0 text-[10px] text-ns-muted">{"›"}</span>}
         </button>
       ))}
 
@@ -368,7 +368,7 @@ export function JackKnife({ items, onSelect, children, label = "Actions", classN
           const rect = e.currentTarget.getBoundingClientRect();
           openAt(rect.left, rect.bottom + 6);
         }}
-        className="mt-3 rounded-[6px] border border-border px-2.5 py-1.5 text-xs text-foreground transition-colors hover:border-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        className="mt-3 rounded-[6px] border border-border px-2.5 py-1.5 text-xs text-foreground transition-colors hover:border-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
       >
         {label}
       </button>

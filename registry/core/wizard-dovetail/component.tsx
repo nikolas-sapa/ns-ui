@@ -81,7 +81,7 @@ const FULL_D = [
 ].join(" ");
 
 // just the leading (left/pin) edge — drawn again on top so it alone can be
-// recoloured to --accent on focus-within, without touching the fill path.
+// recoloured to --ns-accent on focus-within, without touching the fill path.
 const LEFT_EDGE_D = [
   `M0,${CHIP_H}`,
   `L0,${BOT_Y}`,
@@ -330,7 +330,7 @@ export function DovetailRun({
 }
 .ns-dove-seat { animation: ns-dove-seat ${SEAT_MS}ms both; }
 .ns-dove-reject { animation: ns-dove-reject ${REJECT_MS}ms both; }
-.ns-dove-root:focus-within [data-current-pin] { stroke: var(--accent); }
+.ns-dove-root:focus-within [data-current-pin] { stroke: var(--ns-accent); }
 @media (prefers-reduced-motion: reduce) {
   .ns-dove-seat, .ns-dove-reject { animation: none; }
 }
@@ -354,7 +354,7 @@ export function DovetailRun({
 
         {done ? (
           <div role="status" className="rounded-sm border border-border bg-surface p-4">
-            <p className="font-mono text-xs tracking-wide text-muted">ALL STEPS JOINED</p>
+            <p className="font-mono text-xs tracking-wide text-ns-muted">ALL STEPS JOINED</p>
             <p className="mt-1 text-sm text-foreground">
               Every step seated cleanly — the run is complete.
             </p>
@@ -388,7 +388,7 @@ export function DovetailRun({
                     <div key={field.id}>
                       <label
                         htmlFor={inputId}
-                        className="block font-mono text-[11px] uppercase tracking-wide text-muted"
+                        className="block font-mono text-[11px] uppercase tracking-wide text-ns-muted"
                       >
                         {field.label}
                         {field.required ? " *" : ""}
@@ -406,12 +406,12 @@ export function DovetailRun({
                         aria-describedby={hasError ? fieldErrorId : undefined}
                         onChange={(e) => handleFieldChange(field.id, e.target.value)}
                         className={
-                          "mt-1 w-full rounded-sm border bg-surface px-2.5 py-1.5 text-sm text-foreground outline-none transition-colors focus-visible:border-accent " +
+                          "mt-1 w-full rounded-sm border bg-surface px-2.5 py-1.5 text-sm text-foreground outline-none transition-colors focus-visible:border-ns-accent " +
                           (hasError ? "border-foreground" : "border-border")
                         }
                       />
                       {hasError ? (
-                        <p id={fieldErrorId} className="mt-1 font-mono text-xs text-muted">
+                        <p id={fieldErrorId} className="mt-1 font-mono text-xs text-ns-muted">
                           {errors[field.id]}
                         </p>
                       ) : null}
@@ -425,7 +425,7 @@ export function DovetailRun({
                   <button
                     type="button"
                     onClick={goBack}
-                    className="inline-flex items-center rounded-sm border border-border px-3 py-1.5 text-sm text-foreground transition-colors hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                    className="inline-flex items-center rounded-sm border border-border px-3 py-1.5 text-sm text-foreground transition-colors hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
                   >
                     Back
                   </button>
@@ -433,7 +433,7 @@ export function DovetailRun({
                 <button
                   type="submit"
                   data-dovetail-next
-                  className="inline-flex items-center rounded-sm bg-accent px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                  className="inline-flex items-center rounded-sm bg-ns-accent px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-ns-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
                 >
                   {currentIndex === steps.length - 1 ? submitLabel : "Next"}
                 </button>

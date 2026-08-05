@@ -428,7 +428,7 @@ export function BurinHatch({
   }, []);
 
   const ctaFocus =
-    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent";
 
   return (
     <section
@@ -439,7 +439,7 @@ export function BurinHatch({
       <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-10 px-6 py-16 lg:grid-cols-2 lg:gap-14 lg:py-24">
         <div className="order-2 lg:order-1">
           {eyebrow ? (
-            <p className="mb-6 font-mono text-[11px] tracking-[0.25em] text-muted">
+            <p className="mb-6 font-mono text-[11px] tracking-[0.25em] text-ns-muted">
               {eyebrow}
             </p>
           ) : null}
@@ -458,7 +458,7 @@ export function BurinHatch({
             ))}
           </h1>
           {subcopy ? (
-            <p className="mt-6 max-w-md text-base leading-relaxed text-muted">
+            <p className="mt-6 max-w-md text-base leading-relaxed text-ns-muted">
               {subcopy}
             </p>
           ) : null}
@@ -487,7 +487,7 @@ export function BurinHatch({
                 <a
                   href={secondaryCta.href}
                   onClick={secondaryCta.onClick}
-                  className={`rounded-sm border border-border px-5 py-2.5 text-sm font-medium text-muted transition-colors duration-200 hover:border-foreground/30 hover:text-foreground ${ctaFocus}`}
+                  className={`rounded-sm border border-border px-5 py-2.5 text-sm font-medium text-ns-muted transition-colors duration-200 hover:border-foreground/30 hover:text-foreground ${ctaFocus}`}
                 >
                   {secondaryCta.label}
                 </a>
@@ -495,7 +495,7 @@ export function BurinHatch({
                 <button
                   type="button"
                   onClick={secondaryCta.onClick}
-                  className={`rounded-sm border border-border px-5 py-2.5 text-sm font-medium text-muted transition-colors duration-200 hover:border-foreground/30 hover:text-foreground ${ctaFocus}`}
+                  className={`rounded-sm border border-border px-5 py-2.5 text-sm font-medium text-ns-muted transition-colors duration-200 hover:border-foreground/30 hover:text-foreground ${ctaFocus}`}
                 >
                   {secondaryCta.label}
                 </button>

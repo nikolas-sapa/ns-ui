@@ -20,15 +20,15 @@ export default function ThinkingGlyphDemo() {
   return (
     <div className="flex h-screen w-full flex-col items-center justify-center gap-8 bg-background px-6">
       <div className="flex flex-col items-center gap-2 text-center">
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
           ns-ui / loader-ink-blob
         </p>
-        <p className="text-xs text-muted">Cycles through all six assistant states.</p>
+        <p className="text-xs text-ns-muted">Cycles through all six assistant states.</p>
       </div>
       <div data-loader-ink-blob-stage className="flex items-center justify-center rounded-lg border border-border bg-surface p-10">
         <ThinkingGlyph state={state} size={64} />
       </div>
-      <p className="font-mono text-xs text-muted">{state}</p>
+      <p className="font-mono text-xs text-ns-muted">{state}</p>
     </div>
   );
 }

@@ -81,7 +81,7 @@ function AccountBadge({ me }: { me: Extract<Me, { signedIn: true }> }) {
   return (
     <span
       aria-hidden
-      className="flex size-4 shrink-0 items-center justify-center rounded-full bg-accent/15 text-[9px] font-medium text-accent"
+      className="flex size-4 shrink-0 items-center justify-center rounded-full bg-ns-accent/15 text-[9px] font-medium text-ns-accent"
     >
       {label.charAt(0).toUpperCase()}
     </span>
@@ -98,7 +98,7 @@ export function SiteAuth() {
     return (
       <Link
         href="/account"
-        className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+        className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
       >
         Sign in
       </Link>
@@ -117,7 +117,7 @@ export function SiteAuth() {
     <Link
       href="/account"
       title={label}
-      className="flex w-full basis-full items-center gap-1.5 rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+      className="flex w-full basis-full items-center gap-1.5 rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
     >
       <AccountBadge me={me} />
       <span className="min-w-0 flex-1 truncate">{label}</span>

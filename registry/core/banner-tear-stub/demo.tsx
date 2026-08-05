@@ -5,7 +5,7 @@ import { TearStub } from "./component";
 export default function TearStubDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 p-6">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / banner-tear-stub — dismiss, then click the stub to reopen
       </p>
       <TearStub

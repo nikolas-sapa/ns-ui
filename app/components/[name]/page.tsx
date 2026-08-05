@@ -129,7 +129,7 @@ export default async function ComponentPage({
 
       {item ? (
         <header className="mx-auto w-full max-w-3xl px-6 pt-16 sm:px-10">
-          <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
+          <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-ns-muted">
             {item.meta?.collection === "loud" ? "ns-ui / loud" : "ns-ui"}
           </p>
           <div className="mt-2 flex items-start justify-between gap-4">
@@ -162,7 +162,7 @@ export default async function ComponentPage({
       {item ? (
         <section className="mx-auto w-full max-w-3xl px-6 pt-10 sm:px-10">
           {useWhen ? (
-            <p className="mt-4 max-w-[65ch] text-sm leading-relaxed text-muted">
+            <p className="mt-4 max-w-[65ch] text-sm leading-relaxed text-ns-muted">
               <span className="font-mono text-[11px] uppercase tracking-wider text-foreground">
                 Use when
               </span>{" "}
@@ -171,7 +171,7 @@ export default async function ComponentPage({
           ) : null}
 
           <div className="mt-8">
-            <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
+            <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-ns-muted">
               Install
             </p>
             <div className="mt-3 flex w-full items-start gap-2 rounded-md border border-border bg-surface py-2 pl-3.5 pr-1.5">
@@ -189,7 +189,7 @@ export default async function ComponentPage({
             </div>
             <Link
               href={`/preview/${name}/play`}
-              className="mt-2 inline-block rounded-sm py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-muted underline underline-offset-2 outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+              className="mt-2 inline-block rounded-sm py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-ns-muted underline underline-offset-2 outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
             >
               View source and playground
             </Link>
@@ -201,7 +201,7 @@ export default async function ComponentPage({
                 <li key={c.id}>
                   <Link
                     href={`/categories/${c.id}`}
-                    className="block rounded-sm border border-border px-1.5 py-px font-mono text-[10px] uppercase tracking-wider text-muted outline-none transition-colors hover:border-foreground hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+                    className="block rounded-sm border border-border px-1.5 py-px font-mono text-[10px] uppercase tracking-wider text-ns-muted outline-none transition-colors hover:border-foreground hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
                   >
                     {c.label}
                   </Link>
@@ -216,7 +216,7 @@ export default async function ComponentPage({
                 <li key={tag}>
                   <Link
                     href={`/?q=${encodeURIComponent(tag)}`}
-                    className="block rounded-sm border border-border px-1.5 py-px font-mono text-[10px] uppercase tracking-wider text-muted outline-none transition-colors hover:border-foreground hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+                    className="block rounded-sm border border-border px-1.5 py-px font-mono text-[10px] uppercase tracking-wider text-ns-muted outline-none transition-colors hover:border-foreground hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
                   >
                     {tag}
                   </Link>
@@ -235,7 +235,7 @@ export default async function ComponentPage({
               <div className="mt-4 overflow-x-auto rounded-md border border-border">
                 <table className="w-full border-collapse text-left text-sm">
                   <thead>
-                    <tr className="border-b border-border bg-surface font-mono text-[11px] uppercase tracking-wider text-muted">
+                    <tr className="border-b border-border bg-surface font-mono text-[11px] uppercase tracking-wider text-ns-muted">
                       <th scope="col" className="px-3 py-2 font-medium">Prop</th>
                       <th scope="col" className="px-3 py-2 font-medium">Type</th>
                       <th scope="col" className="px-3 py-2 font-medium">Default</th>
@@ -249,13 +249,13 @@ export default async function ComponentPage({
                           {prop.name}
                           {prop.optional ? "?" : ""}
                         </td>
-                        <td className="px-3 py-2 align-top font-mono text-xs text-muted">
+                        <td className="px-3 py-2 align-top font-mono text-xs text-ns-muted">
                           {prop.type}
                         </td>
-                        <td className="whitespace-nowrap px-3 py-2 align-top font-mono text-xs text-muted">
+                        <td className="whitespace-nowrap px-3 py-2 align-top font-mono text-xs text-ns-muted">
                           {prop.default ?? "—"}
                         </td>
-                        <td className="px-3 py-2 align-top text-xs leading-relaxed text-muted">
+                        <td className="px-3 py-2 align-top text-xs leading-relaxed text-ns-muted">
                           {prop.comment ?? "—"}
                         </td>
                       </tr>
@@ -278,7 +278,7 @@ export default async function ComponentPage({
                       href={`https://www.npmjs.com/package/${dep}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="rounded-sm border border-border px-2 py-1 font-mono text-xs text-foreground outline-none transition-colors hover:border-foreground focus-visible:ring-2 focus-visible:ring-accent"
+                      className="rounded-sm border border-border px-2 py-1 font-mono text-xs text-foreground outline-none transition-colors hover:border-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
                     >
                       {dep}
                     </a>
@@ -291,7 +291,7 @@ export default async function ComponentPage({
           <div className="mt-10 border-t border-border pt-8">
             <Link
               href="/"
-              className="rounded-sm font-mono text-xs uppercase tracking-wider text-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+              className="rounded-sm font-mono text-xs uppercase tracking-wider text-ns-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
             >
               Back to the catalog
             </Link>

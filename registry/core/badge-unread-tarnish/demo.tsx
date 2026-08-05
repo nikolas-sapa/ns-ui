@@ -45,11 +45,11 @@ export default function PatinaPipDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-sm">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">
+        <p className="mb-4 font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / badge-unread-tarnish
         </p>
         <h1 className="text-lg font-semibold text-foreground">Inbox</h1>
-        <p className="mt-1 text-sm leading-relaxed text-muted">
+        <p className="mt-1 text-sm leading-relaxed text-ns-muted">
           Same shape, three different ages: a solid pip is fresh, a thin ring
           is a week gone quiet — no need to wait and watch to tell them apart.
         </p>
@@ -62,11 +62,11 @@ export default function PatinaPipDemo() {
             <button
               type="button"
               aria-describedby={messagesId}
-              className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm text-foreground transition-colors duration-150 hover:bg-foreground/5 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent"
+              className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm text-foreground transition-colors duration-150 hover:bg-foreground/5 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ns-accent"
             >
               <span className="flex flex-col gap-0.5">
                 <span>Messages</span>
-                <span className="font-mono text-[10px] tracking-wide text-muted">
+                <span className="font-mono text-[10px] tracking-wide text-ns-muted">
                   {stageCaption(3 * MINUTE)}
                 </span>
               </span>
@@ -75,11 +75,11 @@ export default function PatinaPipDemo() {
             <button
               type="button"
               aria-describedby={updatesId}
-              className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm text-foreground transition-colors duration-150 hover:bg-foreground/5 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent"
+              className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm text-foreground transition-colors duration-150 hover:bg-foreground/5 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ns-accent"
             >
               <span className="flex flex-col gap-0.5">
                 <span>Updates</span>
-                <span className="font-mono text-[10px] tracking-wide text-muted">
+                <span className="font-mono text-[10px] tracking-wide text-ns-muted">
                   {stageCaption(30 * HOUR)}
                 </span>
               </span>
@@ -88,11 +88,11 @@ export default function PatinaPipDemo() {
             <button
               type="button"
               aria-describedby={archiveId}
-              className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm text-foreground transition-colors duration-150 hover:bg-foreground/5 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent"
+              className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm text-foreground transition-colors duration-150 hover:bg-foreground/5 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ns-accent"
             >
               <span className="flex flex-col gap-0.5">
                 <span>Archive</span>
-                <span className="font-mono text-[10px] tracking-wide text-muted">
+                <span className="font-mono text-[10px] tracking-wide text-ns-muted">
                   {stageCaption(Date.now() - archive.newestTimestamp)}
                 </span>
               </span>
@@ -105,21 +105,21 @@ export default function PatinaPipDemo() {
           </nav>
 
           <div className="flex items-center justify-between gap-4 px-4 py-3">
-            <span className="font-mono text-[11px] text-muted">
+            <span className="font-mono text-[11px] text-ns-muted">
               re-polish the archive row
             </span>
             <button
               type="button"
               data-ns-patina-land
               onClick={landNewMail}
-              className="rounded-sm border border-border px-3 py-1.5 font-mono text-[11px] tracking-widest text-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="rounded-sm border border-border px-3 py-1.5 font-mono text-[11px] tracking-widest text-ns-muted transition-colors duration-200 hover:border-foreground/20 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
             >
               LAND NEW MAIL
             </button>
           </div>
         </div>
 
-        <p className="mt-4 font-mono text-[11px] text-muted">
+        <p className="mt-4 font-mono text-[11px] text-ns-muted">
           fill, ring weight and text tone move together — never color alone
         </p>
       </div>

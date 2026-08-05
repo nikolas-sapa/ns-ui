@@ -438,7 +438,7 @@ export function CloudChamber({
         {reduced && (
           <div aria-hidden className="mb-3 flex flex-wrap items-end gap-2">
             {rows.length === 0 ? (
-              <span className="font-mono text-[10px] text-muted">no ticks yet</span>
+              <span className="font-mono text-[10px] text-ns-muted">no ticks yet</span>
             ) : (
               rows
                 .slice(0, 40)
@@ -454,7 +454,7 @@ export function CloudChamber({
                       style={{
                         height: `${14 + m * 16}px`,
                         transform: `rotate(${angleForCategory(e.category, categoryAngles) - 90}deg)`,
-                        backgroundColor: `color-mix(in srgb, var(--foreground) ${pct}%, var(--muted))`,
+                        backgroundColor: `color-mix(in srgb, var(--foreground) ${pct}%, var(--ns-muted))`,
                       }}
                     />
                   );
@@ -471,11 +471,11 @@ export function CloudChamber({
           className="min-h-0 flex-1 overflow-y-auto rounded-md border border-border bg-background p-3 font-mono text-[11px] leading-relaxed"
         >
           {rows.length === 0 ? (
-            <p className="text-muted">Chamber quiet — no events yet.</p>
+            <p className="text-ns-muted">Chamber quiet — no events yet.</p>
           ) : (
             <ul className="space-y-1">
               {rows.map((e) => (
-                <li key={e.id} className="truncate text-muted">
+                <li key={e.id} className="truncate text-ns-muted">
                   <span className="text-foreground">{e.name}</span> · {e.category} ·{" "}
                   {Math.round(magnitudeOf(e) * 100)}%
                 </li>

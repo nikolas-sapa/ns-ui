@@ -117,7 +117,7 @@ export function RampTrace({
         {activeIdx !== null && readoutCenter !== null ? (
           <span
             aria-hidden
-            className="absolute bottom-0 -translate-x-1/2 whitespace-nowrap text-accent"
+            className="absolute bottom-0 -translate-x-1/2 whitespace-nowrap text-ns-accent"
             style={{ left: `${readoutCenter}px` }}
           >
             {valueFormat(series[activeIdx])}
@@ -157,7 +157,7 @@ export function RampTrace({
               onPointerEnter={() => setHoverIdx(i)}
               onPointerLeave={() => setHoverIdx(null)}
               onClick={(e) => e.currentTarget.focus()}
-              className={`flex cursor-pointer flex-col text-center leading-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
+              className={`flex cursor-pointer flex-col text-center leading-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent ${
                 selected ? "bg-foreground" : ""
               }`}
               style={{ width: `${COL_W}ch` }}
@@ -177,7 +177,7 @@ export function RampTrace({
                       ? "bg-foreground"
                       : row.kind === "bar"
                         ? "text-foreground"
-                        : "text-muted/30"
+                        : "text-ns-muted/30"
                   }
                 >
                   {selected

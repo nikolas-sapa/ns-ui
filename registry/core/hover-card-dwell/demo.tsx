@@ -11,7 +11,7 @@ export default function IntentCoilDemo() {
   return (
     <div className="flex min-h-screen items-center justify-center px-6 py-16">
       <div className="w-full max-w-xl rounded-md border border-border bg-background p-6">
-        <p className="mb-1 font-mono text-[11px] uppercase tracking-[0.16em] text-muted">
+        <p className="mb-1 font-mono text-[11px] uppercase tracking-[0.16em] text-ns-muted">
           Release notes / v4.2
         </p>
         <h2 className="mb-4 text-lg font-semibold tracking-tight text-foreground">
@@ -28,7 +28,7 @@ export default function IntentCoilDemo() {
               // auto-close it. "block" keeps the same layout without it.
               <>
                 <span className="block font-medium text-foreground">Streaming parser</span>
-                <span className="mt-1 block text-muted">
+                <span className="mt-1 block text-ns-muted">
                   Tokenizes incrementally as bytes arrive instead of buffering the full payload —
                   flat memory profile from 1KB to 50MB.
                 </span>
@@ -43,7 +43,7 @@ export default function IntentCoilDemo() {
             preview={
               <>
                 <span className="block font-medium text-foreground">Alex Rivera</span>
-                <span className="mt-1 block text-muted">Staff engineer, edge runtime. Joined 2022.</span>
+                <span className="mt-1 block text-ns-muted">Staff engineer, edge runtime. Joined 2022.</span>
               </>
             }
           >
@@ -56,7 +56,7 @@ export default function IntentCoilDemo() {
             preview={
               <>
                 <span className="block font-medium text-foreground">Request coalescing</span>
-                <span className="mt-1 block text-muted">
+                <span className="mt-1 block text-ns-muted">
                   Concurrent misses for the same key collapse into a single origin request; the
                   remaining waiters are served from the result once it lands.
                 </span>

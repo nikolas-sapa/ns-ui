@@ -64,13 +64,13 @@ export default function PhaseSwingDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-12 px-6">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / loader-pendulum-sync
       </p>
 
       <div className="flex w-full max-w-2xl flex-col gap-8 rounded-xl border border-border bg-surface p-8">
         <div className="flex flex-col items-center gap-3">
-          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ns-muted">
             indeterminate — background indexing job
           </span>
           <PhaseSwing
@@ -84,7 +84,7 @@ export default function PhaseSwingDemo() {
         <div className="h-px w-full bg-border" />
 
         <div className="flex flex-col items-center gap-3">
-          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ns-muted">
             determinate — build converges to unison at 100%
           </span>
           <PhaseSwing
@@ -97,7 +97,7 @@ export default function PhaseSwingDemo() {
         </div>
       </div>
 
-      <p className="max-w-md text-center font-mono text-[10px] text-muted">
+      <p className="max-w-md text-center font-mono text-[10px] text-ns-muted">
         sync → chaos → sync every {PERIOD_MS / 1000}s — the realignment is a
         heartbeat, never the finish; done retracts the row and announces
         explicitly

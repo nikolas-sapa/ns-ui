@@ -28,7 +28,7 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 // spatial memory ("analytics lives at 120 degrees" stays true across visits).
 // Direct-DOM rAF hot path (no React state per frame); pure DOM/CSS, no
 // canvas; every color is a Tailwind class bound to --background/--foreground/
-// --muted/--border, with --accent reserved for the one genuine interaction
+// --ns-muted/--border, with --ns-accent reserved for the one genuine interaction
 // state (keyboard focus lighting up the reticle). prefers-reduced-motion: no
 // coast/spring anywhere, every rotation and detent snap is instant.
 // ---------------------------------------------------------------------------
@@ -625,7 +625,7 @@ export function PeriscopeSweep({
     <div className={`w-full ${className}`}>
       <span
         id={labelId}
-        className="mb-1.5 block font-mono text-xs uppercase tracking-[0.14em] text-muted"
+        className="mb-1.5 block font-mono text-xs uppercase tracking-[0.14em] text-ns-muted"
       >
         {label}
       </span>
@@ -637,7 +637,7 @@ export function PeriscopeSweep({
         aria-labelledby={labelId}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
-        className="relative w-full select-none overflow-hidden rounded-md border border-border bg-background outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        className="relative w-full select-none overflow-hidden rounded-md border border-border bg-background outline-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         {/* Geist Mono bearing tape — linear, decorative; real names live on
             the options below for assistive tech. */}
@@ -652,7 +652,7 @@ export function PeriscopeSweep({
               ref={(el) => {
                 tickRefs.current[k] = el;
               }}
-              className="pointer-events-none absolute left-1/2 top-1/2 font-mono text-[10px] tabular-nums text-muted"
+              className="pointer-events-none absolute left-1/2 top-1/2 font-mono text-[10px] tabular-nums text-ns-muted"
             >
               000
             </div>
@@ -681,19 +681,19 @@ export function PeriscopeSweep({
               >
                 <span
                   className={`text-sm font-medium text-foreground sm:text-base ${
-                    focused ? "group-data-[reticle=true]:text-accent" : ""
+                    focused ? "group-data-[reticle=true]:text-ns-accent" : ""
                   }`}
                 >
                   {d.label}
                 </span>
                 {i === committedIndex ? (
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-muted">
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-ns-muted">
                     current
                   </span>
                 ) : d.hint ? (
-                  <span className="font-mono text-[10px] text-muted">{d.hint}</span>
+                  <span className="font-mono text-[10px] text-ns-muted">{d.hint}</span>
                 ) : null}
-                <span aria-hidden className="font-mono text-[10px] text-muted/70">
+                <span aria-hidden className="font-mono text-[10px] text-ns-muted/70">
                   {String(d.bearing).padStart(3, "0")}&deg;
                 </span>
               </div>
@@ -704,12 +704,12 @@ export function PeriscopeSweep({
               ref={reticleRef}
               aria-hidden
               className={`pointer-events-none absolute left-1/2 top-0 h-full w-px -translate-x-1/2 ${
-                focused ? "bg-accent" : "bg-border"
+                focused ? "bg-ns-accent" : "bg-border"
               }`}
             >
               <span
                 className={`absolute left-1/2 top-0 -translate-x-1/2 -translate-y-full border-x-4 border-t-4 border-x-transparent ${
-                  focused ? "border-t-accent" : "border-t-border"
+                  focused ? "border-t-ns-accent" : "border-t-border"
                 }`}
               />
             </div>
@@ -718,7 +718,7 @@ export function PeriscopeSweep({
             <div
               ref={previewChipRef}
               aria-hidden
-              className="pointer-events-none absolute bottom-2 right-2 rounded-sm border border-border bg-background px-2 py-1 font-mono text-[10px] text-muted opacity-0 transition-opacity"
+              className="pointer-events-none absolute bottom-2 right-2 rounded-sm border border-border bg-background px-2 py-1 font-mono text-[10px] text-ns-muted opacity-0 transition-opacity"
             />
           </div>
 
@@ -729,7 +729,7 @@ export function PeriscopeSweep({
             type="button"
             aria-label="Previous bearing"
             onClick={() => engineRef.current?.stepPrev()}
-            className="absolute left-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background text-muted outline-none transition-colors hover:border-foreground/30 hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="absolute left-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background text-ns-muted outline-none transition-colors hover:border-foreground/30 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             <svg aria-hidden viewBox="0 0 16 16" width="14" height="14" fill="none">
               <path
@@ -745,7 +745,7 @@ export function PeriscopeSweep({
             type="button"
             aria-label="Next bearing"
             onClick={() => engineRef.current?.stepNext()}
-            className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background text-muted outline-none transition-colors hover:border-foreground/30 hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background text-ns-muted outline-none transition-colors hover:border-foreground/30 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             <svg aria-hidden viewBox="0 0 16 16" width="14" height="14" fill="none">
               <path
@@ -760,11 +760,11 @@ export function PeriscopeSweep({
         </div>
 
         <div className="flex items-center justify-between gap-3 border-t border-border px-3 py-2">
-          <p className="min-w-0 truncate font-mono text-[11px] text-muted">
+          <p className="min-w-0 truncate font-mono text-[11px] text-ns-muted">
             <span className="text-foreground">{committedLabel}</span> &middot;
             drag, wheel, or arrow keys to sweep
           </p>
-          <p className="shrink-0 font-mono text-[11px] text-muted">
+          <p className="shrink-0 font-mono text-[11px] text-ns-muted">
             enter selects &middot; esc cancels
           </p>
         </div>

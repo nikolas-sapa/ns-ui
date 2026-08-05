@@ -16,7 +16,7 @@ export default function StakeLineDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6">
       <style>{CSS}</style>
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / empty-state-survey — staked out before the data arrives
       </p>
 
@@ -33,7 +33,7 @@ export default function StakeLineDemo() {
                 }}
               >
                 <span className="text-xs font-medium text-foreground">Project {i + 1}</span>
-                <span className="text-[11px] text-muted">Updated just now</span>
+                <span className="text-[11px] text-ns-muted">Updated just now</span>
               </div>
             ))}
           </div>

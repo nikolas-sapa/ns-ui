@@ -47,7 +47,7 @@ export default function HaspFoldDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / accordion-latch
       </p>
 
@@ -55,7 +55,7 @@ export default function HaspFoldDemo() {
         <HaspFold items={ITEMS} defaultOpen={["manifest"]} />
       </div>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Opening rotates the hasp off its staple, lifts the lid, then unfolds
         the section — closing reverses and the hasp drops with a settle.
       </p>

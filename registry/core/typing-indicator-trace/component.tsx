@@ -191,7 +191,7 @@ function TraceRow({ name, status, opacity, reducedMotion, counterRef }: TraceRow
       <span
         className={[
           "w-16 shrink-0 truncate font-mono text-[11px]",
-          showEndedLabel ? "text-muted" : "text-foreground",
+          showEndedLabel ? "text-ns-muted" : "text-foreground",
         ].join(" ")}
       >
         {name}
@@ -236,7 +236,7 @@ function TraceRow({ name, status, opacity, reducedMotion, counterRef }: TraceRow
       </div>
 
       {showTypingTag ? (
-        <span className="shrink-0 font-mono text-[10px] uppercase tracking-wide text-muted">
+        <span className="shrink-0 font-mono text-[10px] uppercase tracking-wide text-ns-muted">
           typing
         </span>
       ) : null}

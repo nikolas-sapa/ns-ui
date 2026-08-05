@@ -25,7 +25,7 @@ import { useEffect, useRef } from "react";
 //               X strokes itself in, timed from the moment `state` became
 //               "error"
 //
-// Ink comes from --foreground/--muted for the blob and --accent/--success/
+// Ink comes from --foreground/--ns-muted for the blob and --ns-accent/--success/
 // --error for the sonar ring, checkmark and X respectively, all read via
 // getComputedStyle at mount and re-read on a MutationObserver watching
 // documentElement's class attribute. The rAF loop pauses on
@@ -119,8 +119,8 @@ export function ThinkingGlyph({
       const rgb = parseHex(fgHex) ?? [23, 23, 23];
       fg = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},0.92)`;
       fgSoft = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},0.14)`;
-      mutedStyle = cs.getPropertyValue("--muted").trim() || "#4d4d4d";
-      accentStyle = cs.getPropertyValue("--accent").trim() || "#006bff";
+      mutedStyle = cs.getPropertyValue("--ns-muted").trim() || "#4d4d4d";
+      accentStyle = cs.getPropertyValue("--ns-accent").trim() || "#006bff";
       successStyle = cs.getPropertyValue("--success").trim() || "#47a447";
       errorStyle = cs.getPropertyValue("--error").trim() || "#ea001d";
     };

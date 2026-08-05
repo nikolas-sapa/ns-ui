@@ -27,7 +27,7 @@ export default function ChangelogPage() {
     <main className="mx-auto w-full max-w-3xl px-6 pb-32 sm:px-10">
       <header className="pt-20 sm:pt-28">
         <div className="flex items-center justify-between gap-4">
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-ns-muted">
             ns-ui / changelog
           </p>
           <ThemeToggle />
@@ -35,7 +35,7 @@ export default function ChangelogPage() {
         <h1 className="mt-5 text-3xl font-semibold leading-[1.15] tracking-tight sm:text-4xl">
           What shipped.
         </h1>
-        <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted">
+        <p className="mt-4 max-w-xl text-sm leading-relaxed text-ns-muted">
           {entries.length} releases since {entries[entries.length - 1]?.iso}.
           The tide below is <span className="font-mono text-foreground">timeline-changelog-wave</span>,
           a component from this registry, running on the real release history.
@@ -47,7 +47,7 @@ export default function ChangelogPage() {
           <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-foreground">
             Release tide
           </h2>
-          <p className="font-mono text-[10px] uppercase tracking-wider text-muted">
+          <p className="font-mono text-[10px] uppercase tracking-wider text-ns-muted">
             {events.length} releases
           </p>
         </div>
@@ -70,14 +70,14 @@ export default function ChangelogPage() {
             aria-label="ns-ui release timeline"
           />
         </TimelineScrub>
-        <p className="mt-3 border-t border-border pt-3 font-mono text-[10px] uppercase tracking-wider text-muted">
+        <p className="mt-3 border-t border-border pt-3 font-mono text-[10px] uppercase tracking-wider text-ns-muted">
           Scrub with the arrows · hover a mark to replay its swash
         </p>
       </section>
 
       <ChangelogEntryList entries={entries} />
 
-      <footer className="mt-24 flex flex-wrap items-baseline gap-x-8 gap-y-2 border-t border-border pt-6 font-mono text-xs text-muted">
+      <footer className="mt-24 flex flex-wrap items-baseline gap-x-8 gap-y-2 border-t border-border pt-6 font-mono text-xs text-ns-muted">
         <Link
           href="/"
           className="underline underline-offset-2 hover:text-foreground"

@@ -157,7 +157,7 @@ export function HatchFill({
       <span aria-hidden className="block whitespace-pre text-border">
         {tickLine}
       </span>
-      <span aria-hidden className="block whitespace-pre text-[0.85em] text-muted">
+      <span aria-hidden className="block whitespace-pre text-[0.85em] text-ns-muted">
         {labelLine}
       </span>
     </div>

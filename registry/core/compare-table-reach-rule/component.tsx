@@ -215,7 +215,7 @@ export function ReachRuleTable({
     p.body.textContent = shown > 0 ? g.text.slice(0, shown - 1) : "";
     p.cap.textContent = shown > 0 ? GLYPH_END : "";
     p.cap.style.color =
-      pinnedRef.current === id ? "var(--accent)" : "currentColor";
+      pinnedRef.current === id ? "var(--ns-accent)" : "currentColor";
     const t = g.len > 0 ? shown / g.len : 1;
     p.el.style.opacity = String(REST_OPACITY + (1 - REST_OPACITY) * t);
   }, []);
@@ -227,7 +227,7 @@ export function ReachRuleTable({
     p.body.textContent = g.text.slice(0, g.len - 1);
     p.cap.textContent = GLYPH_END;
     p.cap.style.color =
-      pinnedRef.current === id ? "var(--accent)" : "currentColor";
+      pinnedRef.current === id ? "var(--ns-accent)" : "currentColor";
     p.el.style.opacity = String(lit ? 1 : REST_OPACITY);
   }, []);
 
@@ -473,9 +473,9 @@ export function ReachRuleTable({
             >
               <div className="flex items-baseline justify-between">
                 <h3 className="text-sm font-medium">{tier.name}</h3>
-                <span className="font-mono text-xs text-muted">{tier.price}</span>
+                <span className="font-mono text-xs text-ns-muted">{tier.price}</span>
               </div>
-              <p className="mt-2 font-mono text-[11px] text-muted">
+              <p className="mt-2 font-mono text-[11px] text-ns-muted">
                 <span aria-hidden style={{ letterSpacing: "0.12em" }}>
                   {track(i)}
                 </span>
@@ -491,7 +491,7 @@ export function ReachRuleTable({
                     <li
                       key={row.id}
                       className={`flex items-baseline justify-between gap-3 text-[13px] ${
-                        on ? "text-foreground" : "text-muted"
+                        on ? "text-foreground" : "text-ns-muted"
                       }`}
                     >
                       <span className="flex items-baseline gap-2">
@@ -504,7 +504,7 @@ export function ReachRuleTable({
                         </span>
                       </span>
                       {val ? (
-                        <span className="font-mono text-[11px] text-muted">{val}</span>
+                        <span className="font-mono text-[11px] text-ns-muted">{val}</span>
                       ) : null}
                     </li>
                   );
@@ -526,7 +526,7 @@ export function ReachRuleTable({
             className="grid items-end gap-x-2 border-b border-border px-4 pb-3 pt-4"
             style={gridStyle}
           >
-            <div role="columnheader" className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted">
+            <div role="columnheader" className="font-mono text-[11px] uppercase tracking-[0.18em] text-ns-muted">
               Feature
             </div>
             {tiers.map((tier, i) => {
@@ -542,8 +542,8 @@ export function ReachRuleTable({
                   style={{ opacity: dim ? DIM_OPACITY : 1 }}
                 >
                   <div className="text-sm font-medium">{tier.name}</div>
-                  <div className="font-mono text-[11px] text-muted">{tier.price}</div>
-                  <div className="mt-1.5 font-mono text-[10px] text-muted">
+                  <div className="font-mono text-[11px] text-ns-muted">{tier.price}</div>
+                  <div className="mt-1.5 font-mono text-[10px] text-ns-muted">
                     <span aria-hidden style={{ letterSpacing: "0.1em" }}>
                       {track(i)}
                     </span>
@@ -578,7 +578,7 @@ export function ReachRuleTable({
                     onFocus={() => enter(row.id)}
                     onBlur={() => leave(row.id)}
                     onClick={() => togglePin(row.id)}
-                    className={`-mx-1 block w-full rounded-sm px-1 text-left text-[13px] leading-5 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
+                    className={`-mx-1 block w-full rounded-sm px-1 text-left text-[13px] leading-5 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent ${
                       isActive || isPinned ? "text-foreground" : "text-foreground/80"
                     }`}
                   >
@@ -588,7 +588,7 @@ export function ReachRuleTable({
                     ) : null}
                   </button>
                   {row.note ? (
-                    <p className="mt-0.5 px-0 text-[11px] leading-4 text-muted">
+                    <p className="mt-0.5 px-0 text-[11px] leading-4 text-ns-muted">
                       {row.note}
                     </p>
                   ) : null}
@@ -608,7 +608,7 @@ export function ReachRuleTable({
                       {/* the rule seats on the row's first line; values hang below it */}
                       <span aria-hidden className="block h-5" />
                       {typeof raw === "string" ? (
-                        <span className="block font-mono text-[11px] leading-4 text-muted">
+                        <span className="block font-mono text-[11px] leading-4 text-ns-muted">
                           {raw}
                         </span>
                       ) : null}

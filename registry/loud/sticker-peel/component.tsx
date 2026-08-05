@@ -726,7 +726,7 @@ const CSS = `
   border-color:color-mix(in srgb, var(--foreground) 30%, var(--border));
   box-shadow:0 18px 44px rgba(0,0,0,0.5);
 }
-.ns-dp-root:focus-visible{outline:2px solid var(--accent);outline-offset:4px;}
+.ns-dp-root:focus-visible{outline:2px solid var(--ns-accent);outline-offset:4px;}
 .ns-dp-root.ns-dp-grabbing{cursor:grabbing;}
 .ns-dp-wrap{
   position:relative;width:220px;height:220px;
@@ -737,7 +737,7 @@ const CSS = `
 .ns-dp-shadow{position:absolute;inset:8px;border-radius:16px;}
 .ns-dp-front{
   position:absolute;inset:0;border-radius:16px;
-  background:var(--accent);
+  background:var(--ns-accent);
   border:7px solid color-mix(in srgb, var(--foreground) 90%, var(--background));
   will-change:clip-path;
 }
@@ -756,8 +756,8 @@ const CSS = `
 .ns-dp-flap{
   position:absolute;inset:0;border-radius:16px;opacity:0;
   background:linear-gradient(var(--dp-flap-angle,135deg),
-    color-mix(in srgb, white 25%, var(--accent)) 0%,
-    color-mix(in srgb, white 55%, var(--accent)) 55%,
+    color-mix(in srgb, white 25%, var(--ns-accent)) 0%,
+    color-mix(in srgb, white 55%, var(--ns-accent)) 55%,
     color-mix(in srgb, var(--background) 90%, var(--foreground)) 100%);
   box-shadow:inset 0 0 14px rgba(0,0,0,0.18);
   will-change:transform,clip-path;

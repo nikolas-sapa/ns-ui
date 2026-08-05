@@ -95,8 +95,8 @@ export function Totality({
     const readTokens = () => {
       fg = getComputedStyle(canvas).color;
       const cs = getComputedStyle(document.documentElement);
-      muted = cs.getPropertyValue("--muted").trim() || fg;
-      accent = cs.getPropertyValue("--accent").trim() || fg;
+      muted = cs.getPropertyValue("--ns-muted").trim() || fg;
+      accent = cs.getPropertyValue("--ns-accent").trim() || fg;
     };
 
     const measureCell = (fontFamily: string) => {

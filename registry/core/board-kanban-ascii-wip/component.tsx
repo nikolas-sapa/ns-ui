@@ -61,7 +61,7 @@ const DASH = "╌";
 // which would leave the box-drawing frame — the whole point of the component —
 // blank at rest. A muted tint reads in both themes and still sits below the
 // card text in the hierarchy.
-const FRAME_INK = "text-muted/55";
+const FRAME_INK = "text-ns-muted/55";
 
 /** `┌─ In Progress ───────── 3/3 ─┐` — exactly `width` characters wide. */
 function headerLine(title: string, count: number, limit: number, width: number) {
@@ -424,7 +424,7 @@ export function WipBoard({
         const over = Math.max(0, count - col.limit);
         const rows: ReactNode[] = [];
         const placeholder = (
-          <div key="ph" className="flex whitespace-pre text-accent">
+          <div key="ph" className="flex whitespace-pre text-ns-accent">
             <span aria-hidden>│</span>
             <span aria-hidden className="min-w-0 flex-1 overflow-hidden px-1">
               {DASH.repeat(Math.max(0, width - 4))}
@@ -467,7 +467,7 @@ export function WipBoard({
                 } of ${col.cards.length}, column at ${col.cards.length} of ${col.limit}. Arrow keys move and reorder.`}
                 onPointerDown={(e) => onPointerDown(card.id, col.id, e)}
                 onKeyDown={(e) => onCardKeyDown(card.id, col.id, e)}
-                className={`flex min-w-0 flex-1 cursor-grab touch-none items-baseline gap-2 rounded-sm px-1 text-left text-muted transition-colors duration-150 hover:bg-surface hover:text-foreground focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent active:cursor-grabbing ${
+                className={`flex min-w-0 flex-1 cursor-grab touch-none items-baseline gap-2 rounded-sm px-1 text-left text-ns-muted transition-colors duration-150 hover:bg-surface hover:text-foreground focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ns-accent active:cursor-grabbing ${
                   dragId === card.id ? "bg-surface text-foreground" : ""
                 }`}
               >
@@ -509,7 +509,7 @@ export function WipBoard({
               col.cards.length > col.limit ? `, over limit by ${col.cards.length - col.limit}` : ""
             }`}
             style={{ width: `${width}ch` }}
-            className={`shrink-0 transition-colors duration-150 ${over > 0 ? "text-accent" : FRAME_INK}`}
+            className={`shrink-0 transition-colors duration-150 ${over > 0 ? "text-ns-accent" : FRAME_INK}`}
           >
             <div className="whitespace-pre" aria-hidden>
               {headerLine(col.title, count, col.limit, width)}

@@ -42,7 +42,7 @@ const nodes: TaprootNode[] = [
 export default function TaprootTraceDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / tree-root-trace — the guide grows from the junction
       </p>
       <div className="w-full max-w-xs rounded-md border border-border bg-background p-3">

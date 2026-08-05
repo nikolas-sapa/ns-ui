@@ -12,7 +12,7 @@ export default function HeatwaveLedgerDemo() {
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-3xl">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-          <p className="font-mono text-xs tracking-widest text-muted">
+          <p className="font-mono text-xs tracking-widest text-ns-muted">
             ns-ui / table-heat-shimmer
           </p>
           <div
@@ -20,7 +20,7 @@ export default function HeatwaveLedgerDemo() {
             aria-label="Heat threshold"
             className="flex items-center gap-2"
           >
-            <span className="font-mono text-[11px] tracking-widest text-muted">
+            <span className="font-mono text-[11px] tracking-widest text-ns-muted">
               THRESHOLD
             </span>
             <div className="flex overflow-hidden rounded-sm border border-border">
@@ -30,10 +30,10 @@ export default function HeatwaveLedgerDemo() {
                   type="button"
                   aria-pressed={threshold === t}
                   onClick={() => setThreshold(t)}
-                  className={`px-3 py-1.5 font-mono text-[11px] tabular-nums transition-colors duration-150 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent ${
+                  className={`px-3 py-1.5 font-mono text-[11px] tabular-nums transition-colors duration-150 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ns-accent ${
                     threshold === t
                       ? "bg-foreground/[0.08] text-foreground"
-                      : "text-muted hover:bg-foreground/[0.04] hover:text-foreground"
+                      : "text-ns-muted hover:bg-foreground/[0.04] hover:text-foreground"
                   }`}
                 >
                   {t}
@@ -45,7 +45,7 @@ export default function HeatwaveLedgerDemo() {
 
         <HeatwaveLedger threshold={threshold} />
 
-        <p className="mt-3 font-mono text-[11px] text-muted">
+        <p className="mt-3 font-mono text-[11px] text-ns-muted">
           rows above the threshold shimmer like air over asphalt — hover one and
           it snaps still to read
         </p>

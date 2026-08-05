@@ -22,12 +22,12 @@ import { useEffect, useId, useRef } from "react";
 // instead of just riding a static-shaded wobbling edge.
 //
 // Palette: the achromatic ramp is derived from --background, --foreground,
-// --muted and --border (read via getComputedStyle at mount, re-read on a
+// --ns-muted and --border (read via getComputedStyle at mount, re-read on a
 // MutationObserver watching documentElement's class) with the contrast
 // direction picked from the background's luminance rather than a fixed
 // token→stop mapping — dark theme reads through bright specular bands,
 // light theme reads through the dark occlusion crease at each edge of the
-// tube, which is the only way both stay legible. --accent tints only the
+// tube, which is the only way both stay legible. --ns-accent tints only the
 // hottest specular pixels, at ~15% mix.
 // ---------------------------------------------------------------------------
 
@@ -332,9 +332,9 @@ export function LiquidCollar({
       const cs = getComputedStyle(document.documentElement);
       const bg = parseHex(cs.getPropertyValue("--background").trim()) ?? [1, 1, 1];
       const fg = parseHex(cs.getPropertyValue("--foreground").trim()) ?? [0.09, 0.09, 0.09];
-      const muted = parseHex(cs.getPropertyValue("--muted").trim()) ?? [0.55, 0.55, 0.55];
+      const muted = parseHex(cs.getPropertyValue("--ns-muted").trim()) ?? [0.55, 0.55, 0.55];
       const border = parseHex(cs.getPropertyValue("--border").trim()) ?? [0.18, 0.18, 0.18];
-      const accentTok = parseHex(cs.getPropertyValue("--accent").trim()) ?? [0, 0.42, 1];
+      const accentTok = parseHex(cs.getPropertyValue("--ns-accent").trim()) ?? [0, 0.42, 1];
       accent = accentTok;
       if (luminance(bg) < 0.5) {
         dark = mixColors(border, bg, 0.3);

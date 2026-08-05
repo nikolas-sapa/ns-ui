@@ -29,7 +29,7 @@ import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from
 // transitionend that never fires (tab hidden mid-flight) must not strand a
 // zero-height region in the document.
 //
-// Tokens only: --border, --foreground, --muted, --surface, --accent. Accent is
+// Tokens only: --border, --foreground, --ns-muted, --surface, --ns-accent. Accent is
 // restricted to the action link and the focus rings; tone:"accent" shifts only
 // the 2px leading rule, never the bar's background.
 // ---------------------------------------------------------------------------
@@ -76,7 +76,7 @@ function MessageBody({ item, linkTabIndex }: { item: AnnouncementItem; linkTabIn
           <a
             href={item.action.href}
             tabIndex={linkTabIndex}
-            className="rounded-sm text-accent underline decoration-accent/40 underline-offset-[3px] outline-none transition-colors hover:decoration-accent focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+            className="rounded-sm text-ns-accent underline decoration-ns-accent/40 underline-offset-[3px] outline-none transition-colors hover:decoration-ns-accent focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
           >
             {item.action.label}
           </a>
@@ -269,7 +269,7 @@ export function AnnouncementBarRelay({
       <span
         aria-hidden="true"
         className="pointer-events-none absolute inset-y-0 left-0 w-[2px]"
-        style={{ background: toneAccent ? "var(--accent)" : "var(--border)" }}
+        style={{ background: toneAccent ? "var(--ns-accent)" : "var(--border)" }}
       />
 
       <div ref={contentRef} className="flex items-center gap-4 px-4 py-2.5 pl-5 sm:px-6 sm:pl-7">
@@ -300,7 +300,7 @@ export function AnnouncementBarRelay({
                 <span key={item.id} className={`ns-abr-pip ${i === 0 ? "ns-abr-pip-on" : ""}`} />
               ))}
             </span>
-            <span className="ml-1 font-mono text-[11px] tabular-nums text-muted">
+            <span className="ml-1 font-mono text-[11px] tabular-nums text-ns-muted">
               {position}/{items.length}
             </span>
           </div>
@@ -310,7 +310,7 @@ export function AnnouncementBarRelay({
             data-announcement-dismiss=""
             onClick={handleDismiss}
             aria-label={`Dismiss: ${shown.message}`}
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm text-muted outline-none transition-colors hover:bg-foreground/[0.07] hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-inset"
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm text-ns-muted outline-none transition-colors hover:bg-foreground/[0.07] hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-inset"
           >
             <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" className="h-3.5 w-3.5" aria-hidden="true">
               <path d="M4 4l8 8M12 4l-8 8" strokeLinecap="round" />
@@ -339,7 +339,7 @@ export function AnnouncementBarRelay({
                 <span key={item.id} className="ns-abr-pip" />
               ))}
             </span>
-            <span className="ml-1 font-mono text-[11px] tabular-nums text-muted">
+            <span className="ml-1 font-mono text-[11px] tabular-nums text-ns-muted">
               {Math.min(items.length, position + 1)}/{items.length}
             </span>
           </div>

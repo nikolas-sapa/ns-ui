@@ -356,12 +356,12 @@ export function ScissorReach({
           aria-valuemax={totalRows}
           aria-valuenow={1}
           aria-valuetext={`viewing ${unitLabel} 1-${initialEndRow} of ${totalRows}`}
-          className="absolute cursor-grab rounded-[3px] border-2 border-foreground/60 bg-foreground/[0.06] outline-none transition-colors hover:border-accent focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background active:cursor-grabbing"
+          className="absolute cursor-grab rounded-[3px] border-2 border-foreground/60 bg-foreground/[0.06] outline-none transition-colors hover:border-ns-accent focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background active:cursor-grabbing"
         />
       </div>
 
       <svg aria-hidden className="pointer-events-none absolute inset-0 h-full w-full overflow-visible">
-        <g ref={groupRef} className="text-muted transition-opacity duration-300 ease-out" style={{ opacity: 1 }}>
+        <g ref={groupRef} className="text-ns-muted transition-opacity duration-300 ease-out" style={{ opacity: 1 }}>
           {[0, 1, 2, 3].map((i) => (
             <line
               key={i}

@@ -308,7 +308,7 @@ export function CarryDigit({ value, decimals = 0, label, className = "" }: Carry
   return (
     <div className={`inline-flex flex-col items-start gap-1.5 ${className}`}>
       {label && (
-        <span className="font-mono text-[10px] uppercase tracking-widest text-muted">{label}</span>
+        <span className="font-mono text-[10px] uppercase tracking-widest text-ns-muted">{label}</span>
       )}
       <div role="status" aria-live="polite" aria-atomic="true" className="inline-flex items-baseline">
         <div aria-hidden className="flex items-baseline font-mono text-3xl font-medium tabular-nums text-foreground">

@@ -132,7 +132,7 @@ export function SieveFacets({
         viewBox={`0 0 ${Math.max(1, rowWidth)} ${HUB_HEIGHT}`}
         preserveAspectRatio="none"
       >
-        <circle cx={rowWidth / 2} cy={4} r={2} className="fill-muted" />
+        <circle cx={rowWidth / 2} cy={4} r={2} className="fill-ns-muted" />
         {FACETS.map((f) => {
           const x = anchors[f.key];
           if (x === undefined) return null;
@@ -184,10 +184,10 @@ export function SieveFacets({
               onMouseLeave={() => setHovered((h) => (h === f.key ? null : h))}
               onFocus={() => setHovered(f.key)}
               onBlur={() => setHovered((h) => (h === f.key ? null : h))}
-              className={`rounded-full border px-3 py-1.5 font-mono text-xs outline-none transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+              className={`rounded-full border px-3 py-1.5 font-mono text-xs outline-none transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                 isActive
                   ? "border-foreground/50 bg-foreground/[0.08] text-foreground"
-                  : "border-border text-muted hover:border-foreground/30 hover:text-foreground"
+                  : "border-border text-ns-muted hover:border-foreground/30 hover:text-foreground"
               }`}
             >
               {f.label}
@@ -203,13 +203,13 @@ export function SieveFacets({
             return (
               <span
                 key={i}
-                className={`nsui-sieve-dot h-1.5 w-1.5 rounded-full ${filled ? "scale-100 bg-foreground opacity-90" : "scale-75 bg-muted opacity-30"}`}
+                className={`nsui-sieve-dot h-1.5 w-1.5 rounded-full ${filled ? "scale-100 bg-foreground opacity-90" : "scale-75 bg-ns-muted opacity-30"}`}
                 style={reducedRef.current ? undefined : { transitionDelay: `${i * 22}ms` }}
               />
             );
           })}
         </div>
-        <p className="font-mono text-xs text-muted">{count} results</p>
+        <p className="font-mono text-xs text-ns-muted">{count} results</p>
       </div>
 
       <div ref={liveRef} aria-live="polite" aria-atomic="true" className="sr-only" />

@@ -160,7 +160,7 @@ export function RationRule({
 }
 `}</style>
 
-      <span id={labelId} className="block font-mono text-[11px] tracking-wide text-muted">
+      <span id={labelId} className="block font-mono text-[11px] tracking-wide text-ns-muted">
         {label.toUpperCase()}
       </span>
 
@@ -171,7 +171,7 @@ export function RationRule({
         }
       >
         {usedText} {unit}{" "}
-        <span className="text-muted">
+        <span className="text-ns-muted">
           of {maxText} {unit}
         </span>
       </p>

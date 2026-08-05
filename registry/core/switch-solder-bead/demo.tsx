@@ -16,7 +16,7 @@ export default function SolderBridgeDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-10 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / switch-solder-bead
       </p>
 
@@ -27,20 +27,20 @@ export default function SolderBridgeDemo() {
             onCheckedChange={setChecked}
             aria-label="Route traffic to secondary"
           />
-          <p className="font-mono text-[11px] uppercase tracking-wide text-muted">
+          <p className="font-mono text-[11px] uppercase tracking-wide text-ns-muted">
             {checked ? "on — 90% routed right" : "off — 90% routed left"}
           </p>
         </div>
 
         <div className="flex flex-col items-center gap-3">
           <SolderBridge ratio={0.35} aria-label="Cache allocation" />
-          <p className="font-mono text-[11px] uppercase tracking-wide text-muted">
+          <p className="font-mono text-[11px] uppercase tracking-wide text-ns-muted">
             ratio=0.35 — partial allocation
           </p>
         </div>
       </div>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Click or press Space to toggle. Mass melts across the neck and
         pinches off; the ratio prop renders any partial split directly.
       </p>

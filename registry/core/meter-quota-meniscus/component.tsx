@@ -14,7 +14,7 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 // overfull, still held by surface tension, no color change required to read
 // "tolerated but over." The instant value crosses the hard limit a bead
 // detaches from the outer wall and eases down under gravity, then a static
-// 1px --muted stain remains — the crossing becomes a permanent mark, not
+// 1px --ns-muted stain remains — the crossing becomes a permanent mark, not
 // just a momentary state. The whole shape is one SVG cubic bezier: fixed
 // endpoints at the current level, two shared control points whose y-offset
 // from that level is the single scalar that walks concave -> flat -> convex.
@@ -23,7 +23,7 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 // simulation loop needed. `role=meter` carries the real semantics (SVG is
 // aria-hidden); a Geist Mono numeric readout beside the vessel means
 // curvature is never the only signal. Every stroke/fill is a token-driven
-// Tailwind class (text-border/text-muted/text-foreground/text-accent) at
+// Tailwind class (text-border/text-ns-muted/text-foreground/text-ns-accent) at
 // low opacity — no hex, no canvas, no getComputedStyle needed since nothing
 // here is a raster surface.
 // ---------------------------------------------------------------------------
@@ -185,7 +185,7 @@ export function MeniscusMeter({
 `}</style>
 
       <div className="flex items-baseline justify-between gap-3">
-        <span id={labelId} className="font-mono text-[11px] tracking-wide text-muted">
+        <span id={labelId} className="font-mono text-[11px] tracking-wide text-ns-muted">
           {label.toUpperCase()}
         </span>
         <span
@@ -203,7 +203,7 @@ export function MeniscusMeter({
           {fmt(value)}
           {unit === "%" ? "%" : ""}
         </span>
-        <span className="font-mono text-xs text-muted">
+        <span className="font-mono text-xs text-ns-muted">
           / {fmt(hardLimit)}
           {unit !== "%" ? ` ${unit}` : ""} cap
         </span>
@@ -285,7 +285,7 @@ export function MeniscusMeter({
               x2={BEAD_X}
               y1={RIM_Y}
               y2={RIM_Y + DRIP_LEN}
-              className="stroke-current text-muted opacity-60"
+              className="stroke-current text-ns-muted opacity-60"
               strokeWidth={1}
             />
           ) : null}
@@ -296,13 +296,13 @@ export function MeniscusMeter({
               cx={BEAD_X}
               cy={RIM_Y}
               r={2.25}
-              className="ns-meniscus-bead fill-current text-muted"
+              className="ns-meniscus-bead fill-current text-ns-muted"
             />
           ) : null}
         </svg>
       </div>
 
-      <p className="mt-2 text-center font-mono text-[11px] text-muted">
+      <p className="mt-2 text-center font-mono text-[11px] text-ns-muted">
         {zone === "spill"
           ? "held — overflow marked on the glass"
           : zone === "grace"

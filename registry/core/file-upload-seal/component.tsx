@@ -257,7 +257,7 @@ function FileCard({
             <>
               <rect
                 ref={mutedRef}
-                className="text-muted"
+                className="text-ns-muted"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth={1.5}
@@ -282,7 +282,7 @@ function FileCard({
         </svg>
 
         <div className="relative z-[1] flex items-center gap-3 px-4 py-3">
-          <span className="shrink-0 text-muted" aria-hidden>
+          <span className="shrink-0 text-ns-muted" aria-hidden>
             {file.status === "sealed" ? (
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 text-foreground">
                 <path d="M4 12.5 9.5 18 20 6" />
@@ -309,7 +309,7 @@ function FileCard({
               aria-valuemax={100}
               aria-valuenow={pct}
               aria-valuetext={statusText(file)}
-              className="font-mono text-[11px] text-muted"
+              className="font-mono text-[11px] text-ns-muted"
             >
               {statusText(file)}
             </p>
@@ -617,9 +617,9 @@ export function VacuumSeal({
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
         onDrop={onDrop}
-        className={`relative flex min-h-[7rem] cursor-pointer flex-col items-center justify-center gap-1.5 rounded-md border border-dashed px-6 py-7 text-center outline-none transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+        className={`relative flex min-h-[7rem] cursor-pointer flex-col items-center justify-center gap-1.5 rounded-md border border-dashed px-6 py-7 text-center outline-none transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
           isOver
-            ? "border-accent bg-accent/[0.05]"
+            ? "border-ns-accent bg-ns-accent/[0.05]"
             : "border-border bg-surface hover:border-foreground/25"
         }`}
       >
@@ -631,7 +631,7 @@ export function VacuumSeal({
           strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className={`h-5 w-5 transition-colors duration-200 ${isOver ? "text-accent" : "text-muted"}`}
+          className={`h-5 w-5 transition-colors duration-200 ${isOver ? "text-ns-accent" : "text-ns-muted"}`}
         >
           <rect x="4" y="4" width="16" height="16" rx="2" />
           <path d="M9 12h6M12 9v6" />
@@ -644,12 +644,12 @@ export function VacuumSeal({
               e.stopPropagation();
               openPicker();
             }}
-            className="rounded-[4px] font-medium text-accent underline-offset-2 outline-none transition-colors hover:underline focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+            className="rounded-[4px] font-medium text-ns-accent underline-offset-2 outline-none transition-colors hover:underline focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
           >
             browse
           </button>
         </p>
-        <p id={hintId} className="font-mono text-[11px] tracking-wide text-muted">
+        <p id={hintId} className="font-mono text-[11px] tracking-wide text-ns-muted">
           {hint}
         </p>
       </div>
@@ -676,7 +676,7 @@ export function VacuumSeal({
         </ul>
       )}
 
-      <p role="status" aria-live="polite" className="min-h-4 font-mono text-[11px] text-muted">
+      <p role="status" aria-live="polite" className="min-h-4 font-mono text-[11px] text-ns-muted">
         {announce}
       </p>
 

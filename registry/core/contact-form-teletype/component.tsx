@@ -141,7 +141,7 @@ export function ContactFormTeletype({
   }
 
   const fieldCls =
-    "ns-cft-field w-full rounded-sm border border-border bg-background px-3 py-2 font-mono text-sm text-foreground outline-none transition-colors duration-150 placeholder:text-muted/60 hover:border-muted focus-visible:border-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+    "ns-cft-field w-full rounded-sm border border-border bg-background px-3 py-2 font-mono text-sm text-foreground outline-none transition-colors duration-150 placeholder:text-ns-muted/60 hover:border-ns-muted focus-visible:border-ns-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent";
 
   return (
     <div className={`ns-cft w-full ${className}`}>
@@ -151,7 +151,7 @@ export function ContactFormTeletype({
           const fieldId = `${uid}-${field.name}`;
           return (
             <div key={field.name} className="flex flex-col gap-1.5">
-              <label htmlFor={fieldId} className="font-mono text-xs uppercase tracking-widest text-muted">
+              <label htmlFor={fieldId} className="font-mono text-xs uppercase tracking-widest text-ns-muted">
                 {field.label}
               </label>
               {field.type === "textarea" ? (
@@ -180,7 +180,7 @@ export function ContactFormTeletype({
         })}
         <button
           type="submit"
-          className="ns-cft-submit self-start rounded-sm border border-border px-4 py-2 font-mono text-xs uppercase tracking-widest text-foreground transition-colors duration-150 hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="ns-cft-submit self-start rounded-sm border border-border px-4 py-2 font-mono text-xs uppercase tracking-widest text-foreground transition-colors duration-150 hover:border-ns-accent hover:text-ns-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
         >
           Send
         </button>
@@ -192,9 +192,9 @@ export function ContactFormTeletype({
         aria-label="Field validation receipt"
         className="ns-cft-receipt mt-6 flex flex-col gap-0.5 rounded-sm border border-border bg-surface p-3 font-mono text-xs"
       >
-        <p className="pb-1 text-muted">— RECEIPT —</p>
+        <p className="pb-1 text-ns-muted">— RECEIPT —</p>
         {entries.length === 0 && (
-          <p aria-hidden="true" className="text-muted/60">
+          <p aria-hidden="true" className="text-ns-muted/60">
             (awaiting input)
           </p>
         )}

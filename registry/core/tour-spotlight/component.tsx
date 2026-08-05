@@ -337,13 +337,13 @@ export function LeadingLight({ steps, active, onNext, onBack, onExit, className 
           Step {active + 1} of {steps.length}: {step.title}
         </span>
         <div className="flex items-center justify-between">
-          <span className="font-mono text-[11px] uppercase tracking-wide text-muted">
+          <span className="font-mono text-[11px] uppercase tracking-wide text-ns-muted">
             {active + 1} of {steps.length}
           </span>
           <button
             type="button"
             onClick={onExit}
-            className="rounded-[6px] px-1.5 py-0.5 font-mono text-[11px] text-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="rounded-[6px] px-1.5 py-0.5 font-mono text-[11px] text-ns-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             Skip
           </button>
@@ -351,7 +351,7 @@ export function LeadingLight({ steps, active, onNext, onBack, onExit, className 
         <h3 id={titleId} className="text-sm font-medium text-foreground">
           {step.title}
         </h3>
-        <p id={bodyId} className="text-xs leading-relaxed text-muted">
+        <p id={bodyId} className="text-xs leading-relaxed text-ns-muted">
           {step.body}
         </p>
         <div className="mt-1 flex items-center justify-between gap-2">
@@ -360,7 +360,7 @@ export function LeadingLight({ steps, active, onNext, onBack, onExit, className 
             onClick={onBack}
             disabled={active === 0}
             aria-disabled={active === 0}
-            className="rounded-[6px] border border-border px-2.5 py-1 text-xs text-foreground transition-colors hover:border-foreground disabled:pointer-events-none disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="rounded-[6px] border border-border px-2.5 py-1 text-xs text-foreground transition-colors hover:border-foreground disabled:pointer-events-none disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             Back
           </button>
@@ -371,7 +371,7 @@ export function LeadingLight({ steps, active, onNext, onBack, onExit, className 
             onMouseEnter={() => {
               flickerRef.current = true;
             }}
-            className="rounded-[6px] border border-foreground bg-foreground px-2.5 py-1 text-xs font-medium text-background transition-opacity hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="rounded-[6px] border border-foreground bg-foreground px-2.5 py-1 text-xs font-medium text-background transition-opacity hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             {active === steps.length - 1 ? "Done" : "Next"}
           </button>

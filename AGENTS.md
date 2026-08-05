@@ -136,8 +136,8 @@ component with no ambiguity to resolve — tag-derivation is fine there and won'
 
 ## The token/theme rule (hard constraint, not a suggestion)
 
-Colors come from CSS custom properties already in scope — `--background --foreground --muted
---border --accent` — never hardcoded hex, in component markup OR in canvas/SVG draw code. This
+Colors come from CSS custom properties already in scope — `--background --foreground --ns-muted
+--border --ns-accent` — never hardcoded hex, in component markup OR in canvas/SVG draw code. This
 broke the light theme across the whole registry once already. If a component derives ink for a
 `<canvas>`, read it via `getComputedStyle` at mount/theme-change, don't bake in a color literal.
 Both light and dark themes must render correctly — verify both, not just whichever your terminal

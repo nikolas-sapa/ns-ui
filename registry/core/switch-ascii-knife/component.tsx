@@ -59,7 +59,7 @@ export function ThrowSwitch({
         el.className = "text-foreground font-semibold";
       } else {
         el.textContent = LIGHT;
-        el.className = "text-muted";
+        el.className = "text-ns-muted";
       }
     }
   };
@@ -129,16 +129,16 @@ export function ThrowSwitch({
       aria-label={ariaLabel}
       disabled={disabled}
       onClick={toggle}
-      className={`group inline-flex items-center gap-2 rounded-sm px-1.5 py-0.5 font-mono text-sm tabular-nums transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent ${
+      className={`group inline-flex items-center gap-2 rounded-sm px-1.5 py-0.5 font-mono text-sm tabular-nums transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ns-accent ${
         disabled ? "cursor-not-allowed opacity-40" : "cursor-pointer hover:bg-surface"
       } ${className}`}
     >
-      <span aria-hidden="true" className={isChecked ? "text-muted" : "text-foreground font-semibold"}>
+      <span aria-hidden="true" className={isChecked ? "text-ns-muted" : "text-foreground font-semibold"}>
         OFF
       </span>
       <span
         aria-hidden="true"
-        className="text-foreground transition-colors group-hover:text-accent"
+        className="text-foreground transition-colors group-hover:text-ns-accent"
       >
         [
         {Array.from({ length: CELLS }).map((_, i) => (
@@ -151,7 +151,7 @@ export function ThrowSwitch({
         ))}
         ]
       </span>
-      <span aria-hidden="true" className={isChecked ? "text-foreground font-semibold" : "text-muted"}>
+      <span aria-hidden="true" className={isChecked ? "text-foreground font-semibold" : "text-ns-muted"}>
         ON
       </span>
     </button>

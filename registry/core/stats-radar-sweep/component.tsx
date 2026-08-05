@@ -9,7 +9,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 // emitted once per revolution. Each card's bearing from the top-left pivot is
 // measured from DOM rects (offset coords, re-measured on resize); when the
 // arm transits within ±2° the card wakes: value counts up over 900ms
-// ease-out-expo, border tweens --border→--accent (200ms) then decays back
+// ease-out-expo, border tweens --border→--ns-accent (200ms) then decays back
 // (1.6s), and the trend delta fades in — one reading per pass, resting muted
 // between transits. Hover/focus replays the count-up without the accent
 // border (accent is sweep-earned only). Rings and wedge live in pruned lists
@@ -171,7 +171,7 @@ const DEFAULT_STATS: ScanStat[] = [
 const PIVOT = 24;
 const COUNT_MS = 900; // value count-up
 const DELTA_MS = 300; // trend delta fade-in
-const BORDER_IN_MS = 200; // --border → --accent
+const BORDER_IN_MS = 200; // --border → --ns-accent
 const BORDER_OUT_MS = 1600; // decay back to --border
 const TWEEN_MS = BORDER_IN_MS + BORDER_OUT_MS; // hard end for every wake
 const RING_SPEED = 320; // px/s expansion
@@ -249,7 +249,7 @@ export function ScanSweepStats({
     const derive = () => {
       const cs = getComputedStyle(document.documentElement);
       fg = parseColor(cs.getPropertyValue("--foreground")) ?? fg;
-      accent = parseColor(cs.getPropertyValue("--accent")) ?? accent;
+      accent = parseColor(cs.getPropertyValue("--ns-accent")) ?? accent;
       borderC = parseColor(cs.getPropertyValue("--border")) ?? borderC;
     };
     derive();
@@ -382,7 +382,7 @@ export function ScanSweepStats({
       c.active = true;
       c.accent = earned;
       c.wakeAt = performance.now();
-      c.valueEl.classList.remove("text-muted");
+      c.valueEl.classList.remove("text-ns-muted");
       c.valueEl.classList.add("text-foreground");
       wake();
     };
@@ -403,7 +403,7 @@ export function ScanSweepStats({
           c.el.style.borderColor = ""; // fall back to class border-border
           if (c.deltaEl) c.deltaEl.style.opacity = "1";
           c.valueEl.classList.remove("text-foreground");
-          c.valueEl.classList.add("text-muted");
+          c.valueEl.classList.add("text-ns-muted");
           continue;
         }
         any = true;
@@ -572,7 +572,7 @@ export function ScanSweepStats({
         onClick={togglePause}
         aria-pressed={paused}
         aria-label={paused ? "Resume radar sweep" : "Pause radar sweep"}
-        className="absolute left-3.5 top-3.5 z-20 flex h-5 w-5 items-center justify-center rounded-full border border-border bg-surface text-muted transition-colors duration-200 hover:border-foreground/25 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/70"
+        className="absolute left-3.5 top-3.5 z-20 flex h-5 w-5 items-center justify-center rounded-full border border-border bg-surface text-ns-muted transition-colors duration-200 hover:border-foreground/25 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/70"
       >
         {paused ? (
           <span aria-hidden className="flex gap-[3px]">
@@ -589,14 +589,14 @@ export function ScanSweepStats({
             {title}
           </h3>
           {paused ? (
-            <span className="font-mono text-[10px] tracking-widest text-muted">
+            <span className="font-mono text-[10px] tracking-widest text-ns-muted">
               PAUSED
             </span>
           ) : null}
           <span
             ref={clockRef}
             suppressHydrationWarning
-            className="ml-auto font-mono text-[11px] tabular-nums text-muted"
+            className="ml-auto font-mono text-[11px] tabular-nums text-ns-muted"
           />
         </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -622,7 +622,7 @@ export function ScanSweepStats({
                 className="pointer-events-none absolute inset-0 rounded-md bg-foreground/[0.045] opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100 group-data-[raised=true]:opacity-100"
               />
               <div className="relative">
-                <div className="flex items-center gap-1.5 text-muted">
+                <div className="flex items-center gap-1.5 text-ns-muted">
                   {s.icon}
                   <span className="font-mono text-[10px] uppercase tracking-widest">
                     {s.label}
@@ -631,14 +631,14 @@ export function ScanSweepStats({
                 <div className="mt-2.5 flex items-baseline gap-2">
                   <span
                     data-value
-                    className="font-mono text-lg tabular-nums text-muted transition-colors duration-500"
+                    className="font-mono text-lg tabular-nums text-ns-muted transition-colors duration-500"
                   >
                     {(s.format ?? defaultFormat)(s.value)}
                   </span>
                   {s.delta ? (
                     <span
                       data-delta
-                      className="font-mono text-[11px] tabular-nums text-muted"
+                      className="font-mono text-[11px] tabular-nums text-ns-muted"
                     >
                       {s.delta}
                     </span>
@@ -648,7 +648,7 @@ export function ScanSweepStats({
             </div>
           ))}
         </div>
-        <div className="mt-5 flex items-center justify-between font-mono text-[10px] tracking-widest text-muted">
+        <div className="mt-5 flex items-center justify-between font-mono text-[10px] tracking-widest text-ns-muted">
           <span ref={sweepRef}>SWEEP 001</span>
           <span>
             {stats.length} SENSORS · {Math.round(360 / Math.max(1, degPerSec))}S

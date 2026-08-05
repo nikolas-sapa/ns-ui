@@ -328,7 +328,7 @@ export function BurrChip({
                 onFocus={() => setFocusedTag(tag)}
                 onClick={() => removeTag(tag)}
                 onKeyDown={(e) => onButtonKeyDown(e, tag, idx)}
-                className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-muted transition-colors duration-150 hover:bg-border hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:pointer-events-none"
+                className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-ns-muted transition-colors duration-150 hover:bg-border hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent disabled:pointer-events-none"
               >
                 <svg aria-hidden viewBox="0 0 10 10" className="h-2.5 w-2.5">
                   <path
@@ -352,7 +352,7 @@ export function BurrChip({
           onKeyDown={onInputKeyDown}
           placeholder={tags.length === 0 ? placeholder : ""}
           aria-label={inputLabel}
-          className="min-w-[6rem] flex-1 bg-transparent text-sm text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="min-w-[6rem] flex-1 bg-transparent text-sm text-foreground placeholder:text-ns-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
         />
       </div>
       <span id={liveId} role="status" aria-live="polite" className="sr-only">

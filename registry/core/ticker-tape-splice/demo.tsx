@@ -35,13 +35,13 @@ export default function BourseTapeDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">ns-ui / ticker-tape-splice</p>
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">ns-ui / ticker-tape-splice</p>
 
       <div data-ns-bt-focus className="w-full max-w-xl">
         <BourseTape quotes={quotes} paused={paused} onPausedChange={setPaused} />
       </div>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         New quotes splice in from the right; hover or focus the tape to brake
         it, or use the transport button to pause outright.
       </p>

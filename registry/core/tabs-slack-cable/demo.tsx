@@ -6,7 +6,7 @@ import { SlackRail } from "./component";
 function StatRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between border-b border-border py-2 text-sm last:border-b-0">
-      <span className="text-muted">{label}</span>
+      <span className="text-ns-muted">{label}</span>
       <span className="font-mono text-foreground">{value}</span>
     </div>
   );
@@ -39,11 +39,11 @@ function ActivityPanel() {
     <ul className="flex flex-col gap-3">
       {events.map((e, i) => (
         <li key={i} className="flex items-start gap-3 text-sm">
-          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border font-mono text-[10px] text-muted">
+          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border font-mono text-[10px] text-ns-muted">
             {e.who}
           </span>
           <span className="min-w-0 flex-1 text-foreground">{e.what}</span>
-          <span className="shrink-0 font-mono text-xs text-muted">{e.when}</span>
+          <span className="shrink-0 font-mono text-xs text-ns-muted">{e.when}</span>
         </li>
       ))}
     </ul>
@@ -64,7 +64,7 @@ function MembersPanel() {
           className="flex items-center justify-between rounded-sm border border-border px-3 py-2"
         >
           <span className="text-sm text-foreground">{m.name}</span>
-          <span className="font-mono text-xs text-muted">{m.role}</span>
+          <span className="font-mono text-xs text-ns-muted">{m.role}</span>
         </div>
       ))}
     </div>
@@ -89,7 +89,7 @@ export default function SlackRailDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / tabs-slack-cable — the underline is a cable, not a bar
       </p>
 
@@ -107,7 +107,7 @@ export default function SlackRailDemo() {
         />
       </div>
 
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Click a tab — the cable pays out and sags across the jump, more for a
         far tab than a near one, then tautens flat with a small snap. Hover a
         tab you're not on and the nearest end tugs 3px toward it. Arrow keys,

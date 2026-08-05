@@ -65,13 +65,13 @@ const GLYPH: Record<SlotStatus, string> = {
 // invisible as type on the light theme (#ebebeb on #fafafa), which would leave
 // the free cells and the rule blank at rest. Muted tints read in both themes
 // and still sit below the busy blocks in the hierarchy.
-const FREE_INK = "text-muted/50";
-const RULE_INK = "text-muted/55";
-const OPTIONAL_INK = "text-muted/30";
+const FREE_INK = "text-ns-muted/50";
+const RULE_INK = "text-ns-muted/55";
+const OPTIONAL_INK = "text-ns-muted/30";
 
 const GLYPH_CLASS: Record<SlotStatus, string> = {
   free: FREE_INK,
-  tentative: "text-muted",
+  tentative: "text-ns-muted",
   busy: "text-foreground",
   out: FREE_INK,
 };
@@ -256,7 +256,7 @@ export function ScheduleAsciiFreebusy({
   const inBest = (k: number) => !!best && k >= best.start && k <= best.end;
 
   const colTint = (k: number) =>
-    hoverCol === k ? "bg-accent/[0.10]" : inBest(k) ? "bg-accent/[0.06]" : "";
+    hoverCol === k ? "bg-ns-accent/[0.10]" : inBest(k) ? "bg-ns-accent/[0.06]" : "";
 
   /** underline glyph for a window of `len` columns at offset `i` */
   const underline = (len: number, i: number) => {
@@ -275,7 +275,7 @@ export function ScheduleAsciiFreebusy({
   return (
     <div className={`inline-flex flex-col gap-3 font-mono text-[14px] ${className}`}>
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <span className="text-[11px] uppercase tracking-[0.18em] text-muted">{title}</span>
+        <span className="text-[11px] uppercase tracking-[0.18em] text-ns-muted">{title}</span>
         <div
           ref={durationRef}
           role="radiogroup"
@@ -294,8 +294,8 @@ export function ScheduleAsciiFreebusy({
                 tabIndex={on || (!durations.includes(duration) && i === 0) ? 0 : -1}
                 onClick={() => setDuration(d)}
                 onKeyDown={(e) => onDurationKeyDown(e, i)}
-                className={`px-2.5 py-1 text-[11px] tabular-nums outline-none transition-colors duration-150 first:rounded-l-sm last:rounded-r-sm motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-accent ${
-                  on ? "bg-accent/[0.14] text-foreground" : "text-muted hover:text-foreground"
+                className={`px-2.5 py-1 text-[11px] tabular-nums outline-none transition-colors duration-150 first:rounded-l-sm last:rounded-r-sm motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-ns-accent ${
+                  on ? "bg-ns-accent/[0.14] text-foreground" : "text-ns-muted hover:text-foreground"
                 }`}
               >
                 {d} min
@@ -328,7 +328,7 @@ export function ScheduleAsciiFreebusy({
                 aria-colindex={k + 2}
                 aria-colspan={Math.min(2, slots - k)}
                 style={{ gridColumn: `span ${Math.min(2, slots - k)}` }}
-                className="flex h-[1.35em] items-center text-[10px] tabular-nums text-muted"
+                className="flex h-[1.35em] items-center text-[10px] tabular-nums text-ns-muted"
               >
                 {timeAt(k).slice(0, 2)}
               </div>
@@ -348,8 +348,8 @@ export function ScheduleAsciiFreebusy({
                   aria-pressed={!off}
                   aria-label={`${a.name} — ${off ? "optional, excluded from the search" : "required"}. Toggle.`}
                   onClick={() => toggle(a.id)}
-                  className={`w-full truncate rounded-[2px] text-left text-[12px] outline-none transition-colors duration-150 motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-accent ${
-                    off ? "text-muted/60 hover:text-muted" : "text-foreground hover:text-accent"
+                  className={`w-full truncate rounded-[2px] text-left text-[12px] outline-none transition-colors duration-150 motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-ns-accent ${
+                    off ? "text-ns-muted/60 hover:text-ns-muted" : "text-foreground hover:text-ns-accent"
                   }`}
                 >
                   {off ? `(${a.name})` : a.name}
@@ -374,7 +374,7 @@ export function ScheduleAsciiFreebusy({
                       setHoverCol(k);
                     }}
                     onKeyDown={(e) => onCellKeyDown(e, r, k)}
-                    className={`${cell} rounded-[1px] outline-none transition-colors duration-150 motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-accent ${colTint(k)} ${
+                    className={`${cell} rounded-[1px] outline-none transition-colors duration-150 motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-ns-accent ${colTint(k)} ${
                       off ? OPTIONAL_INK : GLYPH_CLASS[status]
                     }`}
                   >
@@ -407,7 +407,7 @@ export function ScheduleAsciiFreebusy({
               <div
                 key={k}
                 className={`flex h-[1.1em] items-center justify-center leading-none ${
-                  isBest ? "text-accent" : "text-muted"
+                  isBest ? "text-ns-accent" : "text-ns-muted"
                 }`}
               >
                 {r ? underline(len, k - r.start) : ""}
@@ -424,7 +424,7 @@ export function ScheduleAsciiFreebusy({
             aria-live="polite"
             style={{ gridColumn: `${(best ? Math.min(best.start, 5) : 0) + 2} / -1` }}
             className={`flex h-[1.35em] items-center whitespace-nowrap text-[12px] tabular-nums ${
-              best ? "text-accent" : "text-muted"
+              best ? "text-ns-accent" : "text-ns-muted"
             }`}
           >
             {answer}
@@ -433,7 +433,7 @@ export function ScheduleAsciiFreebusy({
       </div>
 
       {/* readout: hover detail crossfading with the resting hint */}
-      <div className="relative h-[1.4em] text-[11px] text-muted">
+      <div className="relative h-[1.4em] text-[11px] text-ns-muted">
         <span
           className={`absolute inset-0 flex items-center whitespace-nowrap transition-opacity duration-150 motion-reduce:transition-none ${
             hoverLine ? "opacity-0" : "opacity-100"

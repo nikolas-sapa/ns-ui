@@ -42,12 +42,12 @@ export default function ShortFuseDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-sm">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">
+        <p className="mb-4 font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / toast-undo-fuse
         </p>
         <div className="overflow-hidden rounded-md border border-border bg-background">
           <header className="border-b border-border px-4 py-3">
-            <span className="font-mono text-xs tracking-widest text-muted">
+            <span className="font-mono text-xs tracking-widest text-ns-muted">
               INBOX
             </span>
           </header>
@@ -59,12 +59,12 @@ export default function ShortFuseDemo() {
               >
                 <div className="min-w-0">
                   <p className="truncate text-sm text-foreground">{it.title}</p>
-                  <p className="truncate text-xs text-muted">{it.subtitle}</p>
+                  <p className="truncate text-xs text-ns-muted">{it.subtitle}</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => archive(i)}
-                  className="shrink-0 cursor-pointer rounded-[6px] border border-border px-2.5 py-1 font-mono text-[11px] tracking-widest text-muted transition-colors duration-150 hover:border-foreground/20 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                  className="shrink-0 cursor-pointer rounded-[6px] border border-border px-2.5 py-1 font-mono text-[11px] tracking-widest text-ns-muted transition-colors duration-150 hover:border-foreground/20 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
                 >
                   ARCHIVE
                 </button>
@@ -83,7 +83,7 @@ export default function ShortFuseDemo() {
           />
         </div>
 
-        <p className="mt-3 truncate font-mono text-[11px] text-muted">{log}</p>
+        <p className="mt-3 truncate font-mono text-[11px] text-ns-muted">{log}</p>
       </div>
     </main>
   );

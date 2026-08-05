@@ -21,7 +21,7 @@ export default function AssayGateDemo() {
   return (
     <main className="flex min-h-screen justify-center bg-background px-6 py-16">
       <div className="w-full max-w-lg">
-        <p className="mb-8 font-mono text-xs uppercase tracking-[0.2em] text-muted">
+        <p className="mb-8 font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
           ns-ui / approval-inline-diff — tool-call approval
         </p>
 
@@ -29,7 +29,7 @@ export default function AssayGateDemo() {
           <h2 className="text-sm font-medium text-foreground">
             Awaiting your review
           </h2>
-          <p className="mt-1 text-sm leading-relaxed text-muted">
+          <p className="mt-1 text-sm leading-relaxed text-ns-muted">
             deploy-agent wants to run a shell command — someone already
             caught the target and walked it back to staging. Edit any
             argument before you decide; the change is recorded, not

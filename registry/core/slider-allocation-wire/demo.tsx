@@ -12,7 +12,7 @@ export default function CatenarySplitDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / slider-allocation-wire — the wire is the readout
       </p>
 
@@ -21,7 +21,7 @@ export default function CatenarySplitDemo() {
           <h2 className="text-sm font-medium text-foreground">
             Cluster budget
           </h2>
-          <p className="mt-0.5 text-xs text-muted">
+          <p className="mt-0.5 text-xs text-ns-muted">
             Drag the bead to shift the split. Scroll or drag the total track
             to winch how much of the budget is actually committed.
           </p>
@@ -43,7 +43,7 @@ export default function CatenarySplitDemo() {
           <h2 className="text-sm font-medium text-foreground">
             Traffic weighting
           </h2>
-          <p className="mt-0.5 text-xs text-muted">
+          <p className="mt-0.5 text-xs text-ns-muted">
             Fully committed by default — the wire snaps taut with a decaying
             twang the moment total allocation lands at 100%.
           </p>

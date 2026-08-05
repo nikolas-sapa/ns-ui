@@ -655,7 +655,7 @@ export function CatenarySplit({
           <path
             ref={pathRef}
             fill="none"
-            stroke="var(--muted)"
+            stroke="var(--ns-muted)"
             strokeWidth={1.5}
             strokeLinecap="round"
           />
@@ -681,12 +681,12 @@ export function CatenarySplit({
           onKeyDown={onBeadKeyDown}
           onFocus={() => setRatioActive(true)}
           onBlur={() => setRatioActive(false)}
-          className="absolute left-0 top-0 h-7 w-7 cursor-grab rounded-full outline-none will-change-transform active:cursor-grabbing focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          className="absolute left-0 top-0 h-7 w-7 cursor-grab rounded-full outline-none will-change-transform active:cursor-grabbing focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           <span
             aria-hidden
             data-active={ratioActive}
-            className="absolute inset-[3px] rounded-full border border-border bg-background transition-colors duration-150 group-hover:border-foreground/40 data-[active=true]:border-accent"
+            className="absolute inset-[3px] rounded-full border border-border bg-background transition-colors duration-150 group-hover:border-foreground/40 data-[active=true]:border-ns-accent"
           />
           <span
             aria-hidden
@@ -697,7 +697,7 @@ export function CatenarySplit({
 
       <div className="flex items-start justify-between px-0.5 pt-1 font-mono">
         <div className="flex flex-col gap-0.5">
-          <span className="text-xs text-muted">{leftLabel}</span>
+          <span className="text-xs text-ns-muted">{leftLabel}</span>
           <span
             ref={leftPctRef}
             className="tabular-nums text-sm text-foreground"
@@ -706,7 +706,7 @@ export function CatenarySplit({
           </span>
         </div>
         <div className="flex flex-col items-end gap-0.5">
-          <span className="text-xs text-muted">{rightLabel}</span>
+          <span className="text-xs text-ns-muted">{rightLabel}</span>
           <span
             ref={rightPctRef}
             className="tabular-nums text-sm text-foreground"
@@ -718,12 +718,12 @@ export function CatenarySplit({
 
       <div className="mt-5">
         <div className="flex items-center justify-between pb-1.5">
-          <span className="font-mono text-xs text-muted">
+          <span className="font-mono text-xs text-ns-muted">
             Total allocated
           </span>
           <span
             ref={totalCaptionRef}
-            className="font-mono text-xs tabular-nums text-muted"
+            className="font-mono text-xs tabular-nums text-ns-muted"
           >
             {totalNow}%
           </span>
@@ -756,7 +756,7 @@ export function CatenarySplit({
             engineRef.current?.totalDragEnd();
             setTotalActive(false);
           }}
-          className="relative h-4 w-full cursor-ew-resize touch-none outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          className="relative h-4 w-full cursor-ew-resize touch-none outline-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           <span className="absolute left-0 top-1/2 h-1 w-full -translate-y-1/2 rounded-full bg-border" />
           <div
@@ -768,7 +768,7 @@ export function CatenarySplit({
             ref={totalHandleRef}
             data-active={totalActive}
             style={{ left: `${totalNow}%` }}
-            className="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-border bg-background transition-colors duration-150 data-[active=true]:border-accent"
+            className="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-border bg-background transition-colors duration-150 data-[active=true]:border-ns-accent"
           />
         </div>
       </div>

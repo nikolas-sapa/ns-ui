@@ -50,19 +50,19 @@ export default function JackKnifeDemo() {
 
   return (
     <div ref={rootRef} className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / context-menu-unfold
       </p>
 
       <div className="flex w-full max-w-md flex-col items-center gap-3">
         <JackKnife items={ITEMS} label="File actions" onSelect={() => {}}>
-          <div className="flex h-40 w-full max-w-md items-center justify-center rounded-[12px] border border-dashed border-border text-xs text-muted">
+          <div className="flex h-40 w-full max-w-md items-center justify-center rounded-[12px] border border-dashed border-border text-xs text-ns-muted">
             Right-click this surface, or use the File actions button below
           </div>
         </JackKnife>
       </div>
 
-      <p className="max-w-sm text-center text-xs text-muted">
+      <p className="max-w-sm text-center text-xs text-ns-muted">
         Items swing out from a hinge like knife blades; Export as opens a
         smaller knife of its own.
       </p>

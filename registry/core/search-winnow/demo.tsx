@@ -19,11 +19,11 @@ export default function ChaffWinnowDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-md">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">
+        <p className="mb-4 font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / search-winnow
         </p>
         <ChaffWinnow label="Search unix tools" placeholder="Filter tools…" items={ITEMS} />
-        <p className="mt-3 font-mono text-[11px] text-muted">
+        <p className="mt-3 font-mono text-[11px] text-ns-muted">
           non-matches tumble aside and their slots close behind them — clear
           the query and the chaff settles back
         </p>

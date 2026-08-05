@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 // glyph strung on a 1px vertical rail — no colored badges, no status pills:
 // a hollow ring is pending, a half-filled disc is running, a filled dot is
 // done, and a stroked diamond with a cross is failed (a distinct FORM, not a
-// color — --accent stays reserved for the fold affordance and focus rings).
+// color — --ns-accent stays reserved for the fold affordance and focus rings).
 // Steps stream in over time as the `steps` array grows; the currently
 // running step (or, once nothing is running, the most recent step) stays
 // expanded by default while every earlier step folds to a single line, so a
@@ -241,13 +241,13 @@ export function SoundingRail({
                     aria-expanded={expanded}
                     aria-controls={detailId}
                     aria-label={`${expanded ? "Collapse" : "Expand"} ${step.label}`}
-                    className="group -mx-1 flex min-h-6 w-full items-center gap-2 rounded-sm px-1 text-left outline-none transition-colors duration-150 hover:bg-foreground/[0.04] focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface motion-reduce:transition-none"
+                    className="group -mx-1 flex min-h-6 w-full items-center gap-2 rounded-sm px-1 text-left outline-none transition-colors duration-150 hover:bg-foreground/[0.04] focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface motion-reduce:transition-none"
                   >
                     <span className="min-w-0 flex-1 truncate text-sm text-foreground">
                       {step.label}
                     </span>
                     {step.time ? (
-                      <span className="shrink-0 font-mono text-[10px] text-muted">
+                      <span className="shrink-0 font-mono text-[10px] text-ns-muted">
                         {step.time}
                       </span>
                     ) : null}
@@ -256,7 +256,7 @@ export function SoundingRail({
                       height="10"
                       viewBox="0 0 10 10"
                       aria-hidden="true"
-                      className={`shrink-0 text-muted transition-transform duration-200 motion-reduce:transition-none ${
+                      className={`shrink-0 text-ns-muted transition-transform duration-200 motion-reduce:transition-none ${
                         expanded ? "rotate-90" : ""
                       } group-hover:text-foreground`}
                     >
@@ -276,7 +276,7 @@ export function SoundingRail({
                       {step.label}
                     </span>
                     {step.time ? (
-                      <span className="shrink-0 font-mono text-[10px] text-muted">
+                      <span className="shrink-0 font-mono text-[10px] text-ns-muted">
                         {step.time}
                       </span>
                     ) : null}
@@ -291,7 +291,7 @@ export function SoundingRail({
                     <div className="overflow-hidden">
                       <div id={detailId} className="pt-1.5">
                         {step.detail ? (
-                          <p className="max-w-[60ch] text-sm leading-relaxed text-muted">
+                          <p className="max-w-[60ch] text-sm leading-relaxed text-ns-muted">
                             {step.detail}
                           </p>
                         ) : null}
@@ -300,7 +300,7 @@ export function SoundingRail({
                             {step.evidence.map((e, ei) => (
                               <span
                                 key={ei}
-                                className="inline-flex items-center gap-1 rounded-sm border border-border bg-background px-1.5 py-0.5 font-mono text-[11px] text-muted"
+                                className="inline-flex items-center gap-1 rounded-sm border border-border bg-background px-1.5 py-0.5 font-mono text-[11px] text-ns-muted"
                               >
                                 <span className="text-foreground">
                                   {e.label}

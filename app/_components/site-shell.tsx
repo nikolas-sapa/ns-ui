@@ -28,7 +28,7 @@ const isBarePreview = (pathname: string) =>
   /^\/preview\/[^/]+(?:\/embed)?$/.test(pathname);
 
 const LINK =
-  "block truncate rounded-sm px-2 py-1 text-sm outline-none transition-colors hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none";
+  "block truncate rounded-sm px-2 py-1 text-sm outline-none transition-colors hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none";
 
 /** Which categories/kinds are open, beyond the current page's own section —
  *  persisted so a visitor's browsing structure survives navigation.
@@ -245,7 +245,7 @@ export function SiteShell({
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls="site-nav"
-        className="fixed left-3 top-3 z-50 inline-flex h-11 w-11 items-center justify-center rounded-md border border-border bg-background text-muted outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent lg:hidden"
+        className="fixed left-3 top-3 z-50 inline-flex h-11 w-11 items-center justify-center rounded-md border border-border bg-background text-ns-muted outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent lg:hidden"
       >
         <span className="sr-only">
           {open ? "Close component navigation" : "Open component navigation"}
@@ -276,7 +276,7 @@ export function SiteShell({
           aria-hidden
           className="pointer-events-none absolute inset-y-0 right-0 w-px overflow-hidden motion-reduce:hidden"
         >
-          <span className="absolute inset-x-0 top-0 h-24 animate-[nav-trace_9s_ease-in-out_infinite] bg-gradient-to-b from-transparent via-accent/40 to-transparent" />
+          <span className="absolute inset-x-0 top-0 h-24 animate-[nav-trace_9s_ease-in-out_infinite] bg-gradient-to-b from-transparent via-ns-accent/40 to-transparent" />
         </span>
 
         {/* pl-14 clears the fixed mobile toggle button (44px, left-3 top-3),
@@ -288,12 +288,12 @@ export function SiteShell({
         <div className="flex items-center justify-between gap-2 pb-3 pl-14 pr-4 pt-7 lg:pl-4 lg:pt-5">
           <Link
             href="/"
-            className="rounded-sm font-mono text-sm tracking-tight outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded-sm font-mono text-sm tracking-tight outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             ns-ui
           </Link>
           <div className="flex items-center gap-2">
-            <span className="font-mono text-[11px] text-muted">{total}</span>
+            <span className="font-mono text-[11px] text-ns-muted">{total}</span>
             {/* Desktop-only: collapses the whole sidebar, not a section
                 inside it — do not confuse with Expand all / Collapse all
                 below, which never remove the nav itself. Hidden below `lg`
@@ -305,7 +305,7 @@ export function SiteShell({
               onClick={() => setSidebarHiddenPersisted(true)}
               aria-expanded={mounted ? !sidebarHidden : undefined}
               aria-controls="site-nav"
-              className="hidden size-6 shrink-0 items-center justify-center rounded-sm text-muted outline-none transition-colors hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none lg:inline-flex"
+              className="hidden size-6 shrink-0 items-center justify-center rounded-sm text-ns-muted outline-none transition-colors hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none lg:inline-flex"
             >
               <span className="sr-only">Hide sidebar</span>
               <RailChevron direction="left" />
@@ -329,7 +329,7 @@ export function SiteShell({
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Filter sidebar"
               aria-label="Filter sidebar"
-              className="w-full rounded-md border border-border bg-surface px-2.5 py-1.5 text-sm outline-none placeholder:text-muted focus-visible:ring-2 focus-visible:ring-accent"
+              className="w-full rounded-md border border-border bg-surface px-2.5 py-1.5 text-sm outline-none placeholder:text-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent"
             />
             <span aria-hidden className="search-trace pointer-events-none motion-reduce:hidden" />
           </div>
@@ -337,7 +337,7 @@ export function SiteShell({
 
         {/* Bulk controls — at 223 items across up to three levels, hunting
             down every chevron by hand is the wrong default interaction. */}
-        <div className="flex items-center gap-3 px-4 pb-2 font-mono text-[10px] uppercase tracking-wider text-muted">
+        <div className="flex items-center gap-3 px-4 pb-2 font-mono text-[10px] uppercase tracking-wider text-ns-muted">
           {/* Expand all is a one-off "show me everything right now", not a
               standing preference — it doesn't persist, so the tree is back
               to normal on the next visit. Collapse all is the opposite kind
@@ -345,7 +345,7 @@ export function SiteShell({
           <button
             type="button"
             onClick={() => setOpenIds(new Set(allIds))}
-            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             Expand all
           </button>
@@ -356,7 +356,7 @@ export function SiteShell({
               setOpenIds(empty);
               persistOpen(empty);
             }}
-            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             Collapse all
           </button>
@@ -364,7 +364,7 @@ export function SiteShell({
 
         <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-6">
           {isFiltering && shown === 0 ? (
-            <p className="px-2 py-3 text-sm text-muted">No match.</p>
+            <p className="px-2 py-3 text-sm text-ns-muted">No match.</p>
           ) : null}
           {filtered.map((g) => (
             <NavCategory
@@ -385,52 +385,52 @@ export function SiteShell({
             (SiteAuth's `basis-full` below) instead of overflowing past the
             sidebar's fixed width — it never affects Changelog/Writing/Connect
             themselves, which stay on the first line at any name length. */}
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-border px-4 py-3 font-mono text-[11px] text-muted">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-border px-4 py-3 font-mono text-[11px] text-ns-muted">
           <Link
             href="/categories"
-            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             Categories
           </Link>
           <Link
             href="/changelog"
-            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             Changelog
           </Link>
           <Link
             href="/writing"
-            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             Writing
           </Link>
           <Link
             href="/community"
-            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             Community
           </Link>
           <Link
             href="/guidelines"
-            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             Guidelines
           </Link>
           <Link
             href="/submit"
-            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             Submit
           </Link>
           <Link
             href="/connect"
-            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             Connect
           </Link>
           <Link
             href="/status"
-            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             Status
           </Link>
@@ -452,7 +452,7 @@ export function SiteShell({
         onClick={() => setSidebarHiddenPersisted(false)}
         aria-expanded={mounted ? !sidebarHidden : undefined}
         aria-controls="site-nav"
-        className="sidebar-restore fixed left-0 top-4 z-40 h-11 w-6 items-center justify-center rounded-r-md border border-l-0 border-border bg-background text-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none"
+        className="sidebar-restore fixed left-0 top-4 z-40 h-11 w-6 items-center justify-center rounded-r-md border border-l-0 border-border bg-background text-ns-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
       >
         <span className="sr-only">Show sidebar</span>
         <RailChevron direction="right" />
@@ -503,12 +503,12 @@ function NavCategory({
       open={open}
       onToggle={(e) => onToggle(e.currentTarget.open)}
     >
-      <summary className="flex cursor-pointer list-none items-center justify-between rounded-sm px-2 py-1.5 outline-none [&::-webkit-details-marker]:hidden hover:bg-surface focus-visible:ring-2 focus-visible:ring-accent">
-        <span className="flex items-center gap-1.5 text-[12px] text-muted group-hover/cat:text-foreground">
+      <summary className="flex cursor-pointer list-none items-center justify-between rounded-sm px-2 py-1.5 outline-none [&::-webkit-details-marker]:hidden hover:bg-surface focus-visible:ring-2 focus-visible:ring-ns-accent">
+        <span className="flex items-center gap-1.5 text-[12px] text-ns-muted group-hover/cat:text-foreground">
           <Chevron />
           {group.label}
         </span>
-        <span className="font-mono text-[10px] text-muted">{group.count}</span>
+        <span className="font-mono text-[10px] text-ns-muted">{group.count}</span>
       </summary>
 
       <div className="pl-1.5">
@@ -554,12 +554,12 @@ function NavKindGroup({
       open={open}
       onToggle={(e) => onToggle(e.currentTarget.open)}
     >
-      <summary className="flex cursor-pointer list-none items-center justify-between rounded-sm px-2 py-1 pl-3.5 text-xs outline-none [&::-webkit-details-marker]:hidden hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent">
-        <span className="flex items-center gap-1.5 text-muted group-hover/kind:text-foreground">
+      <summary className="flex cursor-pointer list-none items-center justify-between rounded-sm px-2 py-1 pl-3.5 text-xs outline-none [&::-webkit-details-marker]:hidden hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent">
+        <span className="flex items-center gap-1.5 text-ns-muted group-hover/kind:text-foreground">
           <Chevron small />
           {kind.label}
         </span>
-        <span className="font-mono text-[10px] text-muted">{kind.items.length}</span>
+        <span className="font-mono text-[10px] text-ns-muted">{kind.items.length}</span>
       </summary>
       <ul className="pl-3">
         {kind.items.map((i) => (
@@ -600,7 +600,7 @@ function NavLink({
         // searchParams and so is not served from the prerender manifest.
         prefetch={false}
         aria-current={isCurrentPage ? "page" : undefined}
-        className={`${LINK} ${on ? "bg-surface font-medium text-accent" : "text-muted"}`}
+        className={`${LINK} ${on ? "bg-surface font-medium text-ns-accent" : "text-ns-muted"}`}
       >
         {item.title}
       </Link>
@@ -633,7 +633,7 @@ function Chevron({ small }: { small?: boolean }) {
   return (
     <svg
       viewBox="0 0 16 16"
-      className={`${small ? "size-2.5" : "size-3"} shrink-0 -rotate-90 text-muted transition-transform duration-150 ease-out group-open/cat:rotate-0 group-open/kind:rotate-0 motion-reduce:transition-none`}
+      className={`${small ? "size-2.5" : "size-3"} shrink-0 -rotate-90 text-ns-muted transition-transform duration-150 ease-out group-open/cat:rotate-0 group-open/kind:rotate-0 motion-reduce:transition-none`}
       fill="none"
       stroke="currentColor"
       strokeWidth="1.75"
@@ -654,7 +654,7 @@ function RailChevron({ direction }: { direction: "left" | "right" }) {
   return (
     <svg
       viewBox="0 0 16 16"
-      className={`size-3 shrink-0 text-muted ${direction === "left" ? "rotate-90" : "-rotate-90"}`}
+      className={`size-3 shrink-0 text-ns-muted ${direction === "left" ? "rotate-90" : "-rotate-90"}`}
       fill="none"
       stroke="currentColor"
       strokeWidth="1.75"

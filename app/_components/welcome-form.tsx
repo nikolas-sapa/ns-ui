@@ -72,7 +72,7 @@ export function WelcomeForm({ candidateHandle }: { candidateHandle: string }) {
     return (
       <form onSubmit={claimHandle} className="w-full max-w-sm space-y-3">
         <div className="space-y-1">
-          <label htmlFor="welcome-handle" className="text-xs text-muted">
+          <label htmlFor="welcome-handle" className="text-xs text-ns-muted">
             Handle
           </label>
           <input
@@ -82,13 +82,13 @@ export function WelcomeForm({ candidateHandle }: { candidateHandle: string }) {
             required
             autoFocus
             disabled={pending}
-            className="w-full rounded-sm border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
+            className="w-full rounded-sm border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
           />
         </div>
         <button
           type="submit"
           disabled={pending}
-          className="w-full rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-muted focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
+          className="w-full rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
         >
           {pending ? "Claiming…" : "Continue"}
         </button>
@@ -108,12 +108,12 @@ export function WelcomeForm({ candidateHandle }: { candidateHandle: string }) {
         onSaved={finish}
         onSkip={finish}
       />
-      <label className="flex items-start gap-2 text-xs text-muted">
+      <label className="flex items-start gap-2 text-xs text-ns-muted">
         <input
           type="checkbox"
           checked={subscribe}
           onChange={(e) => setSubscribe(e.target.checked)}
-          className="mt-0.5 accent-[var(--accent)]"
+          className="mt-0.5 accent-[var(--ns-accent)]"
         />
         <span>New components, occasionally. No spam.</span>
       </label>

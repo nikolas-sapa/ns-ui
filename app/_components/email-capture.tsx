@@ -32,7 +32,7 @@ export function EmailCapture({ className = "" }: { className?: string }) {
           placeholder="you@example.com"
           autoComplete="email"
           disabled={pending}
-          className="w-full min-w-0 rounded-sm border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
+          className="w-full min-w-0 rounded-sm border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
         />
         {/* Honeypot: hidden from sighted and screen-reader users alike, so a
             human never has a reason to touch it. A filled value is treated as
@@ -48,12 +48,12 @@ export function EmailCapture({ className = "" }: { className?: string }) {
         <button
           type="submit"
           disabled={pending}
-          className="shrink-0 rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-muted focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
+          className="shrink-0 rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
         >
           {pending ? "Adding…" : "Subscribe"}
         </button>
       </form>
-      <p className="mt-2 text-xs text-muted">New components, occasionally. No spam.</p>
+      <p className="mt-2 text-xs text-ns-muted">New components, occasionally. No spam.</p>
       <p aria-live="polite" className="mt-2 text-xs">
         {state.status === "success" ? (
           <span className="text-[var(--success)]">{state.message}</span>

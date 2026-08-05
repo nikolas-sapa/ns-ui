@@ -157,7 +157,7 @@ export function CipherReelOtp({
     const derive = () => {
       const cs = getComputedStyle(document.documentElement);
       fg = parseColor(cs.getPropertyValue("--foreground"), fg);
-      accent = parseColor(cs.getPropertyValue("--accent"), accent);
+      accent = parseColor(cs.getPropertyValue("--ns-accent"), accent);
     };
     derive();
 
@@ -652,7 +652,7 @@ export function CipherReelOtp({
       onPaste={handlePaste}
       className={`m-0 min-w-0 border-0 p-0 ${disabled ? "opacity-50" : ""} ${className}`}
     >
-      <legend className="mb-3 block p-0 font-mono text-xs uppercase tracking-[0.18em] text-muted">
+      <legend className="mb-3 block p-0 font-mono text-xs uppercase tracking-[0.18em] text-ns-muted">
         {label}
       </legend>
       <div
@@ -665,7 +665,7 @@ export function CipherReelOtp({
             ref={(el) => {
               wrapRefs.current[i] = el;
             }}
-            className={`relative h-14 w-11 overflow-hidden rounded-sm border border-border bg-background transition-[border-color,box-shadow] duration-150 hover:border-foreground/25 focus-within:border-accent/60 focus-within:ring-2 focus-within:ring-accent/30 ${
+            className={`relative h-14 w-11 overflow-hidden rounded-sm border border-border bg-background transition-[border-color,box-shadow] duration-150 hover:border-foreground/25 focus-within:border-ns-accent/60 focus-within:ring-2 focus-within:ring-ns-accent/30 ${
               i === 0 ? "" : i === Math.ceil(length / 2) ? "ml-4" : "ml-2"
             }`}
           >
@@ -699,7 +699,7 @@ export function CipherReelOtp({
       </div>
       <p
         aria-live="polite"
-        className={`mt-3 min-h-[1.25rem] text-xs ${error ? "" : "text-muted"}`}
+        className={`mt-3 min-h-[1.25rem] text-xs ${error ? "" : "text-ns-muted"}`}
         style={error ? { color: "var(--error, #ea001d)" } : undefined}
       >
         {error ? errorMessage : complete ? "Code complete." : helperText}

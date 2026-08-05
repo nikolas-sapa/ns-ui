@@ -121,7 +121,7 @@ export function MeridianSpin({
       fgCss = getComputedStyle(canvas).color;
       mutedCss =
         getComputedStyle(document.documentElement)
-          .getPropertyValue("--muted")
+          .getPropertyValue("--ns-muted")
           .trim() || fgCss;
     };
 

@@ -215,7 +215,7 @@ server.registerTool(
     title: "Get ns-ui design/token conventions",
     description:
       "The token contract and stack assumptions every ns-ui component is built " +
-      "against (--background/--foreground/--muted/--border/--accent, Tailwind v4, " +
+      "against (--background/--foreground/--ns-muted/--border/--ns-accent, Tailwind v4, " +
       "React 19, prefers-reduced-motion, accessibility baseline). Read this before " +
       "writing code alongside an installed component so it doesn't look like a " +
       "foreign element in the same UI.",

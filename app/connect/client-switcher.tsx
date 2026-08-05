@@ -32,10 +32,10 @@ export function ClientSwitcher({ clients }: { clients: MCPClient[] }) {
               type="button"
               aria-pressed={selected}
               onClick={() => setActive(c.id)}
-              className={`rounded-sm border px-2.5 py-1 font-mono text-[11px] uppercase tracking-wider outline-none transition-colors focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none ${
+              className={`rounded-sm border px-2.5 py-1 font-mono text-[11px] uppercase tracking-wider outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none ${
                 selected
-                  ? "border-accent/40 bg-accent/10 text-foreground"
-                  : "border-border text-muted hover:text-foreground"
+                  ? "border-ns-accent/40 bg-ns-accent/10 text-foreground"
+                  : "border-border text-ns-muted hover:text-foreground"
               }`}
             >
               {c.label}
@@ -44,9 +44,9 @@ export function ClientSwitcher({ clients }: { clients: MCPClient[] }) {
         })}
       </div>
 
-      <p className="mt-3 font-mono text-[11px] uppercase tracking-wider text-muted">
+      <p className="mt-3 font-mono text-[11px] uppercase tracking-wider text-ns-muted">
         {client.kind === "command" ? (
-          <span className="text-accent">Run in a terminal</span>
+          <span className="text-ns-accent">Run in a terminal</span>
         ) : (
           `Paste into ${client.configPath}`
         )}
@@ -55,7 +55,7 @@ export function ClientSwitcher({ clients }: { clients: MCPClient[] }) {
         <pre className="min-w-0 flex-1 overflow-x-auto whitespace-pre-wrap break-words font-mono text-xs leading-relaxed text-foreground">
           {client.kind === "command" ? (
             <code>
-              <span aria-hidden className="select-none text-muted">
+              <span aria-hidden className="select-none text-ns-muted">
                 ${" "}
               </span>
               {client.snippet}

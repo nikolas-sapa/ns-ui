@@ -167,7 +167,7 @@ export function AsciiCascadeText({ text, className = "" }: AsciiCascadeTextProps
         // the further a char has fallen from home, the more accent bleeds in —
         // a loud, colour-coded readout of "how far into the field" it is
         const strayed = Math.min(1, (1 - s.opacity) / 0.72);
-        s.el.style.color = `color-mix(in oklab, var(--accent) ${Math.round(strayed * 70)}%, var(--foreground))`;
+        s.el.style.color = `color-mix(in oklab, var(--ns-accent) ${Math.round(strayed * 70)}%, var(--foreground))`;
       }
 
       if (visible && !document.hidden) raf = requestAnimationFrame(loop);

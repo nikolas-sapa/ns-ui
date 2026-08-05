@@ -15,7 +15,7 @@ export default function ChartDonutHalftoneDemo() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-2xl">
-        <p className="mb-4 font-mono text-xs tracking-widest text-muted">
+        <p className="mb-4 font-mono text-xs tracking-widest text-ns-muted">
           ns-ui / chart-donut-halftone
         </p>
         <div className="rounded-md border border-border bg-surface p-6">

@@ -93,7 +93,7 @@ export function UnderInk({ children, label, resealMs = 900, className = "" }: Un
       onPointerCancel={endPress}
       onPointerLeave={endPress}
       onClick={onClick}
-      className={`ns-underink group relative inline-block cursor-pointer whitespace-nowrap rounded-[3px] px-[3px] align-baseline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${className}`}
+      className={`ns-underink group relative inline-block cursor-pointer whitespace-nowrap rounded-[3px] px-[3px] align-baseline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent ${className}`}
     >
       <style>{`
         .ns-underink .ns-underink-bar {

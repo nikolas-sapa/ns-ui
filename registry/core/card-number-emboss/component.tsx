@@ -150,7 +150,7 @@ export function EmbossPlate({ className = "" }: EmbossPlateProps) {
         {announce}
       </span>
 
-      <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted">Card number</p>
+      <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-ns-muted">Card number</p>
 
       <div className="relative mt-2 h-9">
         <label htmlFor={`ep-number-${autoId}`} className="sr-only">
@@ -195,7 +195,7 @@ export function EmbossPlate({ className = "" }: EmbossPlateProps) {
         <div>
           <label
             htmlFor={`ep-expiry-${autoId}`}
-            className="block font-mono text-[10px] uppercase tracking-[0.2em] text-muted"
+            className="block font-mono text-[10px] uppercase tracking-[0.2em] text-ns-muted"
           >
             Exp
           </label>
@@ -219,7 +219,7 @@ export function EmbossPlate({ className = "" }: EmbossPlateProps) {
         <div>
           <label
             htmlFor={`ep-cvc-${autoId}`}
-            className="block font-mono text-[10px] uppercase tracking-[0.2em] text-muted"
+            className="block font-mono text-[10px] uppercase tracking-[0.2em] text-ns-muted"
           >
             CVC
           </label>
@@ -242,7 +242,7 @@ export function EmbossPlate({ className = "" }: EmbossPlateProps) {
 
         <p
           aria-hidden="true"
-          className={`ns-ep-brand font-mono text-xs uppercase tracking-[0.25em] text-muted transition-opacity duration-300 ${
+          className={`ns-ep-brand font-mono text-xs uppercase tracking-[0.25em] text-ns-muted transition-opacity duration-300 ${
             showBrand ? "opacity-70" : "opacity-0"
           }`}
         >
@@ -257,10 +257,10 @@ export function EmbossPlate({ className = "" }: EmbossPlateProps) {
 
 const CSS = `
 .ns-ep-input{ background: transparent; color: transparent; caret-color: transparent; border: none; outline: none; font: inherit; letter-spacing: inherit; padding: 0; }
-.ns-ep-input:focus-visible ~ [data-ep-display]{ outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 4px; }
+.ns-ep-input:focus-visible ~ [data-ep-display]{ outline: 2px solid var(--ns-accent); outline-offset: 4px; border-radius: 4px; }
 .ns-ep-digit{ color: var(--foreground); text-shadow: -1px -1px 0 rgba(255,255,255,0.35), 1px 1px 1px rgba(0,0,0,0.5); }
 .dark .ns-ep-digit{ text-shadow: -1px -1px 0 rgba(255,255,255,0.22), 1px 1px 1px rgba(0,0,0,0.6); }
-.ns-ep-flat .ns-ep-digit{ text-shadow: none; color: var(--muted); transition: text-shadow 160ms ease-out, color 160ms ease-out; }
+.ns-ep-flat .ns-ep-digit{ text-shadow: none; color: var(--ns-muted); transition: text-shadow 160ms ease-out, color 160ms ease-out; }
 .ns-ep-error-line{ position: absolute; left: 0; right: 0; bottom: -6px; height: 1px; background: var(--error); }
 .ns-ep-plate:hover .ns-ep-sheen{ opacity: 1; }
 .ns-ep-sheen{ background: rgba(255,255,255,0.03); transition: opacity 200ms ease-out; }

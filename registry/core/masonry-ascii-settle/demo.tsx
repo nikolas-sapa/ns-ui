@@ -16,13 +16,13 @@ const TILES: MasonryAsciiTile[] = [
 export default function MasonryAsciiSettleDemo() {
   return (
     <div className="flex min-h-screen flex-col items-center gap-8 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / masonry-ascii-settle
       </p>
       <div className="w-full max-w-3xl">
         <MasonryAsciiSettle tiles={TILES} />
       </div>
-      <p className="max-w-md text-center text-xs text-muted">
+      <p className="max-w-md text-center text-xs text-ns-muted">
         Every tile resolves from a coarse ASCII halftone to a fine one as it
         drops into its column. Resize the window to watch it re-pack.
       </p>

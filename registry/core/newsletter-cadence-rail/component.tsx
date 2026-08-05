@@ -281,14 +281,14 @@ export function NewsletterCadenceRail({
                 if (isDest) glyph = "█";
                 if (isMarker) glyph = "▸";
 
-                let color = "var(--muted)";
+                let color = "var(--ns-muted)";
                 let opacity = i < dims.past ? 0.35 : 0.6;
                 if (cell.issue) {
                   color = "var(--foreground)";
                   opacity = 0.9;
                 }
                 if (cell.today || isMarker || isDest) {
-                  color = "var(--accent)";
+                  color = "var(--ns-accent)";
                   opacity = 1;
                 }
 
@@ -310,7 +310,7 @@ export function NewsletterCadenceRail({
             </div>
             <div
               suppressHydrationWarning
-              className="tabular-nums text-muted opacity-70 text-[13px] leading-[1.5]"
+              className="tabular-nums text-ns-muted opacity-70 text-[13px] leading-[1.5]"
             >
               {weekLabels.map((w) => (
                 <span key={w.idx} suppressHydrationWarning>
@@ -324,7 +324,7 @@ export function NewsletterCadenceRail({
 
       <p
         suppressHydrationWarning
-        className="mt-3 font-mono text-xs tabular-nums text-muted"
+        className="mt-3 font-mono text-xs tabular-nums text-ns-muted"
       >
         {readout}
       </p>
@@ -335,13 +335,13 @@ export function NewsletterCadenceRail({
             <li key={issue.number} className="border-b border-border">
               <a
                 href={issue.href ?? "#"}
-                className="flex items-baseline gap-3 py-2 text-sm text-foreground transition-colors duration-150 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                className="flex items-baseline gap-3 py-2 text-sm text-foreground transition-colors duration-150 hover:text-ns-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
               >
-                <span className="font-mono text-xs tabular-nums text-muted">
+                <span className="font-mono text-xs tabular-nums text-ns-muted">
                   #{issue.number}
                 </span>
                 <span className="min-w-0 flex-1 truncate">{issue.title}</span>
-                <span className="font-mono text-xs tabular-nums text-muted">
+                <span className="font-mono text-xs tabular-nums text-ns-muted">
                   {shortDate(parseISO(issue.dateISO))}
                 </span>
               </a>
@@ -352,13 +352,13 @@ export function NewsletterCadenceRail({
 
       {done ? (
         <p className="mt-5 font-mono text-sm text-foreground">
-          <span className="text-accent">▸</span> Subscribed.
+          <span className="text-ns-accent">▸</span> Subscribed.
         </p>
       ) : (
         <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-2" noValidate>
           <label
             htmlFor={fieldId}
-            className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted"
+            className="font-mono text-[11px] uppercase tracking-[0.18em] text-ns-muted"
           >
             Email
           </label>
@@ -374,11 +374,11 @@ export function NewsletterCadenceRail({
               aria-invalid={invalid || undefined}
               aria-describedby={statusId}
               onChange={(e) => setEmail(e.target.value)}
-              className="min-w-0 flex-1 rounded-sm border border-border bg-background px-3 py-2 font-mono text-sm text-foreground transition-colors duration-150 placeholder:text-muted/60 hover:border-muted focus-visible:border-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent aria-[invalid=true]:border-[var(--error)]"
+              className="min-w-0 flex-1 rounded-sm border border-border bg-background px-3 py-2 font-mono text-sm text-foreground transition-colors duration-150 placeholder:text-ns-muted/60 hover:border-ns-muted focus-visible:border-ns-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent aria-[invalid=true]:border-[var(--error)]"
             />
             <button
               type="submit"
-              className="shrink-0 rounded-sm border border-border px-4 py-2 font-mono text-xs uppercase tracking-[0.18em] text-foreground transition-colors duration-150 hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="shrink-0 rounded-sm border border-border px-4 py-2 font-mono text-xs uppercase tracking-[0.18em] text-foreground transition-colors duration-150 hover:border-ns-accent hover:text-ns-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
             >
               Subscribe
             </button>
@@ -391,7 +391,7 @@ export function NewsletterCadenceRail({
         role="status"
         aria-live="polite"
         className={`mt-2 min-h-[1.25rem] font-mono text-xs ${
-          invalid ? "text-[var(--error)]" : "text-muted"
+          invalid ? "text-[var(--error)]" : "text-ns-muted"
         }`}
       >
         {status}

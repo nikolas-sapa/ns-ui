@@ -51,11 +51,11 @@ export default function RiffleEdgeDemo() {
   return (
     <div className="flex min-h-screen items-center justify-center px-6 py-16">
       <div className="w-full max-w-sm">
-        <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.16em] text-muted">
+        <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.16em] text-ns-muted">
           Onboarding
         </p>
         <RiffleEdge items={STEPS} defaultIndex={0} aria-label="Onboarding steps" />
-        <p className="mt-3 text-xs text-muted">
+        <p className="mt-3 text-xs text-ns-muted">
           Drag the edge on the right, scroll over it, or focus it and use arrow keys.
         </p>
       </div>

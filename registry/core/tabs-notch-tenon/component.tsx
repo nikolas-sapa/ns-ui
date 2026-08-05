@@ -29,7 +29,7 @@ export type MortiseSlipTab = {
 // tapping home) while the panel content translates ±16px from the travel
 // direction and cross-fades in over ~220ms, the outgoing content fading out
 // on top over ~120ms. Direction always matches index delta. Pure DOM+SVG,
-// no canvas; ink is token-relative (--border/--foreground/--muted/
+// no canvas; ink is token-relative (--border/--foreground/--ns-muted/
 // --background) throughout. Reduced motion: the notch snaps instantly and
 // the panel does a plain opacity cross-fade with no translate.
 // ---------------------------------------------------------------------------
@@ -295,10 +295,10 @@ export function MortiseSlip({
               aria-controls={`${baseId}-panel-${tab.id}`}
               tabIndex={selected ? 0 : -1}
               onClick={() => selectTab(tab.id)}
-              className={`relative z-10 rounded-md px-3.5 py-2 text-sm transition-colors duration-150 hover:bg-foreground/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent ${
+              className={`relative z-10 rounded-md px-3.5 py-2 text-sm transition-colors duration-150 hover:bg-foreground/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ns-accent ${
                 selected
                   ? "font-medium text-foreground"
-                  : "text-muted hover:text-foreground"
+                  : "text-ns-muted hover:text-foreground"
               }`}
             >
               {tab.label}
@@ -344,7 +344,7 @@ export function MortiseSlip({
             id={`${baseId}-panel-${activeTab.id}`}
             aria-labelledby={`${baseId}-tab-${activeTab.id}`}
             tabIndex={0}
-            className="relative text-sm leading-relaxed text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="relative text-sm leading-relaxed text-ns-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
           >
             {activeTab.content}
           </div>

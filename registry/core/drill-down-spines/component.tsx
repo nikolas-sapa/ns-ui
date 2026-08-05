@@ -32,7 +32,7 @@ import {
 // hover/focus of that one spine — rotated text is genuinely harder to read,
 // so wide-enough shelves and any focused/hovered spine get the easier
 // horizontal form. A 1px inset "lit" edge (color-mix over --foreground, a
-// decoration, never --accent) reads as the spine's physical edge catching
+// decoration, never --ns-accent) reads as the spine's physical edge catching
 // light, so the row reads as stacked thickness even at rest.
 //
 // Clicking any spine pops every level above it in one motion: the levels
@@ -311,11 +311,11 @@ export const SpineStack = forwardRef<SpineStackHandle, SpineStackProps>(function
                   pointerEvents: isActive ? "none" : undefined,
                   boxShadow: "inset -1px 0 0 0 color-mix(in srgb, var(--foreground) 22%, transparent)",
                 }}
-                className="ns-spine-face absolute inset-0 outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                className="ns-spine-face absolute inset-0 outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
               >
                 <span
                   aria-hidden
-                  className="ns-spine-label pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden whitespace-nowrap px-1 font-mono text-[10px] tracking-wide text-muted"
+                  className="ns-spine-label pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden whitespace-nowrap px-1 font-mono text-[10px] tracking-wide text-ns-muted"
                   style={{
                     writingMode: "vertical-rl",
                     textOverflow: "ellipsis",
@@ -326,7 +326,7 @@ export const SpineStack = forwardRef<SpineStackHandle, SpineStackProps>(function
                 </span>
                 <span
                   aria-hidden
-                  className="ns-spine-label pointer-events-none absolute inset-0 flex items-center overflow-hidden whitespace-nowrap px-1.5 font-mono text-[10px] tracking-wide text-ellipsis text-muted"
+                  className="ns-spine-label pointer-events-none absolute inset-0 flex items-center overflow-hidden whitespace-nowrap px-1.5 font-mono text-[10px] tracking-wide text-ellipsis text-ns-muted"
                   style={{ opacity: isWideSpine ? 1 : 0 }}
                 >
                   {level.title}

@@ -43,7 +43,7 @@ function readTokens(): Tokens {
     fg: get("--foreground", "#ededed"),
     bg: get("--background", "#0a0a0a"),
     border: get("--border", "#2e2e2e"),
-    accent: get("--accent", "#006bff"),
+    accent: get("--ns-accent", "#006bff"),
   };
 }
 
@@ -301,7 +301,7 @@ export function DeviceMockupAsciiScreen({ className = "" }: DeviceMockupAsciiScr
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
         onKeyDown={onKeyDown}
-        className="cursor-grab select-none touch-none rounded-full border border-border bg-surface px-4 py-1.5 font-mono text-[11px] tracking-widest text-muted transition-colors duration-150 hover:border-foreground/25 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:cursor-grabbing"
+        className="cursor-grab select-none touch-none rounded-full border border-border bg-surface px-4 py-1.5 font-mono text-[11px] tracking-widest text-ns-muted transition-colors duration-150 hover:border-foreground/25 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent active:cursor-grabbing"
       >
         DRAG TO TILT
       </div>

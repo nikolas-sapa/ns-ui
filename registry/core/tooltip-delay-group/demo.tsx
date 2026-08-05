@@ -41,12 +41,12 @@ function InfoIcon() {
 }
 
 const iconButtonClass =
-  "flex size-8 items-center justify-center rounded-sm border border-transparent text-muted transition-colors duration-150 hover:border-border hover:bg-background hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+  "flex size-8 items-center justify-center rounded-sm border border-transparent text-ns-muted transition-colors duration-150 hover:border-border hover:bg-background hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent";
 
 export default function PenumbraTipDemo() {
   return (
     <div className="mx-auto flex min-h-[420px] w-full max-w-2xl flex-col justify-center gap-6 p-8">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / tooltip-delay-group — traces out from the trigger, siblings hand off instantly
       </p>
 
@@ -93,7 +93,7 @@ export default function PenumbraTipDemo() {
         </PenumbraTip>
       </div>
 
-      <div className="rounded-md border border-border bg-background p-4 text-sm leading-relaxed text-muted">
+      <div className="rounded-md border border-border bg-background p-4 text-sm leading-relaxed text-ns-muted">
         <p className="mb-2 text-foreground">Q3 launch notes</p>
         <p>
           Hover or tab through the toolbar above — the first tooltip waits out the open delay, but once

@@ -93,7 +93,7 @@ export default function LooseTypeDemo() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">
         ns-ui / streaming-token-settle
       </p>
 
@@ -103,8 +103,8 @@ export default function LooseTypeDemo() {
         onPointerLeave={() => setPaused(false)}
       >
         <div className="mb-4 flex items-center justify-between gap-3">
-          <span className="font-mono text-[11px] text-muted">transcript</span>
-          <span className="font-mono text-[11px] text-muted">
+          <span className="font-mono text-[11px] text-ns-muted">transcript</span>
+          <span className="font-mono text-[11px] text-ns-muted">
             {streaming ? "transcribing" : "settled"}
           </span>
         </div>
@@ -117,12 +117,12 @@ export default function LooseTypeDemo() {
           wordRef.current = 0;
           setTokens([]);
         }}
-        className="rounded-sm border border-border px-4 py-2 font-mono text-xs text-muted transition-colors duration-150 hover:border-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        className="rounded-sm border border-border px-4 py-2 font-mono text-xs text-ns-muted transition-colors duration-150 hover:border-ns-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
       >
         restart transcript
       </button>
 
-      <p className="font-mono text-[10px] text-muted">
+      <p className="font-mono text-[10px] text-ns-muted">
         hover the panel to pause &middot; loose type is provisional, locked type is committed
       </p>
     </div>

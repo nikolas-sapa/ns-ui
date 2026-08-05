@@ -21,13 +21,13 @@ export default function DrapeMenuDemo() {
   return (
     <div className="flex min-h-screen items-start justify-center bg-background px-6 py-20 text-foreground">
       <div className="w-full max-w-3xl">
-        <p className="font-mono text-xs uppercase tracking-widest text-muted">
+        <p className="font-mono text-xs uppercase tracking-widest text-ns-muted">
           ns-ui / dropdown-drape
         </p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight">
           The dropdown is a piece of fabric
         </h1>
-        <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">
+        <p className="mt-2 max-w-xl text-sm leading-relaxed text-ns-muted">
           Open the Workspace menu: the panel is a live verlet cloth pinned to
           the trigger. It falls under gravity and drapes like an awning, and the
           labels ride the weave until it settles. Sweep the cursor underneath to
@@ -47,12 +47,12 @@ export default function DrapeMenuDemo() {
               <span className="text-sm font-medium">northwind</span>
             </div>
             <DrapeMenu label="Workspace" onSelect={(id) => setLastAction(id)} />
-            <nav aria-label="Primary" className="flex items-center gap-1 text-sm text-muted">
+            <nav aria-label="Primary" className="flex items-center gap-1 text-sm text-ns-muted">
               {["Overview", "Deploys", "Activity"].map((t) => (
                 <button
                   key={t}
                   type="button"
-                  className="rounded-sm px-2.5 py-1.5 transition-colors hover:bg-background hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                  className="rounded-sm px-2.5 py-1.5 transition-colors hover:bg-background hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
                 >
                   {t}
                 </button>
@@ -60,7 +60,7 @@ export default function DrapeMenuDemo() {
             </nav>
             <div
               aria-hidden
-              className="ml-auto flex h-7 w-7 items-center justify-center rounded-full border border-border bg-background font-mono text-[10px] text-muted"
+              className="ml-auto flex h-7 w-7 items-center justify-center rounded-full border border-border bg-background font-mono text-[10px] text-ns-muted"
             >
               NS
             </div>
@@ -70,14 +70,14 @@ export default function DrapeMenuDemo() {
           <div className="px-5 pb-6 pt-5">
             <div className="flex items-baseline justify-between">
               <h2 className="text-sm font-medium">Production overview</h2>
-              <span className="font-mono text-xs text-muted">last 24 h</span>
+              <span className="font-mono text-xs text-ns-muted">last 24 h</span>
             </div>
             <div className="mt-4 grid grid-cols-3 gap-3">
               {STATS.map(([k, v, d]) => (
                 <div key={k} className="rounded-sm border border-border bg-background p-3">
-                  <p className="text-xs text-muted">{k}</p>
+                  <p className="text-xs text-ns-muted">{k}</p>
                   <p className="mt-1.5 font-mono text-lg">{v}</p>
-                  <p className="mt-0.5 font-mono text-[11px] text-muted">{d}</p>
+                  <p className="mt-0.5 font-mono text-[11px] text-ns-muted">{d}</p>
                 </div>
               ))}
             </div>
@@ -90,16 +90,16 @@ export default function DrapeMenuDemo() {
                   }`}
                 >
                   <span className="text-foreground">{id}</span>
-                  <span className="text-muted">{branch}</span>
-                  <span className="ml-auto text-muted">{dur}</span>
-                  <span className="text-muted">{status}</span>
+                  <span className="text-ns-muted">{branch}</span>
+                  <span className="ml-auto text-ns-muted">{dur}</span>
+                  <span className="text-ns-muted">{status}</span>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        <p className="mt-4 font-mono text-xs text-muted" aria-live="polite">
+        <p className="mt-4 font-mono text-xs text-ns-muted" aria-live="polite">
           {lastAction ? `menu → ${lastAction}` : "menu → awaiting selection"}
         </p>
       </div>

@@ -42,21 +42,21 @@ export default function EvalRegressionShearDemo() {
       >
         <div className="mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-2 border-b border-border pb-4">
           <div>
-            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted">
+            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ns-muted">
               swe-bench-verified · run 2481
             </p>
             <h2 className="mt-1 text-lg font-semibold tracking-tight text-foreground">
               Score delta by case
             </h2>
           </div>
-          <p className="font-mono text-[11px] tabular-nums text-muted">
+          <p className="font-mono text-[11px] tabular-nums text-ns-muted">
             candidate 2.4.1-rc3 <span className="text-foreground">vs</span> baseline 2.3.0
           </p>
         </div>
 
         <EvalDeltaTable cases={CASES} label="swe-bench-verified cases, sorted by score delta" />
 
-        <p className="mt-5 border-t border-border pt-4 text-xs leading-relaxed text-muted">
+        <p className="mt-5 border-t border-border pt-4 text-xs leading-relaxed text-ns-muted">
           Bars right of zero are gains, bars left are regressions.
         </p>
       </div>

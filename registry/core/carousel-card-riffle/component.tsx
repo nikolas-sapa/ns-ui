@@ -474,7 +474,7 @@ export function RiffleEdge({
               style={{ willChange: "transform, filter" }}
             >
               {item.eyebrow && (
-                <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+                <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-ns-muted">
                   {item.eyebrow}
                 </p>
               )}
@@ -482,14 +482,14 @@ export function RiffleEdge({
                 {item.title}
               </h3>
               {item.description && (
-                <p className="text-sm leading-relaxed text-muted">{item.description}</p>
+                <p className="text-sm leading-relaxed text-ns-muted">{item.description}</p>
               )}
-              <p aria-hidden className="mt-auto font-mono text-[10px] tracking-wide text-muted">
+              <p aria-hidden className="mt-auto font-mono text-[10px] tracking-wide text-ns-muted">
                 {String(current + 1).padStart(2, "0")} / {String(count).padStart(2, "0")}
               </p>
             </div>
           ) : (
-            <div className="relative flex h-full items-center justify-center rounded-md border border-border bg-surface p-5 text-sm text-muted">
+            <div className="relative flex h-full items-center justify-center rounded-md border border-border bg-surface p-5 text-sm text-ns-muted">
               No cards
             </div>
           )}
@@ -511,7 +511,7 @@ export function RiffleEdge({
           onPointerCancel={onPointerCancel}
           onKeyDown={onKeyDown}
           style={{ height: travel + STRIPE_PAD * 2 }}
-          className="group relative flex w-8 shrink-0 cursor-row-resize touch-none select-none flex-col items-center justify-center rounded-sm outline-none transition-colors duration-200 hover:bg-border/10 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          className="group relative flex w-8 shrink-0 cursor-row-resize touch-none select-none flex-col items-center justify-center rounded-sm outline-none transition-colors duration-200 hover:bg-border/10 focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           <div className="relative" style={{ height: runHeight, width: 14 }}>
             {items.map((it, i) => {
@@ -524,7 +524,7 @@ export function RiffleEdge({
                   className={
                     active
                       ? "absolute left-0 w-full rounded-full bg-foreground transition-colors duration-200"
-                      : "absolute left-0 w-full rounded-full bg-border transition-colors duration-200 group-hover:bg-muted"
+                      : "absolute left-0 w-full rounded-full bg-border transition-colors duration-200 group-hover:bg-ns-muted"
                   }
                   style={{ top: i * pitch, height: active ? 2 : 1 }}
                 />

@@ -42,8 +42,8 @@ export default function AnnouncementBarRelayDemo() {
         />
 
         <header className="flex items-center justify-between border-b border-border px-6 py-3">
-          <span className="font-mono text-xs uppercase tracking-[0.2em] text-muted">northbridge / console</span>
-          <nav className="flex items-center gap-5 text-sm text-muted">
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">northbridge / console</span>
+          <nav className="flex items-center gap-5 text-sm text-ns-muted">
             <span className="text-foreground">Overview</span>
             <span>Deployments</span>
             <span>Usage</span>
@@ -52,7 +52,7 @@ export default function AnnouncementBarRelayDemo() {
 
         <div className="px-6 py-8">
           <h1 className="text-xl font-medium tracking-tight">Overview</h1>
-          <p className="mt-2 max-w-lg text-sm leading-relaxed text-muted">
+          <p className="mt-2 max-w-lg text-sm leading-relaxed text-ns-muted">
             Everything here sits under the announcement bar, so the page moves with the message instead of snapping under it
             when one notice hands off to the next.
           </p>
@@ -64,7 +64,7 @@ export default function AnnouncementBarRelayDemo() {
               { label: "Error rate", value: "0.04%" },
             ].map((stat) => (
               <div key={stat.label} className="bg-surface px-4 py-4">
-                <dt className="font-mono text-[11px] uppercase tracking-wider text-muted">{stat.label}</dt>
+                <dt className="font-mono text-[11px] uppercase tracking-wider text-ns-muted">{stat.label}</dt>
                 <dd className="mt-1.5 text-lg tabular-nums">{stat.value}</dd>
               </div>
             ))}
