@@ -7,7 +7,6 @@ import { EmailCapture } from "./email-capture";
 import { FeaturedCard } from "./featured-card";
 import { GitHubStarButton } from "./github-star-button";
 import { PreviewCard, type RegistryEntry } from "./preview-card";
-import { ThemeToggle } from "./theme-toggle";
 import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
 import { CATEGORIES, categorize } from "@/lib/search-categories";
 import { SYNONYM_TEXT } from "@/lib/search-synonyms";
@@ -30,9 +29,6 @@ export type ShowcaseEntry = RegistryEntry & {
    *  components (not yet in the committed snapshot) sort last. */
   order: number;
 };
-
-const FOOTER_LINK =
-  "rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent transition-colors";
 
 /**
  * How many demos may run at once.
@@ -433,23 +429,22 @@ export function Showcase({
         Skip to components
       </a>
 
-      {/* Star + theme toggle used to open the two-column header grid below,
-          which only spans the narrower left column above xl — it read as
-          floating somewhere in the middle of the page rather than sitting
-          at the top. Pulled out to its own full-width row above the header
-          so it's the first thing on the page, right-aligned against the
-          Install column's edge instead of the left column's, and genuinely
-          higher: `lg:pt-10` only kicks in once the fixed mobile nav toggle
+      {/* Star button used to open the two-column header grid below, which
+          only spans the narrower left column above xl — it read as floating
+          somewhere in the middle of the page rather than sitting at the
+          top. Pulled out to its own full-width row above the header so it's
+          the first thing on the page, right-aligned against the Install
+          column's edge instead of the left column's, and genuinely higher:
+          `lg:pt-10` only kicks in once the fixed mobile nav toggle
           (site-shell.tsx, `fixed left-3 top-3`, 44px) is hidden at lg, so it
-          never climbs into that button's space at narrower widths. */}
+          never climbs into that button's space at narrower widths. Theme
+          toggle used to sit here too — SiteShell renders one for every page
+          now, so this row no longer needs its own. */}
       <div className="flex items-center justify-between gap-3 pt-20 sm:pt-28 lg:pt-10">
         <p className="font-mono text-xs uppercase tracking-[0.18em] text-ns-muted">
           ns-ui
         </p>
-        <div className="flex items-center gap-3">
-          <GitHubStarButton stars={stars} />
-          <ThemeToggle />
-        </div>
+        <GitHubStarButton stars={stars} />
       </div>
 
       {/* Two-column split waits for xl, not lg — the persistent sidebar
@@ -693,60 +688,6 @@ export function Showcase({
       </div>
 
       <JumpToTop />
-
-      {/* Grouped rather than spread: `justify-between` used to pin these
-          three fragments to the far edges of the 1600px container, which at
-          a normal desktop width left them looking like unrelated scraps
-          rather than one footer. A bounded gap keeps the two link clusters
-          close and lets the "built with" line sit apart without spanning
-          the whole row to do it. */}
-      <footer className="mt-16 flex flex-wrap items-baseline gap-x-12 gap-y-3 border-t border-border pt-6 font-mono text-xs text-ns-muted">
-        <div className="flex flex-wrap items-baseline gap-x-8 gap-y-3">
-          <p>
-            For AI agents:{" "}
-            <a href="/llms.txt" className={FOOTER_LINK}>
-              /llms.txt
-            </a>{" "}
-            ·{" "}
-            <a href="/llms-full.txt" className={FOOTER_LINK}>
-              /llms-full.txt
-            </a>
-          </p>
-          <p>
-            <a href="/categories" className={FOOTER_LINK}>
-              Categories
-            </a>{" "}
-            ·{" "}
-            <a href="/changelog" className={FOOTER_LINK}>
-              Changelog
-            </a>{" "}
-            ·{" "}
-            <a href="/writing" className={FOOTER_LINK}>
-              Writing
-            </a>{" "}
-            ·{" "}
-            <a href="/connect" className={FOOTER_LINK}>
-              Connect
-            </a>{" "}
-            ·{" "}
-            <a href="https://github.com/nikolas-sapa/ns-ui" className={FOOTER_LINK}>
-              GitHub
-            </a>{" "}
-            ·{" "}
-            <a
-              href="https://github.com/nikolas-sapa/ns-ui/issues/new?template=component_request.yml"
-              className={FOOTER_LINK}
-            >
-              Request a component
-            </a>{" "}
-            ·{" "}
-            <a href="https://nikolas.helpmarq.com" className={FOOTER_LINK}>
-              Built by Nikolas Sapa
-            </a>
-          </p>
-        </div>
-        <p>Built with love for developers, with Claude Code.</p>
-      </footer>
     </main>
   );
 }

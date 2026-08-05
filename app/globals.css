@@ -234,3 +234,16 @@ html.catalog-sorted .catalog-gate-standin {
     transform: translateY(0);
   }
 }
+
+/* Command palette dialog (command-palette.tsx) — same opaque-transform-only
+   shape as mcp-popup-in above and for the same reason: animating opacity on
+   a panel that sits over live component previews reads as genuinely
+   see-through mid-fade, not just entering. */
+@keyframes cmdk-in {
+  from {
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    transform: translateY(0) scale(1);
+  }
+}

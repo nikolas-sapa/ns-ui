@@ -8,7 +8,6 @@ import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
 import { CopyButton } from "@/app/_components/copy-button";
 import { kindOf } from "@/lib/kind";
 import { loadSource } from "@/lib/source";
-import { ThemeToggle } from "@/app/_components/theme-toggle";
 
 /**
  * The playground: a full-viewport, fully-interactive stage per component.
@@ -136,7 +135,6 @@ export default async function PlaygroundPage({
           />
           <NavArrow href={older} label="Older component" />
           <NavArrow href={newer} label="Newer component" flip />
-          <ThemeToggle />
         </div>
       </header>
 

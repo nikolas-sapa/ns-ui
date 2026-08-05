@@ -5,7 +5,6 @@ import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
 import { jsonLdScript } from "@/lib/json-ld";
 import { categoryPages } from "@/lib/category-pages";
 import { CATEGORY_COPY } from "@/lib/category-copy";
-import { ThemeToggle } from "../../_components/theme-toggle";
 
 // Static-only: 12 known ids at build time, no per-request input. Matches
 // `/components/[name]`'s `generateStaticParams` for `/preview/[name]/embed`
@@ -94,17 +93,14 @@ export default async function CategoryPage({
       />
 
       <header className="pt-20 sm:pt-28">
-        <div className="flex items-center justify-between gap-4">
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-ns-muted">
-            <Link
-              href="/categories"
-              className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent transition-colors"
-            >
-              ns-ui / categories
-            </Link>
-          </p>
-          <ThemeToggle />
-        </div>
+        <p className="font-mono text-xs uppercase tracking-[0.18em] text-ns-muted">
+          <Link
+            href="/categories"
+            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent transition-colors"
+          >
+            ns-ui / categories
+          </Link>
+        </p>
         <h1 className="mt-5 text-3xl font-semibold leading-[1.15] tracking-tight sm:text-4xl">
           {copy.h1}
         </h1>

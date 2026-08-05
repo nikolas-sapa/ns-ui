@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { loadWritingPosts } from "@/lib/writing";
-import { ThemeToggle } from "../_components/theme-toggle";
 
 export const metadata: Metadata = {
   title: "Writing — ns-ui",
@@ -23,12 +22,9 @@ export default function WritingIndexPage() {
   return (
     <main className="mx-auto w-full max-w-2xl px-6 pb-32 sm:px-10">
       <header className="pt-20 sm:pt-28">
-        <div className="flex items-center justify-between gap-4">
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-ns-muted">
-            ns-ui / writing
-          </p>
-          <ThemeToggle />
-        </div>
+        <p className="font-mono text-xs uppercase tracking-[0.18em] text-ns-muted">
+          ns-ui / writing
+        </p>
         <h1 className="mt-5 text-3xl font-semibold leading-[1.15] tracking-tight sm:text-4xl">
           Writing.
         </h1>

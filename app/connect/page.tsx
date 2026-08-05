@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { CopyButton } from "../_components/copy-button";
-import { ThemeToggle } from "../_components/theme-toggle";
 import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
 import { getMcpClients } from "./mcp-clients";
 import { ClientSwitcher } from "./client-switcher";
@@ -26,12 +24,9 @@ export default function ConnectPage() {
   return (
     <main className="mx-auto w-full max-w-3xl px-6 pb-32 sm:px-10">
       <header className="pt-20 sm:pt-28">
-        <div className="flex items-center justify-between gap-4">
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-ns-muted">
-            ns-ui / connect
-          </p>
-          <ThemeToggle />
-        </div>
+        <p className="font-mono text-xs uppercase tracking-[0.18em] text-ns-muted">
+          ns-ui / connect
+        </p>
         <h1 className="mt-5 text-3xl font-semibold leading-[1.15] tracking-tight sm:text-4xl">
           Get the registry into an agent.
         </h1>
@@ -152,21 +147,6 @@ export default function ConnectPage() {
           <code className="font-mono text-foreground">{REGISTRY_ORIGIN}</code>.
         </p>
       </section>
-
-      <footer className="mt-24 flex flex-wrap items-baseline gap-x-8 gap-y-2 border-t border-border pt-6 font-mono text-xs text-ns-muted">
-        <Link
-          href="/"
-          className="underline underline-offset-2 hover:text-foreground transition-colors"
-        >
-          Back to the grid
-        </Link>
-        <a
-          href="https://nikolas.helpmarq.com"
-          className="underline underline-offset-2 hover:text-foreground transition-colors"
-        >
-          Built by Nikolas Sapa
-        </a>
-      </footer>
     </main>
   );
 }

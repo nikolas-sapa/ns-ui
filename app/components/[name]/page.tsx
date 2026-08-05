@@ -9,6 +9,7 @@ import { loadComponentProps } from "@/lib/component-props";
 import { CopyButton } from "@/app/_components/copy-button";
 import { ComponentSave } from "@/app/_components/component-save";
 import { categoriesFor } from "@/lib/category-pages";
+import { navGroups, flatOrder } from "@/lib/nav-data";
 import pkg from "@/package.json";
 
 // package.json's repository.url is the git clone URL (`...ns-ui.git`);
@@ -84,6 +85,17 @@ export default async function ComponentPage({
   // rendered as its own link row rather than turning the tag chips into
   // links two-thirds of which would have nowhere to go.
   const categories = item ? categoriesFor(item.name, item.meta?.tags ?? []) : [];
+
+  // Prev/next in the exact order the sidebar tree reads top-to-bottom
+  // (category -> kind -> loose item), not recency — that's what
+  // `/preview/<name>/play` steps through instead, for a page whose entire
+  // purpose is "the next thing to look at" rather than "where am I in the
+  // catalog I was just browsing".
+  const flat = flatOrder(navGroups());
+  const flatIndex = item ? flat.findIndex((i) => i.name === item.name) : -1;
+  const prevItem = flatIndex > 0 ? flat[flatIndex - 1] : null;
+  const nextItem =
+    flatIndex >= 0 && flatIndex < flat.length - 1 ? flat[flatIndex + 1] : null;
 
   // Only fields populated from real registry/package data — nothing here is
   // invented to fill out the schema. Server-rendered (this is an async
@@ -286,6 +298,44 @@ export default async function ComponentPage({
                 ))}
               </ul>
             </div>
+          ) : null}
+
+          {prevItem || nextItem ? (
+            <nav
+              aria-label="Adjacent components"
+              className="mt-10 grid grid-cols-2 gap-4 border-t border-border pt-8"
+            >
+              {prevItem ? (
+                <Link
+                  href={`/components/${prevItem.name}`}
+                  className="group rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
+                >
+                  <span className="font-mono text-[11px] uppercase tracking-wider text-ns-muted">
+                    Previous
+                  </span>
+                  <span className="mt-1 block truncate text-sm text-foreground underline-offset-2 group-hover:text-ns-accent group-hover:underline">
+                    {prevItem.title}
+                  </span>
+                </Link>
+              ) : (
+                <span />
+              )}
+              {nextItem ? (
+                <Link
+                  href={`/components/${nextItem.name}`}
+                  className="group rounded-sm text-right outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
+                >
+                  <span className="font-mono text-[11px] uppercase tracking-wider text-ns-muted">
+                    Next
+                  </span>
+                  <span className="mt-1 block truncate text-sm text-foreground underline-offset-2 group-hover:text-ns-accent group-hover:underline">
+                    {nextItem.title}
+                  </span>
+                </Link>
+              ) : (
+                <span />
+              )}
+            </nav>
           ) : null}
 
           <div className="mt-10 border-t border-border pt-8">

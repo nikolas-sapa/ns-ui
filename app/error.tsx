@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect } from "react";
 import { ThemeReassert } from "./_components/theme-reassert";
-import { ThemeToggle } from "./_components/theme-toggle";
 
 // Deliberately plain: no registry component runs here. An error boundary that
 // renders a 266-component-library animation risks throwing inside the boundary
@@ -22,14 +21,13 @@ export default function Error({
   return (
     <main className="flex min-h-screen flex-col bg-background">
       <ThemeReassert />
-      <header className="flex items-center justify-between gap-4 border-b border-border px-6 py-4 sm:px-10">
+      <header className="border-b border-border px-6 py-4 sm:px-10">
         <a
           href="/"
           className="rounded-sm font-mono text-xs uppercase tracking-[0.18em] text-ns-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
         >
           ns-ui
         </a>
-        <ThemeToggle />
       </header>
 
       <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-6 px-6 py-20 text-center sm:px-10">

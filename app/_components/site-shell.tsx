@@ -7,6 +7,9 @@ import { locate, type NavGroup, type NavItem, type NavKind } from "@/lib/nav-dat
 import { SIDEBAR_HIDDEN_KEY } from "@/lib/sidebar";
 import { McpPopup } from "./mcp-popup";
 import { SiteAuth } from "./site-auth";
+import { SiteFooter } from "./site-footer";
+import { ThemeToggle } from "./theme-toggle";
+import { CommandPalette, SearchIcon } from "./command-palette";
 
 /**
  * The persistent left sidebar, and the one rule that keeps it from breaking
@@ -75,6 +78,7 @@ export function SiteShell({
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [cmdkOpen, setCmdkOpen] = useState(false);
 
   // Desktop-only sidebar collapse (separate from `open`, which is the
   // mobile drawer above). `sidebarHidden` only gates the two toggle
@@ -105,6 +109,7 @@ export function SiteShell({
 
   const [query, setQuery] = useState("");
   const activeRef = useRef<HTMLAnchorElement | null>(null);
+  const mainRef = useRef<HTMLDivElement | null>(null);
   const isFiltering = query.trim().length > 0;
 
   // Both the playground and the component detail page point at the same
@@ -187,6 +192,41 @@ export function SiteShell({
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
+  // ⌘K / Ctrl+K opens the command palette from anywhere on the page —
+  // registered here rather than inside CommandPalette itself, since it has
+  // to fire while that component is unmounted (cmdkOpen === false).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() !== "k" || !(e.metaKey || e.ctrlKey)) return;
+      e.preventDefault();
+      setCmdkOpen((v) => !v);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  // Move focus to the page's own heading on every route change — otherwise
+  // focus silently stays wherever the link that was just clicked sat in the
+  // DOM (or, for the skip link below, on the sidebar itself), which is not
+  // where a keyboard or screen-reader visitor actually landed. Skipped on
+  // first mount: that's a hard navigation/reload, and stealing focus from
+  // wherever the visitor already put it (a hash link, an autofocused field)
+  // would be the opposite of helpful.
+  const isFirstRender = useRef(true);
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    const container = mainRef.current;
+    if (!container) return;
+    const heading = container.querySelector<HTMLElement>("h1") ?? container;
+    if (heading !== container && !heading.hasAttribute("tabindex")) {
+      heading.setAttribute("tabindex", "-1");
+    }
+    heading.focus();
+  }, [pathname]);
+
   // The browser fires <details onToggle> for a forced open exactly like a
   // real click — while filtering, every matched section's `open` is forced
   // (below, `isFiltering || openIds.has(g.id)`), so without this guard a
@@ -240,6 +280,17 @@ export function SiteShell({
 
   return (
     <div className="lg:flex">
+      {/* First focusable element on every chrome-wrapped page — jumps a
+          keyboard visitor straight past the sidebar's ~300 links to the
+          actual page content, instead of tabbing through the whole tree
+          every single visit. */}
+      <a
+        href="#main"
+        className="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:left-4 focus-visible:top-4 focus-visible:z-50 focus-visible:rounded-sm focus-visible:bg-ns-accent focus-visible:px-3 focus-visible:py-2 focus-visible:text-sm focus-visible:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      >
+        Skip to main content
+      </a>
+
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -292,7 +343,20 @@ export function SiteShell({
           >
             ns-ui
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            {/* Site-wide jump-to (command-palette.tsx) — searches every
+                component and route, not just this tree, so it's worth its
+                own affordance rather than living only behind ⌘K. */}
+            <button
+              type="button"
+              onClick={() => setCmdkOpen(true)}
+              aria-label="Open command palette"
+              className="inline-flex items-center gap-1 rounded-sm px-1.5 py-1 text-ns-muted outline-none transition-colors hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
+            >
+              <SearchIcon />
+              <kbd className="hidden font-mono text-[10px] sm:inline">⌘K</kbd>
+            </button>
+            <ThemeToggle />
             <span className="font-mono text-[11px] text-ns-muted">{total}</span>
             {/* Desktop-only: collapses the whole sidebar, not a section
                 inside it — do not confuse with Expand all / Collapse all
@@ -466,12 +530,23 @@ export function SiteShell({
         <RailChevron direction="right" />
       </button>
 
-      <div className="min-w-0 flex-1">{children}</div>
+      <div className="flex min-w-0 flex-1 flex-col">
+        {/* The skip link above and the route-change focus effect both target
+            this — `tabIndex={-1}` makes it (or, more often, the first `h1`
+            inside it) programmatically focusable without adding it to the
+            normal Tab order. */}
+        <div id="main" ref={mainRef} tabIndex={-1} className="min-w-0 flex-1 outline-none">
+          {children}
+        </div>
+        <SiteFooter />
+      </div>
 
       {/* /connect is where this popup would send someone — pointless there.
           Every /preview/<name> shape (bare route + /embed, the screenshot
           gate and every card's iframe) already returned above this point. */}
       {pathname !== "/connect" ? <McpPopup /> : null}
+
+      <CommandPalette open={cmdkOpen} onClose={() => setCmdkOpen(false)} />
     </div>
   );
 }
