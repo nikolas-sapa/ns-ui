@@ -56,9 +56,15 @@ function featuredNames(): string[] {
 const only = process.argv.slice(2);
 const names = only.length ? only : featuredNames();
 
-// Rebuilt from scratch each time so a slug dropped from or renamed in FEATURED
-// does not leave a stale preview shipping forever.
-rmSync(OUT, { recursive: true, force: true });
+// A FULL run is rebuilt from scratch so a slug dropped from or renamed in
+// FEATURED does not leave a stale preview shipping forever. A TARGETED run
+// (explicit names on argv) must NOT wipe the directory: doing so made
+// `node scripts/build-previews.ts <name>` silently delete the other ~70
+// videos, and made batching the full set self-defeating — each batch erased
+// the one before it, so 36 components in 6 batches left only the last 6.
+if (!only.length) {
+  rmSync(OUT, { recursive: true, force: true });
+}
 mkdirSync(OUT, { recursive: true });
 rmSync(RAW, { recursive: true, force: true });
 mkdirSync(RAW, { recursive: true });
