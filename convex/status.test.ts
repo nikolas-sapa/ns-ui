@@ -1,4 +1,6 @@
-// Proves the two properties the daily status strip depends on.
+// Proves the properties the daily status strip depends on: one bar per
+// (day, service), a bar that aggregates EVERY sample of its day rather than
+// the last one written, and a day nobody sampled staying absent.
 // Usage: node convex/status.test.ts
 //
 // Runs offline against an in-memory store, not against a Convex deployment —
@@ -17,24 +19,43 @@
 import assert from "node:assert/strict";
 import {
   SNAPSHOT_WINDOW_DAYS,
-  upsertSnapshot,
+  deriveState,
+  recordSample,
   utcDay,
   windowStartDay,
+  type SnapshotCounts,
   type SnapshotRow,
   type SnapshotStore,
 } from "./status.logic.ts";
 
 // The same shape `convex/status.ts` builds over `ctx.db`, backed by an array.
 // `patch` mirrors Convex's semantics: an explicit `undefined` removes a field.
-type Stored = SnapshotRow & { id: number };
+// The counters are optional here and NOT in `SnapshotRow`, on purpose: a row
+// as it exists in the deployment today was written before accumulation
+// shipped and carries none. The fake stores that shape faithfully so the
+// legacy path is exercised against the real code rather than assumed to work.
+type Legacy = Omit<SnapshotRow, "sampleCount" | "degradedCount" | "downCount">;
+type Stored = Legacy & Partial<SnapshotCounts> & { id: number };
 
-function makeStore() {
+function makeStore(seed: Legacy[] = []) {
   const rows: Stored[] = [];
   let nextId = 1;
+  for (const row of seed) {
+    rows.push({ id: nextId, ...row });
+    nextId += 1;
+  }
   const store: SnapshotStore<number> = {
     find: async (day, serviceId) => {
       const row = rows.find((r) => r.day === day && r.serviceId === serviceId);
-      return row === undefined ? null : { id: row.id };
+      if (row === undefined) return null;
+      return {
+        id: row.id,
+        state: row.state,
+        detail: row.detail,
+        sampleCount: row.sampleCount,
+        degradedCount: row.degradedCount,
+        downCount: row.downCount,
+      };
     },
     insert: async (row) => {
       // No normalizing: the fake stores exactly the keys it was handed, so an
@@ -52,6 +73,9 @@ function makeStore() {
       assert.ok(row, `patch: no row ${id}`);
       row.state = fields.state;
       row.recordedAt = fields.recordedAt;
+      row.sampleCount = fields.sampleCount;
+      row.degradedCount = fields.degradedCount;
+      row.downCount = fields.downCount;
       if (fields.detail === undefined) delete row.detail;
       else row.detail = fields.detail;
     },
@@ -78,58 +102,188 @@ assert.equal(
   SNAPSHOT_WINDOW_DAYS - 1,
 );
 
-// --- 1. the upsert is idempotent -----------------------------------------
+// --- the derivation itself ------------------------------------------------
+// Stated on its own before any store is involved, because every bar on the
+// page is this function's output.
+assert.equal(deriveState({ sampleCount: 6, degradedCount: 0, downCount: 0 }), "ok");
+assert.equal(deriveState({ sampleCount: 6, degradedCount: 1, downCount: 0 }), "degraded");
+assert.equal(deriveState({ sampleCount: 6, degradedCount: 0, downCount: 1 }), "down");
+// Down beats degraded: a day that was ever actually down is not "degraded".
+assert.equal(deriveState({ sampleCount: 6, degradedCount: 4, downCount: 1 }), "down");
+// Zero samples is not a state. It is an absent day, and asking for its state
+// is a bug rather than a healthy bar.
+assert.throws(() => deriveState({ sampleCount: 0, degradedCount: 0, downCount: 0 }));
+
+// --- 1. many samples in one day aggregate into ONE bar --------------------
 {
   const { store, rows } = makeStore();
   const day = utcDay(today);
+  const at = (minutes: number) => today + minutes * 60_000;
 
-  const first = await upsertSnapshot(store, {
+  const first = await recordSample(store, {
     day,
     serviceId: "live-origin",
     state: "ok",
     detail: "298 items",
-    recordedAt: today,
+    recordedAt: at(0),
   });
-  const second = await upsertSnapshot(store, {
+  const second = await recordSample(store, {
     day,
     serviceId: "live-origin",
-    state: "down",
-    detail: "origin answered 503",
-    recordedAt: today + 60_000,
+    state: "ok",
+    detail: "298 items",
+    recordedAt: at(10),
   });
 
   assert.equal(first, "inserted");
   assert.equal(second, "updated");
-  assert.equal(rows.length, 1, "a second run the same day added a second bar");
-  assert.equal(rows[0].state, "down", "the re-run did not overwrite the state");
-  assert.equal(rows[0].detail, "origin answered 503");
-  assert.equal(rows[0].recordedAt, today + 60_000);
+  assert.equal(rows.length, 1, "a second sample the same day added a second bar");
+  assert.equal(rows[0].state, "ok", "two ok samples did not read ok");
+  assert.deepEqual(
+    [rows[0].sampleCount, rows[0].degradedCount, rows[0].downCount],
+    [2, 0, 0],
+  );
+  assert.equal(rows[0].recordedAt, at(10), "recordedAt is not the latest sample");
 
-  // A third run that measured no detail CLEARS the old caption rather than
-  // carrying a stale fact forward under a fresh timestamp.
-  await upsertSnapshot(store, {
+  // The sample that changes the day's verdict.
+  await recordSample(store, {
     day,
     serviceId: "live-origin",
-    state: "ok",
-    recordedAt: today + 120_000,
+    state: "down",
+    detail: "origin answered 503",
+    recordedAt: at(20),
   });
-  assert.equal(rows.length, 1);
-  assert.equal(rows[0].detail, undefined, "a stale detail survived the re-run");
+  assert.equal(rows[0].state, "down");
+  assert.deepEqual(
+    [rows[0].sampleCount, rows[0].degradedCount, rows[0].downCount],
+    [3, 0, 1],
+  );
 
-  // A different service the same day is a different bar, not an overwrite.
-  await upsertSnapshot(store, {
+  // THE POINT OF THE WHOLE CHANGE: everything recovering afterwards does not
+  // erase the outage. Nine more ok samples, and the day still reads down.
+  for (let i = 1; i <= 9; i += 1) {
+    await recordSample(store, {
+      day,
+      serviceId: "live-origin",
+      state: "ok",
+      detail: "298 items",
+      recordedAt: at(20 + i * 10),
+    });
+  }
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].state, "down", "later ok samples overwrote a down day");
+  assert.deepEqual(
+    [rows[0].sampleCount, rows[0].degradedCount, rows[0].downCount],
+    [12, 0, 1],
+  );
+  // The caption still describes the state the bar shows, not the last sample
+  // taken — an ok sample must never caption a down day "298 items".
+  assert.equal(rows[0].detail, "origin answered 503");
+  assert.equal(rows[0].recordedAt, at(110));
+
+  // Degraded only when nothing was down.
+  await recordSample(store, {
     day,
-    serviceId: "convex-read-path",
+    serviceId: "published-packages",
     state: "ok",
+    recordedAt: at(0),
+  });
+  await recordSample(store, {
+    day,
+    serviceId: "published-packages",
+    state: "degraded",
+    detail: "version drift",
+    recordedAt: at(10),
+  });
+  const pkg = rows.find((r) => r.serviceId === "published-packages");
+  assert.ok(pkg);
+  // A different service the same day is a different bar, not an overwrite.
+  assert.equal(rows.length, 2);
+  assert.equal(pkg.state, "degraded");
+  assert.equal(pkg.detail, "version drift");
+  assert.deepEqual([pkg.sampleCount, pkg.degradedCount, pkg.downCount], [2, 1, 0]);
+
+  // A matching sample with no detail CLEARS the old caption rather than
+  // carrying a stale fact forward under a fresh timestamp.
+  await recordSample(store, {
+    day,
+    serviceId: "published-packages",
+    state: "degraded",
+    recordedAt: at(20),
+  });
+  assert.equal(pkg.detail, undefined, "a stale detail survived a later sample");
+  assert.equal(pkg.sampleCount, 3);
+
+  // Tomorrow is a fresh bar with fresh counters — accumulation never leaks
+  // across the day boundary.
+  await recordSample(store, {
+    day: utcDay(today + DAY_MS),
+    serviceId: "live-origin",
+    state: "ok",
+    recordedAt: today + DAY_MS,
+  });
+  const tomorrow = rows.find((r) => r.day === utcDay(today + DAY_MS));
+  assert.ok(tomorrow);
+  assert.equal(tomorrow.state, "ok");
+  assert.deepEqual(
+    [tomorrow.sampleCount, tomorrow.degradedCount, tomorrow.downCount],
+    [1, 0, 0],
+  );
+}
+
+// --- 1b. a single down sample makes the day down -------------------------
+{
+  const { store, rows } = makeStore();
+  const day = utcDay(today);
+  await recordSample(store, {
+    day,
+    serviceId: "live-origin",
+    state: "down",
+    detail: "origin answered 503",
     recordedAt: today,
   });
-  assert.equal(rows.length, 2);
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].state, "down", "the first sample of a day was not honoured");
+  assert.deepEqual(
+    [rows[0].sampleCount, rows[0].degradedCount, rows[0].downCount],
+    [1, 0, 1],
+  );
+}
+
+// --- 1c. a row written before accumulation keeps counting from 1 ---------
+{
+  // Exactly what is in the deployment now: one row, one ping, no counters.
+  const { store, rows } = makeStore([
+    {
+      day: utcDay(today),
+      serviceId: "live-origin",
+      state: "down",
+      detail: "origin answered 503",
+      recordedAt: today,
+    },
+  ]);
+
+  await recordSample(store, {
+    day: utcDay(today),
+    serviceId: "live-origin",
+    state: "ok",
+    detail: "298 items",
+    recordedAt: today + 600_000,
+  });
+
+  const row = rows[0];
+  assert.equal(rows.length, 1);
+  // The legacy row IS one recorded sample, so the day now holds two — and the
+  // down it recorded is not erased by the ok that followed.
+  assert.deepEqual([row.sampleCount, row.degradedCount, row.downCount], [2, 0, 1]);
+  assert.equal(row.state, "down");
+  assert.equal(row.detail, "origin answered 503");
 }
 
 // --- 2. a day with no snapshot reads back ABSENT, never "ok" -------------
 {
   const { store, since } = makeStore();
-  await upsertSnapshot(store, {
+  await recordSample(store, {
     day: utcDay(today),
     serviceId: "live-origin",
     state: "ok",
@@ -155,6 +309,16 @@ assert.equal(
   // the whole 90-day window holds exactly the one day that was written.
   const distinctDays = new Set(window.map((r) => r.day));
   assert.equal(distinctDays.size, 1);
+
+  // And an unsampled day cannot even be described as zero samples: there is
+  // no row to carry a `sampleCount` of 0, which is what "no data" means.
+  assert.equal(
+    window.find((r) => r.day === utcDay(yesterday)),
+    undefined,
+  );
 }
 
-console.log("convex/status.logic.ts: upsert idempotent, unmeasured days absent — ok");
+console.log(
+  "convex/status.logic.ts: one bar per day/service, samples aggregate, " +
+    "unmeasured days absent — ok",
+);

@@ -16,9 +16,8 @@ import {
   notMeasuredChecks,
   fetchLiveOriginCount,
   fetchPublishedCli,
-  fetchPublishedVersion,
+  fetchPublishedMcp,
   probeConvex,
-  MCP_PACKAGE,
   EM_DASH,
   type StatusBuild,
   type StatusCheck,
@@ -127,7 +126,8 @@ const dead = serviceChecks(
   },
   "2026-01-01T00:00:00.000Z"
 );
-assert.equal(dead.length, 3);
+// live origin, convex, and one row per published package.
+assert.equal(dead.length, 4);
 for (const check of dead) {
   assert.equal(check.state, "unknown", `${check.id} must be unknown when its read fails`);
   assert.equal(check.value, EM_DASH);
@@ -153,7 +153,9 @@ const live = serviceChecks(
   {
     liveOriginCount: build.components,
     cliVersionPublished: build.cliVersionLocal,
+    cliComponentsPublished: build.components,
     mcpVersionPublished: build.mcpVersionLocal,
+    mcpComponentsPublished: build.components,
     convexReachable: true,
   },
   "2026-01-01T00:00:00.000Z"
@@ -162,25 +164,90 @@ assert.equal(by(live, "live-origin").state, "ok");
 assert.equal(by(live, "live-origin").value, `${build.components} items`);
 assert.equal(by(live, "convex-read-path").state, "ok");
 assert.equal(by(live, "convex-read-path").value, "reachable");
-assert.equal(by(live, "published-packages").state, "ok");
+// One row per package, each resting on its own two reads.
+assert.equal(by(live, "published-cli").state, "ok");
+assert.equal(by(live, "published-mcp").state, "ok");
+assert.equal(
+  by(live, "published-cli").value,
+  `${build.cliVersionLocal} · ${build.components} components`
+);
+assert.equal(
+  by(live, "published-mcp").value,
+  `${build.mcpVersionLocal} · ${build.components} components`
+);
+// The MCP row is read from the MCP's own artifact, never the CLI's index.
+assert.ok(by(live, "published-mcp").detail.includes("registry-snapshot.json"));
+assert.ok(by(live, "published-cli").detail.includes("registry-index.json"));
 // The caveat is present even when the row is clean.
 assert.ok(by(live, "convex-read-path").detail.includes("unauthenticated"));
 
 // A published version ahead of this repo is drift, and both numbers are named.
+// It is drift on THAT package's row only: the other package is untouched.
 const stale = serviceChecks(
   build,
   {
     liveOriginCount: build.components,
     cliVersionPublished: "99.0.0",
+    cliComponentsPublished: build.components,
     mcpVersionPublished: build.mcpVersionLocal,
+    mcpComponentsPublished: build.components,
     convexReachable: true,
   },
   "2026-01-01T00:00:00.000Z"
 );
-const pkgRow = by(stale, "published-packages");
+const pkgRow = by(stale, "published-cli");
 assert.equal(pkgRow.state, "degraded");
 assert.ok(pkgRow.detail.includes("99.0.0"));
 assert.ok(pkgRow.detail.includes(build.cliVersionLocal ?? "—"));
+assert.equal(by(stale, "published-mcp").state, "ok");
+
+// A component count short of this build is drift too, and names both counts.
+const short = by(
+  serviceChecks(
+    build,
+    {
+      liveOriginCount: build.components,
+      cliVersionPublished: build.cliVersionLocal,
+      cliComponentsPublished: build.components,
+      mcpVersionPublished: build.mcpVersionLocal,
+      mcpComponentsPublished: build.components - 5,
+      convexReachable: true,
+    },
+    "2026-01-01T00:00:00.000Z"
+  ),
+  "published-mcp"
+);
+assert.equal(short.state, "degraded");
+assert.ok(short.detail.includes(`${build.components - 5}`));
+assert.ok(short.detail.includes(`${build.components}`));
+
+// A version that was read while its index was not is UNKNOWN, and the row
+// still prints an em dash — half a claim is not a value. The reason names the
+// version that WAS read and the file that was not.
+const halfRead = by(
+  serviceChecks(
+    build,
+    {
+      liveOriginCount: build.components,
+      cliVersionPublished: build.cliVersionLocal,
+      cliComponentsPublished: null,
+      mcpVersionPublished: build.mcpVersionLocal,
+      mcpComponentsPublished: build.components,
+      convexReachable: true,
+    },
+    "2026-01-01T00:00:00.000Z"
+  ),
+  "published-cli"
+);
+assert.equal(halfRead.state, "unknown");
+assert.equal(halfRead.value, EM_DASH);
+assert.ok(halfRead.detail.includes(build.cliVersionLocal ?? "—"));
+assert.ok(halfRead.detail.includes("registry-index.json"));
+
+// The split is the point: no row anywhere still carries the combined id.
+for (const row of [...live, ...stale, ...dead]) {
+  assert.notEqual(row.id, "published-packages");
+}
 
 // A live origin behind this build still reads ok here — the divergence is
 // §1's claim, rendered in --error there, and must not also be painted blue.
@@ -224,9 +291,9 @@ if (process.argv.includes("--live")) {
   const [origin, cli, mcp] = await Promise.all([
     fetchLiveOriginCount(REGISTRY_ORIGIN),
     fetchPublishedCli(),
-    fetchPublishedVersion(MCP_PACKAGE),
+    fetchPublishedMcp(),
   ]);
   console.log(`  live origin      ${origin ?? "unknown"}`);
   console.log(`  published cli    ${cli ? `${cli.version} · ${cli.components} components` : "unknown"}`);
-  console.log(`  published mcp    ${mcp ?? "unknown"}`);
+  console.log(`  published mcp    ${mcp ? `${mcp.version} · ${mcp.components} components` : "unknown"}`);
 }

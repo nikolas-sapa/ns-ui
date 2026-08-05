@@ -4,7 +4,8 @@
 // this is exactly the data it renders) and is the whole problem for `record`.
 //
 // `record` is the FIRST write in this deployment that no signed-in identity
-// backs: it is called by a Vercel cron, which has no Convex session. Left
+// backs: it is called by scheduled pollers (a GitHub Actions schedule, plus
+// the Vercel cron as a fallback), which have no Convex session. Left
 // unguarded, anyone holding the public deployment URL could forge uptime
 // history — which would destroy the only thing /status is for. So it carries
 // its own shared-secret check, in the same closed-by-default shape
@@ -22,7 +23,7 @@ import { type Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import {
   SNAPSHOT_WINDOW_DAYS,
-  upsertSnapshot,
+  recordSample,
   utcDay,
   windowStartDay,
   type SnapshotStore,
@@ -40,6 +41,15 @@ const publicSnapshot = v.object({
   state: snapshotState,
   detail: v.optional(v.string()),
   recordedAt: v.number(),
+  // How much evidence stands behind that state. Optional because rows written
+  // before continuous polling existed carry no counters — a reader must treat
+  // an absent `sampleCount` as unknown, NOT as zero and not as many. What the
+  // page does with these numbers is the page's business; this layer computes
+  // no percentage from them, because a percentage over an unknown number of
+  // unevenly spaced samples is not an uptime figure.
+  sampleCount: v.optional(v.number()),
+  degradedCount: v.optional(v.number()),
+  downCount: v.optional(v.number()),
 });
 
 /**
@@ -67,6 +77,13 @@ export const recent = query({
       state: doc.state,
       ...(doc.detail === undefined ? {} : { detail: doc.detail }),
       recordedAt: doc.recordedAt,
+      ...(doc.sampleCount === undefined
+        ? {}
+        : {
+            sampleCount: doc.sampleCount,
+            degradedCount: doc.degradedCount ?? 0,
+            downCount: doc.downCount ?? 0,
+          }),
     }));
   },
 });
@@ -88,13 +105,15 @@ function requireSnapshotSecret(provided: string) {
 }
 
 /**
- * Write today's measurement for one service. Idempotent per (day, serviceId):
- * a second call the same day overwrites the first, so re-running the cron, or
- * retrying after a timeout, cannot produce two bars for one day.
+ * Add one measurement of one service to today's row. One row — one bar — per
+ * (day, serviceId) no matter how often the poller runs, so a 10-minute
+ * schedule cannot produce 144 bars for one day. What each call DOES change is
+ * the evidence: the day's counters grow, and its state is re-derived from
+ * them, so a single down sample keeps the day down for the rest of the day.
  *
  * There is deliberately no way to record "nothing was measured". A check that
  * could not determine its state simply does not call this — absence is the
- * recording.
+ * recording, and a day nobody sampled has no row at all.
  */
 export const record = mutation({
   args: {
@@ -121,7 +140,16 @@ export const record = mutation({
             q.eq("day", d).eq("serviceId", serviceId),
           )
           .unique();
-        return doc === null ? null : { id: doc._id };
+        return doc === null
+          ? null
+          : {
+              id: doc._id,
+              state: doc.state,
+              detail: doc.detail,
+              sampleCount: doc.sampleCount,
+              degradedCount: doc.degradedCount,
+              downCount: doc.downCount,
+            };
       },
       insert: async (row) => {
         await ctx.db.insert("statusSnapshots", row);
@@ -131,7 +159,7 @@ export const record = mutation({
       },
     };
 
-    const result = await upsertSnapshot(store, {
+    const result = await recordSample(store, {
       day,
       serviceId: args.serviceId,
       state: args.state,

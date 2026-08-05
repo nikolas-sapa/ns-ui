@@ -1,0 +1,82 @@
+# Polls `/api/status-snapshot` so a /status bar is backed by many samples a
+# day instead of one. Each call takes one measurement per service and adds it
+# to that UTC day's row (convex/status.ts -> recordSample); the row stays one
+# bar per (day, service) however often this runs.
+#
+# WHAT THIS SCHEDULE ACTUALLY GUARANTEES: nothing. `*/10 * * * *` is a
+# REQUEST. GitHub's documented minimum interval for `schedule` is 5 minutes,
+# scheduled workflows run on shared infrastructure and are commonly delayed
+# during peak load, and a run can be dropped altogether rather than merely
+# queued (GitHub also disables schedules on repositories with no activity for
+# 60 days). So the real gap between two samples is unbounded, and no copy
+# anywhere — here, in the route, or on /status — may describe this as
+# continuous monitoring, a heartbeat, or a 10-minute guarantee. The only
+# truthful record of how much was measured on a given day is that row's
+# `sampleCount`, and a day with no samples stays absent.
+#
+# The once-a-day Vercel cron in vercel.json stays as the fallback: a day this
+# workflow skips entirely should not leave a hole in the strip.
+name: status poll
+
+on:
+  schedule:
+    # Requested every 10 minutes. See the note above about what GitHub
+    # actually delivers.
+    - cron: "*/10 * * * *"
+  # On demand, for a manual sample after a deploy or an incident.
+  workflow_dispatch:
+
+concurrency:
+  # One poll at a time. `cancel-in-progress: false` because a run already
+  # talking to the route is taking a real measurement — cancelling it would
+  # discard a sample, which is the opposite of the point.
+  group: status-poll
+  cancel-in-progress: false
+
+# Nothing here reads or writes repository content.
+permissions: {}
+
+jobs:
+  poll:
+    name: poll
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Call /api/status-snapshot
+        env:
+          # The route's own guard (`Authorization: Bearer <CRON_SECRET>`).
+          # Repository secret name only — never the value, in this file or any
+          # other. It must match `CRON_SECRET` on the Vercel deployment being
+          # polled, and the deployment needs `STATUS_SNAPSHOT_SECRET` set too,
+          # or the route refuses to write and says which one is missing.
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          # Optional repository variable, for polling a different deployment
+          # (a preview, say). Defaults to production below.
+          STATUS_SNAPSHOT_URL: ${{ vars.STATUS_SNAPSHOT_URL }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${CRON_SECRET}" ]; then
+            echo "::error::CRON_SECRET repository secret is unset — refusing to call the route unauthenticated. Set it to the same value as CRON_SECRET on the deployment."
+            exit 1
+          fi
+
+          url="${STATUS_SNAPSHOT_URL:-https://design.helpmarq.com/api/status-snapshot}"
+          body="$(mktemp)"
+
+          # No `--retry`: every successful call records a sample, so a retry
+          # after a response this side never saw would count one measurement
+          # twice. A missed poll is a missed poll; inflating the day's sample
+          # count to hide it would be a fabricated measurement.
+          code="$(curl --silent --show-error --max-time 60 \
+            --output "$body" --write-out '%{http_code}' \
+            --header "Authorization: Bearer ${CRON_SECRET}" \
+            "$url")"
+
+          cat "$body"
+          echo
+
+          if [ "$code" != "200" ]; then
+            echo "::error::$url answered HTTP $code — no sample was recorded for this run."
+            exit 1
+          fi

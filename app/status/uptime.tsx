@@ -119,6 +119,14 @@ export type ServiceRow = {
   /** The host or package this row is actually about. Omitted rather than
    *  faked when the identifier is not configured. */
   subtitle?: string;
+  /**
+   * One sentence about what this row's history does NOT contain, printed under
+   * the strip. It exists for a row whose service id is younger than the page:
+   * a strip of grey bars is indistinguishable from a service nobody has ever
+   * checked, and the difference belongs on the card rather than in a commit
+   * message. Never used to explain away a bar that IS drawn.
+   */
+  note?: string;
 };
 
 /**
@@ -186,6 +194,10 @@ export function ServiceCard({
         <span>90 days</span>
         <span className="tabular-nums">{figure}</span>
       </div>
+
+      {service.note ? (
+        <p className="mt-3 max-w-prose text-xs leading-5 text-ns-muted">{service.note}</p>
+      ) : null}
     </article>
   );
 }

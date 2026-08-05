@@ -291,8 +291,18 @@ export type RuntimeReads = {
   liveOriginCount: number | null;
   /** R2a: dist-tags.latest for the CLI package. */
   cliVersionPublished: string | null;
+  /**
+   * R2b: components.length inside THAT resolved CLI version's own
+   * `data/registry-index.json`. Optional and defaulting to null, because a
+   * caller that only read the version has not read the count, and the row
+   * must say so rather than assume it.
+   */
+  cliComponentsPublished?: number | null;
   /** R3: dist-tags.latest for the MCP package. */
   mcpVersionPublished: string | null;
+  /** R3b: components.length inside THAT resolved MCP version's own
+   *  `data/registry-snapshot.json`. Never inferred from the CLI's file. */
+  mcpComponentsPublished?: number | null;
   /**
    * R4: did the public unauthenticated Convex query resolve? `null` means the
    * call threw — which is NOT the same as Convex being down, see below.
@@ -352,40 +362,115 @@ export function serviceChecks(
           measuredAt
         );
 
-  const { cliVersionPublished: cli, mcpVersionPublished: mcp } = runtime;
-  let packages: StatusCheck;
-  if (cli === null || mcp === null) {
-    packages = unknownCheck(
-      "published-packages",
-      "published packages",
-      "npm dist-tags could not be read",
+  const cliPackage = packageCheck({
+    id: "published-cli",
+    label: "published CLI package",
+    pkg: CLI_PACKAGE,
+    indexFile: CLI_INDEX_FILE,
+    publishedVersion: runtime.cliVersionPublished,
+    localVersion: build.cliVersionLocal,
+    publishedComponents: runtime.cliComponentsPublished ?? null,
+    buildComponents: build.components,
+    measuredAt,
+  });
+
+  const mcpPackage = packageCheck({
+    id: "published-mcp",
+    label: "published MCP package",
+    pkg: MCP_PACKAGE,
+    indexFile: MCP_INDEX_FILE,
+    publishedVersion: runtime.mcpVersionPublished,
+    localVersion: build.mcpVersionLocal,
+    publishedComponents: runtime.mcpComponentsPublished ?? null,
+    buildComponents: build.components,
+    measuredAt,
+  });
+
+  // Declaration order, not severity order: §3 is a fixed list.
+  return [liveOrigin, convex, cliPackage, mcpPackage];
+}
+
+/**
+ * One published npm package, as one row.
+ *
+ * The CLI and the MCP server are separate artifacts, published separately from
+ * separate package.json files, and either can be stale while the other is
+ * current — so they get a row each and neither is ever evidence about the
+ * other. Each row rests on two reads of the SAME resolved version: the version
+ * npm serves, and the component count inside the index that version ships.
+ *
+ * Three outcomes, and only three:
+ *   the registry did not answer          → UNKNOWN, reason names the package
+ *   it answered, its index did not       → UNKNOWN, reason names the version
+ *                                          that WAS read and the file that
+ *                                          was not, so the partial read is
+ *                                          not thrown away silently
+ *   both read                            → OK, or DEGRADED naming every
+ *                                          number on both sides of the drift
+ *
+ * There is no path to `down` here: npm failing to answer is a fact about npm,
+ * not about this package, and a fetch that throws cannot tell the two apart.
+ */
+function packageCheck(args: {
+  id: string;
+  label: string;
+  pkg: string;
+  /** The file inside the published package whose components are counted. */
+  indexFile: string;
+  publishedVersion: string | null;
+  localVersion: string | null;
+  publishedComponents: number | null;
+  buildComponents: number;
+  measuredAt: string;
+}): StatusCheck {
+  const { id, label, pkg, indexFile, publishedVersion: version, measuredAt } = args;
+
+  if (version === null) {
+    return unknownCheck(
+      id,
+      label,
+      `the npm registry did not answer for ${pkg}, so its published version could not be read`,
       measuredAt
     );
-  } else {
-    // Local and published disagreeing means a release is sitting unpublished
-    // (or a publish landed ahead of this build). Both numbers get named — a
-    // row that says "drift" without saying drift from what is not a check.
-    const cliDrift = cli !== build.cliVersionLocal;
-    const mcpDrift = mcp !== build.mcpVersionLocal;
-    const drifts = [
-      cliDrift ? `cli ${cli} published vs ${build.cliVersionLocal ?? EM_DASH} in this repo` : null,
-      mcpDrift ? `mcp ${mcp} published vs ${build.mcpVersionLocal ?? EM_DASH} in this repo` : null,
-    ].filter((d): d is string => d !== null);
-    packages = {
-      id: "published-packages",
-      label: "published packages",
-      state: drifts.length > 0 ? "degraded" : "ok",
-      detail:
-        drifts.length > 0
-          ? drifts.join("; ")
-          : "npm dist-tags latest; matches this repo's package.json",
-      value: `cli ${cli} · mcp ${mcp}`,
-      measuredAt,
-    };
   }
+  if (args.publishedComponents === null) {
+    // The version is a real measurement and is named here rather than dropped,
+    // but the row's value column stays an em dash: half the claim is missing,
+    // and a row that prints a number is a row that claims to have checked one.
+    return unknownCheck(
+      id,
+      label,
+      `npm serves ${pkg} at ${version}, but the ${indexFile} inside that published version could not be read, so how many components it ships is unknown`,
+      measuredAt
+    );
+  }
+  const components = args.publishedComponents;
 
-  // Declaration order, not severity order: §3 is a fixed three-row list.
-  return [liveOrigin, convex, packages];
+  // Local and published disagreeing means a release is sitting unpublished (or
+  // a publish landed ahead of this build). Both sides get named — a row that
+  // says "drift" without saying drift from what is not a check. Symmetric
+  // wording on the counts on purpose: the published index can legitimately lead
+  // this build, and a subtraction phrased one way renders "-5 components".
+  const drifts = [
+    version === args.localVersion
+      ? null
+      : `${version} published vs ${args.localVersion ?? EM_DASH} in this repo`,
+    components === args.buildComponents
+      ? null
+      : `${components} components in the published package vs ${args.buildComponents} in this build`,
+  ].filter((d): d is string => d !== null);
+
+  return {
+    id,
+    label,
+    state: drifts.length > 0 ? "degraded" : "ok",
+    detail:
+      drifts.length > 0
+        ? drifts.join("; ")
+        : `npm dist-tags latest matches this repo's package.json, and the ${indexFile} it ships indexes every component in this build`,
+    value: `${version} · ${components} components`,
+    measuredAt,
+  };
 }
 
 // -------------------------------------------------------------------------
@@ -463,34 +548,48 @@ export async function fetchPublishedVersion(pkg: string): Promise<string | null>
 export const CLI_PACKAGE = "@nikolas.sapa/ns-ui";
 export const MCP_PACKAGE = "@nikolas.sapa/ns-ui-mcp";
 
+/** The file inside each published package whose `components` array is counted.
+ *  Declared once because the row's UNKNOWN reason names the same path the fetch
+ *  asked for, and two copies of the literal can drift into a row that names a
+ *  file nobody read. */
+export const CLI_INDEX_FILE = "data/registry-index.json";
+export const MCP_INDEX_FILE = "data/registry-snapshot.json";
+
+export type PublishedPackage = { version: string; components: number };
+
 /**
- * R2: the published CLI's version AND the component count from that same
- * resolved version's own `data/registry-index.json`. Two hops, one artifact.
+ * A published package's version AND the component count inside that SAME
+ * resolved version's own embedded index. Two hops, one artifact.
  *
- * They are returned together, and either hop failing returns null for both,
- * because a version from one resolution and a count from another are two
- * facts pretending to be one.
+ * Either hop failing returns null for both, because a version from one
+ * resolution and a count from another are two facts pretending to be one. A
+ * caller that wants to tell "npm did not answer" apart from "the index did not
+ * parse" reads the version separately with `fetchPublishedVersion` — which is
+ * what /status does, so its two package rows carry different UNKNOWN reasons.
  *
- * The MCP package's count is deliberately NOT inferred from this file — its
- * own snapshot is 5.2 MB, and one package's contents are not evidence about
- * another's. The MCP row gets a version only.
+ * `dist-tags.latest` is resolved first rather than a bare `@latest` URL on
+ * purpose: the version is the thing the row reports, and reading it from the
+ * registry means the row survives the next publish without an edit here.
  */
-export async function fetchPublishedCli(): Promise<{
-  version: string;
-  components: number;
-} | null> {
+async function fetchPublishedIndex(
+  pkg: string,
+  indexFile: string
+): Promise<PublishedPackage | null> {
   // ponytail: unpkg is an external host with no precedent in this repo.
   // Ceiling: unpkg availability, plus a staleness window between the two hops
-  // if a publish lands between them. Upgrade path: emit the component count
-  // into the package's own manifest at publish time and read it from the
-  // packument alone, dropping the second host entirely.
-  const version = await fetchPublishedVersion(CLI_PACKAGE);
+  // if a publish lands between them, plus the download itself — the CLI's
+  // index is 412 KB and the MCP's snapshot is 5.8 MB, once an hour, server-side
+  // only and never shipped to a client. The MCP file is over Next's 2 MB data
+  // cache ceiling, so it is refetched per ISR revalidation rather than cached.
+  // Upgrade path: emit the component count into each package's own manifest at
+  // publish time and read it straight off the packument, dropping the second
+  // host and both downloads entirely.
+  const version = await fetchPublishedVersion(pkg);
   if (version === null) return null;
   try {
-    const res = await fetch(
-      `https://unpkg.com/${CLI_PACKAGE}@${version}/data/registry-index.json`,
-      { next: { revalidate: HOUR } }
-    );
+    const res = await fetch(`https://unpkg.com/${pkg}@${version}/${indexFile}`, {
+      next: { revalidate: HOUR },
+    });
     if (!res.ok) return null;
     const data: unknown = await res.json();
     const components = (data as { components?: unknown })?.components;
@@ -500,6 +599,21 @@ export async function fetchPublishedCli(): Promise<{
   } catch {
     return null;
   }
+}
+
+/** R2: the published CLI package — `data/registry-index.json` is the offline
+ *  index `npx ns-ui` falls back to, so its length is what the published CLI
+ *  can install without the network. */
+export function fetchPublishedCli(): Promise<PublishedPackage | null> {
+  return fetchPublishedIndex(CLI_PACKAGE, CLI_INDEX_FILE);
+}
+
+/** R3: the published MCP server, measured from ITS own artifact.
+ *  `data/registry-snapshot.json` is the file the MCP server reads to answer an
+ *  agent, and the CLI's index is not evidence about it: they are built by
+ *  different scripts, shipped in different packages and published separately. */
+export function fetchPublishedMcp(): Promise<PublishedPackage | null> {
+  return fetchPublishedIndex(MCP_PACKAGE, MCP_INDEX_FILE);
 }
 
 /**

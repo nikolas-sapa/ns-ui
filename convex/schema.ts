@@ -216,8 +216,11 @@ export default defineSchema({
   // The only time-series store in this repo, and the reason
   // lib/status-checks.ts's `uptime-history` row could ever stop saying "no
   // time-series store exists in this repo". One row per (UTC day, service),
-  // written once a day by `/api/status-snapshot` (a Vercel cron) through
+  // accumulated from every `/api/status-snapshot` run through
   // `convex/status.ts`, read by /status to draw a 90-day daily-bar strip.
+  // The route is polled by a GitHub Actions schedule (every 10 minutes,
+  // subject to GitHub's own delays under load) with the once-a-day Vercel
+  // cron kept as a fallback, so a day's row is many samples, not one ping.
   //
   // ABSENCE IS THE POINT. A day with no row for a service means nothing was
   // measured that day — the cron had not been created yet, it did not run, or
@@ -228,8 +231,9 @@ export default defineSchema({
   // from the caller, so no caller can write a row into the past.
   //
   // `state` carries `"degraded"` because the check layer already expresses it
-  // (`serviceChecks` marks `published-packages` degraded on version drift),
-  // but the daily writer cannot currently measure drift — that comparison
+  // (`serviceChecks` marks `published-cli` and `published-mcp` degraded on
+  // version drift),
+  // but the snapshot writer cannot currently measure drift — that comparison
   // needs the build-time versions in lib/status.generated.json, which a
   // runtime cron does not have. So no row has ever been recorded degraded,
   // and a strip with no degraded bars is evidence of nothing. `"down"` is
@@ -239,7 +243,7 @@ export default defineSchema({
   // network. Same reasoning as `RuntimeReads.convexReachable` being typed
   // `true | null` rather than `boolean`.
   //
-  // Retention: unbounded by design for now — 3 services x 365 days is ~1.1k
+  // Retention: unbounded by design for now — 4 services x 365 days is ~1.5k
   // rows a year, and the read is index-bounded to 90 days regardless, so
   // growth does not slow it down. Pruning is a later decision, not a silent
   // one: deleting old rows destroys history that cannot be re-measured.
@@ -255,12 +259,23 @@ export default defineSchema({
   // (`q.gte("day", cutoff)`) and the per-service upsert as a point lookup
   // (`q.eq("day", d).eq("serviceId", s)`). A `[serviceId, day]` index would
   // have forced one query per service for the read.
+  // The counters below are what makes a bar an aggregate of the day rather
+  // than whatever the last writer thought. `state` is DERIVED from them
+  // (convex/status.logic.ts `deriveState`): down if `downCount > 0`, ok only
+  // if every sample was ok, degraded in between. They are OPTIONAL only
+  // because rows written before continuous polling existed do not carry them;
+  // such a row is read as the one sample it always was (`countsOf`), never as
+  // zero samples. Zero samples is not a value this table stores — it is the
+  // absence of a row, and it must stay that way.
   statusSnapshots: defineTable({
     day: v.string(), // UTC calendar day, YYYY-MM-DD
     serviceId: v.string(), // a StatusCheck id from lib/status-checks.ts
     state: v.union(v.literal("ok"), v.literal("degraded"), v.literal("down")),
     detail: v.optional(v.string()), // what was actually measured, in words
-    recordedAt: v.number(),
+    recordedAt: v.number(), // when the LATEST sample of this day landed
+    sampleCount: v.optional(v.number()), // samples recorded this day
+    degradedCount: v.optional(v.number()), // of those, how many were degraded
+    downCount: v.optional(v.number()), // of those, how many were down
   }).index("by_day_service", ["day", "serviceId"]),
 
   testimonials: defineTable({

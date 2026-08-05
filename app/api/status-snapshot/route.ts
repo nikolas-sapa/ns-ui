@@ -1,11 +1,24 @@
-// `/api/status-snapshot` — the once-a-day writer behind /status's 90-day
-// daily-bar strip. Called by the Vercel cron in vercel.json; safe to call
-// again by hand, because the write is idempotent per (UTC day, service).
+// `/api/status-snapshot` — the sampler behind /status's 90-day daily-bar
+// strip. Every call takes one measurement per service and adds it to that UTC
+// day's row; the row keeps one bar per (day, service) however many times this
+// runs, so calling it again by hand is safe.
 //
-// The cron runs at 06:00 UTC, once a day — daily is the exact granularity of a
-// 90-day daily-bar view, and mid-day rather than midnight because Vercel's
-// cron precision is per-hour (up to 59 minutes late), which at 00:00 UTC could
-// push a run across the UTC day boundary and silently skip a calendar day.
+// WHO CALLS IT, AND HOW OFTEN IT ACTUALLY RUNS — stated honestly, because a
+// status page that overstates its own sampling rate is the exact failure this
+// page exists to avoid:
+//   .github/workflows/status-poll.yml   schedule `*/10 * * * *`. GitHub's own
+//                                       floor is 5 minutes, and scheduled
+//                                       workflows are queued on shared
+//                                       infrastructure: runs are frequently
+//                                       late and can be dropped entirely
+//                                       during peak load. "Every 10 minutes"
+//                                       is the request, not a guarantee.
+//   vercel.json cron `0 6 * * *`        the fallback, once a day (the Hobby
+//                                       plan's ceiling). It exists so a day
+//                                       GitHub skipped is not a blank day.
+// Neither caller is a heartbeat: the gap between two samples is unbounded, and
+// the row's `sampleCount` is the only truthful record of how much was measured
+// that day. Nothing here interpolates across a gap.
 //
 // WHAT IT MAY RECORD. Only what it measures in this request, right now. Every
 // fetch below is `cache: "no-store"` and NOT the shared helper in
@@ -21,16 +34,22 @@
 //                      measurement of the service being down. A thrown fetch
 //                      is not: it cannot distinguish an outage from this
 //                      function's own network, so it records absence.
-//   published-packages a bad response from registry.npmjs.org is a fact about
-//                      npm, not about these packages — recording "down" from
-//                      it would be a fabricated measurement, so anything short
-//                      of a clean read is absence. Note this row can be
-//                      DEGRADED on /status (version drift, see serviceChecks
-//                      in lib/status-checks.ts) but never here: drift is a
+//   published-cli      one row per package, matching the two service ids
+//   published-mcp      /status draws: the CLI and the MCP server are published
+//                      separately and either can be stale while the other is
+//                      current, so one package's read is never evidence about
+//                      the other and a failed read for one leaves only that
+//                      one's day absent. A bad response from
+//                      registry.npmjs.org is a fact about npm, not about the
+//                      package — recording "down" from it would be a
+//                      fabricated measurement, so anything short of a clean
+//                      read is absence. Note these rows can be DEGRADED on
+//                      /status (version drift, see serviceChecks in
+//                      lib/status-checks.ts) but never here: drift is a
 //                      comparison against the build-time versions in
 //                      lib/status.generated.json, which a runtime cron does
-//                      not have. `state: "ok"` here means the dist-tags read
-//                      cleanly, and `detail` names the exact versions read.
+//                      not have. `state: "ok"` here means the dist-tag read
+//                      cleanly, and `detail` names the exact version read.
 //   convex-read-path   resolves -> ok. Throws -> absence, for the same reason
 //                      `RuntimeReads.convexReachable` is typed `true | null`
 //                      rather than `boolean`: an outage and an unset
@@ -99,23 +118,23 @@ async function distTagLatest(pkg: string): Promise<string | null> {
   }
 }
 
-async function checkPublishedPackages(): Promise<Measurement | Skipped> {
-  const serviceId = "published-packages";
-  const [cli, mcp] = await Promise.all([
-    distTagLatest(CLI_PACKAGE),
-    distTagLatest(MCP_PACKAGE),
-  ]);
-  if (cli === null || mcp === null) {
-    // One version from a good read plus one from a failed one is two facts
-    // pretending to be one, so neither is recorded.
-    return { serviceId, reason: "npm dist-tags could not be read for both packages" };
+/** One published package, one service id, one bar. The two calls are
+ *  independent: a package whose dist-tag could not be read leaves ITS day
+ *  absent and says nothing about the other one. */
+async function checkPublishedPackage(
+  serviceId: string,
+  pkg: string,
+): Promise<Measurement | Skipped> {
+  const version = await distTagLatest(pkg);
+  if (version === null) {
+    return { serviceId, reason: `npm dist-tags could not be read for ${pkg}` };
   }
   // The caveat travels with the row, not just with this comment: whoever reads
   // the bar sees why an "ok" here is narrower than an "ok" in §3 of /status.
   return {
     serviceId,
     state: "ok",
-    detail: `npm dist-tags latest: cli ${cli}, mcp ${mcp}; drift vs this repo not evaluated`,
+    detail: `npm dist-tags latest for ${pkg}: ${version}; drift vs this repo not evaluated`,
   };
 }
 
@@ -161,7 +180,8 @@ export async function GET(request: Request) {
   const results = await Promise.all([
     checkLiveOrigin(),
     checkConvexReadPath(),
-    checkPublishedPackages(),
+    checkPublishedPackage("published-cli", CLI_PACKAGE),
+    checkPublishedPackage("published-mcp", MCP_PACKAGE),
   ]);
 
   const recorded: Array<{ serviceId: string; state: string; result: string }> = [];

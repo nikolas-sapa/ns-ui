@@ -29,6 +29,7 @@ import {
   MCP_PACKAGE,
   fetchLiveOriginCount,
   fetchPublishedCli,
+  fetchPublishedMcp,
   fetchPublishedVersion,
   integrityChecks,
   notMeasuredChecks,
@@ -106,13 +107,38 @@ function serviceRows(): ServiceRow[] {
       // No identifier rather than an empty one when the URL is unset.
       subtitle: convexUrl ? hostOf(convexUrl) : undefined,
     },
+    // The CLI and the MCP server are published separately from separate
+    // package.json files and can be stale independently, so they are two
+    // services, not one row averaging both.
     {
-      id: "published-packages",
-      name: "Published packages",
-      subtitle: `${CLI_PACKAGE} · ${MCP_PACKAGE}`,
+      id: "published-cli",
+      name: "Published CLI package",
+      subtitle: CLI_PACKAGE,
+      note: SPLIT_NOTE,
+    },
+    {
+      id: "published-mcp",
+      name: "Published MCP package",
+      subtitle: MCP_PACKAGE,
+      note: SPLIT_NOTE,
     },
   ];
 }
+
+/**
+ * Both package strips start empty, and this says so on the card.
+ *
+ * The snapshots recorded before the split sit under the service id
+ * `published-packages`, a single check that read both packages' dist-tags
+ * together and recorded a state only when BOTH read cleanly. Those rows are
+ * untouched in Convex and are not copied under either new id: a day that check
+ * marked operational is one measurement of two packages, and rendering it twice
+ * would show two bars where one reading happened. So the old history is
+ * declared here rather than redrawn, and each new strip fills in from its own
+ * first recorded day.
+ */
+const SPLIT_NOTE =
+  "This strip starts empty. Days before this package got its own check were recorded against a single combined published-packages check that read both packages together and could not tell them apart, so they are not redrawn as if this package had been measured on its own.";
 
 function hostOf(url: string): string | undefined {
   try {
@@ -145,17 +171,30 @@ const BANNER_CAPTION: Record<BannerState, string> = {
 };
 
 export default async function StatusPage() {
-  const [liveOriginCount, cli, mcpVersionPublished, convexReachable, history] =
-    await Promise.all([
-      fetchLiveOriginCount(REGISTRY_ORIGIN),
-      fetchPublishedCli(),
-      fetchPublishedVersion(MCP_PACKAGE),
-      // The public, unauthenticated query — the only Convex read this page is
-      // entitled to make. A throw is "we could not look", never "Convex is down".
-      probeConvex(() => fetchQuery(api.testimonials.approved, {})),
-      // Isolated: a missing history module must leave the page standing.
-      fetchHistory(),
-    ]);
+  // Each package is read twice and independently: its own dist-tag, and the
+  // component index inside its own published tarball. The bare version reads
+  // are what let a row say "npm serves it at 0.4.0, but its index did not
+  // parse" instead of collapsing both failures into one blank UNKNOWN.
+  const [
+    liveOriginCount,
+    cli,
+    mcp,
+    cliVersionOnly,
+    mcpVersionOnly,
+    convexReachable,
+    history,
+  ] = await Promise.all([
+    fetchLiveOriginCount(REGISTRY_ORIGIN),
+    fetchPublishedCli(),
+    fetchPublishedMcp(),
+    fetchPublishedVersion(CLI_PACKAGE),
+    fetchPublishedVersion(MCP_PACKAGE),
+    // The public, unauthenticated query — the only Convex read this page is
+    // entitled to make. A throw is "we could not look", never "Convex is down".
+    probeConvex(() => fetchQuery(api.testimonials.approved, {})),
+    // Isolated: a missing history module must leave the page standing.
+    fetchHistory(),
+  ]);
 
   const now = new Date().toISOString();
   const integrity = integrityChecks(buildData, cli?.components ?? null, now);
@@ -163,8 +202,10 @@ export default async function StatusPage() {
     buildData,
     {
       liveOriginCount,
-      cliVersionPublished: cli?.version ?? null,
-      mcpVersionPublished,
+      cliVersionPublished: cli?.version ?? cliVersionOnly,
+      cliComponentsPublished: cli?.components ?? null,
+      mcpVersionPublished: mcp?.version ?? mcpVersionOnly,
+      mcpComponentsPublished: mcp?.components ?? null,
       convexReachable,
     },
     now
@@ -244,9 +285,10 @@ export default async function StatusPage() {
         <span className="font-mono text-foreground">scripts/build-status.ts</span> and
         ship with this deployment. Live reads come from{" "}
         <span className="font-mono text-foreground">{REGISTRY_ORIGIN}/r/registry.json</span>,
-        the npm dist-tags for{" "}
-        <span className="font-mono text-foreground">{CLI_PACKAGE}</span> and{" "}
-        <span className="font-mono text-foreground">{MCP_PACKAGE}</span>, and one public
+        the npm dist-tag and the published component index of{" "}
+        <span className="font-mono text-foreground">{CLI_PACKAGE}</span> and of{" "}
+        <span className="font-mono text-foreground">{MCP_PACKAGE}</span> — each package
+        read from its own tarball, never from the other&rsquo;s — and one public
         Convex query, refreshed hourly. The daily bars come from recorded
         snapshots only; days before recording began stay grey.
       </p>
