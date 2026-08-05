@@ -273,12 +273,13 @@ export function PreviewCard({
                 read as the primary word on the card. */}
             <h3 className="truncate text-[15px] font-semibold tracking-tight">
               <Link
-                href={`/preview/${entry.name}/play`}
+                href={`/components/${entry.name}`}
                 // 222 cards, one link each. Next prefetches every link near the
                 // viewport, so the default fired ~147 RSC requests on a single
-                // homepage load (measured) for playgrounds the visitor will
-                // open at most one of. The route is prerendered and CDN-cached,
-                // so the click is fast without paying for 221 unused fetches.
+                // homepage load (measured) for pages the visitor will open at
+                // most one of. Still off now the target is the canonical
+                // component page, which reads searchParams and so isn't served
+                // straight from the prerender manifest.
                 prefetch={false}
                 // No focus ring here — it lives on the preview box above,
                 // via `group-has-[a:focus-visible]/focus:`, so the ring

@@ -213,6 +213,56 @@ export default defineSchema({
     count: v.number(),
   }).index("by_userId", ["userId"]),
 
+  // The only time-series store in this repo, and the reason
+  // lib/status-checks.ts's `uptime-history` row could ever stop saying "no
+  // time-series store exists in this repo". One row per (UTC day, service),
+  // written once a day by `/api/status-snapshot` (a Vercel cron) through
+  // `convex/status.ts`, read by /status to draw a 90-day daily-bar strip.
+  //
+  // ABSENCE IS THE POINT. A day with no row for a service means nothing was
+  // measured that day — the cron had not been created yet, it did not run, or
+  // the check could not determine a state — and it must render as NO DATA,
+  // never as a healthy bar. Nothing backfills or seeds this table; the
+  // earliest honest bar is the day the first snapshot was written. `day` is
+  // computed from the server clock inside the mutation and is never accepted
+  // from the caller, so no caller can write a row into the past.
+  //
+  // `state` carries `"degraded"` because the check layer already expresses it
+  // (`serviceChecks` marks `published-packages` degraded on version drift),
+  // but the daily writer cannot currently measure drift — that comparison
+  // needs the build-time versions in lib/status.generated.json, which a
+  // runtime cron does not have. So no row has ever been recorded degraded,
+  // and a strip with no degraded bars is evidence of nothing. `"down"` is
+  // only ever written for `live-origin`, and only when the origin itself
+  // answered with a 5xx; every other failure mode is recorded as absence,
+  // because a fetch that throws cannot tell an outage from this machine's
+  // network. Same reasoning as `RuntimeReads.convexReachable` being typed
+  // `true | null` rather than `boolean`.
+  //
+  // Retention: unbounded by design for now — 3 services x 365 days is ~1.1k
+  // rows a year, and the read is index-bounded to 90 days regardless, so
+  // growth does not slow it down. Pruning is a later decision, not a silent
+  // one: deleting old rows destroys history that cannot be re-measured.
+  //
+  // OUTSIDE the `deleteAccount` cascade (convex/account.ts), deliberately and
+  // permanently: there is no `userId` here and no personal data of any kind —
+  // these are service-level measurements about this deployment, like
+  // `otpRequestLimits`, not rows belonging to an account. Adding a table keyed
+  // on `userId`? That one belongs in the cascade; this one does not.
+  //
+  // One index, serving both access patterns: `[day, serviceId]` answers the
+  // 90-day read for ALL services as a single range scan
+  // (`q.gte("day", cutoff)`) and the per-service upsert as a point lookup
+  // (`q.eq("day", d).eq("serviceId", s)`). A `[serviceId, day]` index would
+  // have forced one query per service for the read.
+  statusSnapshots: defineTable({
+    day: v.string(), // UTC calendar day, YYYY-MM-DD
+    serviceId: v.string(), // a StatusCheck id from lib/status-checks.ts
+    state: v.union(v.literal("ok"), v.literal("degraded"), v.literal("down")),
+    detail: v.optional(v.string()), // what was actually measured, in words
+    recordedAt: v.number(),
+  }).index("by_day_service", ["day", "serviceId"]),
+
   testimonials: defineTable({
     userId: v.id("users"),
     name: v.string(),

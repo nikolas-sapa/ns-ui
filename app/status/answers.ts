@@ -7,7 +7,9 @@
  * published CLI index behind the site) returned HTTP 200 from every system
  * involved. A board reading "Site / Convex / MCP / CLI" would have been green
  * through both of them. A board reading "can I see a component move before I
- * install it?" would not.
+ * install it?" would not. The service strips now above these questions are
+ * that first board, kept honest by recording only what happened — these
+ * questions are what it still cannot see, which is why they did not move.
  *
  * Nothing is derived here that lib/status-checks.ts already decides. An answer
  * takes the checks it rests on, adopts the worst state among them, and states

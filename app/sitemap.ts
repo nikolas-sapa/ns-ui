@@ -17,8 +17,10 @@ import { categoryPages } from "@/lib/category-pages";
 // app/preview/[name]/page.tsx), not a redirect. `/preview/<name>/embed`
 // duplicates the fixture's DOM verbatim for iframe use and is marked noindex
 // instead (see app/preview/[name]/embed/page.tsx), and `/preview/<name>/play`
-// is left out of the sitemap per the owner's instruction even though it is
-// not a duplicate — see that route's own docblock.
+// stays out: as of the consolidation it is the secondary "open full size"
+// view linked from `/components/<name>`, covering the same subject, so listing
+// it would advertise a duplicate of the canonical page — see that route's own
+// docblock.
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {

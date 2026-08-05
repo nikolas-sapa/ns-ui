@@ -1,20 +1,23 @@
 /**
- * /status — an answer sheet, not a system-status board.
+ * /status — a service board on top, the answer sheet underneath.
  *
- * There is no uptime percentage, no availability history, no incident log and
- * no "All systems operational" banner on this page, and their absence is the
- * design. Nothing in this repo stores a time series, so every one of those
- * would be a number invented at render time. Worse: both real incidents this
- * registry has had — 72 preview videos named with pre-rename slugs, and a
- * published CLI index behind the site — returned HTTP 200 from every system
- * involved. A conventional status page would have been green through both.
+ * The board is conventional in shape and unconventional in what it refuses to
+ * do. The banner states the worst state among the live reads taken for THIS
+ * render, and nothing else; the ninety-day strips under it are drawn purely
+ * from recorded snapshots, so every day before recording began is grey and
+ * stays grey. Nothing is seeded, nothing is backfilled, and an uptime figure
+ * only appears once there is at least one recorded day to compute it from —
+ * with its denominator printed next to it.
  *
- * So the first viewport asks four questions a consumer actually has, and
- * answers each in one sentence. The ledger underneath carries the evidence:
- * a state word, the provenance of the number, and the number.
+ * The answers below the board are the part that catches what a board cannot.
+ * Both real incidents this registry has had — 72 preview videos named with
+ * pre-rename slugs, a published CLI index behind the site — returned HTTP 200
+ * from every system involved, so the strips would have been green through both
+ * of them. That is why the questions stayed, and why the "not measured" list
+ * stayed with them.
  *
- * All of the measuring lives in lib/status-checks.ts. This route fetches, and
- * lays out what comes back.
+ * All of the measuring lives in lib/status-checks.ts and in the Convex history
+ * query. This route fetches, and lays out what comes back.
  */
 import type { Metadata } from "next";
 import { fetchQuery } from "convex/nextjs";
@@ -31,14 +34,25 @@ import {
   notMeasuredChecks,
   probeConvex,
   serviceChecks,
+  type CheckState,
   type StatusBuild,
+  type StatusCheck,
 } from "@/lib/status-checks";
 import { answers } from "./answers";
 import { LedgerSection, stamp } from "./ledger";
+import {
+  BarLegend,
+  OverallBanner,
+  ServiceCard,
+  dayWindow,
+  type BannerState,
+  type HistoryEntry,
+  type ServiceRow,
+} from "./uptime";
 
 const title = "Status";
 const description =
-  "What is actually working in ns-ui, measured: whether a component installs, whether an agent can read the registry, and what this repo cannot measure at all.";
+  "What is actually working in ns-ui, measured: ninety days of recorded snapshots, whether a component installs, whether an agent can read the registry, and what this repo cannot measure at all.";
 
 export const metadata: Metadata = {
   title,
@@ -53,15 +67,95 @@ export const revalidate = 3600;
 
 const buildData: StatusBuild = build;
 
+/**
+ * The daily snapshot history: `recent` in convex/status.ts, the public,
+ * unauthenticated read of the last 90 UTC days. It returns only the rows that
+ * exist and never pads the window, which is what lets every unrecorded day
+ * below render as NO DATA rather than as anything.
+ *
+ * Read through the generated `api` object on purpose: a wrong function name or
+ * a changed argument shape fails the build instead of failing silently as a
+ * board of permanently grey bars.
+ */
+async function fetchHistory(): Promise<HistoryEntry[]> {
+  try {
+    const rows = await fetchQuery(api.status.recent, {});
+    return Array.isArray(rows) ? rows : [];
+  } catch {
+    // An absent module, an unset NEXT_PUBLIC_CONVEX_URL and a real outage are
+    // indistinguishable here, and all three mean the same thing for the strip:
+    // there is no recorded history to draw. Never a green day.
+    return [];
+  }
+}
+
+/** The board's rows, in declaration order. Each id is the check id
+ *  lib/status-checks.ts already uses, and the `serviceId` the snapshot job
+ *  writes against. */
+function serviceRows(): ServiceRow[] {
+  const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
+  return [
+    {
+      id: "live-origin",
+      name: "Registry origin",
+      subtitle: hostOf(REGISTRY_ORIGIN),
+    },
+    {
+      id: "convex-read-path",
+      name: "Convex read path",
+      // No identifier rather than an empty one when the URL is unset.
+      subtitle: convexUrl ? hostOf(convexUrl) : undefined,
+    },
+    {
+      id: "published-packages",
+      name: "Published packages",
+      subtitle: `${CLI_PACKAGE} · ${MCP_PACKAGE}`,
+    },
+  ];
+}
+
+function hostOf(url: string): string | undefined {
+  try {
+    return new URL(url).host;
+  } catch {
+    return undefined;
+  }
+}
+
+const RANK: Record<CheckState, number> = { down: 0, degraded: 1, unknown: 2, ok: 3 };
+
+/** The banner adopts the worst live state. `unknown` is never rounded up into
+ *  green: a read that did not come back is not a service that is fine. */
+function bannerState(services: StatusCheck[]): BannerState {
+  if (services.length === 0) return "unknown";
+  const worst = services.reduce(
+    (a, b) => (RANK[a.state] <= RANK[b.state] ? a : b),
+    services[0]
+  ).state;
+  return worst;
+}
+
+const BANNER_CAPTION: Record<BannerState, string> = {
+  ok: "Every live read taken for this page came back clean.",
+  degraded:
+    "At least one live read came back with drift — the rows below name which, and what it costs.",
+  down: "At least one live read failed outright. The rows below name which.",
+  unknown:
+    "At least one live read did not come back, so its service is unproven rather than fine.",
+};
+
 export default async function StatusPage() {
-  const [liveOriginCount, cli, mcpVersionPublished, convexReachable] = await Promise.all([
-    fetchLiveOriginCount(REGISTRY_ORIGIN),
-    fetchPublishedCli(),
-    fetchPublishedVersion(MCP_PACKAGE),
-    // The public, unauthenticated query — the only Convex read this page is
-    // entitled to make. A throw is "we could not look", never "Convex is down".
-    probeConvex(() => fetchQuery(api.testimonials.approved, {})),
-  ]);
+  const [liveOriginCount, cli, mcpVersionPublished, convexReachable, history] =
+    await Promise.all([
+      fetchLiveOriginCount(REGISTRY_ORIGIN),
+      fetchPublishedCli(),
+      fetchPublishedVersion(MCP_PACKAGE),
+      // The public, unauthenticated query — the only Convex read this page is
+      // entitled to make. A throw is "we could not look", never "Convex is down".
+      probeConvex(() => fetchQuery(api.testimonials.approved, {})),
+      // Isolated: a missing history module must leave the page standing.
+      fetchHistory(),
+    ]);
 
   const now = new Date().toISOString();
   const integrity = integrityChecks(buildData, cli?.components ?? null, now);
@@ -75,7 +169,15 @@ export default async function StatusPage() {
     },
     now
   );
-  const notMeasured = notMeasuredChecks(buildData.builtAt);
+  // `uptime-history` is dropped: it claims no time-series store exists, and the
+  // strips above are that store. Everything else in the list is still true —
+  // there is no incident log, no latency percentiles, no deployment state.
+  const notMeasured = notMeasuredChecks(buildData.builtAt).filter(
+    (c) => c.id !== "uptime-history"
+  );
+  const banner = bannerState(services);
+  const days = dayWindow();
+  const rows = serviceRows();
 
   return (
     <main className="mx-auto w-full max-w-3xl px-6 pb-32 sm:px-10">
@@ -87,15 +189,38 @@ export default async function StatusPage() {
           What is actually working.
         </h1>
         <p className="mt-5 max-w-2xl text-[15px] leading-7 text-muted">
-          Four questions, answered from measurements rather than from a
-          heartbeat. Every failure this registry has had returned HTTP 200, so
-          there is no uptime figure here, no incident log and no green banner —
-          nothing on this page is stored over time, and anything that cannot be
-          measured says so.
+          The banner states the worst of the live reads taken for this page. The
+          strips under it are drawn only from snapshots that were recorded — a
+          day with no snapshot is grey, nothing is backfilled, and an uptime
+          figure appears only once there is a recorded day behind it. Because
+          every failure this registry has had returned HTTP 200, the questions
+          further down carry the part a green strip cannot.
         </p>
       </header>
 
-      <section className="mt-16 border-t border-border">
+      <div className="mt-12">
+        <OverallBanner
+          state={banner}
+          caption={`${BANNER_CAPTION[banner]} Read at ${stamp(now)}.`}
+        />
+      </div>
+
+      <div className="mt-6 grid gap-4">
+        {rows.map((service) => (
+          <ServiceCard
+            key={service.id}
+            service={service}
+            days={days}
+            history={history}
+          />
+        ))}
+      </div>
+
+      <div className="mt-4">
+        <BarLegend />
+      </div>
+
+      <section className="mt-20 border-t border-border">
         {answers(buildData, integrity, services).map((a) => (
           <div key={a.id} className="border-b border-border py-8">
             <h2 className="text-lg font-medium tracking-[-0.02em] text-foreground">
@@ -122,7 +247,8 @@ export default async function StatusPage() {
         the npm dist-tags for{" "}
         <span className="font-mono text-foreground">{CLI_PACKAGE}</span> and{" "}
         <span className="font-mono text-foreground">{MCP_PACKAGE}</span>, and one public
-        Convex query, refreshed hourly.
+        Convex query, refreshed hourly. The daily bars come from recorded
+        snapshots only; days before recording began stay grey.
       </p>
     </main>
   );

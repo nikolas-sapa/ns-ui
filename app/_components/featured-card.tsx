@@ -22,8 +22,9 @@ const PRELOAD_MARGIN = 400;
 /**
  * A featured card is the honest reference fixture (`/preview/<name>`) run inside
  * an iframe — autoplaying and inert, a live thumbnail rather than something to
- * drive in place. Genuine interaction lives one click away at the playground
- * (`/preview/<name>/play`): the whole card is a real link there (same
+ * drive in place. Genuine interaction lives one click away on the canonical
+ * component page (`/components/<name>`, which leads with a live demo and links
+ * on to the full-size playground): the whole card is a real link there (same
  * stretched-hit-area pattern as `preview-card.tsx`), so middle-click,
  * cmd-click and copy-link all work.
  *
@@ -275,12 +276,13 @@ export function FeaturedCard({
             <h3 className="truncate text-[15px] font-semibold tracking-tight">
               {/* `after:inset-0` stretches the hit area over the whole card —
                   same pattern as preview-card.tsx — so the entire featured
-                  card is a real link to the playground, not just the title. */}
+                  card is a real link to the component page, not just the
+                  title. */}
               <Link
-                href={`/preview/${entry.name}/play`}
-                // Same reasoning as preview-card.tsx: the playground is
-                // prerendered and CDN-cached, so prefetching every card's is
-                // spend without a payoff.
+                href={`/components/${entry.name}`}
+                // Same reasoning as preview-card.tsx: prefetching every card's
+                // target is spend without a payoff when the visitor opens at
+                // most one.
                 prefetch={false}
                 // Ring lives on the preview box above (see its
                 // group-has-[a:focus-visible]/focus: classes), not here —

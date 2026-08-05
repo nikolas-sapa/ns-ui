@@ -11,8 +11,17 @@ import { loadSource } from "@/lib/source";
 import { ThemeToggle } from "@/app/_components/theme-toggle";
 
 /**
- * The playground: a dedicated, fully-interactive page per component, one
- * click away from a catalog card.
+ * The playground: a full-viewport, fully-interactive stage per component.
+ *
+ * No longer the destination of the catalog cards or the sidebar — those all
+ * point at `/components/<name>`, the one canonical page per component, since
+ * two differently-designed pages about the same subject were two maintenance
+ * burdens for one thing. This route is kept as the deliberate secondary "open
+ * full size" view, reached from that page's "view source and playground" link:
+ * it is the only place a component runs at the real viewport width with no
+ * scale transform and no sidebar stealing the width, and the only place the
+ * raw source and the build spec are readable. Old external links and the
+ * owner's recordings also still land here, so it stays reachable.
  *
  * Deliberately does NOT frame `/components/[name]` — that route now carries
  * full site chrome (sidebar, nav) so it's indexable, which is exactly what
@@ -226,6 +235,17 @@ export default async function PlaygroundPage({
       </div>
 
       <footer className="mt-8 flex flex-wrap items-baseline gap-x-6 gap-y-2 border-t border-border pt-4 font-mono text-xs text-muted">
+        {/* The canonical page for this component. Every card and sidebar row
+            now links to /components/<name>, so anyone who lands here does so
+            from that page's "view source and playground" link, an older
+            external link or a recording — all of which need a way back to the
+            one page that carries props, dependencies, save and metadata. */}
+        <Link
+          href={`/components/${name}`}
+          className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+        >
+          Component page
+        </Link>
         <Link
           href="/"
           className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
@@ -263,7 +283,12 @@ function NavArrow({
   }
   return (
     <Link
-      href={`/preview/${href}/play`}
+      // Points at the canonical component page, not the neighbouring
+      // playground: /components/<name> is the one page per component now, and
+      // this route is the deliberate secondary "open full size" view reached
+      // from it. Stepping sideways into another playground would rebuild the
+      // parallel browsing tree the consolidation removed.
+      href={`/components/${href}`}
       aria-label={label}
       className={`${shared} outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none`}
     >

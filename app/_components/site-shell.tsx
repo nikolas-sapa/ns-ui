@@ -580,22 +580,24 @@ function NavLink({
   activeRef: React.RefObject<HTMLAnchorElement | null>;
 }) {
   const on = item.name === active;
-  // The link points at /preview/<name>/play, so only claim "current page" when
-  // that is where we actually are — on /components/<name> the row is styled
-  // active but the link still goes somewhere else.
+  // The link points at /components/<name>, so only claim "current page" when
+  // that is where we actually are — `active` also matches the /preview/<name>
+  // shapes (bare fixture, playground), where the row is styled active but the
+  // link still goes somewhere else. Exact match, not a prefix: the row is only
+  // the current page on the canonical component page itself.
   const pathname = usePathname();
-  const isCurrentPage = on && pathname.startsWith("/preview/");
+  const isCurrentPage = pathname === `/components/${item.name}`;
   return (
     <li>
       <Link
         ref={on ? activeRef : undefined}
-        href={`/preview/${item.name}/play`}
+        href={`/components/${item.name}`}
         // This sidebar lists every component, so the default fired ~126 RSC
         // prefetches on every page load — for a list the visitor picks at
         // most one item from. Before these routes were made cacheable that
-        // was ~126 uncached function invocations per visit; now it is merely
-        // 126 wasted CDN round trips. The target is prerendered, so the click
-        // is fast without them.
+        // was ~126 uncached function invocations per visit; keeping it off
+        // matters again now the target is /components/<name>, which reads
+        // searchParams and so is not served from the prerender manifest.
         prefetch={false}
         aria-current={isCurrentPage ? "page" : undefined}
         className={`${LINK} ${on ? "bg-surface font-medium text-accent" : "text-muted"}`}
