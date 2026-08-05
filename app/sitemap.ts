@@ -32,6 +32,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
     },
     {
+      url: `${REGISTRY_ORIGIN}/installation`,
+      lastModified: new Date(),
+    },
+    {
+      url: `${REGISTRY_ORIGIN}/theming`,
+      lastModified: new Date(),
+    },
+    {
       url: `${REGISTRY_ORIGIN}/connect`,
       lastModified: new Date(),
     },
