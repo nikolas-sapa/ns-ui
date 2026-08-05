@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "npx convex deploy --cmd 'npm run build'",
+  "buildCommand": "if [ -n \"$CONVEX_DEPLOY_KEY\" ]; then npx convex deploy --cmd 'npm run build'; else echo 'CONVEX_DEPLOY_KEY unset — building without deploying Convex (expected on Preview)'; npm run build; fi",
   "crons": [
     {
       "path": "/api/status-snapshot",
