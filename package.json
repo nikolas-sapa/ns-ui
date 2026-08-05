@@ -38,6 +38,7 @@
     "test:category-coverage": "node scripts/test-category-coverage.ts",
     "test:status-checks": "node scripts/test-status-checks.ts",
     "test:source-invariants": "node scripts/test-source-invariants.ts",
+    "test:convex-deployed": "node scripts/test-convex-deployed.ts",
     "verify": "node scripts/verify.ts",
     "index:build": "node scripts/build-index.ts",
     "pretypecheck": "npm run registry:build",

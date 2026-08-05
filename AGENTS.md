@@ -159,6 +159,14 @@ screenshot has actually been looked at — that's the state the owner judges fir
 npm run test:source-invariants   # static; no server, no browser. Runs in CI (verify can't).
 ```
 
+`npm run build` (`registry:build && next build`) does **not** deploy Convex — there is no `npx convex
+deploy` anywhere in this repo, in `vercel.json`, or in any workflow. A schema or function change ships
+to Vercel and never reaches Convex unless someone runs `npx convex deploy` separately; twice now that
+drift shipped silently and read as an auth bug. `npm run test:convex-deployed`
+(`scripts/test-convex-deployed.ts`) probes every `api.<module>.<fn>` the app calls against
+`NEXT_PUBLIC_CONVEX_URL` and fails naming the missing function and the fix (`npx convex deploy`); it
+skips loudly when that env var isn't set.
+
 `scripts/test-source-invariants.ts` reads `app/**`, `lib/**` and `registry/**` and fails on the defect
 CLASSES `verify.ts` structurally cannot see — it drives `/preview/<component>`, so it never visits the
 site itself, and it only catches what shows up in a screenshot diff. Eighteen checks, each one a class
