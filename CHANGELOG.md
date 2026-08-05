@@ -3,6 +3,40 @@
 Single source of truth for the /changelog page. Each entry is a `## vX.Y.Z - YYYY-MM-DD`
 heading, a `###` title, then one paragraph of body. Newest first.
 
+## v0.21.0 - 2026-08-05
+
+### Components that installed into the wrong colours, and a status page that can fail
+
+Every component in this registry was styled against tokens the registry never shipped, so
+`npx shadcn add` produced components that rendered wrong in someone else's project and
+gave no error doing it. `--muted` and `--accent` also collided semantically with stock
+shadcn — theirs is a light background and a subtle grey surface, ours was body text and
+electric blue — so installed body copy came out nearly invisible. Both are renamed to
+`--ns-muted` and `--ns-accent`, and 266 of the 298 registry items now ship a `cssVars`
+block so the tokens arrive with the component; `--background`, `--foreground` and
+`--border` are deliberately left to inherit from the host theme, because a component that
+brings its own background looks foreign in every project it lands in. The registry grew
+from 266 to 298: eight ASCII fields built on real mechanisms — Lichtenberg discharge,
+Schlieren density gradients, shock diamonds, reaction-diffusion fronts, Voronoi and
+magnetic domain walls, force chains, nodal lines — plus ASCII instruments that do a job
+(a git graph, a log tail, a flamegraph, a kanban board with WIP limits, a Gantt with a
+real critical path). A new /status page reports what is actually true rather than what is
+reassuring: it shows no uptime figure until it has recorded days to compute one from, it
+says "not measured" where it cannot honestly check, and it refuses to claim sign-in works
+because a public query resolving proves only that the backend can be read. Every failure
+this registry has ever had returned HTTP 200, which is why a conventional green banner
+would have been a lie. Behind it, monitoring now samples every ten minutes and a day's bar
+is derived from all of that day's samples, so one lucky ping cannot paint a bad day green.
+Convex now deploys as part of the Vercel build — the drift that once left `/submit` and
+every account feature returning 200 while completely dead has happened three times, and it
+is now structurally impossible rather than merely documented. All 72 preview videos were
+regenerated: every one had been named for a slug that no longer existed, so no featured
+card had ever moved. The screenshot gate went from covering 266 of 298 components to all
+298. Five automated gates now guard the things that used to depend on remembering — focus
+rings, disabled states that still react to the mouse, animations that ignore reduced
+motion, unreachable categories, stale CSS variables, and functions that exist in the repo
+but not on the deployment — and each one was deliberately broken first to prove it fails.
+
 ## v0.20.0 - 2026-08-04
 
 ### Install URLs that had quietly stopped working, and 38 more components
