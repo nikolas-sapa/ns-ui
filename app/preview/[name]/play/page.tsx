@@ -53,7 +53,12 @@ export async function generateMetadata({
   const item = registry.items.find((i) => i.name === name);
   if (!item) return {};
   const title = `${item.title} — playground — ns-ui`;
-  return { title, description: item.description };
+  return {
+    title,
+    description: item.description,
+    robots: { index: false, follow: false },
+    alternates: { canonical: `${REGISTRY_ORIGIN}/components/${name}` },
+  };
 }
 
 /**
@@ -62,8 +67,9 @@ export async function generateMetadata({
  * visit was a function invocation — and because each catalog card links here,
  * Next prefetches the route for every card near the viewport, so one homepage
  * load fired ~38 uncached renders (measured). The list is empty on purpose:
- * prerendering 218 pages at build buys nothing over caching the first request
- * for each, and costs build time. `revalidate` below does the rest.
+ * prerendering every component in the registry at build buys nothing over
+ * caching the first request for each, and costs build time. `revalidate`
+ * below does the rest.
  */
 export function generateStaticParams() {
   return [];

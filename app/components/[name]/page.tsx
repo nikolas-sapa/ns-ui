@@ -40,6 +40,10 @@ export async function generateMetadata({
   return {
     title,
     description,
+    // `embed`/`autoplay`/`interactive` change what DemoFrame renders below but
+    // describe the same subject, so every searchParams permutation canonicalizes
+    // back to the bare URL rather than indexing as a distinct variant.
+    alternates: { canonical: `${REGISTRY_ORIGIN}/components/${name}` },
     openGraph: { title, description, type: "website" },
     twitter: { card: "summary_large_image", title, description },
   };
@@ -47,7 +51,8 @@ export async function generateMetadata({
 
 /**
  * The canonical, indexed, chrome-wrapped page for a component — one of the
- * 228 pages `site:design.helpmarq.com` should actually return. This is what
+ * `registry.items.length` pages `site:design.helpmarq.com` should actually
+ * return. This is what
  * `app/sitemap.ts` lists, what `app/page.tsx`'s CollectionPage JSON-LD points
  * at, and what carries the SoftwareSourceCode/BreadcrumbList structured data
  * below.
@@ -72,8 +77,8 @@ export default async function ComponentPage({
   const pageUrl = `${REGISTRY_ORIGIN}/components/${name}`;
   const installCommand = `npx shadcn add ${REGISTRY_ORIGIN}/r/${name}.json`;
 
-  // Hand-authored only (106 of 228 today) — see lib/use-when.ts. The other
-  // 122 have no meta.useWhen, so llms.txt's `deriveUseWhen`
+  // Hand-authored only, not every component — see lib/use-when.ts. The rest
+  // have no meta.useWhen, so llms.txt's `deriveUseWhen`
   // (scripts/build-llms.ts) falls back to a tag restatement for them — that
   // fallback is not guidance, so it is left off this page entirely rather
   // than rendered as if it were.
