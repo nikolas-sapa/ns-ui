@@ -45,20 +45,30 @@
  * and it always prints its own denominator, so a reader can reconstruct it from
  * the bars in front of them. With zero recorded days it prints words, never a
  * number.
+ *
+ * WHERE THAT DERIVATION LIVES: not here. The day window, the state whitelist,
+ * the per-service summary and the figure string are `convex/status.logic.ts` —
+ * the one import-free module both this file and `convex/status.test.ts` can
+ * load, since plain node cannot load a .tsx. This file owns colour and wording;
+ * the arithmetic is proven offline against the same code the writer uses.
  */
 
-/** The shape the Convex history query returns, one row per service per day.
- *  `state` is typed as a plain string on purpose: anything this file does not
- *  recognise is treated as NO DATA rather than thrown on. */
-export type HistoryEntry = {
-  /** `YYYY-MM-DD`, UTC. */
-  day: string;
-  serviceId: string;
-  state: string;
-  detail?: string | null;
-};
+// The day arithmetic and the per-service summary live in
+// `convex/status.logic.ts` — the same import-free module the write side uses,
+// which is what lets `convex/status.test.ts` prove the slot placement and the
+// uptime figure offline. This file owns the colour and the words, and nothing
+// else. Re-exported here so the page keeps one import for the strip.
+import {
+  dayWindow,
+  prettyDay,
+  summarizeService,
+  uptimeFigure,
+  type BarState,
+  type HistoryEntry,
+} from "@/convex/status.logic";
 
-export type BarState = "ok" | "degraded" | "down" | "nodata";
+export { dayWindow };
+export type { BarState, HistoryEntry };
 
 const BAR: Record<BarState, string> = {
   ok: "bg-[var(--success)]",
@@ -73,32 +83,6 @@ const WORD: Record<BarState, string> = {
   down: "down",
   nodata: "no data",
 };
-
-const DAYS = 90;
-
-/** The ninety `YYYY-MM-DD` keys ending today, built in UTC so a server render
- *  and a client hydration can never disagree about which day it is. */
-export function dayWindow(now: Date = new Date()): string[] {
-  const end = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
-  const days: string[] = [];
-  for (let i = DAYS - 1; i >= 0; i -= 1) {
-    days.push(new Date(end - i * 86_400_000).toISOString().slice(0, 10));
-  }
-  return days;
-}
-
-function toBarState(state: string): BarState {
-  return state === "ok" || state === "degraded" || state === "down" ? state : "nodata";
-}
-
-/** `2026-08-05` → `5 Aug 2026`, sliced from the ISO day so no locale is read. */
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-function prettyDay(day: string): string {
-  const [y, m, d] = day.split("-");
-  const month = MONTHS[Number(m) - 1];
-  if (!month) return day;
-  return `${Number(d)} ${month} ${y}`;
-}
 
 export type ServiceRow = {
   /** Matches the check id in lib/status-checks.ts and the `serviceId` written
@@ -132,34 +116,16 @@ export function ServiceCard({
   days: string[];
   history: HistoryEntry[];
 }) {
-  const byDay = new Map<string, HistoryEntry>();
-  for (const row of history) {
-    if (row.serviceId === service.id) byDay.set(row.day, row);
-  }
-
-  const bars = days.map((day) => {
-    const row = byDay.get(day);
-    return { day, state: row ? toBarState(row.state) : "nodata", detail: row?.detail ?? null };
-  });
-
-  const recorded = bars.filter((b) => b.state !== "nodata");
-  // `degraded` counts as not-ok. A day the registry served a stale index was
-  // not a day it worked, and rounding it up into the numerator is exactly the
-  // kind of flattery this page exists to refuse.
-  const okDays = recorded.filter((b) => b.state === "ok").length;
-  const first = recorded[0]?.day;
-
-  const figure =
-    recorded.length === 0
-      ? "no snapshots recorded yet"
-      : `${((okDays / recorded.length) * 100).toFixed(1)}% · ${
-          recorded.length === 1 ? "1 day" : `${recorded.length} days`
-        } recorded since ${prettyDay(first as string)}`;
-
+  // Every bar, the figure and the header word come off ONE derivation, proven
+  // in convex/status.test.ts: `degraded` is not ok, a day with no row keeps its
+  // slot as NO DATA, and the figure prints words when nothing was recorded.
+  const summary = summarizeService(service.id, days, history);
+  const bars = summary.bars;
+  const figure = uptimeFigure(summary);
   // The most recent bar's own state, not the recorded-days-only figure above:
   // this is the word the card's header states out loud, and it must agree
   // with the colour of the rightmost bar a reader is looking at.
-  const latest = bars[bars.length - 1]?.state ?? "nodata";
+  const latest = summary.latest;
 
   return (
     <article className="rounded-md border border-border p-5 sm:p-6">
@@ -212,7 +178,9 @@ export function ServiceCard({
       </div>
 
       <div className="mt-3 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 font-mono text-[11px] text-ns-muted">
-        <span>90 days</span>
+        {/* Counted off the strip that was actually drawn, not typed again: the
+            label and the bars cannot disagree about how long the window is. */}
+        <span>{bars.length} days</span>
         <span className="tabular-nums">{figure}</span>
       </div>
 

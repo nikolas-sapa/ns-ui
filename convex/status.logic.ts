@@ -21,6 +21,16 @@
 // is a function of measurements rather than of arrival order: one down
 // sample at 04:10 still reads down after twelve ok samples that afternoon.
 
+// This file also owns the READ side's day arithmetic and per-service summary
+// (`dayWindow`, `toBarState`, `summarizeService`, `uptimeFigure`), for two
+// reasons. It is the only module both `app/status/uptime.tsx` and the offline
+// test can import — the .tsx cannot be loaded by plain node — so keeping the
+// derivation here is what lets the strip's slot placement and uptime figure be
+// PROVEN rather than asserted. And it puts the window length behind a single
+// constant: the write-side cutoff and the render-side 90 bars are now the same
+// number by construction instead of two literals that can drift apart.
+// Colour and wording stay in `uptime.tsx`; nothing here knows a Tailwind class.
+
 /** How far back the public read reaches. One bar per day, 90 bars. */
 export const SNAPSHOT_WINDOW_DAYS = 90;
 
@@ -188,4 +198,122 @@ export async function recordSample<Id>(
     ...counts,
   });
   return "updated";
+}
+
+// ---------------------------------------------------------------------------
+// READ SIDE — what the ninety bars of one card are, given the rows that exist.
+// ---------------------------------------------------------------------------
+
+/** A bar's state. `"nodata"` is the only value not in `SnapshotState`: it is
+ *  what a day with no row is, and what any state string this build does not
+ *  recognise degrades to. There is deliberately no path from an unknown or
+ *  missing state to `"ok"`. */
+export type BarState = SnapshotState | "nodata";
+
+/** The row shape the page hands the strip — `state` typed as a plain string on
+ *  purpose, so a value written by a newer writer is narrowed here rather than
+ *  trusted. */
+export type HistoryEntry = {
+  /** `YYYY-MM-DD`, UTC. */
+  day: string;
+  serviceId: string;
+  state: string;
+  detail?: string | null;
+};
+
+export type Bar = { day: string; state: BarState; detail: string | null };
+
+/** Whitelist, not a blacklist: only the three recorded states survive, and
+ *  everything else — `""`, `"OK"`, `"unknown"`, a trailing space — is NO DATA. */
+export function toBarState(state: string): BarState {
+  return state === "ok" || state === "degraded" || state === "down" ? state : "nodata";
+}
+
+/** The window's `YYYY-MM-DD` keys, oldest first, ending on `now`'s UTC day.
+ *  UTC so a server render and a client hydration cannot disagree about which
+ *  day it is, and `SNAPSHOT_WINDOW_DAYS` long so the strip and the query's
+ *  cutoff cover the same span. */
+export function dayWindow(now: Date = new Date(), days = SNAPSHOT_WINDOW_DAYS): string[] {
+  const end = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  const out: string[] = [];
+  for (let i = days - 1; i >= 0; i -= 1) out.push(utcDay(end - i * MS_PER_DAY));
+  return out;
+}
+
+/** `2026-08-05` → `5 Aug 2026`, sliced from the ISO day so no locale is read. */
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+export function prettyDay(day: string): string {
+  const [y, m, d] = day.split("-");
+  const month = MONTHS[Number(m) - 1];
+  if (!month) return day;
+  return `${Number(d)} ${month} ${y}`;
+}
+
+export type ServiceSummary = {
+  /** Exactly one bar per day in `days`, in that order. A day with no row keeps
+   *  its slot as `"nodata"`, so a gap never shifts the days after it. */
+  bars: Bar[];
+  /** Days that have a row. The uptime figure's denominator. */
+  recordedDays: number;
+  /** Days every sample of which was ok. `degraded` is NOT counted here. */
+  okDays: number;
+  /** Oldest day with a row, or null when nothing was ever recorded. */
+  firstRecordedDay: string | null;
+  /** The rightmost bar's state — what the card's header says out loud. */
+  latest: BarState;
+};
+
+/**
+ * One service's ninety bars, from the rows that exist and from nothing else.
+ * Rows for other services are ignored; rows outside `days` are dropped rather
+ * than pulled into a neighbouring slot.
+ */
+export function summarizeService(
+  serviceId: string,
+  days: string[],
+  history: HistoryEntry[],
+): ServiceSummary {
+  const byDay = new Map<string, HistoryEntry>();
+  for (const row of history) {
+    if (row.serviceId === serviceId) byDay.set(row.day, row);
+  }
+
+  const bars: Bar[] = days.map((day) => {
+    const row = byDay.get(day);
+    const state: BarState = row ? toBarState(row.state) : "nodata";
+    return {
+      day,
+      state,
+      // A NO DATA bar carries NO caption. A row whose state this build does not
+      // recognise still has a `detail` on it, and keeping it would label a bar
+      // "no data: 298 items in /r/registry.json" — a measurement caption under
+      // a bar that says nothing was measured. The state is the thing that could
+      // not be read; its caption describes a state we are not showing.
+      detail: state === "nodata" ? null : row?.detail ?? null,
+    };
+  });
+
+  const recorded = bars.filter((b) => b.state !== "nodata");
+  return {
+    bars,
+    recordedDays: recorded.length,
+    // A day the registry served a stale index was not a day it worked, and
+    // rounding it up into the numerator is exactly the kind of flattery this
+    // page exists to refuse.
+    okDays: recorded.filter((b) => b.state === "ok").length,
+    firstRecordedDay: recorded[0]?.day ?? null,
+    latest: bars[bars.length - 1]?.state ?? "nodata",
+  };
+}
+
+/** The figure under a strip: a percentage over the days that HAVE data, always
+ *  printing its own denominator so a reader can reconstruct it from the bars.
+ *  With zero recorded days it prints words — never `0%`, never `100%`. */
+export function uptimeFigure(summary: ServiceSummary): string {
+  if (summary.recordedDays === 0 || summary.firstRecordedDay === null) {
+    return "no snapshots recorded yet";
+  }
+  const pct = ((summary.okDays / summary.recordedDays) * 100).toFixed(1);
+  const days = summary.recordedDays === 1 ? "1 day" : `${summary.recordedDays} days`;
+  return `${pct}% · ${days} recorded since ${prettyDay(summary.firstRecordedDay)}`;
 }

@@ -26,11 +26,45 @@ export function DemoFrame({
   interactive?: string;
   /**
    * `/components/<name>` only. The demo sits directly under the header there,
-   * so a full `min-h-screen` box — with most demo roots being
-   * `flex min-h-screen items-center justify-center` — centres the component in
-   * a viewport-tall well and pushes it out of the first screen. Bounds the box
-   * and top-aligns the demo root instead. The preview/recording fixture keeps
-   * the untouched full-height render.
+   * so a full `min-h-screen` box — 285 of the 298 demo roots are some flavour
+   * of `flex min-h-screen items-center justify-center` — centres the component
+   * in a viewport-tall well and pushes it out of the first screen.
+   *
+   * The well is therefore a *definite-height* box rather than a minimum: only
+   * a real `height` bounds a demo whose root is `h-screen` (5 of them) or
+   * whose own content is taller than the box, and only a definite height lets
+   * the root's `h-full`/`min-h-full` override below resolve. `relative` makes
+   * the well the containing block for the full-bleed demos (20 files carry an
+   * `absolute inset-0` layer) so their canvases fill the well instead of
+   * resolving against the page, and `overflow-auto` clips what is left rather
+   * than letting it spill over the header or the sections below.
+   *
+   * The two child overrides are property-based on purpose: `h-full!` beats
+   * `h-screen`, `min-h-full!` beats `min-h-screen` (a min-height floors the
+   * used height, so setting `height` alone would not shrink those roots), and
+   * between them they bound any root regardless of which utility spelled its
+   * height. Deliberately *not* `min-h-0`: that removed the floor but left the
+   * root free to collapse to nothing (a root sized only by absolute children
+   * became 0px tall) or to grow past the well and overlap the next section.
+   *
+   * The last two overrides fix what the definite height introduced. A demo
+   * root that centres content taller than the well overflows it in BOTH
+   * directions, and the slice above the root's top edge is unreachable —
+   * a scroll container cannot scroll to a negative offset, so the top line
+   * of sparkline-automaton's caption was sliced in half with no way to see
+   * it (measured on 96 of the 298 pages, up to 1662px hidden on
+   * toc-minimap-mercury). `safe` centring is exactly the CSS answer: it
+   * centres while the content fits and falls back to start alignment the
+   * moment it would overflow, so nothing moves on the pages that were
+   * already correct. Both axes are covered because 158 roots are
+   * `flex-col` (vertical overflow is justify-content there) and 83 are
+   * `flex-row` (align-items). The selectors are keyed on the class the demo
+   * itself declares — `[&>*.items-center]`, not `[&>*]` — so the 19 roots
+   * that deliberately do NOT centre keep their own alignment instead of
+   * being dragged to the middle.
+   *
+   * The preview/recording fixture keeps the untouched full-height render —
+   * `/preview/<name>` and its `/embed` never pass this prop.
    */
   bounded?: boolean;
 }) {
@@ -74,7 +108,7 @@ export function DemoFrame({
     <div
       className={
         bounded
-          ? "min-h-[420px] [&>*]:min-h-0! [&>*]:items-start!"
+          ? "relative h-[520px] overflow-auto [&>*]:h-full! [&>*]:min-h-full! [&>*.items-center]:items-center-safe! [&>*.justify-center]:justify-center-safe!"
           : "min-h-screen"
       }
       inert={embedded && !interactiveEmbed}

@@ -17,10 +17,16 @@
 // exactly as it sorts chronologically, which is why the day is stored as that
 // string in the first place.
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import {
   SNAPSHOT_WINDOW_DAYS,
+  dayWindow,
   deriveState,
+  prettyDay,
   recordSample,
+  summarizeService,
+  toBarState,
+  uptimeFigure,
   utcDay,
   windowStartDay,
   type SnapshotCounts,
@@ -318,7 +324,320 @@ assert.throws(() => deriveState({ sampleCount: 0, degradedCount: 0, downCount: 0
   );
 }
 
+// --- 3. the owner's three questions, end to end --------------------------
+// A. a degraded sample is never rounded up to ok.
+// B. a down sample makes the day down.
+// C. a past day keeps the state it earned, and a later sample can only ever
+//    make a day WORSE, never better.
+// Each block writes samples through `recordSample`, reads them back the way
+// `convex/status.ts.recent` does, and renders them the way the strip does.
+{
+  const day = utcDay(today);
+  const at = (m: number) => today + m * 60_000;
+
+  // A. five ok samples and one degraded → the bar is DEGRADED, not ok.
+  {
+    const { store, rows, since } = makeStore();
+    for (let i = 0; i < 5; i += 1) {
+      await recordSample(store, {
+        day,
+        serviceId: "published-cli",
+        state: "ok",
+        recordedAt: at(i * 10),
+      });
+    }
+    await recordSample(store, {
+      day,
+      serviceId: "published-cli",
+      state: "degraded",
+      detail: "version drift",
+      recordedAt: at(50),
+    });
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].state, "degraded", "one degraded sample was rounded up to ok");
+    assert.deepEqual(
+      [rows[0].sampleCount, rows[0].degradedCount, rows[0].downCount],
+      [6, 1, 0],
+    );
+    // ...and the strip draws it degraded rather than ok.
+    const window = dayWindow(new Date(today));
+    const summary = summarizeService("published-cli", window, since(windowStartDay(today)));
+    assert.equal(summary.bars[summary.bars.length - 1].state, "degraded");
+    assert.equal(summary.latest, "degraded");
+    // A degraded day is a recorded day, and it is NOT an ok one.
+    assert.equal(summary.recordedDays, 1);
+    assert.equal(summary.okDays, 0);
+    assert.equal(uptimeFigure(summary), `0.0% · 1 day recorded since ${prettyDay(day)}`);
+  }
+
+  // B. ok, then degraded, then down → the worst sample wins.
+  {
+    const { store, rows, since } = makeStore();
+    for (const [i, state] of (["ok", "degraded", "down"] as const).entries()) {
+      await recordSample(store, {
+        day,
+        serviceId: "live-origin",
+        state,
+        recordedAt: at(i * 10),
+      });
+    }
+    assert.equal(rows[0].state, "down", "a down sample did not win over ok/degraded");
+    const summary = summarizeService(
+      "live-origin",
+      dayWindow(new Date(today)),
+      since(windowStartDay(today)),
+    );
+    assert.equal(summary.bars[summary.bars.length - 1].state, "down");
+    assert.equal(summary.okDays, 0);
+  }
+
+  // C. a later ok sample cannot flip a down day back to ok — including a day
+  //    in the PAST, read back after the days that followed it were written.
+  {
+    const { store, rows, since } = makeStore();
+    const outage = utcDay(today - 3 * DAY_MS);
+    await recordSample(store, {
+      day: outage,
+      serviceId: "live-origin",
+      state: "down",
+      detail: "origin answered 503",
+      recordedAt: today - 3 * DAY_MS,
+    });
+    await recordSample(store, {
+      day: outage,
+      serviceId: "live-origin",
+      state: "ok",
+      detail: "298 items",
+      recordedAt: today - 3 * DAY_MS + 600_000,
+    });
+    // Three clean days after it.
+    for (let d = 2; d >= 0; d -= 1) {
+      await recordSample(store, {
+        day: utcDay(today - d * DAY_MS),
+        serviceId: "live-origin",
+        state: "ok",
+        recordedAt: today - d * DAY_MS,
+      });
+    }
+    const outageRow = rows.find((r) => r.day === outage);
+    assert.ok(outageRow);
+    assert.equal(outageRow.state, "down", "a later ok sample flipped a down day to ok");
+    assert.equal(outageRow.detail, "origin answered 503");
+
+    const window = dayWindow(new Date(today));
+    const summary = summarizeService("live-origin", window, since(windowStartDay(today)));
+    const bar = summary.bars.find((b) => b.day === outage);
+    assert.ok(bar, "the outage day fell outside the rendered window");
+    assert.equal(bar.state, "down", "the past outage did not render as down");
+    assert.equal(bar.detail, "origin answered 503");
+    // 4 recorded days, 3 of them ok: the outage is in the denominator and out
+    // of the numerator.
+    assert.equal(summary.recordedDays, 4);
+    assert.equal(summary.okDays, 3);
+    assert.equal(uptimeFigure(summary), `75.0% · 4 days recorded since ${prettyDay(outage)}`);
+    assert.equal(summary.latest, "ok");
+  }
+}
+
+// --- 4. the window: one slot per day, and a gap that stays a gap ----------
+{
+  const window = dayWindow(new Date(today));
+  assert.equal(window.length, SNAPSHOT_WINDOW_DAYS);
+  assert.equal(window[window.length - 1], utcDay(today), "the strip does not end today");
+  assert.equal(window[0], windowStartDay(today), "the strip and the query disagree on the cutoff");
+  // Strictly ascending, one calendar day apart, no repeats — the property a
+  // month or year boundary would break.
+  for (let i = 1; i < window.length; i += 1) {
+    assert.equal(
+      Date.parse(`${window[i]}T00:00:00.000Z`) - Date.parse(`${window[i - 1]}T00:00:00.000Z`),
+      DAY_MS,
+      `window is not contiguous at ${window[i - 1]} → ${window[i]}`,
+    );
+  }
+  assert.equal(new Set(window).size, SNAPSHOT_WINDOW_DAYS);
+
+  // Rows on days 10, 9 and 7 back — day 8 is a hole nobody sampled.
+  const { store, since } = makeStore();
+  const held = new Map<string, string>();
+  for (const [back, state] of [[10, "down"], [9, "degraded"], [7, "ok"]] as const) {
+    const d = utcDay(today - back * DAY_MS);
+    held.set(d, state);
+    await recordSample(store, {
+      day: d,
+      serviceId: "live-origin",
+      state,
+      recordedAt: today - back * DAY_MS,
+    });
+  }
+  const summary = summarizeService("live-origin", window, since(windowStartDay(today)));
+  assert.equal(summary.bars.length, SNAPSHOT_WINDOW_DAYS);
+  for (const bar of summary.bars) {
+    // Every bar sits in ITS OWN day's slot: the hole stays a hole instead of
+    // pulling the days after it one place left.
+    assert.equal(
+      bar.state,
+      held.get(bar.day) ?? "nodata",
+      `${bar.day} rendered ${bar.state}`,
+    );
+  }
+  assert.equal(summary.bars[SNAPSHOT_WINDOW_DAYS - 1 - 8].state, "nodata", "the gap was filled");
+  // The figure counts only the days that have data, and degraded is not ok.
+  assert.equal(summary.recordedDays, 3);
+  assert.equal(summary.okDays, 1);
+  assert.equal(
+    uptimeFigure(summary),
+    `33.3% · 3 days recorded since ${prettyDay(utcDay(today - 10 * DAY_MS))}`,
+  );
+  // `recent` has no upper bound (`q.gte("day", cutoff)`), so a row dated
+  // outside the window — clock skew, a manual write — reaches this function.
+  // It is dropped, not slotted somewhere convenient, and it moves no other bar.
+  const stray = summarizeService("live-origin", window, [
+    ...since(windowStartDay(today)),
+    { day: utcDay(today - 200 * DAY_MS), serviceId: "live-origin", state: "ok", detail: null },
+    { day: utcDay(today + DAY_MS), serviceId: "live-origin", state: "ok", detail: null },
+  ]);
+  assert.equal(stray.recordedDays, 3, "a row outside the window entered the strip");
+  assert.deepEqual(
+    stray.bars.map((b) => b.state),
+    summary.bars.map((b) => b.state),
+  );
+
+  // A row for a different service is not this service's bar.
+  const other = summarizeService("published-cli", window, since(windowStartDay(today)));
+  assert.equal(other.recordedDays, 0);
+  assert.equal(uptimeFigure(other), "no snapshots recorded yet");
+}
+
+// --- 5. nothing recorded prints WORDS, never a number --------------------
+{
+  const window = dayWindow(new Date(today));
+  const empty = summarizeService("live-origin", window, []);
+  assert.equal(empty.recordedDays, 0);
+  assert.equal(empty.okDays, 0);
+  assert.equal(empty.firstRecordedDay, null);
+  assert.equal(empty.latest, "nodata");
+  assert.ok(
+    empty.bars.every((b) => b.state === "nodata"),
+    "an empty history produced a bar that was not NO DATA",
+  );
+  const figure = uptimeFigure(empty);
+  assert.equal(figure, "no snapshots recorded yet");
+  assert.ok(!/\d/.test(figure), "the empty-history figure printed a number");
+}
+
+// --- 6. an unrecognised state can never render as ok ----------------------
+{
+  assert.equal(toBarState("ok"), "ok");
+  assert.equal(toBarState("degraded"), "degraded");
+  assert.equal(toBarState("down"), "down");
+  for (const bogus of ["", " ", "ok ", "OK", "Ok", "unknown", "operational", "up", "healthy", "null"]) {
+    assert.equal(toBarState(bogus), "nodata", `"${bogus}" was not treated as NO DATA`);
+  }
+  // ...including when it arrives on a real row, through the real summary.
+  const window = dayWindow(new Date(today));
+  const summary = summarizeService("live-origin", window, [
+    { day: utcDay(today), serviceId: "live-origin", state: "UP", detail: null },
+  ]);
+  assert.equal(summary.latest, "nodata");
+  assert.equal(summary.okDays, 0);
+  // An unknown state is excluded from BOTH sides of the fraction, so it can
+  // neither inflate the figure nor deflate it.
+  assert.equal(summary.recordedDays, 0);
+  assert.equal(uptimeFigure(summary), "no snapshots recorded yet");
+
+  // ...and it carries NO CAPTION either. The row still has a `detail` on it,
+  // and letting that through would render `aria-label="5 Aug 2026 — no data:
+  // 298 items in /r/registry.json"`: a measurement caption under a bar that
+  // says nothing was measured. A NO DATA bar's detail is null, always.
+  const captioned = summarizeService("live-origin", window, [
+    { day: utcDay(today), serviceId: "live-origin", state: "UP", detail: "298 items in /r/registry.json" },
+  ]);
+  const captionedBar = captioned.bars[captioned.bars.length - 1];
+  assert.equal(captionedBar.state, "nodata");
+  assert.equal(
+    captionedBar.detail,
+    null,
+    "a NO DATA bar carried a measurement caption",
+  );
+  assert.ok(
+    captioned.bars.every((b) => b.state !== "nodata" || b.detail === null),
+    "some NO DATA bar carried a caption",
+  );
+  // The days nobody wrote at all are unchanged by this: still nodata, still
+  // captionless, so the assertion above is not passing because the window is
+  // empty of rows.
+  assert.equal(captioned.bars[0].state, "nodata");
+  assert.equal(captioned.bars[0].detail, null);
+  // A RECOGNISED state keeps its caption — the fix nulls captions on nodata
+  // bars, it does not strip details from bars generally.
+  const kept = summarizeService("live-origin", window, [
+    { day: utcDay(today), serviceId: "live-origin", state: "down", detail: "origin answered 503" },
+  ]);
+  assert.equal(kept.bars[kept.bars.length - 1].detail, "origin answered 503");
+}
+
+// --- 8. the window label on the card is the strip's own length ------------
+// The card prints "<n> days" under the bars. That number is read off the bars
+// it drew, not typed a second time, so it cannot claim 90 days over a strip of
+// some other length.
+{
+  const src = readFileSync(new URL("../app/status/uptime.tsx", import.meta.url), "utf8");
+  assert.ok(
+    src.includes("{bars.length} days"),
+    "the card's window label is not counted off the bars it drew",
+  );
+  assert.ok(
+    !/>\s*90 days\s*</.test(src),
+    "the card still hardcodes a 90-day label",
+  );
+  assert.equal(dayWindow(new Date(today)).length, SNAPSHOT_WINDOW_DAYS);
+  // A shorter window shortens the strip, and the label follows it because it
+  // is the same number.
+  assert.equal(summarizeService("live-origin", dayWindow(new Date(today), 7), []).bars.length, 7);
+}
+
+// --- 7. the colour map on the render side --------------------------------
+// A literal-value claim, asserted literally against the source. The
+// exhaustiveness half ("every BarState has a colour") is enforced by
+// `Record<BarState, string>` under `npx tsc --noEmit`; what a type cannot
+// state is WHICH colour, and that is what /status is read for.
+{
+  const src = readFileSync(new URL("../app/status/uptime.tsx", import.meta.url), "utf8");
+  const map = src.slice(src.indexOf("const BAR:"), src.indexOf("const WORD:"));
+  assert.ok(map.length > 0, "the BAR colour map is no longer in uptime.tsx");
+  for (const [state, cls] of [
+    ["ok", "bg-[var(--success)]"],
+    ["degraded", "bg-ns-accent"], // the blue accent — amber is banned here
+    ["down", "bg-[var(--error)]"],
+    ["nodata", "bg-ns-muted/25"],
+  ] as const) {
+    assert.ok(
+      map.includes(`${state}: "${cls}",`),
+      `BAR.${state} is not ${cls}`,
+    );
+  }
+  // No amber/orange/gold is ever PAINTED here, and --warning is never spent on
+  // this page even though the token exists. The banned forms are the paint
+  // ones, so the check cannot be weakened by editing the header comment that
+  // names those colours in order to ban them.
+  for (const banned of [
+    "var(--warning)",
+    "bg-amber",
+    "bg-orange",
+    "text-amber",
+    "text-orange",
+    "border-amber",
+    "border-orange",
+  ]) {
+    assert.ok(!src.includes(banned), `uptime.tsx paints "${banned}"`);
+  }
+  // The one thing a colour map cannot say: down and degraded must not share a
+  // swatch with ok.
+  assert.ok(!map.includes("degraded: \"bg-[var(--success)]\""));
+}
+
 console.log(
   "convex/status.logic.ts: one bar per day/service, samples aggregate, " +
-    "unmeasured days absent — ok",
+    "unmeasured days absent, degraded never rounded up, past days stable, " +
+    "gaps hold their slot, unknown states read NO DATA — ok",
 );
