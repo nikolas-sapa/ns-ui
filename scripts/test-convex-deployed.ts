@@ -1,11 +1,14 @@
 // Guard against the failure that has hit this project three times: a Convex
 // function exists in the REPO but was never `npx convex deploy`ed, so the
-// deployment silently lacks it. `npm run build` is `registry:build && next
-// build` — there is no `npx convex deploy` step anywhere in this repo, on
-// Vercel, or in any workflow, so a schema/function change ships to Vercel and
-// never reaches Convex. Twice now the symptom read as something else
-// entirely: fetchQuery throws on a missing function, the caller's catch maps
-// that to 401 ("unauthenticated"), or the route just says "Server Error".
+// deployment silently lacks it. Vercel now closes that gap structurally —
+// `vercel.json` sets buildCommand `npx convex deploy --cmd 'npm run build'` —
+// but `npm run build` on its own is still `registry:build && next build` and
+// never touches Convex, so a build run outside `vercel.json`, a half-finished
+// `convex deploy`, or a NEXT_PUBLIC_CONVEX_URL pointing at the wrong
+// deployment all still produce the drift. Every time, the symptom read as
+// something else entirely: fetchQuery throws on a missing function, the
+// caller's catch maps that to 401 ("unauthenticated"), or the route just says
+// "Server Error".
 //
 // This enumerates every `api.<module>.<fn>` reference this app actually
 // calls (grepped from source, never hardcoded — a hardcoded list rots the
@@ -303,7 +306,8 @@ if (failing.length) {
   console.log("");
   console.log(`GATE: FAIL ${failing.length} function(s) referenced by the app answered with an unresolvable masked error:`);
   for (const r of failing) console.log(`  ${r.mod}:${r.fn}`);
-  console.log("Most likely fix: run `npx convex deploy`. `npm run build` does NOT do this — see AGENTS.md/CONTRIBUTING.md.");
+  console.log("A Vercel build deploys Convex (vercel.json buildCommand); a bare `npm run build` does NOT.");
+  console.log("If this deployment is not the one a Vercel build last shipped to, run `npx convex deploy` against it — see AGENTS.md/CONTRIBUTING.md.");
 }
 if (unreachable.length) {
   console.log("");

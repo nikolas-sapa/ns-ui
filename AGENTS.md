@@ -159,13 +159,36 @@ screenshot has actually been looked at — that's the state the owner judges fir
 npm run test:source-invariants   # static; no server, no browser. Runs in CI (verify can't).
 ```
 
-`npm run build` (`registry:build && next build`) does **not** deploy Convex — there is no `npx convex
-deploy` anywhere in this repo, in `vercel.json`, or in any workflow. A schema or function change ships
-to Vercel and never reaches Convex unless someone runs `npx convex deploy` separately; twice now that
-drift shipped silently and read as an auth bug. `npm run test:convex-deployed`
-(`scripts/test-convex-deployed.ts`) probes every `api.<module>.<fn>` the app calls against
-`NEXT_PUBLIC_CONVEX_URL` and fails naming the missing function and the fix (`npx convex deploy`); it
-skips loudly when that env var isn't set.
+Convex deploys **with** the site. `vercel.json` sets `"buildCommand": "npx convex deploy --cmd 'npm
+run build'"`, so a Vercel build deploys the functions under `convex/` and then builds the frontend
+against them — one atomic step, authenticated by `CONVEX_DEPLOY_KEY` on the Vercel project. Do not
+add a manual `npx convex deploy` to any release checklist; the build does it. `CONVEX_DEPLOY_KEY` is
+set on **Production only** as of `0ca4b881` — Preview still needs it set, and until it is, preview
+builds fail at the Convex step rather than drifting silently.
+
+`npm run build` on its own is still only `registry:build && next build` and does **not** touch
+Convex. That matters locally and for any pipeline that calls `npm run build` directly rather than
+going through `vercel.json` — there, the functions on the deployment are whatever was last pushed.
+`npx convex dev --once` is codegen against the DEV deployment, not a production deploy.
+
+`npm run test:convex-deployed` (`scripts/test-convex-deployed.ts`) remains the guard: it probes every
+`api.<module>.<fn>` the app calls against `NEXT_PUBLIC_CONVEX_URL` and fails naming the missing
+function. With the Vercel path closed, what it still catches is a build run outside `vercel.json`, a
+`convex deploy` that failed or half-finished, and a `NEXT_PUBLIC_CONVEX_URL` pointing at the wrong
+deployment. It skips loudly when that env var isn't set.
+
+**Why the build command is shaped that way** (history — do not re-open this): before `vercel.json`
+existed, nothing in the pipeline shipped `convex/*.ts`, and the repo/deployment drift caused an
+outage three times. The last one, 2026-08-04, left production missing every function added after
+Phase A — `users.currentUserId`, all of `submissions`, all of `testimonials`,
+`profiles.publicProfile`, `profiles.publicAvatarSource`, `saves.setCollectionVisibility`. The pages
+calling them were live and returned HTTP 200, so the site looked healthy while `/submit`, community
+testimonial submission, moderation and `/u/<handle>` publishing were all dead. The symptoms never
+named the cause: the OAuth callback returned a bare `{"error":"unauthenticated"}` because
+`fetchQuery(api.users.currentUserId, …)` threw on a function that did not exist and the catch mapped
+it to 401; status polls returned `"Server Error"` while the Convex dashboard logged `Could not find
+public function`. Both read as auth bugs. The build command closed the drift structurally; the gate
+above is what proves it stayed closed.
 
 `scripts/test-source-invariants.ts` reads `app/**`, `lib/**` and `registry/**` and fails on the defect
 CLASSES `verify.ts` structurally cannot see — it drives `/preview/<component>`, so it never visits the
