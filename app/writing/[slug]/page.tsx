@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { loadWritingPost, loadWritingPosts } from "@/lib/writing";
 import { getStarCount } from "@/lib/github-stars";
 import { PostBody } from "../_components/post-body";
-import { ThemeToggle } from "../../_components/theme-toggle";
 import { GitHubStarButton } from "../../_components/github-star-button";
 import { EmailCapture } from "../../_components/email-capture";
 
@@ -55,15 +54,12 @@ export default async function WritingPostPage({
   return (
     <main className="mx-auto w-full max-w-2xl px-6 pb-32 sm:px-10">
       <header className="pt-20 sm:pt-28">
-        <div className="flex items-center justify-between gap-4">
-          <Link
-            href="/writing"
-            className="rounded-sm font-mono text-xs uppercase tracking-[0.18em] text-ns-muted outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent transition-colors"
-          >
-            ns-ui / writing
-          </Link>
-          <ThemeToggle />
-        </div>
+        <Link
+          href="/writing"
+          className="rounded-sm font-mono text-xs uppercase tracking-[0.18em] text-ns-muted outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent transition-colors"
+        >
+          ns-ui / writing
+        </Link>
         <p className="mt-6 font-mono text-[11px] uppercase tracking-wider text-ns-muted">
           {formatDate(post.iso)}
         </p>

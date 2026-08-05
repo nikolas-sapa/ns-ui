@@ -5,7 +5,6 @@ import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
 import { jsonLdScript } from "@/lib/json-ld";
 import { categoryPages } from "@/lib/category-pages";
 import { CATEGORY_COPY } from "@/lib/category-copy";
-import { ThemeToggle } from "../_components/theme-toggle";
 
 // Same `registry.items.length` the home page and sidebar count from, so the
 // hub can never quote a total the rest of the site disagrees with.
@@ -62,12 +61,9 @@ export default function CategoriesIndexPage() {
       />
 
       <header className="pt-20 sm:pt-28">
-        <div className="flex items-center justify-between gap-4">
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-ns-muted">
-            ns-ui / categories
-          </p>
-          <ThemeToggle />
-        </div>
+        <p className="font-mono text-xs uppercase tracking-[0.18em] text-ns-muted">
+          ns-ui / categories
+        </p>
         <h1 className="mt-5 text-3xl font-semibold leading-[1.15] tracking-tight sm:text-4xl">
           Categories.
         </h1>

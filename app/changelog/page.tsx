@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Strandline } from "@/registry/core/timeline-changelog-wave/component";
-import { ThemeToggle } from "../_components/theme-toggle";
 import { loadChangelog } from "./entries";
 import { ChangelogEntryList } from "./entry-list";
 import { TimelineScrub } from "./timeline-scrub";
@@ -26,12 +24,9 @@ export default function ChangelogPage() {
   return (
     <main className="mx-auto w-full max-w-3xl px-6 pb-32 sm:px-10">
       <header className="pt-20 sm:pt-28">
-        <div className="flex items-center justify-between gap-4">
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-ns-muted">
-            ns-ui / changelog
-          </p>
-          <ThemeToggle />
-        </div>
+        <p className="font-mono text-xs uppercase tracking-[0.18em] text-ns-muted">
+          ns-ui / changelog
+        </p>
         <h1 className="mt-5 text-3xl font-semibold leading-[1.15] tracking-tight sm:text-4xl">
           What shipped.
         </h1>
@@ -76,21 +71,6 @@ export default function ChangelogPage() {
       </section>
 
       <ChangelogEntryList entries={entries} />
-
-      <footer className="mt-24 flex flex-wrap items-baseline gap-x-8 gap-y-2 border-t border-border pt-6 font-mono text-xs text-ns-muted">
-        <Link
-          href="/"
-          className="underline underline-offset-2 hover:text-foreground transition-colors"
-        >
-          Back to the grid
-        </Link>
-        <a
-          href="https://nikolas.helpmarq.com"
-          className="underline underline-offset-2 hover:text-foreground transition-colors"
-        >
-          Built by Nikolas Sapa
-        </a>
-      </footer>
     </main>
   );
 }

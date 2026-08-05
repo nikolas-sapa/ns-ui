@@ -1,7 +1,6 @@
 import { Knockout404 } from "@/registry/loud/not-found-knockout/component";
 import { CopyButton } from "./_components/copy-button";
 import { ThemeReassert } from "./_components/theme-reassert";
-import { ThemeToggle } from "./_components/theme-toggle";
 import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
 
 const INSTALL = `npx shadcn add ${REGISTRY_ORIGIN}/r/not-found-knockout.json`;
@@ -13,14 +12,13 @@ export default function NotFound() {
   return (
     <main className="flex min-h-screen flex-col bg-background">
       <ThemeReassert />
-      <header className="flex items-center justify-between gap-4 border-b border-border px-6 py-4 sm:px-10">
+      <header className="border-b border-border px-6 py-4 sm:px-10">
         <a
           href="/"
           className="rounded-sm font-mono text-xs uppercase tracking-[0.18em] text-ns-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
         >
           ns-ui
         </a>
-        <ThemeToggle />
       </header>
 
       {/* Move the cursor along the numerals — the stencil rim springs outward. */}

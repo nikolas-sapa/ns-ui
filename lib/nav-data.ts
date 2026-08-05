@@ -122,6 +122,32 @@ export function navGroups(): NavGroup[] {
   return groups;
 }
 
+/**
+ * The tree flattened into the single order it actually reads top-to-bottom
+ * in the sidebar — same category → kind → loose-item walk `navGroups()`
+ * builds and `NavCategory`/`NavKindGroup` render, deduped to first
+ * occurrence. A component can be a member of several categories (the
+ * multi-match rule documented above `navGroups()`), so without the dedupe a
+ * component filed under two sections would neighbour itself in prev/next.
+ * First occurrence wins rather than last so this agrees with whichever
+ * section the sidebar auto-opens for that component (`locate()`, same
+ * category-then-kind order).
+ */
+export function flatOrder(groups: NavGroup[]): NavItem[] {
+  const seen = new Set<string>();
+  const flat: NavItem[] = [];
+  const push = (item: NavItem) => {
+    if (seen.has(item.name)) return;
+    seen.add(item.name);
+    flat.push(item);
+  };
+  for (const g of groups) {
+    for (const k of g.kinds) for (const i of k.items) push(i);
+    for (const i of g.items) push(i);
+  }
+  return flat;
+}
+
 /** Where a component lives in the tree, for auto-opening its section on
  *  navigation — `null` if it's not in the registry (shouldn't happen for a
  *  real slug, but a stale link degrades to "nothing auto-opens" rather than

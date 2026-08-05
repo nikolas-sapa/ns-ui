@@ -189,21 +189,6 @@ export default function GuidelinesPage() {
           takes.
         </p>
       </section>
-
-      <footer className="mt-16 flex flex-wrap items-baseline gap-x-8 gap-y-2 border-t border-border pt-6 font-mono text-xs text-ns-muted">
-        <Link
-          href="/"
-          className="underline underline-offset-2 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent transition-colors"
-        >
-          Back to the grid
-        </Link>
-        <Link
-          href="/community"
-          className="underline underline-offset-2 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent transition-colors"
-        >
-          Community
-        </Link>
-      </footer>
     </main>
   );
 }
