@@ -34,6 +34,7 @@ export const metadata: Metadata = {
     types: {
       "application/rss+xml": [
         { url: "/changelog/feed.xml", title: "ns-ui changelog" },
+        { url: "/writing/feed.xml", title: "ns-ui writing" },
       ],
     },
   },

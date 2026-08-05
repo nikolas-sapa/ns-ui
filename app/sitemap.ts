@@ -7,8 +7,8 @@ import { categoryPages } from "@/lib/category-pages";
 // Reversed 2026-08-01: the comment this replaced called /preview/[name] "an
 // internal embed target... not content worth a search engine crawling on its
 // own." That was true when those pages only backed the showcase's demo
-// cards. They are now the only pages describing each of the 228 components
-// in the registry, and excluding them was why `site:design.helpmarq.com`
+// cards. They are now the only pages describing each of the registry's
+// components, and excluding them was why `site:design.helpmarq.com`
 // returned nothing — this omission wasn't an oversight when it was written,
 // the reasoning underneath it changed. Only the honest reference route is
 // listed, and as of the same day it is `/components/<name>` rather than
@@ -41,6 +41,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${REGISTRY_ORIGIN}/status`,
+      lastModified: new Date(),
+    },
+    {
+      url: `${REGISTRY_ORIGIN}/community`,
+      lastModified: new Date(),
+    },
+    {
+      url: `${REGISTRY_ORIGIN}/guidelines`,
       lastModified: new Date(),
     },
     ...categoryPages().map((c) => ({
