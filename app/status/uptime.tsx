@@ -23,16 +23,23 @@
  * `--color-*` namespace by `@theme inline` — a bare `bg-success` would compile
  * to nothing at all.
  *
- * Height, and this is not decoration: colour is never the only carrier of a
- * bar's state. --success (#47a447) and --error (#ea001d) collapse toward the
- * same muddy tone under deuteranopia, and grey-vs-green — the pair that must
- * NEVER be confused, since it is no-data against healthy — differs by nothing
- * else at all. So every bar also encodes its state as how far it rises in a
- * fixed-height row: ok fills it, degraded reaches half, down is a stub, no
- * data is a flat baseline tick that cannot be mistaken for a day that worked.
- * The row's height is fixed and the bars are baseline-aligned, so this reads
- * as a profile rather than shifting any layout. The legend below shows the
- * same four heights next to their four words.
+ * Bars are now UNIFORM height, colour-coded only — the reference the owner
+ * chose. That drops the height-encoding this file used to carry as the
+ * non-colour cue (ok fills the row, degraded half, down a stub, no data a
+ * baseline tick), so the same information moves to three other places instead
+ * of disappearing:
+ *   (a) each card's header states its own most-recent-day status as a WORD,
+ *       next to a colour dot, right beside the service name;
+ *   (b) the legend below the strips pairs a colour swatch with each state
+ *       word — swatch and word can never drift apart because both come off
+ *       the same `BAR`/`WORD` maps the bars themselves use;
+ *   (c) every bar carries an accessible name — `title` for a mouse hover and
+ *       `aria-label` for anything that reads the DOM — spelling out its date
+ *       and its state word in text, not colour. The on-hover tooltip under the
+ *       bar is a sighted-user convenience layered on top of that name, marked
+ *       `aria-hidden` so assistive tech is never told the same fact twice.
+ * A colour-blind reader therefore never has to resolve --success vs --error by
+ * hue: the word is on the card, in the legend, and in every bar's own name.
  *
  * The uptime figure is computed from days that have data and from nothing else,
  * and it always prints its own denominator, so a reader can reconstruct it from
@@ -58,24 +65,6 @@ const BAR: Record<BarState, string> = {
   degraded: "bg-ns-accent",
   down: "bg-[var(--error)]",
   nodata: "bg-ns-muted/25",
-};
-
-/** The non-colour half of the encoding — see the note at the top of the file.
- *  Read against the fixed `h-8` row the bars sit in. */
-const BAR_HEIGHT: Record<BarState, string> = {
-  ok: "h-8",
-  degraded: "h-4",
-  down: "h-2",
-  nodata: "h-1",
-};
-
-/** The same four heights, scaled into the legend's 10px swatch box, so the
- *  key teaches the shape and not only the colour. */
-const LEGEND_HEIGHT: Record<BarState, string> = {
-  ok: "h-full",
-  degraded: "h-1/2",
-  down: "h-1/4",
-  nodata: "h-px",
 };
 
 const WORD: Record<BarState, string> = {
@@ -167,27 +156,59 @@ export function ServiceCard({
           recorded.length === 1 ? "1 day" : `${recorded.length} days`
         } recorded since ${prettyDay(first as string)}`;
 
+  // The most recent bar's own state, not the recorded-days-only figure above:
+  // this is the word the card's header states out loud, and it must agree
+  // with the colour of the rightmost bar a reader is looking at.
+  const latest = bars[bars.length - 1]?.state ?? "nodata";
+
   return (
     <article className="rounded-md border border-border p-5 sm:p-6">
       <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-        <h3 className="text-[15px] font-medium tracking-[-0.01em] text-foreground">
-          {service.name}
-        </h3>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <h3 className="text-[15px] font-medium tracking-[-0.01em] text-foreground">
+            {service.name}
+          </h3>
+          <span className="flex items-center gap-1.5 font-mono text-[11px] text-ns-muted">
+            <span aria-hidden className={`h-2 w-2 rounded-full ${BAR[latest]}`} />
+            {WORD[latest]}
+          </span>
+        </div>
         {service.subtitle ? (
           <p className="font-mono text-xs text-ns-muted">{service.subtitle}</p>
         ) : null}
       </div>
 
-      {/* The row's height is fixed and the bars are baseline-aligned, so the
-          per-state heights below change the profile without moving anything. */}
-      <div className="mt-4 flex h-8 w-full items-end gap-px overflow-hidden sm:gap-[2px]">
-        {bars.map((bar) => (
-          <span
-            key={bar.day}
-            title={`${bar.day} — ${WORD[bar.state]}${bar.detail ? `: ${bar.detail}` : ""}`}
-            className={`min-w-0 flex-1 rounded-[1px] ${BAR_HEIGHT[bar.state]} ${BAR[bar.state]}`}
-          />
-        ))}
+      {/* Uniform-height, colour-only bars — see the file-level note on where
+          the non-colour cue moved. touch-pan-y lets a touch user scroll the
+          page vertically through the strip instead of the strip eating the
+          gesture. */}
+      <div className="mt-4 flex h-6 w-full touch-pan-y items-stretch gap-[2px]">
+        {bars.map((bar) => {
+          const name = `${prettyDay(bar.day)} — ${WORD[bar.state]}${bar.detail ? `: ${bar.detail}` : ""}`;
+          return (
+            <div key={bar.day} className="group relative min-w-0 flex-1">
+              <span
+                title={name}
+                aria-label={name}
+                className={`block h-full w-full rounded-[1px] transition-opacity duration-100 ${BAR[bar.state]}`}
+              />
+              <div
+                aria-hidden
+                role="tooltip"
+                className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2 whitespace-nowrap rounded-[10px] border border-border bg-surface px-2.5 py-2 text-[12px] opacity-0 shadow-[0_12px_32px_rgba(0,0,0,0.18)] transition-opacity duration-100 group-hover:opacity-100"
+              >
+                <div className="font-medium text-foreground">{prettyDay(bar.day)}</div>
+                <div className="mt-1 flex items-center gap-1.5 text-ns-muted">
+                  <span aria-hidden className={`h-2 w-2 rounded-[3px] ${BAR[bar.state]}`} />
+                  <span>
+                    {WORD[bar.state]}
+                    {bar.detail ? `: ${bar.detail}` : ""}
+                  </span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       <div className="mt-3 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 font-mono text-[11px] text-ns-muted">
@@ -203,11 +224,11 @@ export function ServiceCard({
 }
 
 /**
- * The key. The `title` on a bar is a hover, which a touch screen and most
- * assistive tech never surface, so the key is where a bar's state becomes
- * readable at all. Four swatches, four words, and each swatch carries the same
- * HEIGHT its bars do — read straight off the same maps the bars use, so
- * neither the colour nor the shape can drift from the word next to it.
+ * The key. The `title`/`aria-label` on a bar is only reachable one bar at a
+ * time; the legend is where every state's colour and word sit side by side at
+ * once. Four swatches, four words, read straight off the same `BAR`/`WORD`
+ * maps the bars and the card headers use, so none of the three can drift from
+ * the other two.
  */
 export function BarLegend() {
   const order: BarState[] = ["ok", "degraded", "down", "nodata"];
@@ -215,9 +236,7 @@ export function BarLegend() {
     <ul className="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[11px] text-ns-muted">
       {order.map((state) => (
         <li key={state} className="flex items-center gap-2">
-          <span aria-hidden className="flex h-2.5 w-2.5 items-end">
-            <span className={`w-full rounded-[1px] ${LEGEND_HEIGHT[state]} ${BAR[state]}`} />
-          </span>
+          <span aria-hidden className={`h-2 w-2 rounded-[3px] ${BAR[state]}`} />
           {WORD[state]}
         </li>
       ))}

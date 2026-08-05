@@ -1,6 +1,6 @@
 {
   "name": "@nikolas.sapa/ns-ui-mcp",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "MCP server for the ns-ui component registry: search components, read full source, and get the token/theming conventions an agent needs to build in the same design language.",
   "keywords": [
     "mcp",
