@@ -32,7 +32,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
     },
     {
-      url: `${REGISTRY_ORIGIN}/installation`,
+      url: `${REGISTRY_ORIGIN}/install`,
       lastModified: new Date(),
     },
     {

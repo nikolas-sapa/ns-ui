@@ -395,10 +395,10 @@ export function SiteShell({
             themselves, which stay on the first line at any name length. */}
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-border px-4 py-3 font-mono text-[11px] text-ns-muted">
           <Link
-            href="/installation"
+            href="/install"
             className="rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
           >
-            Installation
+            Install
           </Link>
           <Link
             href="/theming"

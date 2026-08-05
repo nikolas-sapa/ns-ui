@@ -263,7 +263,7 @@ export default function ThemingPage() {
           <code className="font-mono text-foreground">--ns-accent</code> re-themes every
           installed component that uses it, with no component code to touch. This is also
           what running <Link
-            href="/installation"
+            href="/install"
             className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent transition-colors"
           >
             <code className="font-mono text-foreground">shadcn add</code>
@@ -307,10 +307,10 @@ export default function ThemingPage() {
           Back to the grid
         </Link>
         <Link
-          href="/installation"
+          href="/install"
           className="underline underline-offset-2 hover:text-foreground transition-colors"
         >
-          Installation
+          Install
         </Link>
         <Link
           href="/connect"
