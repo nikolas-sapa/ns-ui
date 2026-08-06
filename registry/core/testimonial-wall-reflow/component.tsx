@@ -103,7 +103,9 @@ export function TestimonialWallReflow({
   items = DEFAULT_ITEMS,
   className = "",
 }: {
+  /** the testimonials */
   items?: Testimonial[];
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);

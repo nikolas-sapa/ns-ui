@@ -31,7 +31,9 @@ import { useEffect, useMemo, useRef } from "react";
 // ---------------------------------------------------------------------------
 
 export interface BoltUnfurlProps {
+  /** the media source url */
   src: string;
+  /** alt text for the media */
   alt: string;
   /** Bump to (re)play the unroll animation from rolled to unrolled. */
   trigger: number;
@@ -39,6 +41,7 @@ export interface BoltUnfurlProps {
   strips?: number;
   /** CSS aspect-ratio of the media box. Default "16/9". */
   aspectRatio?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

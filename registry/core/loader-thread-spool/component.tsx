@@ -80,7 +80,9 @@ export type WindSpoolProps = {
   total?: number;
   /** bytes accumulated so far; only meaningful once `total` is known */
   loaded?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** accessible name for the loader */
   "aria-label"?: string;
 };
 

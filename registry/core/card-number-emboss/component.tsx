@@ -21,6 +21,7 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState, type ChangeEv
 // ---------------------------------------------------------------------------
 
 export interface EmbossPlateProps {
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

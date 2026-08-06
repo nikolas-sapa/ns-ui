@@ -39,6 +39,7 @@ export interface DevelopSkeletonProps {
   developMs?: number;
   /** Announced to screen readers while loading. */
   loadingLabel?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

@@ -46,6 +46,7 @@ function normalize3(x: number, y: number, z: number): [number, number, number] {
 export interface TorusRenderProps {
   /** grid cell size in px */
   cellSize?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

@@ -169,6 +169,7 @@ export interface SpectrogramAsciiBandsProps {
   cellSize?: number;
   /** Accessible name for the focusable readout region. */
   label?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

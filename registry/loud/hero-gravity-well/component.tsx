@@ -24,6 +24,7 @@ export function SingularityText({
   damping = 0.55,
   className = "",
 }: {
+  /** the rendered text */
   text?: string;
   /** well strength G in px³/s²; accel a = G / max(d², 24²) */
   gravity?: number;
@@ -33,6 +34,7 @@ export function SingularityText({
   springK?: number;
   /** damping ratio ζ; < 1 gives visible overshoot as letters reform */
   damping?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);

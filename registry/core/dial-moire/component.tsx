@@ -49,7 +49,9 @@ export function MoireDial({
   friction?: number;
   /** interference field height in px */
   fieldHeight?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** accessible name for the dial. Default "Moire tuning dial". */
   "aria-label"?: string;
 }) {
   const fieldRef = useRef<HTMLDivElement>(null);

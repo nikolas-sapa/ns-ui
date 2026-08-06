@@ -102,16 +102,23 @@ export function TideGaugePassword({
 }: {
   /** visible label text above the field */
   label?: string;
+  /** name for the underlying `<input>`, for native form submission */
   name?: string;
+  /** placeholder text for the field */
   placeholder?: string;
   /** uncontrolled initial value */
   defaultValue?: string;
   /** controlled value; omit for uncontrolled */
   value?: string;
+  /** called on every keystroke with the raw input value */
   onValueChange?: (value: string) => void;
+  /** passed straight through to the underlying `<input autoComplete>` */
   autoComplete?: string;
+  /** marks the underlying `<input>` as `required` for native form validation */
   required?: boolean;
+  /** blocks the underlying `<input>` */
   disabled?: boolean;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const uid = useId();

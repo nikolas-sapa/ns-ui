@@ -30,8 +30,11 @@ export interface FlowEdge {
 }
 
 export interface AsciiFlowDiagramProps {
+  /** the diagram's boxes */
   nodes?: FlowNode[];
+  /** the connections between nodes */
   edges?: FlowEdge[];
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

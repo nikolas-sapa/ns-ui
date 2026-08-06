@@ -52,6 +52,7 @@ export interface DownpourProps {
   cellSize?: number;
   /** headline / CTA rendered over the field */
   children?: ReactNode;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

@@ -41,12 +41,14 @@ export interface TrestleSentence {
 }
 
 export interface TrestleGapProps {
+  /** the answer text, split into individually-checked sentences */
   sentences: TrestleSentence[];
   /** Runs a retrieval attempt for one ungrounded sentence. Resolve a source on
    * success, or null/undefined if nothing was found. Defaults to a small
    * deterministic demo resolver (id-hashed, ~4-in-5 found) so the component
    * works with zero configuration. */
   findSupport?: (sentence: TrestleSentence) => Promise<TrestleSource | null | undefined>;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

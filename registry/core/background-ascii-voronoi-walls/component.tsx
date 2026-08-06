@@ -54,6 +54,7 @@ export interface VoronoiWallsProps {
   cellSize?: number;
   /** base number of drifting sites, scaled by frame area and clamped 14..34 */
   siteCount?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

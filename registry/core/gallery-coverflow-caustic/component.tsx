@@ -143,13 +143,17 @@ export function CausticCoverflow({
   className = "",
   "aria-label": ariaLabel = "Coverflow gallery",
 }: {
+  /** the gallery images, in order */
   items?: CausticCoverflowItem[];
   /** starting focused card; defaults to the middle */
   initialIndex?: number;
   /** card width in px (shrinks responsively on narrow containers) */
   cardWidth?: number;
+  /** card height in px */
   cardHeight?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** accessible name for the gallery. Default "Coverflow gallery". */
   "aria-label"?: string;
 }) {
   const n = Math.max(1, items.length);

@@ -31,6 +31,7 @@ import { useEffect, useRef } from "react";
 // ---------------------------------------------------------------------------
 
 export interface VortexStreetProps {
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

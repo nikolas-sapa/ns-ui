@@ -64,10 +64,13 @@ export interface TackleInvocation {
 }
 
 export interface TackleBoardProps {
+  /** the available tools, shown as pegs */
   tools: TackleTool[];
+  /** calls made against `tools`, each keyed to a pending/success/error state */
   invocations: TackleInvocation[];
   /** ms for the recency underline to fully decay. default 60000 */
   decayMs?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

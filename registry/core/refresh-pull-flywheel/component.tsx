@@ -69,6 +69,7 @@ export interface FlywheelPullProps {
   onRefresh?: () => Promise<FlywheelPullItem[]>;
   /** Accessible label for the row list. */
   label?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

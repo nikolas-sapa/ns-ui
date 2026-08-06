@@ -27,6 +27,7 @@ export interface RollCrawlProps {
   separator?: string;
   /** ms per cell advance; also the flicker settle budget is 3x this */
   beatMs?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

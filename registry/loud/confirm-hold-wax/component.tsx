@@ -58,6 +58,7 @@ export interface SignetDropProps {
   demo?: boolean;
   /** Called once when the terminal sealed state is reached. */
   onSealed?: () => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

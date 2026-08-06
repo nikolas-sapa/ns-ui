@@ -203,6 +203,7 @@ export function ScreePour({
   className = "",
   grainBudget = 2400,
 }: {
+  /** extra classes merged onto the rendered root element */
   className?: string;
   /** total grains spawned per transition, distributed across regions by area */
   grainBudget?: number;

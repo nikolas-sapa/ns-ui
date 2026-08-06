@@ -102,6 +102,7 @@ function dirChar(vx: number, vy: number): string {
 export interface SlipstreamProps {
   /** grid cell size in px */
   cellSize?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

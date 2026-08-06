@@ -40,6 +40,7 @@ export interface DeadLetterProps {
   homeHref?: string;
   /** Called with the trimmed query on submit. Omit for a real, inert form. */
   onSearch?: (query: string) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

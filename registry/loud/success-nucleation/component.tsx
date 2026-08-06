@@ -253,6 +253,7 @@ export interface SeedCrystalProps {
   pendingMs?: number;
   /** crystal growth duration in ms. default 700 */
   growMs?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

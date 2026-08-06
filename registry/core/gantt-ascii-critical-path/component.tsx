@@ -40,6 +40,7 @@ export interface GanttTask {
 }
 
 export interface GanttAsciiCriticalPathProps {
+  /** the scheduled tasks */
   tasks?: GanttTask[];
   /** timeline cells drawn per row */
   cols?: number;
@@ -47,7 +48,9 @@ export interface GanttAsciiCriticalPathProps {
   today?: number;
   /** week number printed at the first tick */
   startWeek?: number;
+  /** heading above the chart */
   title?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

@@ -20,10 +20,13 @@ export interface MetaballItem {
 }
 
 export interface MetaballMergeProps {
+  /** the mergeable blobs */
   items?: MetaballItem[];
   /** names the group for assistive tech */
   label?: string;
+  /** called with the full list of selected (merged) ids after any toggle */
   onChange?: (memberIds: string[]) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

@@ -51,7 +51,9 @@ export interface RouterTierCascadeProps {
   onCeilingChange?: (tierId: string, ceiling: number) => void;
   /** formats a spend figure for the right gutter */
   formatCost?: (amount: number) => string;
+  /** accessible name for the cascade */
   ariaLabel?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

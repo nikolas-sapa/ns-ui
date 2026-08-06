@@ -37,6 +37,7 @@ export interface LooseTypeToken {
 export interface LooseTypeProps {
   /** Full ordered snapshot of the line's tokens, every render. */
   tokens: LooseTypeToken[];
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

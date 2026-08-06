@@ -258,10 +258,15 @@ export function Knockout404({
   glyph?: string;
   /** muted line floating in the punched negative space */
   message?: string;
+  /** primary CTA text */
   primaryLabel?: string;
+  /** primary CTA href */
   primaryHref?: string;
+  /** secondary CTA text */
   secondaryLabel?: string;
+  /** secondary CTA href */
   secondaryHref?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);

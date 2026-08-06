@@ -35,6 +35,7 @@ export function LigatureMelt({
   pull?: number;
   /** feGaussianBlur stdDeviation at full field strength — ramps down to near-zero at rest */
   blur?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const rootRef = useRef<HTMLSpanElement>(null);

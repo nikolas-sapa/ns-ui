@@ -92,6 +92,7 @@ export interface SpiroTraceProps {
   r?: number;
   /** pen offset from the rolling circle's centre. */
   d?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

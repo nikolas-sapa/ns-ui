@@ -54,7 +54,9 @@ export interface DecalPeelProps {
    * whenever a real pointer or keyboard interaction is active.
    */
   demo?: boolean;
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** accessible name for the sticker */
   "aria-label"?: string;
 }
 

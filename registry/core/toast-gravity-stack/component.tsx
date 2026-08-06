@@ -202,7 +202,9 @@ export const SedimentStack = forwardRef<
     restitution?: number;
     /** toasts present at mount */
     initial?: SedimentToastInput[];
+    /** extra classes merged onto the rendered root element */
     className?: string;
+    /** accessible name for the toast stack. Default "Notifications". */
     "aria-label"?: string;
   }
 >(function SedimentStack(

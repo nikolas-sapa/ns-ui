@@ -40,9 +40,13 @@ export function BallotDrop({
   defaultValue,
   className = "",
 }: {
+  /** the radio options */
   options?: BallotOption[];
+  /** accessible name for the radio group */
   label?: string;
+  /** uncontrolled initial selected value */
   defaultValue?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const reactId = useId();

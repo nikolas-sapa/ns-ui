@@ -9,6 +9,7 @@ export interface UnderInkProps {
   label?: string;
   /** ms after a hold-peek release before the ink flows back. */
   resealMs?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

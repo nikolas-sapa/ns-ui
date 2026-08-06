@@ -55,11 +55,15 @@ export type ShuntTrayItem = {
 export type ShuntTrayProps = {
   /** accessible name of the root tray; also the "Back to {label}" text once it's an ancestor */
   label: string;
+  /** the root tray's rows */
   items: ShuntTrayItem[];
   /** fires when a leaf row (no `items`) is activated */
   onSelect?: (item: ShuntTrayItem, path: ShuntTrayItem[]) => void;
+  /** px width of the menu */
   width?: number;
+  /** px height of the menu */
   height?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 };
 

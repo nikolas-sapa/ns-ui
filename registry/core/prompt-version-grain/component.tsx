@@ -30,7 +30,9 @@ export interface PromptVersionGrainProps {
   blocks?: PromptGrainBlock[];
   /** Versions, NEWEST FIRST. */
   versions?: PromptGrainVersion[];
+  /** accessible name for the version list */
   ariaLabel?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

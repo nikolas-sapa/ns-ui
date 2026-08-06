@@ -23,9 +23,11 @@ export interface NavLinkItem {
 export interface NavSiteCondenseProps {
   /** wordmark / brand text */
   brand?: string;
+  /** nav links, in order */
   links: NavLinkItem[];
   /** px of scrollY past which the bar condenses. default 24 */
   condenseAt?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

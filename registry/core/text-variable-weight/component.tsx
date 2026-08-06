@@ -12,11 +12,15 @@ export function DynamicWeightText({
   sigma = 90,
   className = "",
 }: {
+  /** the rendered text */
   text: string;
+  /** font-weight furthest from the cursor */
   minWeight?: number;
+  /** font-weight closest to the cursor */
   maxWeight?: number;
   /** gaussian falloff radius in px */
   sigma?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const rootRef = useRef<HTMLSpanElement>(null);

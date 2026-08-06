@@ -39,8 +39,11 @@ export interface WaveformAsciiScrubProps {
   defaultValue?: number;
   /** Total duration in seconds, used only to format aria-valuetext. Default 180. */
   duration?: number;
+  /** called with the new position on every scrub */
   onValueChange?: (value: number) => void;
+  /** accessible name for the scrubber */
   label?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

@@ -51,6 +51,7 @@ export function MercuryMinimap({
   stiffness?: number;
   /** spring damping (slightly under critical → settle wobble) */
   damping?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const [items, setItems] = useState<MinimapSection[] | null>(null);

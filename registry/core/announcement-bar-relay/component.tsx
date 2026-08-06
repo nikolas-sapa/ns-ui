@@ -63,6 +63,7 @@ export interface AnnouncementBarRelayProps {
   resetOnMount?: boolean;
   /** Fires once the last item has been dismissed and the bar has collapsed. */
   onExhausted?: () => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

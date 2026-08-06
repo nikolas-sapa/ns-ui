@@ -24,7 +24,9 @@ export interface BentoCell {
 }
 
 export interface GridBentoAsciiProps {
+  /** the grid's four tiles */
   cells: [BentoCell, BentoCell, BentoCell, BentoCell];
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

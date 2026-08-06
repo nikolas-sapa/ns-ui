@@ -48,8 +48,11 @@ export interface AsciiDissolveTransitionProps {
   value?: number;
   /** initial front position when uncontrolled. Default 0.35 */
   defaultValue?: number;
+  /** called with the new front position on every drag/keyboard change */
   onValueChange?: (value: number) => void;
+  /** accessible name for the slider */
   label?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

@@ -69,6 +69,7 @@ export interface IntentCoilProps {
   preview: ReactNode;
   /** Accessible name for the popover. Defaults to a name derived from `children` when it's plain text. */
   previewLabel?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

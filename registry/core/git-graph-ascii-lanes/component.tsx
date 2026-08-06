@@ -31,9 +31,11 @@ export interface GitCommit {
 }
 
 export interface GitGraphAsciiLanesProps {
+  /** the commits, newest first */
   commits?: GitCommit[];
   /** Commit id HEAD points at. Defaults to the first (newest) commit. */
   head?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

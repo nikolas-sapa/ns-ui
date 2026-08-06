@@ -64,7 +64,9 @@ export function MeshTextDrag({
   text = "ELASTIC",
   className = "",
 }: {
+  /** the rendered text */
   text?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);

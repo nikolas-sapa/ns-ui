@@ -59,7 +59,9 @@ export interface OxbowTurnProps {
   items: OxbowTurnItem[];
   /** fired once a re-inject has finished animating back onto the channel */
   onReinject?: (compactionId: string) => void;
+  /** accessible name for the channel */
   ariaLabel?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 
