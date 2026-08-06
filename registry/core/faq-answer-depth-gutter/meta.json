@@ -19,7 +19,8 @@
   },
   "gate": {
     "openBy": "[data-faq-trigger]",
-    "expect": "[data-faq-panel][data-open=true]"
+    "expect": "[data-faq-panel][data-open=true]",
+    "resetBefore": true
   },
   "card": {
     "focus": ".ns-fdg-root",

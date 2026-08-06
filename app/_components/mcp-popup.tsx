@@ -1,10 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 const STORAGE_KEY = "ns-ui-mcp-notice-dismissed";
 const DELAY_MS = 4000;
+// The card's own copy is two short clauses ("This registry also runs as an
+// MCP server, for agents that want it directly.") — about 3-4s at a
+// comfortable reading pace. 8s doubles that so a slow read or a moment's
+// hesitation before clicking the link isn't cut off, without letting a
+// one-sentence nudge sit on screen indefinitely. Paused entirely (see the
+// hover/focus effect below) rather than shortened, so a visitor who is
+// actively reading or has tabbed onto the link never loses it mid-read.
+const AUTO_DISMISS_MS = 8000;
+// Matches the entrance's duration/easing (mcp-popup-in, globals.css) so the
+// exit reads as the same motion in reverse rather than a different gesture.
+const EXIT_MS = 260;
 
 /**
  * A one-sentence, one-time nudge toward /connect. Rendered from SiteShell
@@ -69,6 +80,17 @@ export function McpPopup() {
   const [mounted, setMounted] = useState(false);
   const [dismissed, setDismissed] = useState(true);
   const [visible, setVisible] = useState(false);
+  // Drives the exit animation only — `visible` stays true for the duration
+  // of the exit so the card keeps rendering while it slides away.
+  const [closing, setClosing] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const hoveredRef = useRef(false);
+  const focusedRef = useRef(false);
+  const closingRef = useRef(false);
+  // Wall-clock accounting for pause/resume: how much of the auto-dismiss
+  // window is left, and when the current countdown segment started.
+  const remainingRef = useRef(AUTO_DISMISS_MS);
+  const startedAtRef = useRef<number | null>(null);
 
   // localStorage doesn't exist on the server — same mounted-gate pattern as
   // ThemeToggle and the sidebar's persisted open state.
@@ -87,36 +109,110 @@ export function McpPopup() {
     return () => window.clearTimeout(id);
   }, [mounted, dismissed]);
 
+  // Auto-dismiss countdown. Paused (see the pointer/focus handlers on the
+  // card below) rather than merely reset, so a visitor who leaves and
+  // returns doesn't get a full fresh window they didn't ask for. Not
+  // restarted on `closing` — once the exit is underway there is nothing
+  // left to time out.
+  useEffect(() => {
+    if (!visible || closing || paused) return;
+    startedAtRef.current = Date.now();
+    const id = window.setTimeout(() => close(false), remainingRef.current);
+    return () => {
+      window.clearTimeout(id);
+      if (startedAtRef.current !== null) {
+        remainingRef.current = Math.max(
+          0,
+          remainingRef.current - (Date.now() - startedAtRef.current),
+        );
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible, closing, paused]);
+
   useEffect(() => {
     if (!visible) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") dismiss();
+      if (e.key === "Escape") close(true);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
-  const dismiss = () => {
-    setVisible(false);
-    setDismissed(true);
-    try {
-      localStorage.setItem(STORAGE_KEY, "1");
-    } catch {
-      /* private mode / storage disabled — it'll just reappear next visit */
-    }
+  /**
+   * `persist` distinguishes a deliberate dismissal (the ✕ button, Escape)
+   * from the auto-dismiss timeout: a click/Escape means "I'm done with
+   * this," and is remembered via STORAGE_KEY like before; a timeout just
+   * means nobody happened to interact with it, so it's free to reappear
+   * next visit rather than being silently retired forever.
+   */
+  const close = (persist: boolean) => {
+    if (closingRef.current) return;
+    closingRef.current = true;
+    setClosing(true);
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const finish = () => {
+      setVisible(false);
+      setClosing(false);
+      closingRef.current = false;
+      if (persist) {
+        setDismissed(true);
+        try {
+          localStorage.setItem(STORAGE_KEY, "1");
+        } catch {
+          /* private mode / storage disabled — it'll just reappear next visit */
+        }
+      }
+    };
+    if (reduced) finish();
+    else window.setTimeout(finish, EXIT_MS);
   };
+
+  const updatePaused = () => setPaused(hoveredRef.current || focusedRef.current);
 
   if (!mounted || dismissed || !visible) return null;
 
   return (
     <div
       aria-hidden={!visible}
-      className="pointer-events-none fixed inset-x-0 bottom-6 z-40 isolate hidden justify-end px-6 sm:flex"
+      // Raised well clear of the "back to top" button's box (fixed
+      // bottom-8/right-8, 40px, sm+ — top edge sits 72px above the
+      // viewport bottom) instead of sharing its bottom-6/right-6 corner:
+      // the two are otherwise both clickable-when-visible fixed elements
+      // sharing the same footprint, and the popup's own link previously
+      // intercepted clicks meant for that button.
+      className="pointer-events-none fixed inset-x-0 bottom-24 z-40 isolate hidden justify-end px-6 sm:flex"
     >
       <div
         role="status"
-        className="pointer-events-auto flex max-w-sm items-center gap-3 rounded-md border border-border bg-surface py-2.5 pl-3.5 pr-2.5 shadow-lg motion-safe:animate-[mcp-popup-in_260ms_cubic-bezier(0.22,1,0.36,1)]"
+        onPointerEnter={() => {
+          hoveredRef.current = true;
+          updatePaused();
+        }}
+        onPointerLeave={() => {
+          hoveredRef.current = false;
+          updatePaused();
+        }}
+        onFocus={() => {
+          focusedRef.current = true;
+          updatePaused();
+        }}
+        onBlur={(e) => {
+          if (e.currentTarget.contains(e.relatedTarget as Node | null)) return;
+          focusedRef.current = false;
+          updatePaused();
+        }}
+        // Two full, static class strings rather than an interpolated
+        // arbitrary-value string — Tailwind's build-time scanner only
+        // generates utilities it can see written out literally, so a
+        // template-literal splice into `animate-[...]` would silently
+        // produce no CSS at all.
+        className={
+          closing
+            ? "pointer-events-auto flex max-w-sm items-center gap-3 rounded-md border border-border bg-surface py-2.5 pl-3.5 pr-2.5 shadow-lg motion-safe:animate-[mcp-popup-out_260ms_cubic-bezier(0.22,1,0.36,1)_forwards]"
+            : "pointer-events-auto flex max-w-sm items-center gap-3 rounded-md border border-border bg-surface py-2.5 pl-3.5 pr-2.5 shadow-lg motion-safe:animate-[mcp-popup-in_260ms_cubic-bezier(0.22,1,0.36,1)]"
+        }
       >
         <p className="text-xs leading-relaxed text-foreground">
           This registry also runs as an{" "}
@@ -130,7 +226,7 @@ export function McpPopup() {
         </p>
         <button
           type="button"
-          onClick={dismiss}
+          onClick={() => close(true)}
           aria-label="Dismiss"
           // The only other interactive element in this card is the inline
           // "MCP server" link in the paragraph beside it — kept modest on

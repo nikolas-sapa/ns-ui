@@ -316,6 +316,20 @@ html.catalog-sorted .catalog-gate-standin {
   }
 }
 
+/* Auto/manual-dismiss exit — the reverse of mcp-popup-in, transform only for
+   the same reason: opacity in the same slot would be see-through over a
+   featured card's live content mid-exit, not just mid-entrance. `forwards`
+   is added at the call site so the card holds its translated-out position
+   for the frame between the animation ending and React unmounting it. */
+@keyframes mcp-popup-out {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(8px);
+  }
+}
+
 /* Command palette dialog (command-palette.tsx) — same opaque-transform-only
    shape as mcp-popup-in above and for the same reason: animating opacity on
    a panel that sits over live component previews reads as genuinely

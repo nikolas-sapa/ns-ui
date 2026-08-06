@@ -138,14 +138,20 @@ export function CommandPalette({
   return (
     <div
       role="presentation"
-      onClick={close}
+      // Closes on a click that lands on the backdrop itself, not one that
+      // merely bubbles up through it — same `target === currentTarget` check
+      // dialog-emerge uses on its native `<dialog>`'s click event. The panel
+      // below no longer needs its own stopPropagation guard: a click inside
+      // it never targets this element in the first place.
+      onClick={(e) => {
+        if (e.target === e.currentTarget) close();
+      }}
       className="fixed inset-0 z-50 flex items-start justify-center bg-background/70 px-4 pt-[12vh] motion-safe:animate-[cmdk-in_120ms_ease-out]"
     >
       <div
         role="dialog"
         aria-modal="true"
         aria-label="Jump to a component or page"
-        onClick={(e) => e.stopPropagation()}
         className="w-full max-w-lg overflow-hidden rounded-md border border-border bg-background shadow-lg"
       >
         <div className="search-trace-field relative border-b border-border">
