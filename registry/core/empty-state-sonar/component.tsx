@@ -40,6 +40,7 @@ export interface EchoSoundProps {
   rowGap?: number;
   /** Rows the stage reserves height for while probing (usually your expected count). */
   stageRows?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

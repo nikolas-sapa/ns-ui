@@ -136,6 +136,7 @@ export function CrackCompare({
   label?: string;
   /** fires on release and keyboard change with the split 0..1 */
   onChange?: (value: number) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);

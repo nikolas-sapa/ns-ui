@@ -53,6 +53,7 @@ function smoothstep(edge0: number, edge1: number, x: number): number {
 }
 
 export interface BurinEtchProps {
+  /** extra classes merged onto the rendered root element */
   className?: string;
   /** grid cell size in px */
   cellSize?: number;

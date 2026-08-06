@@ -49,7 +49,9 @@ export interface TremorTraceHandle {
 }
 
 export interface TremorTraceProps {
+  /** the currently-typing users */
   users: TremorUser[];
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

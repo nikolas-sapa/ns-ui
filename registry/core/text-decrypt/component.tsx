@@ -12,6 +12,7 @@ export function DecryptText({
   className = "",
   replayKey = 0,
 }: {
+  /** the text that resolves out of the scramble */
   text: string;
   /** ms before the first character locks */
   delay?: number;
@@ -19,6 +20,7 @@ export function DecryptText({
   stagger?: number;
   /** ms between idle glitches re-scrambling a few characters; 0 = off */
   ambient?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
   /** bump to replay the animation */
   replayKey?: number;

@@ -169,7 +169,9 @@ export function AuroraFlowChart({
   formatValue?: (v: number) => string;
   /** show the falling/rising hue legend */
   showLegend?: boolean;
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** accessible name for the chart. Default "Aurora flow chart". */
   "aria-label"?: string;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);

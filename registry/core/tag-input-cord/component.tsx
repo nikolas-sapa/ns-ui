@@ -11,12 +11,17 @@ import { useEffect, useRef, useState } from "react";
 // length of their unravel animation and are cleared on unmount.
 
 export interface CinchBeadProps {
+  /** initial tag list */
   defaultTags?: string[];
+  /** placeholder shown only while the list is empty */
   placeholder?: string;
   /** accessible name for the text input */
   label?: string;
+  /** hard cap on tag count. No default — unlimited. */
   maxTags?: number;
+  /** called with the full tag list after an add or remove */
   onChange?: (tags: string[]) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

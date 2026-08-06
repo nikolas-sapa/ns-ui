@@ -22,9 +22,13 @@ type Cell = { r: number; c: number };
 export interface SeatmapAsciiPickProps {
   /** rows x cols seat status grid */
   seats?: SeatStatus[][];
+  /** label for each row, left of the grid */
   rowLabels?: string[];
+  /** label for each column, above the grid */
   colLabels?: string[];
+  /** heading above the seatmap */
   sectionLabel?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

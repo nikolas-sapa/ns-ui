@@ -25,7 +25,9 @@ export interface ChromaTideProps {
   speed?: number;
   /** Noise zoom — smaller reads as broader, slower-moving fields. @default 1 */
   scale?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** inline styles merged onto the root element */
   style?: React.CSSProperties;
 }
 

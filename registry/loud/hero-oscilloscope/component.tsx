@@ -45,6 +45,7 @@ export interface OscilloCrestProps {
   frequency?: number;
   /** grid cell size in px */
   cellSize?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
   /** optional headline, laid over the field */
   children?: ReactNode;

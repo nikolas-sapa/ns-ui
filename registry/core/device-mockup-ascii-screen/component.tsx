@@ -20,6 +20,7 @@ import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, 
 // ---------------------------------------------------------------------------
 
 export interface DeviceMockupAsciiScreenProps {
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

@@ -188,6 +188,7 @@ export function ScanSweepStats({
 }: {
   /** KPI cards, clockwise activation order falls out of their bearings */
   stats?: ScanStat[];
+  /** heading above the sweep */
   title?: string;
   /** sweep speed in degrees per second (30 = one revolution per 12s) */
   degPerSec?: number;
@@ -195,6 +196,7 @@ export function ScanSweepStats({
   wedgeDeg?: number;
   /** transit window around a card's bearing, in degrees */
   toleranceDeg?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);

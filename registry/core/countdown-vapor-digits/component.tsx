@@ -67,6 +67,7 @@ export function VaporCountdown({
   targetDate?: Date | string | number;
   /** mono labels under the HH / MM / SS groups; null hides the row */
   labels?: readonly [string, string, string] | null;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);

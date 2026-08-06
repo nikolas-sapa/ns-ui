@@ -41,6 +41,7 @@ export interface BimetalTripProps {
   unit?: string;
   /** what's being watched, shown above the strip, e.g. "CPU temp" */
   label?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

@@ -64,15 +64,19 @@ export interface SashWeightProps {
   end: React.ReactNode;
   /** controlled: the start pane's share of the container, as a percentage */
   value?: number;
+  /** uncontrolled initial share, as a percentage */
   defaultValue?: number;
+  /** called with the new percentage on every drag/keyboard change */
   onValueChange?: (percent: number) => void;
   /** percentage clamp for the divider's travel */
   min?: number;
+  /** percentage clamp for the divider's travel */
   max?: number;
   /** percentages the divider settles toward on a decisive release, Shift+Arrow, or Enter/double-click's 50/50 fallback */
   detents?: number[];
   /** accessible name for the divider */
   ariaLabel?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

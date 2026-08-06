@@ -32,6 +32,7 @@ export interface PatinaPipProps {
   newestTimestamp: number | Date;
   /** id placed on the pip itself, e.g. so a nav item can aria-describedby it. Defaults to an internal useId. */
   id?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

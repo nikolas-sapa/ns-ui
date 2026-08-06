@@ -88,6 +88,7 @@ export function SolargraphHero({
   maxStrokeAlpha?: number;
   /** scripted 2s figure-eight on load so the exposure shows before any input */
   intro?: boolean;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);

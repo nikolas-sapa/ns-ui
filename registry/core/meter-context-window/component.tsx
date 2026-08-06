@@ -56,6 +56,7 @@ export interface BallastContextProps {
   lowFreeThreshold?: number;
   /** accessible name for the meter. default "Context window budget" */
   ariaLabel?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

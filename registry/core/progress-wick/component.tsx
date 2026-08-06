@@ -66,6 +66,7 @@ export interface WickRunProps {
   label?: string;
   /** announce 25/50/75/100% crossings via a polite live region (default true) */
   announceMilestones?: boolean;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

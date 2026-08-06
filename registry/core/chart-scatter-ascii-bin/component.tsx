@@ -33,9 +33,11 @@ export interface ScatterPoint {
 export interface ChartScatterAsciiBinProps {
   /** synthetic sample; x/y in arbitrary plot units, any range */
   data?: ScatterPoint[];
+  /** heading above the plot */
   title?: string;
   /** brush radius in plot px */
   brushRadius?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

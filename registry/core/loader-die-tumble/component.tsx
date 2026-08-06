@@ -126,6 +126,7 @@ export interface HingeToppleProps {
   periodMs?: number;
   /** text announced via the component's own aria-live region */
   label?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

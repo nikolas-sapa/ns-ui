@@ -44,7 +44,9 @@ export interface ThinkingGlyphProps {
   speed?: number;
   /** Freezes the current frame. @default false */
   paused?: boolean;
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** inline styles merged onto the root element */
   style?: React.CSSProperties;
 }
 

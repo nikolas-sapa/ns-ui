@@ -28,6 +28,7 @@ export interface RationRuleProps {
   unitLabel?: string;
   /** fraction of max (0-1) at which the rule crosses into warning weight */
   warning?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

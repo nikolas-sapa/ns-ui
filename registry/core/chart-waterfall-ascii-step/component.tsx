@@ -35,9 +35,13 @@ export interface WaterfallStepDatum {
 }
 
 export interface ChartWaterfallAsciiStepProps {
+  /** the steps, in order; the final bar is the running total */
   data?: WaterfallStepDatum[];
+  /** heading above the chart */
   title?: string;
+  /** label for the final running-total bar */
   totalLabel?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

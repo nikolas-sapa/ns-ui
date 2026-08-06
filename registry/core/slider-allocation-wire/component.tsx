@@ -128,12 +128,17 @@ export interface CatenarySplitProps {
   rightLabel?: string;
   /** controlled split ratio, 0-100 (% of the committed total given to left) */
   ratio?: number;
+  /** uncontrolled initial split ratio */
   defaultRatio?: number;
   /** controlled total committed, 0-100 (% of budget not left on the table) */
   total?: number;
+  /** uncontrolled initial total committed */
   defaultTotal?: number;
+  /** called with the new ratio on every drag */
   onRatioChange?: (v: number) => void;
+  /** called with the new total on every drag */
   onTotalChange?: (v: number) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

@@ -190,18 +190,23 @@ export function EventHorizonCommand({
   autoTypeLoopMs = 6000,
   className = "h-[560px]",
 }: {
+  /** the searchable commands */
   commands?: CommandItem[];
+  /** input placeholder text */
   placeholder?: string;
   /** palette starts open; ⌘K / Ctrl+K toggles, Esc closes */
   defaultOpen?: boolean;
   /** close the palette after a command is consumed */
   closeOnSelect?: boolean;
+  /** called with the chosen command when one is selected */
   onSelect?: (item: CommandItem) => void;
+  /** called with the new open state after ⌘K/Ctrl+K, Esc, or a selection */
   onOpenChange?: (open: boolean) => void;
   /** demo scripting: auto-types this query character by character, looping */
   autoTypeQuery?: string;
   /** loop period for the auto-typed query, ms */
   autoTypeLoopMs?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const baseId = useId();

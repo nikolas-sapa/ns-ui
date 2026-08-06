@@ -64,12 +64,15 @@ export interface QuickKeyProps {
   defaultOpen?: boolean;
   /** Fired for every close the platform can originate: Escape, backdrop, the close button. */
   onOpenChange?: (open: boolean) => void;
+  /** heading above the sections */
   title?: string;
+  /** number of columns the sections flow into */
   columns?: 1 | 2;
   /** Match real keydowns and flash the matching caps. Default true. */
   liveEcho?: boolean;
   /** How long a cap stays depressed, ms. Default 180. */
   echoDuration?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

@@ -43,6 +43,7 @@ export interface VanishRunProps {
   cellSize?: number;
   /** headline / CTA centered at the vanishing point */
   children?: ReactNode;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

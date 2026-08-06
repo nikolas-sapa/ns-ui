@@ -85,14 +85,17 @@ export interface CarbonFlimsyProps {
   value?: string;
   /** Initial primary value when uncontrolled. @default "" */
   defaultValue?: string;
+  /** called with the new primary value on every keystroke */
   onValueChange?: (value: string) => void;
   /** Fires whenever the derived value changes, with whether it's still linked. */
   onDerivedChange?: (value: string, linked: boolean) => void;
   /** Transforms the primary value into the derived one. @default slugify */
   transform?: (value: string) => string;
+  /** placeholder for the primary field */
   placeholder?: string;
   /** Shown in the flimsy field while its value is empty. @default "auto-generated" */
   derivedPlaceholder?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

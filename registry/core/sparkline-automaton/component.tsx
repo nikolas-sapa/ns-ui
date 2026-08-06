@@ -144,7 +144,9 @@ export function RuleSparkline({
   strokeWidth?: number;
   /** scrub readout formatter */
   formatValue?: (value: number, index: number) => string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** accessible name for the sparkline. Default "KPI sparkline". */
   "aria-label"?: string;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);

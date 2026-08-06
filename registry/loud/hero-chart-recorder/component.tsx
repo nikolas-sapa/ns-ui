@@ -72,7 +72,9 @@ export interface PenLagProps {
   value: number;
   /** fixed vertical scale — recorder paper is calibrated, not auto-ranging */
   min?: number;
+  /** upper bound of the fixed vertical scale, paired with `min` */
   max?: number;
+  /** unit suffix appended to the readout */
   unit?: string;
   /** used in the mono readout and the aria-live summary */
   label?: string;
@@ -80,7 +82,9 @@ export interface PenLagProps {
   speed?: number;
   /** window used for the aria-live range/trend summary */
   rangeMs?: number;
+  /** formats the value for the mono readout and aria-live summary */
   formatValue?: (value: number) => string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

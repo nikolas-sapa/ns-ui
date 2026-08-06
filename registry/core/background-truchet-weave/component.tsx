@@ -53,6 +53,7 @@ function field(cx: number, cy: number, t: number): number {
 export interface TruchetWeaveProps {
   /** square tile size in px */
   tileSize?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

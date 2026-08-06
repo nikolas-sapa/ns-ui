@@ -75,9 +75,11 @@ function glyphRows(ch: string): string[] {
 }
 
 export interface AsciiMagnifyLensProps {
+  /** the magnified text */
   text: string;
   /** lens diameter in px */
   lensSize?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

@@ -65,16 +65,21 @@ export function ScissorReach({
   children: ReactNode;
   /** logical content extent in px that `children` occupies */
   contentWidth: number;
+  /** logical content height in px that `children` occupies */
   contentHeight: number;
   /** minimap panel size in px — independent of content aspect ratio, like a scrollbar rail */
   minimapWidth?: number;
+  /** minimap panel height in px */
   minimapHeight?: number;
   /** fixed viewport pane height in px */
   viewportHeight?: number;
   /** row height in px — used only to phrase the aria-valuetext readout */
   rowHeight?: number;
+  /** unit noun appended to the aria-valuetext readout, e.g. "rows" */
   unitLabel?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** accessible name for the minimap. Default "Document position". */
   "aria-label"?: string;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);

@@ -63,6 +63,7 @@ export interface ChopPressProps {
   levelNames?: string[];
   /** @default "md" */
   size?: "sm" | "md" | "lg";
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

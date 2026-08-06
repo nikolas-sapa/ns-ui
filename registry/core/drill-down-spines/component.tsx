@@ -78,6 +78,7 @@ export interface SpineStackProps {
   initial: SpineStackLevel;
   /** fires after the top (active) level settles — on mount, on push, and once a pop's cascade commits */
   onNavigate?: (id: string) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

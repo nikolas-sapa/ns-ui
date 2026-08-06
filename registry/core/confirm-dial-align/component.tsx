@@ -44,13 +44,17 @@ export function TumblerGate({
   onConfirm,
   className = "",
 }: {
+  /** label shown before confirmation */
   destructiveLabel?: ReactNode;
+  /** label shown briefly after confirmation */
   doneLabel?: ReactNode;
   /** word the type-to-confirm fallback checks against, case-insensitive */
   confirmWord?: string;
   /** starting dial offset in degrees from the index mark */
   initialAngle?: number;
+  /** called once the dial reaches the confirm mark, or the type-to-confirm word matches */
   onConfirm?: () => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const knobRef = useRef<HTMLDivElement>(null);

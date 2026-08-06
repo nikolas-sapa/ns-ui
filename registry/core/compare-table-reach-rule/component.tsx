@@ -145,6 +145,7 @@ export function ReachRuleTable({
   rows?: CompareFeatureRow[];
   /** accessible name for the matrix */
   title?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const n = tiers.length;

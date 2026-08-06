@@ -34,11 +34,13 @@ export interface FaqDepthItem {
 }
 
 export interface FaqDepthGutterProps {
+  /** the question/answer pairs, in order */
   items: FaqDepthItem[];
   /** Allow more than one answer open at once. Default false (single-open). */
   allowMultiple?: boolean;
   /** Item ids open on first render. */
   defaultOpen?: string[];
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

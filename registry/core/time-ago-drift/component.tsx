@@ -93,6 +93,7 @@ export function DriftStamp({
 }: {
   /** the moment being aged — Date, ISO string, or epoch ms */
   date: Date | string | number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const dateMs = date instanceof Date ? date.getTime() : new Date(date).getTime();

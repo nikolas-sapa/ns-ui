@@ -36,6 +36,7 @@ export interface TorsionRetryProps {
   maxNotches?: number;
   /** button label in the idle/charged state (default "Retry") */
   label?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

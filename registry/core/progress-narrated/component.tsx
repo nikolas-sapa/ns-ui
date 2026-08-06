@@ -74,7 +74,9 @@ export function ChronicleBar({
   value?: number;
   /** phases in ascending order of `at` */
   phases?: ChroniclePhase[];
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** accessible name for the progress bar. Default "Progress". */
   "aria-label"?: string;
 }) {
   const trackRef = useRef<HTMLDivElement>(null);

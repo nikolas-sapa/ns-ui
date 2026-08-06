@@ -48,12 +48,15 @@ export interface ShadowBoardProps {
   items: ShadowBoardItem[];
   /** number of silhouette slots the board previews; extra items beyond this render without a paired shadow */
   slots?: number;
+  /** heading above the board */
   title?: string;
   /** plain-text empty-state copy, exposed as the region's description */
   description?: string;
+  /** create button text */
   createLabel?: string;
   /** fired when the create button is pressed — this component does not append the item itself */
   onCreate?: () => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

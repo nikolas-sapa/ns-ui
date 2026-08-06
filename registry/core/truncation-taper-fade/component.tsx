@@ -60,6 +60,7 @@ export interface VanishTaperProps {
   text: string;
   /** How many trailing characters can taper at most. Default 12. */
   maxTailChars?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

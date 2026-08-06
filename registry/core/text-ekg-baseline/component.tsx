@@ -51,6 +51,7 @@ export const CardioBaseline = forwardRef<
     children?: string;
     /** beats per minute from the internal timer; 0 = imperative-only */
     bpm?: number;
+    /** extra classes merged onto the rendered root element */
     className?: string;
   }
 >(function CardioBaseline(

@@ -25,7 +25,9 @@ export interface PatchbayJack {
 }
 
 export interface AsciiPatchbayProps {
+  /** the patchable jacks */
   jacks?: PatchbayJack[];
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

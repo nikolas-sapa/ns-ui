@@ -112,10 +112,15 @@ export function CipherReelOtp({
   error?: boolean;
   /** helper line while error is set — the only place the error token appears */
   errorMessage?: string;
+  /** blocks all reels */
   disabled?: boolean;
+  /** focuses the first reel on mount */
   autoFocus?: boolean;
+  /** called with the current code on every digit change */
   onChange?: (code: string) => void;
+  /** called with the full code once every reel is filled */
   onComplete?: (code: string) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const fieldRef = useRef<HTMLFieldSetElement>(null);

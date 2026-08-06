@@ -118,6 +118,7 @@ export interface ReedVuProps {
    * returns straight to idle when capture stops.
    */
   onCapture?: (durationMs: number) => Promise<void> | void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

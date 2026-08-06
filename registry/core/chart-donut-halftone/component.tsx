@@ -33,9 +33,11 @@ export interface ChartDonutHalftoneDatum {
 export interface ChartDonutHalftoneProps {
   /** ordinal, low -> high tier order (e.g. size tiers, funnel stages) */
   data?: ChartDonutHalftoneDatum[];
+  /** chart title, used as the figure's accessible name */
   title?: string;
   /** unit suffix appended to the center readout, e.g. "orders" */
   unit?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

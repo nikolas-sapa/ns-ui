@@ -51,7 +51,9 @@ export interface CrimpCopyProps {
   masked?: boolean;
   /** Overrides the copy button's accessible name entirely. Never derived from `value`. */
   ariaLabel?: string;
+  /** called with the copied value after a successful copy */
   onCopy?: (value: string) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

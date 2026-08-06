@@ -23,7 +23,9 @@ export interface CropRect {
 }
 
 export interface MatCropProps {
+  /** called with the new crop rect on every drag/resize */
   onChange?: (rect: CropRect) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

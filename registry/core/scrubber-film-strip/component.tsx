@@ -60,6 +60,7 @@ export interface SprocketScrubProps {
   onValueChange?: (value: number) => void;
   /** Accessible name for the slider. Default "Scrub position". */
   label?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

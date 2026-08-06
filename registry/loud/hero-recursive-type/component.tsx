@@ -95,6 +95,7 @@ export interface NestedSlugProps {
   filler: string;
   /** lens radius in px */
   lensRadius?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 
