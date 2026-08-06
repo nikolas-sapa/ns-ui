@@ -32,7 +32,12 @@ export function ClientSwitcher({ clients }: { clients: MCPClient[] }) {
               type="button"
               aria-pressed={selected}
               onClick={() => setActive(c.id)}
-              className={`rounded-sm border px-2.5 py-1 font-mono text-[11px] uppercase tracking-wider outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none ${
+              // Wraps with a uniform 4px gap-1 on both axes, and has its own
+              // `border` (+1px inset to compensate — the pseudo's containing
+              // block is the padding box, not the border box). Capped at
+              // half the gap on both axes so wrapped rows can't overlap
+              // either: 3px CSS inset -> ~2px real reach each side.
+              className={`relative rounded-sm border px-2.5 py-1 font-mono text-[11px] uppercase tracking-wider outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none after:absolute after:-inset-[3px] after:content-[''] ${
                 selected
                   ? "border-ns-accent/40 bg-ns-accent/10 text-foreground"
                   : "border-border text-ns-muted hover:text-foreground"

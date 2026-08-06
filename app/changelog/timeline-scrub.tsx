@@ -91,7 +91,9 @@ function ScrubArrow({
       aria-label={label}
       title={label}
       onClick={onClick}
-      className="inline-flex size-7 items-center justify-center rounded-sm text-ns-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none disabled:pointer-events-none disabled:opacity-30"
+      // Capped at half the 4px gap to its sibling arrow; generous vertically
+      // (isolated row, nothing above/below at that distance) — 28x28 -> ~32x40.
+      className="relative inline-flex size-7 items-center justify-center rounded-sm text-ns-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none disabled:pointer-events-none disabled:opacity-30 after:absolute after:-inset-x-[2px] after:-inset-y-[6px] after:content-['']"
     >
       {/* Same hand-drawn chevron the Sort select and the sidebar's <details>
           use, rotated to point left/right instead of redrawn. */}

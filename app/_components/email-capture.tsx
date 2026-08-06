@@ -48,7 +48,10 @@ export function EmailCapture({ className = "" }: { className?: string }) {
         <button
           type="submit"
           disabled={pending}
-          className="shrink-0 rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none disabled:opacity-60"
+          // Capped at half the 8px gap to the email input beside it (+1px
+          // for this button's own `border` — see github-star-button.tsx for
+          // why); generous below since the caption line has slack.
+          className="relative shrink-0 rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none disabled:opacity-60 after:absolute after:-inset-x-[5px] after:-inset-y-[4px] after:content-['']"
         >
           {pending ? "Adding…" : "Subscribe"}
         </button>

@@ -132,7 +132,12 @@ export function McpPopup() {
           type="button"
           onClick={dismiss}
           aria-label="Dismiss"
-          className="inline-flex size-6 shrink-0 items-center justify-center rounded-sm text-ns-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
+          // The only other interactive element in this card is the inline
+          // "MCP server" link in the paragraph beside it — kept modest on
+          // the left in case text reflow ever lands that link's end near
+          // this button, generous on the right/vertical where the card's
+          // own pr-2.5/py-2.5 padding gives real clearance.
+          className="relative inline-flex size-6 shrink-0 items-center justify-center rounded-sm text-ns-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none after:absolute after:-inset-x-[4px] after:-inset-y-[6px] after:content-['']"
         >
           <svg
             viewBox="0 0 16 16"
