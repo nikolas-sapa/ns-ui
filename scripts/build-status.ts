@@ -12,8 +12,9 @@
 // chain has run. Same pattern as lib/autoplay.generated.json.
 //
 // Every field below is measured. Nothing here is hand-maintained, and nothing
-// is read from prose (README.md, AGENTS.md and package.json's description all
-// still claim 228 components).
+// is read from prose — README.md's counts are themselves generated (see
+// build-readme.ts), and AGENTS.md / package.json's description were fixed to
+// carry no component count rather than a number that would drift again.
 import { readFileSync, writeFileSync, existsSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";

@@ -62,8 +62,9 @@ The wiki does not restate these. Read them for the authoritative version:
 - [`AGENTS.md`](https://github.com/nikolas-sapa/ns-ui/blob/main/AGENTS.md) — the working contract for agents editing this repo: `meta.json` authority, autoplay descriptors, `useWhen`, the token rule, the verify gate.
 - [`SECURITY.md`](https://github.com/nikolas-sapa/ns-ui/blob/main/SECURITY.md), [`CODE_OF_CONDUCT.md`](https://github.com/nikolas-sapa/ns-ui/blob/main/CODE_OF_CONDUCT.md), [`CHANGELOG.md`](https://github.com/nikolas-sapa/ns-ui/blob/main/CHANGELOG.md).
 
-Note that `AGENTS.md` currently carries two stale figures of its own — it
-describes `core` as 188 components and `loud` as 40, and states that
-`public/llms.txt` is not gitignored when `.gitignore` lists it and
-`git ls-files` shows it untracked. Prefer `registry.json` and `.gitignore`
-over any prose count, including the ones on this page.
+`AGENTS.md` used to carry two stale figures of its own (a hand-typed `core`/`loud`
+split, and a claim that `public/llms.txt` was not gitignored when it is) — both
+were fixed to point at the generated source instead of a number. Prefer
+`registry.json` and `.gitignore` over any prose count, including the ones on
+this page: a hand-typed figure anywhere in this repo is a snapshot, not a
+contract, and will be wrong again eventually.

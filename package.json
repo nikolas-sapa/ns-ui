@@ -2,7 +2,7 @@
   "name": "ns-ui",
   "version": "0.1.0",
   "private": true,
-  "description": "A shadcn-compatible registry of 228 React components, each built around one interaction and gated by a Playwright screenshot suite.",
+  "description": "A shadcn-compatible registry of React components, each built around one interaction and gated by a Playwright screenshot suite. See README.md for the current count.",
   "keywords": [
     "shadcn",
     "registry",
@@ -28,7 +28,7 @@
     "dev": "next dev",
     "build": "npm run registry:build && next build",
     "start": "next start",
-    "registry:build": "node scripts/build-index.ts && node scripts/build-registry.ts && node scripts/build-llms.ts && node scripts/build-autoplay.ts && node scripts/build-contributors.ts && node scripts/build-posters.ts && node scripts/build-mcp-snapshot.ts && node scripts/build-readme.ts && node scripts/build-status.ts && node cli/scripts/build-cli-snapshot.mjs",
+    "registry:build": "node scripts/build-index.ts && node scripts/build-registry.ts && node scripts/build-llms.ts && node scripts/build-autoplay.ts && node scripts/build-contributors.ts && node scripts/build-posters.ts && node scripts/build-mcp-snapshot.ts && node scripts/build-mcp-conventions.ts && node scripts/build-readme.ts && node scripts/build-status.ts && node cli/scripts/build-cli-snapshot.mjs",
     "autoplay:build": "node scripts/build-autoplay.ts",
     "contributors:build": "node scripts/build-contributors.ts",
     "llms:build": "node scripts/build-llms.ts",
