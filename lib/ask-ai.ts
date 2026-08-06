@@ -21,6 +21,8 @@ export type AskAiSubject = {
   description: string;
   /** URLs worth telling the AI to read, most useful first. */
   urls: string[];
+  /** What kind of opinion to ask for — the registry as a whole, or one component in it. */
+  scope: "registry" | "component";
 };
 
 /** Registry-wide subject — the default, used on /connect. */
@@ -30,6 +32,7 @@ export function registrySubject(origin: string): AskAiSubject {
     description:
       "ns-ui, a shadcn-compatible registry of React + Tailwind components",
     urls: [`${origin}/llms.txt`, `${origin}/llms-full.txt`],
+    scope: "registry",
   };
 }
 
@@ -39,14 +42,23 @@ export function componentSubject(origin: string, title: string, slug: string): A
     short: title,
     description: `the "${title}" component in the ns-ui registry`,
     urls: [`${origin}/llms-full.txt`, `${origin}/components/${slug}`],
+    scope: "component",
   };
 }
 
+/**
+ * Points the AI at the actual feeds (so its answer is grounded, not
+ * hallucinated) and asks it to form a view, not just echo the docs back —
+ * the owner's ask was specifically for an opinion, not a lookup. Kept to one
+ * sentence per half so the encoded URL stays well under platform query
+ * length limits.
+ */
 export function buildPrompt(subject: AskAiSubject): string {
-  return (
-    `Read ${subject.urls.join(" and ")} — ${subject.description}. ` +
-    `Answer my questions about it and, if I want to use it, show the exact install command.`
-  );
+  const ask =
+    subject.scope === "registry"
+      ? "Give me your honest take: what it's good at, how it compares to other component registries (shadcn/ui, Radix, Origin UI, Aceternity), and which components are worth using and why."
+      : "Give me your honest take on it: what it's good for, how it compares to similar components elsewhere, and whether it's worth using over building it myself.";
+  return `Read ${subject.urls.join(" and ")} — ${subject.description}. ${ask} If I want to use it, show the exact install command.`;
 }
 
 export type AskAiPlatform = {
