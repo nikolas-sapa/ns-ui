@@ -2,6 +2,21 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Lenis (smooth-scroll.tsx) owns vertical wheel input; nothing on the page
+   claims horizontal. Left alone, a horizontal trackpad swipe with no element
+   to consume it falls through to the browser's own back/forward navigation
+   gesture — a full-page slide that reads as "the site scrolled sideways"
+   even though no element ever overflowed. `none` (not `contain`) because
+   there is no legitimate horizontal scroll at the document level to
+   preserve here — nested horizontally-scrollable regions (code blocks,
+   tables, the changelog timeline) set their own overflow-x and are
+   unaffected: this only reaches the root scroller's own overscroll chain,
+   never a descendant's. */
+html,
+body {
+  overscroll-behavior-x: none;
+}
+
 :root {
   /* Tells the UA the document's theme so native chrome — page scrollbar, the
      <select> dropdown panel, range tracks, autofill backgrounds — follows it.
