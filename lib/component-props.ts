@@ -198,17 +198,78 @@ function splitParamAndType(paramText: string): {
   return { destructure: null, annotation: null, empty: false };
 }
 
+/**
+ * `forwardRef`'s inner function destructure defaults, if the source has one
+ * (`export const X = forwardRef<Handle, Props>(function X({ a = 1 }, ref) {`).
+ * The inner function's param isn't required to repeat the `Props` annotation
+ * — the type is already bound via the `forwardRef<Handle, Props>` generic —
+ * so this doesn't check the annotation name, only that a forwardRef call
+ * exists at all.
+ */
+function forwardRefDefaults(src: string): Record<string, string> {
+  const m = src.match(/export const \w+\s*=\s*forwardRef</);
+  if (!m) return {};
+  const ltIdx = m.index! + m[0].length - 1;
+  const gtIdx = findMatch(src, ltIdx);
+  if (gtIdx < 0) return {};
+  const parenIdx = src.indexOf("(", gtIdx);
+  if (parenIdx < 0) return {};
+  const callText = paramTextAt(src, parenIdx);
+  if (callText === null) return {};
+  const fnMatch = callText.match(/function\s+\w+\s*\(/);
+  let innerParamText: string | null = null;
+  if (fnMatch) {
+    const innerParenIdx = parenIdx + 1 + fnMatch.index! + fnMatch[0].length - 1;
+    innerParamText = paramTextAt(src, innerParenIdx);
+  } else {
+    innerParamText = callText;
+  }
+  if (!innerParamText) return {};
+  const brace = leadingBrace(innerParamText);
+  return brace ? parseDefaults(brace) : {};
+}
+
+/**
+ * Destructuring defaults for whichever exported function's param annotation
+ * matches `propsTypeName` exactly (`export function X({ a = 1 }: XProps)`).
+ * Scans every `export function \w+(` / `export const \w+ = (` candidate
+ * rather than just the first, so a file with more than one exported function
+ * doesn't silently borrow defaults from the wrong one; only an exact
+ * annotation match is trusted.
+ */
+function annotatedDefaults(src: string, propsTypeName: string): Record<string, string> {
+  const re = /export function \w+\s*\(|export const \w+\s*=\s*\(/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(src))) {
+    const parenIdx = m.index + m[0].length - 1;
+    const callText = paramTextAt(src, parenIdx);
+    if (callText === null) continue;
+    const { destructure, annotation } = splitParamAndType(callText);
+    if (annotation === propsTypeName && destructure) return parseDefaults(destructure);
+  }
+  return {};
+}
+
 /** Recognizes: named Props type, `export function Name(`, and `forwardRef<Handle, Props>(`. */
 function extractComponentProps(src: string): Extracted | null {
   let m =
-    src.match(/export interface \w+Props\s*\{/) ?? src.match(/export type \w+Props\s*=\s*\{/);
+    src.match(/export interface (\w+Props)\s*\{/) ?? src.match(/export type (\w+Props)\s*=\s*\{/);
   if (m) {
+    const propsTypeName = m[1];
     const braceIdx = m.index! + m[0].length - 1;
     const close = findMatch(src, braceIdx);
     if (close > 0) {
       const body = src.slice(braceIdx + 1, close);
       const members = splitTop(body, ";").map(parseMember).filter((mm): mm is Member => mm !== null);
-      return { segments: [{ kind: "object", members }], defaults: {} };
+      // Prefer a function whose param is explicitly annotated with this
+      // exact props type; fall back to a forwardRef inner function (whose
+      // binding comes from the generic, not a param annotation) when no
+      // annotated match exists.
+      const defaults =
+        Object.keys(annotatedDefaults(src, propsTypeName)).length > 0
+          ? annotatedDefaults(src, propsTypeName)
+          : forwardRefDefaults(src);
+      return { segments: [{ kind: "object", members }], defaults };
     }
   }
 
@@ -220,25 +281,7 @@ function extractComponentProps(src: string): Extracted | null {
       const generic = src.slice(ltIdx + 1, gtIdx);
       const parts = splitTop(generic, ",");
       const propsTypeText = parts[1];
-      let defaults: Record<string, string> = {};
-      const parenIdx = src.indexOf("(", gtIdx);
-      if (parenIdx > -1) {
-        const callText = paramTextAt(src, parenIdx);
-        if (callText !== null) {
-          const fnMatch = callText.match(/function\s+\w+\s*\(/);
-          let innerParamText: string | null = null;
-          if (fnMatch) {
-            const innerParenIdx = parenIdx + 1 + fnMatch.index! + fnMatch[0].length - 1;
-            innerParamText = paramTextAt(src, innerParenIdx);
-          } else {
-            innerParamText = callText;
-          }
-          if (innerParamText) {
-            const brace = leadingBrace(innerParamText);
-            if (brace) defaults = parseDefaults(brace);
-          }
-        }
-      }
+      const defaults = forwardRefDefaults(src);
       if (propsTypeText) return { segments: parseTypeAnnotation(propsTypeText), defaults };
     }
   }
