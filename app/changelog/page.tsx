@@ -56,7 +56,10 @@ export default function ChangelogPage() {
             neighbour. TimelineScrub carries whatever doesn't fit the
             viewport (scroll rail + on-screen/keyboard arrows) instead of
             letting it render off past the visible edge unreachable. */}
-        <TimelineScrub minWidth={Math.max(560, events.length * 64)}>
+        <TimelineScrub
+          minWidth={Math.max(560, events.length * 64)}
+          eventCount={events.length}
+        >
           <Strandline
             events={events}
             // Every release breaks on load — the whole history, not a teaser.
