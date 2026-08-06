@@ -4,6 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 const STORAGE_KEY = "ns-ui-mcp-notice-dismissed";
+// Separate from STORAGE_KEY: a view is "the card actually appeared on
+// screen," counted independently of whether the visitor ever interacted
+// with it. Once MAX_VIEWS is reached the card retires itself even though
+// nobody ever clicked the dismiss button — same "seen it enough times"
+// contract as an explicit close, just triggered by count instead of intent.
+const VIEWS_KEY = "ns-ui-mcp-notice-views";
+const MAX_VIEWS = 2;
 const DELAY_MS = 4000;
 // The card's own copy is two short clauses ("This registry also runs as an
 // MCP server, for agents that want it directly.") — about 3-4s at a
@@ -97,15 +104,29 @@ export function McpPopup() {
   useEffect(() => {
     setMounted(true);
     try {
-      setDismissed(localStorage.getItem(STORAGE_KEY) === "1");
+      const closedBefore = localStorage.getItem(STORAGE_KEY) === "1";
+      const views = Number(localStorage.getItem(VIEWS_KEY) ?? "0");
+      setDismissed(closedBefore || views >= MAX_VIEWS);
     } catch {
+      // Private mode / storage blocked — can't remember views or dismissal,
+      // so degrade to showing rather than silently never showing.
       setDismissed(false);
     }
   }, []);
 
   useEffect(() => {
     if (!mounted || dismissed) return;
-    const id = window.setTimeout(() => setVisible(true), DELAY_MS);
+    const id = window.setTimeout(() => {
+      setVisible(true);
+      // Count this as a view the moment it actually appears, not on mount —
+      // a visitor who leaves before DELAY_MS never saw it.
+      try {
+        const views = Number(localStorage.getItem(VIEWS_KEY) ?? "0") + 1;
+        localStorage.setItem(VIEWS_KEY, String(views));
+      } catch {
+        /* private mode / storage disabled — view just won't be counted */
+      }
+    }, DELAY_MS);
     return () => window.clearTimeout(id);
   }, [mounted, dismissed]);
 
