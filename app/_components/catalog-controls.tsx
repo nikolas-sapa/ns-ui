@@ -138,7 +138,13 @@ export function CatalogControls({
                 type="button"
                 aria-pressed={selected}
                 onClick={() => onFilter(t.key)}
-                className={`min-h-11 rounded-sm px-2.5 py-1 text-sm outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-ns-accent sm:min-h-0 ${
+                // Already 44px tall below `sm` (min-h-11). At `sm`+ it drops
+                // to its content height (~28px) to sit quietly beside the
+                // chips — the ::after there grows the click region instead
+                // of the box, capped at half the 4px gap to its neighbor
+                // tab, generous vertically (11px+ of slack to the chip row
+                // below) — ~28 -> ~40px tall.
+                className={`relative min-h-11 rounded-sm px-2.5 py-1 text-sm outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-ns-accent sm:min-h-0 sm:after:absolute sm:after:-inset-x-[2px] sm:after:-inset-y-[6px] sm:after:content-[''] ${
                   selected
                     ? "bg-surface font-medium text-foreground"
                     : "text-ns-muted hover:text-foreground"
@@ -169,7 +175,16 @@ export function CatalogControls({
             type="button"
             aria-pressed={newOnly}
             onClick={() => onNewOnly(!newOnly)}
-            className={`min-h-11 shrink-0 rounded-sm border px-2.5 py-1 text-sm outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-ns-accent sm:min-h-0 ${
+            // Same treatment as the collection tabs above — ::after only at
+            // `sm`+, capped at half the row's own gap to the search field
+            // beside it.
+            // +1px beyond the intended 3/6px: this button has its own
+            // `border`, and an absolutely positioned pseudo's containing
+            // block is the parent's *padding* box (inside the border) — so
+            // an unmodified -inset-x-[3px] only reaches 2px past the visible
+            // (border) edge. Confirmed with elementFromPoint, not just the
+            // class list.
+            className={`relative min-h-11 shrink-0 rounded-sm border px-2.5 py-1 text-sm outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-ns-accent sm:min-h-0 sm:after:absolute sm:after:-inset-x-[4px] sm:after:-inset-y-[7px] sm:after:content-[''] ${
               newOnly
                 ? "border-border bg-surface font-medium text-foreground"
                 : "border-transparent text-ns-muted hover:text-foreground"
@@ -276,7 +291,14 @@ export function CatalogControls({
                 type="button"
                 aria-pressed={on}
                 onClick={() => onCategory(on ? null : c.id)}
-                className={`flex min-h-11 items-center justify-center rounded-full border px-2.5 py-1 text-xs outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:min-h-0 sm:w-auto sm:shrink-0 sm:justify-start ${
+                // Grid cells (below `sm`) already give each chip a min-h-11
+                // cell. At `sm`+, chips pack at a measured 6px gap — the
+                // ::after there is capped at half that (3px) so neighbors
+                // never overlap, plus a bit more vertically where the wrap
+                // row has slack — ~26px -> ~34px tall.
+                // +1px beyond the intended 3/4px — same border-vs-padding-box
+                // containing-block correction as the New toggle above.
+                className={`relative flex min-h-11 items-center justify-center rounded-full border px-2.5 py-1 text-xs outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:min-h-0 sm:w-auto sm:shrink-0 sm:justify-start sm:after:absolute sm:after:-inset-x-[4px] sm:after:-inset-y-[5px] sm:after:content-[''] ${
                   on
                     ? "border-ns-accent bg-ns-accent text-white"
                     : "border-border text-ns-muted hover:border-ns-muted hover:text-foreground"
@@ -310,7 +332,10 @@ export function CatalogControls({
         <button
           type="button"
           onClick={onClearAll}
-          className={`flex min-h-11 shrink-0 items-center rounded-sm px-1.5 py-1 text-xs text-ns-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent sm:min-h-0 catalog-gate-clear ${
+          // Only non-interactive text (the result-count <p>) and the row's
+          // own end sit near this at `sm`+, so the ::after there can be
+          // generous rather than capped to a half-gap.
+          className={`relative flex min-h-11 shrink-0 items-center rounded-sm px-1.5 py-1 text-xs text-ns-muted underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent sm:min-h-0 sm:after:absolute sm:after:-inset-[8px] sm:after:content-[''] catalog-gate-clear ${
             filtered ? "" : "hidden"
           } transition-colors`}
         >

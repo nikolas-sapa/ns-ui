@@ -38,7 +38,12 @@ export function ThemeToggle() {
       aria-label={mounted ? (isDark ? "Switch to light theme" : "Switch to dark theme") : "Toggle theme"}
       aria-pressed={mounted ? isDark : undefined}
       suppressHydrationWarning
-      className="inline-flex size-8 shrink-0 items-center justify-center rounded-sm text-ns-muted outline-none transition-colors motion-reduce:transition-none hover:bg-border/60 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      // Visual size is unchanged (size-8); the ::after grows only the
+      // clickable region, capped at half the 4px flex gap to the ⌘K
+      // trigger/hide-sidebar buttons on either side so it can't steal their
+      // clicks, and generously vertically (12px+ of slack above/below in
+      // this row) — 32x32 -> ~36x44.
+      className="relative inline-flex size-8 shrink-0 items-center justify-center rounded-sm text-ns-muted outline-none transition-colors motion-reduce:transition-none hover:bg-border/60 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background after:absolute after:-inset-x-[2px] after:-inset-y-[6px] after:content-['']"
     >
       <SunIcon className="dark:hidden" />
       <MoonIcon className="hidden dark:block" />

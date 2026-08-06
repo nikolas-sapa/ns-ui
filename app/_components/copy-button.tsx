@@ -45,11 +45,20 @@ export function CopyButton({
   );
 
   const base =
-    "inline-flex shrink-0 items-center justify-center rounded-sm text-ns-muted " +
+    "relative inline-flex shrink-0 items-center justify-center rounded-sm text-ns-muted " +
     "outline-none transition-colors motion-reduce:transition-none " +
     "hover:bg-border/60 hover:text-foreground  transition-colors" +
     "focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 " +
     "focus-visible:ring-offset-background";
+
+  // "icon" is the card corner (preview-card.tsx / featured-card.tsx): its
+  // nearest interactive neighbor is the title block, guaranteed at least
+  // 12px away by the row's own flex gap, so the ::after is capped at half
+  // that on the left and left generous on the right (open space to the grid
+  // gutter) — 28x28 -> ~40x40. "inline" (the header install bar) is left
+  // alone — that one sits flush against a text field with no such gap.
+  const iconOverlay =
+    variant === "icon" ? "after:absolute after:-inset-x-[6px] after:-inset-y-[6px] after:content-['']" : "";
 
   return (
     <button
@@ -59,7 +68,7 @@ export function CopyButton({
       title={copied ? "Copied" : label}
       className={`${base} ${
         variant === "icon" ? "size-7" : "size-8"
-      } ${className}`}
+      } ${iconOverlay} ${className}`}
     >
       {copied ? <CheckIcon /> : <CopyIcon />}
     </button>
