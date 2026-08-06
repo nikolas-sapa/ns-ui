@@ -40,7 +40,7 @@ export function SavedLibrary({ items, slugs, initialFolders, handle }: { items: 
   const [newFolder, setNewFolder] = useState("");
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
-  const { registerRef, isActive } = useMountManager({ mountCap: MOUNT_CAP, preloadMargin: PRELOAD_MARGIN });
+  const { registerRef, isActive, isOnScreen } = useMountManager({ mountCap: MOUNT_CAP, preloadMargin: PRELOAD_MARGIN });
   const byName = useMemo(() => new Map(items.map((item) => [item.name, item])), [items]);
   const folder = folders.find((entry) => entry.id === selected);
   const visibleSlugs = selected === "all" ? slugs : folder?.slugs ?? [];
@@ -203,6 +203,7 @@ export function SavedLibrary({ items, slugs, initialFolders, handle }: { items: 
                 key={item.name}
                 item={item}
                 active={isActive(item.name)}
+                onScreen={isOnScreen(item.name)}
                 registerRef={registerRef}
               >
                 <div className="flex items-center gap-2 border-t border-border px-3 py-2">
@@ -234,11 +235,14 @@ export function SavedLibrary({ items, slugs, initialFolders, handle }: { items: 
 function SavedCard({
   item,
   active,
+  onScreen,
   registerRef,
   children,
 }: {
   item: Item;
   active: boolean;
+  /** True viewport visibility — see `LivePreviewFrame`'s `onScreen`. */
+  onScreen: boolean;
   registerRef: (name: string, el: HTMLElement | null) => void;
   children: React.ReactNode;
 }) {
@@ -265,6 +269,7 @@ function SavedCard({
           name={item.name}
           title={item.title}
           active={active}
+          onScreen={onScreen}
           className="aspect-[16/10] w-full rounded-none border-0 border-b border-border"
         >
           <div

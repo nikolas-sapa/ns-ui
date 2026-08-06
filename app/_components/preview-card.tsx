@@ -34,6 +34,7 @@ export type RegistryEntry = {
 export function PreviewCard({
   entry,
   active,
+  onScreen,
   registerRef,
   installCommand,
   saved,
@@ -43,6 +44,8 @@ export function PreviewCard({
 }: {
   entry: RegistryEntry;
   active: boolean;
+  /** True viewport visibility — see `LivePreviewFrame`'s `onScreen`. */
+  onScreen: boolean;
   registerRef: (name: string, el: HTMLElement | null) => void;
   installCommand: string;
   saved: boolean;
@@ -88,6 +91,7 @@ export function PreviewCard({
         name={entry.name}
         title={entry.title}
         active={active}
+        onScreen={onScreen}
         onStateChange={setPreviewState}
         className="aspect-[16/10] w-full transition-colors duration-200 group-hover:border-ns-muted/60 group-has-[a:focus-visible]/focus:ring-2 group-has-[a:focus-visible]/focus:ring-ns-accent group-has-[a:focus-visible]/focus:ring-offset-2 group-has-[a:focus-visible]/focus:ring-offset-background motion-reduce:transition-none"
       >

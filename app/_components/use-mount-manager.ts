@@ -27,12 +27,18 @@ export function useMountManager({
   const near = useRef(new Set<string>());
   const frame = useRef<number | null>(null);
   const [mounted, setMounted] = useState<Set<string>>(() => new Set());
+  // The subset of `mounted` that is actually inside the true viewport (no
+  // preload margin) — the same rects `recompute` already computes to decide
+  // eviction order, just kept around instead of thrown away. This is what a
+  // mounted-but-off-screen preview (e.g. a preload card just past the fold)
+  // is paused against — see `LivePreviewFrame`'s visibility postMessage.
+  const [onScreen, setOnScreen] = useState<Set<string>>(() => new Set());
   const observer = useRef<IntersectionObserver | null>(null);
 
   const recompute = useCallback(() => {
     frame.current = null;
     const vh = window.innerHeight;
-    const onScreen: string[] = [];
+    const onScreenNames: string[] = [];
     const offScreen: { name: string; dist: number }[] = [];
 
     for (const name of near.current) {
@@ -40,14 +46,14 @@ export function useMountManager({
       if (!el) continue;
       const r = el.getBoundingClientRect();
       if (r.bottom > 0 && r.top < vh) {
-        onScreen.push(name);
+        onScreenNames.push(name);
       } else {
         const centre = (r.top + r.bottom) / 2;
         offScreen.push({ name, dist: Math.abs(centre - vh / 2) });
       }
     }
 
-    const next = new Set(onScreen);
+    const next = new Set(onScreenNames);
     offScreen.sort((a, b) => a.dist - b.dist);
     for (const o of offScreen) {
       if (next.size >= mountCap) break;
@@ -59,6 +65,14 @@ export function useMountManager({
         return prev;
       }
       return next;
+    });
+
+    const nextOnScreen = new Set(onScreenNames);
+    setOnScreen((prev) => {
+      if (prev.size === nextOnScreen.size && [...nextOnScreen].every((n) => prev.has(n))) {
+        return prev;
+      }
+      return nextOnScreen;
     });
   }, [mountCap]);
 
@@ -115,6 +129,7 @@ export function useMountManager({
   );
 
   const isActive = useCallback((name: string) => mounted.has(name), [mounted]);
+  const isOnScreen = useCallback((name: string) => onScreen.has(name), [onScreen]);
 
-  return { registerRef, isActive };
+  return { registerRef, isActive, isOnScreen };
 }
