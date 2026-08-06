@@ -12,7 +12,12 @@ export default function NotFound() {
   return (
     <main className="flex min-h-screen flex-col bg-background">
       <ThemeReassert />
-      <header className="border-b border-border px-6 py-4 sm:px-10">
+      {/* pl-14 clears the fixed mobile nav toggle (SiteShell, 44px at left-3
+          top-3) — this page renders its own thin header instead of
+          SiteShell's, so it needs the same clearance that header's own
+          wordmark row gives itself. Reset to the header's normal px-10 left
+          inset at `lg`, where the toggle is `lg:hidden`. */}
+      <header className="border-b border-border py-4 pl-14 pr-6 sm:pr-10 lg:pl-10">
         <a
           href="/"
           className="rounded-sm font-mono text-xs uppercase tracking-[0.18em] text-ns-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
