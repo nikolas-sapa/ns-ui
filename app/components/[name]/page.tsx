@@ -317,7 +317,12 @@ export default async function ComponentPage({
               {prevItem ? (
                 <Link
                   href={`/components/${prevItem.name}`}
-                  className="group rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
+                  // -my-3 py-3: the padding grows the link's own click box,
+                  // the matching negative margin cancels it back out of the
+                  // grid's flow, so neighbors above/below don't shift. The
+                  // grid column already gives full width, so only height
+                  // needed the help — ~35px -> ~59px tall.
+                  className="group -my-3 block rounded-sm py-3 outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
                 >
                   <span className="font-mono text-[11px] uppercase tracking-wider text-ns-muted">
                     Previous
@@ -332,7 +337,7 @@ export default async function ComponentPage({
               {nextItem ? (
                 <Link
                   href={`/components/${nextItem.name}`}
-                  className="group rounded-sm text-right outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
+                  className="group -my-3 block rounded-sm py-3 text-right outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
                 >
                   <span className="font-mono text-[11px] uppercase tracking-wider text-ns-muted">
                     Next

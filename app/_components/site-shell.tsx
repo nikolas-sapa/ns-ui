@@ -33,6 +33,14 @@ const isBarePreview = (pathname: string) =>
 const LINK =
   "block truncate rounded-sm px-2 py-1 text-sm outline-none transition-colors hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none";
 
+/** The Install/Theming/Categories/…/Status row at the foot of the sidebar.
+ *  Rows are packed tight (measured: 12px horizontal gap, 6px vertical gap
+ *  between wrapped rows), so the ::after here is capped at half of each —
+ *  the honest ceiling given the row's own spacing, not a full 44px target.
+ *  Measured before/after: ~46-66x16.5 -> ~58-78x22.5. */
+const BOTTOM_BAR_LINK =
+  "relative rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none after:absolute after:-inset-x-[6px] after:-inset-y-[3px] after:content-['']";
+
 /** Which categories/kinds are open, beyond the current page's own section —
  *  persisted so a visitor's browsing structure survives navigation.
  *
@@ -351,7 +359,11 @@ export function SiteShell({
               type="button"
               onClick={() => setCmdkOpen(true)}
               aria-label="Open command palette"
-              className="inline-flex items-center gap-1 rounded-sm px-1.5 py-1 text-ns-muted outline-none transition-colors hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
+              // ::after grows the click region only — capped at half the 4px
+              // gap to the theme toggle beside it, generous vertically (this
+              // row is 64px tall and the button sits centered in it) —
+              // ~40x23 -> ~44x43.
+              className="relative inline-flex items-center gap-1 rounded-sm px-1.5 py-1 text-ns-muted outline-none transition-colors hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none after:absolute after:-inset-x-[2px] after:-inset-y-[10px] after:content-['']"
             >
               <SearchIcon />
               <kbd className="hidden font-mono text-[10px] sm:inline">⌘K</kbd>
@@ -369,7 +381,10 @@ export function SiteShell({
               onClick={() => setSidebarHiddenPersisted(true)}
               aria-expanded={mounted ? !sidebarHidden : undefined}
               aria-controls="site-nav"
-              className="hidden size-6 shrink-0 items-center justify-center rounded-sm text-ns-muted outline-none transition-colors hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none lg:inline-flex"
+              // ::after grows the click region only — capped at half the
+              // ~28px gap to the theme toggle on its left (well clear of it),
+              // generous vertically like its row siblings — 24x24 -> ~36x44.
+              className="relative hidden size-6 shrink-0 items-center justify-center rounded-sm text-ns-muted outline-none transition-colors hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none lg:inline-flex after:absolute after:-inset-x-[6px] after:-inset-y-[10px] after:content-['']"
             >
               <span className="sr-only">Hide sidebar</span>
               <RailChevron direction="left" />
@@ -463,64 +478,34 @@ export function SiteShell({
             sidebar's fixed width — it never affects Changelog/Writing/Connect
             themselves, which stay on the first line at any name length. */}
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-border px-4 py-3 font-mono text-[11px] text-ns-muted">
-          <Link
-            href="/install"
-            className="rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
-          >
+          <Link href="/install" className={BOTTOM_BAR_LINK}>
             Install
           </Link>
-          <Link
-            href="/theming"
-            className="rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
-          >
+          <Link href="/theming" className={BOTTOM_BAR_LINK}>
             Theming
           </Link>
-          <Link
-            href="/categories"
-            className="rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
-          >
+          <Link href="/categories" className={BOTTOM_BAR_LINK}>
             Categories
           </Link>
-          <Link
-            href="/changelog"
-            className="rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
-          >
+          <Link href="/changelog" className={BOTTOM_BAR_LINK}>
             Changelog
           </Link>
-          <Link
-            href="/writing"
-            className="rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
-          >
+          <Link href="/writing" className={BOTTOM_BAR_LINK}>
             Writing
           </Link>
-          <Link
-            href="/community"
-            className="rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
-          >
+          <Link href="/community" className={BOTTOM_BAR_LINK}>
             Community
           </Link>
-          <Link
-            href="/guidelines"
-            className="rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
-          >
+          <Link href="/guidelines" className={BOTTOM_BAR_LINK}>
             Guidelines
           </Link>
-          <Link
-            href="/submit"
-            className="rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
-          >
+          <Link href="/submit" className={BOTTOM_BAR_LINK}>
             Submit
           </Link>
-          <Link
-            href="/connect"
-            className="rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
-          >
+          <Link href="/connect" className={BOTTOM_BAR_LINK}>
             Connect
           </Link>
-          <Link
-            href="/status"
-            className="rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
-          >
+          <Link href="/status" className={BOTTOM_BAR_LINK}>
             Status
           </Link>
           {/* Hydration-only — see site-auth.tsx for why it fetches nothing
