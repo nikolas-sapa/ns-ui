@@ -382,33 +382,12 @@ export function SiteShell({
           >
             ns-ui
           </Link>
-          <div className="flex items-center gap-1">
-            {/* Site-wide jump-to (command-palette.tsx) — searches every
-                component and route, not just this tree, so it's worth its
-                own affordance rather than living only behind ⌘K. */}
-            <button
-              type="button"
-              onClick={() => setCmdkOpen(true)}
-              aria-label="Open command palette"
-              // Went 44x22 -> 52.4x28 -> still read small next to the theme
-              // toggle beside it once both were on screen together. This
-              // pass: size-4 icon -> size-5, text-xs kbd -> text-sm, tighter
-              // px-2/py-1.5 -> px-3/py-2, gap-1.5 -> gap-2. Measured (visual
-              // box, getBoundingClientRect): 52.4x28 -> 68.8x36. ::after
-              // grows the click region only — capped at half the 4px gap to
-              // the theme toggle on its right (still resolves to this
-              // button through +1px past its own edge, the theme toggle
-              // from +2px on), generous vertically (this row is 64px tall
-              // and the button sits centered in it) — 68.8x36 -> ~72.8x52.
-              className="relative inline-flex items-center gap-2 rounded-sm px-3 py-2 text-ns-muted outline-none transition-colors hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none after:absolute after:-inset-x-[2px] after:-inset-y-[8px] after:content-['']"
-            >
-              <SearchIcon className="size-5" />
-              <kbd className="hidden font-mono text-sm sm:inline">⌘K</kbd>
-            </button>
-            {/* Grown alongside the ⌘K trigger (size-8 -> size-9, icon
-                size-3.5 -> size-4) so the two stay proportionate — the pair
-                reads as one cluster and letting only one grow would tip it
-                back out of balance. */}
+          <div className="flex items-center gap-2.5">
+            {/* Grown alongside the old ⌘K trigger that used to sit here
+                (size-8 -> size-9, icon size-3.5 -> size-4). Now that the
+                trigger has moved to its own full-width row below, this is
+                back to being one of two controls in the cluster rather than
+                three, which is the room it was missing. */}
             <ThemeToggle />
             <span className="font-mono text-[11px] text-ns-muted">{total}</span>
             {/* Desktop-only: collapses the whole sidebar, not a section
@@ -416,15 +395,17 @@ export function SiteShell({
                 below, which never remove the nav itself. Hidden below `lg`
                 because the mobile drawer already has its own close
                 affordance (the hamburger button above); this would just be
-                a second, redundant way to dismiss the same panel there. */}
+                a second, redundant way to dismiss the same panel there.
+                ::after grows the click region only — capped at half the gap
+                to the theme toggle on its left, generous vertically like its
+                row siblings — 24x24 -> ~36x44. Re-measured after the ⌘K
+                trigger left this row: nothing to its left now but the theme
+                toggle + count, well clear either way. */}
             <button
               type="button"
               onClick={() => setSidebarHiddenPersisted(true)}
               aria-expanded={mounted ? !sidebarHidden : undefined}
               aria-controls="site-nav"
-              // ::after grows the click region only — capped at half the
-              // ~28px gap to the theme toggle on its left (well clear of it),
-              // generous vertically like its row siblings — 24x24 -> ~36x44.
               className="relative hidden size-6 shrink-0 items-center justify-center rounded-sm text-ns-muted outline-none transition-colors hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none lg:inline-flex after:absolute after:-inset-x-[6px] after:-inset-y-[10px] after:content-['']"
             >
               <span className="sr-only">Hide sidebar</span>
@@ -434,15 +415,41 @@ export function SiteShell({
         </div>
 
         <div className="px-4 pb-3">
-          {/* "sidebar" in both the visible text and the label — this box and
-              the catalog's own search sit in near-identical bordered fields
-              and, before this, both just said "Search"/"Filter components":
-              nothing on screen said they're two different result sets
-              (this narrows the tree, the catalog's narrows the grid), so
-              typing in one and expecting the other to react was a
-              reasonable, wrong assumption. Labelled apart rather than
-              wired together — they genuinely answer different questions. */}
-          <div className="search-trace-field relative rounded-md">
+          {/* Site-wide jump-to (command-palette.tsx), redesigned as a proper
+              search field rather than a scaled-up chip: full-width, bordered,
+              magnifier left, muted placeholder, ⌘K hint right-aligned — the
+              pattern shadcn/Linear/Vercel/Radix docs all converge on for this
+              exact job. It is a <button>, not an <input readOnly>: a real
+              input would take a text caret, break Space-to-activate and
+              fight the global ⌘K listener below, where a button gets
+              Enter/Space for free and needs no extra wiring. Measured (visual
+              box): 322x44 at the sidebar's 17rem width. */}
+          <button
+            type="button"
+            onClick={() => setCmdkOpen(true)}
+            aria-label="Search components and pages"
+            className="search-trace-field group/cmdk relative flex w-full items-center gap-2 rounded-md border border-border bg-surface px-3 py-2.5 text-left text-sm text-ns-muted outline-none transition-colors hover:border-ns-accent/40 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
+          >
+            <SearchIcon className="size-4 shrink-0" />
+            <span className="flex-1 truncate">Search components…</span>
+            <kbd className="hidden shrink-0 rounded-sm border border-border bg-background px-1.5 py-0.5 font-mono text-[11px] text-ns-muted transition-colors group-hover/cmdk:border-ns-accent/40 motion-reduce:transition-none sm:inline">
+              ⌘K
+            </kbd>
+            <span aria-hidden className="search-trace pointer-events-none motion-reduce:hidden" />
+          </button>
+        </div>
+
+        {/* The tree's own filter — visually subordinate to the search field
+            above (borderless, funnel glyph, small type) rather than a second
+            bordered box that reads as the same control twice. This project
+            already got bitten once by exactly that: two near-identical
+            bordered search fields (this one and the catalog's) with nothing
+            on screen saying they answer different questions — see the
+            comment this replaced. Grouped below with Expand/Collapse, its
+            fellow tree controls, instead of living up in the header cluster. */}
+        <div className="px-4 pb-1.5">
+          <div className="relative flex items-center gap-1.5 rounded-sm text-ns-muted focus-within:text-foreground">
+            <FunnelIcon className="size-3 shrink-0" />
             <input
               type="search"
               value={query}
@@ -457,9 +464,8 @@ export function SiteShell({
               }}
               placeholder="Filter sidebar"
               aria-label="Filter sidebar"
-              className="w-full rounded-md border border-border bg-surface px-2.5 py-1.5 text-sm outline-none placeholder:text-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent"
+              className="w-full bg-transparent py-1 text-xs outline-none placeholder:text-ns-muted"
             />
-            <span aria-hidden className="search-trace pointer-events-none motion-reduce:hidden" />
           </div>
         </div>
 
@@ -769,6 +775,26 @@ function RailChevron({ direction }: { direction: "left" | "right" }) {
       aria-hidden
     >
       <path d="M4 6l4 4 4-4" />
+    </svg>
+  );
+}
+
+/** The tree filter's glyph — deliberately not `SearchIcon` (command-palette.tsx),
+ *  so the two fields never read as the same control by icon alone: this one
+ *  narrows a list already on screen, that one jumps somewhere else. */
+function FunnelIcon({ className = "size-3" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <path d="M2.5 3h11l-4 5v4l-3 1.5V8L2.5 3Z" />
     </svg>
   );
 }

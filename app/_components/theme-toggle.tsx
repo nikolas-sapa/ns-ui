@@ -38,12 +38,12 @@ export function ThemeToggle() {
       aria-label={mounted ? (isDark ? "Switch to light theme" : "Switch to dark theme") : "Toggle theme"}
       aria-pressed={mounted ? isDark : undefined}
       suppressHydrationWarning
-      // Bumped size-8 -> size-9 alongside the ⌘K trigger's own enlargement
-      // (see site-shell.tsx), so the two controls stay proportionate as a
-      // cluster rather than the toggle reading small next to a bigger
-      // neighbor. The ::after still only grows the clickable region, capped
-      // at half the 4px flex gap to the ⌘K trigger/hide-sidebar buttons on
-      // either side so it can't steal their clicks, and generously
+      // Bumped size-8 -> size-9 in the header cluster (see site-shell.tsx).
+      // The ⌘K trigger that used to sit beside this button now lives on its
+      // own full-width row below the header — this toggle's only neighbor in
+      // the cluster is the hide-sidebar button on its right. The ::after
+      // still only grows the clickable region, capped at half the 4px flex
+      // gap to that neighbor so it can't steal its clicks, and generously
       // vertically (12px+ of slack above/below in this row) — 36x36 -> ~40x48
       // (visual box measured 36x36 via getBoundingClientRect).
       className="relative inline-flex size-9 shrink-0 items-center justify-center rounded-sm text-ns-muted outline-none transition-colors motion-reduce:transition-none hover:bg-border/60 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background after:absolute after:-inset-x-[2px] after:-inset-y-[6px] after:content-['']"

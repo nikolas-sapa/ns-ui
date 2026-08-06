@@ -201,10 +201,15 @@
   animation: search-trace 5.5s linear infinite;
 }
 
-/* The focus ring reads as the input's own state, not something this trace
+/* The focus ring reads as the field's own state, not something this trace
    should compete with — hide the trace the moment :focus-visible lands
-   rather than layering a second glow on top of it. */
-.search-trace-field:has(:focus-visible) .search-trace {
+   rather than layering a second glow on top of it. Two selectors: an
+   `<input>` field carries `.search-trace-field` on a wrapper AROUND the
+   focusable element (:has() catches that descendant), but the ⌘K trigger
+   is itself the focusable `<button>` — :has() only matches descendants, not
+   self, so that one needs the bare :focus-visible form too. */
+.search-trace-field:has(:focus-visible) .search-trace,
+.search-trace-field:focus-visible .search-trace {
   opacity: 0;
 }
 

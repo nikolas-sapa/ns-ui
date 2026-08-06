@@ -3,6 +3,36 @@
 Single source of truth for the /changelog page. Each entry is a `## vX.Y.Z - YYYY-MM-DD`
 heading, a `###` title, then one paragraph of body. Newest first.
 
+## v0.22.0 - 2026-08-06
+
+### A search field instead of a chip, and chrome that now reaches every page
+
+The ⌘K trigger had been getting scaled up for two rounds running — bigger font, bigger
+padding, same small chip — and still read as something that got inflated rather than
+designed. It's now a proper full-width search field in the sidebar header: magnifier,
+muted "Search components…" placeholder, the ⌘K hint right-aligned in its own kbd chip,
+opening the same palette it always did. The sidebar's own tree filter, which used to sit
+in an identical bordered box one row below and had already caused visitors to assume the
+two searched the same thing, is now visually subordinate — borderless, a funnel glyph,
+grouped with Expand/Collapse instead of dressed as a second search bar. Every one of the
+298 component pages was missing the theme toggle entirely before this pass; it's in the
+shell now, alongside a skip link and prev/next navigation between components. The footer
+is regrouped into four columns instead of one long run. Smooth scroll (Lenis) and a custom
+cursor now run site-wide rather than on isolated pages. `/preview/<slug>/play` is gone,
+folded into `/components/<slug>` with a permanent redirect from the old address, and every
+component demo now renders inside one shared framed stage — the fixed 520px well that used
+to clip taller heroes is gone with it. Canonical tags, noindex on the pages that shouldn't
+rank, seven dedicated OpenGraph images and an RSS feed for `/writing` are new. Click
+targets were enlarged across 18 routes, and this is the first pass at a mobile layout below
+1440px. `/install` and `/theming` are new documentation routes, and the MCP server's token
+list is now generated straight from `globals.css` instead of hand-maintained. Saved
+components show live previews instead of static placeholders, and props tables show real
+default values — 196 of 298 components had been silently missing them. An Ask AI launcher
+now sits on `/connect`, every component page, the footer and the homepage; its own popup
+auto-dismisses and stops appearing at all after two views instead of nagging indefinitely.
+`/status` can no longer fail a production build over a slow CDN response. Copy buttons were
+added to descriptions, build specs, props, feed URLs and changelog entries themselves.
+
 ## v0.21.0 - 2026-08-05
 
 ### Components that installed into the wrong colours, and a status page that can fail
