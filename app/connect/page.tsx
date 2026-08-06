@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { CopyButton } from "../_components/copy-button";
+import { AskAI } from "../_components/ask-ai";
 import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
 import { getMcpClients } from "./mcp-clients";
 import { ClientSwitcher } from "./client-switcher";
@@ -146,6 +147,10 @@ export default function ConnectPage() {
           Every install command resolves against{" "}
           <code className="font-mono text-foreground">{REGISTRY_ORIGIN}</code>.
         </p>
+
+        <div className="mt-8">
+          <AskAI />
+        </div>
       </section>
     </main>
   );

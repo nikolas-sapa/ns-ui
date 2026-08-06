@@ -9,6 +9,7 @@ import { loadUseWhen } from "@/lib/use-when";
 import { loadComponentProps } from "@/lib/component-props";
 import { loadSource } from "@/lib/source";
 import { CopyButton } from "@/app/_components/copy-button";
+import { AskAI } from "@/app/_components/ask-ai";
 import { ComponentSave } from "@/app/_components/component-save";
 import { categoriesFor } from "@/lib/category-pages";
 import { navGroups, flatOrder } from "@/lib/nav-data";
@@ -217,6 +218,10 @@ export default async function ComponentPage({
                 label={`Copy install command for ${item.title}`}
               />
             </div>
+          </div>
+
+          <div className="mt-8">
+            <AskAI component={{ title: item.title, slug: name }} />
           </div>
 
           {source || instruction ? (
