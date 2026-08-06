@@ -4,14 +4,16 @@
  * placement (/connect) and the per-component placement
  * (/components/[name]), which differ only in which subject they build.
  *
- * Every platform below was checked in a real headless browser (not
- * assumed), same discipline as app/connect/mcp-clients.ts — see `source` on
+ * Every platform below was checked in a real headless browser where
+ * possible, same discipline as app/connect/mcp-clients.ts — see `source` on
  * each entry for what was verified and what a future editor should
- * re-check. Two platforms (Claude, Grok) sit behind a login wall that
- * blocked full verification in the sandbox this was built in; both ship
- * anyway on the strength of the same `?q=` shape being Anthropic's and
- * xAI's own documented/observed share-prompt convention, flagged as such
- * rather than silently presented as equally verified to Perplexity.
+ * re-check. ChatGPT and Grok's `?q=` prefill is undocumented/reverse-
+ * engineered (not officially documented by OpenAI or xAI) — flagged as such
+ * rather than presented as equally certain to Perplexity's. Claude sits
+ * behind a login wall that blocked full verification in the sandbox this
+ * was built in and ships on the strength of it being Anthropic's own
+ * documented share-prompt shape. Gemini has no known working prefill route
+ * and stays on clipboard.
  */
 
 export type AskAiSubject = {
@@ -95,15 +97,16 @@ export const ASK_AI_PLATFORMS: AskAiPlatform[] = [
   {
     id: "chatgpt",
     label: "ChatGPT",
-    kind: "clipboard",
-    buildHref: () => "https://chatgpt.com/",
+    kind: "prefill",
+    buildHref: (prompt) => `https://chatgpt.com/?q=${encodeURIComponent(prompt)}`,
     homeHref: "https://chatgpt.com/",
     source:
-      "Tested chatgpt.com/?q=<text> and chatgpt.com/?hints=search&q=<text> unauthenticated in " +
-      "a headless browser: the landing page loads (no login wall for a blank chat) but the " +
-      "composer stays empty (\"Ask anything\" placeholder) in both cases — no working prefill " +
-      "param found, so this falls back to copy-to-clipboard + open a blank chat. " +
-      "Verified 2026-08-06.",
+      "Undocumented, reverse-engineered — re-check before trusting fully. chatgpt.com/?q=<text> " +
+      "prefills the composer (chatgpt.com normalises ?q= to ?prompt= internally, both accepted); " +
+      "it does not reliably auto-submit, the user still presses send. An earlier pass here tested " +
+      "this logged out and saw an empty composer, which is the likely reason it was previously " +
+      "marked clipboard-only — corroborated independently by Mintlify shipping \"Open in ChatGPT\" " +
+      "as a production contextual-menu option using this same shape in 2026. Updated 2026-08-06.",
   },
   {
     id: "gemini",
@@ -120,16 +123,15 @@ export const ASK_AI_PLATFORMS: AskAiPlatform[] = [
   {
     id: "grok",
     label: "Grok",
-    kind: "clipboard",
-    buildHref: () => "https://grok.com/",
+    kind: "prefill",
+    buildHref: (prompt) => `https://grok.com/?q=${encodeURIComponent(prompt)}`,
     homeHref: "https://grok.com/",
     source:
-      "grok.com could not be reached at all from the build sandbox — it's blocked at the OS " +
-      "hosts-file level by the owner's own X/Twitter focus-block, unrelated to the site or this " +
-      "component. Never reachable to test, so this stays copy-to-clipboard + open the site " +
-      "rather than shipping an unverified ?q= guess. Re-check from an unblocked machine before " +
-      "upgrading to \"prefill\" — grok.com is understood to support a similar share-prompt " +
-      "?q= param to Perplexity's, just not confirmed here. Checked 2026-08-06.",
+      "Undocumented, reverse-engineered — re-check before trusting fully. grok.com/?q=<text> " +
+      "prefills the composer and usually auto-submits. grok.com is the canonical surface (x.com/" +
+      "i/grok is legacy); a prior pass here couldn't reach grok.com at all from a sandbox with " +
+      "the owner's own X/Twitter hosts-file block. Also a first-class Mintlify contextual-menu " +
+      "option. Updated 2026-08-06.",
   },
   {
     id: "perplexity",

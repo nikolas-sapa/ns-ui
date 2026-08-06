@@ -43,20 +43,24 @@ const BUTTON =
  * One prompt, five entry points, built from the same registrySubject /
  * componentSubject + buildPrompt in lib/ask-ai.ts that generates llms.txt —
  * the prompt can't drift from what those feeds actually say. Platforms with
- * a verified working prefill URL (Claude*, Perplexity) render first and open
- * straight into a running chat; the rest (ChatGPT, Gemini, Grok) render
- * after a divider, copy the prompt to the clipboard, and open a blank chat
- * for the user to paste into — a small copy/check corner badge on those
- * three (copy-button.tsx's own glyphs) plus a caption below the row spell
- * out the split, since a bare icon row left it silently indistinguishable
- * from the two that just work (owner report: "clicked ChatGPT, no prompt" —
- * it was in the clipboard, he just had no way to know that before or after
- * the click). Exactly which platforms are which, and what was checked to
- * decide: lib/ask-ai.ts.
+ * a working prefill URL (Claude*, ChatGPT*, Grok*, Perplexity) render first
+ * and open straight into a chat with the prompt already there; Gemini, the
+ * one platform with no known prefill route, renders after a divider, copies
+ * the prompt to the clipboard, and opens a blank chat for the user to paste
+ * into — a small copy/check corner badge (copy-button.tsx's own glyphs)
+ * plus a caption below the row spell out the split, since a bare icon row
+ * left it silently indistinguishable from the ones that just work (owner
+ * report: "clicked ChatGPT, no prompt" — it was in the clipboard, he just
+ * had no way to know that before or after the click; ChatGPT has since
+ * moved to prefill, but the same reasoning is why Gemini still gets a
+ * badge rather than being silently identical to the rest). Exactly which
+ * platforms are which, and what was checked to decide: lib/ask-ai.ts.
  * (*Claude ships on the strength of it being Anthropic's own documented
  * share-prompt shape — the actual composer fill couldn't be re-confirmed
  * from this build because an unauthenticated visit redirects to /logout
- * before the app loads. See the source note in lib/ask-ai.ts.)
+ * before the app loads. ChatGPT and Grok's prefill is undocumented/
+ * reverse-engineered, not an official API — see the source notes in
+ * lib/ask-ai.ts for all three.)
  */
 export function AskAI({
   component,
@@ -164,10 +168,11 @@ export function AskAI({
         : {})}
     >
       {prefillPlatforms.map(renderPlatform)}
-      {/* Divider between the two prefill platforms and the three
-          clipboard-fallback ones — the grouping itself is the second half
-          of the discoverability fix, so the split reads before anyone
-          reaches for a tooltip. */}
+      {/* Divider between the four prefill platforms and Gemini, the one
+          remaining clipboard fallback — still worth a divider even for a
+          single odd-one-out, since the corner badge alone is easy to miss
+          at a glance and the gap reads as "this one's different" before
+          anyone gets that close. */}
       <span aria-hidden className="h-6 w-px shrink-0 bg-border" />
       {clipboardPlatforms.map(renderPlatform)}
     </div>
@@ -195,11 +200,11 @@ export function AskAI({
       </p>
       <div className="mt-3">{buttons}</div>
       <p className="mt-2 text-xs text-ns-muted">
-        Claude and Perplexity open with the prompt already in. The rest{" "}
+        Claude, ChatGPT, Grok, and Perplexity open with the prompt already in. Gemini{" "}
         <span className="inline-flex translate-y-[3px] items-center justify-center">
           <CopyIcon />
         </span>{" "}
-        copy it to your clipboard first — paste it in once the chat opens.
+        copies it to your clipboard first — paste it in once the chat opens.
       </p>
     </div>
   );
