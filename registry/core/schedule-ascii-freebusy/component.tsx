@@ -28,7 +28,7 @@ export interface Attendee {
 }
 
 export interface ScheduleAsciiFreebusyProps {
-  attendees?: Attendee[];
+  attendees: Attendee[];
   /** number of half-hour columns (default 18 = 09:00–18:00) */
   slots?: number;
   /** minutes at the first column (default 540 = 09:00) */
@@ -39,20 +39,6 @@ export interface ScheduleAsciiFreebusyProps {
   title?: string;
   className?: string;
 }
-
-const F: SlotStatus = "free";
-const T: SlotStatus = "tentative";
-const B: SlotStatus = "busy";
-const O: SlotStatus = "out";
-
-const DEFAULT_ATTENDEES: Attendee[] = [
-  { id: "dana", name: "Dana", day: [F, B, B, F, F, F, B, B, F, F, B, B, F, F, F, F, O, O] },
-  { id: "priya", name: "Priya", day: [B, F, F, F, F, B, B, F, F, T, B, B, B, F, F, F, F, F] },
-  { id: "marcus", name: "Marcus", day: [B, F, F, F, F, F, B, B, B, F, F, F, B, B, F, T, F, F] },
-  { id: "ines", name: "Inés", day: [F, F, T, F, F, B, F, B, B, F, B, F, F, B, F, F, F, F] },
-  { id: "tobias", name: "Tobias", day: [B, F, F, F, F, F, B, F, F, B, F, B, B, F, F, F, B, B] },
-  { id: "wei", name: "Wei", day: [F, F, F, F, F, B, B, B, F, B, F, F, F, B, T, F, F, O] },
-];
 
 const GLYPH: Record<SlotStatus, string> = {
   free: "·",
@@ -108,7 +94,7 @@ function maximalRuns(mask: boolean[], min: number): Run[] {
 }
 
 export function ScheduleAsciiFreebusy({
-  attendees = DEFAULT_ATTENDEES,
+  attendees,
   slots = 18,
   dayStartMinutes = 9 * 60,
   defaultDuration = 60,
