@@ -83,7 +83,10 @@ export function CopyButton({
   );
 }
 
-function CopyIcon() {
+// Exported so ask-ai.tsx's clipboard-fallback buttons can reuse the exact
+// same copy/copied glyphs as a corner badge — one "this copies something"
+// visual language across the site, not a second one invented for one file.
+export function CopyIcon() {
   return (
     <svg
       viewBox="0 0 16 16"
@@ -101,7 +104,7 @@ function CopyIcon() {
   );
 }
 
-function CheckIcon() {
+export function CheckIcon() {
   return (
     <svg
       viewBox="0 0 16 16"
