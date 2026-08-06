@@ -8,6 +8,7 @@ import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
 import { CopyButton } from "@/app/_components/copy-button";
 import { kindOf } from "@/lib/kind";
 import { loadSource } from "@/lib/source";
+import { DemoStage } from "@/app/_components/demo-stage";
 
 /**
  * The playground: a full-viewport, fully-interactive stage per component.
@@ -149,13 +150,8 @@ export default async function PlaygroundPage({
           no site chrome), so this is exactly the component's own render,
           breathing room and all — the thing the owner asked to "play
           with" — without the sidebar that `/components/[name]` now carries. */}
-      <div className="mt-5 flex-1 overflow-hidden rounded-md border border-border bg-surface">
-        <iframe
-          key={name}
-          src={`/preview/${name}?embed=1&interactive=1`}
-          title={`${item.title} — interactive`}
-          className="h-[76vh] min-h-[520px] w-full border-0 bg-transparent"
-        />
+      <div className="mt-5 flex-1">
+        <DemoStage name={name} title={item.title} />
       </div>
 
       <div className="mt-6 divide-y divide-border border-y border-border">

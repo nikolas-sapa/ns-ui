@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import registry from "@/registry.json";
 import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
 import { jsonLdScript } from "@/lib/json-ld";
-import { DemoFrame } from "@/app/_components/demo-frame";
+import { DemoStage } from "@/app/_components/demo-stage";
 import { loadUseWhen } from "@/lib/use-when";
 import { loadComponentProps } from "@/lib/component-props";
 import { CopyButton } from "@/app/_components/copy-button";
@@ -41,9 +42,6 @@ export async function generateMetadata({
   return {
     title,
     description,
-    // `embed`/`autoplay`/`interactive` change what DemoFrame renders below but
-    // describe the same subject, so every searchParams permutation canonicalizes
-    // back to the bare URL rather than indexing as a distinct variant.
     alternates: { canonical: `${REGISTRY_ORIGIN}/components/${name}` },
     openGraph: { title, description, type: "website" },
     twitter: { card: "summary_large_image", title, description },
@@ -58,23 +56,31 @@ export async function generateMetadata({
  * at, and what carries the SoftwareSourceCode/BreadcrumbList structured data
  * below.
  *
- * `/preview/<name>` (see that route's own docblock) renders the identical
- * `DemoFrame`, chrome-less, noindex, canonical back to this URL — it exists
- * only as the verification/recording fixture. Deliberately not this file:
- * see `/preview/<name>` for why the gate cannot run against this chrome-full
- * page or against `/preview/<name>/embed`.
+ * The demo itself is a `DemoStage` iframe onto `/preview/<name>` (see that
+ * route's own docblock), the same stage `/preview/<name>/play` uses — not
+ * `DemoFrame` mounted inline. Inline mounting is what regressed here before:
+ * a demo root's own `min-h-screen` resolves against the *real* page
+ * viewport when mounted directly, which is why the old inline render needed
+ * a fixed-height well plus `h-full!`/`min-h-full!` overrides to bound it,
+ * and why demos taller than that well (e.g. `hero-ascii-reaction-front`)
+ * had their own title/CTA scrolled out of view by default. Iframing sidesteps
+ * that class of bug entirely: inside the iframe, `min-h-screen` resolves
+ * against the iframe's own box, so the demo renders at its natural height
+ * with nothing left to override or crop.
  */
 export default async function ComponentPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ name: string }>;
-  searchParams: Promise<{ embed?: string; autoplay?: string; interactive?: string }>;
 }) {
   const { name } = await params;
-  const { embed, autoplay, interactive } = await searchParams;
 
   const item = registry.items.find((i) => i.name === name);
+  // Previously implicit: `DemoFrame`'s `demos[name]` lookup called this for
+  // us whenever a bad slug had no registry entry. Now that the demo is an
+  // iframe onto `/preview/<name>` rather than an inline mount, nothing else
+  // 404s on a missing item, so it has to happen here.
+  if (!item) notFound();
   const pageUrl = `${REGISTRY_ORIGIN}/components/${name}`;
   const installCommand = `npx shadcn add ${REGISTRY_ORIGIN}/r/${name}.json`;
 
@@ -168,13 +174,11 @@ export default async function ComponentPage({
           Everything that describes it (use-when, install, links, chips) is
           below — deliberately not hoisted above the demo, where three wrapped
           install lines on mobile would push it off screen again. */}
-      <DemoFrame
-        name={name}
-        embed={embed}
-        autoplay={autoplay}
-        interactive={interactive}
-        bounded
-      />
+      {item ? (
+        <div className="mx-auto w-full max-w-[1400px] px-6 sm:px-10">
+          <DemoStage name={name} title={item.title} />
+        </div>
+      ) : null}
 
       {item ? (
         <section className="mx-auto w-full max-w-3xl px-6 pt-10 sm:px-10">
