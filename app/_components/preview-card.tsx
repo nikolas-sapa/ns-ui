@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useState } from "react";
+import { memo, useCallback, useState } from "react";
 import { CopyButton } from "./copy-button";
 import { LivePreviewFrame } from "./live-preview-frame";
 import { SaveButton } from "./save-button";
@@ -31,7 +31,19 @@ export type RegistryEntry = {
  * exactly as they do on the direct link, at every window shape. `scale()` is a
  * paint-time effect on the parent and never reaches the frame's own layout.
  */
-export function PreviewCard({
+/**
+ * Wrapped in `memo`: the catalog renders up to ~300 of these, and every one
+ * of them re-ran its render function on every filter/sort/search keystroke
+ * even for cards whose props hadn't changed — the parent's `useMemo`s already
+ * scope which items are *shown*, but every prop each surviving card receives
+ * (`entry`, `active`, `saved`, `installCommand`, `registerRef`) is either the
+ * same reference or the same primitive value across such a change, so a
+ * shallow prop comparison correctly bails almost every card out of doing any
+ * work at all. Measured as the dominant cost behind the catalog's INP —
+ * see docs/perf-audit-2026-07.md for the sibling investigation into the
+ * card's own iframe cost, which this does not touch.
+ */
+export const PreviewCard = memo(function PreviewCard({
   entry,
   active,
   onScreen,
@@ -173,4 +185,4 @@ export function PreviewCard({
       </div>
     </article>
   );
-}
+});

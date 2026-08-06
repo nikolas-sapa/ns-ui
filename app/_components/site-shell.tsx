@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { locate, type NavGroup, type NavItem, type NavKind } from "@/lib/nav-data";
@@ -154,6 +154,14 @@ export function SiteShell({
   // Both the playground and the component detail page point at the same
   // component, so both should light up the tree.
   const active = /^\/(?:preview|components)\/([^/]+)/.exec(pathname)?.[1] ?? null;
+  // Narrower than `active`: that also matches the `/preview/<name>` shapes
+  // (bare fixture, playground), where the row is styled active but the link
+  // still goes somewhere else. `aria-current="page"` should only fire on the
+  // canonical `/components/<name>` page itself — computed once here (one
+  // `usePathname` read for the whole tree) rather than inside every one of
+  // the ~300 `NavLink`s, which used to each subscribe to the router's own
+  // pathname and so all re-rendered on *any* navigation, active tree or not.
+  const isOnComponentPage = pathname.startsWith("/components/");
 
   // Where the active component lives in the tree, computed from the same
   // pathname both the server and the client already agree on — nothing here
@@ -515,6 +523,7 @@ export function SiteShell({
               onToggleKind={toggle}
               isFiltering={isFiltering}
               active={active}
+              isOnComponentPage={isOnComponentPage}
               activeRef={activeRef}
             />
           ))}
@@ -598,6 +607,7 @@ function NavCategory({
   onToggleKind,
   isFiltering,
   active,
+  isOnComponentPage,
   activeRef,
 }: {
   group: NavGroup;
@@ -607,6 +617,7 @@ function NavCategory({
   onToggleKind: (id: string, open: boolean) => void;
   isFiltering: boolean;
   active: string | null;
+  isOnComponentPage: boolean;
   activeRef: React.RefObject<HTMLAnchorElement | null>;
 }) {
   return (
@@ -631,13 +642,20 @@ function NavCategory({
             open={isFiltering || openIds.has(k.id)}
             onToggle={(v) => onToggleKind(k.id, v)}
             active={active}
+            isOnComponentPage={isOnComponentPage}
             activeRef={activeRef}
           />
         ))}
         {group.items.length > 0 ? (
           <ul>
             {group.items.map((i) => (
-              <NavLink key={i.name} item={i} active={active} activeRef={activeRef} />
+              <NavLink
+                key={i.name}
+                item={i}
+                isActiveItem={i.name === active}
+                isCurrentPage={isOnComponentPage && i.name === active}
+                activeRef={activeRef}
+              />
             ))}
           </ul>
         ) : null}
@@ -652,12 +670,14 @@ function NavKindGroup({
   open,
   onToggle,
   active,
+  isOnComponentPage,
   activeRef,
 }: {
   kind: NavKind;
   open: boolean;
   onToggle: (open: boolean) => void;
   active: string | null;
+  isOnComponentPage: boolean;
   activeRef: React.RefObject<HTMLAnchorElement | null>;
 }) {
   return (
@@ -675,34 +695,48 @@ function NavKindGroup({
       </summary>
       <ul className="pl-3">
         {kind.items.map((i) => (
-          <NavLink key={i.name} item={i} active={active} activeRef={activeRef} />
+          <NavLink
+            key={i.name}
+            item={i}
+            isActiveItem={i.name === active}
+            isCurrentPage={isOnComponentPage && i.name === active}
+            activeRef={activeRef}
+          />
         ))}
       </ul>
     </details>
   );
 }
 
-function NavLink({
+/**
+ * Wrapped in `memo` and given only booleans a caller has already reduced
+ * per-item (`isActiveItem`, `isCurrentPage`) instead of the raw `active`
+ * string/`pathname` every prior version compared internally: passing the raw
+ * value meant *every* one of the ~300 rendered links got a "changed" prop on
+ * any navigation (the string itself always differs), so memo could never
+ * bail. With a boolean, only the (at most two) links whose own membership
+ * actually flipped receive a different prop; the rest see the exact same
+ * `false` they had before and skip re-rendering entirely. This also drops
+ * this component's own `usePathname()` call, which subscribed all ~300
+ * instances to the router directly and forced every one of them to update on
+ * *any* route change regardless of props — memoizing alone would not have
+ * fixed that.
+ */
+const NavLink = memo(function NavLink({
   item,
-  active,
+  isActiveItem,
+  isCurrentPage,
   activeRef,
 }: {
   item: NavItem;
-  active: string | null;
+  isActiveItem: boolean;
+  isCurrentPage: boolean;
   activeRef: React.RefObject<HTMLAnchorElement | null>;
 }) {
-  const on = item.name === active;
-  // The link points at /components/<name>, so only claim "current page" when
-  // that is where we actually are — `active` also matches the /preview/<name>
-  // shapes (bare fixture, playground), where the row is styled active but the
-  // link still goes somewhere else. Exact match, not a prefix: the row is only
-  // the current page on the canonical component page itself.
-  const pathname = usePathname();
-  const isCurrentPage = pathname === `/components/${item.name}`;
   return (
     <li>
       <Link
-        ref={on ? activeRef : undefined}
+        ref={isActiveItem ? activeRef : undefined}
         href={`/components/${item.name}`}
         // This sidebar lists every component, so the default fired ~126 RSC
         // prefetches on every page load — for a list the visitor picks at
@@ -712,13 +746,13 @@ function NavLink({
         // searchParams and so is not served from the prerender manifest.
         prefetch={false}
         aria-current={isCurrentPage ? "page" : undefined}
-        className={`${LINK} ${on ? "bg-surface font-medium text-ns-accent" : "text-ns-muted"}`}
+        className={`${LINK} ${isActiveItem ? "bg-surface font-medium text-ns-accent" : "text-ns-muted"}`}
       >
         {item.title}
       </Link>
     </li>
   );
-}
+});
 
 /**
  * Narrows every level of the tree to items whose name/title matches, drops
