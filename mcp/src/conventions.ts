@@ -3,6 +3,13 @@
 // what makes get_conventions worth having as its own tool: an agent that
 // installs a component but ignores this will produce code that looks wrong
 // the moment the host app's theme differs from whatever the agent assumed.
+//
+// The token line below (between the generated markers) is NOT hand-typed —
+// scripts/build-mcp-conventions.ts rewrites it from lib/css-tokens.ts, which
+// reads the real names out of app/globals.css. Hand-editing between the
+// markers gets silently overwritten on the next `npm run registry:build`;
+// if a token is missing here, add it to app/globals.css and lib/css-tokens.ts,
+// not to this string. See that script for how the marker pair works.
 export const CONVENTIONS = `# ns-ui conventions
 
 These hold for every component in the registry. Match them in any code you
@@ -14,7 +21,7 @@ element in the same UI.
 Colors come from CSS custom properties already in scope on the host app —
 never a hardcoded hex, in JSX/markup OR in canvas/SVG draw code:
 
-  --background   --foreground   --ns-muted   --border   --ns-accent   --surface   --error   --warning
+<!-- generated:tokens start -->--background   --foreground   --border   --ns-muted   --ns-accent   --ns-accent-hover   --surface   --error   --warning   --success<!-- generated:tokens end -->
 
 If a component derives ink for a <canvas>, it reads these via
 getComputedStyle at mount and on theme change, it does not bake in a color

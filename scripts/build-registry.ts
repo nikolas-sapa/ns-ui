@@ -5,6 +5,7 @@ import { execFileSync } from "node:child_process";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { REGISTRY_ORIGIN } from "../lib/registry-origin.ts";
+import { cssVarsFor } from "../lib/css-tokens.ts";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -17,71 +18,10 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 // --background/--foreground/--border are deliberately NOT emitted: a component
 // that brings its own page colours looks foreign in every host project, so
 // those inherit from the consumer's theme.
-const GLOBALS = readFileSync(join(ROOT, "app/globals.css"), "utf8");
-
-// Values are read out of app/globals.css rather than restated here — a second
-// copy of the hexes is a colour drift waiting to happen.
-function tokenBlock(selector: RegExp): Record<string, string> {
-  const open = GLOBALS.match(selector);
-  if (!open) throw new Error(`globals.css: no ${selector} block`);
-  const start = open.index! + open[0].length;
-  const body = GLOBALS.slice(start, GLOBALS.indexOf("\n}", start));
-  const out: Record<string, string> = {};
-  for (const m of body.matchAll(/--([\w-]+):\s*([^;]+);/g)) out[m[1]] = m[2].trim();
-  return out;
-}
-const LIGHT = tokenBlock(/(^|\n):root\s*\{/);
-const DARK = tokenBlock(/(^|\n)\.dark\s*\{/);
-
-// Detection is on the installed file's own text: `--ns-muted` in a var(), or
-// the Tailwind utility that the @theme mapping lifts it into (text-ns-muted).
-// The lookahead is what keeps --ns-accent from matching --ns-accent-hover.
-const TOKEN_TESTS: Record<string, RegExp> = {
-  "ns-muted": /ns-muted(?![\w-])/,
-  "ns-accent": /ns-accent(?![\w-])/,
-  "ns-accent-hover": /ns-accent-hover(?![\w-])/,
-  // --surface has no shadcn equivalent, so it keeps its plain name. Matched
-  // only as a var() or a real utility prefix, so a component's own local
-  // --ns-*-surface variable can't be mistaken for it.
-  surface:
-    /(?:--|(?:bg|text|border|ring-offset|ring|fill|stroke|outline|decoration|from|via|to)-)surface(?![\w-])/,
-  error: /--error(?![\w-])/,
-  warning: /--warning(?![\w-])/,
-  success: /--success(?![\w-])/,
-};
-// Only these four are lifted into Tailwind's colour namespace by @theme, so
-// only these need a --color-* alias in the consumer's theme layer.
-const THEME_MAPPED = new Set([
-  "ns-muted",
-  "ns-accent",
-  "ns-accent-hover",
-  "surface",
-]);
-
-function cssVarsFor(source: string) {
-  const used = Object.keys(TOKEN_TESTS).filter((t) => TOKEN_TESTS[t].test(source));
-  if (used.length === 0) return undefined;
-  const vars: {
-    theme?: Record<string, string>;
-    light?: Record<string, string>;
-    dark?: Record<string, string>;
-  } = {};
-  const theme: Record<string, string> = {};
-  const light: Record<string, string> = {};
-  const dark: Record<string, string> = {};
-  for (const t of used) {
-    if (THEME_MAPPED.has(t)) theme[`color-${t}`] = `var(--${t})`;
-    if (!LIGHT[t]) throw new Error(`globals.css: :root does not define --${t}`);
-    light[t] = LIGHT[t];
-    // Only tokens the dark block actually overrides — repeating an identical
-    // value under .dark is noise in the consumer's stylesheet.
-    if (DARK[t]) dark[t] = DARK[t];
-  }
-  if (Object.keys(theme).length) vars.theme = theme;
-  vars.light = light;
-  if (Object.keys(dark).length) vars.dark = dark;
-  return vars;
-}
+//
+// Token names, their globals.css values, and the detection regexes live in
+// lib/css-tokens.ts (also consumed by scripts/build-mcp-conventions.ts, so
+// the MCP server's get_conventions() token list can't drift from this one).
 
 const items = [];
 const mismatched: { folder: string; metaName: string }[] = [];

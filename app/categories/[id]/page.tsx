@@ -36,8 +36,8 @@ export async function generateMetadata({
 }
 
 /**
- * One of the 12 category hub pages — the missing middle layer between `/`
- * (one index) and `/components/<name>` (228 leaves). Static/SSG only, built
+ * One of the category hub pages — the missing middle layer between `/`
+ * (one index) and `/components/<name>` (one leaf per component). Static/SSG only, built
  * from `categorize()` against real registry tags (see
  * `lib/search-categories.ts`), never a hand-authored list.
  */

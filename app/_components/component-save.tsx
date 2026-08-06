@@ -1,7 +1,7 @@
 "use client";
 
 // Save control for a single component's detail page. `Showcase` owns this
-// state for the whole grid (one `/api/saves` read for 228 cards); a detail
+// state for the whole grid (one `/api/saves` read for every card); a detail
 // page has exactly one slug, so it does the same read for itself rather than
 // mounting the catalog's state machine.
 //

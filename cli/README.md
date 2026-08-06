@@ -132,8 +132,8 @@ install always goes over the network via `shadcn add` regardless of cache
 state — so `add`'s ability to install a component is never blocked by an
 offline data layer, only its "did you mean" suggestion quality is.
 `info --source` is a fourth, separate network call: it fetches the real
-`component.tsx` from the live registry on demand rather than bundling all
-223 components' source into the index.
+`component.tsx` from the live registry on demand rather than bundling every
+component's source into the index.
 
 ## Links
 
