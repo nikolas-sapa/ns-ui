@@ -158,13 +158,17 @@ export function SlideToShatter({
   label?: string;
   /** label revealed once the pane shatters */
   confirmedLabel?: string;
+  /** px width of the glass pane */
   width?: number;
+  /** px height of the glass pane */
   height?: number;
   /** approximate Voronoi cell count — cracks while dragging, shards on commit */
   shardCount?: number;
+  /** called once the pane fully shatters */
   onConfirm?: () => void;
   /** bump to restore the pane and replay */
   resetKey?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);

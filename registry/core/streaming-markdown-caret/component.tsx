@@ -58,6 +58,7 @@ export interface KerfCaretProps {
   text: string;
   /** true while more content may still arrive. Controls the trailing caret and the sr-only status. */
   streaming?: boolean;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

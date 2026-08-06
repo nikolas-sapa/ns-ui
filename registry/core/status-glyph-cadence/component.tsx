@@ -109,6 +109,7 @@ export interface BeaconCadenceProps {
    * announcement — the glyph is the one guaranteed to announce transitions.
    */
   label?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

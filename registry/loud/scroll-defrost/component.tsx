@@ -262,6 +262,7 @@ export function FrostScrub({
 }: {
   /** image url; omit for a generated monochrome studio still */
   src?: string;
+  /** alt text for the image */
   alt?: string;
   /** mono caption on the side rail */
   caption?: string;
@@ -271,6 +272,7 @@ export function FrostScrub({
   frostRadius?: number;
   /** chromatic dispersion step between R/G/B offset scales */
   dispersion?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
   /** rendered (lerped) progress 0–1, called from the rAF loop */
   onProgress?: (p: number) => void;

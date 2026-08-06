@@ -13,12 +13,17 @@ export interface GrainTallyProps {
   samples: GrainTallySample[];
   /** Fixed domain. A live instrument needs a stable scale — auto-ranging makes every arrival move everything. */
   min?: number;
+  /** upper bound of the fixed domain, paired with `min` */
   max?: number;
+  /** number of histogram buckets across the domain */
   bins?: number;
   /** Unit suffix for readouts, e.g. "ms". */
   unit?: string;
+  /** caption above the histogram */
   label?: string;
+  /** px height of the plotted bars */
   height?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

@@ -68,6 +68,7 @@ const SUN = normalize3(0.55, 0.3, 0.85); // fixed in world space, independent of
 export interface MeridianSpinProps {
   /** grid cell size in px */
   cellSize?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

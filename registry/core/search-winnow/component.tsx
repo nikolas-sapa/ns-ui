@@ -17,11 +17,15 @@ export interface ChaffWinnowItem {
 }
 
 export interface ChaffWinnowProps {
+  /** the searchable items */
   items: ChaffWinnowItem[];
+  /** input placeholder text */
   placeholder?: string;
   /** accessible name for the search input */
   label?: string;
+  /** called with the chosen item when one is selected */
   onSelect?: (item: ChaffWinnowItem) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

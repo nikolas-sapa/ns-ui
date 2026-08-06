@@ -37,12 +37,15 @@ export type DovetailStep = {
 };
 
 export interface DovetailRunProps {
+  /** the wizard steps, in order */
   steps: DovetailStep[];
   /** seed field values by field id, e.g. to demonstrate a pre-filled step */
   defaultValues?: Record<string, string>;
   /** label for the final step's submit button */
   submitLabel?: string;
+  /** called with all field values, keyed by field id, once the final step submits */
   onComplete?: (values: Record<string, string>) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

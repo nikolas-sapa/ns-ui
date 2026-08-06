@@ -33,8 +33,11 @@ export interface FooterColumn {
 }
 
 export interface FooterAsciiRuleProps {
+  /** brand text on the left */
   brand?: string;
+  /** the footer's link columns */
   columns: FooterColumn[];
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

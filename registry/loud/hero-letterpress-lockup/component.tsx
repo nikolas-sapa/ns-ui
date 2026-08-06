@@ -67,6 +67,7 @@ export function QuoinLock({
   headline?: string;
   /** subhead copy, printed beneath once the line locks */
   subhead?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const rootRef = useRef<HTMLElement>(null);

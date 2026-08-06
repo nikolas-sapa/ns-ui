@@ -59,6 +59,7 @@ export interface ChunkSieveProps {
   height?: number;
   /** Accessible name for the cutoff slider. @default "Similarity cutoff" */
   label?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

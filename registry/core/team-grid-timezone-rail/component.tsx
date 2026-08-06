@@ -31,11 +31,13 @@ export interface TeamMember {
 }
 
 export interface TeamGridTimezoneRailProps {
+  /** the team, one card each */
   members?: TeamMember[];
   /** local working window as [startHour, endHour), applied to everyone */
   workingHours?: [number, number];
   /** the viewer's own offset; defaults to the browser's, resolved after mount */
   viewerOffset?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

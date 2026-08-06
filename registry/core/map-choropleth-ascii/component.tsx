@@ -40,8 +40,11 @@ export interface ChoroplethRegion {
 }
 
 export interface MapChoroplethAsciiProps {
+  /** the shaded regions */
   regions?: ChoroplethRegion[];
+  /** heading above the map */
   title?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

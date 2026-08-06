@@ -52,15 +52,19 @@ export interface RedlineResolution {
 }
 
 export interface RedlineParleyProps {
+  /** the flagged prompt span, echoed back for context */
   span: RedlineSpan;
   /** one-sentence explanation of what tripped, shown under the echoed prompt */
   reason: string;
+  /** available fixes the user can toggle on to clear the guardrail */
   remedies: RedlineRemedy[];
   /** decides whether the rewritten span now clears the guardrail. Default:
    * passes once at least one remedy is active — a real integration should
    * pass its own check against the actual guardrail instead. */
   recheck?: (span: RedlineSpan, activeRemedyIds: string[]) => boolean;
+  /** called when the user resends the rewritten span, with the final resolution */
   onResend?: (resolution: RedlineResolution) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

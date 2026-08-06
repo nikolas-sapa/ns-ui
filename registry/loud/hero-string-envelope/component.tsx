@@ -50,15 +50,21 @@ export interface StringEnvelopeCta {
 }
 
 export interface StringEnvelopeProps {
+  /** mono eyebrow label above the headline */
   eyebrow?: string;
+  /** headline text; an array renders one line per entry */
   headline?: string | string[];
+  /** supporting copy under the headline */
   subcopy?: string;
+  /** required primary CTA button/link */
   primaryCta: StringEnvelopeCta;
+  /** optional secondary CTA rendered beside the primary one */
   secondaryCta?: StringEnvelopeCta;
   /** number of nodes on the circle, one chord each. default 240 */
   points?: number;
   /** resting multiplier the ambient breathing is centered on. default 3 (nephroid) */
   multiplier?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

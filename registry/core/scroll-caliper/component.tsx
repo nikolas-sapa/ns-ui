@@ -78,6 +78,7 @@ export function ScrollCaliper({
   needleStiffness?: number;
   /** readout needle damping ratio */
   needleDamping?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);

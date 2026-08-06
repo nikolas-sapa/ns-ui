@@ -113,6 +113,7 @@ export interface RetractInkProps {
   ops: RetractInkOp[];
   /** true while more ops may still arrive. Controls the caret and the sr-only status. */
   streaming?: boolean;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

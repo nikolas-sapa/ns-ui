@@ -74,6 +74,7 @@ export interface ShockTrainProps {
   mach?: number;
   /** headline / CTA rendered over the plume */
   children?: ReactNode;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

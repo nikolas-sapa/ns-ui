@@ -57,6 +57,7 @@ function fieldValue(x: number, y: number, t: number): number {
 export interface GlyphTideProps {
   /** grid cell size in px */
   cellSize?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

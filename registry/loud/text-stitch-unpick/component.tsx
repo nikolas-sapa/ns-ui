@@ -44,11 +44,13 @@ import {
 type LetterState = "stitched" | "picked" | "unraveled";
 
 export interface StitchPickProps {
+  /** the rendered text */
   text?: string;
   /** Glyph font size in px. Default 56. */
   size?: number;
   /** Hover dwell before a picked letter fully unravels into a pile, ms. Default 650. */
   dwellMs?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

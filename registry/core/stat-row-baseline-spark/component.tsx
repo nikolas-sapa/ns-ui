@@ -21,7 +21,9 @@ export interface StatTileData {
 }
 
 export interface StatTileRowProps {
+  /** the stat tiles, in order */
   tiles: StatTileData[];
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

@@ -56,6 +56,7 @@ export interface DomainWallsProps {
   cellSize?: number;
   /** Ising temperature in units of J/k_B; Tc is 2.269, default sits at 0.92 Tc */
   temperature?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

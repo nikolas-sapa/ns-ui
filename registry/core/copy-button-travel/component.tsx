@@ -65,6 +65,7 @@ export interface CarbonLiftProps {
   copyLabel?: string;
   /** Label shown for 2s after a successful copy. @default "Copied" */
   copiedLabel?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

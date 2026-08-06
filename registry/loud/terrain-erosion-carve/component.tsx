@@ -56,7 +56,9 @@ export function ErosionTrail({
   healTau?: number;
   /** font-mono corner readout of cursor grid coords */
   showReadout?: boolean;
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** accessible name for the terrain */
   "aria-label"?: string;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);

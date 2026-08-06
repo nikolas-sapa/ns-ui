@@ -117,7 +117,9 @@ function AnchorFork({ innerRef }: { innerRef: (el: SVGSVGElement | null) => void
 export const EscapementTick = forwardRef<
   EscapementTickHandle,
   {
+    /** extra classes merged onto the rendered root element */
     className?: string;
+    /** accessible name for the feed. Default "Live activity feed". */
     "aria-label"?: string;
     /** shown while no items have arrived yet */
     emptyLabel?: string;

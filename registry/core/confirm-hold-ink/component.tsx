@@ -19,10 +19,15 @@ export function HoldToConfirm({
   onConfirm,
   className = "",
 }: {
+  /** button label shown before confirmation */
   children: ReactNode;
+  /** label shown briefly after the hold completes */
   confirmedLabel?: ReactNode;
+  /** ms the button must be held before it commits */
   holdMs?: number;
+  /** called once the hold completes */
   onConfirm?: () => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const btnRef = useRef<HTMLButtonElement>(null);

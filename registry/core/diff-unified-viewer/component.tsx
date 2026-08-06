@@ -556,6 +556,7 @@ export interface SeamDiffProps {
   widgets?: Record<string, React.ReactNode>;
   /** Accessible name for the scrollable diff region. */
   ariaLabel?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

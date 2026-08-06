@@ -39,6 +39,7 @@ export interface MeniscusMeterProps {
   unit?: string;
   /** what's being metered, shown above the vessel, e.g. "Storage" */
   label?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

@@ -84,6 +84,7 @@ export interface SlipCastProps {
   streaming?: boolean;
   /** accessible name for the region, and the noun the copy button acts on */
   label?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

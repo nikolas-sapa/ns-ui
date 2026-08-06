@@ -152,15 +152,19 @@ export function PeriscopeSweep({
   storageKey = "default",
   className = "",
 }: {
+  /** the listbox destinations */
   destinations?: PeriscopeDestination[];
   /** controlled current destination id */
   value?: string;
+  /** uncontrolled initial destination id */
   defaultValue?: string;
+  /** called with the new id when a different destination is selected */
   onValueChange?: (id: string) => void;
   /** accessible label for the listbox */
   label?: string;
   /** localStorage namespace for auto-assigned bearings */
   storageKey?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const uid = useId();

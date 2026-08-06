@@ -75,6 +75,7 @@ export interface GyreMoteProps {
   label?: string;
   /** render `label` as a visible text node beside the sphere (still announced). */
   showLabel?: boolean;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

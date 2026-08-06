@@ -66,7 +66,12 @@ function nearestOnCheck(
   return best;
 }
 
-export function IronFilings({ className = "" }: { className?: string }) {
+export function IronFilings({
+  className = "",
+}: {
+  /** extra classes merged onto the rendered root element */
+  className?: string;
+}) {
   const [phase, setPhase] = useState<"idle" | "pending" | "done">("idle");
   const fieldRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);

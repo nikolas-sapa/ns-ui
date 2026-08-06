@@ -60,6 +60,7 @@ export interface GlyphCastProps {
   text: string;
   /** cursor-proximity light radius in px, at the canvas's own pixel scale */
   cursorRadius?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

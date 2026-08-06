@@ -35,10 +35,13 @@ export interface TeletypeFieldSpec {
 }
 
 export interface ContactFormTeletypeProps {
+  /** the form fields, in order */
   fields?: TeletypeFieldSpec[];
+  /** called with all field values, keyed by field id, on submit */
   onSubmit?: (values: Record<string, string>) => void;
   /** ms after the last keystroke before that field's line prints. Default 260. */
   debounceMs?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

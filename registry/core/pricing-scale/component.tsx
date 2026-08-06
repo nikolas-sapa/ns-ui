@@ -96,6 +96,7 @@ export function CounterpoiseTiers({
   right?: CounterpoiseTier;
   /** annual billing price multiplier (0.8 = 20% off) */
   annualMultiplier?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const [billing, setBilling] = useState<"monthly" | "annual">("monthly");

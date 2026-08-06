@@ -27,13 +27,19 @@ import { useEffect, useId, useRef, useState } from "react";
 // ---------------------------------------------------------------------------
 
 export interface SolderBridgeProps {
+  /** controlled checked state; omit for uncontrolled */
   checked?: boolean;
+  /** uncontrolled initial checked state. Default false. */
   defaultChecked?: boolean;
+  /** called with the new checked state after a toggle */
   onCheckedChange?: (checked: boolean) => void;
   /** Fraction (0-1) of mass in the right bead. Overrides the checked-derived default. */
   ratio?: number;
+  /** blocks the switch */
   disabled?: boolean;
+  /** accessible name for the switch */
   "aria-label"?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

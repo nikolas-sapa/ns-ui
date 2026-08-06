@@ -11,6 +11,7 @@ export function MagneticDock({
   lift = 16,
   className = "",
 }: {
+  /** the dock's icons/items */
   children: ReactNode;
   /** max extra scale at zero distance (0.55 → 1.55x) */
   gain?: number;
@@ -18,6 +19,7 @@ export function MagneticDock({
   sigma?: number;
   /** upward shift in px at full magnification */
   lift?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);

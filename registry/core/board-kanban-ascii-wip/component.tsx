@@ -42,6 +42,7 @@ export interface WipColumn {
 }
 
 export interface WipBoardProps {
+  /** the board's columns, each with its own WIP limit */
   columns: WipColumn[];
   /** column width in monospace character cells (the frame tiles to exactly this) */
   width?: number;
@@ -49,7 +50,9 @@ export interface WipBoardProps {
   onChange?: (columns: WipColumn[]) => void;
   /** fires per commit for the receiving column: `over` is count - limit, 0 when within policy */
   onOverLimit?: (columnId: string, over: number) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** accessible name for the board */
   "aria-label"?: string;
 }
 

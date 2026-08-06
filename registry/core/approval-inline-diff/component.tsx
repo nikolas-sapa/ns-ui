@@ -36,15 +36,18 @@ export interface AssayGateProps {
   toolName: string;
   /** the agent/identity that proposed the call */
   requestedBy?: string;
+  /** the call's arguments, one editable field each */
   fields: AssayField[];
   /** seed one or more fields as already edited, keyed by field.key — the
    * diff renders immediately instead of waiting for the human to type */
   initialValues?: Record<string, string>;
   /** recorded on the receipt as the decider — default "you" */
   approverName?: string;
+  /** called once the human decides, with the final field values */
   onDecision?: (decision: AssayDecision, fields: AssayField[]) => void;
   /** pre-seed as already decided (e.g. rendering decision history) */
   initialDecision?: AssayDecision;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

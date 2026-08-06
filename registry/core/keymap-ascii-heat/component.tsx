@@ -46,8 +46,11 @@ function keyFor(e: { key: string }): string | null {
 }
 
 export interface KeymapAsciiHeatProps {
+  /** placeholder text for the typing input */
   placeholder?: string;
+  /** accessible name for the typing input */
   label?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

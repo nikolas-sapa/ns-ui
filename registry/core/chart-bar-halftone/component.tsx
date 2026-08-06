@@ -28,9 +28,11 @@ export interface ChartBarHalftoneDatum {
 }
 
 export interface ChartBarHalftoneProps {
+  /** the plotted bars, in order */
   data?: ChartBarHalftoneDatum[];
   /** chart title, used as the figure's accessible name and table caption */
   title?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

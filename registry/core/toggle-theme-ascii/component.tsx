@@ -26,12 +26,15 @@ function readToken(name: string): string {
 export interface ThemeToggleAsciiProps {
   /** controlled dark state; omit for uncontrolled (reads/writes <html class="dark">) */
   dark?: boolean;
+  /** uncontrolled initial dark state. Default false. */
   defaultDark?: boolean;
+  /** called with the new dark state after a toggle */
   onDarkChange?: (dark: boolean) => void;
   /** whether clicking mutates document.documentElement's "dark" class + localStorage */
   syncDocument?: boolean;
   /** localStorage key used when syncDocument is true */
   storageKey?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

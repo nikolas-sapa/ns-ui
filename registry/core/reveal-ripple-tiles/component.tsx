@@ -114,7 +114,9 @@ export function RippleUnfold({
   refraction?: number;
   /** wave height injected per cursor move after full reveal */
   impulse?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** accessible name for the reveal. Default "Media revealed by a ripple wave". */
   "aria-label"?: string;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);

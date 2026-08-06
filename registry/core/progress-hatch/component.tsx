@@ -76,6 +76,7 @@ export interface HatchFillProps {
   marks?: number[];
   /** accessible label for the meter. */
   "aria-label"?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

@@ -118,6 +118,7 @@ function frameAt(t: number): {
 export interface KnotRenderProps {
   /** grid cell size in px */
   cellSize?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

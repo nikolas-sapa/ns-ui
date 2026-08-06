@@ -36,6 +36,7 @@ export interface FlamegraphAsciiFramesProps {
   tree?: FlameNode;
   /** Rows are this tall in px; also drives the graph's overall height. */
   rowHeight?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

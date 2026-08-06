@@ -18,11 +18,15 @@ import { useCallback, useEffect, useRef, useState } from "react";
 // ---------------------------------------------------------------------------
 
 export interface UmbraToggleProps {
+  /** controlled state; omit for uncontrolled */
   checked?: boolean;
+  /** uncontrolled initial state. Default false. */
   defaultChecked?: boolean;
+  /** called with the new state after a toggle */
   onCheckedChange?: (checked: boolean) => void;
   /** accessible name; falls back to the visible Light/Dark label pair */
   "aria-label"?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

@@ -240,16 +240,21 @@ function smoothstep(a: number, b: number, x: number): number {
 }
 
 export interface PenroseInflateProps {
+  /** mono eyebrow label above the headline */
   eyebrow?: string;
   /** each entry is one rendered line of the h1 */
   headline?: string[];
+  /** supporting copy under the headline */
   subcopy?: string;
+  /** primary CTA button/link */
   primaryCta?: { label: string; href: string };
+  /** optional secondary CTA rendered beside the primary one */
   secondaryCta?: { label: string; href: string };
   /** substitution depth of the resting tiling; clamped to 1..7 */
   depth?: number;
   /** ms for one full phi-ratio zoom cycle */
   period?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

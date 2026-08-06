@@ -26,7 +26,9 @@ export interface TreemapNode {
 }
 
 export interface AsciiPartitionProps {
+  /** the treemap's nested nodes */
   data?: TreemapNode[];
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

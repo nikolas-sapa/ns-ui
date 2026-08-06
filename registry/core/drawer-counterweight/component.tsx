@@ -48,14 +48,19 @@ function clamp(v: number, lo: number, hi: number): number {
 export interface SashWeightProps {
   /** controlled open state; omit for uncontrolled */
   open?: boolean;
+  /** uncontrolled initial open state. Default false. */
   defaultOpen?: boolean;
+  /** called with the new open state after the trigger or a dismissal */
   onOpenChange?: (open: boolean) => void;
   /** label rendered on the trigger button */
   trigger?: ReactNode;
+  /** drawer heading */
   title: string;
+  /** supporting copy under the title */
   description?: ReactNode;
   /** drawer body content */
   children?: ReactNode;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

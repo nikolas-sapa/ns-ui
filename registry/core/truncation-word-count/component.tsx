@@ -7,6 +7,7 @@ export interface SelvageFoldProps {
   children: string;
   /** Visible lines when folded. */
   lines?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

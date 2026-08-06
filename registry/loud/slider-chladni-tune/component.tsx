@@ -212,11 +212,15 @@ function ReducedFigure({
 export interface ChladniTuneProps {
   /** controlled value; omit for uncontrolled */
   value?: number;
+  /** uncontrolled initial value */
   defaultValue?: number;
   /** the value the plate resolves at — never rendered as a number in the UI */
   target: number;
+  /** minimum allowed value */
   min?: number;
+  /** maximum allowed value */
   max?: number;
+  /** increment per keyboard/drag step */
   step?: number;
   /** value distance at which detune reaches 1 (full chaos). default: 25% of the range */
   detuneSpan?: number;
@@ -226,8 +230,11 @@ export interface ChladniTuneProps {
   mode?: readonly [number, number];
   /** sand grain count on the canvas plate. default 2200 */
   grainCount?: number;
+  /** called with the new value on every drag/keyboard change */
   onValueChange?: (value: number) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** accessible name for the slider */
   "aria-label"?: string;
 }
 

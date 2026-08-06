@@ -53,10 +53,13 @@ export type TaprootNode = {
 export interface TaprootTraceProps {
   /** Accessible name for the tree, e.g. "Project files". */
   label: string;
+  /** Root-level nodes of the tree. */
   nodes: TaprootNode[];
   /** Node ids expanded on first render, statically — no draw-in animation for these. */
   defaultExpandedIds?: string[];
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** id placed on the root element */
   id?: string;
 }
 

@@ -28,6 +28,7 @@ export interface Attendee {
 }
 
 export interface ScheduleAsciiFreebusyProps {
+  /** attendees and their free/busy blocks, rendered as one row each */
   attendees: Attendee[];
   /** number of half-hour columns (default 18 = 09:00–18:00) */
   slots?: number;
@@ -35,8 +36,11 @@ export interface ScheduleAsciiFreebusyProps {
   dayStartMinutes?: number;
   /** initial meeting length in minutes; must be one of `durations` */
   defaultDuration?: number;
+  /** offered meeting-length options, in minutes */
   durations?: number[];
+  /** heading above the grid */
   title?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

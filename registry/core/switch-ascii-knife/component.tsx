@@ -24,10 +24,15 @@ const ROT = ["◐", "◓", "◑", "◒"];
 export interface ThrowSwitchProps {
   /** controlled state; omit for uncontrolled */
   checked?: boolean;
+  /** uncontrolled initial state. Default false. */
   defaultChecked?: boolean;
+  /** called with the new state after a toggle */
   onCheckedChange?: (checked: boolean) => void;
+  /** blocks the switch */
   disabled?: boolean;
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** accessible name for the switch */
   "aria-label"?: string;
 }
 

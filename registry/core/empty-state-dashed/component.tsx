@@ -20,9 +20,11 @@ export interface FallowPanelProps {
   description?: string;
   /** Label of the single accent CTA. Pass an empty string to omit the button. */
   actionLabel?: string;
+  /** called when the accent CTA is pressed */
   onAction?: () => void;
   /** Optional mark above the headline — an icon, a glyph, anything small. */
   icon?: ReactNode;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 
