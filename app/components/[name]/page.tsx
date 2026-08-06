@@ -367,7 +367,7 @@ export default async function ComponentPage({
                   <span className="font-mono text-[11px] uppercase tracking-wider text-ns-muted">
                     Previous
                   </span>
-                  <span className="mt-1 block truncate text-sm text-foreground underline-offset-2 group-hover:text-ns-accent group-hover:underline">
+                  <span className="mt-1 block truncate text-sm text-foreground underline-offset-2 transition-colors group-hover:text-ns-accent group-hover:underline">
                     {prevItem.title}
                   </span>
                 </Link>
@@ -382,7 +382,7 @@ export default async function ComponentPage({
                   <span className="font-mono text-[11px] uppercase tracking-wider text-ns-muted">
                     Next
                   </span>
-                  <span className="mt-1 block truncate text-sm text-foreground underline-offset-2 group-hover:text-ns-accent group-hover:underline">
+                  <span className="mt-1 block truncate text-sm text-foreground underline-offset-2 transition-colors group-hover:text-ns-accent group-hover:underline">
                     {nextItem.title}
                   </span>
                 </Link>
