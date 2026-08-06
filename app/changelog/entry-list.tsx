@@ -95,7 +95,10 @@ function NavArrow({
       aria-label={label}
       title={label}
       onClick={onClick}
-      className="inline-flex size-8 shrink-0 items-center justify-center rounded-sm text-ns-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none disabled:pointer-events-none disabled:opacity-30"
+      // Same treatment as the timeline scrub arrows — capped at half the
+      // 4px gap to its sibling, generous vertically (sits in the card's own
+      // p-5/p-6 whitespace) — 32x32 -> ~36x44.
+      className="relative inline-flex size-8 shrink-0 items-center justify-center rounded-sm text-ns-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none disabled:pointer-events-none disabled:opacity-30 after:absolute after:-inset-x-[2px] after:-inset-y-[6px] after:content-['']"
     >
       {/* Same hand-drawn chevron the Sort select and the sidebar's <details>
           use, rotated rather than redrawn — one icon language across the site. */}

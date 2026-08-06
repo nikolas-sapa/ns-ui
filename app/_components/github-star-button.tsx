@@ -48,7 +48,14 @@ export function GitHubStarButton({
         target="_blank"
         rel="noopener noreferrer"
         aria-label={ariaLabel}
-        className={`inline-flex items-center gap-2 rounded-sm border border-border px-4 py-2 text-sm text-foreground outline-none transition-colors hover:border-ns-muted hover:bg-surface focus-visible:ring-2 focus-visible:ring-ns-accent ${className}`}
+        // +1px on the y-inset compensates for this link's own `border` —
+        // an absolutely positioned pseudo's containing block is the padding
+        // box, not the border box (confirmed via elementFromPoint on the
+        // catalog's category chips, same border-class shape) — so 4px here
+        // reaches the intended ~3-4px past the visible edge. Plenty of
+        // clearance above/below in both places this renders (header row,
+        // newsletter CTA), so no horizontal-gap-style cap needed.
+        className={`relative inline-flex items-center gap-2 rounded-sm border border-border px-4 py-2 text-sm text-foreground outline-none transition-colors hover:border-ns-muted hover:bg-surface focus-visible:ring-2 focus-visible:ring-ns-accent after:absolute after:-inset-x-[4px] after:-inset-y-[5px] after:content-[''] ${className}`}
       >
         <StarIcon />
         {label}
@@ -70,7 +77,7 @@ export function GitHubStarButton({
         rel="noopener noreferrer"
         aria-label={ariaLabel}
         style={{ borderRadius: 6 }}
-        className="inline-flex items-center gap-2 bg-surface px-4 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:bg-border/60 focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        className="relative inline-flex items-center gap-2 bg-surface px-4 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:bg-border/60 focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background after:absolute after:-inset-x-[4px] after:-inset-y-[4px] after:content-['']"
       >
         <StarIcon />
         {label}

@@ -55,10 +55,18 @@ export function CopyButton({
   // nearest interactive neighbor is the title block, guaranteed at least
   // 12px away by the row's own flex gap, so the ::after is capped at half
   // that on the left and left generous on the right (open space to the grid
-  // gutter) — 28x28 -> ~40x40. "inline" (the header install bar) is left
-  // alone — that one sits flush against a text field with no such gap.
-  const iconOverlay =
-    variant === "icon" ? "after:absolute after:-inset-x-[6px] after:-inset-y-[6px] after:content-['']" : "";
+  // gutter) — 28x28 -> ~40x40.
+  //
+  // "inline" (install/theming/connect/component-detail/not-found code
+  // blocks): every call site wraps it in the same `flex ... gap-2 ...
+  // pr-1.5` code-block shape, the code text to its left, block padding to
+  // its right — so 4px left (half the 8px gap) and generous right/vertical
+  // is safe everywhere it's actually used. Confirmed with the site-wide
+  // audit's theft check, not just by reading the one shared class string.
+  const overlay =
+    variant === "icon"
+      ? "after:absolute after:-inset-x-[6px] after:-inset-y-[6px] after:content-['']"
+      : "after:absolute after:-inset-x-[4px] after:-inset-y-[6px] after:content-['']";
 
   return (
     <button
@@ -68,7 +76,7 @@ export function CopyButton({
       title={copied ? "Copied" : label}
       className={`${base} ${
         variant === "icon" ? "size-7" : "size-8"
-      } ${iconOverlay} ${className}`}
+      } ${overlay} ${className}`}
     >
       {copied ? <CheckIcon /> : <CopyIcon />}
     </button>
