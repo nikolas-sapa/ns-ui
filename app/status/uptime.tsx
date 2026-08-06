@@ -149,8 +149,22 @@ export function ServiceCard({
           page vertically through the strip instead of the strip eating the
           gesture. */}
       <div className="mt-4 flex h-6 w-full touch-pan-y items-stretch gap-[2px]">
-        {bars.map((bar) => {
+        {bars.map((bar, i) => {
           const name = `${prettyDay(bar.day)} — ${WORD[bar.state]}${bar.detail ? `: ${bar.detail}` : ""}`;
+          // Centered (`left-1/2 -translate-x-1/2`) is right for every bar except
+          // the handful nearest either end of the strip, where a centered,
+          // whitespace-nowrap tooltip spills past the card's own edge — and,
+          // for the first/last card in the page grid, past the viewport itself.
+          // Pin those to the edge they're closest to instead. Purely an anchor
+          // swap (`left`/`right`), no measurement: the tooltip is still exactly
+          // as wide, just growing away from the strip's edge instead of past it.
+          const nearStart = i < 4;
+          const nearEnd = i > bars.length - 5;
+          const anchorClass = nearStart
+            ? "left-0"
+            : nearEnd
+              ? "right-0"
+              : "left-1/2 -translate-x-1/2";
           return (
             <div key={bar.day} className="group relative min-w-0 flex-1">
               <span
@@ -161,7 +175,23 @@ export function ServiceCard({
               <div
                 aria-hidden
                 role="tooltip"
-                className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2 whitespace-nowrap rounded-[10px] border border-border bg-surface px-2.5 py-2 text-[12px] opacity-0 shadow-[0_12px_32px_rgba(0,0,0,0.18)] transition-opacity duration-100 group-hover:opacity-100"
+                // Hidden (not just opacity-0) until hovered: an always-in-DOM,
+                // opacity-0 tooltip still occupies its full box, and centered
+                // on a bar near either end of a 90-bar strip that box reaches
+                // past the viewport — inflating the page's scrollWidth even
+                // when nobody is hovering anything. `hidden` + `group-hover:block`
+                // drops it from layout entirely at rest, the same plain-
+                // display-swap, no-transition shape the homepage catalog gate
+                // uses in app/globals.css for the same reason: this is meant
+                // to have never been there, not to fade away.
+                //
+                // No `whitespace-nowrap`: a long `bar.detail` (an incident
+                // description, not just the one-word state) was the thing
+                // actually forcing this past 580px wide. Capped instead at
+                // `min(20rem, 100vw-2rem)` so it wraps rather than run past
+                // the screen — on a phone-width window that's the difference
+                // between "readable, wrapped" and "half of it off-canvas".
+                className={`pointer-events-none absolute bottom-full z-10 mb-2 hidden w-max max-w-[min(20rem,calc(100vw-2rem))] rounded-[10px] border border-border bg-surface px-2.5 py-2 text-[12px] shadow-[0_12px_32px_rgba(0,0,0,0.18)] group-hover:block ${anchorClass}`}
               >
                 <div className="font-medium text-foreground">{prettyDay(bar.day)}</div>
                 <div className="mt-1 flex items-center gap-1.5 text-ns-muted">

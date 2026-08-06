@@ -284,7 +284,7 @@ export default async function StatusPage() {
         Build measurements were taken at {stamp(buildData.builtAt)} by{" "}
         <span className="font-mono text-foreground">scripts/build-status.ts</span> and
         ship with this deployment. Live reads come from{" "}
-        <span className="font-mono text-foreground">{REGISTRY_ORIGIN}/r/registry.json</span>,
+        <span className="break-words font-mono text-foreground">{REGISTRY_ORIGIN}/r/registry.json</span>,
         the npm dist-tag and the published component index of{" "}
         <span className="font-mono text-foreground">{CLI_PACKAGE}</span> and of{" "}
         <span className="font-mono text-foreground">{MCP_PACKAGE}</span> — each package
