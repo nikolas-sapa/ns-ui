@@ -35,7 +35,9 @@ const BUTTON =
 /**
  * "Ask AI about ns-ui" launcher. Defaults to the whole registry; pass
  * `component` to scope the question to one item instead (used on
- * /components/[name]).
+ * /components/[name]). Rendered full on /connect and /components/[name],
+ * and compact (icon row only) in the homepage header and the footer's "For
+ * AI agents" column — see the `variant` prop.
  *
  * One prompt, five entry points, built from the same registrySubject /
  * componentSubject + buildPrompt in lib/ask-ai.ts that generates llms.txt —
@@ -49,7 +51,20 @@ const BUTTON =
  * from this build because an unauthenticated visit redirects to /logout
  * before the app loads. See the source note in lib/ask-ai.ts.)
  */
-export function AskAI({ component }: { component?: { title: string; slug: string } }) {
+export function AskAI({
+  component,
+  variant = "full",
+}: {
+  component?: { title: string; slug: string };
+  /**
+   * "full" (default): the titled block with a description line, used on
+   * /connect and /components/[name] where Ask AI is the point of the
+   * section. "compact": bare icon row, no heading or copy — for placements
+   * where Ask AI is a secondary utility alongside other content (the
+   * footer's "For AI agents" column, the homepage header).
+   */
+  variant?: "full" | "compact";
+}) {
   const subject: AskAiSubject = component
     ? componentSubject(REGISTRY_ORIGIN, component.title, component.slug)
     : registrySubject(REGISTRY_ORIGIN);
@@ -78,6 +93,52 @@ export function AskAI({ component }: { component?: { title: string; slug: string
     timer.current = setTimeout(() => setCopiedId(null), 1600);
   };
 
+  const buttons = (
+    <div
+      className="flex flex-wrap items-center gap-2"
+      {...(variant === "compact"
+        ? { role: "group", "aria-label": `Ask AI about ${subject.short}` }
+        : {})}
+    >
+      {ASK_AI_PLATFORMS.map((platform) => {
+        const Icon = ICONS[platform.id];
+        const label = `Ask ${platform.label} about ${subject.short}`;
+        const copied = copiedId === platform.id;
+
+        if (platform.kind === "prefill") {
+          return (
+            <a
+              key={platform.id}
+              href={platform.buildHref(prompt)}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={label}
+              title={label}
+              className={BUTTON}
+            >
+              <Icon />
+            </a>
+          );
+        }
+
+        return (
+          <button
+            key={platform.id}
+            type="button"
+            onClick={() => copyAndOpen(platform.id, platform.homeHref)}
+            aria-label={copied ? `Prompt copied — paste it into ${platform.label}` : label}
+            title={copied ? `Copied — paste into ${platform.label}` : label}
+            className={BUTTON}
+          >
+            <Icon />
+          </button>
+        );
+      })}
+    </div>
+  );
+
+  if (variant === "compact") return buttons;
+
   return (
     <div>
       <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-ns-muted">
@@ -96,42 +157,7 @@ export function AskAI({ component }: { component?: { title: string; slug: string
           </>
         )}
       </p>
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        {ASK_AI_PLATFORMS.map((platform) => {
-          const Icon = ICONS[platform.id];
-          const label = `Ask ${platform.label} about ${subject.short}`;
-          const copied = copiedId === platform.id;
-
-          if (platform.kind === "prefill") {
-            return (
-              <a
-                key={platform.id}
-                href={platform.buildHref(prompt)}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={label}
-                title={label}
-                className={BUTTON}
-              >
-                <Icon />
-              </a>
-            );
-          }
-
-          return (
-            <button
-              key={platform.id}
-              type="button"
-              onClick={() => copyAndOpen(platform.id, platform.homeHref)}
-              aria-label={copied ? `Prompt copied — paste it into ${platform.label}` : label}
-              title={copied ? `Copied — paste into ${platform.label}` : label}
-              className={BUTTON}
-            >
-              <Icon />
-            </button>
-          );
-        })}
-      </div>
+      <div className="mt-3">{buttons}</div>
     </div>
   );
 }

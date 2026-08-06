@@ -1,3 +1,5 @@
+import { AskAI } from "./ask-ai";
+
 const COLUMN_LABEL = "font-mono text-[10px] uppercase tracking-wider text-ns-muted";
 
 // Same link idiom as the sidebar's own bottom bar (site-shell.tsx) — plain
@@ -93,6 +95,11 @@ export function SiteFooter() {
                 </li>
               ))}
             </ul>
+            {col.heading === "For AI agents" && (
+              <div className="mt-3">
+                <AskAI variant="compact" />
+              </div>
+            )}
           </div>
         ))}
       </div>

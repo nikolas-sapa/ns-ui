@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { AskAI } from "./ask-ai";
 import { CatalogControls, type Filter, type Sort } from "./catalog-controls";
 import { CopyButton } from "./copy-button";
 import { EmailCapture } from "./email-capture";
@@ -487,6 +488,14 @@ export function Showcase({
             <span className="font-mono text-foreground">{EXAMPLE_NAME}</span>
             {" for any component name, or copy a card’s exact command."}
           </p>
+
+          {/* Same moment as the install box above: deciding whether the
+              registry is worth pulling in. Compact row, no repeated
+              heading/copy — the "Install" label above already sets the
+              context for this column. */}
+          <div className="mt-4">
+            <AskAI variant="compact" />
+          </div>
         </div>
       </header>
 
