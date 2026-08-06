@@ -392,7 +392,7 @@ export function Showcase({
     setQuery("");
   };
 
-  const { registerRef, isActive } = useMountManager({ mountCap: MOUNT_CAP, preloadMargin: PRELOAD_MARGIN });
+  const { registerRef, isActive, isOnScreen } = useMountManager({ mountCap: MOUNT_CAP, preloadMargin: PRELOAD_MARGIN });
 
   const byName = useMemo(() => new Map(items.map((i) => [i.name, i])), [items]);
   const featuredItems = useMemo(
@@ -673,6 +673,7 @@ export function Showcase({
             <PreviewCard
               entry={entry}
               active={isActive(entry.name)}
+              onScreen={isOnScreen(entry.name)}
               registerRef={registerRef}
               installCommand={installFor(entry.name)}
               saved={saved.has(entry.name)}

@@ -29,6 +29,7 @@ export function LivePreviewFrame({
   name,
   title,
   active,
+  onScreen = true,
   className = "",
   children,
   onStateChange,
@@ -36,6 +37,16 @@ export function LivePreviewFrame({
   name: string;
   title: string;
   active: boolean;
+  /**
+   * True when this card is inside the *true* viewport, as opposed to just
+   * `active` (mounted — which includes the mount manager's preload margin
+   * and its off-screen-nearest-first eviction backfill). A mounted card can
+   * sit fully off-screen; this is what tells its iframe to actually pause
+   * rather than keep animating unseen. See `use-mount-manager.ts`'s
+   * `isOnScreen`. Defaults to `true` so callers that don't pass it (there
+   * are none left, but it keeps this prop additive) never pause anything.
+   */
+  onScreen?: boolean;
   className?: string;
   children?: React.ReactNode;
   /** Reports mount/paint state up, for callers that surface it (e.g. the
@@ -158,6 +169,25 @@ export function LivePreviewFrame({
     onStateChange?.({ mounted, loaded });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted, loaded]);
+
+  /**
+   * Tells the embed document whether it is actually visible, so its
+   * animation gate (`app/preview/[name]/embed/page.tsx`) can pause rAF work
+   * a mounted-but-scrolled-past card would otherwise keep spending unseen.
+   * Re-sent on `loaded` too — a fresh iframe document starts its own gate
+   * assuming visible, and a preload-margin card can finish loading while
+   * already off-screen.
+   */
+  useEffect(() => {
+    if (!mounted || !loaded) return;
+    const win = frameRef.current?.contentWindow;
+    if (!win) return;
+    try {
+      win.postMessage({ source: "ns-ui-preview", visible: onScreen }, window.location.origin);
+    } catch {
+      /* frame gone */
+    }
+  }, [mounted, loaded, onScreen]);
 
   return (
     <div

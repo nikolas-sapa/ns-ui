@@ -4,6 +4,7 @@ import { demos } from "@/registry/index";
 import autoplayMap from "@/lib/autoplay.generated.json";
 import { parseAutoplay } from "@/lib/autoplay";
 import { AutoplayDriver } from "@/app/_components/autoplay-driver";
+import { ANIMATION_GATE_SCRIPT } from "./animation-gate";
 
 /**
  * The card thumbnail route — what every catalog and featured card loads in its
@@ -64,6 +65,13 @@ export default async function EmbedPreviewPage({
 
   return (
     <div className="min-h-screen" inert data-autoplay-root={spec ? "" : undefined}>
+      {/* Plain inline script, not a client component: it has to install its
+          `requestAnimationFrame` patch before `<Demo/>` (or `AutoplayDriver`)
+          ever calls the real one, and a server-rendered `<script>` runs in
+          document order during initial parse — ahead of React hydrating any
+          client component's effects. See the docblock at the top of
+          `animation-gate.ts` for what it does and why. */}
+      <script dangerouslySetInnerHTML={{ __html: ANIMATION_GATE_SCRIPT }} />
       <Demo />
       {spec ? <AutoplayDriver spec={spec} /> : null}
     </div>
