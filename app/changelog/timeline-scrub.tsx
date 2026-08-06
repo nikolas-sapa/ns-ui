@@ -19,9 +19,14 @@ import { useEffect, useRef, useState } from "react";
  */
 export function TimelineScrub({
   minWidth,
+  eventCount,
   children,
 }: {
   minWidth: number;
+  /** events fed to Strandline — sizes how long its intro tide runs so the
+   *  auto-scroll (below) doesn't ease back to the resting position before
+   *  the tide has actually reached it */
+  eventCount: number;
   children: React.ReactNode;
 }) {
   const trackRef = useRef<HTMLDivElement | null>(null);
@@ -39,11 +44,64 @@ export function TimelineScrub({
     el.addEventListener("scroll", update, { passive: true });
     const ro = new ResizeObserver(update);
     ro.observe(el);
+
+    // Strandline's intro tide always enters from its own right edge (the
+    // "now" side) and washes toward each target — but this track's resting
+    // scroll position is the left edge (newest releases, see page.tsx). With
+    // a history wider than the viewport that leaves the entire tide, and the
+    // first several deposits, scrolled off past the right edge: a visitor
+    // landing during the ~8s intro sees an empty strip. Start scrolled to
+    // the "now" edge so the tide is visible as it sweeps in, then ease back
+    // to the documented resting position (newest-first, left-anchored) once
+    // it's had a moment to play. Any real user input cancels the auto-scroll
+    // outright — it must never fight a scroll/keyboard/touch interaction.
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+    let cancelled = reduced;
+    const cancel = () => {
+      cancelled = true;
+    };
+    if (!cancelled && el.scrollWidth > el.clientWidth) {
+      el.scrollLeft = el.scrollWidth - el.clientWidth;
+      el.addEventListener("pointerdown", cancel, { once: true });
+      el.addEventListener("wheel", cancel, { once: true, passive: true });
+      el.addEventListener("keydown", cancel, { once: true });
+      el.addEventListener("touchstart", cancel, {
+        once: true,
+        passive: true,
+      });
+      // Strandline stages one wave per event every 160ms (its
+      // LAUNCH_STAGGER_MS) and the last-launched wave still has to travel
+      // its full arc (~its width / 420px/s) plus a 550ms recede — for this
+      // page's 20+ releases that's several seconds. Easing the camera back
+      // on a fixed short delay reliably beat the tide here, landing on the
+      // resting position before it had drawn anything there. Size the
+      // delay off the actual event count instead of a guess.
+      const settle = window.setTimeout(
+        () => {
+          if (!cancelled) {
+            el.scrollTo({ left: 0, behavior: "smooth" });
+          }
+        },
+        eventCount * 160 + 4000
+      );
+      return () => {
+        window.clearTimeout(settle);
+        el.removeEventListener("scroll", update);
+        el.removeEventListener("pointerdown", cancel);
+        el.removeEventListener("wheel", cancel);
+        el.removeEventListener("keydown", cancel);
+        el.removeEventListener("touchstart", cancel);
+        ro.disconnect();
+      };
+    }
+
     return () => {
       el.removeEventListener("scroll", update);
       ro.disconnect();
     };
-  }, []);
+  }, [eventCount]);
 
   const scrollBy = (dir: 1 | -1) => {
     const el = trackRef.current;
