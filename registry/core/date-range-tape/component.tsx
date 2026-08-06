@@ -166,6 +166,7 @@ export interface SpanTapeProps {
   value?: SpanTapeRange | null;
   /** fires with the locked range on confirm, or null on cancel */
   onValueChange?: (range: SpanTapeRange | null) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

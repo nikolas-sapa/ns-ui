@@ -41,7 +41,9 @@ export interface NewsletterCadenceRailProps {
   intervalDays?: number;
   /** recent issues, newest first — rendered as a short archive list */
   issues?: NewsletterIssue[];
+  /** called with the entered email on submit */
   onSubmit?: (email: string) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

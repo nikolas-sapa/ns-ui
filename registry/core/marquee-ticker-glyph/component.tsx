@@ -28,6 +28,7 @@ export interface GlyphScrubTickerProps {
   speed?: number;
   /** px/s above which cells blur into noise glyphs (ambient speed should sit under this) */
   resolveThreshold?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

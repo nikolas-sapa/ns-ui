@@ -182,9 +182,11 @@ export interface HumpYardProps {
   defaultView?: ViewMode;
   /** Controlled view. */
   view?: ViewMode;
+  /** called with the new view when a different one is selected */
   onViewChange?: (view: ViewMode) => void;
   /** Accessible name for the item collection, e.g. "Tasks". */
   "aria-label"?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

@@ -43,9 +43,11 @@ export type BoughNode = {
 export interface BoughIndexProps {
   /** Accessible name for the tree, e.g. "Project files". */
   label: string;
+  /** root-level nodes of the tree */
   nodes: BoughNode[];
   /** Node ids expanded on first render, statically — no reveal sequence for these. */
   defaultExpandedIds?: string[];
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

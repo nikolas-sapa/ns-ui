@@ -83,6 +83,7 @@ function ambient(x: number, y: number, t: number): number {
 export interface LloydRelaxProps {
   /** number of stipple sites */
   count?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

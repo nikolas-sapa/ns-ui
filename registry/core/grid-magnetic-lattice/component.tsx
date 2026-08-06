@@ -85,7 +85,9 @@ export function WarpLattice({
   peakBend?: number;
   /** smoothed-cursor lerp per frame — flicks lag, the sheet relaxes behind them */
   cursorLerp?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** accessible name for the grid */
   "aria-label"?: string;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);

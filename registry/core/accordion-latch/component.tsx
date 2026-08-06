@@ -38,11 +38,13 @@ export interface HaspFoldItem {
 }
 
 export interface HaspFoldProps {
+  /** the accordion sections, in order */
   items: HaspFoldItem[];
   /** Allow more than one section open at once. Default false (single-open). */
   multiple?: boolean;
   /** Initially open item ids. */
   defaultOpen?: string[];
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

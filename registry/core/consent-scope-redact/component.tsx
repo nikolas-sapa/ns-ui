@@ -31,6 +31,7 @@ export interface LampBlackProps {
   scopes: LampBlackScope[];
   /** The sentence, templated as an ordered list of literal text and scope-tagged tokens. */
   record: LampBlackPart[];
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

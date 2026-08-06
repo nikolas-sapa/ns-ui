@@ -79,16 +79,23 @@ export function NeedleStepper({
 }: {
   /** controlled value; omit for uncontrolled */
   value?: number;
+  /** uncontrolled initial value */
   defaultValue?: number;
+  /** minimum allowed value */
   min?: number;
+  /** maximum allowed value */
   max?: number;
+  /** increment per press/keystroke */
   step?: number;
   /** accessible name for the spinbutton */
   label?: string;
   /** unit suffix rendered beside the value, e.g. "°C" */
   unit?: string;
+  /** called with the new value on every increment/decrement */
   onValueChange?: (value: number) => void;
+  /** blocks the increment/decrement controls */
   disabled?: boolean;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);

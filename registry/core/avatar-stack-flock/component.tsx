@@ -86,7 +86,9 @@ export function FlockStack({
   overflow?: number;
   /** avatar diameter in px */
   avatarSize?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** accessible name for the avatar group */
   "aria-label"?: string;
 }) {
   const regionRef = useRef<HTMLDivElement>(null);

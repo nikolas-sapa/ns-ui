@@ -35,12 +35,15 @@ export interface JackKnifeItem {
 }
 
 export interface JackKnifeProps {
+  /** the menu's rows */
   items: JackKnifeItem[];
+  /** called with the chosen row's id when one is selected */
   onSelect?: (id: string) => void;
   /** region that opens the menu on right-click; the trigger button always works too */
   children?: ReactNode;
   /** accessible name for the trigger button and the menu itself */
   label?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

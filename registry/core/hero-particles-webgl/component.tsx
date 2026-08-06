@@ -207,11 +207,17 @@ export function ParticleHero({
   ctaHref,
   onCtaClick,
 }: {
+  /** mono eyebrow label above the headline */
   eyebrow?: string;
+  /** main hero heading */
   headline?: string;
+  /** supporting copy under the headline */
   subline?: string;
+  /** CTA button/link text */
   cta?: string;
+  /** renders the CTA as an `<a href>` instead of a `<button>` */
   ctaHref?: string;
+  /** click handler when `ctaHref` is omitted (renders a `<button>`) */
   onCtaClick?: () => void;
 }) {
   const webgl = useWebGLSupport();

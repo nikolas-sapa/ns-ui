@@ -70,10 +70,15 @@ export interface PunchListField {
 }
 
 export interface PunchListProps {
+  /** the form fields, in order */
   fields: PunchListField[];
+  /** heading above the form */
   title?: string;
+  /** submit button text */
   submitLabel?: string;
+  /** called with all field values, keyed by field id, once submission passes validation */
   onSubmit?: (values: Record<string, string>) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

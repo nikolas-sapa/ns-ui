@@ -121,11 +121,15 @@ export interface RiffleEdgeItem {
 }
 
 export interface RiffleEdgeProps {
+  /** the cards, in order */
   items: RiffleEdgeItem[];
   /** controlled current index; omit for uncontrolled */
   index?: number;
+  /** uncontrolled initial index. Default 0. */
   defaultIndex?: number;
+  /** called with the new index after a swipe/click/keyboard change */
   onIndexChange?: (index: number) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
   /** accessible name for the enclosing group */
   "aria-label"?: string;

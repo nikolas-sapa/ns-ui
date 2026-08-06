@@ -44,12 +44,15 @@ export interface Quote {
 }
 
 export interface BourseTapeProps {
+  /** the scrolling quotes, in order */
   quotes: Quote[];
   /** Base feed speed in px/s. Default 46. */
   speed?: number;
   /** External pause control. Omit for internal state. */
   paused?: boolean;
+  /** called with the new paused state after hover/focus enter or leave */
   onPausedChange?: (paused: boolean) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

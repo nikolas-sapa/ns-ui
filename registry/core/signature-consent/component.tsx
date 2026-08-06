@@ -31,6 +31,7 @@ export interface DeedStrokeProps {
   prompt?: string;
   /** Called once, when the signer confirms. */
   onConfirm?: (value: DeedStrokeValue) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

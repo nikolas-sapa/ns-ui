@@ -32,7 +32,9 @@ export interface MasonryAsciiTile {
 }
 
 export interface MasonryAsciiSettleProps {
+  /** the tiles, laid into the masonry grid and settling into place */
   tiles: MasonryAsciiTile[];
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

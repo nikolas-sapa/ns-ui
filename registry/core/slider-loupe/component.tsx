@@ -80,9 +80,13 @@ export function LoupeSlider({
 }: {
   /** controlled value; omit for uncontrolled */
   value?: number;
+  /** uncontrolled initial value */
   defaultValue?: number;
+  /** minimum allowed value */
   min?: number;
+  /** maximum allowed value */
   max?: number;
+  /** increment per keyboard/drag step */
   step?: number;
   /** minor tick interval in value units; auto-derived when omitted */
   tickStep?: number;
@@ -92,8 +96,11 @@ export function LoupeSlider({
   formatLabel?: (v: number) => string;
   /** aria-valuetext for the current value */
   formatValue?: (v: number) => string;
+  /** called with the new value on every drag/keyboard change */
   onValueChange?: (v: number) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** accessible name for the slider. Default "Value". */
   "aria-label"?: string;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);

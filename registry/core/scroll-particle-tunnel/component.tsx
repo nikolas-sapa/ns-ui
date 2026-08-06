@@ -98,6 +98,7 @@ export function ParticleTunnelScrub({
   labels?: string[];
   /** points seeded in the cylinder shell */
   pointCount?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const sectionRef = useRef<HTMLElement>(null);

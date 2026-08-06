@@ -131,10 +131,13 @@ export function DrapeMenu({
 }: {
   /** trigger label; also the menu's aria-label */
   label?: string;
+  /** the menu's rows */
   items?: DrapeMenuItem[];
+  /** called with the chosen row's id when one is selected */
   onSelect?: (id: string) => void;
   /** cloth/panel width floor in px (widens to match a wider trigger) */
   minWidth?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const menuId = useId();

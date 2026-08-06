@@ -31,6 +31,7 @@ export interface PlimsollGaugeProps {
   value: number;
   /** Legal capacity limit (%) — where the "S" load line sits. Default 100. */
   limit?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

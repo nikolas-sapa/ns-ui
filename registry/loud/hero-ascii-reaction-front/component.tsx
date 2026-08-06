@@ -86,6 +86,7 @@ function mulberry32(seed: number) {
 export interface ReactionFrontProps {
   /** grid cell size in px — the sim grid is the glyph grid, never supersampled */
   cellSize?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

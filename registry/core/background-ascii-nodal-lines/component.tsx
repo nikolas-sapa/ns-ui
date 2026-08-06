@@ -49,6 +49,7 @@ export interface NodalLinesProps {
   cellSize?: number;
   /** how many of the four fixed emitters to use (2–4) */
   sourceCount?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

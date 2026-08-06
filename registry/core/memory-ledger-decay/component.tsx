@@ -56,6 +56,7 @@ export interface PatinaMemory {
 }
 
 export interface PatinaLedgerProps {
+  /** the ledger rows, each decaying independently by its own age */
   memories: PatinaMemory[];
   /** current turn index — advances as the conversation proceeds */
   turn: number;
@@ -64,11 +65,13 @@ export interface PatinaLedgerProps {
    * default [1, 4, 9] (0 turns = fresh, 1-3 = aging, 4-8 = fading, 9+ = dormant)
    */
   ageThresholds?: readonly [number, number, number];
+  /** called when a row's pin is toggled */
   onPinToggle?: (id: string, pinned: boolean) => void;
   /** called once a row's evict collapse animation has finished */
   onEvict?: (id: string) => void;
   /** accessible name for the ledger list. default "Session memory" */
   ariaLabel?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

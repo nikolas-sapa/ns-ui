@@ -71,11 +71,13 @@ export interface RidgeWalkProps {
   mode?: RidgeWalkAxisMode;
   /** Initial mode when uncontrolled. @default "balance" */
   defaultMode?: RidgeWalkAxisMode;
+  /** called with the new mode when a different axis emphasis is chosen */
   onModeChange?: (mode: RidgeWalkAxisMode) => void;
   /** Accessible name for the model radiogroup. @default "Model" */
   label?: string;
   /** Word used for the score axis in captions and announcements, e.g. "MMLU". @default "quality" */
   scoreLabel?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

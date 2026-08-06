@@ -15,9 +15,13 @@ export interface BentoCell {
 }
 
 export interface BentoGridProps {
+  /** the grid's tiles */
   cells: BentoCell[];
+  /** number of grid columns */
   cols?: number;
+  /** id of the cell that starts featured (always 2x2). Defaults to the first cell. */
   defaultFeaturedId?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

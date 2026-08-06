@@ -162,7 +162,9 @@ export function Strandline({
   events?: StrandlineEvent[];
   /** waves auto-launched on mount (0 disables the intro tide) */
   autoplay?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** accessible name for the timeline. Default "Release timeline strand". */
   "aria-label"?: string;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);

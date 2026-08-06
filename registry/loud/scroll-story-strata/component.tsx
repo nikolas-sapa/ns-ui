@@ -175,6 +175,7 @@ export function CoreSampleScroll({
   totalDepth?: number;
   /** scroll-track height in vh; the sticky stage is always 100vh */
   trackVh?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const uid = useId();

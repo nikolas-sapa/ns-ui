@@ -29,11 +29,17 @@ import {
 // ---------------------------------------------------------------------------
 
 export interface DetentSwipeProps {
+  /** primary row text */
   title: string;
+  /** secondary row text under the title */
   subtitle?: string;
+  /** called when the archive action is revealed and confirmed */
   onArchive?: () => void;
+  /** called when the flag action is revealed and confirmed */
   onFlag?: () => void;
+  /** called when the delete action is revealed and confirmed */
   onDelete?: () => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

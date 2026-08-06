@@ -16,11 +16,15 @@ export interface TallyNotchItem {
 }
 
 export interface TallyNotchProps {
+  /** the checkbox rows, in order */
   items: TallyNotchItem[];
+  /** ids checked at mount */
   defaultChecked?: string[];
+  /** called with the full list of checked ids after any toggle */
   onChange?: (checkedIds: string[]) => void;
   /** heading shown above the group; also the group's accessible name */
   label?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

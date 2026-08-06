@@ -64,6 +64,7 @@ export interface RelayLaneProps {
   windowMs?: number;
   /** controlled "now" in ms — omit to let the component tick its own clock */
   now?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

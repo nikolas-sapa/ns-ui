@@ -74,13 +74,19 @@ export interface BurinHatchCta {
 }
 
 export interface BurinHatchProps {
+  /** mono eyebrow label above the headline */
   eyebrow?: string;
+  /** headline text; an array renders one line per entry */
   headline?: string | string[];
+  /** supporting copy under the headline */
   subcopy?: string;
+  /** required primary CTA button/link */
   primaryCta: BurinHatchCta;
+  /** optional secondary CTA rendered beside the primary one */
   secondaryCta?: BurinHatchCta;
   /** accessible description of the engraving for screen readers */
   plateLabel?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

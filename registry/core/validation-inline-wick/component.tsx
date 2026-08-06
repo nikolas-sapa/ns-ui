@@ -43,14 +43,19 @@ export type LitmusOutcome =
 export type LitmusStatus = "idle" | "checking" | "valid" | "invalid";
 
 export interface LitmusWickProps {
+  /** field label, rendered above the input and bound to it via htmlFor */
   label: string;
+  /** name for the underlying `<input>`, for native form submission */
   name?: string;
+  /** id for the underlying `<input>`. Auto-generated when omitted. */
   id?: string;
+  /** placeholder text for the field */
   placeholder?: string;
   /** uncontrolled initial value */
   defaultValue?: string;
   /** controlled value; omit for uncontrolled */
   value?: string;
+  /** called on every keystroke with the raw input value */
   onValueChange?: (value: string) => void;
   /**
    * Return synchronously for an instantly-known rule ("definitely wrong" —
@@ -61,9 +66,13 @@ export interface LitmusWickProps {
   validate?: (value: string) => LitmusOutcome | Promise<LitmusOutcome>;
   /** ms after the last keystroke before validate runs. Default 260. */
   debounceMs?: number;
+  /** marks the underlying `<input>` as `required` for native form validation */
   required?: boolean;
+  /** blocks the underlying `<input>` */
   disabled?: boolean;
+  /** passed straight through to the underlying `<input autoComplete>` */
   autoComplete?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

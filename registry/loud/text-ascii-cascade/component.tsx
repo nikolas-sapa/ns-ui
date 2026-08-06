@@ -35,7 +35,9 @@ interface CharState {
 }
 
 export interface AsciiCascadeTextProps {
+  /** the rendered text */
   text: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

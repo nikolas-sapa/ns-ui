@@ -30,7 +30,9 @@ export interface GantryItem {
 }
 
 export interface GantryRunProps {
+  /** the gallery images, in order */
   items?: GantryItem[];
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

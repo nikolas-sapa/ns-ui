@@ -55,7 +55,9 @@ export interface StemSiftProps {
   records: StemSiftRecord[];
   /** unit suffix for readouts and stem labels, e.g. "ms" */
   unit?: string;
+  /** heading above the plot */
   label?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

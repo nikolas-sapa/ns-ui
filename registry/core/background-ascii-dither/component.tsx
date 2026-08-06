@@ -27,6 +27,7 @@ export function AsciiDitherMedia({
   cursorRadius = 140,
   className = "",
 }: {
+  /** rendering style: "ascii" characters, "dither" pattern, or "dot" halftone */
   mode?: Mode;
   /** optional image URL; omit for the built-in animated noise field */
   src?: string;
@@ -34,6 +35,7 @@ export function AsciiDitherMedia({
   cellSize?: number;
   /** cursor-proximity resolve radius in px */
   cursorRadius?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);

@@ -114,15 +114,23 @@ export type NibCheckValue = boolean | "indeterminate";
 export interface NibCheckProps {
   /** controlled value; omit for uncontrolled. "indeterminate" is visual/AT only — the underlying value is boolean */
   checked?: NibCheckValue;
+  /** initial value when uncontrolled. Default false. */
   defaultChecked?: NibCheckValue;
+  /** called with the resolved boolean after a toggle; never fires "indeterminate" */
   onCheckedChange?: (checked: boolean) => void;
+  /** blocks the input and mutes the box; the label cursor becomes not-allowed */
   disabled?: boolean;
   /** visible label; also becomes the accessible name via native label association */
   label?: ReactNode;
+  /** id for the underlying `<input type="checkbox">`. Auto-generated when omitted. */
   id?: string;
+  /** name for the underlying `<input>`, for native form submission */
   name?: string;
+  /** value for the underlying `<input>`, for native form submission */
   value?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** accessible name for the input, used only when `label` is omitted */
   "aria-label"?: string;
 }
 

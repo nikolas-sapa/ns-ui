@@ -25,6 +25,7 @@ export interface StippleYearProps {
   values?: Record<string, number>;
   /** Last day of the 371-day window. Defaults to today. */
   endDate?: Date;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

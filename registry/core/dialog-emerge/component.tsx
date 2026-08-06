@@ -33,12 +33,15 @@ export interface EmergeDialogProps {
   onOpenChange: (open: boolean) => void;
   /** The control the panel emerges from and returns into. Omit for a centered scale-in. */
   triggerRef?: RefObject<HTMLElement | null>;
+  /** dialog heading */
   title?: ReactNode;
+  /** supporting copy under the title */
   description?: ReactNode;
   /** Body and actions. Rendered inside the panel, below the title block. */
   children?: ReactNode;
   /** Clicking the dimmed backdrop closes. Default true. */
   dismissOnBackdrop?: boolean;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

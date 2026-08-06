@@ -52,13 +52,17 @@ export function MortiseSlip({
   className = "",
   "aria-label": ariaLabel = "Sections",
 }: {
+  /** the tabs, in order */
   tabs: MortiseSlipTab[];
   /** id of the initially selected tab (uncontrolled); defaults to the first */
   defaultTab?: string;
   /** controlled selected tab id; omit for uncontrolled */
   value?: string;
+  /** called with the new id when a different tab is selected */
   onValueChange?: (id: string) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** accessible name for the tab list. Default "Sections". */
   "aria-label"?: string;
 }) {
   const baseId = useId();

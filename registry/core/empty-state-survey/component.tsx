@@ -47,9 +47,11 @@ export interface StakeLineProps {
   description?: string;
   /** Label of the single CTA the staked plot ties itself to. */
   actionLabel?: string;
+  /** called when the CTA is pressed */
   onAction?: () => void;
   /** What the plot outlines. Defaults to a 3-column card grid of 6. */
   shape?: StakeLineShape;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

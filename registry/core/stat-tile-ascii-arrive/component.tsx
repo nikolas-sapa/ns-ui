@@ -81,6 +81,7 @@ export interface StatTileAsciiArriveProps {
   label?: string;
   /** shown after the value, e.g. "%" or "ms" */
   suffix?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

@@ -174,7 +174,9 @@ export function WireFeed({
    * that same id to "done"/"error" with endedAt when it finishes. Never
    * shows a step that hasn't actually started. */
   steps: WireFeedStep[];
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** accessible name for the log. Default "Task progress". */
   "aria-label"?: string;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);

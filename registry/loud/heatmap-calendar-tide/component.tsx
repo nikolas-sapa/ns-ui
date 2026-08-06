@@ -28,13 +28,19 @@ export function TideLedger({
   onSelect,
   className = "",
 }: {
+  /** one entry per day; the trailing `weeks * 7` days are shown */
   data: TideCell[];
+  /** number of weeks (columns) rendered, most recent last */
   weeks?: number;
   /** px edge of one day cell */
   cell?: number;
+  /** px gap between cells, both axes */
   gap?: number;
+  /** caption above the grid; also the grid's accessible name */
   label?: string;
+  /** called with the clicked day's data */
   onSelect?: (cell: TideCell) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const [active, setActive] = useState<number | null>(null);

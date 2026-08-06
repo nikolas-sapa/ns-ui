@@ -40,6 +40,7 @@ export interface BrailleSpinProps {
   progress?: number;
   /** accessible label for the progressbar. */
   "aria-label"?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

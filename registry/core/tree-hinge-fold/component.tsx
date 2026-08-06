@@ -23,9 +23,11 @@ export function FoldingRule({
   defaultExpanded = [],
   className = "",
 }: {
+  /** root-level nodes of the tree */
   nodes: RuleNode[];
   /** ids expanded on first render */
   defaultExpanded?: string[];
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const [expanded, setExpanded] = useState<Set<string>>(

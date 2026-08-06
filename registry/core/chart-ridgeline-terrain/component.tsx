@@ -112,7 +112,9 @@ export function SignalTerrain({
   dentSigma?: number;
   /** max cursor dent depth in px */
   dentDepth?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** accessible name for the terrain. Default "Live signal terrain". */
   "aria-label"?: string;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);

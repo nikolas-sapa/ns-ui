@@ -146,6 +146,7 @@ export interface PhaseSwingProps {
   count?: number;
   /** Half-angle of swing, degrees. */
   amplitudeDeg?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

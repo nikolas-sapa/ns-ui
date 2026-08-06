@@ -27,7 +27,9 @@ const LINE_HEIGHT = 1.4;
 export interface RuleFrameProps {
   /** sits inline in the top rule, like a fieldset legend */
   title?: string;
+  /** the framed content */
   children?: React.ReactNode;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

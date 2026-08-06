@@ -75,16 +75,23 @@ const btnDead = "cursor-default opacity-40";
 export interface PawlLiftProps {
   /** controlled value; omit for uncontrolled */
   value?: number;
+  /** uncontrolled initial value */
   defaultValue?: number;
+  /** minimum allowed value */
   min?: number;
+  /** maximum allowed value */
   max?: number;
+  /** increment per press/keystroke */
   step?: number;
   /** accessible name for the spinbutton, and the on-screen caption */
   label?: string;
   /** unit suffix rendered beside the value, e.g. "seats" */
   unit?: string;
+  /** called with the new value on every increment/decrement */
   onValueChange?: (value: number) => void;
+  /** blocks the increment/decrement controls */
   disabled?: boolean;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

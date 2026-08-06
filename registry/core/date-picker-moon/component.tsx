@@ -221,10 +221,15 @@ export function TerminatorDateField({
 }: {
   /** controlled selected date; omit for uncontrolled */
   value?: Date | null;
+  /** uncontrolled initial selected date */
   defaultValue?: Date | null;
+  /** called with the new date when a day is picked */
   onValueChange?: (date: Date) => void;
+  /** field label rendered above the trigger */
   label?: string;
+  /** blocks the trigger and closes the calendar if open */
   disabled?: boolean;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const uid = useId();

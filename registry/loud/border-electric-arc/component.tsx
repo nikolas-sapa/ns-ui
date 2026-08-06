@@ -38,7 +38,9 @@ import { useEffect, useId, useRef } from "react";
 export interface SparkGapProps {
   /** Accessible label / visible text of the CTA button. */
   label?: string;
+  /** called when the button is clicked */
   onClick?: () => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

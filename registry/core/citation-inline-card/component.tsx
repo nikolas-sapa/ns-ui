@@ -48,7 +48,9 @@ export type CiteSource = {
 };
 
 export interface MarginCiteProps {
+  /** the citable sources, referenced by inline markers in the surrounding text */
   sources: CiteSource[];
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

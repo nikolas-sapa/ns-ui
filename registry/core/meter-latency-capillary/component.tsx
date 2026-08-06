@@ -98,6 +98,7 @@ export interface MeniscusHoldProps {
   onSwitchModel?: () => void;
   /** accessible name for the root status region. Default "Time to first token" */
   label?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

@@ -45,6 +45,7 @@ export interface BasteStitchProps {
    * controls to a screen reader. Default "change".
    */
   itemLabel?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

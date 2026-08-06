@@ -304,6 +304,7 @@ export interface ForceChainsProps {
   cellSize?: number;
   /** target number of grains in the packing */
   grainCount?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

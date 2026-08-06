@@ -44,10 +44,13 @@ export type BellowsCrumbItem = {
 export interface BellowsCrumbProps {
   /** Ordered root → current. The last item is the current page. */
   items: BellowsCrumbItem[];
+  /** called when a non-current crumb is activated */
   onNavigate?: (item: BellowsCrumbItem, index: number) => void;
   /** Width a pleated segment rests at. Default 20. */
   pleat?: number;
+  /** accessible name for the breadcrumb nav */
   ariaLabel?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

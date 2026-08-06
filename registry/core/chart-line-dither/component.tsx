@@ -25,8 +25,11 @@ export interface ChartLineDitherDatum {
 }
 
 export interface ChartLineDitherProps {
+  /** the plotted line's points, in order */
   data?: ChartLineDitherDatum[];
+  /** heading above the chart */
   title?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

@@ -77,6 +77,7 @@ export interface CloudChamberProps {
   maxLegendItems?: number;
   /** batching window (ms) for legend rows + the live-region announcement. default 350 */
   flushMs?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

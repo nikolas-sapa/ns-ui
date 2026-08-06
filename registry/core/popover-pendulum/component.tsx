@@ -113,8 +113,11 @@ export interface PlumbSwayProps {
   interaction?: "click" | "hover";
   /** preferred side; flips automatically when the panel would clip the viewport */
   placement?: "bottom" | "top";
+  /** px width of the popover panel */
   panelWidth?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** extra classes merged onto the panel element */
   panelClassName?: string;
 }
 

@@ -54,12 +54,17 @@ type Thumb = "lo" | "hi";
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 
 export interface ShearBandProps {
+  /** minimum allowed value for either thumb */
   min?: number;
+  /** maximum allowed value for either thumb */
   max?: number;
+  /** increment per keyboard/drag step */
   step?: number;
   /** controlled [min, max] value; omit for uncontrolled */
   value?: [number, number];
+  /** uncontrolled initial [min, max] value */
   defaultValue?: [number, number];
+  /** called with the new [min, max] on every drag/keyboard change */
   onValueChange?: (value: [number, number]) => void;
   /** formats a bound for both the printed readout and aria-valuetext */
   formatValue?: (v: number) => string;
@@ -67,6 +72,7 @@ export interface ShearBandProps {
   minLabel?: string;
   /** accessible name for the upper-bound input */
   maxLabel?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

@@ -60,15 +60,21 @@ export interface PressureFrontCta {
 }
 
 export interface PressureFrontProps {
+  /** mono eyebrow label above the headline */
   eyebrow?: string;
+  /** headline text; an array renders one line per entry */
   headline?: string | string[];
+  /** supporting copy under the headline */
   subcopy?: string;
+  /** required primary CTA button/link */
   primaryCta: PressureFrontCta;
+  /** optional secondary CTA rendered beside the primary one */
   secondaryCta?: PressureFrontCta;
   /** number of contour rings. default 30 */
   rings?: number;
   /** ms for one full drift loop of the noise phase. default 20000 */
   driftMs?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

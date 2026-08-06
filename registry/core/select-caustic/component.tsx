@@ -134,17 +134,23 @@ export function CausticSelect({
   name,
   className = "",
 }: {
+  /** the selectable options */
   options?: CausticSelectOption[];
   /** controlled value; omit for uncontrolled */
   value?: string;
+  /** uncontrolled initial value */
   defaultValue?: string;
+  /** called with the new value when a different option is selected */
   onValueChange?: (value: string) => void;
   /** field label rendered above the trigger */
   label?: string;
+  /** shown on the trigger while no option is selected */
   placeholder?: string;
+  /** blocks the trigger and closes the popover if open */
   disabled?: boolean;
   /** when set, renders a hidden input for form posts */
   name?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const uid = useId();

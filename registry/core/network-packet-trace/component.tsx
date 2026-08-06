@@ -33,6 +33,7 @@ export type PacketTraceState = "idle" | "active" | "error";
 export interface PacketTraceProps {
   /** Traffic pattern. Default "idle". */
   state?: PacketTraceState;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

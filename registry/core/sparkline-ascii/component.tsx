@@ -15,6 +15,7 @@ export interface RampTraceProps {
   label?: string;
   /** formats a raw value for the in-grid readout and accessible names */
   valueFormat?: (value: number) => string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

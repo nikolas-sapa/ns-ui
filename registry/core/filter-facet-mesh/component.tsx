@@ -33,7 +33,9 @@ export function SieveFacets({
   defaultActive = ["in-stock", "bestseller"],
   className = "",
 }: {
+  /** facet ids checked at mount */
   defaultActive?: string[];
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const [active, setActive] = useState<Set<string>>(() => new Set(defaultActive));
