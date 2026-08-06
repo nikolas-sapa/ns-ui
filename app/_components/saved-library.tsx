@@ -1,9 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { CopyButton } from "./copy-button";
+import { LivePreviewFrame } from "./live-preview-frame";
+import { useMountManager } from "./use-mount-manager";
 import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
+
+/**
+ * How many saved previews may run at once. Lower than the homepage catalog's
+ * MOUNT_CAP (12) — this grid is 2-3 columns of much smaller cards, and a
+ * saved library can grow to be the largest grid on the site, so eviction
+ * matters more here, not less. Same "never evict what's on screen" rule as
+ * the homepage (see use-mount-manager.ts); this only shrinks the off-screen
+ * preload budget.
+ */
+const MOUNT_CAP = 9;
+
+/** Mount a preview this far outside the viewport so it's already run a beat
+ *  before it scrolls into view. Smaller than the homepage's 600px — these
+ *  cards are smaller too, so less runway is needed to stay ahead of scroll. */
+const PRELOAD_MARGIN = 400;
 
 type Folder = { id: string; name: string; slugs: string[]; isPublic: boolean };
 type Item = { name: string; title: string; description: string };
@@ -23,6 +40,7 @@ export function SavedLibrary({ items, slugs, initialFolders, handle }: { items: 
   const [newFolder, setNewFolder] = useState("");
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
+  const { registerRef, isActive } = useMountManager({ mountCap: MOUNT_CAP, preloadMargin: PRELOAD_MARGIN });
   const byName = useMemo(() => new Map(items.map((item) => [item.name, item])), [items]);
   const folder = folders.find((entry) => entry.id === selected);
   const visibleSlugs = selected === "all" ? slugs : folder?.slugs ?? [];
@@ -181,14 +199,12 @@ export function SavedLibrary({ items, slugs, initialFolders, handle }: { items: 
             const currentFolder = folders.find((entry) => entry.slugs.includes(item.name));
             const installCommand = `npx shadcn add ${REGISTRY_ORIGIN}/r/${item.name}.json`;
             return (
-              <li key={item.name} className="overflow-hidden rounded-md border border-border bg-surface">
-                <Link href={`/components/${item.name}`} className="group block outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ns-accent">
-                  <div className="border-b border-border px-4 py-5 transition-colors group-hover:bg-foreground/[0.03]">
-                    <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-ns-muted">Saved component</p>
-                    <h3 className="mt-2 text-sm font-semibold tracking-tight text-foreground">{item.title}</h3>
-                    <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-ns-muted">{item.description}</p>
-                  </div>
-                </Link>
+              <SavedCard
+                key={item.name}
+                item={item}
+                active={isActive(item.name)}
+                registerRef={registerRef}
+              >
                 <div className="flex items-center gap-2 border-t border-border px-3 py-2">
                   <label htmlFor={`folder-${item.name}`} className="text-[11px] text-ns-muted">Folder</label>
                   <select id={`folder-${item.name}`} value={currentFolder?.id ?? ""} disabled={pending === item.name} onChange={(event) => void move(item.name, event.target.value || null)} className="min-w-0 flex-1 rounded-sm border border-border bg-background px-2 py-1 text-xs text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ns-accent">
@@ -198,11 +214,70 @@ export function SavedLibrary({ items, slugs, initialFolders, handle }: { items: 
                   <CopyButton value={installCommand} label={`Copy install command for ${item.title}`} />
                   <Link href={`/components/${item.name}`} className="rounded-sm px-2 py-1 text-xs text-ns-muted outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent transition-colors">Open preview</Link>
                 </div>
-              </li>
+              </SavedCard>
             );
           })}
         </ul>
       )}
     </div>
+  );
+}
+
+/**
+ * One saved card: a live, smaller version of the homepage's preview
+ * (`preview-card.tsx`) — same `LivePreviewFrame`, same lazy-mount discipline
+ * via the mount manager passed in from `SavedLibrary` — followed by the
+ * title/description and, via `children`, the Folder/copy/open-preview row
+ * SavedLibrary still owns (it needs the folder list and move handler, which
+ * this component has no reason to know about).
+ */
+function SavedCard({
+  item,
+  active,
+  registerRef,
+  children,
+}: {
+  item: Item;
+  active: boolean;
+  registerRef: (name: string, el: HTMLElement | null) => void;
+  children: React.ReactNode;
+}) {
+  const setCardRef = useCallback(
+    (el: HTMLElement | null) => registerRef(item.name, el),
+    [registerRef, item.name],
+  );
+  return (
+    <li
+      ref={setCardRef}
+      data-name={item.name}
+      className="overflow-hidden rounded-md border border-border bg-surface"
+    >
+      {/* `group/card` scoped to the Link only — the Folder/copy/Open-preview
+          row below is a sibling, not part of this hit area, and before this
+          the hover glow was scoped to the whole `<li>`, so the footer's dead
+          space (the "Folder" label, the gaps) lit up on hover with no click
+          behind it. */}
+      <Link
+        href={`/components/${item.name}`}
+        className="group/card block outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ns-accent"
+      >
+        <LivePreviewFrame
+          name={item.name}
+          title={item.title}
+          active={active}
+          className="aspect-[16/10] w-full rounded-none border-0 border-b border-border"
+        >
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 z-10 rounded-none bg-foreground/0 transition-colors duration-200 group-hover/card:bg-foreground/[0.04] motion-reduce:transition-none"
+          />
+        </LivePreviewFrame>
+        <div className="px-4 py-3 transition-colors group-hover/card:bg-foreground/[0.03]">
+          <h3 className="text-sm font-semibold tracking-tight text-foreground">{item.title}</h3>
+          <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-ns-muted">{item.description}</p>
+        </div>
+      </Link>
+      {children}
+    </li>
   );
 }

@@ -390,14 +390,19 @@ export function SiteShell({
               type="button"
               onClick={() => setCmdkOpen(true)}
               aria-label="Open command palette"
-              // ::after grows the click region only — capped at half the 4px
-              // gap to the theme toggle beside it, generous vertically (this
-              // row is 64px tall and the button sits centered in it) —
-              // ~40x23 -> ~44x43.
-              className="relative inline-flex items-center gap-1 rounded-sm px-1.5 py-1 text-ns-muted outline-none transition-colors hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none after:absolute after:-inset-x-[2px] after:-inset-y-[10px] after:content-['']"
+              // Was ~44x22 (size-3 icon, text-[10px] label, px-1.5/py-1) —
+              // a full step smaller than the theme toggle beside it, the one
+              // control in the header row that read as an afterthought.
+              // Measured now at 52.4x28. ::after grows the click region only
+              // — capped at half the 4px gap to the theme toggle on its
+              // right (measured: still resolves to this button through +1px
+              // past its own edge, the theme toggle from +2px on), generous
+              // vertically (this row is 64px tall and the button sits
+              // centered in it) — 52.4x28 -> ~56x44.
+              className="relative inline-flex items-center gap-1.5 rounded-sm px-2 py-1.5 text-ns-muted outline-none transition-colors hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none after:absolute after:-inset-x-[2px] after:-inset-y-[8px] after:content-['']"
             >
-              <SearchIcon />
-              <kbd className="hidden font-mono text-[10px] sm:inline">⌘K</kbd>
+              <SearchIcon className="size-4" />
+              <kbd className="hidden font-mono text-xs sm:inline">⌘K</kbd>
             </button>
             <ThemeToggle />
             <span className="font-mono text-[11px] text-ns-muted">{total}</span>

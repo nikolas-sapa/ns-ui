@@ -58,6 +58,7 @@
 // which is what lets `convex/status.test.ts` prove the slot placement and the
 // uptime figure offline. This file owns the colour and the words, and nothing
 // else. Re-exported here so the page keeps one import for the strip.
+import { CopyButton } from "@/app/_components/copy-button";
 import {
   dayWindow,
   prettyDay,
@@ -140,7 +141,10 @@ export function ServiceCard({
           </span>
         </div>
         {service.subtitle ? (
-          <p className="font-mono text-xs text-ns-muted">{service.subtitle}</p>
+          <span className="flex items-center gap-1">
+            <p className="font-mono text-xs text-ns-muted">{service.subtitle}</p>
+            <CopyButton value={service.subtitle} label={`Copy ${service.name} identifier`} />
+          </span>
         ) : null}
       </div>
 
