@@ -1,5 +1,6 @@
 {
   "name": "validation-error-summary",
+  "rank": 291,
   "title": "Validation Error Summary",
   "description": "Failed-submit error handling as a contractor's punch list: a numbered defect summary pins to the top of the form, a hairline SVG leader line links each entry to its field on selection, and fixing a field strikes it through and counts down to self-dismissal.",
   "collection": "core",

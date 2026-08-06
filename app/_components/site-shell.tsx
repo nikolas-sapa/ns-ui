@@ -44,6 +44,34 @@ const LINK =
 const BOTTOM_BAR_LINK =
   "relative rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none after:absolute after:-inset-x-[6px] after:-inset-y-[3px] after:content-['']";
 
+/** Same grouping the footer uses (site-footer.tsx's `COLUMNS`) so the two
+ *  surfaces never disagree about what belongs together — Browse / Build
+ *  with it / For AI agents collapse into this compact bar, plus the items
+ *  the footer deliberately omits (Guidelines, Submit, Status are content/
+ *  process links, filed under Community; Sign in is an account action, not
+ *  content, so it stays out of any group — rendered by <SiteAuth /> below,
+ *  unchanged). No column headers here (that's footer-weight for a ~300-row
+ *  tree); groups are read by a `·` separator instead, the lightest thing
+ *  that still breaks the run into scannable chunks. */
+const BOTTOM_BAR_GROUPS: { href: string; label: string }[][] = [
+  [
+    { href: "/categories", label: "Categories" },
+    { href: "/changelog", label: "Changelog" },
+  ],
+  [
+    { href: "/install", label: "Install" },
+    { href: "/theming", label: "Theming" },
+  ],
+  [
+    { href: "/writing", label: "Writing" },
+    { href: "/community", label: "Community" },
+    { href: "/connect", label: "Connect" },
+    { href: "/guidelines", label: "Guidelines" },
+    { href: "/submit", label: "Submit" },
+    { href: "/status", label: "Status" },
+  ],
+];
+
 /** Which categories/kinds are open, beyond the current page's own section —
  *  persisted so a visitor's browsing structure survives navigation.
  *
@@ -481,36 +509,16 @@ export function SiteShell({
             sidebar's fixed width — it never affects Changelog/Writing/Connect
             themselves, which stay on the first line at any name length. */}
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-border px-4 py-3 font-mono text-[11px] text-ns-muted">
-          <Link href="/install" className={BOTTOM_BAR_LINK}>
-            Install
-          </Link>
-          <Link href="/theming" className={BOTTOM_BAR_LINK}>
-            Theming
-          </Link>
-          <Link href="/categories" className={BOTTOM_BAR_LINK}>
-            Categories
-          </Link>
-          <Link href="/changelog" className={BOTTOM_BAR_LINK}>
-            Changelog
-          </Link>
-          <Link href="/writing" className={BOTTOM_BAR_LINK}>
-            Writing
-          </Link>
-          <Link href="/community" className={BOTTOM_BAR_LINK}>
-            Community
-          </Link>
-          <Link href="/guidelines" className={BOTTOM_BAR_LINK}>
-            Guidelines
-          </Link>
-          <Link href="/submit" className={BOTTOM_BAR_LINK}>
-            Submit
-          </Link>
-          <Link href="/connect" className={BOTTOM_BAR_LINK}>
-            Connect
-          </Link>
-          <Link href="/status" className={BOTTOM_BAR_LINK}>
-            Status
-          </Link>
+          {BOTTOM_BAR_GROUPS.map((group, gi) => (
+            <span key={gi} className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+              {gi > 0 ? <span aria-hidden className="text-ns-muted/40">·</span> : null}
+              {group.map((link) => (
+                <Link key={link.href} href={link.href} className={BOTTOM_BAR_LINK}>
+                  {link.label}
+                </Link>
+              ))}
+            </span>
+          ))}
           {/* Hydration-only — see site-auth.tsx for why it fetches nothing
               until after paint and never flashes a different state than the
               signed-out default already rendered here. */}

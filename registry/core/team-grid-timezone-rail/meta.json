@@ -1,9 +1,18 @@
 {
   "name": "team-grid-timezone-rail",
+  "rank": 295,
   "title": "Team Grid Timezone Rail",
   "description": "A team grid that answers the question a team grid is actually asked — who is reachable right now — by running a 24-hour UTC rail above the cards with the team's shared working-hours overlap inked into it, while each card shows that person's live local time and dims when they're outside their own hours.",
   "collection": "core",
-  "tags": ["team", "grid", "about", "timezone", "availability", "clock", "marketing"],
+  "tags": [
+    "team",
+    "grid",
+    "about",
+    "timezone",
+    "availability",
+    "clock",
+    "marketing"
+  ],
   "useWhen": "Pick team-grid-timezone-rail for an about/team section that has to stay honest about reachability — live local clocks per person, cards dimmed outside their own hours, and one inked UTC run showing when the whole team overlaps. schedule-ascii-freebusy is the better pick when the input is real per-slot busy/free calendar data and the output is a bookable meeting window; this one needs nothing but each person's UTC offset.",
   "autoplay": {
     "mode": "pointer-path",

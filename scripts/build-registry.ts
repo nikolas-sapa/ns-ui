@@ -125,6 +125,9 @@ for (const collection of ["core", "loud"]) {
         collection: meta.collection,
         tags: meta.tags,
         instruction: meta.instruction,
+        // Owner's taste ranking, lower = better — optional, most components
+        // don't have one yet. See lib/rank.ts for the sort this feeds.
+        rank: meta.rank,
       },
     });
   }

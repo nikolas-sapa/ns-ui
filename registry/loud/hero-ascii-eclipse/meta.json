@@ -1,9 +1,18 @@
 {
   "name": "hero-ascii-eclipse",
+  "rank": 9,
   "title": "Hero ASCII Eclipse",
   "description": "A full-bleed ASCII hero built around an occlusion event — a dark glyph disc transits a bright sun disc over a fixed starfield, the pointer dragging the transit, and a corona blooms at the rim only as the two centers nearly align, the way a real solar corona is only visible near totality.",
   "collection": "loud",
-  "tags": ["ascii", "hero", "background", "canvas", "cursor", "eclipse", "occlusion"],
+  "tags": [
+    "ascii",
+    "hero",
+    "background",
+    "canvas",
+    "cursor",
+    "eclipse",
+    "occlusion"
+  ],
   "instruction": "Build a full-bleed Canvas 2D hero: a fixed sun disc (radius ~15% of the shorter canvas dimension, centered slightly above screen-center) sits over a sparse fixed breathing starfield (identical technique to hero-ascii-terrain's sky: seeded via mulberry32, alpha twinkling on a per-star sine phase), and a moon disc (radius ~1.04x the sun's, so it can fully cover it) transits across it. COMPOSITING, per cell, in strict occlusion order: if the cell is within the moon's radius, it is ALWAYS blank, unconditionally occluding sun or star beneath it — there is no partial-transparency moon. Otherwise, if within the sun's radius, draw the photosphere: the shared ' .:-=+*#%@' ramp indexed by a radial falloff (brighter toward the sun's own center), in the --foreground token. Otherwise, if within a corona ring band just outside the sun's radius (width ~65% of the sun's radius) AND the scalar 'corona intensity' is above a small threshold, draw a corona glyph whose density is the product of a radial falloff and an angular 'streamer' term — sin(angle * 7 + t * 1.4), a smooth per-angle flicker, not noise — scaled by that intensity, rendered in the --ns-accent token (the one place in this hero color leaves pure ink, deliberately, since a corona is the visual payoff). CORONA INTENSITY is a single scalar, pow(max(0, 1 - centerDistance / (sunRadius * 0.85)), 2): near zero for an ordinary partial transit and blooming only as the moon's center nearly coincides with the sun's — real eclipse astronomy, not a cosmetic pulse. Otherwise the cell falls through to the starfield (occluded by the moon check above already handled) or stays blank. The moon's position is the pointer's, inside the container, eased 0.08/frame toward the raw position; with no active pointer, an idle sweep (9s period, sine-driven horizontal traverse of ~2.6 moon-radii either side of the sun plus a small vertical bob) keeps the transit alive on its own. Direct-DOM rAF, zero React state on the hot path; grid buffers/typed arrays sized once per resize (cols/rows via Math.ceil, not floor). Ink is read via getComputedStyle(canvas).color plus the --ns-muted and --ns-accent custom properties at mount, re-derived on a documentElement class MutationObserver. Mono cell measured via an offscreen canvas's measureText. prefers-reduced-motion renders exactly one static frame with the moon parked clear of the sun (an ordinary partial-transit moment, corona at rest) and skips the rAF loop and pointer listeners entirely. Loop pauses on document.hidden, resumes on visibilitychange. Optional children render over the field, bottom-left anchored with padding. Props: cellSize (grid cell px, default 13), children, className.",
   "dependencies": [],
   "useWhen": "Pick hero-ascii-eclipse for a hero whose payoff is a single alignment event — drag the cursor to bring two discs into occlusion and watch a corona bloom — rather than a place to look out across (hero-ascii-terrain), a corridor to be pulled through (hero-ascii-tunnel), or a field bent by wind (hero-ascii-rainfall).",

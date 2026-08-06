@@ -1,5 +1,6 @@
 {
   "name": "hero-ascii-reaction-front",
+  "rank": 12,
   "title": "Hero ASCII Reaction Front",
   "description": "A full-bleed ASCII hero driven by a live Gray-Scott reaction-diffusion sim, inking only the migrating chemical fronts — the gradient ridge of the V species — so self-organising worm-like fronts crawl as thin bright lines across an otherwise empty field, with the pointer injecting fresh reagent that nucleates new fronts.",
   "collection": "loud",

@@ -1,5 +1,6 @@
 {
   "name": "meter-quota-rule",
+  "rank": 279,
   "title": "Meter Quota Rule",
   "description": "A quota meter with no bar, no fill, no pill: the printed reading ('38.2 GB of 100 GB') sits above a 4px hairline whose used portion is solid and remainder is dashed, a fixed tick marks the warning threshold, and crossing it thickens the rule and bolds the digits instead of turning anything red.",
   "collection": "core",

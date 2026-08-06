@@ -1,9 +1,18 @@
 {
   "name": "hero-letterpress-lockup",
+  "rank": 16,
   "title": "Hero Letterpress Lockup",
   "description": "A letterpress hero whose identity is a terminal lock-up event — headline glyphs slide in as metal sorts on individually sprung composing rails, then the quoin tightens in one mechanical clunk: letter-spacing compresses, a hairline chase snaps to fit, and an impression flash prints the subhead beneath.",
   "collection": "loud",
-  "tags": ["hero", "text", "typography", "letterpress", "spring", "entrance", "print"],
+  "tags": [
+    "hero",
+    "text",
+    "typography",
+    "letterpress",
+    "spring",
+    "entrance",
+    "print"
+  ],
   "useWhen": "a hero whose headline arrives once as individually sprung glyph sorts and then commits in a single mechanical tightening (letter-spacing compression + a hairline chase frame snapping to fit + an impression flash) before going fully static — unlike hero-dipole-field (continuous cursor-attraction field) or text-ligature-melt (hover-driven glyph fusion) or text-variable-weight (weight as a live continuous state), this one is about type becoming FIXED: the arrival is only the setup for one terminal event, not an ongoing interaction.",
   "autoplay": {
     "mode": "none"

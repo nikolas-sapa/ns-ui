@@ -1,5 +1,6 @@
 {
   "name": "refusal-negotiation",
+  "rank": 288,
   "title": "Refusal Negotiation",
   "description": "A refusal that negotiates instead of stonewalling: the offending span of a blocked request is echoed back struck through, with narrowing-lever toggle chips that rewrite it and unlock resend the instant a recheck passes.",
   "collection": "core",

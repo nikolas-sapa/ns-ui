@@ -1,5 +1,6 @@
 {
   "name": "validation-inline-wick",
+  "rank": 290,
   "title": "Validation Inline Wick",
   "description": "Inline per-field validation where the bottom border diffuses an error tint in from the exact offending character, like litmus paper — slow and pale while an async check is still pending, fast and decisive once it's definitely wrong, and it wicks back out the moment the field is fixed.",
   "collection": "core",

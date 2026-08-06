@@ -1,15 +1,32 @@
 {
   "name": "compare-crack-seam",
+  "rank": 2,
   "title": "Compare Crack Seam",
   "description": "Before/after comparison slider whose divider is a living Voronoi crack seam — fast drags spawn branching micro-fissures, slow drags heal them shut, and release settles with a 1px specular glint traveling the fracture.",
   "collection": "core",
-  "tags": ["compare", "slider", "before-after", "voronoi", "crack", "canvas", "clip-path", "physics", "image-diff"],
+  "tags": [
+    "compare",
+    "slider",
+    "before-after",
+    "voronoi",
+    "crack",
+    "canvas",
+    "clip-path",
+    "physics",
+    "image-diff"
+  ],
   "useWhen": "before and after images compared through a draggable divider that is itself a living crack, fast drags spawning branching fissures and slow drags healing them shut; pick diff-unified-viewer instead when the comparison is text and individual lines have to be addressable, or image-crop-mat when one image is being framed rather than two compared.",
   "autoplay": {
     "mode": "drag",
     "target": ".border-border",
-    "from": [0.5, 0.5],
-    "to": [0.72, 0.5],
+    "from": [
+      0.5,
+      0.5
+    ],
+    "to": [
+      0.72,
+      0.5
+    ],
     "period": 9000,
     "delay": 700
   },

@@ -1,9 +1,18 @@
 {
   "name": "newsletter-cadence-rail",
+  "rank": 281,
   "title": "Newsletter Cadence Rail",
   "description": "A newsletter capture whose headline element is a mono day-rail showing the publication's actual rhythm — six weeks of days, an issue mark every interval, a caret on today — so before typing anything you know exactly how often it lands and when the next one is.",
   "collection": "core",
-  "tags": ["newsletter", "capture", "form", "cadence", "ascii", "mono", "marketing"],
+  "tags": [
+    "newsletter",
+    "capture",
+    "form",
+    "cadence",
+    "ascii",
+    "mono",
+    "marketing"
+  ],
   "useWhen": "a newsletter/subscribe block where the publication's rhythm is the persuasion — the reader should be able to count the gap between issue marks and see the next date before deciding — rather than a generic 'join 5,000 readers' field; pick contact-form-teletype instead when the fill itself needs an honest running validation log, or schedule-ascii-freebusy when the subject is availability within a week rather than a repeating publication interval.",
   "autoplay": {
     "mode": "type",

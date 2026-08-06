@@ -1,9 +1,18 @@
 {
   "name": "text-prism-split",
+  "rank": 19,
   "title": "Text Prism Split",
   "description": "A frosted prism strip rides the cursor across a headline, magnifying the text beneath it and tearing it into velocity-driven RGB channel slices that snap back with spring overshoot.",
   "collection": "loud",
-  "tags": ["cursor", "text", "rgb-split", "chromatic-aberration", "glass", "spring", "headline"],
+  "tags": [
+    "cursor",
+    "text",
+    "rgb-split",
+    "chromatic-aberration",
+    "glass",
+    "spring",
+    "headline"
+  ],
   "useWhen": "a frosted prism strip rides the cursor across a headline, magnifying it and tearing it into velocity-driven RGB channel slices that snap back with overshoot; use for a glitchy, chromatic-aberration headline moment, not a soft/organic one; pick text-ligature-melt instead when the distortion should be soft and gooey rather than chromatic, text-variable-weight when the headline should respond in weight alone with no colour fringing, or text-decrypt when the effect should fire once on mount rather than ride the cursor.",
   "autoplay": {
     "mode": "pointer-path",

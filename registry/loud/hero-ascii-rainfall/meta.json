@@ -1,9 +1,18 @@
 {
   "name": "hero-ascii-rainfall",
+  "rank": 11,
   "title": "Hero ASCII Rainfall",
   "description": "A full-bleed ASCII precipitation hero — every column runs its own independent falling drop with a fixed rows/sec speed and trail length, and the pointer bends nearby streams sideways like wind gusting through rain instead of painting or warping cells directly.",
   "collection": "loud",
-  "tags": ["ascii", "hero", "background", "canvas", "cursor", "rain", "particles"],
+  "tags": [
+    "ascii",
+    "hero",
+    "background",
+    "canvas",
+    "cursor",
+    "rain",
+    "particles"
+  ],
   "instruction": "Build a full-bleed Canvas 2D hero: one independent falling drop per grid column, each a float head-row position advancing at its own fixed rows/sec speed (9-22) with its own trail length (6-18 rows), seeded via a deterministic mulberry32 PRNG (never Math.random) so a session's rainfall is reproducible. A column's glyph buffer only gets a fresh random character (from '|:.\\'\\`,;') the instant the head crosses into a NEW row — never every frame — so a settled trail holds still instead of flickering; luminance is purely distance-from-head, gamma-shaped (pow 1.5) so the head reads bright and the tail fades toward the ink floor, alpha never fully to zero (0.08 floor) so the tail dissolves rather than hard-cutting. When a column's head clears rows + its trail length past the bottom, it restarts above the top at a randomized negative offset (a random multiple of its own new trail length) with freshly randomized speed and trail — this staggering is what keeps drops from ever resetting in visible unison. WIND, not paint: the pointer maintains a rising/decaying 0..1 'energy' scalar (gains on pointer speed, relaxes over ~1s once it stops moving, exactly the plasma/wake decay pattern but applied to a lateral offset instead of a stamp or sample warp) and every column computes a target horizontal pixel offset as a gaussian falloff of its distance (in columns, sigma 10) from the pointer's column, times that energy, times a per-column sine gust (each column has its own frequency 0.6-1.4 rad/s and phase so nearby streams don't bend in lockstep) capped at 14px — the whole column's rendered x is offset uniformly by this eased value, so streams bend like a curtain in a gust and glide back straight once the pointer stops and energy decays to zero. Direct-DOM rAF, zero React state on the hot path; all typed arrays sized once per resize (cols/rows computed with Math.ceil, never floor, since flooring leaves an unpainted strip along the clipped container's bottom/right edge). Ink is read once via getComputedStyle(canvas).color and re-derived on a documentElement class MutationObserver for live theme flips. Mono cell dimensions are measured via an offscreen canvas's measureText after document.fonts.ready. prefers-reduced-motion fills every column full-height with one static randomized frame (no head/trail concept, no animation, no pointer listeners attached at all) so the effect's silhouette is legible without motion. Loop pauses on document.hidden and resumes on visibilitychange. Optional children render over the field, bottom-left anchored with padding. Props: cellSize (grid cell px, default 13), children, className.",
   "dependencies": [],
   "useWhen": "Pick hero-ascii-rainfall for a full-viewport hero built from independent falling particles where the pointer reads as wind bending the field rather than a place (hero-ascii-terrain) or a forward corridor (hero-ascii-tunnel) or an occlusion event (hero-ascii-eclipse). background-ascii-plasma is the pick for an abstract sampled field with no particles and no vertical motion at all.",

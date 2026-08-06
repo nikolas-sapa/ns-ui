@@ -1,5 +1,6 @@
 {
   "name": "scroll-story-strata",
+  "rank": 4,
   "title": "Scroll Story Strata",
   "description": "Pinned scroll story — the viewport becomes a geological core cross-section and scroll drives a drill bit descending through procedurally banded strata, with content panels crossfading per band and a mono HUD ticking depth.",
   "collection": "loud",

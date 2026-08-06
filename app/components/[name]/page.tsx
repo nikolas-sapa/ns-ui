@@ -184,7 +184,7 @@ export default async function ComponentPage({
           below — deliberately not hoisted above the demo, where three wrapped
           install lines on mobile would push it off screen again. */}
       {item ? (
-        <div className="mx-auto w-full max-w-[1400px] px-6 sm:px-10">
+        <div className="mx-auto w-full max-w-[1400px] px-6 pt-10 sm:px-10">
           <DemoStage name={name} title={item.title} />
         </div>
       ) : null}

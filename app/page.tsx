@@ -32,6 +32,15 @@ const featuredOrder = new Map(
 const featuredRank = (name: string) =>
   featuredOrder.get(name) ?? Number.MAX_SAFE_INTEGER;
 
+// Owner's taste ranking (meta.json `rank`, lower = better) — sorts ahead of
+// everything else below. Unset (the common case: not every component has
+// one yet) resolves to Infinity, which is a no-op in the comparator: it
+// just defers to the existing featured/recency order, so a component
+// without a rank sits exactly where it always did rather than jumping
+// behind every ranked one as a block.
+const rankByName = new Map(registry.items.map((i) => [i.name, i.meta?.rank]));
+const componentRank = (name: string) => rankByName.get(name) ?? Number.MAX_SAFE_INTEGER;
+
 /** The lead sentence carries the component's job; the rest is build detail. */
 const firstSentence = (text: string) => text.split(/(?<=\.)\s/, 1)[0] ?? "";
 
@@ -65,6 +74,7 @@ const items: ShowcaseEntry[] = registry.items
   }))
   .sort(
     (a, b) =>
+      componentRank(a.name) - componentRank(b.name) ||
       featuredRank(a.name) - featuredRank(b.name) ||
       recency(a.name) - recency(b.name) ||
       a.title.localeCompare(b.title),

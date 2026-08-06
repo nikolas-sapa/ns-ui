@@ -54,6 +54,13 @@ export function navGroups(): NavGroup[] {
 
   const memberships = categorize(items);
   const rank = new Map((order as string[]).map((name, i) => [name, i]));
+  // Owner's taste ranking (meta.json `rank`), same tie-break shape as
+  // `rank`/`recency` above — unset resolves to Infinity, a no-op that
+  // defers straight to the existing recency order. See app/page.tsx's
+  // `componentRank` for the identical rule on the catalog side; the two
+  // must not diverge.
+  const tasteRank = new Map(registry.items.map((i) => [i.name, i.meta?.rank]));
+  const byTaste = (name: string) => tasteRank.get(name) ?? Number.MAX_SAFE_INTEGER;
   const buckets = new Map<string, (NavItem & { kind: string | null })[]>();
 
   for (const item of items) {
@@ -70,10 +77,11 @@ export function navGroups(): NavGroup[] {
     }
   }
 
-  // Newest first inside a group/kind, same recency snapshot the catalog sorts by.
+  // Ranked-first, then newest — same recency snapshot the catalog sorts by.
   const byRecency = (a: NavItem, b: NavItem) =>
+    byTaste(a.name) - byTaste(b.name) ||
     (rank.get(a.name) ?? Number.MAX_SAFE_INTEGER) -
-    (rank.get(b.name) ?? Number.MAX_SAFE_INTEGER);
+      (rank.get(b.name) ?? Number.MAX_SAFE_INTEGER);
 
   const split = (categoryId: string, members: (NavItem & { kind: string | null })[]) => {
     const byKind = new Map<string, NavItem[]>();

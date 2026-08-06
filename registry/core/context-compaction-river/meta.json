@@ -1,5 +1,6 @@
 {
   "name": "context-compaction-river",
+  "rank": 284,
   "title": "Context Compaction River",
   "description": "Context compaction drawn as a meandering river: live turns are points on one curving channel, and a compacted run of turns necks off into a reopenable, re-injectable oxbow lake sitting 12px off the channel.",
   "collection": "core",

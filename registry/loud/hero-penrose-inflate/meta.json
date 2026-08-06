@@ -1,9 +1,19 @@
 {
   "name": "hero-penrose-inflate",
+  "rank": 17,
   "title": "Hero Penrose Inflate",
   "description": "A hero backdrop of a true Penrose P3 rhomb quasicrystal built by Robinson-triangle substitution, drifting through a seamless golden-ratio infinite zoom, with the pointer acting as an inflation lens that resolves the tiling one substitution level finer under the cursor.",
   "collection": "loud",
-  "tags": ["hero", "canvas", "penrose", "quasicrystal", "tiling", "generative", "cursor", "aperiodic"],
+  "tags": [
+    "hero",
+    "canvas",
+    "penrose",
+    "quasicrystal",
+    "tiling",
+    "generative",
+    "cursor",
+    "aperiodic"
+  ],
   "useWhen": "Pick hero-penrose-inflate when the hero backdrop should be a real aperiodic structure — hairline fat and thin rhombi with unmistakable five-fold symmetry and no translational repeat — that reads as mathematics rather than decoration, and where the pointer's job is to resolve more of that structure rather than disturb it; hero-isobar-contours is the better pick when the field's whole job is to point at the CTA, and hero-vortex-street when the pointer should stir a fluid rather than magnify a lattice.",
   "autoplay": {
     "mode": "pointer-path",
