@@ -390,20 +390,25 @@ export function SiteShell({
               type="button"
               onClick={() => setCmdkOpen(true)}
               aria-label="Open command palette"
-              // Was ~44x22 (size-3 icon, text-[10px] label, px-1.5/py-1) —
-              // a full step smaller than the theme toggle beside it, the one
-              // control in the header row that read as an afterthought.
-              // Measured now at 52.4x28. ::after grows the click region only
-              // — capped at half the 4px gap to the theme toggle on its
-              // right (measured: still resolves to this button through +1px
-              // past its own edge, the theme toggle from +2px on), generous
-              // vertically (this row is 64px tall and the button sits
-              // centered in it) — 52.4x28 -> ~56x44.
-              className="relative inline-flex items-center gap-1.5 rounded-sm px-2 py-1.5 text-ns-muted outline-none transition-colors hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none after:absolute after:-inset-x-[2px] after:-inset-y-[8px] after:content-['']"
+              // Went 44x22 -> 52.4x28 -> still read small next to the theme
+              // toggle beside it once both were on screen together. This
+              // pass: size-4 icon -> size-5, text-xs kbd -> text-sm, tighter
+              // px-2/py-1.5 -> px-3/py-2, gap-1.5 -> gap-2. Measured (visual
+              // box, getBoundingClientRect): 52.4x28 -> 68.8x36. ::after
+              // grows the click region only — capped at half the 4px gap to
+              // the theme toggle on its right (still resolves to this
+              // button through +1px past its own edge, the theme toggle
+              // from +2px on), generous vertically (this row is 64px tall
+              // and the button sits centered in it) — 68.8x36 -> ~72.8x52.
+              className="relative inline-flex items-center gap-2 rounded-sm px-3 py-2 text-ns-muted outline-none transition-colors hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none after:absolute after:-inset-x-[2px] after:-inset-y-[8px] after:content-['']"
             >
-              <SearchIcon className="size-4" />
-              <kbd className="hidden font-mono text-xs sm:inline">⌘K</kbd>
+              <SearchIcon className="size-5" />
+              <kbd className="hidden font-mono text-sm sm:inline">⌘K</kbd>
             </button>
+            {/* Grown alongside the ⌘K trigger (size-8 -> size-9, icon
+                size-3.5 -> size-4) so the two stay proportionate — the pair
+                reads as one cluster and letting only one grow would tip it
+                back out of balance. */}
             <ThemeToggle />
             <span className="font-mono text-[11px] text-ns-muted">{total}</span>
             {/* Desktop-only: collapses the whole sidebar, not a section

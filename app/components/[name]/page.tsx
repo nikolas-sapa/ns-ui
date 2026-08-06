@@ -173,9 +173,17 @@ export default async function ComponentPage({
               <ComponentSave name={name} />
             </div>
           </div>
-          <p className="mt-4 max-w-[65ch] text-[17px] leading-[1.75] text-foreground/90">
-            {item.description}
-          </p>
+          <div className="mt-4 flex items-start gap-3">
+            <p className="max-w-[65ch] flex-1 text-[17px] leading-[1.75] text-foreground/90">
+              {item.description}
+            </p>
+            <CopyButton
+              variant="prose"
+              value={item.description}
+              label={`Copy ${item.title} description`}
+              className="mt-1 shrink-0"
+            />
+          </div>
         </header>
       ) : null}
 
@@ -253,9 +261,17 @@ export default async function ComponentPage({
               {instruction ? (
                 <details className="py-3">
                   <summary className={SUMMARY}>Build spec</summary>
-                  <p className="mt-3 max-w-3xl whitespace-pre-wrap font-mono text-xs leading-relaxed text-ns-muted">
-                    {instruction}
-                  </p>
+                  <div className="mt-3 flex max-w-3xl items-start gap-3">
+                    <p className="flex-1 whitespace-pre-wrap font-mono text-xs leading-relaxed text-ns-muted">
+                      {instruction}
+                    </p>
+                    <CopyButton
+                      variant="prose"
+                      value={instruction}
+                      label={`Copy ${item.title} build spec`}
+                      className="mt-0.5 shrink-0"
+                    />
+                  </div>
                 </details>
               ) : null}
             </div>
@@ -297,7 +313,21 @@ export default async function ComponentPage({
         <section className="mx-auto w-full max-w-3xl px-6 pb-24 sm:px-10">
           {props && props.length > 0 ? (
             <div className="border-t border-border pt-10">
-              <h2 className="text-lg font-semibold tracking-tight text-foreground">Props</h2>
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="text-lg font-semibold tracking-tight text-foreground">Props</h2>
+                <CopyButton
+                  variant="prose"
+                  value={props
+                    .map(
+                      (p) =>
+                        `${p.name}${p.optional ? "?" : ""}: ${p.type}` +
+                        (p.default ? ` = ${p.default}` : "") +
+                        (p.comment ? `  // ${p.comment}` : ""),
+                    )
+                    .join("\n")}
+                  label={`Copy ${item.title} props`}
+                />
+              </div>
               <div className="mt-4 overflow-x-auto rounded-md border border-border">
                 <table className="w-full border-collapse text-left text-sm">
                   <thead>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useRef } from "react";
+import { CopyButton } from "../_components/copy-button";
 import type { ChangelogEntry } from "./entries";
 
 /**
@@ -55,6 +56,12 @@ export function ChangelogEntryList({ entries }: { entries: ChangelogEntry[] }) {
                 </p>
               </div>
               <div className="flex shrink-0 items-center gap-1">
+                <CopyButton
+                  variant="icon"
+                  value={`${entry.version} — ${entry.title}\n\n${entry.body}`}
+                  label={`Copy ${entry.version} release notes`}
+                  className="mr-1"
+                />
                 <NavArrow
                   disabled={!prev}
                   label={prev ? `Previous release: ${prev.version}` : "No newer release"}

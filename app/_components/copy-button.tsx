@@ -3,9 +3,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
- * Copy-to-clipboard control. Two shapes:
- *  - variant="icon"  small square button, used on each card
- *  - variant="inline" flush button inside the header install bar
+ * Copy-to-clipboard control. Three shapes:
+ *  - variant="icon"   small square button, used on each card
+ *  - variant="inline" flush button inside a code-block row (code to its
+ *    left, block padding to its right, in a `gap-2` flex row)
+ *  - variant="prose"  standalone corner button for a plain-text/prose block
+ *    (description, build spec) that has no code-block padding to sit flush
+ *    against — see the sizing note on `overlay` below
  * Feedback is a glyph swap, not a colour change (accent stays interaction-only).
  */
 export function CopyButton({
@@ -16,7 +20,7 @@ export function CopyButton({
 }: {
   value: string;
   label: string;
-  variant?: "icon" | "inline";
+  variant?: "icon" | "inline" | "prose";
   className?: string;
 }) {
   const [copied, setCopied] = useState(false);
@@ -63,10 +67,17 @@ export function CopyButton({
   // its right — so 4px left (half the 8px gap) and generous right/vertical
   // is safe everywhere it's actually used. Confirmed with the site-wide
   // audit's theft check, not just by reading the one shared class string.
+  // "prose" sits alone at the corner of a paragraph block (description,
+  // build spec) — no code-block padding to stay clear of on its right and no
+  // fixed flex gap to halve on its left, just whitespace in every direction.
+  // Generous on all four sides rather than capped against a neighbor that
+  // isn't there — 32x32 -> ~56x56.
   const overlay =
     variant === "icon"
       ? "after:absolute after:-inset-x-[6px] after:-inset-y-[6px] after:content-['']"
-      : "after:absolute after:-inset-x-[4px] after:-inset-y-[6px] after:content-['']";
+      : variant === "prose"
+        ? "after:absolute after:-inset-[12px] after:content-['']"
+        : "after:absolute after:-inset-x-[4px] after:-inset-y-[6px] after:content-['']";
 
   return (
     <button

@@ -143,6 +143,35 @@ export default function ConnectPage() {
           generated from the same registry data as the MCP server and the site itself, so
           none of the three can drift from another.
         </p>
+
+        {/* The links above stay plain, inline prose — a copy affordance mid-
+            sentence would either crowd the surrounding text (icon-sized) or
+            overwhelm it (prose-sized, meant for a block's own corner). Same
+            URLs, same site convention as the CLI commands above: a labelled
+            block row instead. */}
+        <p className="mt-6 font-mono text-[11px] uppercase tracking-wider text-ns-muted">
+          Feed URLs
+        </p>
+        <div className={`mt-2 ${CODE_BLOCK}`}>
+          <code className="min-w-0 flex-1 break-words font-mono text-xs leading-6 text-foreground">
+            {REGISTRY_ORIGIN}/llms.txt
+          </code>
+          <CopyButton
+            variant="inline"
+            value={`${REGISTRY_ORIGIN}/llms.txt`}
+            label="Copy llms.txt URL"
+          />
+        </div>
+        <div className={`mt-2 ${CODE_BLOCK}`}>
+          <code className="min-w-0 flex-1 break-words font-mono text-xs leading-6 text-foreground">
+            {REGISTRY_ORIGIN}/llms-full.txt
+          </code>
+          <CopyButton
+            variant="inline"
+            value={`${REGISTRY_ORIGIN}/llms-full.txt`}
+            label="Copy llms-full.txt URL"
+          />
+        </div>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ns-muted">
           Every install command resolves against{" "}
           <code className="font-mono text-foreground">{REGISTRY_ORIGIN}</code>.

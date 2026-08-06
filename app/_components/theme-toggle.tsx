@@ -38,12 +38,15 @@ export function ThemeToggle() {
       aria-label={mounted ? (isDark ? "Switch to light theme" : "Switch to dark theme") : "Toggle theme"}
       aria-pressed={mounted ? isDark : undefined}
       suppressHydrationWarning
-      // Visual size is unchanged (size-8); the ::after grows only the
-      // clickable region, capped at half the 4px flex gap to the ⌘K
-      // trigger/hide-sidebar buttons on either side so it can't steal their
-      // clicks, and generously vertically (12px+ of slack above/below in
-      // this row) — 32x32 -> ~36x44.
-      className="relative inline-flex size-8 shrink-0 items-center justify-center rounded-sm text-ns-muted outline-none transition-colors motion-reduce:transition-none hover:bg-border/60 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background after:absolute after:-inset-x-[2px] after:-inset-y-[6px] after:content-['']"
+      // Bumped size-8 -> size-9 alongside the ⌘K trigger's own enlargement
+      // (see site-shell.tsx), so the two controls stay proportionate as a
+      // cluster rather than the toggle reading small next to a bigger
+      // neighbor. The ::after still only grows the clickable region, capped
+      // at half the 4px flex gap to the ⌘K trigger/hide-sidebar buttons on
+      // either side so it can't steal their clicks, and generously
+      // vertically (12px+ of slack above/below in this row) — 36x36 -> ~40x48
+      // (visual box measured 36x36 via getBoundingClientRect).
+      className="relative inline-flex size-9 shrink-0 items-center justify-center rounded-sm text-ns-muted outline-none transition-colors motion-reduce:transition-none hover:bg-border/60 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background after:absolute after:-inset-x-[2px] after:-inset-y-[6px] after:content-['']"
     >
       <SunIcon className="dark:hidden" />
       <MoonIcon className="hidden dark:block" />
@@ -55,7 +58,7 @@ function SunIcon({ className = "" }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 16 16"
-      className={`size-3.5 ${className}`}
+      className={`size-4 ${className}`}
       fill="none"
       stroke="currentColor"
       strokeWidth="1.25"
@@ -73,7 +76,7 @@ function MoonIcon({ className = "" }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 16 16"
-      className={`size-3.5 ${className}`}
+      className={`size-4 ${className}`}
       fill="none"
       stroke="currentColor"
       strokeWidth="1.25"
