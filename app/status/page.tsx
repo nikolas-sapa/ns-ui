@@ -20,6 +20,7 @@
  * query. This route fetches, and lays out what comes back.
  */
 import type { Metadata } from "next";
+import { unstable_cache } from "next/cache";
 import { fetchQuery } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
 import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
@@ -77,18 +78,47 @@ const buildData: StatusBuild = build;
  * Read through the generated `api` object on purpose: a wrong function name or
  * a changed argument shape fails the build instead of failing silently as a
  * board of permanently grey bars.
+ *
+ * `fetchQuery` talks to Convex over its own HTTP transport, not Next's
+ * patched `fetch` — so it carries no cache config Next can see, and a live
+ * `NEXT_PUBLIC_CONVEX_URL` opts this whole route OUT of static/ISR rendering
+ * (verified: the route table reads `● /status` with the env var unset, `ƒ`
+ * with it set to a real host). `export const revalidate` above then does
+ * nothing, and every visitor pays for a Convex round-trip in their own
+ * request. Wrapping the call in `unstable_cache` moves the read into Next's
+ * data cache instead: the first request after the window pays for it, every
+ * later one reads a cached value while Next revalidates in the background,
+ * and the page itself goes back to being static.
  */
+const cachedHistory = unstable_cache(
+  async (): Promise<HistoryEntry[]> => {
+    try {
+      const rows = await fetchQuery(api.status.recent, {});
+      return Array.isArray(rows) ? rows : [];
+    } catch {
+      // An absent module, an unset NEXT_PUBLIC_CONVEX_URL and a real outage are
+      // indistinguishable here, and all three mean the same thing for the strip:
+      // there is no recorded history to draw. Never a green day.
+      return [];
+    }
+  },
+  ["status-convex-history"],
+  { revalidate: 3600 }
+);
+
 async function fetchHistory(): Promise<HistoryEntry[]> {
-  try {
-    const rows = await fetchQuery(api.status.recent, {});
-    return Array.isArray(rows) ? rows : [];
-  } catch {
-    // An absent module, an unset NEXT_PUBLIC_CONVEX_URL and a real outage are
-    // indistinguishable here, and all three mean the same thing for the strip:
-    // there is no recorded history to draw. Never a green day.
-    return [];
-  }
+  return cachedHistory();
 }
+
+/** Same reasoning as `cachedHistory` above, for the other Convex read this
+ *  page makes: `probeConvex` still owns the try/catch (a cache miss that
+ *  throws must still collapse to UNKNOWN, never DOWN), this only keeps the
+ *  read itself off the request path. */
+const cachedTestimonialsApproved = unstable_cache(
+  () => fetchQuery(api.testimonials.approved, {}),
+  ["status-convex-testimonials-approved"],
+  { revalidate: 3600 }
+);
 
 /** The board's rows, in declaration order. Each id is the check id
  *  lib/status-checks.ts already uses, and the `serviceId` the snapshot job
@@ -191,7 +221,7 @@ export default async function StatusPage() {
     fetchPublishedVersion(MCP_PACKAGE),
     // The public, unauthenticated query — the only Convex read this page is
     // entitled to make. A throw is "we could not look", never "Convex is down".
-    probeConvex(() => fetchQuery(api.testimonials.approved, {})),
+    probeConvex(cachedTestimonialsApproved),
     // Isolated: a missing history module must leave the page standing.
     fetchHistory(),
   ]);

@@ -202,6 +202,19 @@ export function FeaturedCard({
             `priority` on the first row only: these are the LCP candidates. */}
         {!hot ? (
           <>
+            {/* Light and dark are both rendered — server can't know the
+                visitor's theme (localStorage-only, see lib/theme.ts) — but
+                only ONE of them may carry `priority`. `priority` emits a
+                `<link rel="preload">` in <head>, and preload ignores
+                `display:none` entirely: marking both meant every row-1 card
+                downloaded two poster images instead of one, every time.
+                (Same principle as the video note above: hiding via CSS
+                doesn't stop a fetch.) The no-flash script in app/layout.tsx
+                sets `.dark` synchronously before <body> is parsed, so the
+                unpreloaded dark image, being `display:none` at parse time,
+                has no box and is never picked up by native `loading="lazy"`
+                either — it only fetches once a visitor actually toggles into
+                dark mode. */}
             <Image
               src={`/posters/${entry.name}-light.png`}
               alt=""
@@ -218,7 +231,7 @@ export function FeaturedCard({
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               className="hidden object-cover dark:block"
-              priority={priority}
+              loading="lazy"
             />
             {/* `inView` gates the fetch so a rail of 36 does not pull 36 files
                 on load. `calm === false` keeps it out of the tree entirely for

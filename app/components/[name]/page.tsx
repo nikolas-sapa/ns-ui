@@ -15,6 +15,21 @@ import { categoriesFor } from "@/lib/category-pages";
 import { navGroups, flatOrder } from "@/lib/nav-data";
 import pkg from "@/package.json";
 
+// All 298 slugs, known at build time from the same registry.json every other
+// read on this page uses — nothing here depends on a request. Without this,
+// the route has no generateStaticParams at all, which puts EVERY component
+// page in the always-dynamic bucket: a fresh render, off disk, on every
+// single request (measured: hero-ascii-schlieren field TTFB in the seconds).
+// Matches `/categories/[id]` and `/writing/[slug]`, which enumerate their own
+// (much smaller) param sets the same way. Unlike `/preview/[name]/embed`,
+// which deliberately prerenders NOTHING because it mounts each demo's own
+// client component at build time (218+ of them, unexercised, real build-time
+// risk) — this page never renders a demo at all: `DemoStage` below is a
+//10-line `<iframe src>`, so full enumeration carries none of that risk.
+export function generateStaticParams() {
+  return registry.items.map((item) => ({ name: item.name }));
+}
+
 // package.json's repository.url is the git clone URL (`...ns-ui.git`);
 // schema.org's `codeRepository` wants the browsable repo URL instead.
 const CODE_REPOSITORY = pkg.repository.url.replace(/\.git$/, "");
