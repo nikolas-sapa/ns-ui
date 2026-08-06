@@ -7,6 +7,7 @@ import { jsonLdScript } from "@/lib/json-ld";
 import { DemoStage } from "@/app/_components/demo-stage";
 import { loadUseWhen } from "@/lib/use-when";
 import { loadComponentProps } from "@/lib/component-props";
+import { loadSource } from "@/lib/source";
 import { CopyButton } from "@/app/_components/copy-button";
 import { ComponentSave } from "@/app/_components/component-save";
 import { categoriesFor } from "@/lib/category-pages";
@@ -20,6 +21,12 @@ const LICENSE_URL =
   pkg.license === "MIT"
     ? "https://opensource.org/licenses/MIT"
     : undefined;
+
+// Same disclosure treatment /preview/[name]/play used for Source and Build
+// spec, ported over now that both live here — see that route's docblock for
+// why it no longer owns this content.
+const SUMMARY =
+  "cursor-pointer select-none rounded-sm font-mono text-xs uppercase tracking-[0.14em] text-ns-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none";
 
 // The per-component opengraph-image.tsx in this same folder is picked up by
 // the file-convention automatically — this only needs to supply the title
@@ -57,8 +64,8 @@ export async function generateMetadata({
  * below.
  *
  * The demo itself is a `DemoStage` iframe onto `/preview/<name>` (see that
- * route's own docblock), the same stage `/preview/<name>/play` uses — not
- * `DemoFrame` mounted inline. Inline mounting is what regressed here before:
+ * route's own docblock), not `DemoFrame` mounted inline. Inline mounting is
+ * what regressed here before:
  * a demo root's own `min-h-screen` resolves against the *real* page
  * viewport when mounted directly, which is why the old inline render needed
  * a fixed-height well plus `h-full!`/`min-h-full!` overrides to bound it,
@@ -91,6 +98,10 @@ export default async function ComponentPage({
   // than rendered as if it were.
   const useWhen = item ? loadUseWhen()[item.name] : undefined;
   const props = item ? loadComponentProps(item.name) : null;
+  const source = item ? loadSource(item.name) : null;
+  const instruction = item
+    ? (item.meta as { instruction?: string } | undefined)?.instruction
+    : undefined;
   // Tags aren't category ids (most, like "hasp"/"svg", have no category) —
   // this is the same categorize() call the sidebar and /categories/[id] use,
   // rendered as its own link row rather than turning the tag chips into
@@ -98,10 +109,8 @@ export default async function ComponentPage({
   const categories = item ? categoriesFor(item.name, item.meta?.tags ?? []) : [];
 
   // Prev/next in the exact order the sidebar tree reads top-to-bottom
-  // (category -> kind -> loose item), not recency — that's what
-  // `/preview/<name>/play` steps through instead, for a page whose entire
-  // purpose is "the next thing to look at" rather than "where am I in the
-  // catalog I was just browsing".
+  // (category -> kind -> loose item) — "where am I in the catalog I was
+  // just browsing", not recency.
   const flat = flatOrder(navGroups());
   const flatIndex = item ? flat.findIndex((i) => i.name === item.name) : -1;
   const prevItem = flatIndex > 0 ? flat[flatIndex - 1] : null;
@@ -208,13 +217,44 @@ export default async function ComponentPage({
                 label={`Copy install command for ${item.title}`}
               />
             </div>
-            <Link
-              href={`/preview/${name}/play`}
-              className="mt-2 inline-block rounded-sm py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-ns-muted underline underline-offset-2 outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
-            >
-              View source and playground
-            </Link>
           </div>
+
+          {source || instruction ? (
+            <div className="mt-8 divide-y divide-border border-y border-border">
+              {source ? (
+                <details className="py-3">
+                  <summary className={SUMMARY}>Source</summary>
+                  <div className="mt-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <code className="font-mono text-[11px] text-ns-muted">
+                        {source.file}
+                      </code>
+                      <CopyButton
+                        variant="inline"
+                        value={source.code}
+                        label={`Copy ${item.title} source`}
+                      />
+                    </div>
+                    {/* No highlighter: one <pre> of real source, the same
+                        bytes the CLI would write, nothing to keep in sync
+                        with a theme. */}
+                    <pre className="mt-2 max-h-[60vh] overflow-auto rounded-md border border-border bg-surface p-4 font-mono text-[11px] leading-relaxed text-foreground">
+                      <code>{source.code}</code>
+                    </pre>
+                  </div>
+                </details>
+              ) : null}
+
+              {instruction ? (
+                <details className="py-3">
+                  <summary className={SUMMARY}>Build spec</summary>
+                  <p className="mt-3 max-w-3xl whitespace-pre-wrap font-mono text-xs leading-relaxed text-ns-muted">
+                    {instruction}
+                  </p>
+                </details>
+              ) : null}
+            </div>
+          ) : null}
 
           {categories.length ? (
             <ul className="mt-6 flex flex-wrap gap-1.5">

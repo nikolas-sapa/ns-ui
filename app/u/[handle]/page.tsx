@@ -152,7 +152,7 @@ export default async function PublicProfilePage({
                         className="overflow-hidden rounded-md border border-border bg-surface"
                       >
                         <Link
-                          href={`/preview/${item.name}/play`}
+                          href={`/components/${item.name}`}
                           className="group block outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ns-accent"
                         >
                           <div className="px-4 py-5 transition-colors group-hover:bg-foreground/[0.03]">

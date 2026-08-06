@@ -59,10 +59,14 @@ function renamePairs(root: string): Array<[string, string]> {
  *   the published CLI and MCP server construct, and what `npx shadcn add`
  *   fetches.
  * - `/components/<slug>` — the current public page.
- * - `/preview/<slug>` and `/preview/<slug>/play` — the pre-move page shapes
- *   (`2026-08-01-components-route-move`), which may still exist as links.
- *   `/preview/<slug>` remains a live route for the verify gate, so these only
- *   catch slugs that no longer resolve.
+ * - `/preview/<slug>` — the pre-move page shape (`2026-08-01-components-route-move`),
+ *   which may still exist as a link. It remains a live route for the verify
+ *   gate, so this only catches slugs that no longer resolve.
+ * - `/preview/<slug>/play` — the pre-move page shape, AND (since
+ *   `2026-08-06-play-route-fold`) a dead route for every slug, not just
+ *   renamed ones — see the generic `/preview/:name/play` redirect in
+ *   `next.config.ts` for current slugs. This one only needs to land an old
+ *   slug's `/play` link on the new slug's canonical page in one hop.
  */
 export function renameRedirects(root: string): SlugRedirect[] {
   const out: SlugRedirect[] = [];
@@ -71,7 +75,7 @@ export function renameRedirects(root: string): SlugRedirect[] {
       { source: `/r/${from}.json`, destination: `/r/${to}.json`, permanent: true },
       { source: `/components/${from}`, destination: `/components/${to}`, permanent: true },
       { source: `/preview/${from}`, destination: `/components/${to}`, permanent: true },
-      { source: `/preview/${from}/play`, destination: `/preview/${to}/play`, permanent: true },
+      { source: `/preview/${from}/play`, destination: `/components/${to}`, permanent: true },
     );
   }
   return out;

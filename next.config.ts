@@ -18,7 +18,25 @@ const nextConfig: NextConfig = {
   // hand-listed — see `lib/rename-redirects.ts` for why this layer exists
   // despite the freeze decision having rejected redirects.
   async redirects() {
-    return renameRedirects(process.cwd());
+    return [
+      // Rename-specific pairs first: an old, renamed slug's `/play` link has
+      // its own one-hop rule straight to the new slug's component page (see
+      // `lib/rename-redirects.ts`). Ordered ahead of the generic rule below
+      // so it wins the match instead of bouncing through `/components/<old>`
+      // first.
+      ...renameRedirects(process.cwd()),
+      // `/preview/<name>/play` no longer exists for any current slug —
+      // everything it uniquely had (source, build spec) moved onto
+      // `/components/<name>`, which already rendered the same DemoStage.
+      // Permanent, not just for old external links and the owner's own
+      // recordings, but because `/components/<name>` is genuinely the
+      // correct destination now, not a temporary detour.
+      {
+        source: "/preview/:name/play",
+        destination: "/components/:name",
+        permanent: true,
+      },
+    ];
   },
 };
 

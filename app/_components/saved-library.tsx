@@ -182,7 +182,7 @@ export function SavedLibrary({ items, slugs, initialFolders, handle }: { items: 
             const installCommand = `npx shadcn add ${REGISTRY_ORIGIN}/r/${item.name}.json`;
             return (
               <li key={item.name} className="overflow-hidden rounded-md border border-border bg-surface">
-                <Link href={`/preview/${item.name}/play`} className="group block outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ns-accent">
+                <Link href={`/components/${item.name}`} className="group block outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ns-accent">
                   <div className="border-b border-border px-4 py-5 transition-colors group-hover:bg-foreground/[0.03]">
                     <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-ns-muted">Saved component</p>
                     <h3 className="mt-2 text-sm font-semibold tracking-tight text-foreground">{item.title}</h3>
@@ -196,7 +196,7 @@ export function SavedLibrary({ items, slugs, initialFolders, handle }: { items: 
                     {folders.map((entry) => <option key={entry.id} value={entry.id}>{entry.name}</option>)}
                   </select>
                   <CopyButton value={installCommand} label={`Copy install command for ${item.title}`} />
-                  <Link href={`/preview/${item.name}/play`} className="rounded-sm px-2 py-1 text-xs text-ns-muted outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent transition-colors">Open preview</Link>
+                  <Link href={`/components/${item.name}`} className="rounded-sm px-2 py-1 text-xs text-ns-muted outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent transition-colors">Open preview</Link>
                 </div>
               </li>
             );

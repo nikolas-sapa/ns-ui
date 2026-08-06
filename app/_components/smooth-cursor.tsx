@@ -7,15 +7,19 @@ const EASE = 0.18; // higher = tighter follow
 const TURN = 0.22; // rotation smoothing
 const MIN_SPEED = 0.35; // below this, keep the last angle instead of jittering
 
-const CLICKABLE = 'a, button, [role="button"], input, textarea, select, summary, label';
+const CLICKABLE =
+  'a, button, [role="button"], [role="link"], input, textarea, select, summary, label';
 
 /**
- * Ported from the portfolio's `SmoothCursor`, unchanged (same lerp/turn
- * constants, same markup, same CSS hooks). ns-ui-specific addition: bails
- * out entirely inside iframes, since every `/preview/<slug>` shape and every
- * catalog card thumbnail render this same root layout framed — a hidden
- * native cursor with no replacement inside that frame would make embedded
- * components unusable.
+ * Ported from the portfolio's `SmoothCursor` (same lerp/turn constants, same
+ * markup, same CSS hooks), with ns-ui-specific additions: bails out entirely
+ * inside iframes, since every `/preview/<slug>` shape and every catalog card
+ * thumbnail render this same root layout framed — a hidden native cursor
+ * with no replacement inside that frame would make embedded components
+ * unusable. `[role="link"]` and a `cursor-pointer` class fallback were added
+ * to the hand-state hit test on top of the portfolio's plain tag/role list,
+ * so any non-semantic clickable (a div/span with an onClick, styled
+ * cursor-pointer instead of using a real button/link) still gets the hand.
  */
 export function SmoothCursor() {
   const ref = useRef<HTMLDivElement>(null);
@@ -52,8 +56,20 @@ export function SmoothCursor() {
         x = tx;
         y = ty;
         seen = true;
-        el.dataset.visible = "true";
       }
+      // Always mark visible on a real move, not just the first one. onOver's
+      // IFRAME branch below sets visible="false" when the pointer crosses onto
+      // an embedded component's iframe (that document owns the pointer from
+      // then on, so the arrow would otherwise hang mid-page). Gating this
+      // behind `!seen` — which is true exactly once, ever — meant the pointer
+      // coming back off that iframe onto real content never un-hid the arrow:
+      // pointerenter doesn't fire (the pointer never left the window) and
+      // pointermove had already run its one-time branch. The arrow, and with
+      // it the entire cursor, stayed invisible for the rest of the page's
+      // life. Confirmed live: hover a component page's interactive demo
+      // iframe, then move back onto a plain link — data-visible stuck
+      // "false" until this line ran unconditionally.
+      el.dataset.visible = "true";
     };
     const onLeave = () => {
       el.dataset.visible = "false";
@@ -73,8 +89,19 @@ export function SmoothCursor() {
         el.dataset.visible = "false";
         return;
       }
-      const hit = target?.closest?.(CLICKABLE);
-      el.dataset.hand = hit ? "true" : "false";
+      // Semantic clickables first (cheap `closest`, covers everything real in
+      // this codebase today — grepped, the only non-semantic `cursor-pointer`
+      // uses are already `<summary>`, already in CLICKABLE). Anything left
+      // over — a future div/span with an onClick and no button/link role,
+      // styled `cursor-pointer` instead — still presents as interactive
+      // visually, so fall back to a class check. NOT `getComputedStyle`: the
+      // global `body.smooth-cursor-active *` rule (globals.css) sets
+      // `cursor: none` on every element while this effect is running, which
+      // outranks a `cursor-pointer` utility class on specificity — computed
+      // style would read "none" here regardless, silently never matching.
+      const semantic = target?.closest?.(CLICKABLE);
+      const styled = !semantic && target?.closest?.('[class*="cursor-pointer"]');
+      el.dataset.hand = semantic || styled ? "true" : "false";
     };
     const onDown = () => {
       el.dataset.down = "true";

@@ -17,10 +17,12 @@ import { categoryPages } from "@/lib/category-pages";
 // app/preview/[name]/page.tsx), not a redirect. `/preview/<name>/embed`
 // duplicates the fixture's DOM verbatim for iframe use and is marked noindex
 // instead (see app/preview/[name]/embed/page.tsx), and `/preview/<name>/play`
-// stays out: as of the consolidation it is the secondary "open full size"
-// view linked from `/components/<name>`, covering the same subject, so listing
-// it would advertise a duplicate of the canonical page — see that route's own
-// docblock.
+// stayed out for the same reason before it was deleted outright
+// (`2026-08-06-play-route-fold`): it rendered the same DemoStage as
+// `/components/<name>`, and everything it had that page didn't (source,
+// build spec) now lives there too, so the route itself is gone and
+// `/preview/<name>/play` permanently redirects to `/components/<name>`
+// (see `next.config.ts`).
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {

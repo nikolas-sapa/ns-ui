@@ -1,10 +1,10 @@
 /**
- * The bordered, iframed stage that presents a component's live demo — shared
- * by `/components/<name>` (directly under the header, full site chrome) and
- * `/preview/<name>/play` (the playground). Extracted so the frame itself
- * (border, card background, iframe sizing) has one source of truth instead
- * of `/components/<name>` growing its own presentation that drifts from
- * play's.
+ * The bordered, iframed stage that presents a component's live demo, used by
+ * `/components/<name>` (directly under the header, full site chrome) — the
+ * one canonical page per component. Formerly shared with `/preview/<name>/play`
+ * before that route was folded into this one; kept as its own component
+ * rather than inlined so the frame itself (border, card background, iframe
+ * sizing) still has one source of truth if another page ever needs it.
  *
  * Always iframes `/preview/<name>?embed=1&interactive=1` — the bare
  * verification fixture — rather than mounting `DemoFrame` inline. That's

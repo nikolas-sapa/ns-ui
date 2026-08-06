@@ -15,13 +15,16 @@ import { CommandPalette, SearchIcon } from "./command-palette";
  * The persistent left sidebar, and the one rule that keeps it from breaking
  * the quality gate:
  *
- * `/preview/<name>` (the BARE route, no `/play`) is what `scripts/verify.ts`
- * and `scripts/record.ts` screenshot, and what the playground embeds in an
- * iframe. `/preview/<name>/embed` is the cacheable card thumbnail every catalog
- * and featured card loads. Both must stay naked component pages — the gate
- * grabs "the first visible interactive element" for its hover/press/focus diff,
- * and a sidebar full of links would hand it a nav link instead. So those two
- * shapes render children with no chrome at all.
+ * `/preview/<name>` (the BARE route) is what `scripts/verify.ts` and
+ * `scripts/record.ts` screenshot, and what `DemoStage` embeds in an iframe on
+ * `/components/<name>`. `/preview/<name>/embed` is the cacheable card
+ * thumbnail every catalog and featured card loads. Both must stay naked
+ * component pages — the gate grabs "the first visible interactive element"
+ * for its hover/press/focus diff, and a sidebar full of links would hand it a
+ * nav link instead. So those two shapes render children with no chrome at
+ * all. (`/preview/<name>/play` no longer exists — folded into
+ * `/components/<name>`, see that route's docblock — so there is no third
+ * shape to exclude here.)
  *
  * `/embed` has to be listed explicitly: it is a deeper path, so the original
  * single-segment pattern rejected it and every card rendered the full sidebar
