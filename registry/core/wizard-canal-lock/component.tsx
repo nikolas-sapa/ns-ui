@@ -61,14 +61,19 @@ export interface LockFlightStep {
 }
 
 export interface LockFlightProps {
+  /** the wizard steps, in order */
   steps: LockFlightStep[];
   /** controlled current step index; omit for uncontrolled */
   index?: number;
+  /** uncontrolled initial step index. Default 0. */
   defaultIndex?: number;
+  /** called with the new index after Next/Back/a step jump */
   onIndexChange?: (index: number) => void;
   /** fires once when the final step is completed (Finish, while valid) */
   onComplete?: () => void;
+  /** accessible name for the step list */
   ariaLabel?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

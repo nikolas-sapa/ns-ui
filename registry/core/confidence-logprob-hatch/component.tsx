@@ -79,6 +79,7 @@ export interface PencilHedgeProps {
   daggerOnHighestDoubt?: boolean;
   /** Opts this passage into verbose screen-reader descriptions (names alternatives + percentages). Default false — the terse form. */
   verbose?: boolean;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

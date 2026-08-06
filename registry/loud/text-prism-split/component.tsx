@@ -20,6 +20,7 @@ export function PrismDragSplit({
   magnify = 1.06,
   className = "",
 }: {
+  /** the rendered text */
   text?: string;
   /** prism strip width in px */
   stripWidth?: number;
@@ -35,6 +36,7 @@ export function PrismDragSplit({
   maxDispersion?: number;
   /** scale of the refracted clones inside the strip */
   magnify?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);

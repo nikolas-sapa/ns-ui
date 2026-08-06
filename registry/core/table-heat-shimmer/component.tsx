@@ -121,6 +121,7 @@ export function HeatwaveLedger({
   title?: string;
   /** mono timestamp shown beside the title */
   timestamp?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   // unique, hydration-stable filter id prefix (useId sanitized for url(#…))

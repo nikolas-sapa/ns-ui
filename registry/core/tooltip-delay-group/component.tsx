@@ -301,6 +301,7 @@ export interface PenumbraTipProps {
   /** Delay before an isolated open (standalone, or a cold group), ms.
    * Defaults to the enclosing PenumbraTipGroup's openDelay, else 500. */
   openDelay?: number;
+  /** suppresses the tooltip entirely */
   disabled?: boolean;
   /** Extra classes on the tooltip panel. */
   className?: string;

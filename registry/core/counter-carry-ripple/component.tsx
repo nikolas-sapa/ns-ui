@@ -94,6 +94,7 @@ export interface CarryDigitProps {
   decimals?: number;
   /** visible caption above the readout, also prefixed onto the SR announcement */
   label?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

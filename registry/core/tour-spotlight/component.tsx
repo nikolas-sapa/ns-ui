@@ -26,13 +26,17 @@ export interface LeadingLightStep {
 }
 
 export interface LeadingLightProps {
+  /** the tour steps, in order */
   steps: LeadingLightStep[];
   /** current step index, 0-based */
   active: number;
+  /** called to advance to the next step */
   onNext: () => void;
+  /** called to return to the previous step */
   onBack: () => void;
   /** Esc or Skip — caller unmounts / restores whatever it wants */
   onExit: () => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

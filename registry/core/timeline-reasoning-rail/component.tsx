@@ -44,6 +44,7 @@ export interface SoundingRailProps {
   steps: SoundingRailStep[];
   /** accessible name for the timeline region */
   label?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

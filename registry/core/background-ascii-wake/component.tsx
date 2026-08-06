@@ -18,6 +18,7 @@ const RAMP = " .:-=+*#%@";
 export interface WakeGlyphProps {
   /** grid cell size in px */
   cellSize?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

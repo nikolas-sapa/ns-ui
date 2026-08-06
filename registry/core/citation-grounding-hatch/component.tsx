@@ -59,10 +59,13 @@ export interface TraceSentence {
 }
 
 export interface BedrockTraceProps {
+  /** the answer text, split into individually-cited sentences */
   sentences: TraceSentence[];
+  /** the citable sources referenced by `sentences` */
   sources?: TraceSource[];
   /** true while the answer is still arriving — new segments stagger their draw-in to read as a stream catching up */
   streaming?: boolean;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

@@ -27,13 +27,17 @@ export interface UndertowItem {
 }
 
 export interface UndertowDriftProps {
+  /** the deletable rows */
   items: UndertowItem[];
   /** ms the collapsed bar takes to drift fully across before the delete commits */
   graceMs?: number;
+  /** called immediately when a row's delete is triggered, before the grace window */
   onDelete?: (item: UndertowItem) => void;
+  /** called if the delete is undone within the grace window */
   onRestore?: (item: UndertowItem) => void;
   /** fires once the grace window elapses (or the bar is dismissed) and the item is gone for good */
   onExpire?: (item: UndertowItem) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

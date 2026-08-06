@@ -28,10 +28,13 @@ export interface ScrollIslandSection {
 }
 
 export interface ScrollIslandProps {
+  /** brand text on the left */
   wordmark?: string;
+  /** the tracked page sections */
   sections?: ScrollIslandSection[];
   /** id of the currently active section; the label rolls when this changes */
   activeId?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

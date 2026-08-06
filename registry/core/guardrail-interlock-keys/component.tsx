@@ -40,6 +40,7 @@ export type InterlockGate = {
 };
 
 export interface KeyInterlockProps {
+  /** the interlock's rules, each independently tripped/released */
   gates: InterlockGate[];
   /** the model output the lock is holding */
   output: string;
@@ -52,6 +53,7 @@ export interface KeyInterlockProps {
   /** fired when a tripped gate is overridden — the owner flips that gate to
    * "released" (this component never mutates the gates it was handed) */
   onOverride?: (id: string) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

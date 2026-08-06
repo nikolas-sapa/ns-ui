@@ -62,11 +62,15 @@ interface GhostRect {
 }
 
 export interface TearTabProps {
+  /** initial tag list */
   defaultTags?: string[];
+  /** placeholder shown only while the list is empty */
   placeholder?: string;
   /** accessible name for the chip listbox */
   label?: string;
+  /** called with the full tag list after an add or remove */
   onChange?: (tags: string[]) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

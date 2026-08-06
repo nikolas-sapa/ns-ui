@@ -72,10 +72,13 @@ export interface SiphonLiftProps {
   defaultDestinationIds?: string[];
   /** ids from `items` that start pre-selected in the source list */
   defaultSelectedIds?: string[];
+  /** accessible name for the source list */
   sourceLabel?: string;
+  /** accessible name for the destination list */
   destinationLabel?: string;
   /** fires once, when a flow drains successfully, with the ids that made it across in order */
   onTransfer?: (ids: string[]) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

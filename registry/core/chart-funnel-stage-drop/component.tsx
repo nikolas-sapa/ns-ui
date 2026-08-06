@@ -24,8 +24,11 @@ export interface ChartFunnelStageDropDatum {
 }
 
 export interface ChartFunnelStageDropProps {
+  /** the funnel stages, in order */
   data?: ChartFunnelStageDropDatum[];
+  /** heading above the chart */
   title?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

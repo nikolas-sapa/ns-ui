@@ -21,11 +21,15 @@ type Cell = { r: number; c: number };
 export interface SheetAsciiRangeProps {
   /** rows x cols numeric grid */
   data?: number[][];
+  /** label for each row, left of the grid */
   rowLabels?: string[];
+  /** label for each column, above the grid */
   colLabels?: string[];
   /** unit suffix printed after aggregate numbers, e.g. "units" */
   unit?: string;
+  /** heading above the grid */
   title?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

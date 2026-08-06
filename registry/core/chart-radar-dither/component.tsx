@@ -29,8 +29,11 @@ export interface ChartRadarDitherDatum {
 }
 
 export interface ChartRadarDitherProps {
+  /** the plotted axes/values */
   data?: ChartRadarDitherDatum[];
+  /** heading above the chart */
   title?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

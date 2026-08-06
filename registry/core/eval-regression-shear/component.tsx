@@ -30,6 +30,7 @@ export interface EvalDeltaTableProps {
   scale?: number;
   /** Accessible caption for the table. */
   label?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

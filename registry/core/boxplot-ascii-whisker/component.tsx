@@ -35,8 +35,11 @@ export interface BoxplotGroup {
 }
 
 export interface BoxplotAsciiWhiskerProps {
+  /** the plotted groups, one boxplot each */
   groups?: BoxplotGroup[];
+  /** heading above the chart */
   title?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

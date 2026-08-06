@@ -26,13 +26,17 @@ export interface AfterImageItem {
 }
 
 export interface AfterImageListProps {
+  /** the deletable rows */
   items: AfterImageItem[];
   /** ms the ghost takes to collapse to zero height and finalize the delete */
   ghostMs?: number;
+  /** called immediately when a row's delete is triggered, before the ghost window */
   onDelete?: (item: AfterImageItem) => void;
+  /** called if the delete is undone within the ghost window */
   onRestore?: (item: AfterImageItem) => void;
   /** fires once the ghost window elapses (or is dismissed) and the item is gone for good */
   onExpire?: (item: AfterImageItem) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

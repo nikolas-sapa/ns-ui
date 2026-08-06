@@ -46,7 +46,9 @@ export interface LogViewerAsciiTailProps {
   initialLines?: number;
   /** service column values drawn from. */
   services?: string[];
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** accessible name for the log pane */
   "aria-label"?: string;
 }
 

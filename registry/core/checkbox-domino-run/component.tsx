@@ -70,6 +70,7 @@ export interface ToppleRunProps {
   defaultChecked?: string[];
   /** Fires whenever the checked set changes, including mid-run commits. */
   onChange?: (checkedIds: string[]) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

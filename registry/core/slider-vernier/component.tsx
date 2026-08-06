@@ -45,8 +45,11 @@ function easeOutExpo(t: number) {
 export interface VernierSlipProps {
   /** controlled value; omit for uncontrolled */
   value?: number;
+  /** uncontrolled initial value */
   defaultValue?: number;
+  /** minimum allowed value */
   min?: number;
+  /** maximum allowed value */
   max?: number;
   /** resolution — the fine (vernier) scale reveals exactly this last digit */
   step?: number;
@@ -56,7 +59,9 @@ export interface VernierSlipProps {
   unit?: string;
   /** aria-valuetext override */
   formatValue?: (v: number) => string;
+  /** called with the new value on every drag/keyboard change */
   onValueChange?: (value: number) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

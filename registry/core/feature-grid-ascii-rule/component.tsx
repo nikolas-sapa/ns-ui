@@ -31,8 +31,11 @@ export interface FeatureGridAsciiRuleItem {
 }
 
 export interface FeatureGridAsciiRuleProps {
+  /** the feature cards */
   items: FeatureGridAsciiRuleItem[];
+  /** number of grid columns */
   cols?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

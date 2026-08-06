@@ -370,11 +370,15 @@ export function VacuumSeal({
   }[];
   /** allowed types: extensions (".png") or mime ("image/png", "image/*"); empty = any */
   accept?: string[];
+  /** rejects any file larger than this. No default — unlimited. */
   maxSizeBytes?: number;
   /** perform the real upload, reporting 0..1 via onProgress; reject to fail the seal. omit to use a built-in simulated upload. */
   uploadFile?: (file: File, onProgress: (p: number) => void) => Promise<void>;
+  /** called with the full file list after any add, progress update, or removal */
   onFilesChange?: (files: VacuumSealFile[]) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** accessible name for the dropzone. Default "Upload files". */
   "aria-label"?: string;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);

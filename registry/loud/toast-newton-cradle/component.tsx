@@ -120,7 +120,9 @@ export const ImpulseCradle = forwardRef<
     duration?: number;
     /** toasts present at mount */
     initial?: ImpulseToastInput[];
+    /** extra classes merged onto the rendered root element */
     className?: string;
+    /** accessible name for the toast stack */
     "aria-label"?: string;
   }
 >(function ImpulseCradle(

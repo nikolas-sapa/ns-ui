@@ -32,6 +32,7 @@ import { useEffect, useId, useRef } from "react";
 // ---------------------------------------------------------------------------
 
 export interface LiquidCollarProps {
+  /** the wrapped content the ring runs around */
   children: React.ReactNode;
   /** "pill" follows `radius`; "circle" forces a disc sized to the box. */
   variant?: "pill" | "circle";
@@ -43,7 +44,9 @@ export interface LiquidCollarProps {
   paused?: boolean;
   /** Width of the liquid band in CSS px. */
   ringWidth?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** inline styles merged onto the root element */
   style?: React.CSSProperties;
 }
 

@@ -45,6 +45,7 @@ export interface WetInkProps {
    * punctuation yet) tail is flushed to the live region anyway. Default 900.
    */
   idleFlushMs?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

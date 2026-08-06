@@ -33,11 +33,17 @@ export interface SlackRailItem {
 }
 
 export interface SlackRailProps {
+  /** the tabs, in order */
   items: SlackRailItem[];
+  /** controlled selected value; omit for uncontrolled */
   value?: string;
+  /** uncontrolled initial selected value */
   defaultValue?: string;
+  /** called with the new value when a different tab is selected */
   onValueChange?: (value: string) => void;
+  /** accessible name for the tab list */
   "aria-label": string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

@@ -45,6 +45,7 @@ export interface ClapperBellItem {
 export interface ClapperBellProps {
   /** Append-only notification list; ids not seen on a previous render are treated as arrivals. */
   items: ClapperBellItem[];
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

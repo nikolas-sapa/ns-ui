@@ -104,6 +104,7 @@ export interface SchlierenRigProps {
   gain?: number;
   /** optional hero content, rendered over the field */
   children?: ReactNode;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

@@ -65,6 +65,7 @@ export interface PawlTickProps {
   status: PawlTickStatus;
   /** Gear glyph size in px. Default 20. */
   size?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

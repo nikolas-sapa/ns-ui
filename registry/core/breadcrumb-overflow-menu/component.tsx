@@ -47,8 +47,11 @@ export interface WornPathProps {
   minVisibleHead?: number;
   /** Crumbs at the tail that can never collapse, current included. Default 2. */
   minVisibleTail?: number;
+  /** called when a non-current crumb is activated */
   onNavigate?: (item: Crumb, index: number) => void;
+  /** accessible name for the breadcrumb nav */
   ariaLabel?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

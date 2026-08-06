@@ -49,6 +49,7 @@ export interface PlumbTrueProps {
   onConfirm?: () => void;
   /** fires when the settled button is pressed */
   onNextAction?: () => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

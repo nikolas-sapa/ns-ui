@@ -33,9 +33,11 @@ export function PointsThrow({
   defaultTab,
   className = "",
 }: {
+  /** the tabs, in order */
   tabs: PointsThrowTab[];
   /** id of the initially selected tab (defaults to the first) */
   defaultTab?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const baseId = useId();

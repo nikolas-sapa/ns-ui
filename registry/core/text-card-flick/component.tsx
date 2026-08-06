@@ -20,6 +20,7 @@ import { useCallback, useEffect, useRef, type RefObject } from "react";
 export interface CardFlickProps {
   /** the text to animate, one Animation pair per character */
   text: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
   /** classes applied to every individual letter span */
   letterClassName?: string;
@@ -33,6 +34,7 @@ export interface CardFlickProps {
   stiffness?: number;
   /** spring damping — lower overshoots more */
   damping?: number;
+  /** called once the spring settles at its resting state */
   onSettle?: () => void;
 }
 

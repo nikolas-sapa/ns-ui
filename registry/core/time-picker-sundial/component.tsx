@@ -30,9 +30,13 @@ export interface GnomonSetProps {
   hour?: number;
   /** 0-59, controlled — only 5-minute values are reachable via the UI. */
   minute?: number;
+  /** uncontrolled initial hour, 0-23 */
   defaultHour?: number;
+  /** uncontrolled initial minute, 0-59 */
   defaultMinute?: number;
+  /** called with the new hour and minute on any change */
   onChange?: (hour: number, minute: number) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

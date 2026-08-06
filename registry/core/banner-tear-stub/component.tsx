@@ -148,6 +148,7 @@ export interface TearStubProps {
   onOpenChange?: (open: boolean) => void;
   /** Accessible name (and visible label) for the dismiss control. @default "Dismiss" */
   dismissLabel?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

@@ -24,9 +24,13 @@ export interface NavCondenseRailLink {
 }
 
 export interface NavCondenseRailProps {
+  /** brand text on the left */
   wordmark?: string;
+  /** nav links, in order */
   links?: NavCondenseRailLink[];
+  /** trailing CTA link/button */
   cta?: NavCondenseRailLink;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

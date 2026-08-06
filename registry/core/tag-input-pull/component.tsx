@@ -63,11 +63,15 @@ function useReducedMotion() {
 export interface BurrChipProps {
   /** controlled tag list; omit for uncontrolled */
   value?: string[];
+  /** uncontrolled initial tag list */
   defaultValue?: string[];
+  /** called with the full tag list after an add or remove */
   onChange?: (tags: string[]) => void;
   /** placeholder shown only while the list is empty */
   placeholder?: string;
+  /** blocks adding or removing tags */
   disabled?: boolean;
+  /** extra classes merged onto the rendered root element */
   className?: string;
   /** accessible name for the chip group */
   "aria-label"?: string;

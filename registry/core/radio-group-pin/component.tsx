@@ -99,14 +99,17 @@ export interface PinTumblerOption {
 export interface PinTumblerProps {
   /** Accessible name for the radiogroup, e.g. "Shipping speed". */
   label: string;
+  /** the radio options */
   options: PinTumblerOption[];
   /** Controlled selected value. */
   value?: string;
   /** Initial value when uncontrolled. @default options[0]?.value */
   defaultValue?: string;
+  /** called with the new value when a different option is selected */
   onValueChange?: (value: string) => void;
   /** Shared `name` for the native radios. @default a generated id */
   name?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

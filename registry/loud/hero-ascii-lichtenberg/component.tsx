@@ -122,7 +122,9 @@ export interface StrikeFigureProps {
    * discharge grows fewer channels there instead of being masked afterwards.
    */
   quiet?: { x: number; y: number; w: number; h: number };
+  /** copy overlaid on the discharge; also informs the `quiet` rect's contents */
   children?: ReactNode;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

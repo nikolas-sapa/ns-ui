@@ -125,8 +125,11 @@ export function LogoCloudSettle({
   label = "Trusted by teams shipping with ns-ui",
   className = "",
 }: {
+  /** the logos, settling into place */
   marks?: Mark[];
+  /** accessible name for the logo group */
   label?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);

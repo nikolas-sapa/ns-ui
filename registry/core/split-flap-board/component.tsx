@@ -54,6 +54,7 @@ export interface SolariFlapProps {
   cellWidth?: number;
   /** Cell height in px. Default 50. */
   cellHeight?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

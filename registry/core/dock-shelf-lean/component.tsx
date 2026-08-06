@@ -53,11 +53,13 @@ export interface ShelfCantItem {
 }
 
 export interface ShelfCantProps {
+  /** the toolbar's reorderable items */
   items: ShelfCantItem[];
   /** accessible name for the toolbar row itself */
   label?: string;
   /** fires with the new order after every reorder step (swap or drop) */
   onReorder?: (items: ShelfCantItem[]) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

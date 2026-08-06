@@ -58,6 +58,7 @@ export interface ShortFuseProps {
   onUndo?: () => void;
   /** Fires once the exit finishes after the fuse burns out, or Escape. */
   onDismiss?: () => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

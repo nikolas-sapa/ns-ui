@@ -40,10 +40,13 @@ export interface BowWakeItem {
 }
 
 export interface BowWakeProps {
+  /** the reorderable rows, in order */
   items: BowWakeItem[];
   /** fires whenever the committed order changes — drag drop or a keyboard step */
   onReorder?: (items: BowWakeItem[]) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** accessible name for the list */
   "aria-label"?: string;
 }
 

@@ -50,6 +50,7 @@ export interface PawlClickProps {
   onUndo?: (card: PawlClickCard) => void;
   /** Called once the queue is fully drained. */
   onEmpty?: () => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

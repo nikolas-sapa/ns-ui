@@ -14,7 +14,9 @@ export function LoomShuttle({
 }: {
   /** 0–100. Omit to self-run a staged demo loop. */
   value?: number;
+  /** accessible name for the loader. Default "Loading assets". */
   label?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);

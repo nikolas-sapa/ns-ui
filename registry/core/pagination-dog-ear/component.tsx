@@ -42,7 +42,9 @@ export interface FolioTurnProps {
   page: number;
   /** Total number of pages. */
   count: number;
+  /** called with the new 1-indexed page when a different page is chosen */
   onChange: (page: number) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

@@ -93,6 +93,7 @@ export interface HeatSoakProps {
   children: ReactNode;
   /** Fires on every press that isn't soaked — the actual rate-limited action. */
   onPress?: () => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

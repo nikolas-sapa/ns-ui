@@ -25,9 +25,11 @@ export interface ChartBarDitherDatum {
 }
 
 export interface ChartBarDitherProps {
+  /** the plotted bars, in order */
   data?: ChartBarDitherDatum[];
   /** chart title, used as the figure's accessible name and table caption */
   title?: string;
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

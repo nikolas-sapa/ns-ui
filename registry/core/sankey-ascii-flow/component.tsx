@@ -31,8 +31,11 @@ export interface SankeyLink {
 }
 
 export interface AsciiSankeyFlowProps {
+  /** the diagram's nodes */
   nodes?: SankeyNode[];
+  /** the flows between nodes */
   links?: SankeyLink[];
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

@@ -29,7 +29,9 @@ export interface PostListAsciiItem {
 }
 
 export interface PostListAsciiIndexProps {
+  /** the posts, in list order */
   posts: PostListAsciiItem[];
+  /** extra classes merged onto the rendered root element */
   className?: string;
 }
 

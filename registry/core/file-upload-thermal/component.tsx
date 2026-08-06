@@ -183,9 +183,13 @@ export function UpdraftDropzone({
   defaultFiles?: { name: string; size: number; type: string }[];
   /** allowed types: extensions (".png") or mime ("image/png", "image/*"); empty = any */
   accept?: string[];
+  /** rejects any file larger than this. No default — unlimited. */
   maxSizeBytes?: number;
+  /** called with the full file list after any add or removal */
   onFilesChange?: (files: UpdraftFile[]) => void;
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** accessible name for the dropzone. Default "Upload files". */
   "aria-label"?: string;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);

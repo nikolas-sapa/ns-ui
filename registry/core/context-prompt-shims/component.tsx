@@ -44,7 +44,9 @@ export interface ShimFitProps {
   candidates?: ShimSection[];
   /** px per token for row height (min 8px floor still applies) */
   scale?: number;
+  /** extra classes merged onto the rendered root element */
   className?: string;
+  /** accessible name for the stack */
   "aria-label"?: string;
 }
 
