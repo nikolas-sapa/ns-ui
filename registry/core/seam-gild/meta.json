@@ -1,0 +1,29 @@
+{
+  "name": "seam-gild",
+  "title": "Seam Gild",
+  "description": "A kintsugi payoff for consequential actions: confirming cracks the panel with a biased-random-walk SVG path in ~400ms, then immediately re-fills it from both ends as a bright raised seam — the scar stays for the rest of the browser session, so repeated confirmations accumulate as ornament instead of fading.",
+  "collection": "core",
+  "tags": [
+    "confirm",
+    "success",
+    "payment",
+    "svg",
+    "persistence",
+    "session",
+    "repair",
+    "aria-live"
+  ],
+  "useWhen": "a weighty confirmation (payment cleared, migration finished, plan upgraded) where the payoff should leave a lasting, accumulating trace on the panel itself — a hairline crack that heals into a bright raised seam and stays for the rest of the session; pick success-nucleation instead when the moment should be a one-shot crystallization that resets between successes, or confirm-slide-shatter when the action is destructive and the pane should break apart rather than mend.",
+  "instruction": "A self-contained confirm panel: a bordered card with a description block, a real <button> (default label 'Confirm payment') and an aria-hidden, pointer-events:none SVG overlay absolutely positioned over the whole panel. Clicking the button calls the optional onConfirm callback — awaited if it returns a Promise, pendingLabel shown meanwhile — and the instant it settles, two things fire independently of each other: a role=status aria-live=assertive region receives confirmedMessage (this is the real confirmation, and it fires even if the visual below has nowhere to draw), and a visible role=status aria-live=polite counter ('N seams this session') updates from a running total kept in sessionStorage. Geometry: one seed point is picked on the panel's edge, retried up to 20 times against a measured exclusion list — every element carrying data-seam-avoid (the content block, the button, the counter) — read via getBoundingClientRect so the crack never starts inside one of them. A biased random walk grows inward from there: each step nudges the previous heading by a small jitter, and a step that would land inside an excluded rect (padded 6px) resamples its angle up to 6 times before the walk simply stops early — a shorter valid crack rather than an invalid one. Partway along (35-65% of the walk), one branch forks off at roughly a 60deg turn and walks a shorter distance under the same avoidance. Both polylines render as SVG <path>s with pathLength=1, so real pixel length is never measured: dasharray '1', dashoffset animated 1->0 over 400ms in --border draws the crack outward from the origin, with the branch on the same 400ms clock but starting 42% of the way through so it visibly forks mid-propagation rather than growing from t=0. The instant the crack's 400ms finishes, the gild pass starts: the same polyline once forward and once with its points reversed, both pathLength=1, dashoffset animated 1->0.5 over ~450ms in --foreground at 1.5px — forward reveals the first half from the origin, reversed reveals the first half of the flipped path (the original's second half) from the far end, so the bright seam visibly closes toward the middle from both directions at once. A drop-shadow(0 -1px 0 color-mix(in srgb, var(--foreground) 55%, transparent)) filter on that same stroke is the raised highlight, an offset duplicate of exactly the currently-revealed geometry rather than a separately animated path; the original hairline crack stays underneath as the seam's groove. Finished seams are normalized to fractions of the panel box and appended (capped at maxSeams, default 5, oldest dropped) to sessionStorage under ns-seam-gild:<storageKey>, alongside the running count under the same key plus ':count' kept separately so the tally stays accurate even on the rare panel too crowded to fit a new seam. Seams loaded from storage, or any seam past its own mount, render at their finished gilded state directly with no crack-then-gild replay. prefers-reduced-motion skips the propagation entirely for every new seam and renders it settled immediately, the same code path storage-loaded seams already use. Props: actionLabel, pendingLabel, confirmedMessage, description, onConfirm, storageKey, maxSeams, resetKey, className.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "press",
+    "target": "[data-seam-gild-trigger]",
+    "hold": 300,
+    "period": 4000
+  },
+  "gate": {
+    "openBy": "[data-seam-gild-trigger]",
+    "expect": "[data-seam-gild-status]"
+  }
+}
