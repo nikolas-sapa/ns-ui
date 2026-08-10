@@ -2,6 +2,23 @@
 
 Raw ideation archive for the `ASCII & raster surfaces` lane. Reference only — completeness over brevity. Do not treat this as a spec; the built components in `registry/` are authoritative.
 
+## Owner verdict (2026-08-10) — read this before the concepts below
+
+All 10 selected concepts passed the technical gate (`## Outcome` further down). The owner then reviewed the built components and rejected 7 of 10 outright. The 3 that survived did not survive on execution quality — the judge's selections below were unanimous on that. They survived on whether the product surface itself was worth building at all.
+
+- **`light-table` — CUT.** Hex viewer. A developer tool wearing an ascii skin.
+- **`under-brace` — CUT.** Regex tester. A developer tool.
+- **`chalk-snap` — CUT.** Freehand code/UI annotator. A developer tool.
+- **`stencil-fill` — LIFTED.** Kept, but needed a visual pass (motion + scale) before it cleared the bar — it did not pass as originally built.
+- **`chord-punch` — CUT.** Shortcut recorder. A settings-screen control.
+- **`pin-barrel` — CUT.** Cron-expression editor. A developer/ops tool.
+- **`flood-mark` — CUT.** SRE alert-threshold config. An ops tool.
+- **`grain-crest` — CUT.** Admin data-table column header. An internal-dashboard control.
+- **`nomogram-edge` — LIFTED.** Kept, but needed the same visual pass as `stencil-fill` before it cleared the bar.
+- **`rosensweig-crest` — KEPT (fixed).** Shipped broken; repaired to working, no taste objection.
+
+The failure was structural, not a matter of any one concept's craft: every cut was a niche developer/ops/settings tool wearing an ascii skin, and every one rendered as a static bordered grey card until interacted with. Do not read the concept write-ups below — including the ones for cut components — as examples of reasoning that produces keepers. See `03-Resources/fable-taste-patterns.md`'s 2026-08-10 correction section in the vault for what this means for future ideation.
+
 ## Lane brief
 
 > You are a design engineer with distinctive taste, brainstorming new components for ns-ui. Be creative, aesthetic, exploratory — this is the generative step. Every concept must be honest and buildable in principle.
@@ -27,6 +44,23 @@ Three parallel `claude-fable-5` agents ran the same lane brief above under three
 - 20 rejected by the judge (see below, folded into each concept's entry).
 - 10/10 selected concepts built and passed the gate (see `lab-ascii-batch-1-build.md` companion notes / gate_report if present).
 
+
+## OUTCOME — owner review (2026-08-10)
+
+All 10 selected concepts passed the technical quality gate. The owner then reviewed the built components and rejected 7 outright, unanimously and structurally — not on execution quality. Every cut was a niche developer/ops tool wearing an ascii skin, rendered as a static bordered grey card until interacted with.
+
+- **`light-table`** — CUT. Hex viewer: a developer tool, not a product surface.
+- **`under-brace`** — CUT. Regex tester: a developer tool.
+- **`chalk-snap`** — CUT. Code annotator: a developer tool.
+- **`chord-punch`** — CUT. Shortcut recorder: a developer tool.
+- **`pin-barrel`** — CUT. Cron editor: a developer tool.
+- **`flood-mark`** — CUT. SRE alert-threshold config: an internal dashboard input.
+- **`grain-crest`** — CUT. Admin data-table header: an internal dashboard control.
+- **`stencil-fill`** — LIFTED. Saved by a visual pass: rescaled 2.1x, license-key mask, dot-grid plaque, self-typing loop at rest.
+- **`nomogram-edge`** — LIFTED. Saved by a visual pass: thicker line, entrance spring, ambient drift through value pairs, real handle/label overlap bug fixed.
+- **`rosensweig-crest`** — KEPT, fixed. Was a broken loud hero: eruption radius was ~67px of a nominal 230 after smoothstep, and the exclusion rect was measured off the full-bleed wrapper so it blocked half the field.
+
+The rule this produced, standing for all future batches: **Beautiful first, broadly useful second.** Filter 1 — name the product surface this component replaces (hero, background, divider, card, nav, loader, empty state, feedback moment, pricing element, gallery, testimonial, footer). If the honest answer is "a settings screen," "an internal dashboard," or "a developer tool," do not build it, however clever the mechanism. Filter 2 — it must be alive at rest and striking to look at. The resting frame is the first and often only thing judged; a static bordered grey card is an automatic rejection. Something must move, breathe, drift, or settle before the user touches anything.
 
 ---
 
