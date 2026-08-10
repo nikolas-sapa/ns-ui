@@ -425,7 +425,7 @@ export function RingStain({
               pathLength={1}
               fill="none"
               stroke="var(--foreground)"
-              strokeWidth={4.5}
+              strokeWidth={2.5}
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeDasharray="1 1"

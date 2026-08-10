@@ -45,7 +45,7 @@ const TIP_FLASH_MS = 380;
 
 type Pt = { x: number; y: number };
 type Branch = { d: string; delay: number; length: number };
-type Crack = { mainD: string; branches: Branch[]; longestIdx: number; tip: Pt };
+type Crack = { mainD: string; branches: Branch[]; longestIdx: number; secondIdx: number; tip: Pt };
 
 /** mulberry32 — small, fast, deterministic given a seed */
 function mulberry32(seed: number) {
@@ -104,8 +104,16 @@ function generateCrack(seed: number): Crack {
   branches.forEach((b, i) => {
     if (b.length > branches[longestIdx].length) longestIdx = i;
   });
+  // second-longest gets its own, differently-timed idle creep so the rest
+  // state reads as more than one twitching branch tip — still calm, just
+  // not perceptually flat.
+  let secondIdx = -1;
+  branches.forEach((b, i) => {
+    if (i === longestIdx) return;
+    if (secondIdx === -1 || b.length > branches[secondIdx].length) secondIdx = i;
+  });
 
-  return { mainD, branches, longestIdx, tip: mainPts[mainPts.length - 1] };
+  return { mainD, branches, longestIdx, secondIdx, tip: mainPts[mainPts.length - 1] };
 }
 
 export function CrazeRule({ seed, className = "" }: CrazeRuleProps) {
@@ -165,7 +173,10 @@ export function CrazeRule({ seed, className = "" }: CrazeRuleProps) {
 }
 .ns-craze-rule[data-armed="true"] .ns-craze-branch{stroke-dashoffset:0}
 .ns-craze-rule[data-armed="true"] .ns-craze-branch-longest{
-  animation:ns-craze-idle-branch 6s ease-in-out infinite;
+  animation:ns-craze-idle-branch 5s ease-in-out infinite;
+}
+.ns-craze-rule[data-armed="true"] .ns-craze-branch-second{
+  animation:ns-craze-idle-branch-second 7s ease-in-out infinite;
 }
 .ns-craze-rule[data-armed="true"] .ns-craze-ink{
   animation:ns-craze-idle-breathe 6s ease-in-out infinite;
@@ -176,13 +187,15 @@ export function CrazeRule({ seed, className = "" }: CrazeRuleProps) {
   animation:ns-craze-tip-flash ${TIP_FLASH_MS}ms ease-out both;
   animation-delay:${MAIN_MS}ms;
 }
-@keyframes ns-craze-idle-branch{0%,100%{stroke-dashoffset:0}50%{stroke-dashoffset:-0.14}}
-@keyframes ns-craze-idle-breathe{0%,100%{stroke-opacity:0.8}50%{stroke-opacity:1}}
+@keyframes ns-craze-idle-branch{0%,100%{stroke-dashoffset:0}50%{stroke-dashoffset:-0.55}}
+@keyframes ns-craze-idle-branch-second{0%,100%{stroke-dashoffset:0}50%{stroke-dashoffset:-0.4}}
+@keyframes ns-craze-idle-breathe{0%,100%{stroke-opacity:0.3}50%{stroke-opacity:1}}
 @keyframes ns-craze-tip-flash{0%{opacity:0}18%{opacity:1}100%{opacity:0}}
 @media (prefers-reduced-motion: reduce){
   .ns-craze-rule .ns-craze-main,
   .ns-craze-rule .ns-craze-branch{transition:none!important;stroke-dashoffset:0!important}
   .ns-craze-rule .ns-craze-branch-longest,
+  .ns-craze-rule .ns-craze-branch-second,
   .ns-craze-rule .ns-craze-ink{animation:none!important;stroke-opacity:0.9!important}
   .ns-craze-rule .ns-craze-tip{animation:none!important;opacity:0!important}
 }
@@ -207,26 +220,35 @@ export function CrazeRule({ seed, className = "" }: CrazeRuleProps) {
             pathLength={1}
             vectorEffect="non-scaling-stroke"
           />
-          {crack?.branches.map((b, i) => (
-            <path
-              key={i}
-              d={b.d}
-              className={
-                i === crack.longestIdx ? "ns-craze-branch ns-craze-branch-longest" : "ns-craze-branch"
-              }
-              style={{
-                transitionDelay: `${b.delay}ms`,
-                animationDelay: `${b.delay + BRANCH_MS}ms`,
-              }}
-              fill="none"
-              stroke="var(--border)"
-              strokeWidth={1}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              pathLength={1}
-              vectorEffect="non-scaling-stroke"
-            />
-          ))}
+          {crack?.branches.map((b, i) => {
+            const idleClass =
+              i === crack.longestIdx
+                ? "ns-craze-branch-longest"
+                : i === crack.secondIdx
+                  ? "ns-craze-branch-second"
+                  : "";
+            return (
+              <path
+                key={i}
+                d={b.d}
+                className={`ns-craze-branch ${idleClass}`}
+                style={{
+                  transitionDelay: `${b.delay}ms`,
+                  animationDelay:
+                    idleClass === "ns-craze-branch-second"
+                      ? `${b.delay + BRANCH_MS + 700}ms`
+                      : `${b.delay + BRANCH_MS}ms`,
+                }}
+                fill="none"
+                stroke="var(--border)"
+                strokeWidth={1}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                pathLength={1}
+                vectorEffect="non-scaling-stroke"
+              />
+            );
+          })}
         </g>
         {crack && (
           <circle

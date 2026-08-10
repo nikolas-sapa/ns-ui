@@ -63,11 +63,19 @@ interface GridApi {
 
 const GridContext = createContext<GridApi | null>(null);
 
-const IDLE_PERIOD_MS = 24000;
+const IDLE_PERIOD_MS = 12000;
 const QUADRANT_MS = IDLE_PERIOD_MS / 4;
 const REDUCED_ANGLE_DEG = 315;
 const SPRING = 0.12;
 const DEG_TO_RAD = Math.PI / 180;
+// Unit-vector offsets (cos/sin of --rake-angle) were capped at ~1px, which
+// measured as byte-identical screenshots 2.5s apart in light mode — --border
+// and --ns-muted sit too close to --background there for a sub-pixel shadow
+// to round to a different pixel. Scaling by these magnitudes keeps the same
+// cos/sin direction but pushes the emboss past the perceptual floor in both
+// themes without changing the mechanism.
+const BEVEL_PX = 1.8; // text-shadow + feDropShadow dx/dy
+const RIM_PX = 2.6; // inset box-shadow standing in for the border catching light
 
 function easeInOutCubic(f: number): number {
   return f < 0.5 ? 4 * f * f * f : 1 - Math.pow(-2 * f + 2, 3) / 2;
@@ -142,14 +150,14 @@ export function GrazingLightCard({ heading, body, href, icon, className = "" }: 
       root.style.setProperty("--rake-angle", `${deg.toFixed(1)}deg`);
       if (headingRef.current) {
         headingRef.current.style.textShadow =
-          `${(-cosA).toFixed(2)}px ${(-sinA).toFixed(2)}px 0 var(--border), ` +
-          `${cosA.toFixed(2)}px ${sinA.toFixed(2)}px 0 var(--ns-muted)`;
+          `${(-cosA * BEVEL_PX).toFixed(2)}px ${(-sinA * BEVEL_PX).toFixed(2)}px 0 var(--border), ` +
+          `${(cosA * BEVEL_PX).toFixed(2)}px ${(sinA * BEVEL_PX).toFixed(2)}px 0 var(--ns-muted)`;
       }
-      lightShadowRef.current?.setAttribute("dx", (-cosA).toFixed(2));
-      lightShadowRef.current?.setAttribute("dy", (-sinA).toFixed(2));
-      darkShadowRef.current?.setAttribute("dx", cosA.toFixed(2));
-      darkShadowRef.current?.setAttribute("dy", sinA.toFixed(2));
-      root.style.boxShadow = `inset ${(-cosA * 1.5).toFixed(2)}px ${(-sinA * 1.5).toFixed(2)}px 0 0 color-mix(in srgb, var(--foreground) 14%, transparent)`;
+      lightShadowRef.current?.setAttribute("dx", (-cosA * BEVEL_PX).toFixed(2));
+      lightShadowRef.current?.setAttribute("dy", (-sinA * BEVEL_PX).toFixed(2));
+      darkShadowRef.current?.setAttribute("dx", (cosA * BEVEL_PX).toFixed(2));
+      darkShadowRef.current?.setAttribute("dy", (sinA * BEVEL_PX).toFixed(2));
+      root.style.boxShadow = `inset ${(-cosA * RIM_PX).toFixed(2)}px ${(-sinA * RIM_PX).toFixed(2)}px 0 0 color-mix(in srgb, var(--foreground) 14%, transparent)`;
     };
 
     if (prefersReducedMotion()) {
@@ -157,6 +165,13 @@ export function GrazingLightCard({ heading, body, href, icon, className = "" }: 
       paint(REDUCED_ANGLE_DEG);
       return;
     }
+
+    // Start the spring at the idle circuit's own t=0 angle rather than the
+    // reduced-motion resting angle: the two are unrelated, so springing
+    // 315deg -> ~0deg on mount read as a glitchy snap, the only motion in
+    // the whole first second.
+    angleRef.current = idleAngleAt(0);
+    paint(angleRef.current);
 
     const tick = ({ idleAngleDeg, pointer }: TickPayload) => {
       const rect = root.getBoundingClientRect();
