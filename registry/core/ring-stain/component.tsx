@@ -83,7 +83,13 @@ interface Particle {
 
 // deterministic per-index radius (0.5 - 1.5), a low-discrepancy sequence so
 // dot sizes look organically varied without Math.random touching render.
-const RADII: number[] = Array.from({ length: COUNT }, (_, i) => 0.5 + ((i * GOLDEN + 0.5) % 1));
+// Floor on how many particles form the finished checkmark — see the completion
+// effect. Enough to read as a dotted glyph rather than a few specks.
+const MIN_RESIDUE = 34;
+// Radii in local units against the 100-unit viewBox. Widened from 0.5..1.5:
+// at the demo's 104-160px render that produced ~1.5-3px dots that all but
+// vanished, and disappeared entirely on a scaled-down catalog card.
+const RADII: number[] = Array.from({ length: COUNT }, (_, i) => 0.9 + ((i * GOLDEN + 0.5) % 1) * 1.6);
 
 // deterministic fixed rim-slot angles for prefers-reduced-motion.
 const SLOT_ANGLES: number[] = Array.from({ length: COUNT }, (_, i) => (i / COUNT) * TWO_PI);
@@ -309,17 +315,34 @@ export function RingStain({
     const total = check ? check.getTotalLength() : 0;
     const reduced = reducedMotionRef.current;
 
-    deposited.forEach((idx, j) => {
+    // The residue IS the checkmark, so there has to be some. Completing with an
+    // empty deposit set used to hide all COUNT particles and leave a bare
+    // stroke: mounting already-complete (or firing `complete` during an early
+    // indeterminate wait) never gives the rim time to collect anything, so the
+    // panel rendered as an empty circle — measured deposited:0, 90 particles at
+    // opacity:0. Recruit particles up to a floor so the glyph always reads as
+    // settled residue, and mark the recruits deposited so they take the same
+    // --foreground fill rather than staying muted.
+    const residue = deposited.slice();
+    for (let i = 0; i < COUNT && residue.length < MIN_RESIDUE; i++) {
+      if (depositedRef.current.has(i)) continue;
+      depositedRef.current.add(i);
+      els[i]?.classList.add("ns-rs-deposit");
+      residue.push(i);
+    }
+
+    residue.forEach((idx, j) => {
       const el = els[idx];
       if (!el || !check) return;
-      const frac = deposited.length > 1 ? j / (deposited.length - 1) : 0.5;
+      const frac = residue.length > 1 ? j / (residue.length - 1) : 0.5;
       const pt = check.getPointAtLength(frac * total);
       el.style.transition = reduced ? "none" : "transform 460ms cubic-bezier(.34,1.56,.64,1)";
       el.style.transform = `translate(${pt.x.toFixed(2)}px, ${pt.y.toFixed(2)}px)`;
     });
 
+    const onCheck = new Set(residue);
     for (let i = 0; i < COUNT; i++) {
-      if (depositedRef.current.has(i)) continue;
+      if (onCheck.has(i)) continue;
       const el = els[i];
       if (!el) continue;
       el.style.transition = reduced ? "none" : "opacity 200ms ease";
@@ -381,7 +404,7 @@ export function RingStain({
             </clipPath>
           </defs>
           <g transform="translate(50 50)" clipPath={`url(#${clipId})`}>
-            <circle r={RIM} fill="none" stroke="var(--border)" strokeWidth={0.8} />
+            <circle r={RIM} fill="none" stroke="var(--border)" strokeWidth={1.4} />
             {Array.from({ length: COUNT }).map((_, i) => (
               <circle
                 key={i}
