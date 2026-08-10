@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 // ---------------------------------------------------------------------------
 // CrazeRule — a section divider that arrives as a propagating fracture
@@ -17,10 +17,15 @@ import { useEffect, useRef, useState } from "react";
 // IntersectionObserver arms the reveal once, then disconnects — no rAF loop,
 // no ongoing JS. At rest the crack is not dead: a 6s keyframe nudges the
 // longest branch's dashoffset a couple of px and breathes the whole ink
-// group's stroke-opacity 0.8->1.0, so the material still reads as under
-// stress. Every ink is --border, with one momentary --foreground flash at
-// the tip on arrival. prefers-reduced-motion renders the crack fully formed
-// — no propagation, no idle creep. Zero deps, no canvas.
+// group's opacity, so the material still reads as under stress. --border
+// alone measured an 18-23/255 pixel delta against --background — legible in
+// a diff, not to an eye glancing at the page. Every stroke is drawn twice in
+// --foreground instead: a soft, wider, blurred halo underneath (low opacity,
+// gives the line presence/glow against the page) plus a crisper, narrower
+// core on top (higher opacity, gives it a readable edge) — same trick as
+// chalk on a dark floor. One momentary full --foreground flash at the tip on
+// arrival. prefers-reduced-motion renders the crack fully formed — no
+// propagation, no idle creep. Zero deps, no canvas.
 // ---------------------------------------------------------------------------
 
 export interface CrazeRuleProps {
@@ -42,6 +47,20 @@ const MAIN_POINTS = 26;
 const MAIN_MS = 600;
 const BRANCH_MS = 260;
 const TIP_FLASH_MS = 380;
+
+// Ink, in screen px (vectorEffect="non-scaling-stroke" keeps these constant
+// regardless of the viewBox's horizontal stretch). Every stroke below is
+// drawn twice: a wide, blurred, dim HALO for presence against a near-black
+// page, and a narrower, sharper CORE on top for a readable edge — see the
+// header comment for why --border alone wasn't enough.
+const HALO_MAIN_W = 5;
+const HALO_BRANCH_W = 3.6;
+const HALO_OPACITY = 0.16;
+const HALO_BLUR = 1.1;
+const CORE_MAIN_W = 1.6;
+const CORE_BRANCH_W = 1.15;
+const CORE_MAIN_OPACITY = 0.62;
+const CORE_BRANCH_OPACITY = 0.5;
 
 type Pt = { x: number; y: number };
 type Branch = { d: string; delay: number; length: number };
@@ -120,6 +139,7 @@ export function CrazeRule({ seed, className = "" }: CrazeRuleProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [crack, setCrack] = useState<Crack | null>(null);
   const [armed, setArmed] = useState(false);
+  const filterId = useId().replace(/[:]/g, "");
 
   // -- generate the crack once, client-side (a seeded random walk can't run
   // identically on the server without pinning every seed, so this waits for
@@ -189,14 +209,18 @@ export function CrazeRule({ seed, className = "" }: CrazeRuleProps) {
 }
 @keyframes ns-craze-idle-branch{0%,100%{stroke-dashoffset:0}50%{stroke-dashoffset:-0.55}}
 @keyframes ns-craze-idle-branch-second{0%,100%{stroke-dashoffset:0}50%{stroke-dashoffset:-0.4}}
-@keyframes ns-craze-idle-breathe{0%,100%{stroke-opacity:0.3}50%{stroke-opacity:1}}
+/* Group-level opacity, not stroke-opacity: the halo/core paths already carry
+   their own strokeOpacity, and an explicit stroke-opacity on a child is not
+   inherited from its ancestor — opacity is a compositing effect, so it
+   still dims both layers together. */
+@keyframes ns-craze-idle-breathe{0%,100%{opacity:0.75}50%{opacity:1}}
 @keyframes ns-craze-tip-flash{0%{opacity:0}18%{opacity:1}100%{opacity:0}}
 @media (prefers-reduced-motion: reduce){
   .ns-craze-rule .ns-craze-main,
   .ns-craze-rule .ns-craze-branch{transition:none!important;stroke-dashoffset:0!important}
   .ns-craze-rule .ns-craze-branch-longest,
   .ns-craze-rule .ns-craze-branch-second,
-  .ns-craze-rule .ns-craze-ink{animation:none!important;stroke-opacity:0.9!important}
+  .ns-craze-rule .ns-craze-ink{animation:none!important;opacity:1!important}
   .ns-craze-rule .ns-craze-tip{animation:none!important;opacity:0!important}
 }
 `}</style>
@@ -208,13 +232,71 @@ export function CrazeRule({ seed, className = "" }: CrazeRuleProps) {
         aria-hidden
         className="block overflow-visible"
       >
+        <defs>
+          <filter
+            id={`${filterId}-blur`}
+            x="-10%"
+            y="-300%"
+            width="120%"
+            height="700%"
+          >
+            <feGaussianBlur stdDeviation={HALO_BLUR} />
+          </filter>
+        </defs>
         <g className="ns-craze-ink">
+          {/* halo: wide, blurred, dim — what gives the crack presence against a near-black page */}
+          <g filter={`url(#${filterId}-blur)`}>
+            <path
+              d={crack?.mainD ?? fallbackD}
+              className="ns-craze-main"
+              fill="none"
+              stroke="var(--foreground)"
+              strokeOpacity={HALO_OPACITY}
+              strokeWidth={HALO_MAIN_W}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              pathLength={1}
+              vectorEffect="non-scaling-stroke"
+            />
+            {crack?.branches.map((b, i) => {
+              const idleClass =
+                i === crack.longestIdx
+                  ? "ns-craze-branch-longest"
+                  : i === crack.secondIdx
+                    ? "ns-craze-branch-second"
+                    : "";
+              return (
+                <path
+                  key={`halo-${i}`}
+                  d={b.d}
+                  className={`ns-craze-branch ${idleClass}`}
+                  style={{
+                    transitionDelay: `${b.delay}ms`,
+                    animationDelay:
+                      idleClass === "ns-craze-branch-second"
+                        ? `${b.delay + BRANCH_MS + 700}ms`
+                        : `${b.delay + BRANCH_MS}ms`,
+                  }}
+                  fill="none"
+                  stroke="var(--foreground)"
+                  strokeOpacity={HALO_OPACITY}
+                  strokeWidth={HALO_BRANCH_W}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  pathLength={1}
+                  vectorEffect="non-scaling-stroke"
+                />
+              );
+            })}
+          </g>
+          {/* core: narrower, crisper, the readable edge of the line */}
           <path
             d={crack?.mainD ?? fallbackD}
             className="ns-craze-main"
             fill="none"
-            stroke="var(--border)"
-            strokeWidth={1.25}
+            stroke="var(--foreground)"
+            strokeOpacity={CORE_MAIN_OPACITY}
+            strokeWidth={CORE_MAIN_W}
             strokeLinecap="round"
             strokeLinejoin="round"
             pathLength={1}
@@ -240,8 +322,9 @@ export function CrazeRule({ seed, className = "" }: CrazeRuleProps) {
                       : `${b.delay + BRANCH_MS}ms`,
                 }}
                 fill="none"
-                stroke="var(--border)"
-                strokeWidth={1}
+                stroke="var(--foreground)"
+                strokeOpacity={CORE_BRANCH_OPACITY}
+                strokeWidth={CORE_BRANCH_W}
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 pathLength={1}
@@ -255,7 +338,7 @@ export function CrazeRule({ seed, className = "" }: CrazeRuleProps) {
             className="ns-craze-tip"
             cx={crack.tip.x}
             cy={crack.tip.y}
-            r={2}
+            r={2.4}
             fill="var(--foreground)"
           />
         )}

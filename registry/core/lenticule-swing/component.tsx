@@ -75,6 +75,28 @@ const SPRING_ZETA = 0.55; // <1 = visible settle wobble, the "spring-flavored" p
 const MIN_STRIPS = 22;
 const MAX_STRIPS = 64;
 const PARALLAX_COEFF = 0.05; // px of shimmer per deg per centered-strip-index
+// Per-strip crossover angle (deg) at which THAT strip's window-A opacity
+// passes 0.5, spread across [CROSSOVER_LO, CROSSOVER_HI] by the strip's own
+// jitter. CROSSOVER_BAND is how many degrees wide each strip's own fade is.
+// Kept narrow on purpose: a strip should snap from ~1 to ~0 quickly, at ITS
+// OWN angle, not crossfade in lockstep with every other strip. Without a
+// spread wide enough (an earlier version leaned on --j for only a +/-0.06
+// opacity nudge, ~6% of the range) almost every strip crossed 50% within the
+// same handful of degrees, so mid-scroll the entire headline sat at ~50%
+// opacity for both messages at once — two bold headlines double-exposed and
+// neither legible, the actual bug a scrolling visitor hits. With the spread
+// wide relative to the band, at any given angle during the scroll ramp most
+// strips have already fully resolved one way or the other and only a
+// narrow subset are actively blending — the "wipe" a real lenticular sheet
+// gives, not a uniform dissolve. CROSSOVER_LO sits far enough above the idle
+// spring's max excursion that resting message A stays fully opaque; the gap
+// between CROSSOVER_HI and ANGLE_RESOLVE is what leaves the "small handful
+// of strips lag behind" residual seam in the resolved frame.
+const CROSSOVER_LO = 1.5;
+const CROSSOVER_HI = 8.1;
+const CROSSOVER_MID = (CROSSOVER_LO + CROSSOVER_HI) / 2;
+const CROSSOVER_SPREAD = (CROSSOVER_HI - CROSSOVER_LO) / 2;
+const CROSSOVER_BAND = 1.2;
 
 function hash01(i: number) {
   const x = Math.sin(i * 12.9898 + 78.233) * 43758.5453;
@@ -294,7 +316,15 @@ const CSS = `
 }
 .ns-lens-a{
   z-index:2;
-  opacity:clamp(0, calc(0.95 - (var(--lens-angle) / ${ANGLE_RESOLVE}) * 0.95 + var(--j) * 0.06), 1);
+  /*
+    Each strip fades from fully opaque to fully transparent over a narrow
+    CROSSOVER_BAND-wide window centered on ITS OWN crossover angle (spread
+    across [CROSSOVER_LO, CROSSOVER_HI] by --j). That keeps most strips
+    fully committed to one message at any given angle, so the mid-scroll
+    frame reads as a wipe between two legible headlines instead of both
+    superimposed at ~50%.
+  */
+  opacity:clamp(0, calc(0.5 - (var(--lens-angle) - (${CROSSOVER_MID} + var(--j) * ${CROSSOVER_SPREAD})) / ${CROSSOVER_BAND}), 1);
 }
 @media (prefers-reduced-motion: reduce){
   .ns-lens-window{transition:none;}
