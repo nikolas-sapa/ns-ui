@@ -297,7 +297,10 @@ export function StencilFill({
         {label}
       </label>
 
-      <div className="relative inline-flex h-12 items-center rounded-[12px] border border-border bg-background px-3">
+      <div
+        className="relative inline-flex h-[2.7em] items-center rounded-[0.67em] border border-border bg-background px-[0.67em]"
+        style={{ fontSize: "var(--sf-size, 1.125rem)" }}
+      >
         <input
           id={inputId}
           name={name}
@@ -321,7 +324,7 @@ export function StencilFill({
         <div
           aria-hidden="true"
           data-sf-glyphs
-          className="pointer-events-none flex items-center font-mono text-lg"
+          className="pointer-events-none flex items-center font-mono"
         >
           {tokens.map((t, i) => {
             if (t.kind === "sep") {
@@ -366,13 +369,13 @@ export function StencilFill({
 const CSS = `
 .ns-sf-input{ background: transparent; color: transparent; caret-color: transparent; border: none; padding: 0; font: inherit; outline: none; border-radius: inherit; transition: box-shadow 150ms ease-out; }
 .ns-sf-input:hover{ box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--border), var(--foreground) 35%); }
-.ns-sf-input:focus-visible{ outline: 2px solid var(--ns-accent); outline-offset: 2px; box-shadow: none; }
+.ns-sf-input:focus-visible{ outline: 0.11em solid var(--ns-accent); outline-offset: 0.11em; box-shadow: none; }
 .ns-sf-cell{ display: inline-flex; align-items: center; justify-content: center; width: 1.2ch; text-align: center; }
 .ns-sf-glyph{ display: inline-block; min-width: 1ch; transition: color 90ms ease-out, opacity 90ms ease-out, font-weight 90ms ease-out; }
 .ns-sf-stencil{ color: var(--ns-muted); opacity: 0.62; font-weight: 400; }
 .ns-sf-ink{ color: var(--foreground); opacity: 1; font-weight: 600; }
 .ns-sf-sep{ color: var(--ns-muted); opacity: 0.62; }
-.ns-sf-caret{ position: absolute; left: -1px; top: 50%; width: 2px; height: 1.15em; transform: translateY(-50%); background: var(--ns-accent); border-radius: 1px; animation: ns-sf-blink 1s steps(1, jump-none) infinite; }
+.ns-sf-caret{ position: absolute; left: -1px; top: 50%; width: 0.11em; height: 1.15em; transform: translateY(-50%); background: var(--ns-accent); border-radius: 1px; animation: ns-sf-blink 1s steps(1, jump-none) infinite; }
 .ns-sf-reject{ position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--ns-muted); font-weight: 500; pointer-events: none; animation: ns-sf-reject-spring 560ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
 @keyframes ns-sf-blink{ 0%, 49%{ opacity: 1; } 50%, 100%{ opacity: 0; } }
 @keyframes ns-sf-reject-spring{
