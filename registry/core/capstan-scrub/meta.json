@@ -1,0 +1,27 @@
+{
+  "name": "capstan-scrub",
+  "title": "Capstan Scrub",
+  "description": "A numeric scrubber shaped as a winch drum: drag in circles and every completed wrap of rope multiplies friction ~8x, gearing value change down exponentially per degree so one wrap is coarse travel and three wraps is surgical, with the current gear rendered live as rope stacked on the drum.",
+  "collection": "core",
+  "tags": [
+    "slider",
+    "scrubber",
+    "numeric",
+    "precision",
+    "svg",
+    "drag",
+    "gear",
+    "micro-interaction"
+  ],
+  "useWhen": "a single scrub gesture needs to cover a huge numeric range (0-10M sample offsets, frame counts, log timestamps) AND land exactly, with no separate fine-mode toggle: winding the drum in place is what earns precision, and the wrap count on the drum is the only precision UI there is. Pick slider-vernier instead when the value's last digit is what deserves ceremony and a fixed coarse scale plus a sliding fine scale reads better than a continuously gearing dial; pick slider-loupe when the read is approximate and a magnifier beside a linear track is flavor rather than the mechanism. capstan-scrub is for six-orders-of-magnitude range plus exact landing in one continuous gesture, not for a bounded low-range dial.",
+  "instruction": "Build a numeric scrubber as a working capstan/winch drum, not a decorated dial. MECHANISM: an SVG drum (a circle with concentric stroked-arc wrap rings) accumulates the pointer's angle around its center into `wound`, a non-negative radian total representing rope laid on the drum. Effective rate = baseRate * e^(-mu*wound) with mu = ln(8)/(2*PI), so every full 2*PI radians of wound (one physical wrap) divides value-per-radian sensitivity by exactly 8x — continuous exponential decay, not discrete steps — tuned so gear 1 (unwound) spans the whole domain in a handful of turns and gear 4 (three wraps deep) resolves single units even across a 10-million-unit range. Value changes follow the pointer's ACTUAL angular delta each move (signed, shortest-path unwrapped), never the winding direction. WINDING VS PAYOUT: track a signed wind direction alongside `wound`. Movement continuing in the established direction adds its angular magnitude to `wound`; movement reversing direction subtracts (pays out) from `wound` first, clamped at 0, and only once fully paid out does `wound` start building in the new direction — real rope coming off a spool, not a mode switch, which is why the rate stays fine for a beat after a reversal and only coarsens as rope genuinely unwinds. RENDERING: settled full wraps are concentric circles stroked --border, stacking inward from the drum's outer flange at a fixed pitch (radius rhythm derived from the design system's 6/12/16 scale); the currently-forming wrap is a partial arc stroked --foreground, swept from the top in the current wind direction by the fractional part of wound/2*PI; a dashed --foreground line (the free rope end) runs from the forming wrap's radius out to the live pointer position while dragging, and disappears at rest. The value renders in Geist Mono at the drum's center, tabular-nums, with the current gear multiplier (×1, ×8, ×64, ...) shown beneath it and again as a small eyebrow badge. PERFORMANCE: the drag hot path (arc path `d`, wrap circle opacity, handle position, rope line endpoints, center text) writes directly to refs every pointermove; React state for the committed value and the wound total only updates at drag end and on keyboard input, matching this repo's other drag-heavy dials. ACCESSIBILITY: the drum is a single role=slider, tabIndex=0, focusable control (no separate buttons) with aria-valuemin/max/now and an aria-valuetext that always carries BOTH the live value and the current precision (\"2,400,000 smp — precision ×64, 2 wraps\") so nothing is pointer-only; ArrowLeft/Right/Up/Down step by the value-per-revolution at the CURRENT gear (coarser at gear 1, finer at each wrap deep); PageUp/PageDown add or remove exactly one whole wrap (2*PI radians of wound) and push an aria-live announcement (\"precision ×8\", \"precision ×64\"); Home rewinds `wound` to zero without touching the committed value. Capped at 8 drawable wraps (~16.8M x precision ceiling) so the geometry and the exponent both stay bounded. Every stroke and fill is currentColor via --background/--foreground/--ns-muted/--border/--ns-accent utility classes — no canvas, no hex, --ns-accent reserved for the focus ring only.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "drag",
+    "target": "[data-capstan-track]",
+    "from": [0.22, 0.28],
+    "to": [0.8, 0.74],
+    "period": 4800,
+    "delay": 700
+  }
+}
