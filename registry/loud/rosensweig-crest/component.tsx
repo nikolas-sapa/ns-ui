@@ -45,7 +45,15 @@ const RAMP = ["·", "~", "≈", "∧", "▲"]; // flat pool -> crest
 const HOLLOW_CHAR = "˘"; // moat between spikes, overrides the height bucket
 const HEIGHT_STOPS = [0.02, 0.24, 0.5, 0.74, 1.01]; // upper bound per RAMP index
 
-const FIELD_RADIUS = 230; // px — pointer influence radius
+// pointer influence radius: derived per-instance from container size (see
+// resize()), not a fixed px value. A fixed 230px reads fine in isolation but
+// composed with the quadratic falloff + 0.5 smoothstep edge below, the
+// onset ring only ever reaches d <= radius*(1-sqrt(THRESHOLD)) =~ 0.29*radius
+// — a 230px constant was producing a ~67px onset radius (134px eruption)
+// inside a full-bleed hero, unmistakably too small to read as "loud".
+const FIELD_RADIUS_FACTOR = 1.02; // multiplier of min(width, height)
+const FIELD_RADIUS_MIN = 260; // px floor, so scaled-down catalog cards still erupt visibly
+const FIELD_RADIUS_MAX = 1100; // px ceiling, so huge heroes don't erupt everywhere at once
 const THRESHOLD = 0.5; // fraction of field strength where the phase flips
 const THRESHOLD_SOFTNESS = 0.14;
 const K_UP = 260; // stiff spring, rising
@@ -124,6 +132,7 @@ export function RosensweigCrest({
     let originY = 0;
     let latH = new Float32Array(0);
     let latV = new Float32Array(0);
+    let fieldRadius = FIELD_RADIUS_MIN;
 
     let exclX0 = 0;
     let exclY0 = 0;
@@ -188,6 +197,11 @@ export function RosensweigCrest({
       }
       width = w;
       height = h;
+      fieldRadius = clamp(
+        Math.min(w, h) * FIELD_RADIUS_FACTOR,
+        FIELD_RADIUS_MIN,
+        FIELD_RADIUS_MAX
+      );
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = Math.max(1, Math.round(w * dpr));
       canvas.height = Math.max(1, Math.round(h * dpr));
@@ -309,7 +323,7 @@ export function RosensweigCrest({
             const ddx = cursor.x - px;
             const ddy = cursor.y - py;
             const d = Math.hypot(ddx, ddy);
-            let field = clamp(1 - d / FIELD_RADIUS, 0, 1);
+            let field = clamp(1 - d / fieldRadius, 0, 1);
             field = field * field; // quadratic falloff
             field = smoothstep(THRESHOLD, THRESHOLD + THRESHOLD_SOFTNESS, field);
             target = field * exclusionFactor(px, py);
@@ -404,7 +418,7 @@ export function RosensweigCrest({
           const px = originX + c * dx() + rowOffset;
           const idx = latIndex(r, c);
           const d = Math.hypot(vx - px, vy - py);
-          let field = clamp(1 - d / FIELD_RADIUS, 0, 1);
+          let field = clamp(1 - d / fieldRadius, 0, 1);
           field = field * field;
           field = smoothstep(THRESHOLD, THRESHOLD + THRESHOLD_SOFTNESS, field);
           latH[idx] = field * exclusionFactor(px, py);
@@ -417,7 +431,12 @@ export function RosensweigCrest({
     readTokens();
     const mo = new MutationObserver(() => {
       readTokens();
+      // a theme flip while asleep (rest, no pointer) would otherwise leave
+      // stale-colored glyphs on screen until the next pointer wake — force
+      // one repaint with the freshly-read tokens regardless of loop state.
       if (reduced) drawStaticErupted();
+      else if (raf) wake();
+      else drawFrame();
     });
     mo.observe(document.documentElement, {
       attributes: true,
@@ -479,14 +498,21 @@ export function RosensweigCrest({
       <canvas
         ref={canvasRef}
         aria-hidden
-        className="pointer-events-none absolute inset-0 block h-full w-full text-foreground"
+        className="pointer-events-none absolute inset-0 block h-full w-full text-foreground [animation:ns-crest-breathe_7s_ease-in-out_infinite] motion-reduce:animate-none"
       />
+      <style>{`
+@keyframes ns-crest-breathe{0%,100%{opacity:0.86}50%{opacity:1}}
+`}</style>
       {children ? (
-        <div
-          ref={exclRef}
-          className="relative z-10 flex h-full w-full flex-col items-start justify-center gap-4 p-8 sm:p-14"
-        >
-          {children}
+        <div className="relative z-10 flex h-full w-full flex-col items-start justify-center gap-4 p-8 sm:p-14">
+          {/* exclRef hugs just the content, not this w-full/h-full centering
+              wrapper — measuring the wrapper instead would hand the field
+              target an exclusion rect spanning the container's entire width
+              (and most of its height on narrow cards), leaving the surface
+              nowhere to erupt. */}
+          <div ref={exclRef} className="flex flex-col items-start gap-4">
+            {children}
+          </div>
         </div>
       ) : null}
     </div>
