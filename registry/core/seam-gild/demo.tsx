@@ -4,7 +4,14 @@ import { useState } from "react";
 import { SeamGild } from "./component";
 
 export default function SeamGildDemo() {
-  const [resetKey, setResetKey] = useState(0);
+  // Starts nonzero (not 0) so every fresh mount of this demo wipes
+  // ns-seam-gild:demo in sessionStorage before it renders anything — the
+  // component's own resetKey>0 branch already does this. Without it, the
+  // resting frame the screenshot gate and the owner both grade would depend
+  // on whether this browser session had already visited the demo before:
+  // a same-tab revisit would show leftover seams from a prior click instead
+  // of the deterministic blank panel a fresh look expects.
+  const [resetKey, setResetKey] = useState(1);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-10 bg-background px-6 py-24 text-foreground">

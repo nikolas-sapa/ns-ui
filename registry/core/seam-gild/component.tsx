@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 // ---------------------------------------------------------------------------
 // SeamGild — a kintsugi payoff for consequential actions. Confirming a
@@ -83,6 +83,20 @@ type SeamRecord = {
 
 const CRACK_MS = 400;
 const GILD_MS = 450;
+// Idle stress hairline — the panel's "alive at rest" tell before any
+// confirmation exists. Same geometry engine as a real crack (buildSeam), a
+// fraction of the opacity, --border only (no --foreground, no gild
+// highlight), so it never risks reading as a finished seam or a rendering
+// glitch: draws in, holds faintly, dissolves, and a new one starts
+// elsewhere after a pause. Only shown while the panel has no real seams yet
+// — once one exists, the panel already has its own trace and doesn't also
+// need an ambient hint.
+const IDLE_START_MS = 900;
+const IDLE_APPEAR_MS = 1300;
+const IDLE_HOLD_MS = 2600;
+const IDLE_FADE_MS = 1200;
+const IDLE_GAP_MS = 1400;
+const IDLE_OPACITY = 0.42;
 const BRANCH_START_FRAC = 0.42; // branch begins this far into the trunk's crack timeline
 const STEP = 8; // px per walk step
 const EXCLUDE_PAD = 6; // px padding around an excluded rect
@@ -367,6 +381,111 @@ function SeamMark({
   );
 }
 
+/** one hairline draw-in, mirroring SeamMark's own preCrack -> crack tick so
+ * the transition actually animates instead of snapping on mount. */
+function IdleStressStroke({ trunk }: { trunk: Pt[] }) {
+  const [drawn, setDrawn] = useState(false);
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setDrawn(true));
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  return (
+    <path
+      d={toPath(trunk)}
+      pathLength={1}
+      fill="none"
+      stroke="var(--border)"
+      strokeWidth={1}
+      strokeLinecap="round"
+      strokeDasharray={1}
+      style={{
+        strokeDashoffset: drawn ? 0 : 1,
+        transition: `stroke-dashoffset ${IDLE_APPEAR_MS}ms ${EASE}`,
+      }}
+    />
+  );
+}
+
+type IdleStage = "hidden" | "appear" | "hold" | "fade";
+
+/** the pristine panel's idle tell — see the constants above for why this
+ * exists and stays this restrained. */
+function IdleStress({
+  panelRef,
+  box,
+}: {
+  panelRef: { current: HTMLDivElement | null };
+  box: { w: number; h: number };
+}) {
+  const [trunk, setTrunk] = useState<Pt[] | null>(null);
+  const [cycleKey, setCycleKey] = useState(0);
+  const [stage, setStage] = useState<IdleStage>("hidden");
+
+  useEffect(() => {
+    if (box.w <= 0 || box.h <= 0) return;
+    let cancelled = false;
+    let timer: number | undefined;
+
+    const schedule = (fn: () => void, ms: number) => {
+      timer = window.setTimeout(() => {
+        if (!cancelled) fn();
+      }, ms);
+    };
+
+    const tryBuild = () => {
+      const panel = panelRef.current;
+      if (!panel) {
+        schedule(tryBuild, IDLE_GAP_MS);
+        return;
+      }
+      const panelRect = panel.getBoundingClientRect();
+      const avoid = Array.from(panel.querySelectorAll<HTMLElement>("[data-seam-avoid]")).map(
+        (el) => {
+          const r = el.getBoundingClientRect();
+          return new DOMRect(r.left - panelRect.left, r.top - panelRect.top, r.width, r.height);
+        }
+      );
+      const built = buildSeam(box.w, box.h, avoid);
+      if (!built) {
+        schedule(tryBuild, IDLE_GAP_MS); // too crowded this cycle — retry after the usual gap
+        return;
+      }
+      setTrunk(built.trunk);
+      setCycleKey((k) => k + 1);
+      setStage("appear");
+      schedule(() => {
+        setStage("hold");
+        schedule(fadeOut, IDLE_HOLD_MS);
+      }, IDLE_APPEAR_MS);
+    };
+    const fadeOut = () => {
+      setStage("fade");
+      schedule(() => {
+        setStage("hidden");
+        schedule(tryBuild, IDLE_GAP_MS);
+      }, IDLE_FADE_MS);
+    };
+
+    schedule(tryBuild, IDLE_START_MS);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [box.w, box.h, panelRef]);
+
+  if (!trunk || stage === "hidden") return null;
+  return (
+    <g
+      style={{
+        opacity: stage === "fade" ? 0 : IDLE_OPACITY,
+        transition: `opacity ${stage === "fade" ? IDLE_FADE_MS : IDLE_APPEAR_MS}ms ${EASE}`,
+      }}
+    >
+      <IdleStressStroke key={cycleKey} trunk={trunk} />
+    </g>
+  );
+}
+
 // ---------------------------------------------------------------------------
 
 export interface SeamGildProps {
@@ -408,6 +527,7 @@ export function SeamGild({
   const [pending, setPending] = useState(false);
   const [announcement, setAnnouncement] = useState("");
   const [count, setCount] = useState(0);
+  const [pendingBuild, setPendingBuild] = useState(0);
   const idRef = useRef(0);
   const onConfirmRef = useRef(onConfirm);
   onConfirmRef.current = onConfirm;
@@ -459,6 +579,22 @@ export function SeamGild({
     setCount(nextCount);
     setAnnouncement(confirmedMessage);
 
+    // defer the crack geometry to the layout effect below, which runs after
+    // this render (the count above included) has actually committed to the
+    // DOM — see its comment for why that ordering matters.
+    setPendingBuild((n) => n + 1);
+  }
+
+  // Builds a seam against exclusion rects measured from the DOM *after* the
+  // triggering render committed. Measuring inside handleConfirm instead
+  // (synchronously, before React flushes the state updates above) missed
+  // the counter on exactly the confirmation that makes it first appear —
+  // count goes 0 -> 1 in the same click that starts the crack, so
+  // `querySelectorAll("[data-seam-avoid]")` ran against DOM that hadn't
+  // grown the counter span yet, and the crack could route straight through
+  // where the number was about to land.
+  useLayoutEffect(() => {
+    if (pendingBuild === 0) return; // nothing pending on initial mount
     const panel = panelRef.current;
     if (!panel || box.w <= 0 || box.h <= 0) return;
     const panelRect = panel.getBoundingClientRect();
@@ -484,7 +620,8 @@ export function SeamGild({
       return next;
     });
     setNewestId(record.id);
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingBuild]);
 
   return (
     <div
@@ -498,6 +635,9 @@ export function SeamGild({
         viewBox={`0 0 ${Math.max(1, box.w)} ${Math.max(1, box.h)}`}
         preserveAspectRatio="none"
       >
+        {box.w > 0 && box.h > 0 && seams.length === 0 && !reduced && (
+          <IdleStress panelRef={panelRef} box={box} />
+        )}
         {box.w > 0 &&
           box.h > 0 &&
           seams.map((s) => (

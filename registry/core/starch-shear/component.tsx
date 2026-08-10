@@ -81,6 +81,8 @@ const EPS_PX = 0.05;
 const EPS_V = 0.01;
 const CLICK_SLOP = 6; // px of pointer travel below which a release counts as a select-click
 const MAX_DT = 48; // ms, clamp to avoid a huge jump after a background tab
+const IDLE_AMP_PX = 1.6; // idle wobble fed into node[0]'s chase target, not into `drive` itself
+const IDLE_PERIOD_MS = 7000; // one full breathe cycle
 
 function clamp(v: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, v));
@@ -206,7 +208,16 @@ export function StarchShear({
         const lambda = LAMBDA_SOFT + (LAMBDA_STIFF - LAMBDA_SOFT) * t;
         const alpha = 1 - Math.exp(-lambda * dt);
 
-        let prev = drive;
+        // At rest (no drag, envelope decayed to ~0) node[0] chases a slow
+        // sine offset instead of `drive` exactly — the same overdamped
+        // coupling then carries a gentle lag down the chain, unprompted.
+        // `drive`/`lastDriveRef` and the committed index below are never
+        // touched by this: the wobble is purely a visual settle target, so
+        // selection can't drift while idle.
+        const idleWobble = draggingRef.current
+          ? 0
+          : IDLE_AMP_PX * Math.sin((now * 2 * Math.PI) / IDLE_PERIOD_MS);
+        let prev = drive + idleWobble;
         for (let i = 0; i < n; i++) {
           const gap = prev - arr[i];
           arr[i] += gap * alpha;
@@ -221,8 +232,13 @@ export function StarchShear({
       const idx = driveToIndex(drive);
       if (idx !== lastCommittedRef.current) commit(idx);
 
-      const settled = reducedRef.current || (maxDelta < EPS_PX && envelopeRef.current < EPS_V);
-      if (draggingRef.current || !settled) {
+      // Reduced motion never has anything left to chase (arr already equals
+      // drive above), so it's the only case allowed to actually stop the
+      // loop. Otherwise the idle wobble means there's always something to
+      // settle toward next frame — ambient motion keeps the loop alive
+      // continuously, gated only by tab visibility for cost.
+      const settled = reducedRef.current && maxDelta < EPS_PX && envelopeRef.current < EPS_V;
+      if (!settled && !document.hidden) {
         rafRef.current = requestAnimationFrame(frameRef.current);
       } else {
         runningRef.current = false;
@@ -252,6 +268,7 @@ export function StarchShear({
     reducedRef.current = mq.matches;
     const onMotionChange = () => {
       reducedRef.current = mq.matches;
+      if (!mq.matches) wake();
     };
     mq.addEventListener("change", onMotionChange);
 
@@ -267,6 +284,7 @@ export function StarchShear({
       renderedRef.current = arr;
       for (let i = 0; i < n; i++) writeItem(i, drive, reducedRef.current ? 0 : sagFor(i));
       initializedRef.current = true;
+      if (!reducedRef.current) wake(); // idle wobble starts immediately at rest
     };
     seed();
 
@@ -279,8 +297,16 @@ export function StarchShear({
     });
     ro.observe(el);
 
+    // the frame loop stops scheduling itself while the tab is hidden (see
+    // frameRef above); this is what starts it back up.
+    const onVisibility = () => {
+      if (!document.hidden && !reducedRef.current) wake();
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+
     return () => {
       mq.removeEventListener("change", onMotionChange);
+      document.removeEventListener("visibilitychange", onVisibility);
       ro.disconnect();
     };
     // seeded once per item-count change; controlled `value` sync handled below
@@ -415,8 +441,19 @@ export function StarchShear({
                   className="h-6 w-9 opacity-40"
                   style={{ color: "var(--ns-muted)" }}
                 >
-                  <circle cx="6" cy="5" r="2" fill="currentColor" />
-                  <path d="M1 14 L9 7 L14 11 L18 6 L23 14 Z" fill="currentColor" />
+                  {/* viewfinder corners, not a mountain silhouette: the
+                      earlier two-peak path filled solid between its ends
+                      (single closed polygon, valley short of the baseline)
+                      and read as a stray play-triangle rather than a photo
+                      placeholder. Four open corner brackets can't be
+                      mistaken for anything but "this is a frame". */}
+                  <path
+                    d="M2 2 L2 6 M2 2 L7 2 M22 2 L22 6 M22 2 L17 2 M2 14 L2 10 M2 14 L7 14 M22 14 L22 10 M22 14 L17 14"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={1.5}
+                    strokeLinecap="round"
+                  />
                 </svg>
                 {item.caption ? (
                   <span className="font-mono text-[9px] tabular-nums text-ns-muted">{item.caption}</span>
