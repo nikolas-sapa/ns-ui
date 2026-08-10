@@ -9,10 +9,10 @@
   "dependencies": [],
   "autoplay": {
     "mode": "type",
-    "text": "AB3DO9K7XQ2F8H1M5",
+    "text": "AB3DO9K7XQ2F8H1M5Y6C0P4RS8",
     "target": "input",
-    "cps": 3,
-    "hold": 1800,
+    "cps": 2,
+    "hold": 2000,
     "delay": 600
   }
 }
