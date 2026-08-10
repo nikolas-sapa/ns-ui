@@ -66,8 +66,30 @@ attribute vec2 a_pos;
 void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }
 `;
 
-const TRAIL = 6;
+const TRAIL = 10;
 const LOBES = 4;
+
+// Pointer smoothing / wake sampling. The wake is a train of rings laid down
+// along the pointer's path; these govern how that path is sampled, and they
+// are the whole difference between a wake that flows and one that beads.
+//
+// The pointer position the sim sees is an exponential follower of the raw
+// event position (POINTER_TAU), advanced in the rAF loop rather than in the
+// event handler — so the path is continuous at frame rate no matter what
+// cadence pointermove happens to fire at, and a 120Hz trackpad, a 60Hz mouse
+// and a synthetic driver all produce the same motion.
+//
+// Samples are laid down by distance (SAMPLE_SPACING) with a time ceiling
+// (SAMPLE_MAX_GAP), and each ring's amplitude is proportional to the interval
+// of pointer travel it stands for, normalised to SAMPLE_REF_DT. That last part
+// is what lets the sampling rate change freely — denser sampling means more,
+// fainter rings, so the wake's integrated depth is a property of the pointer's
+// motion and not of the sampling cadence.
+const POINTER_TAU = 0.035;
+const SAMPLE_SPACING = 26;
+const SAMPLE_MAX_GAP = 0.05;
+const SAMPLE_REF_DT = 0.055;
+const MAX_SUBSAMPLES = 3;
 
 const FRAG_SRC = `
 precision highp float;
@@ -82,7 +104,7 @@ uniform float u_scale;
 uniform float u_relief;
 uniform sampler2D u_text;   // R = blurred bevel, G = sharp glyph mask
 uniform float u_textAmt;
-uniform vec3 u_trail[TRAIL]; // x,y css px, z = age in seconds (negative = slot unused)
+uniform vec4 u_trail[TRAIL]; // x,y css px, z = age in seconds (negative = slot unused), w = amplitude
 uniform vec3 u_lobes[LOBES]; // x,y css px, z = radius css px
 uniform float u_hover;       // 0..1 eased
 uniform float u_wake;        // 0 when every trail slot has decayed
@@ -139,6 +161,11 @@ float lobeField(vec2 p) {
 // Pointer wake: each sampled pointer position leaves a mexican-hat dent whose
 // radius grows and whose amplitude decays, so a sweep drags a train of
 // expanding rings through the pool instead of a single sticky blob.
+//
+// .w carries the interval of pointer travel the sample stands for, normalised
+// to SAMPLE_REF_DT on the CPU. Summing amplitude-weighted rings makes the
+// wake's depth track how the pointer moved rather than how often it was
+// sampled, which is what lets the sampler run dense enough to look continuous.
 float trailField(vec2 p) {
   // uniform-branch, so it is coherent across the whole draw: at rest — which is
   // the state the page spends most of its life in — the wake costs nothing
@@ -150,7 +177,7 @@ float trailField(vec2 p) {
     float rad = 30.0 + age * 165.0;
     vec2 d = (p - u_trail[i].xy) / rad;
     float r2 = dot(d, d);
-    s += (1.0 - r2 * 1.75) * exp(-r2 * 1.6) * exp(-age * 2.0);
+    s += u_trail[i].w * (1.0 - r2 * 1.75) * exp(-r2 * 1.6) * exp(-age * 2.0);
   }
   return s;
 }
@@ -412,6 +439,9 @@ class GLSurface {
   v3a(name: string, data: Float32Array) {
     this.gl?.uniform3fv(this.loc(name), data);
   }
+  v4a(name: string, data: Float32Array) {
+    this.gl?.uniform4fv(this.loc(name), data);
+  }
 
   draw(pixelW: number, pixelH: number) {
     const gl = this.gl;
@@ -516,15 +546,34 @@ export function WeldPool({
     let cssH = 0;
     let dpr = 1;
     let disposed = false;
-    const startedAt = performance.now();
-    let lastMs = startedAt;
+    let lastMs = performance.now();
+    // integrated, per-frame-clamped clock rather than (now - startedAt): a long
+    // frame — a GC pause, the tab coming back, a resize — then advances the
+    // flow by one clamped step instead of teleporting it, and time simply stops
+    // while the surface is asleep offscreen
+    let simTime = 0;
 
     let hoverTarget = 0;
     let hoverAmt = 0;
-    const trail = new Float32Array(TRAIL * 3).fill(-1);
+    const trail = new Float32Array(TRAIL * 4).fill(-1);
+    const trailNow = new Float32Array(TRAIL * 4);
     let trailHead = 0;
-    let lastTrailPush = -1e6;
     const lobes = new Float32Array(LOBES * 3);
+
+    // pointer: raw target from events, smoothed position advanced in the loop
+    let havePointer = false;
+    let tgtX = 0;
+    let tgtY = 0;
+    let ptrX = 0;
+    let ptrY = 0;
+    let sampleX = 0;
+    let sampleY = 0;
+    let lastSampleT = 0;
+    // the wrap's viewport offset, cached: reading it per pointermove is a
+    // forced layout on the hottest path there is
+    let rectLeft = 0;
+    let rectTop = 0;
+    let rectDirty = true;
 
     let c0: RGB = [0.03, 0.03, 0.03];
     let c1: RGB = [0.18, 0.18, 0.18];
@@ -655,18 +704,18 @@ export function WeldPool({
       }
     };
 
-    const draw = (nowMs: number) => {
+    const draw = () => {
       if (!surface.gl || cssW <= 0 || cssH <= 0) return;
-      const t = staticMode ? STATIC_TIME : ((nowMs - startedAt) / 1000) * speed;
+      const t = staticMode ? STATIC_TIME : simTime;
       updateLobes(t);
       // ages are refreshed here rather than at push time so a paused/static
       // frame does not freeze a half-decayed wake mid-flight
-      const trailNow = new Float32Array(trail);
+      trailNow.set(trail);
       let wakeAlive = false;
       for (let i = 0; i < TRAIL; i++) {
-        const born = trail[i * 3 + 2];
+        const born = trail[i * 4 + 2];
         const age = born < 0 ? -1 : t - born;
-        trailNow[i * 3 + 2] = age;
+        trailNow[i * 4 + 2] = age;
         if (age >= 0 && age <= 1.9) wakeAlive = true;
       }
       surface.v2("u_size", cssW, cssH);
@@ -676,7 +725,7 @@ export function WeldPool({
       surface.f("u_relief", 15 * Math.max(0, relief));
       surface.f("u_textAmt", textAmt * 0.5);
       surface.i("u_text", 0);
-      surface.v3a("u_trail", trailNow);
+      surface.v4a("u_trail", trailNow);
       surface.v3a("u_lobes", lobes);
       surface.f("u_hover", hoverAmt);
       surface.f("u_wake", wakeAlive ? 1 : 0);
@@ -694,8 +743,10 @@ export function WeldPool({
     const loop = (nowMs: number) => {
       const dt = Math.min(0.05, Math.max(0, (nowMs - lastMs) / 1000));
       lastMs = nowMs;
+      simTime += dt * speed;
       hoverAmt += (hoverTarget - hoverAmt) * (1 - Math.exp(-dt * 8));
-      draw(nowMs);
+      stepPointer(dt);
+      draw();
       raf = requestAnimationFrame(loop);
     };
     const wake = () => {
@@ -719,61 +770,153 @@ export function WeldPool({
       const changed = Math.abs(rect.width - cssW) > 0.5 || Math.abs(rect.height - cssH) > 0.5;
       cssW = rect.width;
       cssH = rect.height;
+      rectLeft = rect.left;
+      rectTop = rect.top;
+      rectDirty = false;
       dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       canvas.width = Math.round(cssW * dpr);
       canvas.height = Math.round(cssH * dpr);
       canvas.style.width = `${cssW}px`;
       canvas.style.height = `${cssH}px`;
       if (changed) rasterizeText();
-      draw(performance.now());
+      draw();
     };
 
-    const nowSeconds = () =>
-      staticMode ? STATIC_TIME : ((performance.now() - startedAt) / 1000) * speed;
+    const syncRect = () => {
+      if (!rectDirty) return;
+      const rect = wrap.getBoundingClientRect();
+      rectLeft = rect.left;
+      rectTop = rect.top;
+      rectDirty = false;
+    };
+    const markRectDirty = () => {
+      rectDirty = true;
+    };
 
-    const pushTrail = (x: number, y: number) => {
-      const t = nowSeconds();
-      if (t - lastTrailPush < 0.055) {
-        // keep the freshest slot glued to the cursor between pushes
-        const i = ((trailHead - 1 + TRAIL) % TRAIL) * 3;
-        trail[i] = x;
-        trail[i + 1] = y;
-        return;
-      }
-      lastTrailPush = t;
-      const i = trailHead * 3;
+    const pushTrail = (x: number, y: number, born: number, amp: number) => {
+      const i = trailHead * 4;
       trail[i] = x;
       trail[i + 1] = y;
-      trail[i + 2] = t;
+      trail[i + 2] = born;
+      trail[i + 3] = amp;
       trailHead = (trailHead + 1) % TRAIL;
     };
 
-    const localPoint = (e: PointerEvent): [number, number] => {
-      const rect = wrap.getBoundingClientRect();
-      return [e.clientX - rect.left, e.clientY - rect.top];
+    // Advance the smoothed pointer one frame and lay down whatever wake samples
+    // that step of travel earned. Everything the sim sees about the pointer is
+    // produced here, in the frame, from a target the event handlers only ever
+    // assign to — so event cadence, coalescing and burstiness cannot reach the
+    // surface, and a fast flick lays an evenly spaced train instead of two
+    // beads at wherever the two events happened to land.
+    const stepPointer = (dt: number) => {
+      if (!havePointer) return;
+      const k = 1 - Math.exp(-dt / POINTER_TAU);
+      ptrX += (tgtX - ptrX) * k;
+      ptrY += (tgtY - ptrY) * k;
+
+      const dx = ptrX - sampleX;
+      const dy = ptrY - sampleY;
+      const dist = Math.hypot(dx, dy);
+      const gap = simTime - lastSampleT;
+      if (dist < SAMPLE_SPACING && !(gap >= SAMPLE_MAX_GAP && dist > 1.5)) return;
+
+      const n = Math.min(MAX_SUBSAMPLES, Math.max(1, Math.round(dist / SAMPLE_SPACING)));
+      // amplitude is the share of the travel interval each sample stands for,
+      // so N fainter rings deposit exactly what one ring at the old fixed
+      // cadence would have: sampling density becomes a smoothness knob rather
+      // than a depth knob
+      const amp = Math.min(1.6, gap / SAMPLE_REF_DT) / n;
+      for (let s = 1; s <= n; s++) {
+        const f = s / n;
+        pushTrail(sampleX + dx * f, sampleY + dy * f, lastSampleT + gap * f, amp);
+      }
+      sampleX = ptrX;
+      sampleY = ptrY;
+      lastSampleT = simTime;
+    };
+
+    // Static mode has no loop to smooth in, and its clock is frozen, so the
+    // wake collapses to a single ring under the pointer rather than a train.
+    const staticPoint = () => {
+      trail.fill(-1);
+      trailHead = 0;
+      pushTrail(ptrX, ptrY, STATIC_TIME, 1);
+      draw();
+    };
+
+    const setTarget = (e: PointerEvent) => {
+      syncRect();
+      // the last coalesced point is the pointer's true current position; the
+      // event's own coordinates can be a frame stale on a high-rate device
+      const co =
+        typeof e.getCoalescedEvents === "function" ? e.getCoalescedEvents() : null;
+      const last = co && co.length > 0 ? co[co.length - 1] : e;
+      tgtX = last.clientX - rectLeft;
+      tgtY = last.clientY - rectTop;
+    };
+
+    // entering, pressing, or coming back after a gap teleports the smoothed
+    // position instead of easing to it — otherwise re-entry drags a wake across
+    // everything between where the pointer left and where it came back
+    const snapPointer = () => {
+      ptrX = tgtX;
+      ptrY = tgtY;
+      sampleX = tgtX;
+      sampleY = tgtY;
+      lastSampleT = simTime;
+      havePointer = true;
     };
 
     const onPointerEnter = (e: PointerEvent) => {
       hoverTarget = 1;
-      const [x, y] = localPoint(e);
-      pushTrail(x, y);
-      if (staticMode) draw(performance.now());
+      setTarget(e);
+      snapPointer();
+      if (staticMode) {
+        staticPoint();
+        return;
+      }
+      pushTrail(tgtX, tgtY, simTime, 1);
     };
     const onPointerLeave = () => {
       hoverTarget = 0;
+      havePointer = false;
     };
     const onPointerMove = (e: PointerEvent) => {
-      const [x, y] = localPoint(e);
-      pushTrail(x, y);
-      if (staticMode) draw(performance.now());
+      setTarget(e);
+      if (!havePointer) {
+        // no enter fired: the surface appeared under a resting pointer, or a
+        // touch was lifted and put back down
+        snapPointer();
+        hoverTarget = 1;
+      }
+      if (staticMode) {
+        ptrX = tgtX;
+        ptrY = tgtY;
+        staticPoint();
+      }
     };
     const onPointerDown = (e: PointerEvent) => {
       // a press drops a fresh, full-amplitude ring at the contact point
-      const [x, y] = localPoint(e);
-      lastTrailPush = -1e6;
-      pushTrail(x, y);
+      setTarget(e);
+      snapPointer();
       hoverTarget = 1;
-      if (staticMode) draw(performance.now());
+      if (staticMode) {
+        staticPoint();
+        return;
+      }
+      pushTrail(tgtX, tgtY, simTime, 1);
+    };
+    const onPointerUp = (e: PointerEvent) => {
+      // a lifted touch or pen has no position any more, and no pointerleave is
+      // coming: without this the surface stays hovered forever after one tap
+      if (e.pointerType !== "mouse") {
+        hoverTarget = 0;
+        havePointer = false;
+      }
+    };
+    const onPointerCancel = () => {
+      hoverTarget = 0;
+      havePointer = false;
     };
 
     if (!surface.init()) return; // no WebGL: children still render over the page bg
@@ -787,7 +930,7 @@ export function WeldPool({
       document.fonts.ready.then(() => {
         if (disposed) return;
         rasterizeText();
-        if (staticMode) draw(performance.now());
+        if (staticMode) draw();
       });
     }
 
@@ -795,6 +938,13 @@ export function WeldPool({
     wrap.addEventListener("pointerleave", onPointerLeave);
     wrap.addEventListener("pointermove", onPointerMove);
     wrap.addEventListener("pointerdown", onPointerDown);
+    wrap.addEventListener("pointerup", onPointerUp);
+    wrap.addEventListener("pointercancel", onPointerCancel);
+    // the wrap's viewport offset only moves on scroll or layout, so mark it
+    // stale here and re-read it once, on the next pointer event, instead of
+    // forcing a layout inside every pointermove
+    window.addEventListener("scroll", markRectDirty, { passive: true, capture: true });
+    window.addEventListener("resize", markRectDirty, { passive: true });
 
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     let reduced = mq.matches;
@@ -802,7 +952,7 @@ export function WeldPool({
       if (reduced || pausedRef.current) {
         staticMode = true;
         sleep();
-        draw(performance.now());
+        draw();
       } else {
         staticMode = false;
         wake();
@@ -847,7 +997,7 @@ export function WeldPool({
       if (headlineRef.current !== lastPolledHeadline) {
         lastPolledHeadline = headlineRef.current;
         rasterizeText();
-        if (staticMode) draw(performance.now());
+        if (staticMode) draw();
       }
       poll = window.setTimeout(tick, 140);
     };
@@ -855,7 +1005,7 @@ export function WeldPool({
 
     const themeObserver = new MutationObserver(() => {
       readColors();
-      if (staticMode) draw(performance.now());
+      if (staticMode) draw();
     });
     themeObserver.observe(document.documentElement, {
       attributes: true,
@@ -890,6 +1040,10 @@ export function WeldPool({
       wrap.removeEventListener("pointerleave", onPointerLeave);
       wrap.removeEventListener("pointermove", onPointerMove);
       wrap.removeEventListener("pointerdown", onPointerDown);
+      wrap.removeEventListener("pointerup", onPointerUp);
+      wrap.removeEventListener("pointercancel", onPointerCancel);
+      window.removeEventListener("scroll", markRectDirty, { capture: true } as EventListenerOptions);
+      window.removeEventListener("resize", markRectDirty);
       window.clearTimeout(poll);
       sleep();
       if (texture && surface.gl) surface.gl.deleteTexture(texture);
