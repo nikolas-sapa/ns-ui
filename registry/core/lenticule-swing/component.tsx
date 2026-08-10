@@ -61,7 +61,13 @@ export interface LenticuleSwingProps {
   className?: string;
 }
 
-const ANGLE_IDLE = 3; // deg, idle spring bounce amplitude
+// deg, idle spring bounce amplitude. Deliberately small: the resting frame is
+// the one the catalog screenshots and the owner judges, and message A has to
+// stay legible there. At +/-0.6deg the A-window's opacity only modulates
+// between ~0.90 and 1.0, which reads as a shimmer over ONE readable headline.
+// At the original +/-3deg it swung down to ~0.63, so message B showed through
+// at ~37% and the two copies composited into unreadable garble.
+const ANGLE_IDLE = 0.6;
 const ANGLE_RESOLVE = 9; // deg magnitude that fully commits a strip to one message
 const HALF_PERIOD = 4000; // ms between idle spring target flips (8s full cycle)
 const SPRING_K = 34; // s^-2
@@ -270,13 +276,25 @@ const CSS = `
   will-change:transform,opacity;
   transform:translateX(calc(var(--lens-angle) * var(--i) * ${PARALLAX_COEFF}px));
 }
+/*
+  Both windows paint an opaque --background. Without it the crossfade cannot
+  work at all: text has a transparent background, so message B stayed fully
+  visible through the gaps in and between message A's glyphs no matter what
+  opacity A carried, and the two copies composited into permanently unreadable
+  garble. Measured A at opacity 1 and B still showing through. With an opaque
+  fill, A genuinely occludes B, and fading A is what reveals B — which is also
+  what makes the per-strip flip read as a lenticular card instead of a blend.
+*/
+.ns-lens-window{
+  background:var(--background);
+}
 .ns-lens-b{
   opacity:1;
   z-index:1;
 }
 .ns-lens-a{
   z-index:2;
-  opacity:clamp(0, calc(0.5 - (var(--lens-angle) / ${ANGLE_RESOLVE}) * 0.5 + var(--j) * 0.12), 1);
+  opacity:clamp(0, calc(0.95 - (var(--lens-angle) / ${ANGLE_RESOLVE}) * 0.95 + var(--j) * 0.06), 1);
 }
 @media (prefers-reduced-motion: reduce){
   .ns-lens-window{transition:none;}

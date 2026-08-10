@@ -483,8 +483,8 @@ const CSS = `
 .ns-seal-stage {
   position: relative;
   overflow: hidden;
-  padding-top: 40px;
-  min-height: 96px;
+  padding-top: ${BARREL_H + 16}px;
+  min-height: 116px;
 }
 .ns-seal-barrel-wrap {
   position: absolute;
