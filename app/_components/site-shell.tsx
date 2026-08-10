@@ -148,6 +148,7 @@ export function SiteShell({
 
   const [query, setQuery] = useState("");
   const activeRef = useRef<HTMLAnchorElement | null>(null);
+  const navScrollRef = useRef<HTMLDivElement | null>(null);
   const mainRef = useRef<HTMLDivElement | null>(null);
   const isFiltering = query.trim().length > 0;
 
@@ -225,7 +226,22 @@ export function SiteShell({
   // closed <details> is a no-op (no layout box).
   useEffect(() => {
     const id = requestAnimationFrame(() => {
-      activeRef.current?.scrollIntoView({ block: "center" });
+      const el = activeRef.current;
+      const container = navScrollRef.current;
+      if (!el || !container) return;
+      // Adjust the nav panel's own `scrollTop` directly rather than calling
+      // `el.scrollIntoView({ block: "center" })`: that walks *every*
+      // ancestor scrolling box, not just the nearest one, so it was also
+      // centering the link in the full window — visible as the whole page
+      // landing scrolled down on arrival, worse the further down the
+      // alphabetized tree that component's link happened to sit. Computing
+      // the offset ourselves keeps this scoped to the nav's own
+      // `overflow-y-auto` box.
+      const elRect = el.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      const delta =
+        elRect.top - containerRect.top - (container.clientHeight - elRect.height) / 2;
+      container.scrollTop += delta;
     });
     return () => cancelAnimationFrame(id);
   }, [pathname]);
@@ -509,7 +525,11 @@ export function SiteShell({
             window-level Lenis instance in the root layout would eat wheel
             events over the sidebar and scroll the page behind it instead of
             the nav tree. */}
-        <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-6" data-lenis-prevent>
+        <div
+          ref={navScrollRef}
+          className="min-h-0 flex-1 overflow-y-auto px-2 pb-6"
+          data-lenis-prevent
+        >
           {isFiltering && shown === 0 ? (
             <p className="px-2 py-3 text-sm text-ns-muted">No match.</p>
           ) : null}
