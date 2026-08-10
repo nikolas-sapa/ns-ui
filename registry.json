@@ -937,6 +937,46 @@
       }
     },
     {
+      "name": "chalk-snap",
+      "type": "registry:ui",
+      "title": "Chalk Snap",
+      "description": "A freehand annotation layer over any UI, doc, or code region: every pointer stroke quantizes live onto an invisible character grid as box-drawing glyphs, so scribbling produces a real, copyable ASCII diagram instead of a screenshot.",
+      "files": [
+        {
+          "path": "registry/core/chalk-snap/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/chalk-snap.tsx"
+        }
+      ],
+      "dependencies": [],
+      "cssVars": {
+        "theme": {
+          "color-ns-muted": "var(--ns-muted)",
+          "color-ns-accent": "var(--ns-accent)"
+        },
+        "light": {
+          "ns-muted": "#4d4d4d",
+          "ns-accent": "#006bff"
+        },
+        "dark": {
+          "ns-muted": "#8f8f8f"
+        }
+      },
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "annotation",
+          "ascii",
+          "box-drawing",
+          "drawing",
+          "freehand",
+          "clipboard",
+          "keyboard-navigation"
+        ],
+        "instruction": "Wraps `children` (the UI/doc/code region being annotated — optional, omit for a blank grid sized by `cols`/`rows`) with an invisible cell grid measured off the real font metrics: a hidden 1ch x 1lh probe span plus a ResizeObserver on the host (same idiom as container-box-drawing), so the grid always tiles to whole characters over whatever content sits underneath, no assumed pixel size. THE MECHANISM: on pointerdown the grid captures the pointer and starts a walk; on every pointermove, `walkTo` converts the continuous pointer position into a discrete cell-by-cell walk toward it, one grid step per iteration, choosing between the horizontal and vertical axis with a hysteresis margin (a committed axis keeps winning unless the other axis's delta beats it by more than HYSTERESIS) — this is what stops a hand that's basically drawing a straight line from flickering the glyph between ─ and │ on every wobble pixel. Each committed step OR-accumulates a 4-bit N/E/S/W direction mask into a shared `Map<'x,y', mask>` covering every stroke ever drawn (never reset except by Clear), and a 16-entry lookup table turns any accumulated mask into its box-drawing character: straight runs (─│), corners (┌┐└┘), three-way junctions (├┤┬┴), and the four-way crossing (┼) — so two strokes that cross or meet resolve their junction from neighbor bits alone, no separate pass. A stroke's trailing pointer speed is smoothed (exponential, 0.6/0.4) across pointermove events; if it clears ARROW_VELOCITY at pointerup, the final cell gets an arrowhead (► ◄ ▲ ▼) in the direction of travel instead of a plain rule. SETTLE: every cell whose mask (or arrow) actually changes bumps its own generation counter, which is folded into that glyph span's React `key` — the remount replays a 220ms ease-out-expo (`cubic-bezier(.16,1,.3,1)`) keyframe that scales and translates in from CSS custom properties holding the raw pointer offset at the moment that cell committed, back to the cell's true center, so the glyph visibly snaps from where the hand actually was to where the grid disciplined it. TRAIL: an SVG polyline of the raw, unsnapped pointer path renders in `--ns-accent` while a stroke is active, then fades over ~200ms after pointerup before its points are cleared — the accent color never touches settled ink, only the live gesture and the keyboard cursor. KEYBOARD: the grid is one focusable region (a real aria-label states every control). Arrow keys move a visible `--ns-accent`-outlined cursor cell, shown only while the region has focus. Shift+Arrow commits one segment through the identical `applyBit` path pointer strokes use, grouping consecutive shift-moves into one open run; a plain arrow move (or Escape) closes that run without an arrowhead, Enter caps it with one in its last direction. A11Y: the glyph raster and the raw trail are both `aria-hidden` — box-drawing glyphs read character-by-character by a screen reader are noise, not signal. A visually-hidden `<ul>` is the shadow description instead: one line per completed stroke, plain language ('arrow from row 3 col 10 to row 3 col 42' / 'line from row 1 col 4 to row 5 col 4'), kept in sync by the same `recordStroke` call both pointer and keyboard paths use. `Copy raster` builds the plain-text grid (trailing whitespace trimmed per row) and writes it via the Clipboard API; the result — success, empty-grid no-op, or failure — lands in a `role=status aria-live=polite` region since the write is async. `Clear` resets the grid, the trail, and the stroke log in one action. Every color is a token (`--foreground` for settled ink, `--ns-accent` for the live trail and cursor only, `--border`/`--ns-muted` for chrome) — no hex. `prefers-reduced-motion` removes the settle keyframe and the trail/cursor transitions; the grid, the walk, and the copy/clear controls stay fully usable with instant state changes instead of animated ones. Pure DOM + CSS + a transient SVG path — no canvas."
+      }
+    },
+    {
       "name": "chart-bar-dither",
       "type": "registry:ui",
       "title": "Chart Bar Dither",
@@ -1410,6 +1450,46 @@
           "micro-interaction"
         ],
         "instruction": "Build a checkbox group styled as a carved tally board. STRUCTURE: a bordered bg-surface card (role=group with aria-label from the label prop) whose header carries the group label, an SVG tally cluster, and an aria-live 'checked/total' mono counter; below, one full-width row per item, each a real <button role=checkbox aria-checked> containing a 20px SVG notch mark, the label, and an optional mono hint line. STROKES: every stroke is an SVG <path pathLength={1}> with strokeDasharray 1, drawn by transitioning strokeDashoffset 1 -> 0 over 260ms (ease-out-back-ish cubic-bezier(0.22,1,0.36,1)) and retracted on uncheck with an ease-in curve; the row's notch is two cuts, a short down-stroke then the long up-stroke delayed 120ms so the carve reads as two motions. TALLY CLUSTER: render items.length strokes grouped in fives, four leaning verticals (6px pitch) then a diagonal slash across the group; stroke k is drawn when checkedCount > k, with a 30ms per-position stagger so a batch (e.g. defaultChecked at mount) carves in sequence. Jitter every stroke's lean, length, and endpoints with a deterministic mulberry32-style hash of its index so the carving looks hand-cut but renders byte-identical every mount (stable screenshots). INK: strokes stroke='var(--foreground)', unchecked notch boxes stroke='var(--border)', all chrome from the border/surface/muted tokens — zero hex in markup, both themes render. STATE: uncontrolled Set<string> seeded from defaultChecked, onChange fires with checked ids in items order; checked rows dim their label to text-ns-muted. INTERACTION: rows are native buttons so Space/Enter toggle and Tab reaches every row; hover tints the row bg-border/40; focus-visible draws an inset 2px accent outline. Reduced motion: strokes and notches snap with transition:none. No canvas, no timers, no observers — the only state is the Set, everything else is CSS transitions on SVG attributes."
+      }
+    },
+    {
+      "name": "chord-punch",
+      "type": "registry:ui",
+      "title": "Chord Punch",
+      "description": "A keyboard-shortcut recorder: click to arm it, press a combination, and each key punches into place as a box-drawing keycap — modifiers seating first in canonical order, the terminal key striking last with a spring overshoot, and a collision against a supplied bindings map surfacing live as a second, muted row under a ≠ rule.",
+      "files": [
+        {
+          "path": "registry/core/chord-punch/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/chord-punch.tsx"
+        }
+      ],
+      "dependencies": [],
+      "cssVars": {
+        "theme": {
+          "color-ns-muted": "var(--ns-muted)",
+          "color-ns-accent": "var(--ns-accent)"
+        },
+        "light": {
+          "ns-muted": "#4d4d4d",
+          "ns-accent": "#006bff"
+        },
+        "dark": {
+          "ns-muted": "#8f8f8f"
+        }
+      },
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "keyboard",
+          "shortcuts",
+          "input",
+          "recorder",
+          "settings",
+          "accessibility",
+          "box-drawing"
+        ],
+        "instruction": "Build <ChordPunch id label placeholder value defaultValue onChange bindings className>. STATE: a committed ChordValue ({ctrl, alt, shift, meta, base}) is controlled via `value`/`onChange` or runs uncontrolled from `defaultValue`; a separate `isRecording` boolean gates capture. ENTRY: the field is a role=button div (never a native <button>, so it owns Enter/Space instead of them auto-firing a click) that arms recording ONLY on a real click or an Enter keydown while idle — Tab landing on it does nothing, matching the rule that a keyboard user tabbing through a settings form must never have their next keystroke swallowed by surprise. Clicking is idempotent: it always (re)arms a fresh empty capture rather than toggling, so a second click while already recording is harmless — this is what keeps the verifier's press-pass-then-gate-click sequence resolving correctly instead of toggling back out. CAPTURE: once armed, every keydown on the surface is intercepted (preventDefault) except Tab, which is never touched, armed or not. Modifier keydowns (Control/Alt/Shift/Meta) update a `seated` flag set from the event's own ctrlKey/altKey/shiftKey/metaKey and render a keycap in fixed canonical slots — ⌃ then ⌥ then ⇧ then ⌘ — regardless of physical press order, so Shift-then-Cmd and Cmd-then-Shift seat identically. The first non-modifier keydown is the terminal key: its chord is frozen from THAT event's own modifier flags (not the live-accumulated set, so a modifier keydown the handler happened to miss can never corrupt what commits) and its keycap punches in with a spring-overshoot animation (cubic-bezier(0.34,1.56,0.64,1), scale 0.5 -> 1.18 -> 1), replayed on every strike by remounting the keycap off an incrementing sequence number so hitting the same key twice in a row still visibly re-punches. A Set of currently-down event.codes tracks every held key; the whole chord only commits once that Set empties AND a terminal key was struck — releasing modifiers while still holding the terminal key does not commit early, and releasing modifiers alone (no terminal key ever struck) commits nothing and leaves recording armed for another attempt. Escape cancels outright: exits recording and reverts to whatever was committed before, discarding the in-progress attempt. Backspace un-strikes only the terminal keycap (seated modifiers and the held-codes tracking are left alone), so the user can try a different terminal key without re-holding modifiers. Losing focus while armed cancels the same way Escape does — a field can never be left silently capturing keystrokes after the user has moved on. CONFLICTS: a `bindings: {id,label,chord}[]` prop is checked by exact modifier+base signature both live (the instant a terminal key strikes, before release) and again on commit, excluding any entry whose id matches this recorder's own `id` — a hit renders the colliding binding's keycaps in --ns-muted on a second row beneath a ≠ rule (two flex-1 rules either side of the glyph), so the clash is part of the surface the moment it exists rather than a toast arriving after the fact. RENDERING: each keycap is framed with box-drawing corner glyphs ⌜ ⌝ ⌞ ⌟ absolutely positioned at the corners of a small relatively-positioned box around the letter (not a CSS border rectangle) — corners and glyph in --foreground at rest, --ns-accent only transiently while a keycap is mid-strike-animation (interaction-only use of the accent), --ns-muted for a colliding binding's row. A11Y: entry and exit are announced through a role=alert aria-live=assertive region present and empty at mount ('Recording, press a combination, escape to cancel.' on arm; the full spoken chord plus any conflict clause, e.g. 'Command Shift K, conflicts with Delete Line', on commit; 'Recording cancelled.' on Escape) — spoken words, never raw glyphs, via a SPOKEN_BASE lookup so a screen reader is never handed an unnamed Unicode arrow. The accessible name itself does not depend on that live region having fired: a visible label span plus a visually-hidden state span are combined with aria-labelledby, so the name is correct at every render including the very first. No canvas — DOM + CSS only, keycaps and the box-drawing frame are plain Unicode glyphs in flex/absolute-positioned spans."
       }
     },
     {
@@ -3189,6 +3269,48 @@
       }
     },
     {
+      "name": "flood-mark",
+      "type": "registry:ui",
+      "title": "Flood Mark",
+      "description": "A threshold-setting control drawn over its own history: the last 30 days plot as a braille dot field and you drag a horizontal ─── rule up and down through it, with every day above the rule flipping live from a muted dot to a solid foreground ▴ and a fixed line stating exactly what that setting would have cost — 'would have fired 3 times last month', broken down per week.",
+      "files": [
+        {
+          "path": "registry/core/flood-mark/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/flood-mark.tsx"
+        }
+      ],
+      "dependencies": [],
+      "cssVars": {
+        "theme": {
+          "color-ns-muted": "var(--ns-muted)",
+          "color-ns-accent": "var(--ns-accent)"
+        },
+        "light": {
+          "ns-muted": "#4d4d4d",
+          "ns-accent": "#006bff"
+        },
+        "dark": {
+          "ns-muted": "#8f8f8f"
+        }
+      },
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "slider",
+          "threshold",
+          "sparkline",
+          "braille",
+          "monitoring",
+          "alert",
+          "drag",
+          "history",
+          "accessibility"
+        ],
+        "instruction": "Renders `history` (an array of daily samples, ideally 30, oldest first) as a braille-dot scatter field and a draggable horizontal rule — the flood mark — that sets a threshold value against it. FIELD: ROWS=8 stacked bands of braille cells span the field's fixed height; each day's value maps to one of ROWS*4 quantized vertical slots via the left column's 4 addressable dot bits (dots 1/2/3/7, top-to-bottom, U+2800 + bit), so each day renders as exactly one single-dot braille glyph at the row/sub-row its value rounds to — a real 2D scatter of history, not a bar chart. RULE: a full-width row of '─' glyphs sits at a CONTINUOUS y position (unmixed with the field's ROWS*4 quantization) computed straight from the live threshold value against the same min/max domain, with a small mono tag ('{value}{unit}') riding its right end and a grab-dot ('●') at its left end that recolors to --ns-accent only while actively being dragged (never at rest, never on hover — accent is interaction-only) — everything else on the rule is --foreground/--border/--background tokens. COMPARISON: every render, each day's raw value (not its quantized dot slot) is compared directly against the live threshold — days above it ('would have fired') cross-fade their single-dot glyph to a solid foreground '▴' via two stacked absolutely-positioned spans toggling opacity 0/1 on a 150ms transition, with transition-delay = min(240, round(|value-threshold|/domain * 8) * 30)ms, so a big threshold jump visibly ripples outward from the rule's new position rather than flipping every day in lockstep; drag and arrow-key stepping both drive this identically since it's derived purely from render-time value comparison, not a separate animation trigger. CONSEQUENCE: below the field, a line reads 'would have fired {N} times last month — wk1 {c} · wk2 {c} · ...' (history chunked into 7-day weeks) — the number is never shown without its per-week retrospective cost. DETENTS: p50/p95/p99 of `history` render as faint muted tick marks off the field's left edge; dragging soft-snaps the raw pointer value to any detent within 2% of the domain, and Shift+ArrowUp/Right (or Shift+ArrowDown/Left) jumps straight to the next detent above (or below) the current value, falling back to an ordinary `step` move past the top/bottom detent. INTERACTION: the entire field (not just the rule strip) is one role=slider node, tabIndex=0, aria-orientation=vertical (the value axis IS vertical here, even though the glyph itself is a horizontal line), aria-valuemin/max from the real metric domain, aria-valuenow=current, and aria-valuetext carrying the full consequence sentence ('threshold 480ms, 3 alerts in the last 30 days') rather than the bare number — pointerdown anywhere in the field jumps the rule there and begins a drag (pointer capture on the same node), ArrowUp/Right and ArrowDown/Left step by `step`, Home/End go to the domain rails. The consequence paragraph is `role=status aria-live=polite` and doubles as the only live region — since `commit()` only actually updates state when the quantized value changes, a drag doesn't spam re-announcements every pixel, only at each real step. The braille field and the detent ticks are `aria-hidden` and `pointer-events-none` (decorative; the slider node carries all real semantics and pointer handling); the rule's visual row (dashes, grab-dot, value tag) is also `aria-hidden` since it's drawn purely from state already exposed via aria-valuetext. `prefers-reduced-motion: reduce` collapses the cross-fade transition and its ripple delay to 0ms; the rule's own position never animates (it tracks the live value directly, no tween). Colors are token utility classes only — text-foreground, text-ns-muted (plus /0 and /50 and /80 opacity variants), border-border, bg-background, text-ns-accent for the two interaction-only spots — no hex, no canvas, DOM+CSS only."
+      }
+    },
+    {
       "name": "footer-ascii-rule",
       "type": "registry:ui",
       "title": "Footer ASCII Rule",
@@ -3404,6 +3526,46 @@
           "developer-tools"
         ],
         "instruction": "Build <GitGraphAsciiLanes commits? head? className?> where `commits` is `{id, subject, author, date, parents: string[], branch?}[]` in newest-first topological order, and render it exactly the way `git log --graph` renders a history: a monospace lane grid of DOM rows, no canvas and no rAF loop anywhere. THE LANE ALLOCATOR (the actual mechanic, not a router): keep one `active: (string|null)[]` array, initially empty, and walk the commit list top to bottom. For each commit c: `lane = active.indexOf(c.id)`; if -1, `lane = active.indexOf(null)`; if still -1, `lane = active.push(null) - 1`; then `active[lane] = c.id` so the row's snapshot shows the slot occupied. Snapshot `active` for the commit row, then free every OTHER slot still holding c.id — a branch converging — setting it null and recording a CLOSE pair `(thatLane -> lane)`. Set `active[lane] = c.parents[0] ?? null`. For each extra parent p at index >= 1 (i.e. a merge): `pLane = active.indexOf(p)`, else the lowest null slot, else a pushed new slot; `active[pLane] = p`; record an OPEN pair `(lane -> pLane)`. ROW RENDERING: every lane is 2 characters wide (glyph plus a spacer column). The commit row draws `●` at the commit's own lane — `◍` instead when `parents.length > 1`, so a merge is distinguishable by GLYPH and never by hue — `│` at every other non-null lane, and a space at null lanes. The CONNECTOR row is emitted between two commit rows only when that commit produced open or close pairs: live lanes are laid down as `│` first, then for each pair spanning lanes a<b it writes `├` at a, `─` across every intermediate column, and `┐` at b for an open pair or `┘` at b for a close pair; any live lane whose `│` the horizontal run crosses is upgraded to `┼`, and untouched live lanes keep their `│`. Lanes past MAX_LANES = 6 collapse: the last lane column (index MAX_LANES - 1) renders `⋯` and every lane at or beyond it is drawn there. The entire grid is ONE `useMemo` over (commits, collapsedMerges) that rebuilds from an EMPTY `active` array — never patched incrementally — so layout is a pure function of the data. INK is monochrome plus one accent and carries no branch identity: at REST the first-parent trunk lane's glyphs and every commit subject are `--foreground`, every other lane glyph and connector is `--ns-muted`, shas and author/age are `--ns-muted`, and HEAD's dot and sha are `--ns-accent`. `--border` is reserved exclusively for the dimmed non-ancestor state below, so the resting braid is never drawn in the faintest token and is fully legible before any input. ANCESTOR LIGHTING: hovering or keyboard-focusing a row runs a BFS over `parents` from that commit, and every row NOT in the resulting ancestor set — plus every lane column whose current occupant is not in it — drops to `--border` while the ancestor chain and the lanes it occupies hold `--foreground` (`--ns-accent` on HEAD), so the branch you are asking about lights up through the braid. Pointer-out or blur restores full ink across a 140ms color transition with no state left behind. COLLAPSE: Enter or Space on a merge row toggles that merge into a `collapsedMerges` set; the grid pass then walks that merge as if it had only its first parent, hides every commit reachable from its second parent but NOT from its first (an exclusive-ancestor set difference), and emits a single `⋯ N commits from feat/router` row in their place — because the whole lane grid is re-derived, the side lane is never opened and the braid visibly straightens; Enter again expands it. Enter on a non-merge row instead pins its ancestor highlight so it survives pointer-out. KEYBOARD: roving tabindex across the commit rows with ArrowUp/ArrowDown and Home/End, Escape clearing both the hover and pinned highlight, a real `<button>` per commit carrying an `aria-label` naming the subject, sha, author, age, HEAD status and the available action, `aria-expanded` on merge rows, and a `:focus-visible` outline in `--ns-accent` at `-2px` offset on every row. Tokens only (`--background --foreground --ns-muted --border --ns-accent`) applied as Tailwind token classes, never hex, correct in both themes. There is no ambient animation to gate, and every transition is `motion-reduce:transition-none`, so `prefers-reduced-motion` leaves the component fully usable and instantly settled. Props: `commits` (defaults to a 13-commit sample history with two merges and two side branches), `head` (commit id HEAD points at, defaults to the newest commit), `className`. Zero dependencies."
+      }
+    },
+    {
+      "name": "grain-crest",
+      "type": "registry:ui",
+      "title": "Grain Crest",
+      "description": "Sortable data-table column headers where each one carries a one-line braille micro-histogram of its own column's distribution, so skew, outliers and bimodality are answered before anyone sorts.",
+      "files": [
+        {
+          "path": "registry/core/grain-crest/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/grain-crest.tsx"
+        }
+      ],
+      "dependencies": [],
+      "cssVars": {
+        "theme": {
+          "color-ns-muted": "var(--ns-muted)",
+          "color-ns-accent": "var(--ns-accent)"
+        },
+        "light": {
+          "ns-muted": "#4d4d4d",
+          "ns-accent": "#006bff"
+        },
+        "dark": {
+          "ns-muted": "#8f8f8f"
+        }
+      },
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "table",
+          "data-viz",
+          "sortable",
+          "histogram",
+          "distribution",
+          "braille",
+          "accessibility"
+        ],
+        "instruction": "Sortable <table> column headers that each stack three lines inside their sort button: (1) the label, an optional small aria-hidden ᴸ tag, and a caret that fills in and rotates on the active column; (2) a 16-glyph aria-hidden strip computed from that column's own values — numeric columns render a histogram on the braille fill ramp ' ⣀⣤⣶⣿' (0..4 dots-per-cell, bottom-anchored), log-binned (edges = min·(max/min)^(i/16)) with the ᴸ tag shown whenever max/median >= 4 so a right-skewed column doesn't collapse into one saturated bin; categorical columns render a dominance bar instead — filled cells (⣿, text-foreground) sized to round(topShare*16), remainder as a dim track (⣀, text-ns-muted/40); (3) a fixed-height marker track. RENDERING: plain semantic <table> in a rounded-md border border-border bg-background card — no canvas, no SVG chart, DOM+CSS only (one 8x8 inline <svg> per header is just the sort caret icon). INTERACTION: clicking a header's button (type=button, native Enter/Space) sorts the whole table by that column, numeric defaulting to descending and categorical to ascending on first click, toggling direction on repeat clicks of the same column; the crest itself never changes shape, since sorting doesn't change the data — instead, on the active column only, a ▸ marker (text-ns-accent, position:absolute, left set inline and eased with transition: left 550ms cubic-bezier(0.19,1,0.22,1), disabled to an instant snap when prefers-reduced-motion) shows where the row now on top of the table sits inside that column's OWN distribution: for numeric columns, the bin its value falls into; for categorical, the middle of the dominant zone if the top row's category is the dominant one, otherwise the middle of the non-dominant remainder. Toggling direction on the same column flips which end the top row's value sits near, which is what actually drives the marker's slide. Hovering a strip (onPointerMove computing a bin/segment from cursor fraction) writes a plain-text line — bin range and row count, or category and share — into a shared detail bar below the table (not a floating tooltip); focusing a header button writes that column's full stat summary into the same bar as a sighted keyboard-parity affordance, cleared on blur/pointerleave. TOKENS: --foreground, --ns-muted (including a /40 opacity cut for the dominance track), --border, --background, --ns-accent reserved for the marker and the focus ring — never for the histogram or dominance-bar ink itself, so accent stays interaction-only. A11Y: standard th[aria-sort=ascending|descending] (omitted, not 'none', when the column isn't the active sort — matches the rest of the registry), the header's real accessible name is a computed aria-label of the form '<Label>, sortable, median 120ms, range 40 to 2100, right-skewed' (or 'sorted ascending'/'descending' once active, and a categorical form giving category count and top share) so the crest's information survives without vision even though the glyphs themselves are aria-hidden; Tab reaches every header button in DOM order, resting state has no marker in the DOM at all (mounts only once a column is sorted). DEMO: a 16-row 'request latency by route' table — Latency (ms, right-skewed 42..2100, gets the ᴸ tag), Cost ($, roughly linear, no tag), Region and Status (categorical dominance bars) — plus a leading, non-sortable Endpoint identity column so the table's first interactive control is unambiguously a grain header."
       }
     },
     {
@@ -4047,6 +4209,48 @@
           "cursor"
         ],
         "instruction": "A circular lens, driven by a `text` prop rendered as real plain DOM text (one `<span>` per character, plain content, no aria-hidden anywhere on the real text — it's never hidden, so accessibility needs nothing special here). Layered on top is a purely decorative `aria-hidden` `<canvas>` plus a DOM ring div; together they are the lens. Every character in `text` has a hand-built 5x7 dot-matrix representation (a compact bitmap font covering A-Z, 0-9, space and basic punctuation; an unmapped character falls back to a light diagonal-hatch placeholder rather than rendering blank). On every frame, for each character whose measured `getBoundingClientRect()` falls within the lens radius of its current center, the canvas fills the lens circle's background with a `--background`-token flat fill (occluding the flat glyph underneath) and then redraws that character as its OWN 5x7 grid of cells, each cell either a solid ramp glyph (`--foreground` at full alpha, for an 'on' bit) or a faint one (28% alpha, for an 'off' bit) — that grid is strictly finer than the single flat character it replaces, which is the entire mechanic: MORE glyphs resolving one glyph, not the same glyph scaled up (that's slider-loupe's job) and not a channel-split refraction (text-prism-split's job). The lens position chases the pointer with an exponential lag (10/s time-constant) via one direct-DOM `requestAnimationFrame` loop that sleeps once settled, wakes on `pointermove`, and returns to a PARKED position at the text block's own center on `pointerleave` — so the resting/default screenshot already shows the lens sitting mid-block resolving whatever text is there, not a plain, unmagnified paragraph waiting for a cursor. All canvas ink (`--foreground` fill/background fill) and the mono font family are read via `getComputedStyle` at mount and re-derived on a `MutationObserver` watching `documentElement` class changes, so both themes render correctly with no baked-in hex. `prefers-reduced-motion: reduce` disables the chase loop and the pointer-follow entirely: the lens renders once, parked at center, with no rAF running — still legible as the concept, just not animated. ResizeObserver and IntersectionObserver keep it correctly sized and paused off-screen. Zero dependencies."
+      }
+    },
+    {
+      "name": "light-table",
+      "type": "registry:ui",
+      "title": "Light Table",
+      "description": "A binary inspector rendered as an offset gutter, a hex pane and an ASCII pane on a light table. Hovering or focusing any byte cell registers the matching cell across panes with a foreground tint and a hairline rule drawn across the seam between them, so hex and ASCII resolve to the same byte instead of two disconnected dumps.",
+      "files": [
+        {
+          "path": "registry/core/light-table/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/light-table.tsx"
+        }
+      ],
+      "dependencies": [],
+      "cssVars": {
+        "theme": {
+          "color-ns-muted": "var(--ns-muted)",
+          "color-ns-accent": "var(--ns-accent)"
+        },
+        "light": {
+          "ns-muted": "#4d4d4d",
+          "ns-accent": "#006bff"
+        },
+        "dark": {
+          "ns-muted": "#8f8f8f"
+        }
+      },
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "hex-editor",
+          "binary-inspector",
+          "developer-tool",
+          "ascii",
+          "mono",
+          "grid",
+          "keyboard-navigation",
+          "selection",
+          "data-visualization"
+        ],
+        "instruction": "Build <LightTable bytes bytesPerRow title className> over a byte array (default a 64-byte plausible PNG-header fragment chosen so every value class already appears at rest: the 0x89 signature byte is high-bit, 'PNG'/'IHDR'/'tEXt' are printable, CR/LF/SUB/NUL are control/null). Three-column CSS layout in Geist Mono: an offset gutter (one row label per 16-byte row, e.g. '0x0010'), a hex pane (role=grid, one button per byte, 16 per row), a thin inter-pane seam, then an ASCII pane (aria-hidden, mirrors the hex grid's information so it never duplicates it for assistive tech) — thin --border rules separate every column. MECHANIC: hovering (pointerenter) or focusing any byte cell in either the hex or ASCII pane sets one shared 'live index'; whichever cell (hex or ASCII) currently holds that index gets an inline style background of exactly color-mix(in srgb, var(--foreground) 8%, transparent) — never a Tailwind opacity utility for this specific tint, the literal CSS function is the point — and an absolutely positioned 1px rule (data-bridge-rule) is drawn across the seam column, overhanging slightly into both panes, at that row's vertical center — only rendered when a live index exists, so nothing crosses the seam at rest. The live index is hoverIndex when the pointer is over a cell, else focusedIndex when the hex grid currently holds DOM focus, else null — so resting between interactions shows no tint and no seam rule, and byte structure is legible purely from the value-class ramp. VALUE-CLASS RAMP: every hex and ASCII cell carries a data-value-class attribute (null/control/highbit/printable) driving both its text color and, in the ASCII pane, its glyph — 0x00 renders '·', 0x01-0x1F and 0x7F render '▖', 0x80-0xFF render '▓', printable bytes render their real character — so non-printable structure reads before any interaction, not as a uniform dot. SELECTION: focusedIndex is a roving-tabindex active cell (tabIndex 0 only on the current cell) that Shift-drag (pointerdown with shiftKey sets the anchor to the prior focusedIndex if none exists yet and starts a drag; subsequent pointerenter while dragging keeps moving focusedIndex) or Shift+ArrowKey (preventDefault; anchor set to focusedIndex before the move if none exists, then focusedIndex moves) extends into a contiguous byte range; a bare click or plain ArrowKey clears the anchor and collapses to a single cell. Selected cells get the same color-mix background at a stronger 14% mix, applied identically to both panes. KEYBOARD: ArrowLeft/Right move ±1 byte, ArrowUp/Down move ±bytesPerRow (a 16-byte row jump by default), all clamped to the array bounds. FOOTER: a visible plain-text bar beneath the panes prints, when a range is active, 'selected <n> bytes at 0x<start>–0x<end> · u16=0x<hex> · u32=0x<hex> · utf8=\"<escaped>\"' (u16/u32 little-endian, present only once the range is long enough to fill them; utf8 is a TextDecoder('utf-8',{fatal:false}) best-effort decode of the exact selected bytes, JSON-escaped for control characters); with no range it prints the single hovered/focused byte's offset, hex value and descriptor, or a plain hint at rest. A separate visually-hidden aria-live=polite element (not the visible footer, so it doesn't re-announce on every hover) carries only the short form ('selected 8 bytes at 0x40') and is empty outside a range, so range changes announce without also announcing every hover. A11Y: the hex pane is role=grid with role=gridcell buttons, each named 'offset 0x<idx>, value 0x<byte>, <descriptor>' where descriptor is a control-code mnemonic (NUL, LF, ESC, DEL, ...), the literal printable character, or 'non-ASCII'; the ASCII pane is aria-hidden entirely since it duplicates the grid's information. Colors are token-only (--background/--foreground/--ns-muted/--border via Tailwind utilities, plus the two literal color-mix(var(--foreground)) tints and --ns-accent solely on the focus-visible ring) — no canvas, nothing to re-derive on theme change. No motion beyond a 100-150ms color/opacity transition, skipped under prefers-reduced-motion via motion-reduce:transition-none; there is no rAF loop anywhere in this component."
       }
     },
     {
@@ -5095,6 +5299,49 @@
       }
     },
     {
+      "name": "nomogram-edge",
+      "type": "registry:ui",
+      "title": "Nomogram Edge",
+      "description": "A two-input estimator built as a real paper nomogram: three vertical ASCII scales in Geist Mono where a straightedge stretched between draggable left and right handles crosses the middle scale at the exact computed answer, log-spaced so the crossing is mathematically exact rather than decorative.",
+      "files": [
+        {
+          "path": "registry/core/nomogram-edge/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/nomogram-edge.tsx"
+        }
+      ],
+      "dependencies": [],
+      "cssVars": {
+        "theme": {
+          "color-ns-muted": "var(--ns-muted)",
+          "color-ns-accent": "var(--ns-accent)"
+        },
+        "light": {
+          "ns-muted": "#4d4d4d",
+          "ns-accent": "#006bff"
+        },
+        "dark": {
+          "ns-muted": "#8f8f8f"
+        }
+      },
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "nomogram",
+          "estimator",
+          "calculator",
+          "pricing",
+          "capacity",
+          "slider",
+          "svg",
+          "drag",
+          "log-scale",
+          "form"
+        ],
+        "instruction": "Build a two-input estimator as a working three-scale nomogram, not a pair of sliders with a computed label. GEOMETRY (the part that must be exact): three vertical tick-glyph scales (─ for minor ticks, ┬ for major, on a 1px │ spine) sit in three equal-width grid columns with zero gap, so the middle column's spine is the exact horizontal midpoint between the left and right spines. Left and right scales are anchored so their own domain MAXIMUM maps to fraction 0 (top of a fixed-height track) and fraction grows downward; with a single shared log modulus R = ln(leftMax/leftMin) (product mode) or linear span R = leftMax-leftMin (sum mode) taken from the LEFT domain only, frac(u) = ln(leftMax/u)/R (or (leftMax-u)/R for sum) and frac(v) = ln(rightMax/v)/R using that SAME R — this is what makes the halfway-average of the two handles' fractions a well-defined function of the product/sum alone, regardless of how it decomposes into u and v. The middle scale's own ticks are drawn at frac(w) = ln(wMax/w)/(2R) (or (wMax-w)/(2R) for sum), wMax = combine(leftMax, rightMax) — so a straight line whose y at the left spine is frac(u)*trackHeight and at the right spine is frac(v)*trackHeight crosses the middle spine (the true geometric midpoint) at exactly frac(u*v)*trackHeight by the intercept theorem. The crossing value itself is computed analytically (result = leftValue OP rightValue) and placed at (fracLeft+fracRight)/2 — the drawn SVG line and the printed number are never two separate approximations of each other. Because R comes from the left domain, a right (or middle) domain with a smaller log-ratio/span reaches less than the full track height and ends at a real drawn '══' scale cap partway down rather than filling the column — that is correct nomography (a shorter physical scale for a narrower range), not a layout bug, and it's the part of the geometry that makes the two inputs' sensitivities genuinely different: the same handle travel covers a different fraction of a shorter scale's own domain. RENDERING: inline SVG line only (a quadratic bezier that collapses to exactly a straight line when its control point sits at the true midpoint, i.e. no visual sag at rest), `vector-effect=\"non-scaling-stroke\"` on the path since the SVG uses `viewBox=\"0 0 100 100\" preserveAspectRatio=\"none\"` (percentage coordinates so the line tracks any container width with zero JS measurement) — non-uniform x/y scaling would otherwise smear stroke width, which is also why nothing else in the SVG is round (no circles for handles or the crossing mark; those are real DOM elements). The crossing glyph swells to ╪ (larger, bold, --foreground — never accent) with the read-off value printed beside it in a small bordered chip; ordinary middle-scale ticks carry no numeric labels, only the live crossing does, so nothing static competes with the live answer. Outer scales label their major ticks with compact mono figures (100/1k/10k style) outside the spine, away from the center column. INTERACTION: left and right handles are small rotated-square DOM markers (not SVG), draggable via pointerdown/move/up on their full-height track (so a click anywhere on the track jumps the handle there, matching this registry's slider-vernier convention) with pointer capture; drag is continuous and unquantized so the crossing visibly moves in real time as you drag (this IS the point — you see at a glance that doubling one input barely moves the crossing while nudging the other swings it wildly, when the two domains' log-ratios differ); on release the handle snaps to the nearest generated tick (by fractional distance, not raw value) with a spring-flavored `cubic-bezier(0.34,1.56,0.64,1)` ease on its `top` position — value commits are instant, only the visual position eases, same idiom as slider-vernier. Keyboard: ArrowUp/Right and ArrowDown/Left step one tick, PageUp/PageDown jump roughly a decade (product) or five ticks (sum), Home/End go to the domain rails — all computed from the nearest-tick index so keyboard nav never gets stuck between detents. While a handle is down the straightedge carries a small quadratic sag (~3 viewBox units, control point offset from the true midpoint) that eases back to zero — a straight line — on release via a `d`-attribute CSS transition; this sag is purely decorative, the crossing computation never reads the drawn path. `prefers-reduced-motion` is detected in JS (matchMedia, not just a Tailwind variant) so every eased transition — handle snap, crossing glyph settle, straightedge sag — is set to `none` outright rather than merely shortened, while remaining fully usable (every value change still applies instantly). ACCESSIBILITY: both handles are `role=\"slider\"` `tabIndex=0` with `aria-orientation=\"vertical\"`, `aria-valuemin/max/now`, and `aria-valuetext` composed as '<this handle's own reading> — estimated <formatResult(result)>' (e.g. '100k requests — estimated $1,000/mo') so either handle alone tells you the full answer regardless of which one last moved; a `sr-only` `aria-live=\"polite\"` region holds the same composed sentence and is updated only on commit (drag release or a keystroke), never on every pointermove, so dragging doesn't flood a screen reader with per-pixel announcements. All three scales and the straightedge SVG are `aria-hidden` — the two role=slider handles are the entire accessible surface, so the component is fully keyboard-operable with no gesture-only path (Tab reaches both handles; there is no third focusable element). Focus rings and the grabbed-handle fill/border are the ONLY places `--ns-accent` appears anywhere in this component — the crossing glyph, the header readouts, and the straightedge are all `--foreground`/`--border`/`--ns-muted`. PROPS: `mode` (\"product\" default or \"sum\") swaps log for linear scales and multiplication for addition; `leftMin/Max`, `rightMin/Max`, `defaultLeftValue/RightValue`, per-column `label`s, and `formatLeft/Right/Result` overrides (used for both the header readouts and each handle's `aria-valuetext`, tick glyphs use their own fixed compact formatting since they're decorative); `onValuesChange(left, right, result)` fires on every value change including mid-drag."
+      }
+    },
+    {
       "name": "notification-bell-swing",
       "type": "registry:ui",
       "title": "Notification Bell Swing",
@@ -5381,6 +5628,48 @@
           "accessibility"
         ],
         "instruction": "A model picker that replaces the dropdown-of-marketing-names with the actual decision, drawn as a small self-explaining scatter-plot instrument. Given a models[] prop of {id, name, cost, latency, score}, it computes the real Pareto frontier by pairwise dominance (a model dominates another if it is no worse on cost AND latency AND score, strictly better on at least one) independent of any display mode, then plots every model at x = a weighted blend of normalized cost and normalized latency (the blend ratio is the only thing the speed/balance/quality toggle changes) and y = normalized quality score, higher score sitting higher. The y-axis is labelled QUALITY↑ in the top-left corner — the cheap-and-excellent corner that never has a point in it — and the x-axis is captioned 'cheaper·faster' → 'costlier·slower', so at rest the form states what is being compared and which way is better. FRONTIER: the non-dominated models are connected by one rising SVG polyline and marked with solid --foreground node dots; because the line only rises left-to-right, its shape IS the tradeoff (you cannot gain quality without moving right into cost/latency). DOMINATED: every dominated model is a hollow --ns-muted node at its own honest position below the line, joined to the ridge by a faint vertical connector whose length is literally the quality you forfeit by choosing it — never hidden or filtered out, always selectable. SELECTION: a real role=radiogroup of role=radio buttons, one per model, roving tabindex, Arrow keys move AND commit in visual x-order (Home/End jump to the ends), recomputed from the CURRENT axis mode so traversal always matches left-to-right on screen. A drag anywhere on the plot computes the pointer's x-fraction and snaps to the nearest node by 1D distance (a Voronoi partition of the x-axis) committing on every zone crossing, so dragging walks the selection node-to-node rather than echoing a free pointer. The selected node is the only place --ns-accent appears: a filled accent dot with a soft accent halo. READOUT: beneath the plot a bordered panel names the selected model, prints its three raw numbers (cost /1k, latency s, score) in Geist Mono, tags it 'on frontier' or 'dominated', and prints — once per COMMIT, never per drag pixel — the concrete delta versus the previously selected model ('vs Atlas Mini +0.4s · +$0.35/1k · +11 MMLU'); when the selection is dominated it instead states who beats it and by how much at no higher cost or latency. A visually-hidden aria-live=polite region announces the same change in words on every focus/commit ('0.4 seconds slower, 35 cents more expensive per thousand, 11 points higher quality'). A small legend names the two node kinds. AXIS TOGGLE: a speed/balance/quality segmented control (its own role=radiogroup) re-weights the cost/latency blend that produces x; every node's position, the ridge path's `d`, and every connector transition together on an ease-out-expo curve (cubic-bezier(0.16,1,0.3,1), 450ms) — the frontier's point count never changes between modes, only x, so the path stays interpolation-safe. COLORS: --foreground for the ridge line and frontier dots, --ns-muted for dominated dots, connectors and captions, --border for the baseline and readout panel, --ns-accent only for the selected dot and its halo. REDUCED MOTION: every transition is skipped — positions snap to target. No canvas: one aria-hidden SVG draws only the straight lines (preserveAspectRatio=none, non-scaling-stroke), while every node dot is a real DOM element positioned by percentage so it stays a perfect circle at any aspect ratio and the hit-target buttons stay pixel-aligned with no ResizeObserver; all data lives in each radio's aria-label, never in the SVG."
+      }
+    },
+    {
+      "name": "pin-barrel",
+      "type": "registry:ui",
+      "title": "Pin Barrel",
+      "description": "A cron-expression field with a physical firing preview: five mono sub-inputs sit above a seven-day rule of muted dots, and every hour the expression actually fires gets a raised pin that seats with a small spring overshoot and drops out when the expression changes.",
+      "files": [
+        {
+          "path": "registry/core/pin-barrel/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/pin-barrel.tsx"
+        }
+      ],
+      "dependencies": [],
+      "cssVars": {
+        "theme": {
+          "color-ns-muted": "var(--ns-muted)",
+          "color-ns-accent": "var(--ns-accent)"
+        },
+        "light": {
+          "ns-muted": "#4d4d4d",
+          "ns-accent": "#006bff"
+        },
+        "dark": {
+          "ns-muted": "#8f8f8f"
+        }
+      },
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "cron",
+          "schedule",
+          "scheduling",
+          "recurrence",
+          "form",
+          "validation",
+          "ascii",
+          "mono",
+          "disclosure"
+        ],
+        "instruction": "Build <PinBarrel defaultValue onChange label className> as a pure DOM+CSS cron-expression editor (no canvas, no WebGL). FIELDS: a <fieldset><legend> holding five real <input data-field=\"minute|hour|dom|month|dow\"> cells in crontab order, each a plain-text mono field (no native number stepper) with a visually-hidden <label> for its accessible name and aria-describedby pointing at one shared plain-language sentence. Each field is parsed independently — tokens '*', 'a', 'a,b,c', 'a-b', '*/n', 'a-b/n' — and a field whose value fails to parse gets aria-invalid plus its own inline dashed border-bottom (var(--foreground), never a color-only or --error cue) without blocking the other four; ANY invalid field empties the whole barrel of pins (parsed=null short-circuits the firing computation) while leaving the rest of the UI live. The field currently focused prints its full role name ('minute', 'day of month', ...) in text-ns-muted directly beneath that one input, fading in/out over 150ms; unfocused fields show nothing there so the row reads like a real crontab line, not a labeled form. PLAIN LANGUAGE + LIVE REGION: one aria-live=polite region (referenced by every field's aria-describedby) renders a generated sentence — 'At minute 0 past every 2nd hour' for '0 */2 * * *' — built per-field ('every 2nd hour' for */2, 'minute 0' for a bare number, 'minutes 1, 15' for a list, 'hours 9 through 17' for a range, month/day-of-week numbers rendered as names) plus a second line 'next run: Tue 14:00' computed by an independent minute-by-minute forward scan from now (real cron day semantics: day-of-month OR day-of-week when BOTH are restricted from '*', otherwise whichever one is restricted). THE BARREL: an aria-hidden, overflow-x-auto strip of 168 inline mono cells (24h x 7 days, anchored to local midnight) rendered as a single flow of glyphs — '·' at rest, '┊' every 24th cell marking a day boundary, and '╹' replacing either glyph on any hour where hour+month+day match (the representative firing shown on hover is the smallest value in the parsed minute set, with a '+N more that hour' suffix when the minute field yields more than one). A '▏' read-head is absolutely positioned at the real current-time fraction of the 168-hour window and is re-targeted every 30s with a matching 30s linear CSS transition, so it creeps continuously in real time at zero rAF cost — no per-frame loop anywhere in the component. MOTION (the physical part): changing any field diffs the new set of matching hour-cells against what's currently rendered, keyed by hour-cell index. Newly-matching cells mount pre-transition (translateY(4px) scale(0.4) opacity 0, transition:none), then a doubled requestAnimationFrame flips a single `armed` flag that transitions every entering pin to its resting transform over 220ms on the back-out bezier cubic-bezier(0.34,1.56,0.64,1) — a small mechanical overshoot, the same technique counter-carry-ripple's column reveals use, with no spring differential-equation loop required. Cells that stop matching keep rendering for 120ms with a plain translateY(6px)+fade-out on cubic-bezier(0.55,0,1,0.45) before their node is dropped, so departure reads as a drop, not a disappearance; cells whose match status is unchanged never replay any animation, even when the representative minute they show updates. Hovering a pin sets a fixed-position detail line beneath the barrel (crossfading 150ms opacity against the resting hint, exactly schedule-ascii-freebusy's hover-line idiom) printing that firing's full absolute timestamp ('Tue 16 Aug, 14:00') — nothing ever floats over the rule itself. prefers-reduced-motion collapses straight to the resting frame for every cell (no enter/exit choreography played) and the read-head's creep transition is dropped to `none` so it just snaps to the correct position on each 30s tick — always usable, never stuck mid-animation. A11Y (the real surface, since the barrel above is aria-hidden): the sentence + next-run live region is the assistive-tech-facing equivalent of the whole rule, and a <button aria-expanded aria-controls data-firings-toggle> disclosure reveals a plain <ul> where every matching hour is a <li data-firing-item> with its full timestamp — the individual-firings list the pin rule encodes for anyone who cannot hover a pin. COLOR: token-only (--background --foreground --ns-muted --border --ns-accent through Tailwind utilities, arbitrary-opacity tints like text-ns-muted/40, and one `var(--foreground)` inline for the invalid-field underline) — --ns-accent appears only on focus-visible rings and on a hovered pin, never as resting decoration or the read-head, which is plain text-foreground. Every input and the disclosure button carries a visible focus-visible:ring-2 focus-visible:ring-ns-accent ring (outline-none paired only with focus-visible:ring, never with focus-visible:outline-*, so the ring is never suppressed by --tw-outline-style:none)."
       }
     },
     {
@@ -7396,6 +7685,45 @@
         ],
         "instruction": "A live distribution instrument that resurrects the stem-and-leaf plot: the `records` prop is a rolling window of `{ id, value, meta? }` objects, and it is rendered as a real <table> whose rows are tens-stems (`<th scope=\"row\">120-129 ms</th>`) and whose cells hold a flex row of Geist Mono digit leaves, one per record, each leaf being that record's rounded ones digit. Nothing is pre-aggregated the way a histogram bucket would be — the glyphs ARE the data, and the row's own width (leaf count x leaf width) doubles as the bar, so there is no separate bar element. ARRIVAL MECHANISM: a new id is diffed against the previous render's id set; entering leaves are measured against a decorative aria-hidden staging slot rendered above the table, given an inverted transform equal to (staging rect minus final rect) with transitions off, then one requestAnimationFrame later the transform clears to 0 over a 440ms spring (cubic-bezier(0.34,1.56,0.64,1)) — a two-keyframe fly from the staging point into its sorted slot in the row. Every EXISTING sibling leaf whose position shifted because of that insertion (later stem, later digit, or a stem row appearing/disappearing at either edge as the window's min/max moves) gets the identical FLIP treatment computed from its own previous vs. current getBoundingClientRect, at a faster 320ms so it reads as a shoulder-nudge rather than a fresh arrival. The staging slot itself flashes the incoming digit for 360ms then reverts to a dashed placeholder. SORTING: leaves within a row are sorted ascending by digit; ties (repeated digits) keep arrival order because Array#sort is spec-stable, so same-digit leaves read left-to-right as chronological without extra bookkeeping. DOMAIN: stem rows span every integer stem from the current window's minimum to its maximum, including zero-leaf rows in between (rendered as a muted em-dash placeholder) so the shape reads correctly even where the distribution is sparse. ACCESSIBILITY: a <caption> states n, median and range as a sentence; each leaf is a real <button> with a roving tabindex (exactly one Tab stop for the whole table, tracked in React state and re-resolved if the active leaf ages out of the window) and an accessible name built from the RAW value (not the rounded digit) plus unit and meta, e.g. '127.4 ms, req-4821' — the digit is a compression of the data for sighted users, never what assistive tech is told the value is. Arrow keys move within a row (clamped at the ends), Up/Down step to the nearest row that still has leaves (skipping empty stems), Home/End jump to a row's first/last leaf. Hovering or focusing any leaf lifts it 2px and swaps the footer readout from the resting 'median * range' summary to that record's exact value and meta; a role=status live region debounces arrivals into one batched sentence every 900ms of quiet ('3 new values, median now 141ms') instead of announcing every tick. REDUCED MOTION: the fly-in and shoulder-nudge transforms are skipped entirely (matchMedia gate on the FLIP effect) — leaves render straight at their final table position, fully readable and keyboard-navigable either way. Distinct from histogram-live-grain (a canvas-free but still bucket histogram where grains are anonymous units stacked in a bin and the raw value is gone once counted): here every mark keeps its id and its exact value forever, addressable by hover or by keyboard, and the plot is literally typeset from the value's own digits rather than being counted into a bucket. Pure DOM + CSS, zero dependencies; all color is token-relative (--foreground digits and staging box, --border rules/dashes, --ns-muted labels, --ns-accent only on the keyboard focus ring).",
         "rank": 298
+      }
+    },
+    {
+      "name": "stencil-fill",
+      "type": "registry:ui",
+      "title": "Stencil Fill",
+      "description": "A reusable pattern-masked input: the full template renders at rest as a muted stencil with literal separators already in place, each typed character inks its own cell, and a refused character prints faint, shakes, and falls away instead of vanishing silently.",
+      "files": [
+        {
+          "path": "registry/core/stencil-fill/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/stencil-fill.tsx"
+        }
+      ],
+      "dependencies": [],
+      "cssVars": {
+        "theme": {
+          "color-ns-muted": "var(--ns-muted)",
+          "color-ns-accent": "var(--ns-accent)"
+        },
+        "light": {
+          "ns-muted": "#4d4d4d",
+          "ns-accent": "#006bff"
+        },
+        "dark": {
+          "ns-muted": "#8f8f8f"
+        }
+      },
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "input",
+          "form",
+          "mask",
+          "validation",
+          "license-key",
+          "accessibility"
+        ],
+        "instruction": "Build a reusable pattern-masked input driven by a `mask` prop string ('X' = editable cell, any other character = a literal separator, e.g. \"XXXX-XXXX-XXXX-XXXX\"). At rest, render the ENTIRE mask verbatim as a muted stencil: every 'X' cell shows the literal glyph 'X' in `var(--ns-muted)` at ~50% opacity, and every separator cell shows its literal character (also muted) already in place — the format is visible before the first keystroke, never auto-inserted as-you-type. A single native `<input>` (transparent text and caret via `color:transparent; caret-color:transparent`, absolutely positioned to exactly overlay the decorative cell grid beneath it — same split as card-number-emboss: real input drives state/focus/label/autocomplete, `aria-hidden` decorative layer is what's actually seen) owns all interaction. Because the mask model is append-then-backspace (not free mid-string cursor editing, matching the rest of the registry's structured-entry components), intercept every printable keydown yourself: `preventDefault()` always, validate the character against a `validate(char)` predicate (default `/^[A-Za-z0-9]$/`), and if it passes, transform it (default: uppercase) and append it to an internal typed-character array, advancing to the next open cell. If the character equals one of the mask's own literal separator characters, silently no-op — that is the 'auto-skip', never a rejection. Backspace/Delete removes the last typed character. On accept, the cell's glyph steps from stencil to inked with a 90ms transition (opacity 0.5->1, `var(--ns-muted)` -> `var(--foreground)`, font-weight 400->600) — a state change, not a spring. The emitted `value` (via `onValueChange`) is built by walking the mask and interleaving typed characters with literal separators, so it keeps the separators exactly where the mask puts them — never raw digits without them.\n\nThe rejection beat is the signature interaction: when a keystroke fails `validate`, do NOT just drop it. Show it: in that character's target cell (the next open one), render an absolutely-positioned overlay printing the refused raw character at `var(--ns-muted)`, animate it through a CSS keyframe — appear to ~40% opacity, a 3px-amplitude decaying horizontal shake (a few decreasing-amplitude translateX steps standing in for a spring, not a linear tween), then fall (translateY down, fade to 0 opacity) over roughly 550ms — and clear the overlay on `animationend` (with a small timeout fallback in case the event is missed). Simultaneously fire a polite `aria-live` announcement built from a `rejectMessage(char)` callback (default: \"Letter X not allowed\" for a letter, \"Character \\\"x\\\" not allowed\" otherwise) — clear the live region text and re-set it on a short delay so two consecutive rejections of the same character still both get announced, since an unchanged live-region string doesn't reliably re-fire in every screen reader. Reduced motion: replace the shake+fall keyframe with a plain 260ms fade (print in, fade out, no transform) via a `prefers-reduced-motion: reduce` media query on the same class, so the rejection is still visibly communicated without motion.\n\nPaste: intercept `onPaste`, prevent default, filter the clipboard text through the same `validate`/separator-skip logic (invalid or over-capacity characters are silently dropped, not individually shaken — the shake is a keystroke-time beat), then commit the accepted characters into the typed array via a short staggered cascade (~45ms per character via sequential `setTimeout`s, collapsed to no stagger under reduced motion) so the paste visibly inks left-to-right rather than jumping to its final state in one frame. Clear all pending stagger timers on unmount and whenever a new paste starts.\n\nThe caret is a kerf-thin (2px) `var(--ns-accent)` bar, vertically centered, rendered only while the real input is focused, positioned at the start of the next open editable cell (never inside a separator cell) — it blinks via a `steps()` keyframe, suppressed (solid, no animation) under reduced motion. Accessibility: a real `<label>` (visually `sr-only`, associated via `htmlFor`) supplies the accessible name; `aria-describedby` points at a `sr-only` span stating the format contract up front — auto-derive it from the mask when groups are uniform (\"Format: N groups of M characters, separated by <sep>\"), overridable via a `formatDescription` prop for irregular masks. The entire decorative glyph layer is `aria-hidden`. No dependencies."
       }
     },
     {
@@ -9444,6 +9772,47 @@
       }
     },
     {
+      "name": "under-brace",
+      "type": "registry:ui",
+      "title": "Under Brace",
+      "description": "A regex tester that annotates matches beneath the sample text with box-drawing braces instead of inline highlight color: each match gets its own └──┘ span, and capture groups add further rows stepped by nesting depth, the group's number printed inside its brace. A live, aria-live match list backs the same data for assistive tech; hovering a brace or a group chip lights every span it touches, and an invalid pattern prints the engine's own error under a ┗ caret pointer.",
+      "files": [
+        {
+          "path": "registry/core/under-brace/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/under-brace.tsx"
+        }
+      ],
+      "dependencies": [],
+      "cssVars": {
+        "theme": {
+          "color-ns-muted": "var(--ns-muted)",
+          "color-ns-accent": "var(--ns-accent)"
+        },
+        "light": {
+          "ns-muted": "#4d4d4d",
+          "ns-accent": "#006bff"
+        },
+        "dark": {
+          "ns-muted": "#8f8f8f"
+        }
+      },
+      "meta": {
+        "collection": "core",
+        "tags": [
+          "regex",
+          "developer-tools",
+          "text",
+          "testing",
+          "box-drawing",
+          "accessibility",
+          "aria-live",
+          "form"
+        ],
+        "instruction": "A regex tester (pattern input, flags input, sample <textarea>) whose result is rendered as box-drawing braces stacked BENEATH the sample text rather than inline highlight color — the five-token palette (--background --foreground --ns-muted --border --ns-accent) has no room for one hue per capture group, so depth is read from vertical position and opacity instead. MATCHING: the pattern is compiled with `new RegExp(pattern, 'gd' + sanitizedFlags)` — 'g' and 'd' (match indices) are always forced on internally regardless of what the user types in the flags field, which only accepts i/m/s; `sample.matchAll(regex)` then walks every match, and each participating capture group's exact [start,end) comes straight from `match.indices[n]`, never re-derived from string search. ROW ASSIGNMENT (the actual mechanic): `analyzePattern` walks the PATTERN SOURCE once — tracking character-class state, backslash escapes, and a stack of open groups — to assign every capturing group a fixed depth: a plain `(` or named `(?<x>` opens a numbered capturing group at (enclosing capturing depth + 1); `(?:`, `(?=`, `(?!`, `(?<=`, `(?<!` open a non-capturing construct whose CONTENTS still nest but which itself never gets a number or a row. Row 0, immediately under the text, is always reserved for the whole match's own brace; a capturing group at source depth 1 renders on row 1, depth 2 on row 2, and so on, clamped at 4 so a pathologically nested pattern still renders instead of growing without bound. Because the depth comes from the pattern's own text, a group's row is stable pattern-to-pattern and never jumps around as the SAMPLE changes, only as the PATTERN's structure does. Each row's brace is built as one literal string of box-drawing characters — `└` + `─`×(width-2) + `┘` for anything 2+ columns wide, a lone `┴` for a single-column match, `│` for a genuine zero-length match — square corners deliberately, not the rounded ╰╯ set: they're the glyphs already proven, elsewhere in this registry (diagram-ascii-flow, container-box-drawing), to have a predictable 1ch advance in Geist Mono, which this component's whole column mapping depends on — with the group's number centered inside the dashes when there's room (width ≥ label.length + 2); the whole match's own row-0 brace never carries a number. Every brace is positioned with plain `ch` units against a true monospace font (Geist Mono) — one character of the sample line equals exactly 1ch in its own annotation row, so no pixel measurement or per-character span grid is needed, just `left: {col}ch` on one span holding the whole glyph run. A match or group whose span crosses a line break is clipped and rendered separately on every line it touches. REVEAL: each brace span carries a registered `--under-brace-reveal` custom property (`@property`, syntax `<percentage>`) driving its own `mask-image`, animated 0%→100% left-to-right over `max(120ms, min(600ms, width*12ms))` with an ease-out curve — width-proportional so a two-character brace and a twenty-character one both feel like the same reveal speed rather than the wide one snapping in. `prefers-reduced-motion: reduce` removes the mask and animation entirely so every brace is simply present at full width immediately — still fully legible and interactive, nothing to wait on. INTERACTION: hovering (or, via a group chip, focusing) a brace tints its EXACT covered substring in the annotated view using `color-mix(in srgb, var(--ns-accent) 18%, transparent)` — --ns-accent used only for this and the standard focus rings, never resting decoration. Because the live pattern <input>'s own text can't be individually decorated without breaking normal editing/selection/IME behavior, 'hovering a group token' is implemented as a small strip of real `<button aria-label=\"Group N\">` chips rendered next to the pattern field, one per capturing group; hovering OR focusing a chip lights every brace with that group number across every match at once, tinting every one of that group's substrings simultaneously — the intended way to answer 'everywhere this group grabbed, across the whole sample'. INVALID PATTERNS: `new RegExp` is wrapped in try/catch; on failure the engine's own SyntaxError message renders verbatim below the field, and a caret position is approximated by shrinking the pattern from the end, one character at a time, until a PREFIX of it compiles standalone — exact for the single most common live-editing mistake (a dangling trailing construct, e.g. a second quantifier), honestly degrading to column 0 for a still-open group or class where no single column is really at fault; the caret renders as a `┗` glyph positioned the same `ch`-unit way as the braces themselves, under the pattern field rather than the sample. ACCESSIBILITY: the entire annotated brace block is one `aria-hidden` decorative layer; the real, assistive-tech-facing surface is the plain native pattern `<input>` (`aria-invalid` mirrors whether the current pattern fails to compile, `aria-describedby` always points at one paragraph carrying either the live match count, 'Type a pattern to test it.', or the SyntaxError text), the plain native sample `<textarea>` (fully untouched keyboard/IME/undo/selection behavior), and a 'Matches' `<ol aria-live=\"polite\">` of real `<button>`s, one per match, each reading e.g. 'Match 1: \"#TX-482\" at 7–14; group 1: \"TX-482\"; group 2: \"482\"' — updating live on every pattern, flag, or sample edit. Tab reaches the pattern input, the flags input, every group chip, the sample textarea, and every match button in document order; focusing (Tab or click) a match button draws a visible `outline: 2px solid var(--ns-accent)` directly on that match's OWN row-0 brace in the annotated view, in addition to the button's own native focus ring, so keyboard users see the visible focus indicator land on the thing it refers to, not just on the list item naming it. No canvas, no SVG, no per-group hex — pure DOM text and CSS, and every color in the whole component resolves to one of the five tokens."
+      }
+    },
+    {
       "name": "undo-drift-bar",
       "type": "registry:ui",
       "title": "Undo Drift Bar",
@@ -11237,6 +11606,45 @@
           "intersection-observer"
         ],
         "instruction": "Build <BoltUnfurl src alt trigger strips? aspectRatio? className?> where `trigger: number` is a counter the caller bumps to (re)play the unroll from scratch (an IntersectionObserver firing once on first view, and/or a Replay button) — the component diffs `trigger` against the last value it saw in a ref and starts a fresh 0->1 tween any time it changes, including while already mid-animation. STRUCTURE: a real <img src alt> fills the box (object-cover) underneath everything, both for accessibility (the caller's real alt text) and as network-free progressive enhancement; an aria-hidden overlay of exactly `strips` (default 24) absolutely-positioned divs sits on top and is what's actually seen once painted, since each strip is opaque. SLICING: strip i has `left: (i/strips)*100%`, `width: 100/strips%`, and shows its slice of the same image via the classic CSS sprite technique — `backgroundImage: url(src)`, `backgroundSize: (strips*100)% 100%`, `backgroundPosition: (i/(strips-1))*100% 0%` — no canvas, no cropping math beyond that one percentage formula. MOTION: one requestAnimationFrame loop tweens a single `progress` 0->1 over 1300ms with an ease-out-expo curve; every frame it computes `rollX = progress * containerWidth` and, for each strip, `curl` (0 = flat/unrolled, 1 = fully rolled) as a smoothstep of the strip's rest-center distance from rollX across a curl band ~16% of the container width — strips left of the band are curl 0, right of it are curl 1, inside it interpolate. Each strip's actual style.transform is `translateX(tx) rotateY(angle)` where `angle = -curl * 86deg` and, critically, `tx = (rollX - centerX) * curl` — the translate is what converges every still-rolled strip's center onto the roll cursor as curl approaches 1, bundling them into a dense, foreshortened, shaded cylinder sitting at the leading edge rather than 24 independent slivers spread across the whole width (that translate term is the difference between reading as \"a rolled bolt of cloth\" and reading as \"broken image\"). `filter: brightness(1 - curl*0.45)` darkens curled strips for the shaded side of the roll. transform-origin is `left center` on every strip so the hinge is physically at its own left edge. A single absolutely-positioned shadow div (linear-gradient transparent -> rgba(0,0,0,0.35), ~24px wide) tracks `rollX` via the same per-frame writes, giving the roll's leading edge a soft cast shadow on the already-flat part; it's opacity-hidden outside 0<progress<1. SETTLE: the instant progress reaches 1, a CSS class toggle (removed then re-added after a forced reflow, so replays restart it cleanly) plays one 260ms per-strip `rotateX(-6deg) -> rotateX(0deg)` keyframe with a 14ms stagger (via an inline `animationDelay` set just before the class is added) — the fabric settle ripple — plus, being `loud`, a diagonal sheen sweep (a `::after` layer, `background-position` animated across a wide gradient band) that plays once over the same beat; both are pure CSS keyframes, no JS per-frame work. REDUCED MOTION: the whole strip/tween machinery is skipped — on trigger, `progress` jumps straight to 1 (paint once, no rAF loop) and the strips wrapper gets one opacity fade-in class, so the caller still sees a state change but nothing rolls, rotates, or ripples. A11Y: the real <img>'s alt text is the only accessible description; every strip and the shadow overlay are aria-hidden; the Replay button (owned by the demo, not the component) is a real, labeled, focusable <button>. DEMO: the media box's src is generated once on an offscreen canvas (diagonal bands + a couple of rings in the live --foreground/--border/--ns-accent tokens) precisely so the bare demo never depends on a network image URL; an IntersectionObserver on the box bumps `trigger` the first time it scrolls into view, a visible Replay button bumps it again on demand, and a self-driving interval also bumps it every few seconds so the reveal plays unattended for screenshots."
+      }
+    },
+    {
+      "name": "rosensweig-crest",
+      "type": "registry:ui",
+      "title": "Rosensweig Crest",
+      "description": "A flat pool of ASCII glyphs that erupts into a hexagonal lattice of sharp spikes wherever the pointer's field crosses a critical threshold, tracking the cursor with a stiff-up, overdamped-down viscous lag — the Rosensweig instability rendered as a deformable surface, not particles.",
+      "files": [
+        {
+          "path": "registry/loud/rosensweig-crest/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/rosensweig-crest.tsx"
+        }
+      ],
+      "dependencies": [],
+      "cssVars": {
+        "theme": {
+          "color-ns-muted": "var(--ns-muted)"
+        },
+        "light": {
+          "ns-muted": "#4d4d4d"
+        },
+        "dark": {
+          "ns-muted": "#8f8f8f"
+        }
+      },
+      "meta": {
+        "collection": "loud",
+        "tags": [
+          "ascii",
+          "hero",
+          "canvas",
+          "cursor",
+          "physics",
+          "ferrofluid",
+          "field",
+          "spring"
+        ],
+        "instruction": "Build a full-bleed Canvas 2D hero rendering a deformable ASCII SURFACE, not discrete particles. A hexagonal lattice of 'peak' points is authored directly in PIXEL space (dx = glyph cell size * 2.6, dy = dx * sqrt(3)/2, alternate rows offset by dx/2) so the hexagons stay visually equilateral regardless of the monospace glyph's cell aspect ratio — building the lattice in glyph-cell-index space instead would come out stretched, since a mono cell is taller than it is wide. Each lattice point carries its own scalar height and velocity (two Float32Array buffers, reallocated on resize). Every frame: field strength at a lattice point is (1 - distance/230px)^2 clamped to [0,1] against the eased pointer position (an inner cursor.x/y lerps toward the raw pointer at 0.22/frame, adding a first layer of lag on top of the spring), then passed through smoothstep(0.5, 0.64, field) so the response is a hard phase boundary, not a gradual bulge — nothing happens below threshold, height snaps toward its ceiling just above it. An exclusion rectangle measured from the real DOM children (the headline/CTA wrapper, expanded by 22px padding and a 78px soft feather via smoothstep) multiplies the target toward zero near and under that content regardless of pointer distance, so the surface can never rise under the wordmark — a physical constraint on the field target, not a z-index trick. Each point then springs toward that target with an ASYMMETRIC response chosen by the sign of the error every frame: k=260 stiffness / c=15 damping when rising (fast, slightly underdamped, a visible snap-and-settle 'eruption'), k=26 / c=42 when falling (heavily overdamped, a slow heavy liquid slump, no bounce) — same spring equation, two constant pairs. Rendering: for every glyph cell, a 3x3-candidate hex nearest-neighbor search (checking the lattice row above/at/below the cell's approximate row, each with the column above/at/below) finds the owning peak's height AND the tallest height among those same candidates; if the cell's own height is below 0.55 and the neighborhood max exceeds it by more than 0.22, the cell renders the hollow glyph '˘' (a moat beside a taller spike) instead of its height bucket. Otherwise height buckets at 0.02/0.24/0.5/0.74/1.01 map to the ramp ' · ~ ≈ ∧ ▲' (flat pool through crest), with the bottom two buckets drawn in --ns-muted at low alpha (resting/rising, subtle) and the top three in the canvas's resolved color() (crest, full ink, alpha scaling 0.55 to 1 with bucket). This is a faceted nearest-peak lookup (effectively Voronoi-per-lattice-point), not smoothed interpolation, which is what gives spikes their sharp faceted edges rather than a blurred bump. The physics loop tracks an aggregate energy term (sum of |velocity| + height across all lattice points) each frame and stops requesting frames once it drops below a small epsilon AND no pointer is active — a pointerenter/pointermove/pointerleave triple on the ROOT container (never the canvas, which is pointer-events:none and aria-hidden) toggles pointerActive and re-wakes the loop; the canvas listening on itself would risk stealing events meant for the real headline/CTA layered above it in the same box. Touch/coarse pointers (matchMedia('(pointer: coarse)'), checked once at mount) never receive pointer listeners at all: instead pointerActive is forced permanently true and the eased cursor target follows a slow 15s lissajous lap across the container — the exclusion rect still guards the headline even though the autonomous path pays it no attention, because the guard lives in the field-target math, not the path. prefers-reduced-motion renders exactly one static frame of the FORMED lattice (a virtual magnet placed off-center, heights set directly to their equilibrium target with zero velocity, no spring, no loop, no listeners) rather than the flat rest state — the drama the component exists to show is the erupted phase, and reduced motion should still show it once. Colors are read via getComputedStyle(canvas).color for foreground ink and the --ns-muted custom property for the resting/hollow tone, both re-derived on a documentElement class MutationObserver for live theme flips, and --ns-accent is never painted (interaction-only per the token rule). Props: cellSize (glyph cell px, default 13, also drives lattice spacing), children (rendered in a centered column, its measured bounding box becomes the exclusion rect), className."
       }
     },
     {
