@@ -42,8 +42,24 @@ type Mode = "product" | "sum";
 type Side = "left" | "right";
 type Tick = { value: number; major: boolean };
 
-const TRACK_H = 360; // px, track column height
+const TRACK_H_DEFAULT = 480; // px, track column height — a pricing-hero instrument, not a form-row widget
 const SAG = 3.2; // viewBox units, straightedge sag while a handle is down
+// A handful of illustrative (fracLeft, fracRight) waypoints the crossing
+// drifts through before anyone touches the component — spread across the
+// domain so the sensitivity story (one side swinging the crossing more than
+// the other) is visible without a single click. Permanently cancelled on the
+// first real pointerdown/keydown (see interactedRef) and never started under
+// reduced motion.
+const IDLE_WAYPOINTS: [number, number][] = [
+  [0.14, 0.82],
+  [0.62, 0.26],
+  [0.36, 0.58],
+  [0.8, 0.12],
+];
+const IDLE_STEP_MS = 2600;
+const IDLE_FIRST_DELAY_MS = 1100;
+const ENTRY_FRAC = 0.5; // both handles start here on mount and spring out to their real reading
+const ENTRANCE_MS = 640; // draw-in duration, same overshoot curve as the interactive snap
 
 function clamp(v: number, lo: number, hi: number): number {
   return v < lo ? lo : v > hi ? hi : v;
@@ -141,6 +157,12 @@ export interface NomogramEdgeProps {
   formatRight?: (v: number) => string;
   formatResult?: (v: number) => string;
   onValuesChange?: (left: number, right: number, result: number) => void;
+  /** Track column height in px. Default 480 — a full instrument, not a form-row control. */
+  trackHeight?: number;
+  /** Before any interaction, the crossing drifts through a few illustrative
+   * value pairs on its own (off under prefers-reduced-motion, and cancelled
+   * for good the moment a real drag or keystroke lands). Default true. */
+  ambient?: boolean;
   className?: string;
 }
 
@@ -159,6 +181,8 @@ export function NomogramEdge({
   formatRight = (v) => `$${v.toFixed(2)}/request`,
   formatResult = (v) => (v >= 1000 ? `$${Math.round(v).toLocaleString()}/mo` : `$${v.toFixed(2)}/mo`),
   onValuesChange,
+  trackHeight = TRACK_H_DEFAULT,
+  ambient = true,
   className = "",
 }: NomogramEdgeProps) {
   const reduced = usePrefersReducedMotion();
@@ -166,6 +190,45 @@ export function NomogramEdge({
   const [leftValue, setLeftValue] = useState(() => clamp(defaultLeftValue, leftMin, leftMax));
   const [rightValue, setRightValue] = useState(() => clamp(defaultRightValue, rightMin, rightMax));
   const [dragging, setDragging] = useState<Side | null>(null);
+  // flips (and stays flipped) the instant a real drag or keystroke lands —
+  // ends the idle drift for good and switches the handle's `top` easing from
+  // the slow ambient drift back to the snappy interactive spring.
+  const [interacted, setInteracted] = useState(false);
+  const interactedRef = useRef(false);
+  const stepIndexRef = useRef(0);
+  const markInteracted = useCallback(() => {
+    if (interactedRef.current) return;
+    interactedRef.current = true;
+    setInteracted(true);
+  }, []);
+  // `entered` flips true one paint after mount so the very first frame draws
+  // both handles at ENTRY_FRAC with no transition, then the flip animates
+  // them out to their real reading on the same overshoot spring as an
+  // interactive snap — the "drawn in" reveal. `settled` flips true once that
+  // reveal has had time to finish, so the ambient idle ease (below) doesn't
+  // start competing with it. Both resolve instantly under reduced motion.
+  const [entered, setEntered] = useState(false);
+  const [settled, setSettled] = useState(false);
+  useEffect(() => {
+    if (reduced) {
+      setEntered(true);
+      setSettled(true);
+      return;
+    }
+    let raf2 = 0;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => setEntered(true));
+    });
+    return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+    };
+  }, [reduced]);
+  useEffect(() => {
+    if (!entered || reduced) return;
+    const t = setTimeout(() => setSettled(true), ENTRANCE_MS + 60);
+    return () => clearTimeout(t);
+  }, [entered, reduced]);
   const [liveText, setLiveText] = useState(
     () =>
       `${formatLeft(clamp(defaultLeftValue, leftMin, leftMax))} × ${formatRight(
@@ -209,6 +272,14 @@ export function NomogramEdge({
   const fracRight = fracOf(mode, rightValue, rightMax, R);
   const fracMid = (fracLeft + fracRight) / 2;
   const result = combine(mode, leftValue, rightValue);
+
+  // visual-only positions: everything DRAWN (handles, line, crossing) reads
+  // these, never the raw fracs directly, so the pre-`entered` first frame
+  // paints at ENTRY_FRAC while `leftValue`/`rightValue` (and therefore every
+  // number on screen) are already correct from the very first render.
+  const renderFracLeft = entered ? fracLeft : ENTRY_FRAC;
+  const renderFracRight = entered ? fracRight : ENTRY_FRAC;
+  const renderFracMid = (renderFracLeft + renderFracRight) / 2;
 
   const updateFromClientY = useCallback(
     (side: Side, clientY: number) => {
@@ -269,6 +340,7 @@ export function NomogramEdge({
 
   const onPointerDown = (side: Side) => (e: React.PointerEvent<HTMLDivElement>) => {
     e.preventDefault();
+    markInteracted();
     const trackEl = side === "left" ? leftTrackRef.current : rightTrackRef.current;
     trackEl?.setPointerCapture(e.pointerId);
     (side === "left" ? leftHandleRef : rightHandleRef).current?.focus({ preventScroll: true });
@@ -319,18 +391,76 @@ export function NomogramEdge({
         return;
     }
     e.preventDefault();
+    markInteracted();
     next = clamp(next, 0, ticks.length - 1);
     commitValue(side, ticks[next].value);
   };
+
+  // Before anyone touches a handle, the crossing drifts through a few
+  // illustrative waypoints on its own — this is what makes the resting frame
+  // read as alive rather than a static instrument nobody has picked up.
+  // Cancelled for good (interactedRef) the instant a real drag or keystroke
+  // lands, whether from an actual visitor or the site's own autoplay driver
+  // (both dispatch genuine pointerdown events onPointerDown already sees).
+  useEffect(() => {
+    if (!ambient || reduced) return;
+    let cancelled = false;
+    const step = () => {
+      if (cancelled || interactedRef.current) return;
+      const [fl, fr] = IDLE_WAYPOINTS[stepIndexRef.current % IDLE_WAYPOINTS.length];
+      stepIndexRef.current += 1;
+      const lv = clamp(valueOf(mode, fl, leftMax, R), leftMin, leftMax);
+      const rv = clamp(valueOf(mode, fr, rightMax, R), rightMin, rightMax);
+      setLeft(lv);
+      setRight(rv);
+      // no aria-live announce here and no `commitValue` — an autonomous
+      // demo drift is not a user commit, and shouldn't read to a screen
+      // reader as though someone chose these values.
+      onValuesChange?.(lv, rv, combine(mode, lv, rv));
+    };
+    const first = setTimeout(step, IDLE_FIRST_DELAY_MS);
+    const id = setInterval(step, IDLE_STEP_MS);
+    return () => {
+      cancelled = true;
+      clearTimeout(first);
+      clearInterval(id);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ambient, reduced, mode, leftMin, leftMax, rightMin, rightMax, R]);
+
+  // Four motion phases, in the order a mount actually passes through them:
+  // "none" (pre-entrance first paint, no transition at all), "entrance" (the
+  // spring draw-in), "idle" (the slow ambient drift, once settled and still
+  // untouched), "interactive" (the normal drag-release/keyboard snap). Same
+  // phase drives the handle's `top`, the crossing's `top`, and the
+  // straightedge path's `d` so the three never fall out of sync with
+  // each other mid-transition.
+  const motionPhase: "none" | "entrance" | "idle" | "interactive" = !entered
+    ? "none"
+    : !settled
+      ? "entrance"
+      : !interacted && ambient
+        ? "idle"
+        : "interactive";
+  const posEase =
+    motionPhase === "entrance"
+      ? `${ENTRANCE_MS}ms cubic-bezier(0.34,1.56,0.64,1)`
+      : motionPhase === "idle"
+        ? "1600ms cubic-bezier(0.45,0,0.55,1)"
+        : motionPhase === "interactive"
+          ? "320ms cubic-bezier(0.34,1.56,0.64,1)"
+          : null;
 
   const handleTransition = (side: Side) =>
     reduced
       ? "none"
       : dragging === side
         ? "background-color 150ms ease, border-color 150ms ease"
-        : "top 320ms cubic-bezier(0.34,1.56,0.64,1), background-color 150ms ease, border-color 150ms ease";
+        : `${posEase ? `top ${posEase}, ` : ""}background-color 150ms ease, border-color 150ms ease`;
 
-  const pathTransition = reduced ? "none" : "d 280ms cubic-bezier(0.22,1,0.36,1)";
+  const crossingTransition = reduced ? "none" : posEase ? `top ${posEase}` : "none";
+
+  const pathTransition = reduced ? "none" : posEase ? `d ${posEase}` : "none";
 
   // straightedge: quadratic bezier whose control point sits at the true
   // midpoint x (50) and the average of the two endpoint y's — at sag=0 this
@@ -338,8 +468,8 @@ export function NomogramEdge({
   const x1 = 100 / 6;
   const xm = 50;
   const x2 = 500 / 6;
-  const y1 = fracLeft * 100;
-  const y2 = fracRight * 100;
+  const y1 = renderFracLeft * 100;
+  const y2 = renderFracRight * 100;
   const sag = dragging ? SAG : 0;
   const pathD = `M ${x1.toFixed(2)} ${y1.toFixed(2)} Q ${xm} ${((y1 + y2) / 2 + sag).toFixed(2)} ${x2.toFixed(2)} ${y2.toFixed(2)}`;
 
@@ -354,14 +484,21 @@ export function NomogramEdge({
             className="absolute left-1/2 -translate-y-1/2 select-none"
             style={{ top: `${f * 100}%` }}
           >
-            <span className="font-mono text-[11px] leading-none text-ns-muted">{t.major ? "┬" : "─"}</span>
+            <span className="font-mono text-sm leading-none text-ns-muted">{t.major ? "┬" : "─"}</span>
             {t.major ? (
+              // mr-4/ml-4 (16px) clears the 16px handle's ~11.3px rotated
+              // half-diagonal with margin to spare — at the old mr-1.5 (6px)
+              // gap, a handle sitting at or near this tick's own value
+              // visually swallowed the number it's supposed to label. `z-20`
+              // plus its own `bg-background` chip is a second, size-independent
+              // defense: even if a future resize shrinks that clearance again,
+              // the label paints over the handle instead of the reverse.
               <span
-                className={`absolute top-1/2 -translate-y-1/2 whitespace-nowrap font-mono text-[10px] tabular-nums text-ns-muted ${
-                  side === "left" ? "right-full mr-1.5 text-right" : "left-full ml-1.5"
+                className={`absolute top-1/2 z-20 -translate-y-1/2 whitespace-nowrap font-mono text-xs tabular-nums text-ns-muted ${
+                  side === "left" ? "right-full mr-4 text-right" : "left-full ml-4"
                 }`}
               >
-                {fmtCompact(t.value)}
+                <span className="rounded-sm bg-background px-0.5">{fmtCompact(t.value)}</span>
               </span>
             ) : null}
           </div>
@@ -378,7 +515,7 @@ export function NomogramEdge({
           <span
             key={t.value}
             aria-hidden
-            className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 select-none font-mono text-[11px] leading-none text-ns-muted"
+            className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 select-none font-mono text-sm leading-none text-ns-muted"
             style={{ top: `${f * 100}%` }}
           >
             {t.major ? "┬" : "─"}
@@ -398,7 +535,7 @@ export function NomogramEdge({
       {spanFrac < 0.999 ? (
         <span
           aria-hidden
-          className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 select-none font-mono text-[10px] leading-none text-ns-muted"
+          className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 select-none font-mono text-xs leading-none text-ns-muted"
           style={{ top: `${clamp(spanFrac, 0, 1) * 100}%` }}
         >
           {"══"}
@@ -409,7 +546,7 @@ export function NomogramEdge({
 
   const renderHandle = (side: Side) => {
     const value = side === "left" ? leftValue : rightValue;
-    const frac = side === "left" ? fracLeft : fracRight;
+    const frac = side === "left" ? renderFracLeft : renderFracRight;
     const min = side === "left" ? leftMin : rightMin;
     const max = side === "left" ? leftMax : rightMax;
     const label = side === "left" ? leftLabel : rightLabel;
@@ -427,7 +564,7 @@ export function NomogramEdge({
         aria-valuetext={`${fmt(value)} — estimated ${formatResult(result)}`}
         data-nomogram-handle={side}
         onKeyDown={onKeyDown(side)}
-        className={`absolute left-1/2 z-10 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rotate-45 cursor-grab rounded-sm border-2 outline-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background active:cursor-grabbing ${
+        className={`absolute left-1/2 z-10 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rotate-45 cursor-grab rounded-sm border-2 outline-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background active:cursor-grabbing ${
           dragging === side ? "border-ns-accent bg-ns-accent" : "border-foreground bg-background"
         }`}
         style={{ top: `${frac * 100}%`, transition: handleTransition(side) }}
@@ -458,23 +595,23 @@ export function NomogramEdge({
   };
 
   return (
-    <div className={`w-full max-w-2xl rounded-md border border-border bg-background p-5 font-mono ${className}`}>
-      <div className="grid grid-cols-3 gap-2">
-        <div className="flex flex-col items-start gap-0.5">
-          <span className="text-[10px] uppercase tracking-[0.2em] text-ns-muted">{leftLabel}</span>
-          <span className="text-sm font-semibold tabular-nums text-foreground">{formatLeft(leftValue)}</span>
+    <div className={`w-full max-w-3xl rounded-md border border-border bg-background p-7 font-mono ${className}`}>
+      <div className="grid grid-cols-3 gap-3">
+        <div className="flex flex-col items-start gap-1">
+          <span className="text-[11px] uppercase tracking-[0.2em] text-ns-muted">{leftLabel}</span>
+          <span className="text-xl font-semibold tabular-nums text-foreground">{formatLeft(leftValue)}</span>
         </div>
-        <div className="flex flex-col items-center gap-0.5">
-          <span className="text-[10px] uppercase tracking-[0.2em] text-ns-muted">{middleLabel}</span>
-          <span className="text-sm font-semibold tabular-nums text-foreground">{formatResult(result)}</span>
+        <div className="flex flex-col items-center gap-1">
+          <span className="text-[11px] uppercase tracking-[0.2em] text-ns-muted">{middleLabel}</span>
+          <span className="text-2xl font-bold tabular-nums text-foreground">{formatResult(result)}</span>
         </div>
-        <div className="flex flex-col items-end gap-0.5">
-          <span className="text-[10px] uppercase tracking-[0.2em] text-ns-muted">{rightLabel}</span>
-          <span className="text-sm font-semibold tabular-nums text-foreground">{formatRight(rightValue)}</span>
+        <div className="flex flex-col items-end gap-1">
+          <span className="text-[11px] uppercase tracking-[0.2em] text-ns-muted">{rightLabel}</span>
+          <span className="text-xl font-semibold tabular-nums text-foreground">{formatRight(rightValue)}</span>
         </div>
       </div>
 
-      <div className="relative mt-4" style={{ height: TRACK_H }}>
+      <div className="relative mt-6" style={{ height: trackHeight }}>
         <svg
           aria-hidden
           className="pointer-events-none absolute inset-0 h-full w-full text-foreground"
@@ -484,7 +621,7 @@ export function NomogramEdge({
           <path
             d={pathD}
             stroke="currentColor"
-            strokeWidth={1.5}
+            strokeWidth={2.5}
             strokeLinecap="round"
             fill="none"
             vectorEffect="non-scaling-stroke"
@@ -499,13 +636,13 @@ export function NomogramEdge({
             {renderMidTicks()}
             <div
               aria-hidden
-              className="absolute left-1/2 flex items-center -translate-y-1/2"
-              style={{ top: `${fracMid * 100}%`, transition: reduced ? "none" : "top 320ms cubic-bezier(0.34,1.56,0.64,1)" }}
+              className="absolute left-1/2 z-20 flex items-center -translate-y-1/2"
+              style={{ top: `${renderFracMid * 100}%`, transition: crossingTransition }}
             >
-              <span className="-translate-x-1/2 select-none font-mono text-base font-semibold leading-none text-foreground">
+              <span className="-translate-x-1/2 select-none font-mono text-3xl font-semibold leading-none text-foreground">
                 {"╪"}
               </span>
-              <span className="ml-1 whitespace-nowrap rounded-sm border border-border bg-background px-1.5 py-0.5 font-mono text-[11px] font-semibold tabular-nums text-foreground">
+              <span className="ml-1.5 whitespace-nowrap rounded-sm border border-border bg-background px-2.5 py-1 font-mono text-sm font-bold tabular-nums text-foreground">
                 {formatResult(result)}
               </span>
             </div>
@@ -514,7 +651,7 @@ export function NomogramEdge({
         </div>
       </div>
 
-      <p className="mt-3 font-mono text-[10px] text-ns-muted">
+      <p className="mt-4 font-mono text-xs text-ns-muted">
         drag or arrow-key either handle · the straightedge crosses the middle scale at the answer
       </p>
       <p aria-live="polite" className="sr-only">
