@@ -101,7 +101,10 @@ const MAX_TRACKS = 6;
 const TRACK_GROW_MS = 900;
 const TRACK_HOLD_MS = 2600;
 const TRACK_REFOG_MS = 5200;
-const PATCH_PAD = 22;
+// Padding around the measured copy block that stays permanently clear of fog.
+// Kept tight: with the wide feather above, a large pad cleared essentially the
+// whole panel and left the veil visible only as a band along the bottom edge.
+const PATCH_PAD = 6;
 
 const CSS = `
 .ns-dew-drop{fill:none;stroke:var(--border);stroke-width:1;vector-effect:non-scaling-stroke;transition:cx 340ms ease-out,cy 340ms ease-out,r 340ms ease-out}
@@ -438,7 +441,14 @@ export function DewCoalesce({
         >
           <defs>
             <filter id={`${uid}-feather`} x="-60%" y="-60%" width="220%" height="220%">
-              <feGaussianBlur stdDeviation="3.5" />
+              {/*
+                Condensation has no straight edges. At stdDeviation 3.5 the
+                content patch resolved to a crisp horizontal boundary and the
+                veil survived only as a hard-edged grey band across the bottom
+                of the panel — it read as a broken gradient, not fogged glass.
+                A much wider feather turns the same hole into a soft vignette.
+              */}
+              <feGaussianBlur stdDeviation="16" />
             </filter>
             <mask id={`${uid}-mask`} maskContentUnits="userSpaceOnUse">
               <rect x={0} y={0} width={size.w} height={size.h} fill="white" />

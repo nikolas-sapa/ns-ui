@@ -195,7 +195,17 @@ export function BrineFloat({
           </path>
         </svg>
 
-        <div className="relative flex justify-center gap-5 overflow-x-auto px-1">
+        {/*
+          The vertical padding has to live on THIS element, not on the parent.
+          `overflow-x-auto` sets overflow-x to a non-visible value, and per the
+          CSS overflow spec that forces the computed overflow-y from `visible`
+          to `auto` — so this scroll container clips vertically too. The cards
+          are moved by transform (equilibrium -14..+26px, plus a +/-3px bob and
+          a +4px hover push), and the heaviest float was being sliced off at
+          the bottom edge: Starter's CTA rendered cut in half in both themes.
+          Padding on the parent cannot help, since the clip happens here.
+        */}
+        <div className="relative flex justify-center gap-5 overflow-x-auto px-1 pt-5 pb-10">
           {tiers.map((tier, i) => {
             const bob = BOB[i % BOB.length]!;
             const price = priceOf(tier);
