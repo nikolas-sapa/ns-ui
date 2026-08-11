@@ -90,6 +90,18 @@ function luminance([r, g, b]: RGB): number {
   return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
 }
 
+// Deterministic per-plate noise. The surface damage has to be STABLE across a
+// re-raster (resize, theme flip) or plate 03 would grow a different set of
+// scratches every time the window moved, and it has to differ per plate or six
+// plates of identical wear read as one plate shown six times.
+function rng(seed: number): () => number {
+  let s = (Math.imul(seed + 1, 2654435761) ^ 0x9e3779b9) >>> 0;
+  return () => {
+    s = (Math.imul(s, 1664525) + 1013904223) >>> 0;
+    return s / 4294967296;
+  };
+}
+
 interface Palette {
   bg: RGB;
   fg: RGB;
@@ -103,6 +115,10 @@ interface Palette {
   bay: RGB;
   /** the lit aperture band the gate reads the plate in */
   lamp: RGB;
+  /** the lighter of the two theme poles — every highlight mixes toward it */
+  hi: RGB;
+  /** the darker of the two theme poles — every shadow mixes toward it */
+  lo: RGB;
 }
 
 // A rigid plate in flight. y is signed px from the seat (negative = above the
@@ -192,6 +208,8 @@ export function MagazineDrop({
       plate: [240, 240, 240],
       bay: [246, 246, 246],
       lamp: [250, 250, 250],
+      hi: [255, 255, 255],
+      lo: [10, 10, 10],
     };
 
     const readColors = () => {
@@ -218,11 +236,27 @@ export function MagazineDrop({
       // the lamp aperture sits under it, and the bay is sunk below both. A
       // first pass had the aperture at the page value and the plate a hair
       // below it, which put the subject dimmer than its own background.
-      const plate = dark ? mixRGB(bg, border, 0.95) : bg;
-      const lamp = dark ? mixRGB(bg, border, 0.3) : mixRGB(bg, fg, 0.05);
-      const bay = dark ? mixRGB(bg, [0, 0, 0], 0.55) : mixRGB(bg, fg, 0.12);
-      pal = { bg, fg, muted, border, accent, dark, plate, bay, lamp };
+      // The two poles every highlight and shadow in the machine mixes toward.
+      // Shading has to be written once for both themes or it inverts: in light
+      // the page IS the highlight and the ink is the shadow, in dark it is the
+      // other way round.
+      const hi = dark ? fg : bg;
+      const lo = dark ? bg : fg;
+      // Range, not stops. The first pass put all three values inside the top
+      // 7% of the light scale (#ffffff / #f4f4f4 / #e9e9e9) and the frame read
+      // as washed paper: the machine has to own most of the tonal range, so the
+      // bay is sunk HALF WAY to --foreground in light and the plate carries the
+      // top of the scale on its own.
+      // The light plate is deliberately NOT the page white: a specular
+      // highlight mixes toward --background in light, so a plate already AT
+      // --background has no headroom for one and stays a flat sheet of paper.
+      // Sitting it 5% down leaves room for the lamp to actually catch it.
+      const plate = dark ? mixRGB(bg, fg, 0.26) : mixRGB(bg, fg, 0.055);
+      const lamp = dark ? mixRGB(bg, fg, 0.09) : mixRGB(bg, fg, 0.13);
+      const bay = dark ? mixRGB(bg, [0, 0, 0], 0.6) : mixRGB(bg, fg, 0.52);
+      pal = { bg, fg, muted, border, accent, dark, plate, bay, lamp, hi, lo };
       rasterizePlates();
+      rasterizeWheel();
     };
 
     // ---- procedural plates ----------------------------------------------
@@ -248,6 +282,15 @@ export function MagazineDrop({
       const ia = (a: number) => Math.min(1, a * A);
 
       c.fillStyle = css(sub);
+      c.fillRect(0, 0, w, h);
+      // The substrate is rolled stock, not paper: a diagonal ramp across the
+      // sheet before anything is cut into it, so the engraving lands on a
+      // surface that already has a light direction.
+      const base = c.createLinearGradient(0, 0, w, h);
+      base.addColorStop(0, css(pal.hi, pal.dark ? 0.1 : 0.55));
+      base.addColorStop(0.45, css(pal.hi, 0.02));
+      base.addColorStop(1, css(pal.lo, pal.dark ? 0.22 : 0.1));
+      c.fillStyle = base;
       c.fillRect(0, 0, w, h);
 
       c.save();
@@ -391,6 +434,54 @@ export function MagazineDrop({
       c.fillStyle = css(ink, ia(0.42));
       for (let k = 0; k < 5; k++) {
         c.fillRect(w - pad - k * 9 - 4, pad, 4, k === 0 ? 16 : 10);
+      }
+
+      // ---- surface -----------------------------------------------------
+      // Everything below is one-time: plates are engraved into an offscreen
+      // canvas on resize/theme only and blitted per frame, so the surface can
+      // carry as much material as it likes without costing a frame. This is
+      // where the plate stops being a diagram of a plate — the first pass was
+      // flat fill plus 1px strokes, which is what made the frame read thin.
+      const spec = c.createLinearGradient(0, h * 0.72, w * 0.6, -h * 0.12);
+      spec.addColorStop(0, css(pal.hi, 0));
+      spec.addColorStop(0.52, css(pal.hi, pal.dark ? 0.14 : 0.5));
+      spec.addColorStop(1, css(pal.hi, 0));
+      c.fillStyle = spec;
+      c.fillRect(0, 0, w, h);
+
+      // the sheet falls away from the lamp toward its own corners
+      const vig = c.createRadialGradient(
+        w * 0.44,
+        h * 0.4,
+        Math.min(w, h) * 0.1,
+        w * 0.5,
+        h * 0.5,
+        Math.hypot(w, h) * 0.6
+      );
+      vig.addColorStop(0, css(pal.lo, 0));
+      vig.addColorStop(0.6, css(pal.lo, pal.dark ? 0.16 : 0.1));
+      vig.addColorStop(1, css(pal.lo, pal.dark ? 0.5 : 0.34));
+      c.fillStyle = vig;
+      c.fillRect(0, 0, w, h);
+
+      // wear: seeded per plate so a re-raster (resize, theme flip) reproduces
+      // the SAME scratches, and six plates do not share one set of damage
+      const r = rng(i * 977 + 13);
+      const grains = Math.round((w * h) / 300);
+      for (let k = 0; k < grains; k++) {
+        c.fillStyle = css(r() < 0.5 ? pal.hi : pal.lo, 0.04 + r() * 0.07);
+        c.fillRect(r() * w, r() * h, 1, 1);
+      }
+      c.lineWidth = 1;
+      for (let k = 0; k < 11; k++) {
+        const x0 = r() * w;
+        const y0 = r() * h;
+        const len = w * (0.1 + r() * 0.45);
+        c.strokeStyle = css(r() < 0.65 ? pal.hi : pal.lo, 0.08 + r() * (pal.dark ? 0.12 : 0.4));
+        c.beginPath();
+        c.moveTo(x0, y0);
+        c.lineTo(x0 + len, y0 + (r() - 0.5) * 12);
+        c.stroke();
       }
 
       // plate edge: a bevel, not a border-radius. Light catches the top edge.
@@ -626,35 +717,52 @@ export function MagazineDrop({
       ctx.restore();
     };
 
-    const drawMagazine = () => {
+    const drawMagazine = (idle: number) => {
       const { w, h, cx, cy } = geom();
-      const slot = 13;
-      const top = cy - h / 2 - 30;
-      const bottom = cy + h / 2 + 30;
-      const frac = phase - Math.round(phase);
+      const slot = 15;
+      const top = cy - h / 2 - 26;
+      const bottom = cy + h / 2 + 26;
+      const frac = phase + idle - Math.round(phase);
       ctx.save();
-      // upcoming plates, seen edge-on in the drum; the whole stack slides down
-      // by the fractional drum phase, which is what makes a half-drag legible
-      for (let k = 1; k <= 6; k++) {
+      // Upcoming plates, seen edge-on in the drum. The whole stack slides by
+      // the fractional drum phase, which is what makes a half-drag legible as a
+      // mechanism under load. Each plate is a lit top face and a shadowed edge
+      // — a single grey bar per plate read as a stack of rules, which is the
+      // schematic problem in miniature.
+      for (let k = 1; k <= 8; k++) {
         const y = top - (k - frac) * slot;
         if (y < -slot) continue;
-        const t = 1 - (k - 1) / 6;
-        const ww = w * (0.995 - k * 0.012);
-        ctx.fillStyle = css(pal.dark ? mixRGB(pal.bg, pal.border, 0.7) : pal.plate, 0.35 + 0.55 * t);
-        ctx.fillRect(cx - ww / 2, y, ww, 6);
-        // the edge line under each plate is what makes the stack read as
-        // stacked rather than as one grey block; --border is too faint to do
-        // that job in light, so light uses --foreground at low alpha instead
-        ctx.fillStyle = css(pal.fg, pal.dark ? 0.5 : 0.3);
-        ctx.fillRect(cx - ww / 2, y + 6, ww, 1.5);
+        const t = 1 - (k - 1) / 8;
+        const ww = w * (0.995 - k * 0.009);
+        const x0 = cx - ww / 2;
+        // the stack is inside the drum, ABOVE the aperture: every plate up
+        // there is the same stock as the seated one seen out of the light, so
+        // it is mixed down toward the shadow pole and never competes with the
+        // plate actually being read
+        const face = ctx.createLinearGradient(x0, y, x0 + ww, y + 7);
+        face.addColorStop(0, css(mixRGB(pal.plate, pal.lo, 0.52 - 0.2 * t)));
+        face.addColorStop(0.45, css(mixRGB(pal.plate, pal.lo, 0.3 - 0.24 * t)));
+        face.addColorStop(1, css(mixRGB(pal.plate, pal.lo, 0.6 - 0.24 * t)));
+        ctx.fillStyle = face;
+        ctx.fillRect(x0, y, ww, 7);
+        // the shadow the plate above casts on the one under it, which is what
+        // makes the stack read as stacked rather than as one grey block
+        ctx.fillStyle = css(pal.lo, pal.dark ? 0.6 : 0.32);
+        ctx.fillRect(x0, y + 7, ww, 2);
+        ctx.fillStyle = css(pal.hi, (pal.dark ? 0.22 : 0.6) * t);
+        ctx.fillRect(x0, y, ww, 1);
       }
-      for (let k = 1; k <= 4; k++) {
+      // spent plates stacking up in the lower chute, out of the lamp
+      for (let k = 1; k <= 6; k++) {
         const y = bottom + (k - 1 + frac) * slot;
         if (y > cssH + slot) continue;
-        const t = 1 - (k - 1) / 4;
-        const ww = w * (0.995 - k * 0.014);
-        ctx.fillStyle = css(pal.dark ? mixRGB(pal.bg, pal.border, 0.5) : mixRGB(pal.plate, pal.border, 0.5), 0.22 + 0.4 * t);
-        ctx.fillRect(cx - ww / 2, y, ww, 5);
+        const t = 1 - (k - 1) / 6;
+        const ww = w * (0.995 - k * 0.011);
+        const x0 = cx - ww / 2;
+        ctx.fillStyle = css(mixRGB(pal.plate, pal.lo, 0.5 - 0.2 * t));
+        ctx.fillRect(x0, y, ww, 6);
+        ctx.fillStyle = css(pal.lo, pal.dark ? 0.5 : 0.26);
+        ctx.fillRect(x0, y + 6, ww, 2);
       }
       ctx.restore();
     };
@@ -705,15 +813,37 @@ export function MagazineDrop({
       // frame doing nothing.
       const apTop = cy - h / 2 - 10;
       const apH = h + 20;
+      const apBot = apTop + apH;
       // Painted as three bands rather than a full-frame fill plus the aperture
       // over it: the aperture covers most of the height, so the naive order
       // paid for the whole viewport twice every frame.
-      ctx.fillStyle = css(pal.bay);
+      //
+      // The two outer bands are the drum barrel and the chute, and they are
+      // CYLINDERS rather than backgrounds: each is a vertical ramp that turns
+      // away from the lamp at the far side of its own curve. A flat fill there
+      // is what left two thirds of the frame doing nothing.
+      const barrel = ctx.createLinearGradient(0, 0, 0, apTop);
+      barrel.addColorStop(0, css(mixRGB(pal.bay, pal.lo, 0.5)));
+      barrel.addColorStop(0.66, css(mixRGB(pal.bay, pal.hi, pal.dark ? 0.16 : 0.2)));
+      barrel.addColorStop(1, css(mixRGB(pal.bay, pal.lo, 0.28)));
+      ctx.fillStyle = barrel;
       ctx.fillRect(0, 0, cssW, apTop);
-      ctx.fillRect(0, apTop + apH, cssW, cssH - apTop - apH);
-      // the lamp aperture: a full-width lit band exactly as tall as the gate,
-      // flat (no gradient), so the seated plate reads as being ON the light
-      ctx.fillStyle = css(pal.lamp);
+
+      const chute = ctx.createLinearGradient(0, apBot, 0, cssH);
+      chute.addColorStop(0, css(mixRGB(pal.bay, pal.lo, 0.4)));
+      chute.addColorStop(0.45, css(mixRGB(pal.bay, pal.hi, pal.dark ? 0.1 : 0.12)));
+      chute.addColorStop(1, css(mixRGB(pal.bay, pal.lo, 0.62)));
+      ctx.fillStyle = chute;
+      ctx.fillRect(0, apBot, cssW, cssH - apBot);
+
+      // The lamp aperture: a full-width lit band exactly as tall as the gate.
+      // Not flat — the throw falls off toward the frame edges, which is what
+      // turns the wide margins from paint into lit space with the drive gear
+      // standing in it.
+      const throw_ = ctx.createRadialGradient(cx, cy, h * 0.18, cx, cy, Math.max(cssW, cssH) * 0.62);
+      throw_.addColorStop(0, css(pal.lamp));
+      throw_.addColorStop(1, css(mixRGB(pal.lamp, pal.lo, pal.dark ? 0.6 : 0.45)));
+      ctx.fillStyle = throw_;
       ctx.fillRect(0, apTop, cssW, apH);
       ctx.fillStyle = css(pal.border, pal.dark ? 0.85 : 1);
       ctx.fillRect(0, apTop, cssW, 1);
@@ -743,11 +873,234 @@ export function MagazineDrop({
       ctx.fillText("SEAT", 8, cy + h / 2 - 4);
     };
 
+    const TEETH = 44;
+    // The tooth tips stand proud of R, so the raster box is a little larger
+    // than the wheel or the crowns would be cut off by their own canvas.
+    const WHEEL_PAD = 1.07;
+
+    // The wheel is engraved once, exactly like a plate, and blitted rotated.
+    // Drawing it live cost 44 tooth paths, ~140 turned grooves, 9 bores and
+    // three gradients EVERY frame; as a raster it is one drawImage per side,
+    // which is what buys the surface enough detail to survive being looked at.
+    const paintWheel = (c: CanvasRenderingContext2D, R: number) => {
+      const body = c.createRadialGradient(-R * 0.35, -R * 0.45, R * 0.05, 0, 0, R * 1.05);
+      body.addColorStop(0, css(mixRGB(pal.bay, pal.hi, pal.dark ? 0.3 : 0.26)));
+      body.addColorStop(0.62, css(mixRGB(pal.bay, pal.hi, pal.dark ? 0.1 : 0.05)));
+      body.addColorStop(1, css(mixRGB(pal.bay, pal.lo, 0.4)));
+
+      // teeth first, under the body, so each one reads as rooted in the rim
+      c.fillStyle = body;
+      for (let t = 0; t < TEETH; t++) {
+        const a = (t / TEETH) * Math.PI * 2;
+        const half = (Math.PI / TEETH) * 0.42;
+        c.beginPath();
+        c.moveTo(Math.cos(a - half) * R, Math.sin(a - half) * R);
+        c.lineTo(Math.cos(a - half * 0.62) * R * 1.06, Math.sin(a - half * 0.62) * R * 1.06);
+        c.lineTo(Math.cos(a + half * 0.62) * R * 1.06, Math.sin(a + half * 0.62) * R * 1.06);
+        c.lineTo(Math.cos(a + half) * R, Math.sin(a + half) * R);
+        c.closePath();
+        c.fill();
+        // each crown catches the light on its leading flank
+        c.strokeStyle = css(pal.hi, pal.dark ? 0.16 : 0.5);
+        c.lineWidth = Math.max(1, R * 0.004);
+        c.beginPath();
+        c.moveTo(Math.cos(a - half) * R, Math.sin(a - half) * R);
+        c.lineTo(Math.cos(a - half * 0.62) * R * 1.06, Math.sin(a - half * 0.62) * R * 1.06);
+        c.stroke();
+      }
+      c.beginPath();
+      c.arc(0, 0, R, 0, Math.PI * 2);
+      c.fillStyle = body;
+      c.fill();
+
+      c.save();
+      c.beginPath();
+      c.arc(0, 0, R, 0, Math.PI * 2);
+      c.clip();
+
+      // The face is TURNED, not cast: it came off a lathe, so it carries
+      // concentric tool marks at the pitch of the feed. A flat disc with a
+      // gradient over it is exactly the "illustration of a gear" the whole
+      // density pass exists to get rid of — this is what the wide margins are
+      // actually made of when you look at them.
+      const rw = rng(31);
+      for (let r = R * 0.14, k = 0; r < R * 0.995; k++, r += 2.4 + rw() * 1.6) {
+        const heavy = k % 9 === 0;
+        c.strokeStyle = css(k % 2 === 0 ? pal.hi : pal.lo, (heavy ? 0.13 : 0.055) * (pal.dark ? 0.9 : 1.5));
+        c.lineWidth = heavy ? 1.8 : 1;
+        c.beginPath();
+        c.arc(0, 0, r, 0, Math.PI * 2);
+        c.stroke();
+      }
+
+      // six web ribs standing off the face, each lit on one flank and casting
+      // on the other — this is the read on rotation from the corner of the eye
+      for (let s = 0; s < 6; s++) {
+        const a = (s / 6) * Math.PI * 2;
+        const halfA = Math.PI / 22;
+        for (const [off, col, al] of [
+          [-halfA, pal.hi, pal.dark ? 0.08 : 0.13],
+          [halfA, pal.lo, pal.dark ? 0.3 : 0.2],
+        ] as const) {
+          // faded at both ends: a rib blends into the web where it is cast in,
+          // and a hard-ended full-length stroke read as a light streak laid
+          // across the wheel rather than as a rib standing off it
+          const g0 = c.createLinearGradient(
+            Math.cos(a + off) * R * 0.24,
+            Math.sin(a + off) * R * 0.24,
+            Math.cos(a + off) * R * 0.92,
+            Math.sin(a + off) * R * 0.92
+          );
+          g0.addColorStop(0, css(col, 0));
+          g0.addColorStop(0.4, css(col, al));
+          g0.addColorStop(1, css(col, 0));
+          c.strokeStyle = g0;
+          c.lineWidth = Math.max(2, R * 0.018);
+          c.beginPath();
+          c.moveTo(Math.cos(a + off) * R * 0.24, Math.sin(a + off) * R * 0.24);
+          c.lineTo(Math.cos(a + off) * R * 0.92, Math.sin(a + off) * R * 0.92);
+          c.stroke();
+        }
+      }
+
+      // lightening bores: the wheel is machined THROUGH, so each hole is a
+      // wall with a shadowed interior and a lit lower lip, not a white disc.
+      // Filling them with the aperture value put nine glaring dots in the
+      // light frame that competed with the plate for the eye.
+      for (let k = 0; k < 9; k++) {
+        const a = (k / 9) * Math.PI * 2 + Math.PI / 9;
+        const hx = Math.cos(a) * R * 0.64;
+        const hy = Math.sin(a) * R * 0.64;
+        const hr = R * 0.105;
+        const bore = c.createRadialGradient(hx - hr * 0.3, hy - hr * 0.45, hr * 0.05, hx, hy, hr);
+        // Sunk, but NOT the darkest value in the frame. In light a bore at
+        // half way to --foreground was the highest-contrast thing anywhere,
+        // and nine of them per wheel took the eye off the plate — the margins
+        // won the composition. The subject has to be read first.
+        bore.addColorStop(0, css(mixRGB(pal.bay, pal.lo, pal.dark ? 0.55 : 0.14)));
+        bore.addColorStop(1, css(mixRGB(pal.bay, pal.lo, pal.dark ? 0.78 : 0.34)));
+        c.fillStyle = bore;
+        c.beginPath();
+        c.arc(hx, hy, hr, 0, Math.PI * 2);
+        c.fill();
+        // the far wall of the bore, catching the lamp
+        c.strokeStyle = css(pal.hi, pal.dark ? 0.2 : 0.55);
+        c.lineWidth = Math.max(1.5, hr * 0.2);
+        c.beginPath();
+        c.arc(hx, hy, hr * 0.94, Math.PI * 0.1, Math.PI * 0.9);
+        c.stroke();
+        c.strokeStyle = css(pal.lo, pal.dark ? 0.5 : 0.24);
+        c.lineWidth = Math.max(1, hr * 0.12);
+        c.beginPath();
+        c.arc(hx, hy, hr, Math.PI * 1.08, Math.PI * 1.92);
+        c.stroke();
+      }
+
+      // hub boss, keyway and the web rib line
+      const boss = c.createRadialGradient(-R * 0.06, -R * 0.07, R * 0.01, 0, 0, R * 0.17);
+      boss.addColorStop(0, css(mixRGB(pal.bay, pal.hi, pal.dark ? 0.34 : 0.3)));
+      boss.addColorStop(1, css(mixRGB(pal.bay, pal.lo, 0.42)));
+      c.fillStyle = boss;
+      c.beginPath();
+      c.arc(0, 0, R * 0.17, 0, Math.PI * 2);
+      c.fill();
+      c.fillStyle = css(pal.lo, pal.dark ? 0.55 : 0.3);
+      c.fillRect(-R * 0.028, -R * 0.16, R * 0.056, R * 0.32);
+      c.strokeStyle = css(pal.hi, pal.dark ? 0.12 : 0.22);
+      c.lineWidth = 1.5;
+      c.beginPath();
+      c.arc(0, 0, R * 0.86, 0, Math.PI * 2);
+      c.stroke();
+
+      // cast/handling wear, seeded so it is the SAME damage after a resize or
+      // a theme flip rather than a fresh set of scratches every re-raster
+      const r2 = rng(101);
+      for (let k = 0; k < 900; k++) {
+        const a = r2() * Math.PI * 2;
+        const rr = R * (0.16 + r2() * 0.82);
+        c.fillStyle = css(r2() < 0.5 ? pal.hi : pal.lo, 0.05 + r2() * 0.09);
+        c.fillRect(Math.cos(a) * rr, Math.sin(a) * rr, 1.6, 1.6);
+      }
+      c.restore();
+    };
+
+    // The drum's drive, one sprocket on each end of the axle, standing in the
+    // lamp throw. This is what the wide margins are FOR: they were flat gutters
+    // with a ruler down them, and a ruler is a diagram of a machine rather than
+    // a machine. The sprockets are geared straight off the drum phase, so they
+    // turn under the finger during a drag, spin through a flick, and rock
+    // against the detent while the machine idles — the transport is legible
+    // from the edge of the frame even when nothing is falling.
+    let wheelCanvas: HTMLCanvasElement | null = null;
+    let wheelR = 0;
+    let wheelDpr = 0;
+
+    const wheelRadius = () => {
+      const { w } = geom();
+      const gutter = cssW * 0.5 - w / 2 - 20;
+      if (gutter < 56) return 0; // a narrow frame has no margin to put them in
+      return Math.max(gutter * 1.7, 120);
+    };
+
+    const rasterizeWheel = () => {
+      const R = wheelRadius();
+      if (R <= 0) {
+        wheelR = 0;
+        return;
+      }
+      const box = R * WHEEL_PAD;
+      const px = Math.round(box * 2 * dpr);
+      if (!wheelCanvas) wheelCanvas = document.createElement("canvas");
+      if (wheelCanvas.width !== px || wheelCanvas.height !== px) {
+        wheelCanvas.width = px;
+        wheelCanvas.height = px;
+      }
+      const c = wheelCanvas.getContext("2d");
+      if (!c) return;
+      c.setTransform(dpr, 0, 0, dpr, 0, 0);
+      c.clearRect(0, 0, box * 2, box * 2);
+      c.save();
+      c.translate(box, box);
+      paintWheel(c, R);
+      c.restore();
+      wheelR = R;
+      wheelDpr = dpr;
+    };
+
+    const drawDrive = (idle: number) => {
+      if (!wheelCanvas || wheelR <= 0) return;
+      const { w, cx, cy } = geom();
+      const gutter = cx - w / 2 - 20;
+      const R = wheelR;
+      const box = R * WHEEL_PAD;
+      const ang = ((phase + idle) * Math.PI * 2) / 12;
+      for (const side of [-1, 1] as const) {
+        // pushed most of the way off the frame: what shows is the near rim of
+        // a wheel much bigger than the gutter, not a cog floating in it — a
+        // whole wheel centred in the margin reads as an illustration of a gear
+        const px = side < 0 ? gutter - R * 0.78 : cssW - gutter + R * 0.78;
+        ctx.save();
+        ctx.translate(px, cy);
+        ctx.rotate(ang * side);
+        ctx.drawImage(wheelCanvas, -box, -box, box * 2, box * 2);
+        ctx.restore();
+      }
+    };
+
     const draw = () => {
       if (cssW < 2 || cssH < 2) return;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       drawBay();
-      drawMagazine();
+      // The drum never sits perfectly still: at rest it rocks a fraction of a
+      // notch against the detent spring it is being held by. Purely visual —
+      // it is added to the drive angle and the edge-on stack, never to `phase`,
+      // which is the transport's source of truth and would fire transitions.
+      const idle =
+        !dragging && !reducedMotion && !pausedRef.current && settled()
+          ? Math.sin(simTime * 1.1) * 0.16
+          : 0;
+      drawDrive(idle);
+      drawMagazine(idle);
       for (const b of spent) drawPlateBody(b, 0.55);
       drawGate();
       if (flying) drawPlateBody(flying, 1);
@@ -818,6 +1171,10 @@ export function MagazineDrop({
         plateH = g.h;
         rasterizePlates();
       }
+      // the wheel is keyed off the gutter, which moves with the plate: skip the
+      // re-engrave unless the radius or the ratio actually changed, or a resize
+      // drag would re-cut both wheels on every ResizeObserver callback
+      if (Math.abs(wheelRadius() - wheelR) > 0.5 || wheelDpr !== dpr) rasterizeWheel();
       draw();
     };
 
