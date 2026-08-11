@@ -66,18 +66,29 @@ attribute vec2 a_pos;
 void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }
 `;
 
-const TRAIL = 10;
+const TRAIL = 20;
 const LOBES = 4;
 
 // Pointer smoothing / wake sampling. The wake is a train of rings laid down
 // along the pointer's path; these govern how that path is sampled, and they
 // are the whole difference between a wake that flows and one that beads.
 //
-// The pointer position the sim sees is an exponential follower of the raw
+// The pointer position the sim sees is a LEAD-COMPENSATED follower of the raw
 // event position (POINTER_TAU), advanced in the rAF loop rather than in the
 // event handler — so the path is continuous at frame rate no matter what
 // cadence pointermove happens to fire at, and a 120Hz trackpad, a 60Hz mouse
 // and a synthetic driver all produce the same motion.
+//
+// Lead-compensated, not plain, and that distinction is the whole point: a
+// plain exponential follower has a steady-state error of exactly v*tau under
+// constant velocity, and because the wake is laid down at the FOLLOWED
+// position, that error is a lag the entire surface inherits. Smoothing the
+// path that way buys continuity by making the metal late — which is a worse
+// fault than the beading it was fixing, because the eye reads it as the
+// surface not responding. Extrapolating the target one tau ahead cancels the
+// term algebraically, so at constant velocity the head sits ON the cursor and
+// the smoothing is spent only where it belongs: on direction changes and on
+// interpolating between events that arrived sparser than frames.
 //
 // Samples are laid down by distance (SAMPLE_SPACING) with a time ceiling
 // (SAMPLE_MAX_GAP), and each ring's amplitude is proportional to the interval
@@ -85,11 +96,37 @@ const LOBES = 4;
 // is what lets the sampling rate change freely — denser sampling means more,
 // fainter rings, so the wake's integrated depth is a property of the pointer's
 // motion and not of the sampling cadence.
-const POINTER_TAU = 0.035;
-const SAMPLE_SPACING = 26;
-const SAMPLE_MAX_GAP = 0.05;
+//
+// These numbers are set by a latency measurement, not by taste. tau is now the
+// smoothing window only, not a lag, because the lead term above cancels the
+// v*tau error; 12ms is about one frame of absorption at 60Hz. VEL_TAU has to
+// outlive the gap between two pointer events or the velocity estimate — and
+// with it the compensation — collapses to zero on every frame that happened to
+// carry no event, which would put the lag back in as a flicker. LEAD_MAX caps
+// the extrapolation so a teleporting pointer (a tab switch, a warp across the
+// hero) cannot fling the head past the cursor. Likewise the spacing is a
+// cadence: a
+// sample is only deposited once the pointer has travelled SAMPLE_SPACING, so
+// at 26px and 700px/s the head of the wake only advanced every ~2.2 frames —
+// a 20Hz wake under a 60Hz page, which reads as lag even though nothing is
+// dropping frames. 13px deposits roughly per frame. TRAIL is doubled in step
+// so that SPACING*TRAIL — the length of the visible train — is unchanged at
+// 260px; the extra slots cost ~0.3ms/frame at 2160x1350, measured.
+//
+// SAMPLE_MAX_GAP is the one that actually binds at ordinary speeds, and it is
+// the reason the first pass at this only got halfway: 700px/s is 11.7px of
+// travel per 60Hz frame, under SAMPLE_SPACING, so the deposit is made by the
+// time ceiling rather than by the distance rule. At 33ms that ceiling is two
+// frames — a 30Hz wake head under a 60Hz page. One frame's worth means the
+// wake advances every frame at any speed a hand can produce, and the distance
+// rule takes over above ~800px/s where it should.
+const POINTER_TAU = 0.012;
+const VEL_TAU = 0.06;
+const LEAD_MAX = 24;
+const SAMPLE_SPACING = 13;
+const SAMPLE_MAX_GAP = 0.016;
 const SAMPLE_REF_DT = 0.055;
-const MAX_SUBSAMPLES = 3;
+const MAX_SUBSAMPLES = 5;
 
 const FRAG_SRC = `
 precision highp float;
@@ -547,6 +584,34 @@ export function WeldPool({
     let dpr = 1;
     let disposed = false;
     let lastMs = performance.now();
+    // Adaptive render scale, and it is insurance rather than the fix: measured
+    // on an Apple M3 this shader costs 1.1ms per frame at 2880x1800, ~7% of a
+    // 60Hz budget, so SCALES[0] is what every machine we can measure actually
+    // runs at. The steps exist for the ones we cannot — a weak integrated GPU,
+    // a 6K panel, a laptop throttling on battery. Frame cost is an EMA and a
+    // step only happens after a sustained stretch over budget, so one GC pause
+    // or a tab switch cannot cost quality.
+    //
+    // Every threshold here is in milliseconds of wall clock, never in frames.
+    // A frame-counted gate is backwards: the slower the machine, the longer it
+    // waits before helping — 90 frames is 1.5s at 60fps but 9s at 10fps, which
+    // is most of the time the visitor was going to give it.
+    //
+    // Recovery matters as much as the step down, because the frame time this
+    // watches is the PAGE's, not this component's: at 1.1ms of a 16.7ms budget
+    // the pool is almost never the thing that blew it. A sibling animation, an
+    // image decode or a layout storm would otherwise soften the metal for the
+    // rest of the visit and turn a stutter complaint into a blur complaint. So
+    // the surface climbs back the moment it is no longer missing budget, and
+    // the wait before it tries again doubles on each failure — a transient
+    // recovers in 8s, a genuinely slow machine stops probing within a minute.
+    const SCALES = [1, 0.75, 0.55];
+    const BUDGET_OVER = 24; // ms/frame that counts as missing the budget
+    let scaleIdx = 0;
+    let frameEma = 16.7;
+    let overMs = 0;
+    let underMs = 0;
+    let upWindow = 8000;
     // integrated, per-frame-clamped clock rather than (now - startedAt): a long
     // frame — a GC pause, the tab coming back, a resize — then advances the
     // flow by one clamped step instead of teleporting it, and time simply stops
@@ -566,6 +631,10 @@ export function WeldPool({
     let tgtY = 0;
     let ptrX = 0;
     let ptrY = 0;
+    let velX = 0;
+    let velY = 0;
+    let lastTgtX = 0;
+    let lastTgtY = 0;
     let sampleX = 0;
     let sampleY = 0;
     let lastSampleT = 0;
@@ -741,12 +810,39 @@ export function WeldPool({
     };
 
     const loop = (nowMs: number) => {
-      const dt = Math.min(0.05, Math.max(0, (nowMs - lastMs) / 1000));
+      const rawMs = nowMs - lastMs;
+      const dt = Math.min(0.05, Math.max(0, rawMs / 1000));
       lastMs = nowMs;
       simTime += dt * speed;
       hoverAmt += (hoverTarget - hoverAmt) * (1 - Math.exp(-dt * 8));
       stepPointer(dt);
       draw();
+      // clamped the same way the clock is, so a tab returning from the
+      // background cannot inject a one-second frame into the average, and
+      // time-constant rather than frame-count smoothing so the average settles
+      // in ~120ms of wall clock whatever the frame rate is
+      const clamped = Math.min(50, rawMs);
+      frameEma += (clamped - frameEma) * (1 - Math.exp(-clamped / 120));
+      if (frameEma > BUDGET_OVER) {
+        overMs += clamped;
+        underMs = 0;
+      } else {
+        underMs += clamped;
+        overMs = 0;
+      }
+      // asymmetric on purpose: drop after ~0.9s of stutter, climb back only
+      // after a much longer clean stretch, so a marginal surface cannot
+      // oscillate between two resolutions
+      const down = overMs > 900 && scaleIdx < SCALES.length - 1;
+      const up = underMs > upWindow && scaleIdx > 0;
+      if (down || up) {
+        scaleIdx += down ? 1 : -1;
+        if (down) upWindow = Math.min(64000, upWindow * 2);
+        overMs = 0;
+        underMs = 0;
+        frameEma = 16.7;
+        applyBacking();
+      }
       raf = requestAnimationFrame(loop);
     };
     const wake = () => {
@@ -763,7 +859,25 @@ export function WeldPool({
     // DPR is capped at 1.5 rather than the usual 2: this shader is full-bleed
     // and its per-pixel cost is three evaluations of a warped fbm field, so
     // the area term dominates. 1.5 keeps a 1440x900 hero comfortably at frame
-    // rate without a visible loss of specular detail.
+    // rate without a visible loss of specular detail. Resizing the backing
+    // store is separated from the layout read so the adaptive step can change
+    // resolution without re-rasterizing the headline or forcing a layout.
+    const applyBacking = () => {
+      if (cssW < 2 || cssH < 2) return;
+      dpr = Math.min(window.devicePixelRatio || 1, 1.5) * SCALES[scaleIdx];
+      const pw = Math.round(cssW * dpr);
+      const ph = Math.round(cssH * dpr);
+      // assigning width/height clears the drawing buffer even when the value
+      // is unchanged, so only touch it on a real change
+      if (canvas.width !== pw || canvas.height !== ph) {
+        canvas.width = pw;
+        canvas.height = ph;
+      }
+      canvas.style.width = `${cssW}px`;
+      canvas.style.height = `${cssH}px`;
+      draw();
+    };
+
     const resize = () => {
       const rect = wrap.getBoundingClientRect();
       if (rect.width < 2 || rect.height < 2) return;
@@ -773,11 +887,14 @@ export function WeldPool({
       rectLeft = rect.left;
       rectTop = rect.top;
       rectDirty = false;
-      dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-      canvas.width = Math.round(cssW * dpr);
-      canvas.height = Math.round(cssH * dpr);
-      canvas.style.width = `${cssW}px`;
-      canvas.style.height = `${cssH}px`;
+      // a new size is a new cost, so the adaptive ladder starts over rather
+      // than carrying a verdict earned at a different number of fragments
+      scaleIdx = 0;
+      overMs = 0;
+      underMs = 0;
+      upWindow = 8000;
+      frameEma = 16.7;
+      applyBacking();
       if (changed) rasterizeText();
       draw();
     };
@@ -809,10 +926,25 @@ export function WeldPool({
     // surface, and a fast flick lays an evenly spaced train instead of two
     // beads at wherever the two events happened to land.
     const stepPointer = (dt: number) => {
-      if (!havePointer) return;
+      if (!havePointer || dt <= 0) return;
+      // velocity of the raw target, smoothed over a window longer than the gap
+      // between two events so it survives a frame that carried none
+      const vk = 1 - Math.exp(-dt / VEL_TAU);
+      velX += ((tgtX - lastTgtX) / dt - velX) * vk;
+      velY += ((tgtY - lastTgtY) / dt - velY) * vk;
+      lastTgtX = tgtX;
+      lastTgtY = tgtY;
+
+      let leadX = velX * POINTER_TAU;
+      let leadY = velY * POINTER_TAU;
+      const lead = Math.hypot(leadX, leadY);
+      if (lead > LEAD_MAX) {
+        leadX = (leadX / lead) * LEAD_MAX;
+        leadY = (leadY / lead) * LEAD_MAX;
+      }
       const k = 1 - Math.exp(-dt / POINTER_TAU);
-      ptrX += (tgtX - ptrX) * k;
-      ptrY += (tgtY - ptrY) * k;
+      ptrX += (tgtX + leadX - ptrX) * k;
+      ptrY += (tgtY + leadY - ptrY) * k;
 
       const dx = ptrX - sampleX;
       const dy = ptrY - sampleY;
@@ -861,6 +993,12 @@ export function WeldPool({
     const snapPointer = () => {
       ptrX = tgtX;
       ptrY = tgtY;
+      // a teleport carries no velocity, and a stale estimate would extrapolate
+      // the head off along whatever direction the pointer had before it left
+      velX = 0;
+      velY = 0;
+      lastTgtX = tgtX;
+      lastTgtY = tgtY;
       sampleX = tgtX;
       sampleY = tgtY;
       lastSampleT = simTime;
