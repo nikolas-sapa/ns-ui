@@ -102,8 +102,30 @@ const NOTCH_SIDES = [0, 1, 0] as const; // 0 = bay on the left, 1 = on the right
 // longer would print its crest off the water it belongs to. Rows, not fixed
 // heights: the panels have to grow with the price clamp and with wrapping at
 // narrow widths rather than clip.
-const HEAD_H = "row-start-1";
-const FOOT_H = "row-start-3";
+const HEAD_ROW = "row-start-1";
+const FOOT_ROW = "row-start-3";
+
+// The reservoir row's floor. Without it the middle row is minmax(0,1fr) and
+// the head and foot — which grow at sm:, where the tagline, the feature list
+// and the wider gaps all switch on — eat the whole band: measured 0px at
+// 1024x640 and 1280x600, 71px at 640x900. The mechanism silently vanished
+// while the cards still read as a pricing table.
+// The section cannot grow to pay for the floor: the frame this renders in is
+// h-screen + overflow-hidden, so height is a hard budget and anything the
+// floor takes has to come out of the head and the foot. The floor is
+// therefore sized against the tightest cell measured (640x620, where the
+// compact panels already want ~556 of 620) — 10vh, bounded — and the panels
+// give up their prose before it binds. Guaranteed range: height >= 600.
+const BAND_MIN = "clamp(3.5rem,10vh,7rem)";
+
+// The other half of the same trade. The tagline and the feature list are the
+// two blocks of prose that switch on with width, and they are what the head
+// and the foot grow by, and on a short viewport they are what the reservoir
+// can least afford. So they need width AND height to appear: below 760px tall
+// the panels stay in their compact form and the band keeps its floor inside
+// the viewport rather than pushing the foot past the bottom edge of a frame
+// that cannot scroll.
+const PROSE_ONLY = "hidden sm:[@media(min-height:760px)]:block";
 
 const FRAG_SRC = `
 precision highp float;
@@ -999,9 +1021,9 @@ export function WeirCrest({
         </div>
 
         {/* --- body: rail + three dams ------------------------------------- */}
-        {/* The body takes the height that is left, but never less than its own
-            content: at a short viewport the reservoir band closes to nothing
-            and the section grows rather than shearing the foot panels. */}
+        {/* The body takes the height that is left. The reservoir band keeps a
+            floor out of that budget (BAND_MIN) and the head and foot panels
+            drop their prose rather than squeeze it out. */}
         <div className="relative flex flex-1 gap-3 sm:gap-5">
           {/* the level rail: this slider IS the water surface */}
           <div className="flex w-16 shrink-0 flex-col sm:w-24">
@@ -1054,7 +1076,10 @@ export function WeirCrest({
           </div>
 
           {/* three plans, three crests */}
-          <div className="grid min-h-0 flex-1 grid-cols-3 grid-rows-[auto_minmax(0,1fr)_auto] gap-3 sm:gap-5">
+          <div
+            className="grid min-h-0 flex-1 grid-cols-3 gap-3 sm:gap-5"
+            style={{ gridTemplateRows: `auto minmax(${BAND_MIN},1fr) auto` }}
+          >
             {priced.map((row, i) => {
               const best = i === bestIndex;
               const spilling = usage > row.plan.included;
@@ -1068,7 +1093,7 @@ export function WeirCrest({
                   className="relative row-span-3 grid min-h-0 grid-rows-subgrid gap-3 sm:gap-5"
                 >
                   <div
-                    className={`overflow-hidden rounded-md bg-background/78 p-3 backdrop-blur-md sm:p-4 ${HEAD_H}`}
+                    className={`overflow-hidden rounded-md bg-background/78 p-3 backdrop-blur-md sm:p-4 ${HEAD_ROW}`}
                   >
                     <div className="flex items-baseline justify-between gap-2">
                       <h3 className="text-base font-medium tracking-tight text-foreground sm:text-lg">
@@ -1080,7 +1105,7 @@ export function WeirCrest({
                         </span>
                       ) : null}
                     </div>
-                    <p className="mt-1 hidden text-xs leading-snug text-ns-muted sm:block">
+                    <p className={`mt-1 text-xs leading-snug text-ns-muted ${PROSE_ONLY}`}>
                       {row.plan.tagline}
                     </p>
                     <p className="mt-3 font-mono text-[clamp(1.5rem,3.4vw,2.6rem)] leading-none tracking-tight text-foreground tabular-nums">
@@ -1118,9 +1143,9 @@ export function WeirCrest({
                   </div>
 
                   <div
-                    className={`overflow-hidden rounded-md bg-background/78 p-3 backdrop-blur-md sm:p-4 ${FOOT_H}`}
+                    className={`overflow-hidden rounded-md bg-background/78 p-3 backdrop-blur-md sm:p-4 ${FOOT_ROW}`}
                   >
-                    <ul className="hidden space-y-1 text-xs text-ns-muted sm:block">
+                    <ul className={`space-y-1 text-xs text-ns-muted ${PROSE_ONLY}`}>
                       {row.plan.features.map((f) => (
                         <li key={f} className="flex gap-2">
                           <span aria-hidden="true" className="mt-[7px] h-px w-2.5 shrink-0 bg-border" />
