@@ -51,8 +51,8 @@ import { useEffect, useId, useRef } from "react";
 // column of air, light is the same layer photographed as ink on paper, where
 // the dense sheet is the darkest thing on screen. Light is the harder case —
 // pale strata over a pale ground wash out — so its stops are spaced apart
-// separately rather than derived from dark's. --ns-accent is interaction-only:
-// it tints the pointer's own vortices, and it decays to exactly zero.
+// separately rather than derived from dark's. The pointer's own vortices lift
+// the sheet toward the brightest stop, in luminance only, and decay to zero.
 // ---------------------------------------------------------------------------
 
 export interface ShearBillowProps {
@@ -128,7 +128,6 @@ uniform vec3 u_c1;
 uniform vec3 u_c2;
 uniform vec3 u_c3;
 uniform vec3 u_c4;
-uniform vec3 u_accent;
 uniform float u_dark;
 
 float hash21(vec2 p) {
@@ -336,8 +335,10 @@ void main() {
   vec3 col = ramp(sigma);
 
   // ---- pointer ----------------------------------------------------------
-  // accent only where a live pointer vortex is, and it reaches zero when the
-  // last one decays, so a resting frame carries no accent at all
+  // a live pointer vortex lifts the sheet toward the brightest stop, and it
+  // reaches zero when the last one decays, so a resting frame carries no
+  // highlight at all — luminance only, never hue: --ns-accent is reserved
+  // for real interactive chrome, not a resting fluid layer
   if (u_stir > 0.0) {
     float near = 0.0;
     for (int i = 0; i < VORT; i++) {
@@ -349,8 +350,7 @@ void main() {
       near += exp(-r2 * 0.85) * exp(-age * 1.4);
     }
     near = clamp(near, 0.0, 1.0);
-    vec3 tint = mix(u_accent, mix(u_c4, u_accent, 0.5), sheet);
-    col = mix(col, tint, near * 0.34 * (0.30 + 0.70 * sheet));
+    col = clamp(col + vec3(near * 0.34 * (0.30 + 0.70 * sheet)), 0.0, 1.0);
   }
 
   // mild elliptical vignette toward the deepest stop so the frame edges stop
@@ -599,7 +599,6 @@ export function ShearBillow({
     let c2: RGB = [0.34, 0.34, 0.34];
     let c3: RGB = [0.7, 0.7, 0.7];
     let c4: RGB = [1, 1, 1];
-    let accent: RGB = [0, 0.42, 1];
     let darkMode = 1;
 
     // Two ramps, written separately rather than derived from one with a bias
@@ -614,7 +613,6 @@ export function ShearBillow({
       const fg = parseHex(cs.getPropertyValue("--foreground")) ?? [0.09, 0.09, 0.09];
       const muted = parseHex(cs.getPropertyValue("--ns-muted")) ?? [0.55, 0.55, 0.55];
       const border = parseHex(cs.getPropertyValue("--border")) ?? [0.18, 0.18, 0.18];
-      accent = parseHex(cs.getPropertyValue("--ns-accent")) ?? [0, 0.42, 1];
       const black: RGB = [0, 0, 0];
       const white: RGB = [1, 1, 1];
       if (luminance(bg) < 0.5) {
@@ -684,7 +682,6 @@ export function ShearBillow({
       surface.v3("u_c2", c2);
       surface.v3("u_c3", c3);
       surface.v3("u_c4", c4);
-      surface.v3("u_accent", accent);
       surface.f("u_dark", darkMode);
       surface.draw(canvas.width, canvas.height);
     };
