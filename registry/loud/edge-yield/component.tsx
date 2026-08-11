@@ -24,8 +24,8 @@ import { useEffect, useId, useRef } from "react";
 //                        electrons reach an Everhart-Thornley detector sitting
 //                        off to one upper-left corner. Facets turned away from
 //                        it are dim; anything with a grain between it and the
-//                        detector is in a deep, hard shadow, found by a five-
-//                        step horizon march reaching ~1.7 grain radii.
+//                        detector is in a deep, hard shadow, found by a three-
+//                        step horizon march reaching ~2 grain radii.
 //
 // Everything is in focus at once because nothing here has a lens — that
 // extreme depth of field is a property of the technique, not a choice.
@@ -132,6 +132,10 @@ const vec3 DET = vec3(-0.593, -0.526, 0.610);
 // of t moves length(DET.xy) horizontally, this is DET.z, not tan(elevation)
 const float DET_RISE = 0.610;
 
+// Ceiling, in css px, on how far the stage's motion may shear the picture
+// across the sweep line. See the note at the shear itself in main().
+const float SHEAR_MAX = 0.8;
+
 float hash21(vec2 p) {
   p = fract(p * vec2(287.13, 419.71));
   p += dot(p, p + 27.31);
@@ -229,65 +233,74 @@ float smaxH(float a, float b, float k) {
 }
 
 // ---------------------------------------------------------------------------
-// Grains. A jittered lattice of ellipsoid caps, h = A*(1 - |d|^2/r^2)^prof.
-// prof = 0.5 is an exact spheroid; slightly above it rounds the last pixel of
-// the silhouette without touching the broad slope ramp that carries the rim
-// read, which is what keeps the hottest pixel from aliasing into sparkle.
+// Grains. A jittered lattice of ellipsoid caps, h = A*sqrt(1 - |d|^2/r^2) — the
+// exact spheroid, and deliberately sqrt rather than a tunable pow(t, prof): a
+// general exponent costs TWO pow() per cell (the height and the derivative's
+// t^(prof-1)) and there are up to 45 cells per fragment across the five layers
+// plus the horizon march. The silhouette's last pixel is kept off the aliasing
+// edge by the tc floor and the smax crease instead.
 //
 // Because q = u*S, the S in the height and the S in dq/du cancel: the gradient
 // is scale-free, which is correct — a sphere has the same slopes however small
 // it is drawn — and it means every layer shares one closed form.
 // ---------------------------------------------------------------------------
 vec3 grains(vec2 u, float S, mat2 warp, mat2 warpT, float seed, float rmin,
-            float rspan, float elong, float prof, float jit, out float matId) {
+            float rspan, float elong, float jit, out float matId) {
   vec2 q = warp * u * S;
   vec2 ip = floor(q);
   vec2 f = fract(q);
-  vec3 best = vec3(0.0);
+  // The loop carries a SCORE, not a height. h = elong*r*sqrt(tc)/S is monotonic
+  // in r*r*tc, so the winner is found without a sqrt per cell, and the
+  // gradient's reciprocal and the warp transpose are paid once instead of nine
+  // times. What that buys is not the arithmetic — it is that the nine live
+  // vec3s collapse to four floats. This shader was register-spilling, and the
+  // measured cost of the specimen was a cliff rather than a slope.
+  float bs = 0.0;
+  vec2 bd = vec2(0.0);
   matId = 0.5;
   for (int y = -1; y <= 1; y++) {
     for (int x = -1; x <= 1; x++) {
       vec2 g = vec2(float(x), float(y));
       vec2 o = hash22(ip + g + seed);
-      vec2 c = g + 0.5 + (o - 0.5) * jit;
       float r = rmin + rspan * fract(o.x * 7.13 + o.y * 3.71);
-      vec2 d = f - c;
+      vec2 d = f - (g + 0.5 + (o - 0.5) * jit);
       float t = 1.0 - dot(d, d) / (r * r);
       if (t > 0.0) {
-        float tc = max(t, 0.0008);
-        float h = elong * r * pow(tc, prof) / S;
-        if (h > best.x) {
-          // dh/dq = -2*elong*prof*t^(prof-1)*d/(r*S), and dq/du = S*warp, so
-          // the two S cancel and what is left is the warp's TRANSPOSE — a
-          // sphere has the same slopes however small it is drawn
-          vec2 gr = (-2.0 * elong * prof * pow(tc, prof - 1.0) / r) * d;
-          best = vec3(h, warpT * gr);
+        float sc = r * r * max(t, 0.0008);
+        if (sc > bs) {
+          bs = sc;
+          bd = d;
           matId = o.y;
         }
       }
     }
   }
-  return best;
+  if (bs <= 0.0) return vec3(0.0);
+  // s = r*sqrt(tc), so the height is elong*s/S and inversesqrt(tc)/r is 1/s:
+  // dh/dq = -elong*d/s, and dq/du = S*warp, so the two S cancel and what is
+  // left is the warp's TRANSPOSE — a sphere has the same slopes however small
+  // it is drawn
+  float s = sqrt(bs);
+  return vec3(elong * s / S, warpT * ((-elong / s) * bd));
 }
 
 float grainsH(vec2 u, float S, mat2 warp, float seed, float rmin, float rspan,
-              float elong, float prof, float jit) {
+              float elong, float jit) {
   vec2 q = warp * u * S;
   vec2 ip = floor(q);
   vec2 f = fract(q);
-  float best = 0.0;
+  float bs = 0.0;
   for (int y = -1; y <= 1; y++) {
     for (int x = -1; x <= 1; x++) {
       vec2 g = vec2(float(x), float(y));
       vec2 o = hash22(ip + g + seed);
-      vec2 c = g + 0.5 + (o - 0.5) * jit;
       float r = rmin + rspan * fract(o.x * 7.13 + o.y * 3.71);
-      vec2 d = f - c;
+      vec2 d = f - (g + 0.5 + (o - 0.5) * jit);
       float t = 1.0 - dot(d, d) / (r * r);
-      if (t > 0.0) best = max(best, elong * r * pow(max(t, 0.0008), prof) / S);
+      if (t > 0.0) bs = max(bs, r * r * max(t, 0.0008));
     }
   }
-  return best;
+  return elong * sqrt(bs) / S;
 }
 
 // Filaments draped across the specimen: a warped ridge train. The warp comes
@@ -325,43 +338,56 @@ const mat2 IDENT = mat2(1.0, 0.0, 0.0, 1.0);
 const mat2 ROD = mat2(0.918, 0.397, -0.834, 1.928);
 const mat2 ROD_T = mat2(0.918, -0.834, 0.397, 1.928);
 
-void specimen(vec2 u, float dens, out vec2 grad, out float matId, out float coarse) {
+void specimen(vec2 u, float dens, out vec2 grad, out float matId, out float marchH) {
   float k = u_px * 2.6;
   float m1;
   float m2;
 
   vec3 h = fbmd(u, 2.9, 0.026);
+  // a sparse population of much larger bodies. Without it every grain is the
+  // same size and the field reads as a manufactured lattice — packed roe rather
+  // than a specimen. r stays well under half a cell, so most cells are empty and
+  // the big ones arrive at an irregular spacing the eye cannot pre-empt.
+  float m0;
+  h = smaxG(h, grains(u, 4.2 * dens, IDENT, IDENT, 137.0,
+                      0.15, 0.19, 0.86, 0.95, m0), k);
   h = smaxG(h, fibre(u, FIB_A, 5.6 * dens, 0.0125, 0.55, 3.1), k);
   h = smaxG(h, fibre(u, FIB_B, 8.3 * dens, 0.0085, 0.42, 17.7), k);
-  h = smaxG(h, grains(u, 10.5 * dens, IDENT, IDENT, 5.0,
-                      0.30, 0.20, 0.80, 0.575, 0.72, m1), k);
+  vec3 g1 = grains(u, 10.5 * dens, IDENT, IDENT, 5.0,
+                   0.30, 0.20, 0.80, 0.72, m1);
+  // the march's reference height, captured here for free: it must be THIS
+  // layer's raw height, because this layer is the only thing the march samples
+  marchH = g1.x;
+  h = smaxG(h, g1, k);
   h = smaxG(h, grains(u, 24.0 * dens, ROD, ROD_T, 41.0,
-                      0.26, 0.26, 0.90, 0.560, 0.80, m2), k);
-  coarse = h.x;
-  matId = mix(m1, m2, 0.4);
+                      0.26, 0.26, 0.90, 0.80, m2), k);
+  // the big bodies get their own atomic number too, so a boulder is not forced
+  // to the same brightness as the small grains it is sitting among
+  matId = mix(mix(m1, m2, 0.4), m0, 0.35);
 
   // debris and micro-relief sit ON whatever surface won, so they are summed
   // rather than unioned — a fleck of dust on top of a grain is above it, and a
   // union would hide every small thing behind every large one
   float m3;
   h += grains(u, 58.0 * dens, IDENT, IDENT, 91.0,
-              0.20, 0.22, 0.85, 0.58, 0.88, m3) * 0.85;
+              0.20, 0.22, 0.85, 0.88, m3) * 0.85;
   h += fbmd(u, 21.0, 0.0042);
   h += fbmd(u, 96.0, 0.0016);
 
   grad = h.yz;
 }
 
-float specimenH(vec2 u, float dens, float lod) {
-  float k = u_px * 2.6;
-  float h = fbmOnly(u, 2.9, 0.026);
-  h = smaxH(h, fibreH(u, FIB_A, 5.6 * dens, 0.0125, 0.55, 3.1), k);
-  h = smaxH(h, grainsH(u, 10.5 * dens, IDENT, 5.0, 0.30, 0.20, 0.80, 0.575, 0.72), k);
-  if (lod > 0.5) {
-    h = smaxH(h, fibreH(u, FIB_B, 8.3 * dens, 0.0085, 0.42, 17.7), k);
-    h = smaxH(h, grainsH(u, 24.0 * dens, ROD, 41.0, 0.26, 0.26, 0.90, 0.560, 0.80), k);
-  }
-  return h;
+// What the march samples: the round-grain population and NOTHING else.
+//
+// Cost here is a cliff, not a slope — this shader lives near the edge of its
+// register budget, and adding a second lattice layer plus the substrate fbm to
+// the march once took it from ~15ms to 50-75ms, a 2.3x increase in work for a
+// 3.5x increase in time. So the march gets exactly one layer, and h0 is
+// that SAME layer's raw height at u (captured in specimen() for free) rather
+// than the full surface: comparing a full-surface h0 against a one-layer sample
+// biases every comparison and the frame loses its shadows altogether.
+float specimenH(vec2 u, float dens) {
+  return grainsH(u, 10.5 * dens, IDENT, 5.0, 0.30, 0.20, 0.80, 0.72);
 }
 
 // Horizon march toward the detector. The reach matters more than the step
@@ -370,12 +396,12 @@ float specimenH(vec2 u, float dens, float lod) {
 // heightfield, the exact generic read this is trying not to be.
 float collect(vec2 u, float h0, float dens) {
   float s = 1.0;
-  float t = u_px * 3.0;
-  for (int i = 0; i < 5; i++) {
-    float hs = specimenH(u + DET.xy * t, dens, i < 2 ? 1.0 : 0.0);
+  float t = u_px * 4.0;
+  for (int i = 0; i < 3; i++) {
+    float hs = specimenH(u + DET.xy * t, dens);
     float over = hs - (h0 + t * DET_RISE);
     s = min(s, 1.0 - clamp(over / (u_px * 5.0 + t * 0.30), 0.0, 1.0));
-    t *= 2.20;
+    t *= 4.2;
   }
   return s;
 }
@@ -412,12 +438,23 @@ void main() {
   vec2 cu = (sp - u_size * 0.5) * u_px;
   float cs = cos(u_rot);
   float sn = sin(u_rot);
-  vec2 u = mat2(cs, sn, -sn, cs) * cu + u_stage - u_lagVel * lag;
+  // The shear this lag buys has to stay SUB-PIXEL. Left unbounded it is
+  // |u_lagVel| * SWEEP_PERIOD / u_px css px: about 6px on the drift alone, and
+  // up to ~75px while the hand is panning, since the pan velocity is folded
+  // into u_lagVel. At that size the sweep line stops reading as a scan and
+  // reads as a tear — the specimen above it is a different picture from the
+  // one below, which is the one thing a continuous surface must never do.
+  // Saturating instead of clamping keeps it exactly linear in the slow regime
+  // that is honest, and asymptotic to SHEAR_MAX css px at any speed.
+  vec2 sh = u_lagVel * lag;
+  float shm = SHEAR_MAX * u_px;
+  sh *= shm / (length(sh) + shm);
+  vec2 u = mat2(cs, sn, -sn, cs) * cu + u_stage - sh;
 
   vec2 grad;
   float matId;
-  float coarse;
-  specimen(u, dens, grad, matId, coarse);
+  float marchH;
+  specimen(u, dens, grad, matId, marchH);
 
   float gm = length(grad);
   if (gm > 12.0) grad *= 12.0 / gm;
@@ -431,7 +468,7 @@ void main() {
   // atomic-number contrast: different grains are different stuff
   delta *= 0.86 + 0.30 * matId;
 
-  float shadow = collect(u, coarse, dens);
+  float shadow = collect(u, marchH, dens);
   float facing = max(dot(n, DET), 0.0);
   float eta = 0.30 + 0.70 * facing * shadow;
   // a small isotropic pedestal: electrons that scatter off the chamber wall and
@@ -476,9 +513,16 @@ void main() {
   sig += shot * 0.115 * u_noise * (0.35 + 0.65 * sqrt(max(sig, 0.0))) * mix(1.0, 0.28, spot);
 
   // the sweep line itself: the beam is on it right now
+  // its amplitude is the whole question. At 0.22 it was a saturated rule right
+  // across the frame — measured at +76/255 over the surrounding rows, five
+  // times the brightest ordinary grain row, which is not what a beam passing
+  // over a line looks like. Kept just clear of the shot noise so it reads as
+  // the pass going by, and rolled off where the signal is already high so it
+  // cannot blow a rim out.
   float sweepD = abs(yf - u_sweep);
-  sig += 0.22 * exp(-sweepD * sweepD * 26000.0);
-  sig += 0.05 * exp(-sweepD * sweepD * 700.0);
+  float onLine = 0.040 * exp(-sweepD * sweepD * 26000.0)
+               + 0.016 * exp(-sweepD * sweepD * 700.0);
+  sig += onLine * (1.0 - 0.55 * clamp(sig, 0.0, 1.0));
 
   float L = clamp((sig - 0.5) * u_contrast + 0.5 + u_bias, 0.0, 1.0);
   gl_FragColor = vec4(ramp(L), 1.0);
@@ -886,11 +930,14 @@ export function EdgeYield({
       running = false;
     };
 
-    // DPR is capped at 2, not the 1.5 a cheaper full-bleed shader could get away
-    // with: shot noise, the scan comb and the rim band are all high-frequency
-    // structure, and a reduced backing store destroys exactly those first. The
-    // cost is paid back by the analytic gradient — one field evaluation for the
-    // normal instead of three — and bounded by the adaptive ladder above.
+    // Full DPR 2. The high-frequency structure — shot noise, the scan comb, the
+    // rim band — is what a reduced backing store destroys first, so anything
+    // under 2 is the first thing this component gives away and the last thing
+    // it should. It was capped at 1.5 for a while because the shader could not
+    // hold 60fps at 2880x1800; that was a register-spill in the grain lattice,
+    // not a fill-rate wall, and fixing it left the frame at ~2.8ms with the
+    // ladder resting on its top rung. The ladder stays as insurance for
+    // machines slower than this one, not as the thing that buys the frame rate.
     const applyBacking = () => {
       if (cssW < 2 || cssH < 2) return;
       dpr = Math.min(window.devicePixelRatio || 1, 2) * SCALES[scaleIdx];
