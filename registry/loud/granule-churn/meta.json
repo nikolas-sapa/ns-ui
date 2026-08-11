@@ -1,0 +1,25 @@
+{
+  "name": "granule-churn",
+  "title": "Granule Churn",
+  "description": "A full-bleed stellar photosphere: bright convection cells packed edge to edge, born, swelling against their neighbours, splitting and dying, with the cooled material draining back down the dark intergranular lanes between them and bright flecks flaring in the strongest downdrafts.",
+  "collection": "loud",
+  "tags": [
+    "background",
+    "hero",
+    "canvas",
+    "webgl",
+    "shader",
+    "convection",
+    "cursor",
+    "decorative"
+  ],
+  "instruction": "Build <GranuleChurn density? speed? faculae? paused? children? className? style?> as a full-bleed WebGL2 background rendering SOLAR GRANULATION — a stellar photosphere seen from above, boiling continuously with no input at all. The mechanism is a compressible surface flow, not a cell diagram: a potential field is built from a lattice of gaussian plumes, each born at a jittered position with its own period, swelling over its lifetime and fading; horizontal velocity is the negative gradient of that field, so material runs downhill off every summit and piles up where three or four plumes' skirts meet. Nothing computes a nearest-site distance — the dark intergranular lanes are not the edges of a partition, they are where an advected density has genuinely been squeezed together, so they vary in width, break into segments and lag behind the plumes that pushed them. Four channels ride one RGBA16F ping-pong target through a single semi-Lagrangian pass: temperature injected where the flow diverges and cooling radiatively as it travels out (so a granule is bright at the middle and dim by the time it reaches its own boundary), material density multiplied by the continuity term (which is what actually darkens a lane), faculae seeded stochastically in the strongest downdrafts and carried along the lane that made them, and pointer freshness. Birth and death are structural: when a plume's envelope reaches zero its successor is born at a new jittered position, neighbours immediately expand into the space and the lane network re-knits, and about a third of sites develop an exploding-granule dimple late in life that drives a lane through the middle of the cell and cleaves it in two. The pointer is an extra upwelling rather than a decal — it pushes the lanes apart and floats fresh hot material up under the cursor, on a lead-compensated follower so the response is not late, and --ns-accent tints only that freshly disturbed material. Colours come from --background, --foreground, --ns-muted, --border and --ns-accent via getComputedStyle, re-read on a documentElement class MutationObserver; the ramp inverts between themes rather than shifting its distribution, so dark theme is a luminous star and light theme its deliberate negative, graphite granules on a paper field. The sim is spun up for twenty seconds of convection before the first paint in every mode, so the surface is already boiling at mount; prefers-reduced-motion gets a longer spin-up and then a frozen frame. Pauses offscreen and on tab hidden, and steps down display then sim resolution only after a sustained stretch of missed frames.",
+  "useWhen": "Reach for this when a page wants a full-bleed surface that is alive on its own — cells being born, jostling their neighbours and dying — rather than a background that waits for the cursor. Prefer weld-pool if you want a headline lying IN the surface and a reflective metal read, background-lloyd-relax if you specifically want a geometric Voronoi partition relaxing, and one of the ASCII heroes if the texture should be type rather than a continuous field.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "pointer-path",
+    "path": "figure8",
+    "period": 6000,
+    "inset": 0.08
+  }
+}
