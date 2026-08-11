@@ -122,6 +122,7 @@ uniform float u_strata;
 uniform vec4 u_vort[VORT]; // x, y css px, z = birth time (negative = unused), w = signed strength
 uniform float u_vrad;
 uniform float u_stir;      // 0 when every pointer vortex has decayed
+uniform float u_vminborn;  // earliest birth time among live vortices
 uniform vec3 u_c0;
 uniform vec3 u_c1;
 uniform vec3 u_c2;
@@ -220,8 +221,13 @@ vec2 flow(vec2 p, float t) {
   vec2 vel = vec2(u_um + u_u0 * u, u_u0 * v);
 
   // uniform branch, coherent across the draw: at rest — where the page spends
-  // most of its life — the stir costs nothing at all
-  if (u_stir > 0.0) {
+  // most of its life — the stir costs nothing at all. The second half of the
+  // test is the same skip one step earlier: the trace reaches back further than
+  // a vortex has existed, so for every step before the earliest live birth the
+  // loop below can only ever hit age < 0 and continue. Hoisting that to a
+  // uniform comparison drops the loop entirely on those steps — same output,
+  // and the branch is coherent because tt is identical across the draw.
+  if (u_stir > 0.0 && t >= u_vminborn) {
     for (int i = 0; i < VORT; i++) {
       float born = u_vort[i].z;
       float age = t - born;
@@ -284,8 +290,14 @@ void main() {
   float mix0 = exp(-Yq * Yq * 0.055);
   float turbAmt = u_turb * smoothstep(0.34, 1.02, xn) * (0.30 + 0.70 * mix0);
   float ref = min(u_size.x, u_size.y);
-  q += curl(q * 0.0075 + vec2(u_time * 0.021, 3.1)) * turbAmt * ref * 0.30;
-  q += curl(q * 0.026 + vec2(-u_time * 0.05, 8.4)) * turbAmt * ref * 0.055;
+  // upstream of xn = 0.34 turbAmt is exactly zero, so both curl fields are
+  // multiplied out — 32 hash taps per pixel producing a displacement of 0.
+  // Skipping them there is not an approximation, and the branch is coherent
+  // because it depends only on the column.
+  if (turbAmt > 0.0) {
+    q += curl(q * 0.0075 + vec2(u_time * 0.021, 3.1)) * turbAmt * ref * 0.30;
+    q += curl(q * 0.026 + vec2(-u_time * 0.05, 8.4)) * turbAmt * ref * 0.055;
+  }
 
   float Y0 = u_k * (q.y - u_yc);
   // the source stratification drifts with the mean flow, so its texture is a
@@ -540,6 +552,16 @@ export function ShearBillow({
     // soften this surface for the rest of the visit.
     const SCALES = [1, 0.75, 0.55];
     const BUDGET_OVER = 24;
+    // The first second of a surface's life is not evidence about the surface:
+    // hydration, the shader compile and the first uploads all land inside it,
+    // and they cost the same whatever resolution the canvas is. Measured, that
+    // transient alone was enough to walk the ladder down two rungs on every
+    // load — and since recovery needs 8s under budget and doubles after each
+    // demotion, it then stayed at the bottom rung for the whole visit, soft, on
+    // a machine that renders it at 60Hz at full scale. The ladder must judge
+    // the steady state or it is just a resolution downgrade with extra steps.
+    const LADDER_SETTLE = 1500;
+    let settleMs = 0;
     let scaleIdx = 0;
     let frameEma = 16.7;
     let overMs = 0;
@@ -633,9 +655,13 @@ export function ShearBillow({
       const trace = (1.65 * 2 * Math.PI) / (k * u0);
 
       let alive = false;
+      let minBorn = Infinity;
       for (let i = 0; i < VORT; i++) {
         const born = vort[i * 4 + 2];
-        if (born >= 0 && t - born <= VORT_LIFE) alive = true;
+        if (born >= 0 && t - born <= VORT_LIFE) {
+          alive = true;
+          if (born < minBorn) minBorn = born;
+        }
       }
 
       surface.v2("u_size", cssW, cssH);
@@ -652,6 +678,7 @@ export function ShearBillow({
       surface.v4a("u_vort", vort);
       surface.f("u_vrad", Math.min(cssW, cssH) * 0.17);
       surface.f("u_stir", alive ? 1 : 0);
+      surface.f("u_vminborn", alive ? minBorn : 0);
       surface.v3("u_c0", c0);
       surface.v3("u_c1", c1);
       surface.v3("u_c2", c2);
@@ -674,6 +701,14 @@ export function ShearBillow({
       // time-constant rather than frame-count smoothing so the average settles
       // in ~120ms of wall clock whatever the frame rate is
       const clamped = Math.min(50, rawMs);
+      if (settleMs < LADDER_SETTLE) {
+        settleMs += clamped;
+        frameEma = 16.7;
+        overMs = 0;
+        underMs = 0;
+        raf = requestAnimationFrame(loop);
+        return;
+      }
       frameEma += (clamped - frameEma) * (1 - Math.exp(-clamped / 120));
       if (frameEma > BUDGET_OVER) {
         overMs += clamped;
@@ -698,6 +733,9 @@ export function ShearBillow({
       if (running || disposed) return;
       running = true;
       lastMs = performance.now();
+      // waking from offscreen or from a hidden tab re-uploads and re-warms the
+      // same way a first mount does, so the same settle applies
+      settleMs = 0;
       raf = requestAnimationFrame(loop);
     };
     const sleep = () => {
@@ -734,6 +772,7 @@ export function ShearBillow({
       scaleIdx = 0;
       overMs = 0;
       underMs = 0;
+      settleMs = 0;
       upWindow = 8000;
       frameEma = 16.7;
       applyBacking();
@@ -816,6 +855,19 @@ export function ShearBillow({
       pushVort(ptrX, ptrY, STATIC_TIME - 0.5, Math.max(0, stir) * Math.min(cssW, cssH) * 0.32);
       draw();
     };
+    // Static mode carries no loop, so a pointermove is the only thing that can
+    // schedule a frame — and a pointer device reporting at 120Hz+ would
+    // otherwise buy a full-resolution draw PER EVENT, several per vsync, all
+    // but the last of them thrown away unseen. Coalesce to one draw per frame,
+    // which is the most a display can show anyway.
+    let staticRaf = 0;
+    const staticPointSoon = () => {
+      if (staticRaf) return;
+      staticRaf = requestAnimationFrame(() => {
+        staticRaf = 0;
+        staticPoint();
+      });
+    };
 
     const setTarget = (e: PointerEvent) => {
       syncRect();
@@ -863,7 +915,7 @@ export function ShearBillow({
       if (staticMode) {
         ptrX = tgtX;
         ptrY = tgtY;
-        staticPoint();
+        staticPointSoon();
       }
     };
     const onPointerDown = (e: PointerEvent) => {
@@ -995,6 +1047,7 @@ export function ShearBillow({
       } as EventListenerOptions);
       window.removeEventListener("resize", markRectDirty);
       window.clearTimeout(poll);
+      if (staticRaf) cancelAnimationFrame(staticRaf);
       sleep();
       surface.destroy();
     };
