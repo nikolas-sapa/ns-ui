@@ -93,6 +93,18 @@ const STATIC_TIME = 7.3;
 const NOTCH_W = 0.4;
 const NOTCH_SIDES = [0, 1, 0] as const; // 0 = bay on the left, 1 = on the right
 
+// The head and foot panels are rows 1 and 3 of a subgrid the three columns
+// share, so every column's head is as tall as the tallest head and the middle
+// row — the reservoir band — starts and ends on the same pixel in all three.
+// That equality is load-bearing: each crest label is positioned as a fraction
+// of its OWN band, while the canvas draws one water line across the band the
+// three have in common, so a column whose tagline or feature list ran a line
+// longer would print its crest off the water it belongs to. Rows, not fixed
+// heights: the panels have to grow with the price clamp and with wrapping at
+// narrow widths rather than clip.
+const HEAD_H = "row-start-1";
+const FOOT_H = "row-start-3";
+
 const FRAG_SRC = `
 precision highp float;
 
@@ -533,11 +545,14 @@ export function WeirCrest({
     Math.LN10 / span,
   ];
 
+  // annualNow is passed explicitly by the billing-term radios: they announce
+  // from inside their own change handler, before `annual` has re-rendered, so
+  // reading the closed-over flag there would price the term just left.
   const commit = useCallback(
-    (v: number) => {
+    (v: number, annualNow: boolean = annual) => {
       const best = plans.reduce(
         (acc, p) => {
-          const base = p.base * (annual ? 1 - annualDiscount : 1);
+          const base = p.base * (annualNow ? 1 - annualDiscount : 1);
           const t = base + (Math.max(0, v - p.included) / 1000) * p.overagePer1k;
           return t < acc.t ? { p, t } : acc;
         },
@@ -545,7 +560,7 @@ export function WeirCrest({
       );
       setAnnounce(
         `${fullVolume(v)} events per month. Cheapest plan ${best.p.name}, ${money(best.t)} per month${
-          annual ? ", billed annually" : ""
+          annualNow ? ", billed annually" : ""
         }.`
       );
     },
@@ -972,9 +987,7 @@ export function WeirCrest({
                       onChange={() => {
                         setAnnual(opt.value);
                         onChange?.(usage, opt.value);
-                        setAnnounce(
-                          `${opt.label} billing. ${fullVolume(usage)} events per month.`
-                        );
+                        commit(usage, opt.value);
                       }}
                     />
                     {opt.label}
@@ -986,7 +999,10 @@ export function WeirCrest({
         </div>
 
         {/* --- body: rail + three dams ------------------------------------- */}
-        <div className="relative flex min-h-0 flex-1 gap-3 sm:gap-5">
+        {/* The body takes the height that is left, but never less than its own
+            content: at a short viewport the reservoir band closes to nothing
+            and the section grows rather than shearing the foot panels. */}
+        <div className="relative flex flex-1 gap-3 sm:gap-5">
           {/* the level rail: this slider IS the water surface */}
           <div className="flex w-16 shrink-0 flex-col sm:w-24">
             <div
@@ -1038,7 +1054,7 @@ export function WeirCrest({
           </div>
 
           {/* three plans, three crests */}
-          <div className="grid min-h-0 flex-1 grid-cols-3 gap-3 sm:gap-5">
+          <div className="grid min-h-0 flex-1 grid-cols-3 grid-rows-[auto_minmax(0,1fr)_auto] gap-3 sm:gap-5">
             {priced.map((row, i) => {
               const best = i === bestIndex;
               const spilling = usage > row.plan.included;
@@ -1049,7 +1065,7 @@ export function WeirCrest({
                     colRefs.current[i] = el;
                   }}
                   aria-label={`${row.plan.name} plan`}
-                  className="relative flex min-h-0 flex-col gap-3 sm:gap-5"
+                  className="relative row-span-3 grid min-h-0 grid-rows-subgrid gap-3 sm:gap-5"
                 >
                   <div
                     className={`overflow-hidden rounded-md bg-background/78 p-3 backdrop-blur-md sm:p-4 ${HEAD_H}`}
@@ -1071,10 +1087,15 @@ export function WeirCrest({
                       {money(row.total)}
                       <span className="ml-1 font-sans text-xs text-ns-muted">/mo</span>
                     </p>
+                    {/* The spill is printed as what is left of the rounded
+                        total after the rounded base, not as its own rounded
+                        term: on annual billing the base carries a fraction, and
+                        two independently rounded terms can read $15 + $0 under
+                        a $16 total. Rounding the remainder always reconciles. */}
                     <p className="mt-2 font-mono text-[10px] leading-relaxed text-ns-muted tabular-nums sm:text-[11px]">
                       {money(row.base)} base
                       {spilling
-                        ? ` + ${money(row.over)} spill · ${compactVolume(usage - row.plan.included)} over the crest`
+                        ? ` + ${money(row.total - Math.round(row.base))} spill · ${compactVolume(usage - row.plan.included)} over the crest`
                         : " · holds, no spill"}
                     </p>
                   </div>
