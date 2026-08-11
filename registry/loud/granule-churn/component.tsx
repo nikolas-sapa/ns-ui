@@ -26,7 +26,10 @@ import { useEffect, useRef } from "react";
 //      which is what actually darkens a lane rather than a painted stroke
 //   f  faculae — bright flecks seeded stochastically in the strongest
 //      downdrafts and carried along the lane they were born in
-//   a  pointer freshness — the only channel --ns-accent ever touches
+//   a  pointer freshness — lifts luminance under the cursor. Pure brightness,
+//      no hue: --ns-accent is reserved for interaction chrome elsewhere in the
+//      registry, and a resting frame (which is what every screenshot is) has
+//      no pointer "interacting" with it, so no accent belongs in this pass
 //
 // Birth and death are structural. Each lattice site runs its own period; when
 // a plume's envelope reaches zero its successor is born at a new jittered
@@ -303,7 +306,6 @@ uniform vec3 u_c1;
 uniform vec3 u_c2;
 uniform vec3 u_c3;
 uniform vec3 u_c4;
-uniform vec3 u_accent;
 uniform float u_bias;
 uniform float u_contrast;
 uniform float u_mottle;
@@ -402,6 +404,12 @@ void main() {
 
   L += f * 0.62;
 
+  // pointer freshness lifts luminance under the cursor, same ramp as
+  // everything else — brighter or dimmer depending where L already sits,
+  // never a hue laid on top. Folded in before the ramp so it also picks up
+  // contrast/bias like every other term, rather than being a flat overlay.
+  L += clamp(a, 0.0, 1.0) * 0.22;
+
   // a full-bleed surface should reach the edge of the frame. The vignette is
   // here only to stop the clamped border texels from reading as a hard cut,
   // so it starts late and lands shallow — at 0.09 it put visible black bands
@@ -412,8 +420,6 @@ void main() {
 
   L = clamp((L - 0.5) * u_contrast + 0.5 + u_bias, 0.0, 1.0);
   vec3 col = ramp(L);
-
-  col = mix(col, u_accent, clamp(a, 0.0, 1.0) * 0.36);
 
   // the low end of a full-bleed ramp is a very long flat gradient, which is
   // exactly where 8-bit banding shows
@@ -769,7 +775,6 @@ export function GranuleChurn({
     let c2: RGB = [0.42, 0.42, 0.44];
     let c3: RGB = [0.86, 0.86, 0.87];
     let c4: RGB = [1, 1, 1];
-    let accent: RGB = [0, 0.42, 1];
     let bias = 0;
     let contrast = 1.18;
     let mottle = 0.14;
@@ -787,7 +792,6 @@ export function GranuleChurn({
       const fg = parseColor(cs.getPropertyValue("--foreground")) ?? [0.09, 0.09, 0.09];
       const muted = parseColor(cs.getPropertyValue("--ns-muted")) ?? [0.55, 0.55, 0.55];
       const border = parseColor(cs.getPropertyValue("--border")) ?? [0.2, 0.2, 0.2];
-      accent = parseColor(cs.getPropertyValue("--ns-accent")) ?? [0, 0.42, 1];
       const black: RGB = [0, 0, 0];
       const white: RGB = [1, 1, 1];
       if (luminance(bg) < 0.5) {
@@ -800,7 +804,6 @@ export function GranuleChurn({
         bias = -0.04;
         contrast = 1.2;
         mottle = 0.17;
-        accent = mixRGB(accent, white, 0.2);
       } else {
         // the negative: pale lanes, graphite granules, and the darkest stop
         // held well off black so the field reads as inked paper
@@ -812,7 +815,6 @@ export function GranuleChurn({
         bias = 0.02;
         contrast = 1.14;
         mottle = 0.15;
-        accent = mixRGB(accent, bg, 0.35);
       }
     };
     readColors();
@@ -857,7 +859,6 @@ export function GranuleChurn({
       surface.v3("u_c2", c2);
       surface.v3("u_c3", c3);
       surface.v3("u_c4", c4);
-      surface.v3("u_accent", accent);
       surface.f("u_bias", bias);
       surface.f("u_contrast", contrast);
       surface.f("u_mottle", mottle);
