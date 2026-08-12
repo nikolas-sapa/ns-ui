@@ -429,7 +429,61 @@ in the first place.
 
 ---
 
-## 10. Re-measuring
+## 10. Phase 3 findings — the premise was wrong, the real cost is elsewhere
+
+### §2's homepage numbers were a measurement artifact
+
+§2 claims "203 requests vs 68 on every other route… each visible card mounts a
+`/preview/<name>/embed` iframe plus an `.mp4`". That was measured by a script
+that scrolled 1500 px first, so it counted lazy-loads as if they were initial
+load. Corrected, on a clean load with no scrolling:
+
+| | requests | iframes | videos |
+| --- | --- | --- | --- |
+| `/` initial load | **77** | **0** | 4 (340 KB) |
+
+Zero `/embed` iframes on load. The grid already lazy-mounts and already loads
+posters ahead of video. **The Phase 3 work item — "below-fold cards should not
+mount iframes or fetch .mp4 until intersection" — is already implemented.** Do
+not do it again.
+
+Of the 77, 43 are Next `?_rsc=` link prefetches totalling 9 KB. Many requests,
+negligible weight.
+
+### What is actually expensive: main-thread work on card mount
+
+| | long tasks | total blocking | worst | resources |
+| --- | --- | --- | --- | --- |
+| `/` no scroll | 3 | 330 ms | 191 ms | 76 |
+| `/` after scrolling | 14 | **1006 ms** | 164 ms | 92 |
+
+Scrolling adds 11 long tasks and 676 ms of blocking to load just 16 more
+resources. The cost per mounted card is main-thread execution, not bytes and not
+requests.
+
+This connects Phase 2: an interaction made while browsing the catalog lands on a
+main thread already saturated by card-mount work, which is a plausible mechanism
+for the 2560 ms field INP sample on a slower device — and it fits Phase 2's
+finding that the time is presentation, not handler processing.
+
+### Revised Phase 3
+
+Not "fewer requests". The target is **main-thread cost per mounted card**:
+
+```
+T4'  scroll-induced blocking on /: 676ms -> < 300ms
+     measured as (total longtask ms after 4 scroll steps) - (same before scroll)
+```
+
+Profile one card mount before changing anything. Candidate causes, unverified:
+the ASCII/WebGL components initialising on mount, video decode kicked off on
+intersection, or per-card layout thrash. Establish which before touching code —
+this document has already produced three confident hypotheses that measurement
+rejected.
+
+---
+
+## 11. Re-measuring
 
 Lab harness (per-route TTFB/FCP/LCP/CLS/long tasks/request count) is what
 produced the lab column above. It runs against prod with Playwright, already a
