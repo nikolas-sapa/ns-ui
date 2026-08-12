@@ -65,6 +65,7 @@ import { NextResponse } from "next/server";
 import { api } from "@/convex/_generated/api";
 import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
 import { CLI_PACKAGE, MCP_PACKAGE } from "@/lib/status-checks";
+import { submitBindingsMatch } from "@/lib/submit-oauth-cookies";
 
 export const dynamic = "force-dynamic";
 
@@ -173,7 +174,13 @@ export async function GET(request: Request) {
     );
   }
 
-  if (request.headers.get("authorization") !== `Bearer ${cronSecret}`) {
+  // Constant-time compare (reuses `submitBindingsMatch` rather than a second
+  // implementation, same helper `lib/submit-oauth-cookies.ts` uses for its
+  // own header check) — a plain `!==` leaks timing on how many leading
+  // characters matched. A length mismatch short-circuits `submitBindingsMatch`
+  // itself, which is fine here: a wrong-length guess is already distinguishable
+  // by its length, not by a timing side-channel.
+  if (!submitBindingsMatch(request.headers.get("authorization") ?? "", `Bearer ${cronSecret}`)) {
     return NextResponse.json({ ok: false, wrote: false, error: "unauthorized" }, { status: 401 });
   }
 
