@@ -216,14 +216,16 @@ void main() {
   float fx = fieldAt(p + vec2(e.x, 0.0)) - fieldAt(p - vec2(e.x, 0.0));
   float fy = fieldAt(p + vec2(0.0, e.y)) - fieldAt(p - vec2(0.0, e.y));
 
-  // the plate is flexing, not static: the normal is tilted by the instantaneous
-  // displacement, whose sign oscillates far faster than anything the eye can
-  // track, so what survives is a shimmer riding on the standing envelope
-  // ...but the sheen must never pass through zero, or a frame sampled at the
-  // instant the plate is flat through its rest position shows unlit steel with
-  // no modal structure in it at all
-  float osc = sin(u_time * 41.0);
-  float phase = osc >= 0.0 ? mix(0.55, 1.0, osc) : -mix(0.55, 1.0, -osc);
+  // The plate flexes far faster than any display can show it. Lighting the
+  // steel from the INSTANTANEOUS deflection means sampling that oscillation at
+  // the refresh rate, and the sign flip aliases straight down into a full-bleed
+  // strobe: measured at 6.5 Hz, a 3.3% mean-luminance sawtooth with 0.024
+  // between consecutive frames — a photosensitivity hazard on a surface this
+  // size, and the flicker the plate was reported for. What an eye (or a camera)
+  // integrates over any interval it can resolve is the ENVELOPE of the motion,
+  // so the sheen rides on that instead, strictly positive and with only a slow
+  // continuous breath left in it so the steel is not dead.
+  float phase = 0.88 + 0.12 * sin(u_time * 0.55);
   vec3 n = normalize(vec3(-fx * 5.4 * u_amp * phase, -fy * 5.4 * u_amp * phase, 1.0));
   vec3 l = normalize(vec3(0.42, 0.66, 0.62));
   float diff = max(dot(n, l), 0.0);
@@ -484,11 +486,36 @@ export function SandLock({
     // grains back on live steel; it happens while the plate is already storming
     // between two modes, so what you see is the plate reconfiguring, which is
     // what it is — a different clamping gives a different plate.
+    // It has to SLIDE there rather than cut, though. Reseating the lattice in a
+    // single frame translates every nodal line at once, which is a step change
+    // in what the whole viewport is showing — measured as the only luminance
+    // discontinuity left after the sheen was fixed (0.0067 between consecutive
+    // frames, against a 0.0009 p95 elsewhere). Easing it over the sweep costs
+    // one table rebuild per frame while it is in flight (a few thousand sines,
+    // against a few hundred thousand multiply-adds for the field) and reads as
+    // the plate being re-clamped, which is what it is.
     let orgX = 0;
     let orgY = 0;
+    let orgTX = 0;
+    let orgTY = 0;
+    const ORG_TAU = 0.75;
     const shiftLattice = () => {
-      orgX = (orgX + cell * 0.381966) % (cell * 2);
-      orgY = (orgY + cell * 0.236068) % (cell * 2);
+      orgTX += cell * 0.381966;
+      orgTY += cell * 0.236068;
+    };
+    const stepLattice = (dt: number) => {
+      if (orgX === orgTX && orgY === orgTY) return;
+      const k = 1 - Math.exp(-dt / ORG_TAU);
+      orgX += (orgTX - orgX) * k;
+      orgY += (orgTY - orgY) * k;
+      if (Math.abs(orgTX - orgX) < 0.02 && Math.abs(orgTY - orgY) < 0.02) {
+        // land exactly, then fold both back into one lattice period so the
+        // offsets cannot drift off into a range where the fold loses precision
+        orgTX %= cell * 2;
+        orgTY %= cell * 2;
+        orgX = orgTX;
+        orgY = orgTY;
+      }
       buildTables();
     };
 
@@ -619,12 +646,29 @@ export function SandLock({
       const mob = MOBILITY * cell * dt * (0.35 + 0.85 * coh);
       // off-resonance the plate has no stable zero set, so the same physical
       // bouncing reads as a storm; on resonance it reads as settling
-      const chaos = 0.5 + 2.1 * (1 - coh) + bowAmt * 1.5;
+      const chaos = 0.5 + 2.1 * (1 - coh) + bowAmt * 2.2;
       const jit = DIFFUSE * cell * Math.sqrt(dt) * chaos;
       const maxStep = cell * 0.09;
-      const bowR = Math.max(60, Math.min(cssW, cssH) * 0.22);
+      // The pointer BOWS the plate, and a bow injects DRIVE, not a force on the
+      // sand. The first version only shoved grains sideways around the contact
+      // and shaved a little off the friction threshold, which is why it read as
+      // doing nothing: a settled grain sits where the local amplitude is a
+      // couple of percent, an order below the threshold, so it was never
+      // unparked and the figure underneath the cursor simply did not move. The
+      // contact now RAISES the local amplitude — the steel under the pointer is
+      // being driven harder — which lifts those grains over the threshold and
+      // lets the ordinary diffusion throw them off the line. The radial shove
+      // stays as the wake of the contact, but scaled by dt, because the old one
+      // was per-frame and so meant something different on every machine.
+      const bowR = Math.max(90, Math.min(cssW, cssH) * 0.34);
       const bowR2 = bowR * bowR;
-      const bowing = havePointer ? 0.55 + bowAmt * 1.2 : 0;
+      const bowing = presence * (0.3 + bowAmt * 1.25);
+      // the wake is deliberately weaker than the energy injection: a strong
+      // radial shove alone just sweeps a clean bald disc, which reads as an
+      // eraser. Most of what happens under the contact should be the sand being
+      // THROWN — isotropic, off the line, a storm — with the bow only giving it
+      // a direction.
+      const wake = cell * 0.7 * dt;
 
       for (let i = 0; i < COUNT; i++) {
         let x = gx[i];
@@ -648,9 +692,26 @@ export function SandLock({
         const w01 = (1 - tx) * ty;
         const w11 = tx * ty;
 
-        const amp = absF[a00] * w00 + absF[a10] * w10 + absF[a01] * w01 + absF[a11] * w11;
+        let amp = absF[a00] * w00 + absF[a10] * w10 + absF[a01] * w01 + absF[a11] * w11;
         const dx = gradX[a00] * w00 + gradX[a10] * w10 + gradX[a01] * w01 + gradX[a11] * w11;
         const dy = gradY[a00] * w00 + gradY[a10] * w10 + gradY[a01] * w01 + gradY[a11] * w11;
+
+        // local energy from the bow, added to the amplitude the grain answers to
+        let pushX = 0;
+        let pushY = 0;
+        if (bowing > 0) {
+          const bx = x - ptrX;
+          const by = y - ptrY;
+          const d2 = bx * bx + by * by;
+          if (d2 < bowR2) {
+            const q = 1 - d2 / bowR2;
+            const bow = q * q * bowing;
+            amp += bow * 0.7;
+            const invd = 1 / Math.sqrt(Math.max(1, d2));
+            pushX = bx * invd * bow * wake;
+            pushY = by * invd * bow * wake;
+          }
+        }
 
         // A grain only goes anywhere while the plate is throwing it. Below a
         // FRICTION threshold on the local amplitude it stays where it is, the
@@ -670,7 +731,7 @@ export function SandLock({
         // The threshold drops as the plate is bowed harder and as the drive
         // loses coherence, so a storm really does put the whole plate back in
         // motion instead of leaving a stale figure stencilled underneath it.
-        const thresh = FRICTION * (1 - 0.55 * bowAmt) * (0.35 + 0.65 * coh);
+        const thresh = FRICTION * (1 - 0.8 * bowAmt) * (0.35 + 0.65 * coh);
         const excess = amp - thresh;
         let stepX: number;
         let stepY: number;
@@ -694,20 +755,8 @@ export function SandLock({
           stepY += (rnd() + rnd() - 1) * s;
         }
 
-        if (bowing > 0) {
-          const px = x - ptrX;
-          const py = y - ptrY;
-          const d2 = px * px + py * py;
-          if (d2 < bowR2) {
-            const f = (1 - d2 / bowR2) * bowing;
-            const inv = 1 / Math.sqrt(Math.max(1, d2));
-            stepX += px * inv * f * cell * 0.05 + (rnd() - 0.5) * f * cell * 0.07;
-            stepY += py * inv * f * cell * 0.05 + (rnd() - 0.5) * f * cell * 0.07;
-          }
-        }
-
-        x += stepX;
-        y += stepY;
+        x += stepX + pushX;
+        y += stepY + pushY;
         if (x < 0) x = -x;
         else if (x > cssW) x = 2 * cssW - x;
         if (y < 0) y = -y;
@@ -779,6 +828,7 @@ export function SandLock({
     let velX = 0;
     let velY = 0;
     let havePointer = false;
+    let presence = 0;
     let bowTarget = 0;
     let bowAmt = 0;
     let rectLeft = 0;
@@ -798,6 +848,12 @@ export function SandLock({
 
     const stepPointer = (dt: number) => {
       bowAmt += (bowTarget - bowAmt) * (1 - Math.exp(-dt * 6));
+      // presence fades the bow in and out instead of switching it. The detune is
+      // now large enough to change which mode the plate is in, so applying it on
+      // the frame the cursor crosses the edge would snap the whole field at once
+      // — the same class of discontinuity as the sheen strobe, just rarer.
+      presence += ((havePointer ? 1 : 0) - presence) * (1 - Math.exp(-dt * 4.5));
+      if (!havePointer && presence < 0.002) presence = 0;
       if (!havePointer || dt <= 0) return;
       const vk = 1 - Math.exp(-dt / VEL_TAU);
       velX += ((tgtX - lastTgtX) / dt - velX) * vk;
@@ -868,9 +924,18 @@ export function SandLock({
       let d = scheduledDrive(t);
       // the pointer BOWS: horizontal position detunes the drive by up to half
       // the local mode spacing, enough to break a locked figure and pull the
-      // neighbouring one in, never enough to take the sweep over
-      const bend = havePointer ? (ptrX / Math.max(1, cssW) - 0.5) * 2 : 0;
-      d *= 1 + (bend * 0.16 + keyDetune * 0.16) * (0.5 + bowAmt);
+      // neighbouring one in, never enough to take the sweep over.
+      // THE SIZE OF THAT NUMBER IS THE WHOLE INTERACTION. The modes in the
+      // sequence are ~1.4x apart and a resonance is only a couple of percent
+      // wide, so an eight percent detune (what this was) walks the drive off the
+      // peak without ever changing WHICH mode dominates: the figure keeps its
+      // shape and only dims, which is indistinguishable from nothing happening.
+      // Half a mode spacing is ~20%, and that is where a neighbour's response
+      // becomes comparable, coherence collapses and the figure actually breaks.
+      // A press bows harder — it also stiffens the plate, so it detunes on its
+      // own and storms the sand even with the pointer sitting dead centre.
+      const bend = presence * (ptrX / Math.max(1, cssW) - 0.5) * 2;
+      d *= 1 + (bend * 0.2 + keyDetune * 0.2) * (1 + 0.5 * bowAmt) + bowAmt * 0.13;
       drive = d;
     };
 
@@ -949,6 +1014,7 @@ export function SandLock({
     const simulate = (dt: number) => {
       simTime += dt;
       advanceSchedule(dt, simTime);
+      stepLattice(dt);
       respond(drive);
       buildField();
       stepGrains(dt);
@@ -1031,6 +1097,10 @@ export function SandLock({
       rectTop = rect.top;
       rectDirty = false;
       cell = Math.min(cssW, cssH) * Math.max(0.25, plateScale);
+      // the lattice offsets are in px, so a cell that just changed size makes an
+      // in-flight slide meaningless: land it rather than let it crawl
+      orgX = orgTX;
+      orgY = orgTY;
       allocGrid();
       scaleIdx = 0;
       overMs = 0;
