@@ -182,6 +182,14 @@ assert.deepEqual(
 assert.deepEqual(
   validateSubmission({
     ...cleanSubmission,
+    company: "",
+  }),
+  { ok: false, code: "empty_company" },
+);
+
+assert.deepEqual(
+  validateSubmission({
+    ...cleanSubmission,
     quote: "",
   }),
   { ok: false, code: "empty_quote" },
