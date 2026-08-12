@@ -382,7 +382,54 @@ inferring from event timings. That is what separates "large style recalc" from
 
 ---
 
-## 9. Re-measuring
+## 9. Phase 4 findings — CLS mechanism confirmed, fix deliberately NOT shipped
+
+### Mechanism (confirmed by reading, not guessed)
+
+`app/_components/site-auth.tsx` renders two different shapes:
+
+- Server render and pre-fetch: `<Link>Sign in</Link>`, inline, sharing the
+  footer's first line with Changelog/Writing/Connect.
+- After `/api/me` resolves **for a signed-in user**: a `<Link>` carrying
+  `w-full basis-full`, which forces it onto **its own new line** in the
+  `flex-wrap` footer row in `site-shell.tsx`.
+
+The footer therefore grows by one line height after hydration. That is the
+`footer.mt-16.border-t…` 0.11 CLS row across 6 samples, and it explains why
+`/account` shows 0.11 — the shift only happens for signed-in visitors, which is
+exactly the population those samples represent.
+
+Bonus: the 576 ms INP selector
+`a.rounded-sm.outline-none.hover:text-foreground.focus-visible:ring-2…` is that
+same "Sign in" `<Link>`'s class string.
+
+### Why no fix landed here
+
+The `basis-full` behavior is deliberate and documented in place: it lets a long
+display name or email wrap against the sidebar's full width instead of fighting
+three fixed labels for the remainder of the first line.
+
+Reserving the line unconditionally would add permanent empty space in the footer
+for **anonymous visitors, who are the overwhelming majority of traffic**, to fix
+a 0.11 shift affecting 6 signed-in samples — while site-wide CLS P75 is already
+0.07, i.e. "Great", and T5 only asks that it be held.
+
+Verifying any fix requires an authenticated session, which this measurement
+setup does not have. Shipping an unverifiable layout change to the auth footer,
+paid for by every anonymous visitor, is a worse trade than leaving it.
+
+### If it is picked up later
+
+Reserve space **conditionally**, not always: render the footer's second line as
+a zero-content placeholder only once `/api/me` has resolved signed-in, or move
+the auth link out of the wrapping row so its line count never changes. Verify
+with a real signed-in session and a CLS observer before and after — do not
+accept a lab CLS of 0 as proof, since anonymous lab runs never trigger the shift
+in the first place.
+
+---
+
+## 10. Re-measuring
 
 Lab harness (per-route TTFB/FCP/LCP/CLS/long tasks/request count) is what
 produced the lab column above. It runs against prod with Playwright, already a
