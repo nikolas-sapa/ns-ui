@@ -150,6 +150,11 @@ export function SiteShell({
   const activeRef = useRef<HTMLAnchorElement | null>(null);
   const navScrollRef = useRef<HTMLDivElement | null>(null);
   const mainRef = useRef<HTMLDivElement | null>(null);
+  // The drawer's own toggle button — closing the drawer without restoring
+  // focus here leaves a keyboard visitor's focus on an element that just
+  // went `-translate-x-full invisible` (same problem command-palette.tsx's
+  // `returnFocusRef` solves for ⌘K).
+  const navToggleRef = useRef<HTMLButtonElement | null>(null);
   const isFiltering = query.trim().length > 0;
 
   // Both the playground and the component detail page point at the same
@@ -249,7 +254,10 @@ export function SiteShell({
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") {
+        setOpen(false);
+        navToggleRef.current?.focus();
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -355,6 +363,7 @@ export function SiteShell({
       </a>
 
       <button
+        ref={navToggleRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
@@ -369,7 +378,10 @@ export function SiteShell({
 
       {open ? (
         <div
-          onClick={() => setOpen(false)}
+          onClick={() => {
+            setOpen(false);
+            navToggleRef.current?.focus();
+          }}
           className="fixed inset-0 z-30 bg-background/70 lg:hidden"
         />
       ) : null}
@@ -488,7 +500,7 @@ export function SiteShell({
               }}
               placeholder="Filter sidebar"
               aria-label="Filter sidebar"
-              className="w-full bg-transparent py-1 text-xs outline-none placeholder:text-ns-muted"
+              className="w-full rounded-sm bg-transparent py-1 text-xs outline-none placeholder:text-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent"
             />
           </div>
         </div>

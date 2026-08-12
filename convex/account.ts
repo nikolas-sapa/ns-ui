@@ -201,6 +201,15 @@ export const deleteAccount = mutation({
       .unique();
     if (submissionRateLimit !== null) await ctx.db.delete(submissionRateLimit._id);
 
+    // Same shape as `saveRateLimits`/`submissionRateLimits` above, added
+    // alongside the fix that made `testimonials.submit`'s rate limit durable
+    // (schema.ts's comment on `testimonialRateLimits` has the reasoning).
+    const testimonialRateLimit = await ctx.db
+      .query("testimonialRateLimits")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+    if (testimonialRateLimit !== null) await ctx.db.delete(testimonialRateLimit._id);
+
     // `users` last — every other table above is reached via `userId`, so
     // deleting the `users` doc first would not break anything here (Convex
     // has no FK enforcement to trip), but deleting it last keeps the order

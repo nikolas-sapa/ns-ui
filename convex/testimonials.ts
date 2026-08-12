@@ -6,12 +6,48 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import { mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
+import type { Id } from "./_generated/dataModel";
 import {
   scoreSubmission,
   validateSubmission,
 } from "../lib/testimonial-moderation";
 
 const SUBMISSION_WINDOW_MS = 24 * 60 * 60 * 1000;
+const SUBMISSION_MAX = 1;
+
+// Durable, status-independent cap: one submission per user per
+// `SUBMISSION_WINDOW_MS`, counted in `testimonialRateLimits` (schema.ts) —
+// same pattern `submissions.ts`'s `checkAndRecordSubmissionRateLimit` uses,
+// for the same reason. The earlier version of this check counted rows still
+// `status === "pending"`, which reset the moment an owner rejected one; this
+// counts the submission itself, so a reject no longer clears the window.
+async function checkAndRecordTestimonialRateLimit(
+  ctx: MutationCtx,
+  userId: Id<"users">,
+): Promise<void> {
+  const now = Date.now();
+  const existing = await ctx.db
+    .query("testimonialRateLimits")
+    .withIndex("by_userId", (q) => q.eq("userId", userId))
+    .unique();
+  const current =
+    existing !== null && now - existing.windowStart < SUBMISSION_WINDOW_MS
+      ? existing
+      : null;
+  if (existing !== null && current === null) {
+    await ctx.db.delete(existing._id);
+  }
+
+  if (current !== null && current.count >= SUBMISSION_MAX) {
+    throw new ConvexError({ code: "rate_limited" as const });
+  }
+
+  if (current === null) {
+    await ctx.db.insert("testimonialRateLimits", { userId, windowStart: now, count: 1 });
+  } else {
+    await ctx.db.patch(current._id, { count: current.count + 1 });
+  }
+}
 
 // Same owner identity `convex/profiles.ts` uses for the reserved-name claim —
 // one `OWNER_EMAILS` list, not a second parallel notion of "admin". An empty
@@ -101,18 +137,9 @@ export const submit = mutation({
       throw new ConvexError({ code: validated.code });
     }
 
-    const now = Date.now();
-    const existing = await ctx.db
-      .query("testimonials")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .collect();
-    const hasRecentPending = existing.some(
-      (doc) => doc.status === "pending" && now - doc.createdAt < SUBMISSION_WINDOW_MS,
-    );
-    if (hasRecentPending) {
-      throw new ConvexError({ code: "rate_limited" as const });
-    }
+    await checkAndRecordTestimonialRateLimit(ctx, userId);
 
+    const now = Date.now();
     const { score, flags } = scoreSubmission(validated.value);
     await ctx.db.insert("testimonials", {
       userId,

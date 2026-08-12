@@ -278,6 +278,31 @@ export default defineSchema({
     downCount: v.optional(v.number()), // of those, how many were down
   }).index("by_day_service", ["day", "serviceId"]),
 
+  // Durable rate limit for `testimonials.submit`, same shape and same
+  // reasoning as `submissionRateLimits`/`saveRateLimits` above: an in-memory
+  // per-instance counter is wrong on serverless, and check-and-increment
+  // happens inside `submit` itself, so Convex's serializable-mutation
+  // guarantee makes the read-check-increment-write atomic.
+  //
+  // Replaces an earlier scheme that counted `testimonials` rows with
+  // `status === "pending"` in the last `SUBMISSION_WINDOW_MS` — that made
+  // the cap status-dependent: the moment an owner rejected a submission
+  // (`testimonials.reject`), the pending count dropped back to zero and the
+  // same user could submit again immediately, so total submission volume
+  // was bounded only by how fast the queue was reviewed, not by this window.
+  // This table counts submissions, not rows in one status, so a reject no
+  // longer resets it. `SUBMISSION_WINDOW_MS` (24h) and the one-per-window
+  // cap are unchanged.
+  //
+  // Keyed on `userId`, so — same rule as `saveRateLimits`/
+  // `submissionRateLimits` — belongs in the `deleteAccount` cascade
+  // (convex/account.ts).
+  testimonialRateLimits: defineTable({
+    userId: v.id("users"),
+    windowStart: v.number(),
+    count: v.number(),
+  }).index("by_userId", ["userId"]),
+
   testimonials: defineTable({
     userId: v.id("users"),
     name: v.string(),

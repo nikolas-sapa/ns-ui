@@ -31,6 +31,7 @@ function originIsAllowed(request: NextRequest): boolean {
 const VALIDATION_CODES = new Set([
   "empty_name",
   "empty_role",
+  "empty_company",
   "empty_quote",
   "name_too_long",
   "quote_too_long",
