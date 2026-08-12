@@ -483,7 +483,53 @@ rejected.
 
 ---
 
-## 11. Re-measuring
+## 11. Phase 3 profile — forced layout is the candidate, no fix shipped
+
+CPU profile (CDP `Profiler`, 100µs sampling) of `/` across 4 scroll steps,
+27,847 samples over 5,338 ms:
+
+| share | symbol |
+| --- | --- |
+| 60% | `(program)` — browser-internal style/layout/paint |
+| 11% | `(idle)` |
+| 3% | **`getBoundingClientRect`** (786 samples) |
+| ~14% | assorted minified app frames in one chunk |
+
+60% in `(program)` corroborates Phase 2: the cost is browser layout/paint work,
+not application JS. The one application-attributable signal is 786 samples of
+`getBoundingClientRect` — forced synchronous layout.
+
+### Two call sites, one of them bounded
+
+- `app/_components/use-mount-manager.ts:47` — `recompute()` measures each tracked
+  card. It is rAF-throttled (`frame.current = null`) and runs once per frame, so
+  it is bounded by the number of near cards.
+- `app/_components/autoplay-driver.tsx:337-345` — `hitTest()` walks up to 32
+  levels, and at each level loops every child calling `getBoundingClientRect()`
+  **and** `getComputedStyle()` in the same pass. Read-after-read is fine, but
+  interleaving with the driver's own DOM writes is the classic thrash shape, and
+  this runs continuously for autoplaying demos rather than only on scroll.
+
+`hitTest` exists for a real reason, documented in place: demos are `inert`, so
+`document.elementFromPoint` always answers `<body>`.
+
+### Not fixed here, deliberately
+
+This is the machinery driving 298 component demos. A wrong "optimisation" —
+caching rects across a pass, or changing traversal — silently breaks demo
+interaction across the catalog, and the lab has no assertion that would catch it.
+Combined with field verification being ~7 days out, blind-optimising it is the
+worst available trade.
+
+Next step, in order: (1) confirm `hitTest` is actually hot by profiling with the
+autoplay driver disabled — if `getBoundingClientRect` self-time collapses, it is
+confirmed; if not, the cost is `recompute` or the browser's own work and this
+lead dies like the others; (2) only then batch the reads, with a demo-interaction
+test in place first.
+
+---
+
+## 12. Re-measuring
 
 Lab harness (per-route TTFB/FCP/LCP/CLS/long tasks/request count) is what
 produced the lab column above. It runs against prod with Playwright, already a
