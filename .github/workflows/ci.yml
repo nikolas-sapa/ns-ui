@@ -50,6 +50,14 @@ jobs:
       - name: Build site
         run: npm run build
 
+      # Client JS weight gate. Reads the build output above — no browser, so it
+      # runs under PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD like everything else here.
+      # It catches new weight only: it is blind to TTFB, paint and INP, which
+      # is why docs/perf-goal.md treats Speed Insights as the real verdict.
+      # Green here means "nothing got heavier", never "still fast".
+      - name: Perf budget
+        run: npm run test:perf-budget
+
   dco:
     name: dco
     # Only meaningful on a PR: the repo's own pre-Phase-B history carries no
