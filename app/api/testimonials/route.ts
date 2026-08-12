@@ -34,6 +34,8 @@ const VALIDATION_CODES = new Set([
   "empty_company",
   "empty_quote",
   "name_too_long",
+  "role_too_long",
+  "company_too_long",
   "quote_too_long",
   "url_too_long",
   "invalid_url",

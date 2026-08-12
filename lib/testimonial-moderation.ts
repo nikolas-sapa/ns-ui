@@ -293,6 +293,12 @@ export function validateSubmission(
   if (!normalized.company) return { ok: false, code: "empty_company" };
   if (!normalized.quote) return { ok: false, code: "empty_quote" };
   if (normalized.name.length > MAX_NAME_LENGTH) return { ok: false, code: "name_too_long" };
+  // `role`/`company` share `MAX_NAME_LENGTH` rather than carrying a bound of
+  // their own — same class of short identity field, and one unbounded string
+  // is enough for a direct Convex caller (the URL this route's doctrine
+  // treats as public) to write a megabyte-scale row.
+  if (normalized.role.length > MAX_NAME_LENGTH) return { ok: false, code: "role_too_long" };
+  if (normalized.company.length > MAX_NAME_LENGTH) return { ok: false, code: "company_too_long" };
   if (normalized.quote.length > MAX_QUOTE_LENGTH) return { ok: false, code: "quote_too_long" };
 
   const profileUrl = validateUrl(normalized.profileUrl);
