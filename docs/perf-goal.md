@@ -529,7 +529,57 @@ test in place first.
 
 ---
 
-## 12. ROOT CAUSE FOUND — card-tied motion, ~10x the main-thread blocking on `/`
+## 12. RETRACTED — the "root cause" was a headless artifact
+
+> **This section previously claimed a confirmed root cause. It was wrong.**
+> A better-controlled experiment falsified it. The original reasoning is kept
+> below the retraction because the mistake is instructive, but do not act on it.
+
+### The falsifying experiment
+
+The original A/B ran in **headless** Chromium, which never autoplays video. Re-run
+**headed** with `--autoplay-policy=no-user-gesture-required`, so the videos
+actually play, 3 runs per condition:
+
+| condition | scroll blocking | median | videos playing |
+| --- | --- | --- | --- |
+| normal | 276 / 126 / 71 ms | **126 ms** | 4, 4, 4, 4 |
+| reduced-motion | 178 / 116 / 172 ms | **172 ms** | 0 (elements absent) |
+
+**No meaningful difference, and reduced motion is marginally *slower* at the
+median.** The ~10x effect does not exist under real conditions.
+
+### What went wrong
+
+Headless reported 2213-4315 ms of scroll blocking where headed reports 71-276 ms
+— an order of magnitude of pure instrument error. The "replication" that gave
+confidence (two experiments, both ~10x) replicated the *artifact*, because both
+ran under the same broken conditions. Replication does not rescue a biased
+instrument.
+
+`featured-card.tsx:243` does gate `<video>` out of the tree under
+`calm === false`, so reduced motion genuinely removes the videos. That part was
+read correctly. It simply does not cost what headless implied.
+
+### What this means for the remaining targets
+
+Headed homepage scroll blocking is ~126 ms median. That is not a performance
+problem, and it undercuts the premises of Phase 3 (§10's 676 ms) and the
+forced-layout lead (§11) equally — all were measured with the same headless
+instrument.
+
+**There is currently no lab-reproducible main-thread problem on `/`.** Field INP
+is 176 ms P75, which Vercel rates Great, and the 2560 ms selector row is 2
+samples on an unknown device. The honest position is that T3/T6 may have no
+defect behind them at all.
+
+Anyone resuming: measure headed, 5+ runs, compare medians. Every blocking figure
+in §2, §10, §11 and the original §12 was produced by an instrument now known to
+inflate by ~10x.
+
+---
+
+## 12b. Original (retracted) reasoning — card-tied motion
 
 The first hypothesis in this document that survived its own disconfirming test.
 
