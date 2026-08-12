@@ -597,6 +597,35 @@ The measurement is what this phase owed. The decision is the owner\'s.
 Whichever is chosen, a demo-interaction test must exist first. Nothing in the
 lab currently fails if a demo silently stops responding.
 
+### Variance warning — do not trust a single blocking run
+
+Three homepage runs under identical conditions, same session, minutes apart:
+
+```
+531 ms   2267 ms   2981 ms      (scroll blocking, same page, same method)
+```
+
+Nearly 6x spread with nothing changed. Any single-run blocking figure in this
+document — including the 464 ms in §2 and the 676 ms in §10 — is one draw from
+that distribution, not a measurement. Only differences that replicate across
+separate experiments should be believed.
+
+The reduced-motion finding in §12 survives this bar: two independent experiments,
+4315 -> 707 ms and 2213 -> 214 ms, both ~10x, plus a corroborating profile shift
+(`(program)` 73% -> 12%). The effect is real even though the absolute numbers are
+not stable.
+
+### Video is neither confirmed nor excluded
+
+An attempt to isolate autoplaying `<video>` by pausing every video and
+re-measuring returned `playing=0` in **all** runs, including the controls:
+headless Chromium never started the videos. The experiment tested nothing. Video
+decode/compositing remains an untested candidate for the §12 delta, alongside the
+autoplay driver and the featured card.
+
+Anyone resuming this: run blocking measurements at least 5x and compare medians,
+and use a headed browser for anything involving video.
+
 ---
 
 ## 13. Re-measuring
