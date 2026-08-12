@@ -122,6 +122,13 @@ export function CommandPalette({
           close();
           router.push(target.href);
         }
+      } else if (e.key === "Tab") {
+        // The input is the dialog's only real focusable control — results
+        // are driven by aria-activedescendant, not tab stops — so trap
+        // focus there instead of letting Tab/Shift+Tab escape to the
+        // sidebar links behind the overlay.
+        e.preventDefault();
+        inputRef.current?.focus();
       }
     };
     window.addEventListener("keydown", onKeyDown);
@@ -168,7 +175,7 @@ export function CommandPalette({
             aria-label="Jump to a component or page"
             autoComplete="off"
             spellCheck={false}
-            className="w-full bg-transparent px-4 py-3.5 text-sm text-foreground outline-none placeholder:text-ns-muted"
+            className="w-full bg-transparent px-4 py-3.5 text-sm text-foreground outline-none placeholder:text-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent"
           />
           <span aria-hidden className="search-trace pointer-events-none motion-reduce:hidden" />
         </div>

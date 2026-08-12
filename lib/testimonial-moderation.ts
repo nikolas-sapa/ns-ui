@@ -290,6 +290,7 @@ export function validateSubmission(
 
   if (!normalized.name) return { ok: false, code: "empty_name" };
   if (!normalized.role) return { ok: false, code: "empty_role" };
+  if (!normalized.company) return { ok: false, code: "empty_company" };
   if (!normalized.quote) return { ok: false, code: "empty_quote" };
   if (normalized.name.length > MAX_NAME_LENGTH) return { ok: false, code: "name_too_long" };
   if (normalized.quote.length > MAX_QUOTE_LENGTH) return { ok: false, code: "quote_too_long" };
