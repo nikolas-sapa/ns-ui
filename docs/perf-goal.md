@@ -728,6 +728,54 @@ before optimising it.
 
 ---
 
+## 12d. CONCLUSION — no actionable performance defect was found
+
+The homepage load profile, headed, 97,196 samples at 50µs:
+
+```
+77.8%  (idle)
+18.0%  (program)        browser style / layout / paint
+ 0.5%  top JS frame     nothing above half a percent
+```
+
+No hotspot. The ~324 ms is diffuse browser rendering of a large page, not a
+concentration any single change removes. There is nothing here to optimise.
+
+### Where that leaves the seven targets
+
+| target | outcome |
+| --- | --- |
+| T1 FCP | Lab FCP is 388 ms median. Field P75 1.99 s is client network, not render. |
+| T2 TTFB | Unreachable. 117 ms origin hop, Convex 4 ms from iad1, ~45/66 samples never touch origin. |
+| T3 INP | Field 176 ms P75 — Vercel rates this **Great**. No lab defect reproduces. |
+| T4 LCP | Field 2.32 s is **Great**. Lab 388 ms. |
+| T5 CLS | Field 0.07 **Great**, lab 0.000 on every route. Held. |
+| T6 selector INP | 2 samples, never reproduced under any method. |
+| T7 gate | **Delivered and proven in CI.** |
+
+Every Core Web Vital is already in Vercel's "Great" band except FCP, whose gap is
+client network. **The premise that started this work — that the site got slower —
+is not supported by any measurement taken here.**
+
+### What the original signal probably was
+
+The baseline was 256 data points with route rows of 1-7 samples, on a Hobby plan
+capped to a 7-day window. At that sample size, percentile rows are noise. The
+2560 ms INP row (2 samples) and the 15.61 s `/changelog` TTFB row (1 sample) are
+the clearest examples: neither survived contact with a real measurement.
+
+### Recommendation
+
+Do not optimise. Ship the gate, let it hold the line, and revisit only if field
+numbers degrade with enough samples behind them to mean something. If the site
+subjectively feels slow to real users, that is worth investigating as a fresh
+question with its own evidence — not by mining this dataset further.
+
+The most useful artifact from this work is not a fix. It is the record of which
+leads are dead, so nobody spends another day on them.
+
+---
+
 ## 13. Re-measuring
 
 Lab harness (per-route TTFB/FCP/LCP/CLS/long tasks/request count) is what
