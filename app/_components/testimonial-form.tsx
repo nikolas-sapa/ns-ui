@@ -16,11 +16,16 @@ const MESSAGES: Record<string, string> = {
   empty_company: "Add your company.",
   empty_quote: "Add a few words about how you use ns-ui.",
   name_too_long: "That name is too long.",
+  role_too_long: "That role is too long.",
+  company_too_long: "That company name is too long.",
   quote_too_long: "That quote is too long.",
   invalid_url: "Check the profile URL.",
   unsupported_url_protocol: "Profile URL must start with https://.",
   url_too_long: "That URL is too long.",
-  rate_limited: "You already have a submission awaiting review.",
+  // The cap is one submission per 24h counted in `testimonialRateLimits`, not
+  // a count of rows still pending — a rejection no longer clears it, so this
+  // can't promise the visitor that something is "awaiting review".
+  rate_limited: "You can submit one testimonial a day. Try again tomorrow.",
   unauthenticated: "Your session expired. Sign in again.",
 };
 
