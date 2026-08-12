@@ -1,0 +1,7 @@
+{
+  "// generated": "npm run test:perf-budget -- --update — see scripts/test-perf-budget.ts",
+  "// tolerance": "CI fails a value exceeding budget by more than 10%.",
+  "// scope": "Client JS weight only. Says nothing about TTFB, paint, or INP.",
+  "totalClientJsKb": 5403,
+  "largestChunkKb": 2215
+}
