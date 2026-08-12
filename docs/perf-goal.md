@@ -529,7 +529,77 @@ test in place first.
 
 ---
 
-## 12. Re-measuring
+## 12. ROOT CAUSE FOUND — card-tied motion, ~10x the main-thread blocking on `/`
+
+The first hypothesis in this document that survived its own disconfirming test.
+
+### The A/B
+
+`prefers-reduced-motion` short-circuits `autoplay-driver.tsx:30`,
+`smooth-scroll.tsx:25`, `smooth-cursor.tsx:39` and `featured-card.tsx:126`, so
+emulating it is a kill switch requiring no deploy.
+
+| page | motion | scroll blocking | load blocking |
+| --- | --- | --- | --- |
+| `/install` (no cards) | normal | **0 ms** | 0 ms |
+| `/install` (no cards) | reduced | 0 ms | 0 ms |
+| `/` (cards) | normal | **2213 ms** | 2295 ms |
+| `/` (cards) | reduced | **214 ms** | 230 ms |
+
+Smooth-scroll and smooth-cursor are exonerated: on a card-free page they cost
+nothing measurable, normal or reduced. The whole delta is **card-tied motion**,
+and it is roughly **10x** on the homepage.
+
+Supporting profile, same A/B: `(program)` — browser style/layout/paint — falls
+from **73% to 12%** of samples, and `getBoundingClientRect` self-time from 87
+samples to 9.
+
+### Why this is also the Phase 2 answer
+
+Phase 2 established interaction cost was presentation-bound with ~0 ms of handler
+processing, but could not say what saturated the main thread. This is it: an
+interaction taken while browsing the catalog lands on a thread already busy with
+per-card demo simulation and its forced layout. That is a credible mechanism for
+the 2560 ms field INP sample on a slower device, and it is consistent with every
+Phase 2 measurement rather than contradicting any.
+
+### Attribution, stated precisely
+
+Confirmed: **card-tied motion systems**. The two candidates are
+`autoplay-driver.tsx` (which drives demo interaction and runs the `hitTest`
+forced-layout walk from §11) and `featured-card.tsx`. The autoplay driver is the
+primary suspect because it is the one performing the forced layout, but reduced
+motion disables both at once, so this A/B does not separate them. Separating them
+needs a build with one disabled — a deploy, not a lab run.
+
+### Still not fixed, and why
+
+Autoplaying demos are the site's core value proposition, not an incidental
+animation. Throttling, capping concurrency, or pausing off-screen demos is a
+**product decision about how the catalog feels**, not a mechanical optimisation,
+and it is exactly the class of change the non-goals section keeps off an agent's
+hands. Field verification remains ~7 days out regardless.
+
+The measurement is what this phase owed. The decision is the owner\'s.
+
+### Options, cheapest first
+
+1. **Pause demos that are mounted but off-screen.** `use-mount-manager.ts`
+   already computes `onScreen` separately from `mounted` for exactly this kind of
+   use, and `LivePreviewFrame` already has a visibility postMessage path.
+2. **Cap concurrent driven demos** to the 2-3 nearest the viewport centre;
+   `recompute()` already sorts off-screen cards by distance.
+3. **Batch the `hitTest` reads** (§11) so the walk stops interleaving
+   `getBoundingClientRect` with `getComputedStyle`. Smallest behavioural risk,
+   smallest expected win.
+4. **Respect reduced motion more aggressively** — already correct, no change.
+
+Whichever is chosen, a demo-interaction test must exist first. Nothing in the
+lab currently fails if a demo silently stops responding.
+
+---
+
+## 13. Re-measuring
 
 Lab harness (per-route TTFB/FCP/LCP/CLS/long tasks/request count) is what
 produced the lab column above. It runs against prod with Playwright, already a
