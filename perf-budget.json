@@ -2,6 +2,7 @@
   "// generated": "npm run test:perf-budget -- --update — see scripts/test-perf-budget.ts",
   "// tolerance": "CI fails a value exceeding budget by more than 10%.",
   "// scope": "Client JS weight only. Says nothing about TTFB, paint, or INP.",
-  "totalClientJsKb": 5403,
-  "largestChunkKb": 2215
+  "// baselined-from": "CI build of main (run 31567054906). The first baseline was taken from a final/integration build, which had deleted registry components main still carries, so it read 581 KB light and the gate correctly rejected it.",
+  "totalClientJsKb": 5984,
+  "largestChunkKb": 2619
 }
