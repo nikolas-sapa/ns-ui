@@ -678,6 +678,56 @@ and use a headed browser for anything involving video.
 
 ---
 
+## 12c. Trustworthy baseline — headed, 5 runs, medians
+
+Replaces every headless figure in §2, §10, §11 and the retracted §12. Method:
+headed Chromium, `--autoplay-policy=no-user-gesture-required`, fresh context per
+run, load + 3 scroll steps, 5 runs per route, medians reported.
+
+| route | FCP | LCP | CLS | blocking | requests |
+| --- | --- | --- | --- | --- | --- |
+| `/` | 388 ms | 388 ms | 0.000 | **324 ms** | 89 |
+| `/categories` | 380 ms | 380 ms | 0.000 | **0 ms** | 120 |
+| `/install` | 340 ms | 340 ms | 0.000 | **0 ms** | 68 |
+| `/changelog` | 324 ms | 324 ms | 0.000 | **0 ms** | 68 |
+
+Homepage raw blocking across 5 runs: 289, 289, 324, 324, 358 — tight, unlike the
+6x spread the headless instrument produced. This is a real, reproducible signal.
+
+### Request count is not the cause
+
+`/categories` issues **more** requests than `/` (120 vs 89) with **zero**
+blocking. Whatever costs 324 ms on the homepage, it is not the number of
+requests — which retires the original §2 framing completely.
+
+### Motion and video are not the cause either
+
+The reduced-motion A/B, re-run correctly (headed, total blocking including load,
+5 runs each):
+
+| condition | median | raw | videos |
+| --- | --- | --- | --- |
+| normal | 349 ms | 269, 304, 349, 364, 413 | 4 |
+| reduced | 328 ms | 259, 290, 328, 346, 353 | 0 |
+
+Removing all four videos changes nothing. `featured-card.tsx:243` genuinely drops
+them from the tree, so this is a real manipulation with a null result. **Video,
+the autoplay driver, and the smooth-scroll stack are all excluded.**
+
+### What is still open
+
+~324 ms of main-thread blocking occurs on `/` and nowhere else, concentrated at
+load rather than during scroll. Untested candidates, in order of prior
+plausibility: the Showcase component's own mount cost across ~298 registry
+items, and parse/execute of the homepage-only ~491 KB chunk.
+
+Whether it is worth chasing is a separate question: field INP is 176 ms P75,
+which Vercel rates Great, and 324 ms of load-time blocking on one route is not
+obviously a user-visible defect. Establish that it costs a real user something
+before optimising it.
+
+---
+
 ## 13. Re-measuring
 
 Lab harness (per-route TTFB/FCP/LCP/CLS/long tasks/request count) is what
