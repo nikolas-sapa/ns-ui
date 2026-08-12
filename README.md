@@ -7,12 +7,12 @@
 [![Live registry](https://img.shields.io/badge/registry-design.helpmarq.com-0B0B0D?style=flat-square&labelColor=0B0B0D&color=0B0B0D)](https://design.helpmarq.com)
 [![CI](https://github.com/nikolas-sapa/ns-ui/actions/workflows/ci.yml/badge.svg?style=flat-square)](https://github.com/nikolas-sapa/ns-ui/actions/workflows/ci.yml)
 
-<!-- generated:count start -->318<!-- generated:count end --> React components you install by URL, no package to depend on. Every one is
+<!-- generated:count start -->326<!-- generated:count end --> React components you install by URL, no package to depend on. Every one is
 built around a single interaction and gated by a Playwright suite that refuses
 to pass a component whose hover looks identical to its resting state.
 
-Two collections. `core` (<!-- generated:core start -->264<!-- generated:core end -->) is restrained and production-facing, Geist-dark.
-`loud` (<!-- generated:loud start -->54<!-- generated:loud end -->) is a deliberately flashy showcase.
+Two collections. `core` (<!-- generated:core start -->257<!-- generated:core end -->) is restrained and production-facing, Geist-dark.
+`loud` (<!-- generated:loud start -->69<!-- generated:loud end -->) is a deliberately flashy showcase.
 
 Browse them live at **[design.helpmarq.com](https://design.helpmarq.com)**.
 

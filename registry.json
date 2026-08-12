@@ -980,46 +980,6 @@
       }
     },
     {
-      "name": "chalk-snap",
-      "type": "registry:ui",
-      "title": "Chalk Snap",
-      "description": "A freehand annotation layer over any UI, doc, or code region: every pointer stroke quantizes live onto an invisible character grid as box-drawing glyphs, so scribbling produces a real, copyable ASCII diagram instead of a screenshot.",
-      "files": [
-        {
-          "path": "registry/core/chalk-snap/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/chalk-snap.tsx"
-        }
-      ],
-      "dependencies": [],
-      "cssVars": {
-        "theme": {
-          "color-ns-muted": "var(--ns-muted)",
-          "color-ns-accent": "var(--ns-accent)"
-        },
-        "light": {
-          "ns-muted": "#4d4d4d",
-          "ns-accent": "#006bff"
-        },
-        "dark": {
-          "ns-muted": "#8f8f8f"
-        }
-      },
-      "meta": {
-        "collection": "core",
-        "tags": [
-          "annotation",
-          "ascii",
-          "box-drawing",
-          "drawing",
-          "freehand",
-          "clipboard",
-          "keyboard-navigation"
-        ],
-        "instruction": "Wraps `children` (the UI/doc/code region being annotated — optional, omit for a blank grid sized by `cols`/`rows`) with an invisible cell grid measured off the real font metrics: a hidden 1ch x 1lh probe span plus a ResizeObserver on the host (same idiom as container-box-drawing), so the grid always tiles to whole characters over whatever content sits underneath, no assumed pixel size. THE MECHANISM: on pointerdown the grid captures the pointer and starts a walk; on every pointermove, `walkTo` converts the continuous pointer position into a discrete cell-by-cell walk toward it, one grid step per iteration, choosing between the horizontal and vertical axis with a hysteresis margin (a committed axis keeps winning unless the other axis's delta beats it by more than HYSTERESIS) — this is what stops a hand that's basically drawing a straight line from flickering the glyph between ─ and │ on every wobble pixel. Each committed step OR-accumulates a 4-bit N/E/S/W direction mask into a shared `Map<'x,y', mask>` covering every stroke ever drawn (never reset except by Clear), and a 16-entry lookup table turns any accumulated mask into its box-drawing character: straight runs (─│), corners (┌┐└┘), three-way junctions (├┤┬┴), and the four-way crossing (┼) — so two strokes that cross or meet resolve their junction from neighbor bits alone, no separate pass. A stroke's trailing pointer speed is smoothed (exponential, 0.6/0.4) across pointermove events; if it clears ARROW_VELOCITY at pointerup, the final cell gets an arrowhead (► ◄ ▲ ▼) in the direction of travel instead of a plain rule. SETTLE: every cell whose mask (or arrow) actually changes bumps its own generation counter, which is folded into that glyph span's React `key` — the remount replays a 220ms ease-out-expo (`cubic-bezier(.16,1,.3,1)`) keyframe that scales and translates in from CSS custom properties holding the raw pointer offset at the moment that cell committed, back to the cell's true center, so the glyph visibly snaps from where the hand actually was to where the grid disciplined it. TRAIL: an SVG polyline of the raw, unsnapped pointer path renders in `--ns-accent` while a stroke is active, then fades over ~200ms after pointerup before its points are cleared — the accent color never touches settled ink, only the live gesture and the keyboard cursor. KEYBOARD: the grid is one focusable region (a real aria-label states every control). Arrow keys move a visible `--ns-accent`-outlined cursor cell, shown only while the region has focus. Shift+Arrow commits one segment through the identical `applyBit` path pointer strokes use, grouping consecutive shift-moves into one open run; a plain arrow move (or Escape) closes that run without an arrowhead, Enter caps it with one in its last direction. A11Y: the glyph raster and the raw trail are both `aria-hidden` — box-drawing glyphs read character-by-character by a screen reader are noise, not signal. A visually-hidden `<ul>` is the shadow description instead: one line per completed stroke, plain language ('arrow from row 3 col 10 to row 3 col 42' / 'line from row 1 col 4 to row 5 col 4'), kept in sync by the same `recordStroke` call both pointer and keyboard paths use. `Copy raster` builds the plain-text grid (trailing whitespace trimmed per row) and writes it via the Clipboard API; the result — success, empty-grid no-op, or failure — lands in a `role=status aria-live=polite` region since the write is async. `Clear` resets the grid, the trail, and the stroke log in one action. Every color is a token (`--foreground` for settled ink, `--ns-accent` for the live trail and cursor only, `--border`/`--ns-muted` for chrome) — no hex. `prefers-reduced-motion` removes the settle keyframe and the trail/cursor transitions; the grid, the walk, and the copy/clear controls stay fully usable with instant state changes instead of animated ones. Pure DOM + CSS + a transient SVG path — no canvas."
-      }
-    },
-    {
       "name": "chart-bar-dither",
       "type": "registry:ui",
       "title": "Chart Bar Dither",
@@ -1493,46 +1453,6 @@
           "micro-interaction"
         ],
         "instruction": "Build a checkbox group styled as a carved tally board. STRUCTURE: a bordered bg-surface card (role=group with aria-label from the label prop) whose header carries the group label, an SVG tally cluster, and an aria-live 'checked/total' mono counter; below, one full-width row per item, each a real <button role=checkbox aria-checked> containing a 20px SVG notch mark, the label, and an optional mono hint line. STROKES: every stroke is an SVG <path pathLength={1}> with strokeDasharray 1, drawn by transitioning strokeDashoffset 1 -> 0 over 260ms (ease-out-back-ish cubic-bezier(0.22,1,0.36,1)) and retracted on uncheck with an ease-in curve; the row's notch is two cuts, a short down-stroke then the long up-stroke delayed 120ms so the carve reads as two motions. TALLY CLUSTER: render items.length strokes grouped in fives, four leaning verticals (6px pitch) then a diagonal slash across the group; stroke k is drawn when checkedCount > k, with a 30ms per-position stagger so a batch (e.g. defaultChecked at mount) carves in sequence. Jitter every stroke's lean, length, and endpoints with a deterministic mulberry32-style hash of its index so the carving looks hand-cut but renders byte-identical every mount (stable screenshots). INK: strokes stroke='var(--foreground)', unchecked notch boxes stroke='var(--border)', all chrome from the border/surface/muted tokens — zero hex in markup, both themes render. STATE: uncontrolled Set<string> seeded from defaultChecked, onChange fires with checked ids in items order; checked rows dim their label to text-ns-muted. INTERACTION: rows are native buttons so Space/Enter toggle and Tab reaches every row; hover tints the row bg-border/40; focus-visible draws an inset 2px accent outline. Reduced motion: strokes and notches snap with transition:none. No canvas, no timers, no observers — the only state is the Set, everything else is CSS transitions on SVG attributes."
-      }
-    },
-    {
-      "name": "chord-punch",
-      "type": "registry:ui",
-      "title": "Chord Punch",
-      "description": "A keyboard-shortcut recorder: click to arm it, press a combination, and each key punches into place as a box-drawing keycap — modifiers seating first in canonical order, the terminal key striking last with a spring overshoot, and a collision against a supplied bindings map surfacing live as a second, muted row under a ≠ rule.",
-      "files": [
-        {
-          "path": "registry/core/chord-punch/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/chord-punch.tsx"
-        }
-      ],
-      "dependencies": [],
-      "cssVars": {
-        "theme": {
-          "color-ns-muted": "var(--ns-muted)",
-          "color-ns-accent": "var(--ns-accent)"
-        },
-        "light": {
-          "ns-muted": "#4d4d4d",
-          "ns-accent": "#006bff"
-        },
-        "dark": {
-          "ns-muted": "#8f8f8f"
-        }
-      },
-      "meta": {
-        "collection": "core",
-        "tags": [
-          "keyboard",
-          "shortcuts",
-          "input",
-          "recorder",
-          "settings",
-          "accessibility",
-          "box-drawing"
-        ],
-        "instruction": "Build <ChordPunch id label placeholder value defaultValue onChange bindings className>. STATE: a committed ChordValue ({ctrl, alt, shift, meta, base}) is controlled via `value`/`onChange` or runs uncontrolled from `defaultValue`; a separate `isRecording` boolean gates capture. ENTRY: the field is a role=button div (never a native <button>, so it owns Enter/Space instead of them auto-firing a click) that arms recording ONLY on a real click or an Enter keydown while idle — Tab landing on it does nothing, matching the rule that a keyboard user tabbing through a settings form must never have their next keystroke swallowed by surprise. Clicking is idempotent: it always (re)arms a fresh empty capture rather than toggling, so a second click while already recording is harmless — this is what keeps the verifier's press-pass-then-gate-click sequence resolving correctly instead of toggling back out. CAPTURE: once armed, every keydown on the surface is intercepted (preventDefault) except Tab, which is never touched, armed or not. Modifier keydowns (Control/Alt/Shift/Meta) update a `seated` flag set from the event's own ctrlKey/altKey/shiftKey/metaKey and render a keycap in fixed canonical slots — ⌃ then ⌥ then ⇧ then ⌘ — regardless of physical press order, so Shift-then-Cmd and Cmd-then-Shift seat identically. The first non-modifier keydown is the terminal key: its chord is frozen from THAT event's own modifier flags (not the live-accumulated set, so a modifier keydown the handler happened to miss can never corrupt what commits) and its keycap punches in with a spring-overshoot animation (cubic-bezier(0.34,1.56,0.64,1), scale 0.5 -> 1.18 -> 1), replayed on every strike by remounting the keycap off an incrementing sequence number so hitting the same key twice in a row still visibly re-punches. A Set of currently-down event.codes tracks every held key; the whole chord only commits once that Set empties AND a terminal key was struck — releasing modifiers while still holding the terminal key does not commit early, and releasing modifiers alone (no terminal key ever struck) commits nothing and leaves recording armed for another attempt. Escape cancels outright: exits recording and reverts to whatever was committed before, discarding the in-progress attempt. Backspace un-strikes only the terminal keycap (seated modifiers and the held-codes tracking are left alone), so the user can try a different terminal key without re-holding modifiers. Losing focus while armed cancels the same way Escape does — a field can never be left silently capturing keystrokes after the user has moved on. CONFLICTS: a `bindings: {id,label,chord}[]` prop is checked by exact modifier+base signature both live (the instant a terminal key strikes, before release) and again on commit, excluding any entry whose id matches this recorder's own `id` — a hit renders the colliding binding's keycaps in --ns-muted on a second row beneath a ≠ rule (two flex-1 rules either side of the glyph), so the clash is part of the surface the moment it exists rather than a toast arriving after the fact. RENDERING: each keycap is framed with box-drawing corner glyphs ⌜ ⌝ ⌞ ⌟ absolutely positioned at the corners of a small relatively-positioned box around the letter (not a CSS border rectangle) — corners and glyph in --foreground at rest, --ns-accent only transiently while a keycap is mid-strike-animation (interaction-only use of the accent), --ns-muted for a colliding binding's row. A11Y: entry and exit are announced through a role=alert aria-live=assertive region present and empty at mount ('Recording, press a combination, escape to cancel.' on arm; the full spoken chord plus any conflict clause, e.g. 'Command Shift K, conflicts with Delete Line', on commit; 'Recording cancelled.' on Escape) — spoken words, never raw glyphs, via a SPOKEN_BASE lookup so a screen reader is never handed an unnamed Unicode arrow. The accessible name itself does not depend on that live region having fired: a visible label span plus a visually-hidden state span are combined with aria-labelledby, so the name is correct at every render including the very first. No canvas — DOM + CSS only, keycaps and the box-drawing frame are plain Unicode glyphs in flex/absolute-positioned spans."
       }
     },
     {
@@ -3385,48 +3305,6 @@
       }
     },
     {
-      "name": "flood-mark",
-      "type": "registry:ui",
-      "title": "Flood Mark",
-      "description": "A threshold-setting control drawn over its own history: the last 30 days plot as a braille dot field and you drag a horizontal ─── rule up and down through it, with every day above the rule flipping live from a muted dot to a solid foreground ▴ and a fixed line stating exactly what that setting would have cost — 'would have fired 3 times last month', broken down per week.",
-      "files": [
-        {
-          "path": "registry/core/flood-mark/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/flood-mark.tsx"
-        }
-      ],
-      "dependencies": [],
-      "cssVars": {
-        "theme": {
-          "color-ns-muted": "var(--ns-muted)",
-          "color-ns-accent": "var(--ns-accent)"
-        },
-        "light": {
-          "ns-muted": "#4d4d4d",
-          "ns-accent": "#006bff"
-        },
-        "dark": {
-          "ns-muted": "#8f8f8f"
-        }
-      },
-      "meta": {
-        "collection": "core",
-        "tags": [
-          "slider",
-          "threshold",
-          "sparkline",
-          "braille",
-          "monitoring",
-          "alert",
-          "drag",
-          "history",
-          "accessibility"
-        ],
-        "instruction": "Renders `history` (an array of daily samples, ideally 30, oldest first) as a braille-dot scatter field and a draggable horizontal rule — the flood mark — that sets a threshold value against it. FIELD: ROWS=8 stacked bands of braille cells span the field's fixed height; each day's value maps to one of ROWS*4 quantized vertical slots via the left column's 4 addressable dot bits (dots 1/2/3/7, top-to-bottom, U+2800 + bit), so each day renders as exactly one single-dot braille glyph at the row/sub-row its value rounds to — a real 2D scatter of history, not a bar chart. RULE: a full-width row of '─' glyphs sits at a CONTINUOUS y position (unmixed with the field's ROWS*4 quantization) computed straight from the live threshold value against the same min/max domain, with a small mono tag ('{value}{unit}') riding its right end and a grab-dot ('●') at its left end that recolors to --ns-accent only while actively being dragged (never at rest, never on hover — accent is interaction-only) — everything else on the rule is --foreground/--border/--background tokens. COMPARISON: every render, each day's raw value (not its quantized dot slot) is compared directly against the live threshold — days above it ('would have fired') cross-fade their single-dot glyph to a solid foreground '▴' via two stacked absolutely-positioned spans toggling opacity 0/1 on a 150ms transition, with transition-delay = min(240, round(|value-threshold|/domain * 8) * 30)ms, so a big threshold jump visibly ripples outward from the rule's new position rather than flipping every day in lockstep; drag and arrow-key stepping both drive this identically since it's derived purely from render-time value comparison, not a separate animation trigger. CONSEQUENCE: below the field, a line reads 'would have fired {N} times last month — wk1 {c} · wk2 {c} · ...' (history chunked into 7-day weeks) — the number is never shown without its per-week retrospective cost. DETENTS: p50/p95/p99 of `history` render as faint muted tick marks off the field's left edge; dragging soft-snaps the raw pointer value to any detent within 2% of the domain, and Shift+ArrowUp/Right (or Shift+ArrowDown/Left) jumps straight to the next detent above (or below) the current value, falling back to an ordinary `step` move past the top/bottom detent. INTERACTION: the entire field (not just the rule strip) is one role=slider node, tabIndex=0, aria-orientation=vertical (the value axis IS vertical here, even though the glyph itself is a horizontal line), aria-valuemin/max from the real metric domain, aria-valuenow=current, and aria-valuetext carrying the full consequence sentence ('threshold 480ms, 3 alerts in the last 30 days') rather than the bare number — pointerdown anywhere in the field jumps the rule there and begins a drag (pointer capture on the same node), ArrowUp/Right and ArrowDown/Left step by `step`, Home/End go to the domain rails. The consequence paragraph is `role=status aria-live=polite` and doubles as the only live region — since `commit()` only actually updates state when the quantized value changes, a drag doesn't spam re-announcements every pixel, only at each real step. The braille field and the detent ticks are `aria-hidden` and `pointer-events-none` (decorative; the slider node carries all real semantics and pointer handling); the rule's visual row (dashes, grab-dot, value tag) is also `aria-hidden` since it's drawn purely from state already exposed via aria-valuetext. `prefers-reduced-motion: reduce` collapses the cross-fade transition and its ripple delay to 0ms; the rule's own position never animates (it tracks the live value directly, no tween). Colors are token utility classes only — text-foreground, text-ns-muted (plus /0 and /50 and /80 opacity variants), border-border, bg-background, text-ns-accent for the two interaction-only spots — no hex, no canvas, DOM+CSS only."
-      }
-    },
-    {
       "name": "footer-ascii-rule",
       "type": "registry:ui",
       "title": "Footer ASCII Rule",
@@ -3642,46 +3520,6 @@
           "developer-tools"
         ],
         "instruction": "Build <GitGraphAsciiLanes commits? head? className?> where `commits` is `{id, subject, author, date, parents: string[], branch?}[]` in newest-first topological order, and render it exactly the way `git log --graph` renders a history: a monospace lane grid of DOM rows, no canvas and no rAF loop anywhere. THE LANE ALLOCATOR (the actual mechanic, not a router): keep one `active: (string|null)[]` array, initially empty, and walk the commit list top to bottom. For each commit c: `lane = active.indexOf(c.id)`; if -1, `lane = active.indexOf(null)`; if still -1, `lane = active.push(null) - 1`; then `active[lane] = c.id` so the row's snapshot shows the slot occupied. Snapshot `active` for the commit row, then free every OTHER slot still holding c.id — a branch converging — setting it null and recording a CLOSE pair `(thatLane -> lane)`. Set `active[lane] = c.parents[0] ?? null`. For each extra parent p at index >= 1 (i.e. a merge): `pLane = active.indexOf(p)`, else the lowest null slot, else a pushed new slot; `active[pLane] = p`; record an OPEN pair `(lane -> pLane)`. ROW RENDERING: every lane is 2 characters wide (glyph plus a spacer column). The commit row draws `●` at the commit's own lane — `◍` instead when `parents.length > 1`, so a merge is distinguishable by GLYPH and never by hue — `│` at every other non-null lane, and a space at null lanes. The CONNECTOR row is emitted between two commit rows only when that commit produced open or close pairs: live lanes are laid down as `│` first, then for each pair spanning lanes a<b it writes `├` at a, `─` across every intermediate column, and `┐` at b for an open pair or `┘` at b for a close pair; any live lane whose `│` the horizontal run crosses is upgraded to `┼`, and untouched live lanes keep their `│`. Lanes past MAX_LANES = 6 collapse: the last lane column (index MAX_LANES - 1) renders `⋯` and every lane at or beyond it is drawn there. The entire grid is ONE `useMemo` over (commits, collapsedMerges) that rebuilds from an EMPTY `active` array — never patched incrementally — so layout is a pure function of the data. INK is monochrome plus one accent and carries no branch identity: at REST the first-parent trunk lane's glyphs and every commit subject are `--foreground`, every other lane glyph and connector is `--ns-muted`, shas and author/age are `--ns-muted`, and HEAD's dot and sha are `--ns-accent`. `--border` is reserved exclusively for the dimmed non-ancestor state below, so the resting braid is never drawn in the faintest token and is fully legible before any input. ANCESTOR LIGHTING: hovering or keyboard-focusing a row runs a BFS over `parents` from that commit, and every row NOT in the resulting ancestor set — plus every lane column whose current occupant is not in it — drops to `--border` while the ancestor chain and the lanes it occupies hold `--foreground` (`--ns-accent` on HEAD), so the branch you are asking about lights up through the braid. Pointer-out or blur restores full ink across a 140ms color transition with no state left behind. COLLAPSE: Enter or Space on a merge row toggles that merge into a `collapsedMerges` set; the grid pass then walks that merge as if it had only its first parent, hides every commit reachable from its second parent but NOT from its first (an exclusive-ancestor set difference), and emits a single `⋯ N commits from feat/router` row in their place — because the whole lane grid is re-derived, the side lane is never opened and the braid visibly straightens; Enter again expands it. Enter on a non-merge row instead pins its ancestor highlight so it survives pointer-out. KEYBOARD: roving tabindex across the commit rows with ArrowUp/ArrowDown and Home/End, Escape clearing both the hover and pinned highlight, a real `<button>` per commit carrying an `aria-label` naming the subject, sha, author, age, HEAD status and the available action, `aria-expanded` on merge rows, and a `:focus-visible` outline in `--ns-accent` at `-2px` offset on every row. Tokens only (`--background --foreground --ns-muted --border --ns-accent`) applied as Tailwind token classes, never hex, correct in both themes. There is no ambient animation to gate, and every transition is `motion-reduce:transition-none`, so `prefers-reduced-motion` leaves the component fully usable and instantly settled. Props: `commits` (defaults to a 13-commit sample history with two merges and two side branches), `head` (commit id HEAD points at, defaults to the newest commit), `className`. Zero dependencies."
-      }
-    },
-    {
-      "name": "grain-crest",
-      "type": "registry:ui",
-      "title": "Grain Crest",
-      "description": "Sortable data-table column headers where each one carries a one-line braille micro-histogram of its own column's distribution, so skew, outliers and bimodality are answered before anyone sorts.",
-      "files": [
-        {
-          "path": "registry/core/grain-crest/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/grain-crest.tsx"
-        }
-      ],
-      "dependencies": [],
-      "cssVars": {
-        "theme": {
-          "color-ns-muted": "var(--ns-muted)",
-          "color-ns-accent": "var(--ns-accent)"
-        },
-        "light": {
-          "ns-muted": "#4d4d4d",
-          "ns-accent": "#006bff"
-        },
-        "dark": {
-          "ns-muted": "#8f8f8f"
-        }
-      },
-      "meta": {
-        "collection": "core",
-        "tags": [
-          "table",
-          "data-viz",
-          "sortable",
-          "histogram",
-          "distribution",
-          "braille",
-          "accessibility"
-        ],
-        "instruction": "Sortable <table> column headers that each stack three lines inside their sort button: (1) the label, an optional small aria-hidden ᴸ tag, and a caret that fills in and rotates on the active column; (2) a 16-glyph aria-hidden strip computed from that column's own values — numeric columns render a histogram on the braille fill ramp ' ⣀⣤⣶⣿' (0..4 dots-per-cell, bottom-anchored), log-binned (edges = min·(max/min)^(i/16)) with the ᴸ tag shown whenever max/median >= 4 so a right-skewed column doesn't collapse into one saturated bin; categorical columns render a dominance bar instead — filled cells (⣿, text-foreground) sized to round(topShare*16), remainder as a dim track (⣀, text-ns-muted/40); (3) a fixed-height marker track. RENDERING: plain semantic <table> in a rounded-md border border-border bg-background card — no canvas, no SVG chart, DOM+CSS only (one 8x8 inline <svg> per header is just the sort caret icon). INTERACTION: clicking a header's button (type=button, native Enter/Space) sorts the whole table by that column, numeric defaulting to descending and categorical to ascending on first click, toggling direction on repeat clicks of the same column; the crest itself never changes shape, since sorting doesn't change the data — instead, on the active column only, a ▸ marker (text-ns-accent, position:absolute, left set inline and eased with transition: left 550ms cubic-bezier(0.19,1,0.22,1), disabled to an instant snap when prefers-reduced-motion) shows where the row now on top of the table sits inside that column's OWN distribution: for numeric columns, the bin its value falls into; for categorical, the middle of the dominant zone if the top row's category is the dominant one, otherwise the middle of the non-dominant remainder. Toggling direction on the same column flips which end the top row's value sits near, which is what actually drives the marker's slide. Hovering a strip (onPointerMove computing a bin/segment from cursor fraction) writes a plain-text line — bin range and row count, or category and share — into a shared detail bar below the table (not a floating tooltip); focusing a header button writes that column's full stat summary into the same bar as a sighted keyboard-parity affordance, cleared on blur/pointerleave. TOKENS: --foreground, --ns-muted (including a /40 opacity cut for the dominance track), --border, --background, --ns-accent reserved for the marker and the focus ring — never for the histogram or dominance-bar ink itself, so accent stays interaction-only. A11Y: standard th[aria-sort=ascending|descending] (omitted, not 'none', when the column isn't the active sort — matches the rest of the registry), the header's real accessible name is a computed aria-label of the form '<Label>, sortable, median 120ms, range 40 to 2100, right-skewed' (or 'sorted ascending'/'descending' once active, and a categorical form giving category count and top share) so the crest's information survives without vision even though the glyphs themselves are aria-hidden; Tab reaches every header button in DOM order, resting state has no marker in the DOM at all (mounts only once a column is sorted). DEMO: a 16-row 'request latency by route' table — Latency (ms, right-skewed 42..2100, gets the ᴸ tag), Cost ($, roughly linear, no tag), Region and Status (categorical dominance bars) — plus a leading, non-sortable Endpoint identity column so the table's first interactive control is unambiguously a grain header."
       }
     },
     {
@@ -4393,48 +4231,6 @@
           "typography"
         ],
         "instruction": "A hero headline rendered twice — messageA (the problem) and messageB (the promise) — into a shared stage cut into N thin vertical strips (~pitch px each, default 10, actual count derived live from the stage's own width via ResizeObserver, clamped 22-64). Each strip is its own overflow:hidden peephole div holding two oversized copies of the full headline text (window for B underneath, window for A on top), each shifted left by exactly that strip's index times the stage width so the visible sliver in every strip lines up with its neighbors into one continuous line — the classic 'replicate the whole image, offset each copy, clip with a small window' lenticular-strip trick, no canvas. One custom property, --lens-angle (a signed degree number, used only inside calc(), no CSS unit), drives every strip: window-A's opacity is clamp(0, 0.5 - (angle/9)*0.5 + strip-jitter*0.12, 1) where strip-jitter is a deterministic hash of the strip's index baked in at mount (-1..1) — so as the whole headline sweeps from angle -9 (message A fully wins every strip) to +9 (message B fully wins every strip) the strips whose jitter sits furthest from the pack lag behind and keep interlacing a beat after the rest have committed, a residual seam a real lenticular print never fully resolves. Both windows in a strip also translateX by angle * that strip's centered index (i - (count-1)/2) * 0.05px, a few tenths of a pixel of per-strip parallax shimmer, the 'tilt the plastic sheet' cue. --lens-angle has exactly one writer: a single rAF loop that reads the component root's own getBoundingClientRect() every frame (viewport-relative, so it is correct whether the page itself scrolls or the root sits inside a nested overflow-y:auto ancestor — no scroll-event listener, no scroller coupling). At rest (scroll progress 0) a damped spring (k=34 s^-2, zeta=0.55, visible settle wobble) bounces the angle between -3 and +3 deg on a 4s half-period — an 8s full swing — so the two messages shimmer against each other and the resting frame is deliberately the ambiguous in-between, never a clean read of either. Once the root starts scrolling out of the viewport, progress = clamp(-rect.top/rect.height, 0, 1); an eased scroll term (easeOutCubic(min(progress/snapAt,1)) * 9deg) ramps the angle toward a full commit to messageB by snapAt (default 0.4) of the root's own height, while the idle spring's contribution fades to 0 weight over that same span so the two drivers hand off rather than fight — past snapAt the angle holds at its resolved value, a clean snap rather than a continuing creep. Consumers size 'the hero' by giving the root a min-height via className (the demo uses flex + min-h-[380px]); snapAt is relative to the root's rendered height, not just the single text line. The real <h1> is a visually-hidden (sr-only) element containing messageA followed by messageB as plain text, read exactly once, unconditionally, with no interaction required; the entire strip apparatus is aria-hidden. Zero interactive controls — this replaces a headline plus subhead, not a widget, so the a11y control audit's Tab-reachability rule does not apply. prefers-reduced-motion: the spring and the easing are both skipped; the angle is pinned to -9 (full messageA) at progress 0 and flips once, with no interpolation, to +9 (full messageB) the instant progress crosses snapAt — no oscillation, no creep, still legible and still resolves. All ink is var(--foreground); no color other than the token is used anywhere in the strip apparatus. Zero dependencies."
-      }
-    },
-    {
-      "name": "light-table",
-      "type": "registry:ui",
-      "title": "Light Table",
-      "description": "A binary inspector rendered as an offset gutter, a hex pane and an ASCII pane on a light table. Hovering or focusing any byte cell registers the matching cell across panes with a foreground tint and a hairline rule drawn across the seam between them, so hex and ASCII resolve to the same byte instead of two disconnected dumps.",
-      "files": [
-        {
-          "path": "registry/core/light-table/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/light-table.tsx"
-        }
-      ],
-      "dependencies": [],
-      "cssVars": {
-        "theme": {
-          "color-ns-muted": "var(--ns-muted)",
-          "color-ns-accent": "var(--ns-accent)"
-        },
-        "light": {
-          "ns-muted": "#4d4d4d",
-          "ns-accent": "#006bff"
-        },
-        "dark": {
-          "ns-muted": "#8f8f8f"
-        }
-      },
-      "meta": {
-        "collection": "core",
-        "tags": [
-          "hex-editor",
-          "binary-inspector",
-          "developer-tool",
-          "ascii",
-          "mono",
-          "grid",
-          "keyboard-navigation",
-          "selection",
-          "data-visualization"
-        ],
-        "instruction": "Build <LightTable bytes bytesPerRow title className> over a byte array (default a 64-byte plausible PNG-header fragment chosen so every value class already appears at rest: the 0x89 signature byte is high-bit, 'PNG'/'IHDR'/'tEXt' are printable, CR/LF/SUB/NUL are control/null). Three-column CSS layout in Geist Mono: an offset gutter (one row label per 16-byte row, e.g. '0x0010'), a hex pane (role=grid, one button per byte, 16 per row), a thin inter-pane seam, then an ASCII pane (aria-hidden, mirrors the hex grid's information so it never duplicates it for assistive tech) — thin --border rules separate every column. MECHANIC: hovering (pointerenter) or focusing any byte cell in either the hex or ASCII pane sets one shared 'live index'; whichever cell (hex or ASCII) currently holds that index gets an inline style background of exactly color-mix(in srgb, var(--foreground) 8%, transparent) — never a Tailwind opacity utility for this specific tint, the literal CSS function is the point — and an absolutely positioned 1px rule (data-bridge-rule) is drawn across the seam column, overhanging slightly into both panes, at that row's vertical center — only rendered when a live index exists, so nothing crosses the seam at rest. The live index is hoverIndex when the pointer is over a cell, else focusedIndex when the hex grid currently holds DOM focus, else null — so resting between interactions shows no tint and no seam rule, and byte structure is legible purely from the value-class ramp. VALUE-CLASS RAMP: every hex and ASCII cell carries a data-value-class attribute (null/control/highbit/printable) driving both its text color and, in the ASCII pane, its glyph — 0x00 renders '·', 0x01-0x1F and 0x7F render '▖', 0x80-0xFF render '▓', printable bytes render their real character — so non-printable structure reads before any interaction, not as a uniform dot. SELECTION: focusedIndex is a roving-tabindex active cell (tabIndex 0 only on the current cell) that Shift-drag (pointerdown with shiftKey sets the anchor to the prior focusedIndex if none exists yet and starts a drag; subsequent pointerenter while dragging keeps moving focusedIndex) or Shift+ArrowKey (preventDefault; anchor set to focusedIndex before the move if none exists, then focusedIndex moves) extends into a contiguous byte range; a bare click or plain ArrowKey clears the anchor and collapses to a single cell. Selected cells get the same color-mix background at a stronger 14% mix, applied identically to both panes. KEYBOARD: ArrowLeft/Right move ±1 byte, ArrowUp/Down move ±bytesPerRow (a 16-byte row jump by default), all clamped to the array bounds. FOOTER: a visible plain-text bar beneath the panes prints, when a range is active, 'selected <n> bytes at 0x<start>–0x<end> · u16=0x<hex> · u32=0x<hex> · utf8=\"<escaped>\"' (u16/u32 little-endian, present only once the range is long enough to fill them; utf8 is a TextDecoder('utf-8',{fatal:false}) best-effort decode of the exact selected bytes, JSON-escaped for control characters); with no range it prints the single hovered/focused byte's offset, hex value and descriptor, or a plain hint at rest. A separate visually-hidden aria-live=polite element (not the visible footer, so it doesn't re-announce on every hover) carries only the short form ('selected 8 bytes at 0x40') and is empty outside a range, so range changes announce without also announcing every hover. A11Y: the hex pane is role=grid with role=gridcell buttons, each named 'offset 0x<idx>, value 0x<byte>, <descriptor>' where descriptor is a control-code mnemonic (NUL, LF, ESC, DEL, ...), the literal printable character, or 'non-ASCII'; the ASCII pane is aria-hidden entirely since it duplicates the grid's information. Colors are token-only (--background/--foreground/--ns-muted/--border via Tailwind utilities, plus the two literal color-mix(var(--foreground)) tints and --ns-accent solely on the focus-visible ring) — no canvas, nothing to re-derive on theme change. No motion beyond a 100-150ms color/opacity transition, skipped under prefers-reduced-motion via motion-reduce:transition-none; there is no rAF loop anywhere in this component."
       }
     },
     {
@@ -5812,48 +5608,6 @@
           "accessibility"
         ],
         "instruction": "A model picker that replaces the dropdown-of-marketing-names with the actual decision, drawn as a small self-explaining scatter-plot instrument. Given a models[] prop of {id, name, cost, latency, score}, it computes the real Pareto frontier by pairwise dominance (a model dominates another if it is no worse on cost AND latency AND score, strictly better on at least one) independent of any display mode, then plots every model at x = a weighted blend of normalized cost and normalized latency (the blend ratio is the only thing the speed/balance/quality toggle changes) and y = normalized quality score, higher score sitting higher. The y-axis is labelled QUALITY↑ in the top-left corner — the cheap-and-excellent corner that never has a point in it — and the x-axis is captioned 'cheaper·faster' → 'costlier·slower', so at rest the form states what is being compared and which way is better. FRONTIER: the non-dominated models are connected by one rising SVG polyline and marked with solid --foreground node dots; because the line only rises left-to-right, its shape IS the tradeoff (you cannot gain quality without moving right into cost/latency). DOMINATED: every dominated model is a hollow --ns-muted node at its own honest position below the line, joined to the ridge by a faint vertical connector whose length is literally the quality you forfeit by choosing it — never hidden or filtered out, always selectable. SELECTION: a real role=radiogroup of role=radio buttons, one per model, roving tabindex, Arrow keys move AND commit in visual x-order (Home/End jump to the ends), recomputed from the CURRENT axis mode so traversal always matches left-to-right on screen. A drag anywhere on the plot computes the pointer's x-fraction and snaps to the nearest node by 1D distance (a Voronoi partition of the x-axis) committing on every zone crossing, so dragging walks the selection node-to-node rather than echoing a free pointer. The selected node is the only place --ns-accent appears: a filled accent dot with a soft accent halo. READOUT: beneath the plot a bordered panel names the selected model, prints its three raw numbers (cost /1k, latency s, score) in Geist Mono, tags it 'on frontier' or 'dominated', and prints — once per COMMIT, never per drag pixel — the concrete delta versus the previously selected model ('vs Atlas Mini +0.4s · +$0.35/1k · +11 MMLU'); when the selection is dominated it instead states who beats it and by how much at no higher cost or latency. A visually-hidden aria-live=polite region announces the same change in words on every focus/commit ('0.4 seconds slower, 35 cents more expensive per thousand, 11 points higher quality'). A small legend names the two node kinds. AXIS TOGGLE: a speed/balance/quality segmented control (its own role=radiogroup) re-weights the cost/latency blend that produces x; every node's position, the ridge path's `d`, and every connector transition together on an ease-out-expo curve (cubic-bezier(0.16,1,0.3,1), 450ms) — the frontier's point count never changes between modes, only x, so the path stays interpolation-safe. COLORS: --foreground for the ridge line and frontier dots, --ns-muted for dominated dots, connectors and captions, --border for the baseline and readout panel, --ns-accent only for the selected dot and its halo. REDUCED MOTION: every transition is skipped — positions snap to target. No canvas: one aria-hidden SVG draws only the straight lines (preserveAspectRatio=none, non-scaling-stroke), while every node dot is a real DOM element positioned by percentage so it stays a perfect circle at any aspect ratio and the hit-target buttons stay pixel-aligned with no ResizeObserver; all data lives in each radio's aria-label, never in the SVG."
-      }
-    },
-    {
-      "name": "pin-barrel",
-      "type": "registry:ui",
-      "title": "Pin Barrel",
-      "description": "A cron-expression field with a physical firing preview: five mono sub-inputs sit above a seven-day rule of muted dots, and every hour the expression actually fires gets a raised pin that seats with a small spring overshoot and drops out when the expression changes.",
-      "files": [
-        {
-          "path": "registry/core/pin-barrel/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/pin-barrel.tsx"
-        }
-      ],
-      "dependencies": [],
-      "cssVars": {
-        "theme": {
-          "color-ns-muted": "var(--ns-muted)",
-          "color-ns-accent": "var(--ns-accent)"
-        },
-        "light": {
-          "ns-muted": "#4d4d4d",
-          "ns-accent": "#006bff"
-        },
-        "dark": {
-          "ns-muted": "#8f8f8f"
-        }
-      },
-      "meta": {
-        "collection": "core",
-        "tags": [
-          "cron",
-          "schedule",
-          "scheduling",
-          "recurrence",
-          "form",
-          "validation",
-          "ascii",
-          "mono",
-          "disclosure"
-        ],
-        "instruction": "Build <PinBarrel defaultValue onChange label className> as a pure DOM+CSS cron-expression editor (no canvas, no WebGL). FIELDS: a <fieldset><legend> holding five real <input data-field=\"minute|hour|dom|month|dow\"> cells in crontab order, each a plain-text mono field (no native number stepper) with a visually-hidden <label> for its accessible name and aria-describedby pointing at one shared plain-language sentence. Each field is parsed independently — tokens '*', 'a', 'a,b,c', 'a-b', '*/n', 'a-b/n' — and a field whose value fails to parse gets aria-invalid plus its own inline dashed border-bottom (var(--foreground), never a color-only or --error cue) without blocking the other four; ANY invalid field empties the whole barrel of pins (parsed=null short-circuits the firing computation) while leaving the rest of the UI live. The field currently focused prints its full role name ('minute', 'day of month', ...) in text-ns-muted directly beneath that one input, fading in/out over 150ms; unfocused fields show nothing there so the row reads like a real crontab line, not a labeled form. PLAIN LANGUAGE + LIVE REGION: one aria-live=polite region (referenced by every field's aria-describedby) renders a generated sentence — 'At minute 0 past every 2nd hour' for '0 */2 * * *' — built per-field ('every 2nd hour' for */2, 'minute 0' for a bare number, 'minutes 1, 15' for a list, 'hours 9 through 17' for a range, month/day-of-week numbers rendered as names) plus a second line 'next run: Tue 14:00' computed by an independent minute-by-minute forward scan from now (real cron day semantics: day-of-month OR day-of-week when BOTH are restricted from '*', otherwise whichever one is restricted). THE BARREL: an aria-hidden, overflow-x-auto strip of 168 inline mono cells (24h x 7 days, anchored to local midnight) rendered as a single flow of glyphs — '·' at rest, '┊' every 24th cell marking a day boundary, and '╹' replacing either glyph on any hour where hour+month+day match (the representative firing shown on hover is the smallest value in the parsed minute set, with a '+N more that hour' suffix when the minute field yields more than one). A '▏' read-head is absolutely positioned at the real current-time fraction of the 168-hour window and is re-targeted every 30s with a matching 30s linear CSS transition, so it creeps continuously in real time at zero rAF cost — no per-frame loop anywhere in the component. MOTION (the physical part): changing any field diffs the new set of matching hour-cells against what's currently rendered, keyed by hour-cell index. Newly-matching cells mount pre-transition (translateY(4px) scale(0.4) opacity 0, transition:none), then a doubled requestAnimationFrame flips a single `armed` flag that transitions every entering pin to its resting transform over 220ms on the back-out bezier cubic-bezier(0.34,1.56,0.64,1) — a small mechanical overshoot, the same technique counter-carry-ripple's column reveals use, with no spring differential-equation loop required. Cells that stop matching keep rendering for 120ms with a plain translateY(6px)+fade-out on cubic-bezier(0.55,0,1,0.45) before their node is dropped, so departure reads as a drop, not a disappearance; cells whose match status is unchanged never replay any animation, even when the representative minute they show updates. Hovering a pin sets a fixed-position detail line beneath the barrel (crossfading 150ms opacity against the resting hint, exactly schedule-ascii-freebusy's hover-line idiom) printing that firing's full absolute timestamp ('Tue 16 Aug, 14:00') — nothing ever floats over the rule itself. prefers-reduced-motion collapses straight to the resting frame for every cell (no enter/exit choreography played) and the read-head's creep transition is dropped to `none` so it just snaps to the correct position on each 30s tick — always usable, never stuck mid-animation. A11Y (the real surface, since the barrel above is aria-hidden): the sentence + next-run live region is the assistive-tech-facing equivalent of the whole rule, and a <button aria-expanded aria-controls data-firings-toggle> disclosure reveals a plain <ul> where every matching hour is a <li data-firing-item> with its full timestamp — the individual-firings list the pin rule encodes for anyone who cannot hover a pin. COLOR: token-only (--background --foreground --ns-muted --border --ns-accent through Tailwind utilities, arbitrary-opacity tints like text-ns-muted/40, and one `var(--foreground)` inline for the invalid-field underline) — --ns-accent appears only on focus-visible rings and on a hovered pin, never as resting decoration or the read-head, which is plain text-foreground. Every input and the disclosure button carries a visible focus-visible:ring-2 focus-visible:ring-ns-accent ring (outline-none paired only with focus-visible:ring, never with focus-visible:outline-*, so the ring is never suppressed by --tw-outline-style:none)."
       }
     },
     {
@@ -10117,47 +9871,6 @@
       }
     },
     {
-      "name": "under-brace",
-      "type": "registry:ui",
-      "title": "Under Brace",
-      "description": "A regex tester that annotates matches beneath the sample text with box-drawing braces instead of inline highlight color: each match gets its own └──┘ span, and capture groups add further rows stepped by nesting depth, the group's number printed inside its brace. A live, aria-live match list backs the same data for assistive tech; hovering a brace or a group chip lights every span it touches, and an invalid pattern prints the engine's own error under a ┗ caret pointer.",
-      "files": [
-        {
-          "path": "registry/core/under-brace/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/under-brace.tsx"
-        }
-      ],
-      "dependencies": [],
-      "cssVars": {
-        "theme": {
-          "color-ns-muted": "var(--ns-muted)",
-          "color-ns-accent": "var(--ns-accent)"
-        },
-        "light": {
-          "ns-muted": "#4d4d4d",
-          "ns-accent": "#006bff"
-        },
-        "dark": {
-          "ns-muted": "#8f8f8f"
-        }
-      },
-      "meta": {
-        "collection": "core",
-        "tags": [
-          "regex",
-          "developer-tools",
-          "text",
-          "testing",
-          "box-drawing",
-          "accessibility",
-          "aria-live",
-          "form"
-        ],
-        "instruction": "A regex tester (pattern input, flags input, sample <textarea>) whose result is rendered as box-drawing braces stacked BENEATH the sample text rather than inline highlight color — the five-token palette (--background --foreground --ns-muted --border --ns-accent) has no room for one hue per capture group, so depth is read from vertical position and opacity instead. MATCHING: the pattern is compiled with `new RegExp(pattern, 'gd' + sanitizedFlags)` — 'g' and 'd' (match indices) are always forced on internally regardless of what the user types in the flags field, which only accepts i/m/s; `sample.matchAll(regex)` then walks every match, and each participating capture group's exact [start,end) comes straight from `match.indices[n]`, never re-derived from string search. ROW ASSIGNMENT (the actual mechanic): `analyzePattern` walks the PATTERN SOURCE once — tracking character-class state, backslash escapes, and a stack of open groups — to assign every capturing group a fixed depth: a plain `(` or named `(?<x>` opens a numbered capturing group at (enclosing capturing depth + 1); `(?:`, `(?=`, `(?!`, `(?<=`, `(?<!` open a non-capturing construct whose CONTENTS still nest but which itself never gets a number or a row. Row 0, immediately under the text, is always reserved for the whole match's own brace; a capturing group at source depth 1 renders on row 1, depth 2 on row 2, and so on, clamped at 4 so a pathologically nested pattern still renders instead of growing without bound. Because the depth comes from the pattern's own text, a group's row is stable pattern-to-pattern and never jumps around as the SAMPLE changes, only as the PATTERN's structure does. Each row's brace is built as one literal string of box-drawing characters — `└` + `─`×(width-2) + `┘` for anything 2+ columns wide, a lone `┴` for a single-column match, `│` for a genuine zero-length match — square corners deliberately, not the rounded ╰╯ set: they're the glyphs already proven, elsewhere in this registry (diagram-ascii-flow, container-box-drawing), to have a predictable 1ch advance in Geist Mono, which this component's whole column mapping depends on — with the group's number centered inside the dashes when there's room (width ≥ label.length + 2); the whole match's own row-0 brace never carries a number. Every brace is positioned with plain `ch` units against a true monospace font (Geist Mono) — one character of the sample line equals exactly 1ch in its own annotation row, so no pixel measurement or per-character span grid is needed, just `left: {col}ch` on one span holding the whole glyph run. A match or group whose span crosses a line break is clipped and rendered separately on every line it touches. REVEAL: each brace span carries a registered `--under-brace-reveal` custom property (`@property`, syntax `<percentage>`) driving its own `mask-image`, animated 0%→100% left-to-right over `max(120ms, min(600ms, width*12ms))` with an ease-out curve — width-proportional so a two-character brace and a twenty-character one both feel like the same reveal speed rather than the wide one snapping in. `prefers-reduced-motion: reduce` removes the mask and animation entirely so every brace is simply present at full width immediately — still fully legible and interactive, nothing to wait on. INTERACTION: hovering (or, via a group chip, focusing) a brace tints its EXACT covered substring in the annotated view using `color-mix(in srgb, var(--ns-accent) 18%, transparent)` — --ns-accent used only for this and the standard focus rings, never resting decoration. Because the live pattern <input>'s own text can't be individually decorated without breaking normal editing/selection/IME behavior, 'hovering a group token' is implemented as a small strip of real `<button aria-label=\"Group N\">` chips rendered next to the pattern field, one per capturing group; hovering OR focusing a chip lights every brace with that group number across every match at once, tinting every one of that group's substrings simultaneously — the intended way to answer 'everywhere this group grabbed, across the whole sample'. INVALID PATTERNS: `new RegExp` is wrapped in try/catch; on failure the engine's own SyntaxError message renders verbatim below the field, and a caret position is approximated by shrinking the pattern from the end, one character at a time, until a PREFIX of it compiles standalone — exact for the single most common live-editing mistake (a dangling trailing construct, e.g. a second quantifier), honestly degrading to column 0 for a still-open group or class where no single column is really at fault; the caret renders as a `┗` glyph positioned the same `ch`-unit way as the braces themselves, under the pattern field rather than the sample. ACCESSIBILITY: the entire annotated brace block is one `aria-hidden` decorative layer; the real, assistive-tech-facing surface is the plain native pattern `<input>` (`aria-invalid` mirrors whether the current pattern fails to compile, `aria-describedby` always points at one paragraph carrying either the live match count, 'Type a pattern to test it.', or the SyntaxError text), the plain native sample `<textarea>` (fully untouched keyboard/IME/undo/selection behavior), and a 'Matches' `<ol aria-live=\"polite\">` of real `<button>`s, one per match, each reading e.g. 'Match 1: \"#TX-482\" at 7–14; group 1: \"TX-482\"; group 2: \"482\"' — updating live on every pattern, flag, or sample edit. Tab reaches the pattern input, the flags input, every group chip, the sample textarea, and every match button in document order; focusing (Tab or click) a match button draws a visible `outline: 2px solid var(--ns-accent)` directly on that match's OWN row-0 brace in the annotated view, in addition to the button's own native focus ring, so keyboard users see the visible focus indicator land on the thing it refers to, not just on the list item naming it. No canvas, no SVG, no per-group hex — pure DOM text and CSS, and every color in the whole component resolves to one of the five tokens."
-      }
-    },
-    {
       "name": "undo-drift-bar",
       "type": "registry:ui",
       "title": "Undo Drift Bar",
@@ -10746,6 +10459,46 @@
       }
     },
     {
+      "name": "blade-stop",
+      "type": "registry:ui",
+      "title": "Blade Stop",
+      "description": "A full-viewport route curtain built as a real iris diaphragm: nine leaves cranked off one actuating ring stop the aperture down to zero to cover the outgoing page, swap the route at the covered frame, then run back open on the incoming one.",
+      "files": [
+        {
+          "path": "registry/loud/blade-stop/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/blade-stop.tsx"
+        }
+      ],
+      "dependencies": [],
+      "cssVars": {
+        "theme": {
+          "color-ns-muted": "var(--ns-muted)",
+          "color-ns-accent": "var(--ns-accent)"
+        },
+        "light": {
+          "ns-muted": "#4d4d4d",
+          "ns-accent": "#006bff"
+        },
+        "dark": {
+          "ns-muted": "#8f8f8f"
+        }
+      },
+      "meta": {
+        "collection": "loud",
+        "tags": [
+          "transition",
+          "route",
+          "curtain",
+          "canvas",
+          "iris",
+          "shutter",
+          "overlay"
+        ],
+        "instruction": "Build <BladeStop active? leaves? duration? onCovered? onRevealed? paused? children? className?> as a full-viewport route curtain drawn on a 2D canvas over the page, implemented as an iris diaphragm rather than as an animated shape. ONE DEGREE OF FREEDOM: the only animated quantity is phi, the angle of the actuating ring. Leaf i has a pivot P at angle theta = 2*pi*i/n on a mount ring of radius 1.30R, a crank of length 0.72R, and an inner edge that is a circular arc of radius 0.80R centred at C = P + 0.72R*u(theta + phi); R is half the viewport diagonal times 0.88, so the frame corner sits at 1.136R — and that factor is load-bearing rather than cosmetic, because the open aperture is 1.22R and every bit of margin above the corner is travel the viewer cannot see (at 1.06 the leaves were still outside the frame for the first 42% of every close and the cycle read as blank more often than not). The aperture radius is |C| - 0.80R and nothing computes it directly. Because |C|^2 = Rp^2 + L^2 + 2*Rp*L*cos(phi), the whole travel is one cosine — 1.22R of clear aperture at phi=0 down to -0.10R (overlapped) at the stop — and every read of the motion follows from it: the aperture opens fast and closes slow (near phi=0 the crank moves radially and |C| barely changes; near phi=pi it moves tangentially), the leaves do not enter the frame at all until roughly a third of the travel has passed, the hole is a nine-lobed star and not a circle, and adjacent plates slide across each other by different amounts at different phases. NO EASING CURVE IS APPLIED ANYWHERE; that asymmetry is the linkage's. The crank is 0.72R and not a shorter one because at phi=pi the crank folds back along the pivot arm and d|C|/dphi is exactly zero; a crank that puts closure ON that dead point moves the blades almost not at all through the last third and leaves the stop nothing to strike. THE TRAVEL IS INTEGRATED: phi is a second-order system (crank inertia, viscous bearing damping, spring return) with omega = 3.4/duration and zeta 0.72 closing / 0.86 opening, stepped at a fixed 1/240s substep — a 50ms catch-up frame integrated in one go jumps the ring straight through its stop. Both ends are HARD STOPS with restitution 0.12, so the close arrives at phi=2.734 with the linkage still moving, strikes, rebounds and settles in two decaying bounces. That is where the weight comes from. Each leaf also carries a fixed per-leaf bearing clearance of a few tenths of a degree, faded in with phi, so the closed rosette is shimmed by hand rather than perfectly nine-fold. LEAF DRAWING — the part that is easy to get catastrophically wrong: do NOT sweep the leading arc about C and close it back along the mount ring, because the winding direction of that closing sweep has no reliable rule and getting it inverted makes every leaf contain the frame centre, which yields no aperture at any phase (the curtain reads as a hard cut and the whole mechanism is invisible). Instead sample the plate's inner boundary as a RADIUS PER FRAME-CENTRE ANGLE: r(psi) = d*cos(D) - sqrt(Rb^2 - d^2*sin(D)^2) with d = |C|, D = psi - angle(C), the near root of the ray/circle intersection, over psi within a half-width of min(asin(Rb/d), 1.9*pi/n) either side of angle(C), 26 samples, then straight out along the same rays to a mount ring of 2.7R (past the corner at any phi) and closed. The three regimes of that root are the three things the mechanism does: negative discriminant = the ray misses the circle, the blade has no material and pinches out against its mount (why nothing is in frame when open); negative root = the frame centre is inside the edge circle and the plates are pie slices meeting at the axis (closed); in between it is the aperture edge, nearest the axis mid-plate and furthest at the seams, which is what makes the hole a nine-lobed star scalloped by 5-19% rather than a circle. A 1.9x plate overlap is what keeps the covered state opaque at every phi and at every viewport aspect (verified 100% coverage at 16:9 and 4:3). One fixed source at -2.2rad lights the stack: each plate's value is 0.08 + 0.84*facing with facing = 0.5 + 0.5*cos(crank - light), applied as a linear gradient across the whole assembly rather than a flat per-plate tint, so leaves change tone AS THEY TRAVEL and a plate that spans the frame is brighter at the lit end. Each plate drops a contact shadow onto the one beneath — a SECOND, UNBLURRED FILL of the same outline offset up-left by 0.012R, not a canvas shadowBlur: at DPR 2 a 0.05R blur on nine full-canvas paths measured one ~400ms long task per frame and rAF fell to 9fps, while the offset fill holds a 16.7ms median with no long tasks at all. That is what makes the stack read as nine separate sheets instead of one filled polygon, and a bevel stroke along the sampled inner boundary — broken wherever the plate has reached the axis, or the closed shutter gets a star of lines drawn across it — gives the aperture its lit edge. COMPLETION IS REPORTED OFF THE APERTURE, NOT OFF SETTLING: onCovered fires the frame |C| - Rb first reaches zero — before the ring has finished bouncing — because that is the only moment a route may be swapped without the swap being visible through a still-open hole; onRevealed fires when the aperture clears the corner (1.136R, not a hardcoded 1), likewise before the ring has stopped ringing. The loop sleeps the instant the ring settles, so an open curtain costs nothing, and a change to `active` wakes it from wherever the ring currently is via a ref rather than an effect dependency, so a reversal mid-travel keeps its momentum. PALETTE: two plate stops, an edge highlight and a shadow tint mixed from --background, --foreground, --ns-muted and --border via getComputedStyle, re-read on a documentElement class MutationObserver. --ns-accent is not read at all: the shutter has no pointer interaction, and an accent tint on an occluder is a coloured blob. What is held constant across themes is the SPREAD across the nine plates, because that spread is the only thing showing the assembly is nine sheets and not one hole punched in a rectangle — the plates sit above a near-black page and well under a paper one; insisting the shutter be the low value in BOTH themes makes the dark covered state a black field with two faint seams in it. Light theme is the harder case because the plates must sit far enough under a bright page to read as metal in front of paper. prefers-reduced-motion and `paused` draw one still frame at 72% of the closing travel — leaves covering 73% of the frame with the nine-lobed aperture clearly formed — never a blank page or a flat plate. DPR-aware canvas sized by ResizeObserver; IntersectionObserver and visibilitychange both stop the loop. children render under the shutter; the canvas is pointer-events-none and aria-hidden. The demo must drive a real loop through the component's own onCovered/onRevealed callbacks (close, swap the route behind the closed leaves, open, dwell) rather than a timeline, and keep the fully-open dwell the shortest beat of the cycle so an arbitrary screenshot lands on the mechanism."
+      }
+    },
+    {
       "name": "border-chrome-ring",
       "type": "registry:ui",
       "title": "Border Chrome Ring",
@@ -10997,6 +10750,170 @@
       }
     },
     {
+      "name": "crease-fall",
+      "type": "registry:ui",
+      "title": "Crease Fall",
+      "description": "A full-screen navigation overlay that is a sheet of paper folded flat into a concertina: opening releases the creases in order, each panel swinging down on its own weight with a nav link riding on it.",
+      "files": [
+        {
+          "path": "registry/loud/crease-fall/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/crease-fall.tsx"
+        }
+      ],
+      "dependencies": [],
+      "cssVars": {
+        "theme": {
+          "color-ns-muted": "var(--ns-muted)",
+          "color-ns-accent": "var(--ns-accent)"
+        },
+        "light": {
+          "ns-muted": "#4d4d4d",
+          "ns-accent": "#006bff"
+        },
+        "dark": {
+          "ns-muted": "#8f8f8f"
+        }
+      },
+      "meta": {
+        "collection": "loud",
+        "tags": [
+          "navigation",
+          "menu",
+          "overlay",
+          "dialog",
+          "fold",
+          "paper",
+          "physics",
+          "3d"
+        ],
+        "instruction": "Build <CreaseFall items? triggerLabel? label? eyebrow? footer? children? className?> as a full-screen navigation overlay whose open and close are a physical fold, not a fade. THE MECHANISM: the overlay is one sheet of paper folded flat into a concertina and pinned under the header bar. Panels are NESTED in the DOM — panel i is a child of panel i-1, absolutely positioned at top:100% of it, transform-origin top, transformed with rotateX inside a single 1400px perspective on the dialog, perspective-origin 50% 0%. That nesting is the whole point: every crease's rotation composes with every crease above it, so the far end of the sheet whips further and lands later than the near end exactly as a fold chain does, and a flat per-item stagger cannot fake it. It also forces the detail that makes or breaks the component: THE FOLDED ANGLE MUST ALTERNATE. Because each angle is parent-relative, a constant folded angle does not zig-zag, it ROLLS — the cumulative angle marches -96, -192, -288 until the deep panels point anywhere and leave the screen, which is exactly what a first pass ships and what makes the mid-fold frame two thirds empty. Local folded angle is therefore -96deg on the first crease and alternating +192 / -192 below it, which pins the WORLD angle of every panel to -96 / +96 / -96: a stack leaning alternately away from and toward the viewer, flat, one panel tall, on screen. Each crease is an independent damped spring integrated at a FIXED 1/240s substep (wall-clock dt changes a near-critical spring's character with the frame rate), released on a stagger: 132ms per crease top-first on the way down, 40ms per crease bottom-first on the way up, because a concertina closes from the far end. That opening stagger is tuned so the sheet is still landing its last two panels about 700ms in — the fold is meant to be caught mid-air, not glimpsed. Weight is a function of chain position: the lower panels carry more sheet, so stiffness falls from 260 to 164 and damping ratio rises only 0.5 to 0.6 across the chain, giving the bottom of the sheet a longer, looser flap and a visible overshoot before it slaps flat. A small angular coupling term feeds a fraction of each crease's rate into the crease it carries. Closing is a different spring, not the same one reversed: k=420, zeta=0.92, so the sheet snaps up crisply rather than lolling back. THE TYPE PARTICIPATES: each nav item is a real DOM <a> printed ON its panel, so it is foreshortened by the same rotateX that is unfolding it — a line of type arrives edge-on and flattens into legibility as its panel lands. Nothing is rasterized; there is no canvas. Do NOT put will-change:transform or backface-visibility on the panels: both promote the panel to a layer rasterized once at rest scale, and the foreshortened type then arrives as a smeared bitmap instead of re-rendered glyphs, which contradicts the entire premise. Paper is printed on one side, so instead of backface-visibility the ink layer is switched off by opacity whenever cos(world angle) goes negative — a panel turned past edge-on shows blank stock, never its own type in mirror. Shading is a function of WORLD orientation, not the angle across the crease (the light is in the room, not in the parent's frame): |sin(world)|^2.4 * 0.94 painted in --foreground, a steep falloff so only paper turned near edge-on is shaded and a landed panel is clean ink on clean stock. The crease hairline in --border fades in with the absolute angle across it, so a crease is visible only while it exists. AT REST the sheet is still there: five --border hairlines stacked with a progressive inset and falling opacity, pinned at the same 5.5rem the overlay unfolds from, so the closed page shows the concertina edge-on rather than hiding the mechanism until something is clicked. ACCESSIBILITY IS THE HARD PART AND IS NOT DECORATION: the trigger is a real button carrying aria-expanded and aria-haspopup=dialog; the overlay is role=dialog aria-modal with an aria-label; the items are real anchors with real hrefs reachable by Tab; focus moves to the first nav LINK on open (not the Close button that precedes it in the DOM), is trapped by a wrapping Tab/Shift-Tab handler bound on both the dialog and the document AND by a document focusin listener that pulls anything landing outside back to the first item — Tab wrapping alone is not a trap, because focus can arrive from outside onto the trigger, which is still in the DOM behind the sheet. Escape closes, and focus is restored to the trigger by the focus effect's cleanup so it is restored on unmount too, not only on a well-behaved close. That effect must depend on BOTH the open flag and the mounted flag: the dialog mounts one render after open flips, so keying it on open alone runs it against a null ref, never re-runs, and ships a menu with no focus move, no trap and no Escape. prefers-reduced-motion skips the solver entirely and settles every crease to its target in one paint, so the menu still opens, still traps focus and is fully usable with no motion at all. The rAF loop only exists while a crease is still moving; it stops itself when every spring is within 0.05deg and 0.4deg/s of target, and visibilitychange lands the sheet rather than resuming from a stale timestamp. PALETTE: --background --foreground --border --ns-muted only, through Tailwind token utilities; --ns-accent appears exclusively under hover and focus-visible on an item, so a resting frame carries no accent at all. Both themes work because the shading is painted in --foreground over a --background panel: in dark the standing panel catches light, in light it falls into shadow, and either way it reads as stock turning."
+      }
+    },
+    {
+      "name": "dye-whorl",
+      "type": "registry:ui",
+      "title": "Dye Whorl",
+      "description": "A full-bleed tank of ink diffusing in water — a real GPU fluid solver whose coarse velocity field transports a fine dye field, so plumes billow with dense cores, sheets thin as they stretch, tendrils shear off the shoulders and everything dissipates into haze. Drifting injectors, falling drops and interface buoyancy keep it blooming with nobody touching it; the pointer stirs the fluid and presses drop a fresh bead.",
+      "files": [
+        {
+          "path": "registry/loud/dye-whorl/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/dye-whorl.tsx"
+        }
+      ],
+      "dependencies": [],
+      "cssVars": {
+        "theme": {
+          "color-ns-muted": "var(--ns-muted)",
+          "color-ns-accent": "var(--ns-accent)"
+        },
+        "light": {
+          "ns-muted": "#4d4d4d",
+          "ns-accent": "#006bff"
+        },
+        "dark": {
+          "ns-muted": "#8f8f8f"
+        }
+      },
+      "meta": {
+        "collection": "loud",
+        "tags": [
+          "background",
+          "hero",
+          "canvas",
+          "webgl",
+          "shader",
+          "fluid",
+          "ink",
+          "cursor",
+          "decorative"
+        ],
+        "instruction": "Build <DyeWhorl speed? density? stir? paused? children? className? style?> as a full-bleed WebGL2 fluid tank rendering INK DIFFUSING IN WATER — volumetric plumes and threading filaments, never particles, streaks or a vector-field visualisation. REAL SOLVER, TWO GRIDS: an incompressible Navier-Stokes step runs on a coarse velocity grid cut to the container's aspect (208 cells on the long side) and its velocity field then transports a much finer dye grid (768 on the long side) which is what gets rendered at display resolution. That split is the whole performance story: the expensive physics is 208x130, the expensive fill is one texture fetch plus four gradient taps per screen pixel. Velocity is stored in GRID CELLS PER SECOND, never uv/s — the grid is aspect-cut so a cell is square in screen space, which makes curl, divergence and the pressure Laplacian isotropic with dx = 1; in uv units all three are silently anisotropic and the whorls come out as ellipses that stretch with the window. PASSES per step: (1) semi-Lagrangian velocity advection with exp(-0.16 dt) dissipation; (2) ONE combined body-force pass — vorticity confinement computed inline from twenty velocity taps rather than through a separate curl target, density buoyancy, curl-noise stirring and every splat, because at this grid size the extra fetches cost far less than two more full-screen passes and their FBO binds; (3) divergence; (4) 18 warm-started Jacobi pressure iterations (the pressure texture persists across frames, so the field being solved barely changed and a modest count converges); (5) gradient subtraction; (6) MacCormack dye advection; (7) render. ALIVE AT REST, three mechanisms: five injectors, each ANCHORED in its own region of the frame and orbiting locally (not five phases of one global lissajous — sharing a path shape puts every source near the middle at the same time and leaves whole thirds of the frame empty for minutes, which on a full-bleed field reads as a component that has not loaded), trailing ink behind a jet whose heading rotates on its own period; a one-shot drop lands every 1.5-3.2s at a pseudorandom point with a single frame of 1.35x amplitude and ~300 cells/s of momentum behind it, so it blooms instead of seeping; and a divergence-free curl-noise body force (analytic perpendicular gradient of an fbm potential, so it cannot fight the projection) stirs the whole tank at low frequency. BUOYANCY AGAINST A LOCAL MEAN — the single most load-bearing choice. Ink is denser than the fluid so the excess sinks, but taking the force against zero sediments the entire field into the bottom of the frame within half a minute and leaves a flat layer. Taking it against a wide 4-tap neighbourhood average (6 texels out) makes the force vanish inside a uniform patch and survive only across an interface, which is the Rayleigh-Taylor instability and is what grows fingers off the underside of a plume rather than translating the plume. A small lateral term modulated by noise is the symmetry break: a perfectly horizontal interface under a purely vertical force is a stable equilibrium and never fingers at all. MACCORMACK, CLAMPED: phi_new = advect(phi, +dt) + 0.5*(phi - advect(advect(phi,+dt), -dt)), clamped to the min/max of the four cells the backtrace landed between. The clamp is not optional — unclamped the correction is an antidiffusion term that manufactures new extrema at every sharp interface, so filament edges ring, go negative, advect and speckle the field. Clamped, it buys back most of the detail plain semi-Lagrangian advection throws away, which is the difference between a filament that threads for ten seconds and one that fogs in two. Soft walls (velocity scaled to 0.86 within 4.5% of the edge) stop the tank emptying itself into the margins, and density is clamped at 1.05 — a compositional constraint, not a physical one: a source sitting in slow water otherwise piles up an unbounded pool that renders as a flat hole with no internal structure, the opposite of ink, which is legible precisely because even its dense core stays modulated. Dye dissipates on a ~10s time constant, which is what makes the equilibrium a full frame rather than a few isolated plumes; measured unattended, ink is still distributed across the full height at t=60s. RENDER: coverage = pow(1 - exp(-density*k), gamma), ramped through five token stops; the dye gradient magnitude is added as a deliberately SUBORDINATE rim so a sheet seen edge-on separates from the one behind it — pushed harder it stops being ink and becomes a web of bright filaments, which is a different component. Plus a mild elliptical vignette and one hash of sub-LSB dither, because the ramp's low end is a very long flat gradient across a full-bleed field and that is exactly where 8-bit banding shows. PALETTE: five stops from --background, --foreground, --ns-muted and --border via getComputedStyle, re-read on a documentElement class MutationObserver. Unlike a reflective surface, which spans black-to-white in both themes and only shifts its distribution, ink departs from the page in ONE direction, so this genuinely INVERTS — light ink in dark fluid, dark ink in pale fluid — and the two ramps are written apart rather than derived from one with a bias term. Light is the harder half and took two passes: the first tuning pushed its low end down hard (gamma 1.55) on the theory that thin dark ink over a pale ground reads as dirt. It does not — it reads as a washed-out component, which is worse, because the same field that was dense in dark went nearly invisible over half the frame. The real asymmetry is small: light needs slightly MORE ink per unit density (2.90 versus 2.50) and only a little more toe (1.18 versus 1.08), and its haze stop must leave --background early or the low half of the range does nothing. --ns-accent is interaction-only: the dye texture is RG, R = density and G = a freshness channel nothing but the pointer ever writes, advected by the same velocity field in the same pass so the tint travels with the ink it marks rather than detaching from it, and dissipating ~20x faster than density, and tinted weakly on purpose — at a 0.55 mix it saturated whole plumes into flat blue, which stops reading as tinted ink and starts reading as coloured dye, the exact thing the palette rule exists to prevent, so it is capped at a 0.42 mix and the TARGET COLOUR is pre-adapted per theme on the CPU rather than the coverage being windowed. That distinction cost a pass: fresh ink is the densest ink, which under the light ramp is near-black, and mixing the raw token into near-black is a muddy navy that reads as a dirty patch; windowing the tint away from the dense core removes the mud but also deletes the cue in both themes. Lifting the token 20% toward white for dark and letting it down 50% toward --background for light keeps the same mark legible against either ground. POINTER: a lead-compensated follower (tau 12ms, velocity smoothed over 60ms, lead capped at 26px) — a plain exponential follower has a steady-state error of exactly v*tau, so stirring at the followed position makes the fluid respond LATE, and extrapolating the target one tau ahead cancels that term algebraically. Stir samples are deposited by distance (11px) with a one-frame time ceiling, so injection runs at the DISPLAY's 60Hz rather than at the pointer event rate; each sample pushes the fluid with the pointer's own velocity converted to cells/s and writes the freshness channel. pointerdown drops a full bead at the contact point. WARM-UP: a fluid has no meaningful t=0 — an empty tank is an empty frame — so the sim is spun 150 fixed 1/60s steps before the first paint in every mode, and prefers-reduced-motion (or paused) is simply a longer 260-step spin that is then never stepped again, with pointer input running one further step under the cursor. ADAPTIVE: a four-tier wall-clock ladder (never frame-counted: a frame-counted gate waits longer the slower the machine is) drops after ~1.8s over a 26ms EMA — 1.8s and not 0.9s because the frame time it watches is the PAGE's, and at ~6ms of GPU work per frame the tank is almost never what blew the budget, so a burst of unrelated main-thread work was enough to soften a surface that was in fact running at a flat 60Hz and climbs back only after a clean stretch that doubles on each failure. Jacobi iterations go first, then the MacCormack correction, then dye resolution, then display scale — sim resolution is last because it is what makes the tendrils fine. HOST: an internal Solver class owns the context, programs, ping-pong targets and the fullscreen triangle; one VAO with a_pos bound to location 0 for every program. Requires WebGL2 plus EXT_color_buffer_float (or half_float) for renderable R16F/RG16F; without them nothing renders and the caller's children sit on --background. DPR capped at 2, ResizeObserver is rAF-coalesced (it fires on every step of a window drag) and a resize CARRIES THE FIELD ACROSS: the replacement targets are built before the old ones are released, the live velocity and dye are resampled into them by the advection program with dt = 0, and only 8 settling steps run instead of a cold 260-step seed. Dropping and re-seeding instead measured a 87.8ms worst frame across a 30-step viewport drag, against 17.5ms with the carry, and it also made the ink the viewer was watching vanish and rebuild on every step. The clock is never reset on a resize, which would restart every injector phase. IntersectionObserver and visibilitychange both stop the single rAF loop, webglcontextlost/restored rebuild cleanly. The canvas is aria-hidden decoration with no controls of its own; children render over the tank and need a token scrim, since a plume can pass under any line of type."
+      }
+    },
+    {
+      "name": "ebb-flat",
+      "type": "registry:ui",
+      "title": "Ebb Flat",
+      "description": "A pinned full-bleed tidal flat where scroll position is the water level: bars break surface, the channel drains and pools strand, and scrolling back floods it in exactly the order it emptied.",
+      "files": [
+        {
+          "path": "registry/loud/ebb-flat/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/ebb-flat.tsx"
+        }
+      ],
+      "dependencies": [],
+      "cssVars": {
+        "theme": {
+          "color-ns-muted": "var(--ns-muted)",
+          "color-ns-accent": "var(--ns-accent)"
+        },
+        "light": {
+          "ns-muted": "#4d4d4d",
+          "ns-accent": "#006bff"
+        },
+        "dark": {
+          "ns-muted": "#8f8f8f"
+        }
+      },
+      "meta": {
+        "collection": "loud",
+        "tags": [
+          "scroll",
+          "story",
+          "sticky",
+          "canvas",
+          "webgl",
+          "shader",
+          "water"
+        ],
+        "instruction": "Build <EbbFlat stages? pinLength? highWater? lowWater? speed? children? className? style?> as a pinned full-bleed WebGL scroll story of a tidal flat in which SCROLL IS THE WATER LEVEL and nothing else. ONE SCALAR, NO HISTORY: the frame is a single fragment shader over a fixed terrain field h(x,z), and every pixel asks the same question of one uniform — above = h - level. Positive is flat, negative is water, and the shoreline is wherever that difference crosses zero. Wetness is exp(-max(above,0)/0.17), i.e. a function of height above the CURRENT waterline, never of how long a patch has been out of the water; the moment that becomes a history the tide stops being reversible. Because flat_() carries no time term at all, the frame at a given level is bit-identical whether the tide fell into it or rose back through it, so scrolling up floods the flat in exactly the reverse order it drained and the claim is provable by diffing two screenshots taken at the same scroll depth from opposite directions. TERRAIN: a gentle seaward slope, four shore-parallel gaussian bars (crests set so each breaks at one stage level, each wobbling along its own length so it is not a ruled line), a meandering main channel widening seaward plus a feeder gully subtracted as gaussians, two octaves of broad relief whose hollows are what strand pools when the level drops past them, ~0.6m ripple marks and sand grain — the last two faded out by smoothstep on the pixel footprint rather than left to alias into moire. PROJECTION: not a plan view; distance up the frame is exponential, z = Z0*exp(y*ZK), so the flat recedes into a horizon at 11.5% of frame height and lateral scale grows with z. Exponential rather than true 1/y because its derivative is linear in z, which keeps the pixel footprint finite at the horizon instead of running away, and that footprint is what makes the far half sampleable at all. RELIEF IS REAL: three terrain taps one pixel apart give a surface normal for a low sun off to the right, and the SAME three taps give the antialias width of the waterline — aa = |hx-h| + |hy-h| + eps. A shoreline is a contour of a 2D field, so on the near-flat pans it would otherwise crawl and stair badly while the level moves; deriving the blend width from the local gradient is what keeps it a clean wet edge at every level. ON THE CLOCK, NOT THE SCROLL (so the resting un-scrolled frame is alive, never a still): swell running shoreward, chop, a glitter path under the sun, foam breaking wherever depth runs out — breakK = smoothstep(0.34, 0.0, depth), which puts the white line on the shoreline at any level AND over every bar the moment it starts to trip the swell — drift in the cloud band, and rills threading off the sand. A smoothed signed rate of level change scales foam and rill intensity, so a tide actually running looks different from slack water without any of it latching. SCROLL PLUMBING: the section is pinLength viewport-heights tall with an inner sticky top-0 h-screen stage, so layout releases the pin at both ends with no fixed-position boundary jump and no scroll ever hijacked or given back. Progress is read from getBoundingClientRect ONCE PER FRAME inside the rAF loop, never in a scroll handler — a handler samples at the browser's scroll cadence, which is bursty under trackpad momentum and on some engines delivered after paint, so the level would tear against the frame it is drawn in. The level then chases that target on a ~90ms exponential, short enough to stay attached to the finger and long enough to absorb a flick or a PageDown jump over about six frames. The loop seeds from wherever the page already is, so a reload part-way down paints the right level on the first frame. COPY: stage blocks are written straight to style (opacity, translate3d) at frame rate so scrolling never schedules a React render, each stage owning a crossfade band derived from its own neighbours rather than one window for the whole run (a single window sized for the close stages near high water leaves dead level with no copy on screen); those blocks are aria-hidden and the accessible copy of the whole sequence is one sr-only ordered list in tide order, always present in document order. A right-hand tide rail scales a fill and lights per-stage ticks as a readout, not a control. PALETTE: five luminance stops derived from --background, --foreground, --ns-muted and --border via getComputedStyle, re-read on a documentElement class MutationObserver. --ns-accent never reaches the canvas — water, wet sand and dry sand are three luminances, not three hues, so the flat is achromatic in both themes and the ramp direction never inverts; only bias and contrast move (light theme is the flat under an overcast noon, dark the same flat at the end of the day). A mild vignette toward the deepest stop gives the copy column somewhere to sit. HOST: an internal GLSurface owns the program, the fullscreen triangle pair and lazily resolved uniform locations; DPR capped at 2 with a three-rung adaptive render scale gated on wall-clock milliseconds rather than frame counts (a frame-counted gate waits longest on exactly the machines that need help soonest); ResizeObserver re-sizes; an IntersectionObserver and visibilitychange both stop the rAF loop entirely, since a pinned stage that has scrolled away is the most expensive idle thing a page can carry; webglcontextlost/restored rebuild cleanly. prefers-reduced-motion renders the ebb as DISCRETE STANDS — the level snaps to the nearest stage, the ambient clock is frozen at a composed t, and only the stage whose level is nearest is shown at full opacity — so the process is still legible and every word stays readable and reachable without any continuous motion."
+      }
+    },
+    {
+      "name": "edge-yield",
+      "type": "registry:ui",
+      "title": "Edge Yield",
+      "description": "A full-bleed scanning electron micrograph: a packed micro-landscape of spore grains, rod crystals and draped filaments imaged by a detector simulation rather than a lighting model, so steep facets bloom into glowing rims, crevices fall into hard shadow, and the whole frame is crisp at once under a live scan with shot noise and a descending sweep line.",
+      "files": [
+        {
+          "path": "registry/loud/edge-yield/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/edge-yield.tsx"
+        }
+      ],
+      "dependencies": [],
+      "cssVars": {
+        "theme": {
+          "color-ns-muted": "var(--ns-muted)"
+        },
+        "light": {
+          "ns-muted": "#4d4d4d"
+        },
+        "dark": {
+          "ns-muted": "#8f8f8f"
+        }
+      },
+      "meta": {
+        "collection": "loud",
+        "tags": [
+          "background",
+          "hero",
+          "canvas",
+          "webgl",
+          "shader",
+          "microscopy",
+          "monochrome",
+          "noise",
+          "cursor",
+          "decorative"
+        ],
+        "instruction": "Build <EdgeYield magnification? density? relief? noise? speed? paused? children? className? style?> as a full-bleed WebGL hero that renders a scanning electron micrograph — the world at 10,000x — and is a DETECTOR SIMULATION, not a lighting model. There is no light source anywhere in the shader; that constraint is what makes the image read as an electron micrograph instead of a bumpy heightfield with a lamp on it. One fragment shader evaluates a height field h(u) together with its ANALYTIC gradient — every primitive is a closed form whose slope is known, so the normal costs ONE field evaluation instead of three central-difference taps — then feeds that normal through the two terms that actually make an SEM image. (1) SECONDARY YIELD delta = sec(theta) = pow(1/max(n.z, 0.13), 0.95): yield rises as the surface tilts away from the beam because more of the interaction volume lies within escape depth of a free surface. This is the characteristic glowing rim, and it is not a fresnel stand-in for it — it is the actual 1/n.z dependence, which is why a silhouette edge blooms to near-white while the facet two pixels inside it stays mid-grey. The n.z floor exists so the silhouette saturates instead of going singular in whichever pixel happens to land on it. delta is then scaled by 0.86 + 0.30*matId, the per-grain atomic-number contrast: different grains are different stuff. (2) COLLECTION EFFICIENCY eta = 0.30 + 0.70*facing*shadow + 0.055*shadow, where the detector is a single Everhart-Thornley unit at DET = vec3(-0.593, -0.526, 0.610) — upper-left, ~34 degrees elevation, and the ONLY directional term in the shader. shadow comes from a five-step horizon march toward the detector, stepping t *= 2.20 from u_px*3.0 so the reach clears ~1.7 of the largest grain radius; the reach matters far more than the step count, because a short march degenerates into ambient occlusion on a heightfield, a tight contact halo around every bump, which is exactly the generic read this is trying not to be. The march compares against `coarse` — the specimen WITHOUT its additive debris and micro-relief — so shadows are not biased by detail the march's own lod cannot resolve. The isotropic 0.055 pedestal is electrons scattered off the chamber wall and returning, which is why a real crevice is dark but never black. Signal is then delta*eta*0.42, tilted 13% toward the detector corner (an SEM's broad collection gradient, which it has INSTEAD of a vignette) and compressed sig/(1+sig*0.50) so rims roll off rather than clip flat. THE SPECIMEN is five layers smooth-unioned with smaxG at k = u_px*2.6 — a crease a couple of CSS pixels wide at any magnification and any DPR, so the seam between two grains is a LINE, not a soft valley, and never a one-pixel normal discontinuity that sparkles under sec(theta): a warped fbm substrate, a SPARSE population of much larger bodies at 4.2 whose radius stays well under half a cell so most cells are empty and the big ones arrive at an irregular spacing the eye cannot pre-empt (without that layer every grain is the same size and the field reads as a manufactured lattice — packed roe rather than a specimen), two warped ridge trains of draped filaments at 5.6 and 8.3 cycles, round grain caps at 10.5, and rod/prism grains at 24.0 pushed through a squashed-and-turned matrix (ROD) so the medium layer reads as crystals wedged between the round grains rather than a second smaller copy of the same population. Grains are ellipsoid caps h = A*(1-|d|^2/r^2)^prof on a jittered 3x3 lattice; prof slightly above 0.5 rounds the last pixel of the silhouette without touching the broad slope ramp that carries the rim. Because q = u*S, the S in the height and the S in dq/du cancel and the gradient is scale-free — correct, since a sphere has the same slopes however small it is drawn — and the warp's TRANSPOSE is what the gradient must be multiplied by. Fine debris at 58.0 and two fbm micro-relief octaves are SUMMED on top rather than unioned: a fleck of dust on a grain sits above it, and a union would hide every small thing behind every large one. Everything is in focus at once because nothing here has a lens — the extreme depth of field is a property of the technique, not a choice. THE ACQUISITION is all in screen space and none of it drifts with the stage, because a detector's faults belong to the instrument and not to the sample: a scan comb at 2.7px, per-line DC error (one component reseeded every pass, one slow drift reading as the amplifier wandering), sub-pixel line-to-line misregistration applied to the SAMPLE POSITION so shadows move with their rims instead of sliding under them, charge streaking pulled along the fast horizontal axis and gated on smoothstep(0.35,0.9,sig) since it is bright features that charge, and Poisson shot noise whose amplitude tracks sqrt(signal) and which is 42% correlated with the pixel to its left because the beam has not finished moving. The shot lattice is floor(css px), phase-locked to the display, so the adaptive render scale cannot change the grain size. A sweep line descends the frame once per 1.15s: lines above it were acquired this pass and lines below on the last one, so the stage's drift SHEARS the picture very slightly across that line. The tear is the single detail that proves the image is being scanned rather than rendered; at 4s the same shear would be a visible skew of the whole specimen and read as a broken transform. MOTION WITH NO INPUT: the stage is an integrated position, not a function of time, so a long frame advances it by one clamped step instead of teleporting the specimen — a constant ~0.007 world-units/sec drift whose heading turns slowly plus two incommensurate wobbles, a 0.0075 rad/sec stage rotation, and a 4.5% magnification breathing on a 0.043 rad/sec sine that reads as the working distance creeping. POINTER: the pointer pans the stage (11% of the offset from centre, eased on a 0.16s constant because a stage is heavy) and parks the BEAM, which is a dwell, not a glow sprite — inside a gaussian of 0.155*min(W,H) the signal rises 30% and the shot noise drops to 28%, because more electrons per pixel is more signal and less Poisson. Pan velocity feeds the same tear term the drift does, so a fast sweep of the hand visibly shears the frame at the sweep line. Pointer smoothing extrapolates the target one tau ahead: a plain exponential follower has a steady-state error of exactly velocity*tau, which reads as the instrument not responding rather than as damping; a LEAD_MAX cap stops a teleporting pointer flinging the stage past the cursor. PALETTE: an SEM is natively greyscale because it maps electron yield to luminance and never to colour, so monochrome here is the honest reading rather than a restriction. Five stops derived from --background, --foreground, --ns-muted and --border via getComputedStyle, re-read on a documentElement class MutationObserver. The ramp's DIRECTION never inverts — yield always climbs toward light — but the exposure does: dark theme is the micrograph on the console, substrate low and the rims owning the top of the range (bias +0.035, contrast 1.24); light theme is the same acquisition PRINTED, specimen dark on pale, the top stop being the paper and the substrate lifted only to a pale grey (bias +0.17, contrast 1.26) while c0/c1 stay genuinely dark so the crevices anchor the bottom of the range. Putting the substrate ON the paper value, or clustering the top three stops near it, is the wash-out that kills it: the rims lose their headroom and the frame turns to flat mid-grey mush. NOTHING in the frame is chromatic, including the beam spot — an --ns-accent tint under the pointer is the one mark that reads as a rendered glow sprite rather than as a dwell, and it is the fastest way to lose the electron-image read, so the dwell is spent entirely on signal and shot noise. PERFORMANCE AND HOST: an internal GLSurface class owns the program, the fullscreen triangle pair and lazily-resolved uniform locations and knows nothing about the micrograph. DPR is capped at 2 rather than the 1.5 a cheaper full-bleed shader would take, because shot noise, the scan comb and the rim band are all high-frequency structure and a reduced backing store destroys exactly those first; the cost is paid back by the analytic gradient and bounded by an adaptive render-scale ladder [1, 0.78, 0.58] that steps down only after 900ms of sustained wall-clock overrun and climbs back on a doubling window. Every threshold is milliseconds, never frames — a frame-counted gate waits longer the slower the machine is, which is backwards — and a resize resets the ladder rather than carrying a verdict earned at a different fragment count. ResizeObserver re-sizes; an IntersectionObserver and visibilitychange both stop the single rAF loop; webglcontextlost/restored rebuild cleanly; `paused` is polled rather than made an effect dependency, since the dependency would tear down and recreate the whole GL context to change a boolean. prefers-reduced-motion (and paused) draw exactly one composed still frame at t=9.6 with the sweep parked at 0.63 and a lag velocity still applied — the tear, the rims and the noise are all present, never a blank grey box — and pointer input still redraws that frozen frame directly. The canvas is aria-hidden; children render over the micrograph for an eyebrow, headline and CTA, and because the image spans the full value range in both themes they need a token scrim (bg-background/70 + backdrop-blur) rather than bare type."
+      }
+    },
+    {
       "name": "event-stream-vapor",
       "type": "registry:ui",
       "title": "Event Stream Vapor",
@@ -11033,6 +10950,47 @@
           "mono"
         ],
         "instruction": "A Wilson cloud chamber styled ambient-awareness widget for a live event stream, laid out as a canvas chamber (flex-1) beside a fixed-width Geist Mono legend. Consumer owns the data: pass `events` ({id, name, category, magnitude?, timestamp?}[]) as an append-only array — the component diffs by id every render and only ever reacts to ids it has not seen before, so re-renders with the same array are inert. MECHANISM: each new event immediately seeds a short track — origin is a random point inside the inner 64% of the box, direction comes from `angleForCategory` (a small canonical table: deploy/release ~-50deg, error/crash ~100deg, purchase/payment ~15deg, warning ~135deg, signal ~-125deg; any other category string falls back to a deterministic hash bucket, so nothing is ever unhandled), and distance covers speed*~400ms where speed and the per-particle brightness/radius/lifetime all scale with `magnitude` (0..1, default 0.4). Positions are stored as box-relative fractions and converted to pixels at DRAW time using the CURRENT box size, so an in-flight resize never distorts an already-spawned track. magnitude >= 0.68 also forks 1-2 short branch tracks off a random point partway along the primary path at a randomized angle offset (2 branches once magnitude >= 0.88) — the 'heavier events ionize harder' read. RENDERING: there is deliberately no persistent destination-out accumulation buffer. Every event pushes a small batch of stamps (fractional position, birth time, per-particle tau, peak alpha) into a plain capped array (700 max, oldest dropped first); every animation frame fully clears the canvas and redraws every live stamp from scratch at alpha = peak * exp(-age/tau) with 'lighter' compositing (so overlapping fresh particles brighten into a hot streak core while tails stay soft), pruning anything past ~5*tau. This is the fix for the destination-out fade this brief calls out: repeated low-alpha destination-out on an 8-bit backing store stalls once dst*alpha drops below the rounding floor, leaving a permanent low haze instead of returning to empty; redrawing from an explicit, analytically-decaying list has no such floor, so a quiet stream provably returns to a fully transparent, quiet chamber. Per-particle tau is 2.2-3.4s (branches 2.2-3.4s scaled off a lower magnitude), so a track's mist is visibly gone within roughly 6-10s of its last stamp. Brightness is the ONLY intensity channel — strictly monochrome, derived from --foreground via getComputedStyle at mount and re-baked into a small radial-gradient sprite on every documentElement class change, so both themes render correctly (dark ink on a light chamber in light mode is correct, not a bug). ACCESSIBILITY: the canvas is aria-hidden — the real interface for assistive tech is the paired legend, a role=log aria-live=polite region carrying event name/category/magnitude as plain Geist Mono text, labelled via the `label` prop. New arrivals are diffed against the same seen-id set but batched into ONE flush every `flushMs` (default 350) so a burst of events produces a single legend update and a single live-region announcement rather than one per event; this throttle only affects the legend/announcement, never the canvas, which reacts to a genuinely new event immediately. REDUCED MOTION: prefers-reduced-motion (checked live via a matchMedia change listener, not just once at mount) replaces the whole chamber — no canvas node is rendered at all — with the legend taking the full width plus a row of small static per-event tick marks (rotated to the event's category angle, sized/brightened by magnitude, zero motion, built from the same throttled row list) above it, so the same information stays legible without any animation. ENGINEERING: rAF loop pauses via IntersectionObserver while the chamber is scrolled offscreen; ResizeObserver keeps the canvas backing store correct (DPR clamped to 2); every observer, timer and rAF handle is torn down on unmount. Zero dependencies. Props: events, label, categoryAngles (override/extend the category->angle degree table), maxLegendItems (default 30), flushMs (default 350), className (default 'h-96', sets the widget's height)."
+      }
+    },
+    {
+      "name": "flyback-tear",
+      "type": "registry:ui",
+      "title": "Flyback Tear",
+      "description": "A full-bleed dead-broadcast CRT: a live monoscope test signal scanned onto a phosphor face by a timebase that keeps losing its grip, with rolling vertical hold, tear bands, snow and real phosphor persistence.",
+      "files": [
+        {
+          "path": "registry/loud/flyback-tear/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/flyback-tear.tsx"
+        }
+      ],
+      "dependencies": [],
+      "cssVars": {
+        "theme": {
+          "color-ns-muted": "var(--ns-muted)",
+          "color-ns-accent": "var(--ns-accent)"
+        },
+        "light": {
+          "ns-muted": "#4d4d4d",
+          "ns-accent": "#006bff"
+        },
+        "dark": {
+          "ns-muted": "#8f8f8f"
+        }
+      },
+      "meta": {
+        "collection": "loud",
+        "tags": [
+          "background",
+          "hero",
+          "canvas",
+          "webgl",
+          "shader",
+          "crt",
+          "glitch",
+          "cursor"
+        ],
+        "instruction": "Build <FlybackTear caption? captionWeight? captionFit? captionY? tear? noise? persistence? curvature? speed? paused? children? className?> as a full-bleed WebGL CRT showing a dead broadcast. THE ORGANISING IDEA: the entire simulation runs in LUMINANCE and colour is applied exactly once, in the final composite, through a five-stop ramp read from the theme tokens. A CRT is normally sold by its phosphor hue, so with hue unavailable every cue is carried by value, structure and time instead — scanline pitch, aperture grille, persistence, bloom, amplifier ringing, the blanking bar, snow. Nothing upstream of the ramp knows what colour anything is. TWO PASSES over a ping-pong pair of RGBA8 framebuffers. PASS A (signal + phosphor) evaluates the picture in SIGNAL space — a rolling, per-line-displaced copy of tube space — but samples the accumulation buffer at the TUBE-space texel, which is the whole trick: the picture slides across a stationary phosphor, so a vertical-hold slip smears the way a real one does rather than translating a sprite. Three channels of persistence, each an exp(-dt/tau) per-frame multiplier so smear length is a property of the phosphor and not of the frame rate: R fast (75ms), G the slow burn behind it (340ms), B the pointer beam (520ms). Combined with max(), not mix() — a phosphor is excited to a level and decays from it. The subtracted floor (0.006/0.004/0.010) is load-bearing, not cosmetic: the buffer is 8-bit and pure multiplicative decay stalls at whatever value rounds to itself, leaving a permanent ghost of everything bright that ever crossed the tube. THE SOURCE is an analytic monoscope, and every element of it moves, because a still picture under the failures would read as a filter over a JPEG rather than as a transmission: a square graticule with every fifth line heavier and widths derived from the viewport so it holds one pixel of weight at any size, convergence rings drifting outward, twenty-four radial wedges turning slowly (angular width converted back through the radius or they fatten into a solid disc at the centre), a centre reticle, two resolution chirps whose frequency ramps past the raster's own pitch so the top of the sweep aliases against the scanline comb and crawls, a nine-step greyscale staircase, a low-frequency fbm swim standing in for an adjacent carrier, and the caption rasterized on a 2D canvas from the wrapper's own computed font-family and max()ed into the signal so it rolls and tears with everything else (re-rasterized after document.fonts.ready, since a texture baked pre-webfont freezes fallback letterforms permanently). THE FAILURES are event-driven on the CPU, not noise-shaped, so their timing is legible and the shader only ever sees a current amplitude. Vertical hold: an impulse into a velocity that decays over 900ms and then RE-LOCKS to the top of the frame — the re-lock is the beat, since a picture that drifts and stays put reads as a scrolling background while a picture that snaps back reads as a set fighting to hold sync. Tear: contiguous nine-line bands thrown sideways, the trigger quantized to 18Hz so they read as discrete failures instead of a shimmer, plus per-line timebase jitter and a smooth supply wobble; a displaced line wraps with fract() rather than clipping. Dropout: kept under a quarter second and first scheduled at t=11s, because a collapsed frame is the one state of this component that reads as broken rather than as an effect and must never be what a card or a screenshot catches. CHROMATIC ABERRATION WITHOUT CHROMA: where a colour build would split RGB, this weights three horizontal taps of the one monochrome signal — 1.18 at the sample, -0.30 at -d, +0.14 at +2.4d, and a fourth at +0.031 for a multipath ghost — which is amplifier overshoot and echo, the same fringing read, entirely inside the palette constraint. Also a vertical blanking bar with a bright edge line and noise in the interval, head-switching noise on the last lines, snow sampled per source line at half horizontal resolution and smeared into its neighbour (per-pixel white noise reads as digital sensor grain, not analogue), and interlace applied in TUBE space so the unwritten line is last frame's decaying one and the flicker reads as an interlaced source rather than a strobe. PASS B (glass) barrel-distorts with the picture overscanned by exactly the amount the distortion pulls in, so a full-bleed frame never shows an empty corner; adds a twelve-tap golden-angle bloom spiral whose radius rides the sample index so one loop covers both tight halation and the wide veil; multiplies in the scanline comb at 240 lines and a 3-css-px aperture grille phase-locked to the display rather than the picture so it survives the adaptive render scale unmoved; drifts a mains hum bar up the face; then maps the single remaining float through the ramp. PALETTE: five stops from --background, --foreground, --ns-muted and --border via getComputedStyle, re-read on a documentElement class MutationObserver. The ramp's DIRECTION carries the theme. Dark is a tube — beam energy climbing from an unlit face toward white-hot. Light is the same signal as a photographic negative of itself — energy climbing into ink on paper, so bloom becomes a smudge spreading out of the stroke instead of a halo, which is what that polarity ought to do. POINTER: a beam overdrive written as the distance to the SEGMENT the pointer swept this frame, not to a point, so the stroke is continuous at any speed with no ring buffer and no beading and the deposit rate is the display's rather than the pointer's; the follower is lead-compensated (target extrapolated one tau ahead) because a plain exponential follower has a steady-state error of exactly v*tau and the stroke would inherit it as lag. --ns-accent tints only where that beam channel is non-zero, and it decays to exactly zero, so a resting frame carries no accent. HOST: DPR is capped at 2 rather than 1.5 — scanline pitch and grille are exactly the high-frequency structure a reduced backing store destroys first — with a three-step adaptive ladder that engages only on sustained wall-clock overrun. Every path that invalidates the accumulation (mount, resize, a render-scale step, context restore) runs 22 warm-up accumulate frames before compositing, or the tube shows a thin cold picture that fills in a beat later; webglcontextlost/restored rebuilds both framebuffers, both textures and the ping-pong index, not just the programs. prefers-reduced-motion and paused compose one still at t=7.3 with the hold mid-slip and a tear burst live, warmed up so the phosphor carries a real smear, and a pointer over the frozen tube still writes and composites one stroke by hand. The caption's accessible copy is an sr-only <h1>; children render over the glass and need a token scrim (bg-background/70 + backdrop-blur) because the tube spans the full value range in both themes."
       }
     },
     {
@@ -11076,6 +11034,47 @@
           "cursor"
         ],
         "instruction": "Build a 400vh section with a sticky full-viewport inner div. Cards are laid out along a 'gantry track': item i sits at world position (i*34px lateral, i*-16px vertical rise, i*260px depth), and the item list is rendered TWICE back to back (a loop buffer) so a duplicate of the first card is already approaching as the last real card recedes out of frame. A real CSS perspective (1400px, origin 50% 45%) on the viewport wrapper plus transform-style: preserve-3d on the track and every card lets the browser do the actual projection — each card's transform (translate3d + a fixed rotateY(-6deg) + a small in-focus scale bump) is written directly to its ref every frame, not through React state. Scroll progress is read from the section's getBoundingClientRect in a passive scroll listener (0 at the section's top edge reaching the viewport, 1 once its bottom edge does), mapped to camera depth camZ = progress * (item count * 260px) — since that span equals exactly the depth of ONE set of the duplicated pair, the pass reads as a single continuous, closed loop: at progress 1 the camera is back at the seam. Independently of scroll, the pointer tilts the whole track (not any individual card) toward itself: pointer offset from viewport center maps to a target rotateX/rotateY on the track wrapper, eased in at a fixed 0.1 lerp factor per frame, so the tray reads as a tilting specimen table rather than N cards each springing at the mouse. Every frame the card whose depth (|world Z - camZ|) is smallest is the 'focus' card: it gets `data-focused=\"true\"\" (styled via a plain Tailwind data-attribute variant into an --ns-accent border and a raised shadow, both transitioning over 200ms) and its title is written directly into a small mono readout above the scroll hint via textContent, so attention follows camera depth, not cursor proximity. Cards more than 1.5 track-steps behind the camera or past the loop's far edge are set to opacity 0 to bound the DOM work; visible cards fade out gradually as they approach either edge of the visible window. Default items render as token-styled specimen cards (id, a diagonal-hatch swatch built from a `repeating-linear-gradient` of `var(--border)`, title, caption) rather than photographic images, so the component has no network dependency and stays theme-reactive by construction. prefers-reduced-motion replaces the entire scroll-scrubbed 3D experience with a plain static grid of the same cards and tokens — no scroll listener, no tilt, no receding track — rather than merely slowing the scrub down. Props: items (id/title/caption), className. Zero dependencies."
+      }
+    },
+    {
+      "name": "granule-churn",
+      "type": "registry:ui",
+      "title": "Granule Churn",
+      "description": "A full-bleed stellar photosphere: bright convection cells packed edge to edge, born, swelling against their neighbours, splitting and dying, with the cooled material draining back down the dark intergranular lanes between them and bright flecks flaring in the strongest downdrafts.",
+      "files": [
+        {
+          "path": "registry/loud/granule-churn/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/granule-churn.tsx"
+        }
+      ],
+      "dependencies": [],
+      "cssVars": {
+        "theme": {
+          "color-ns-muted": "var(--ns-muted)",
+          "color-ns-accent": "var(--ns-accent)"
+        },
+        "light": {
+          "ns-muted": "#4d4d4d",
+          "ns-accent": "#006bff"
+        },
+        "dark": {
+          "ns-muted": "#8f8f8f"
+        }
+      },
+      "meta": {
+        "collection": "loud",
+        "tags": [
+          "background",
+          "hero",
+          "canvas",
+          "webgl",
+          "shader",
+          "convection",
+          "cursor",
+          "decorative"
+        ],
+        "instruction": "Build <GranuleChurn density? speed? faculae? paused? children? className? style?> as a full-bleed WebGL2 background rendering SOLAR GRANULATION — a stellar photosphere seen from above, boiling continuously with no input at all. The mechanism is a compressible surface flow, not a cell diagram: a potential field is built from a lattice of gaussian plumes, each born at a jittered position with its own period, swelling over its lifetime and fading; horizontal velocity is the negative gradient of that field, so material runs downhill off every summit and piles up where three or four plumes' skirts meet. Nothing computes a nearest-site distance — the dark intergranular lanes are not the edges of a partition, they are where an advected density has genuinely been squeezed together, so they vary in width, break into segments and lag behind the plumes that pushed them. Four channels ride one RGBA16F ping-pong target through a single semi-Lagrangian pass: temperature injected where the flow diverges and cooling radiatively as it travels out (so a granule is bright at the middle and dim by the time it reaches its own boundary), material density multiplied by the continuity term (which is what actually darkens a lane), faculae seeded stochastically in the strongest downdrafts and carried along the lane that made them, and pointer freshness. Birth and death are structural: when a plume's envelope reaches zero its successor is born at a new jittered position, neighbours immediately expand into the space and the lane network re-knits, and about a third of sites develop an exploding-granule dimple late in life that drives a lane through the middle of the cell and cleaves it in two. The pointer is an extra upwelling rather than a decal — it pushes the lanes apart and floats fresh hot material up under the cursor, on a lead-compensated follower so the response is not late, and --ns-accent tints only that freshly disturbed material. Colours come from --background, --foreground, --ns-muted, --border and --ns-accent via getComputedStyle, re-read on a documentElement class MutationObserver; the ramp inverts between themes rather than shifting its distribution, so dark theme is a luminous star and light theme its deliberate negative, graphite granules on a paper field. The sim is spun up for twenty seconds of convection before the first paint in every mode, so the surface is already boiling at mount; prefers-reduced-motion gets a longer spin-up and then a frozen frame. Pauses offscreen and on tab hidden, and steps down display then sim resolution only after a sustained stretch of missed frames."
       }
     },
     {
@@ -11880,6 +11879,45 @@
       }
     },
     {
+      "name": "magazine-drop",
+      "type": "registry:ui",
+      "title": "Magazine Drop",
+      "description": "A full-bleed gallery driven by a gravity-fed slide magazine: a rotary drum indexes against a detent, releases a plate, and the plate falls into the gate and seats over two decaying bounces.",
+      "files": [
+        {
+          "path": "registry/loud/magazine-drop/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/magazine-drop.tsx"
+        }
+      ],
+      "dependencies": [],
+      "cssVars": {
+        "theme": {
+          "color-ns-muted": "var(--ns-muted)",
+          "color-ns-accent": "var(--ns-accent)"
+        },
+        "light": {
+          "ns-muted": "#4d4d4d",
+          "ns-accent": "#006bff"
+        },
+        "dark": {
+          "ns-muted": "#8f8f8f"
+        }
+      },
+      "meta": {
+        "collection": "loud",
+        "tags": [
+          "gallery",
+          "carousel",
+          "canvas",
+          "physics",
+          "drag",
+          "transport"
+        ],
+        "instruction": "Build <MagazineDrop items? defaultIndex? ambient? weight? paused? className?> as a full-bleed 2D-canvas gallery whose transport is a gravity-fed slide magazine rather than any kind of slide or fade. THE MACHINE: a rotary drum sits above a gate at the centre of the frame; a plate is released from the drum, FALLS under gravity, strikes the seat and settles. There is no tween anywhere in the transport — every visible motion is a fixed-timestep integrator over rigid bodies with y, vy, rot and vrot, gravity 2600*weight px/s^2, restitution 0.34 and exactly two bounces before the body is clamped, after which the gate's registration pins pull the residual tilt out with a critically damped return. Reverse is the same physics, not the animation reversed: the return ram tosses the previous plate up from the lower chute with sqrt(2*g*(drop+40)) of velocity, just enough to overshoot the seat, and gravity catches and settles it. The outgoing plate is kicked out of the gate with an impulse and a little spin and leaves the frame, and its impulse is SIGNED AND SIZED by direction because gravity is still acting on it: forward needs only a nudge, reverse must be thrown at sqrt(2*g*H*0.85) or it rises a few px, falls back and crosses the incoming plate at the gate mouth. Exactly ONE spent plate stays in flight, at 0.55 alpha — this component's entire per-frame cost is fill, and a train of three measured 33ms (two vsync intervals) during a drag at DPR 2. DRUM PHASE IS THE SOURCE OF TRUTH: a continuous scalar in notches, 96px of drag per notch. A drag maps to it DIRECTLY and unsmoothed — a plate must sit exactly where the finger is, and an exponential follower would introduce v*tau of steady-state error, which on a drag is not smoothing but lag. Release hands the phase to a detent spring (stiffness 190, damping 17) carrying an EMA of the flick velocity, so a slow drag lets you feel the detent and back out without committing while a flick crosses several notches; a transition fires whenever round(phase) changes, and a multi-notch crossing consumes the intermediate steps as drum rotation so only the last one gets a flight. Pointerdown on a button, link or role=button must NOT start a drag: the drag takes pointer capture on the wrapper, and a captured pointer retargets the subsequent click to the CAPTURE element, which silently killed both transport buttons while the keyboard path kept working. The fractional part of the phase also slides the edge-on stack of upcoming plates drawn above the gate and the spent stack below it, which is what makes a half-drag legible as a mechanism under load rather than a stuck animation. PLATES ARE PROCEDURAL: six engravings drawn once each into an offscreen canvas at gate resolution and blitted with a transform per frame — a turned concentric face with pitch opening toward the rim, a two-pass 60-degree hatch, a moiré of two rasters four degrees apart, a radial-falloff halftone lattice, a three-source interference field drawn as contour bands (bands rather than a shaded field so the plate survives being 5px tall in the magazine stack), and a braided warp weave. Each carries an engraved two-digit index, its title in mono, a registration bar and a bevelled edge, all cut into the same raster so they travel with the plate. A plate in flight is squashed vertically by 1/(1 + |vy|/9000) so it reads as being seen slightly edge-on at speed. PALETTE: --background, --foreground, --ns-muted, --border and --ns-accent only, via getComputedStyle, re-read on a documentElement class/data-theme MutationObserver which also re-engraves every plate. THREE values must separate, and their ORDER matters more than the numbers: the plate is the brightest thing in the frame because it is the thing being lit, the full-width lamp aperture band (as tall as the gate) sits under it, and the recessed bay is sunk below both. Light is the harder case twice over — a bay mixed toward a near-white --border lands within 3% of the plate and the machine reads flat, and the engraving alphas that work on the dark plate produce a ghost on the near-white one, so every ink alpha is written for dark and scaled by 1.7 for light. --ns-accent is interaction-only — the four gate registration ticks turn accent while dragging or focused and are --ns-muted at rest, so a screenshot at the default pointer position carries no accent at all. THE DRIVE FILLS THE MARGINS: the gutters either side of the gate carry the drum's drive sprockets, one on each end of the axle, each pushed most of the way off the frame so what shows is the near rim of a wheel far bigger than the gutter rather than a whole cog floating in it — a wheel centred in the margin reads as an illustration of a gear. Each is engraved ONCE into an offscreen canvas exactly like a plate and blitted rotated, which is what buys it a surface that survives being looked at: 44 teeth crowned proud of the rim and lit on the leading flank, ~140 concentric turned tool marks at the pitch of a lathe feed, six web ribs faded at both ends so they read as ribs standing off the face rather than light streaks laid across it, nine lightening bores with a shadowed interior and a lit far wall, a hub boss with a keyway, and seeded speckle wear that reproduces the same damage across a resize or theme flip. The bores are sunk but must NOT be the darkest value in the frame — at half way to --foreground in light, nine of them per wheel out-competed the plate and the margins won the composition. The wheels are geared straight off the drum phase (angle = phase * 2pi / 12, mirrored per side), so they turn under the finger during a drag, spin through a flick, and rock a sixth of a notch against the detent spring while the machine idles: the resting frame is never static and the transport is legible from the edge of the frame even when nothing is falling. Re-engraved only when the radius or the DPR changes, so a resize drag does not re-cut both wheels per ResizeObserver callback, and skipped entirely below a 56px gutter. ACCESSIBILITY: the wrapper is a focusable role=group with aria-roledescription='slide magazine' taking ArrowDown/ArrowRight/PageDown forward, ArrowUp/ArrowLeft/PageUp back and Home/End to the ends. Home/End are a JUMP, not N advances: the drum spins to the target and one plate flies, arriving from the side the jump came from; a full sr-only <ul> of every plate is the DOM equivalent of the canvas, with only the gated plate unhidden, and an aria-live=polite line announces 'Plate n of N'. Both transport buttons are real buttons with accessible names. prefers-reduced-motion and paused collapse the machine to discrete states: no flight, no spent stack, the plate is simply in the gate, and a drag resolves to a single step on release. IDLE: an ambient advance every `ambient` seconds (default 4.6) whenever the machine is settled and nothing is focused or dragging, suspended for one full period after any real input, and deliberately NOT gated on hover — the component is full bleed, so a cursor resting anywhere in the viewport is 'over' it and would stop the transport forever, including in the screenshot gate, which parks the mouse at 0,0 — so the transport demonstrates itself without ever taking the frame from someone driving it. HOST: DPR capped at 1.5 rather than 2 — the cost scales with the square of the ratio and the content is flat engraved line work already antialiased into the plate raster, so 1.5 is indistinguishable and is 44% of the pixels; bodies outside the frame are culled from rasterization while still being integrated, and the bay is painted as three bands rather than a full-frame fill under the aperture so the viewport is not paid for twice per frame. Measured on a production build at DPR 2, 1440x900: p50 16.7ms, p95 17.4ms, zero frames over 20ms through a continuous drag that indexed all six plates. ResizeObserver re-raster on gate size change, IntersectionObserver and visibilitychange both stop the single rAF loop, and paused/items are polled rather than effect deps so neither tears down the machine and drops a plate mid-flight."
+      }
+    },
+    {
       "name": "not-found-knockout",
       "type": "registry:ui",
       "title": "Not Found Knockout",
@@ -11965,6 +12003,46 @@
       }
     },
     {
+      "name": "ping-shadow",
+      "type": "registry:ui",
+      "title": "Ping Shadow",
+      "description": "A full-bleed acoustic image of a seabed drawn by a sector beam that sweeps the frame — grazing-lit sand ripples, boulders with shadows stretching radially away from the transducer, range-growing speckle, and a persistence gradient trailing the wedge.",
+      "files": [
+        {
+          "path": "registry/loud/ping-shadow/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/ping-shadow.tsx"
+        }
+      ],
+      "dependencies": [],
+      "cssVars": {
+        "theme": {
+          "color-ns-muted": "var(--ns-muted)",
+          "color-ns-accent": "var(--ns-accent)"
+        },
+        "light": {
+          "ns-muted": "#4d4d4d",
+          "ns-accent": "#006bff"
+        },
+        "dark": {
+          "ns-muted": "#8f8f8f"
+        }
+      },
+      "meta": {
+        "collection": "loud",
+        "tags": [
+          "hero",
+          "background",
+          "canvas",
+          "webgl",
+          "shader",
+          "sonar",
+          "cursor"
+        ],
+        "instruction": "Build <PingShadow speed? sweepPeriod? persistence? scale? paused? children? className?> as a full-bleed WebGL background that is an ACOUSTIC IMAGE of a seabed, built by a beam sweeping the frame, not a radar line over an empty field. POLAR FRAME: a transducer sits off-frame above the top edge at (0.5W, -1.18H) — on the edge would leave the top corners outside any sector and the display would carry two dead wedges — and every fragment computes its range r and bearing theta = atan(dx, dy) from it, with the sector half-angle derived from the viewport as atan(0.5W / 1.18H) * 1.05 so the rectangle always fits inside one sector. ANALYTIC PERSISTENCE, the load-bearing idea: the scanner is harmonic, theta_b(t) = A*sin(wt), so it is invertible, and the shader can ask 'how long ago did the beam last cross MY bearing' without a history buffer — sin(phase) = x has roots asin(x) and PI - asin(x), and the age is min(mod(phase - root, 2PI)) / omega. No feedback texture, no ping-pong FBO, and the consequence that matters is that frame zero is ALREADY a fully painted scene with a correct freshness gradient behind the beam rather than an empty display filling in. The clock also starts at 3.34s, so the first frame anyone sees has the beam a third of the way off boresight and travelling near its fastest. ECHO FIELD: return strength is assembled the way an insonified bottom assembles it. (1) Sand ripples lit at GRAZING INCIDENCE — phase = dot(wp, rd)*0.052 + fbm warp*5.2, and the return is -sin(phase) * dot(u, rd) where u is the unit outgoing ray, so facets tilted toward the transducer flare, facets tilted away go dark, ripples broadside to the beam band hard and ripples end-on almost vanish. That single dot product is the strongest cue that the frame is lit from one moving point. (2) Two fbm octaves of bottom sediment. (3) Eleven boulders, positions animated on the CPU and passed as a vec4[11] (x, y, radius, height): each gets a near-face specular gaussian at r = objectRange - radius*0.45 and an ACOUSTIC SHADOW covering everything at its bearing beyond it, length proportional to height and to range, with the lateral penumbra widening with distance behind because the source is not a point. Shadows always point directly away from the transducer and lengthen as the bottom drifts past — the tell that separates an acoustic image from a texture with a wipe over it. (4) Sparse point scatterers from a shell hash, one cell in a hundred. (5) Multiplicative speckle whose correlation cell grows with range, 1.7 + 5.5*r/refR px, SEEDED BY THE PASS THAT PAINTED THE PIXEL — floor((t - age)*2/period), not by now — so grain decorrelates one wedge at a time as the beam goes over it, exactly like ping-to-ping speckle decorrelation, instead of the whole frame boiling together. Then residual TVG (near range hotter than far) and log compression, log(1 + 7.5E)/log(8.5), the mapping every acoustic display uses to fit a decade of return into a screen's worth of luminance. BEAM AND RESOLUTION: the live wedge is defined in ANGLE, half-width 0.0055 + 0.0175*r/refR, so it fans out with range instead of staying a constant-width stripe, and it carries a wide faint skirt because no transducer has a hard-edged main lobe. Because azimuth resolution is an angle, the along-arc footprint grows with range, and the ripple term is low-passed by exp(-(beamWidth*r*rippleFreq*9)^2) — the far field genuinely loses fine structure the near field keeps, which is what stops the image reading as one flat texture. Gain is 0.085 + 0.915*exp(-age/tau) with tau = period*0.19, plus the wedge's own boost, so the frame carries a continuous gradient of freshness from the beam back into the dark and never fully empties. Receiver noise is redrawn every frame everywhere including inside the shadows, so the far side of the sweep is alive rather than dead. Range rings every fifth of full scale and bearing ticks are drawn at the threshold of legibility, brighter where the image is fresh. POINTER: the pointer aims and focuses. Horizontal position biases the sector centre by up to 0.34 of the half-angle and narrows the swing to match, so the beam is steered rather than teleported; vertical position sets the focal range, which narrows the wedge around that range (defocus = 0.55 + 1.5*|r - focal|/refR) and adds a gaussian gain band there. It is a lead-compensated follower — a plain exponential lags by exactly v*tau under constant velocity, so the aim is extrapolated one tau ahead — and the whole effect is gated by an eased hover term, so a resting pointer at the viewport origin only tilts the sector slightly rather than parking anything anywhere. PALETTE: four luminance stops from --background, --foreground, --ns-muted and --border via getComputedStyle, re-read on a documentElement class MutationObserver. --ns-accent is deliberately NEVER sampled: an echo has no hue, and the pointer's job here is aim and focus, not a coloured highlight. Dark theme is the instrument — strong returns bright on a near-black display. Light theme INVERTS to a wet-paper record, strong returns as dark ink on white, the way side-scan was printed before it was screened. The same L drives both and only the ramp reverses, so nothing in the shader knows about the theme. HOST: an internal GLSurface class owns the program, the fullscreen triangle pair and lazily-resolved uniform locations. DPR is capped at 1.5 because full bleed at 2 is four times the fragments and per-pixel hash speckle gains nothing past that, with a three-step adaptive ladder gated in milliseconds of wall clock (never in frames, since a frame-counted gate waits longest exactly on the machines that need help soonest). ResizeObserver re-lays out the apex and sector, an IntersectionObserver and visibilitychange both stop the single rAF loop, webglcontextlost/restored rebuild cleanly, and prefers-reduced-motion (or paused) draws one composed still frame at t = 3.34 that is a fully painted swath with the beam mid-pass, never a blank display — pointer input still re-aims that frozen frame. Children render over the display and need a token scrim, since the image spans the full value range in both themes."
+      }
+    },
+    {
       "name": "reveal-cloth-unfurl",
       "type": "registry:ui",
       "title": "Reveal Cloth Unfurl",
@@ -11989,6 +12067,47 @@
           "intersection-observer"
         ],
         "instruction": "Build <BoltUnfurl src alt trigger strips? aspectRatio? className?> where `trigger: number` is a counter the caller bumps to (re)play the unroll from scratch (an IntersectionObserver firing once on first view, and/or a Replay button) — the component diffs `trigger` against the last value it saw in a ref and starts a fresh 0->1 tween any time it changes, including while already mid-animation. STRUCTURE: a real <img src alt> fills the box (object-cover) underneath everything, both for accessibility (the caller's real alt text) and as network-free progressive enhancement; an aria-hidden overlay of exactly `strips` (default 24) absolutely-positioned divs sits on top and is what's actually seen once painted, since each strip is opaque. SLICING: strip i has `left: (i/strips)*100%`, `width: 100/strips%`, and shows its slice of the same image via the classic CSS sprite technique — `backgroundImage: url(src)`, `backgroundSize: (strips*100)% 100%`, `backgroundPosition: (i/(strips-1))*100% 0%` — no canvas, no cropping math beyond that one percentage formula. MOTION: one requestAnimationFrame loop tweens a single `progress` 0->1 over 1300ms with an ease-out-expo curve; every frame it computes `rollX = progress * containerWidth` and, for each strip, `curl` (0 = flat/unrolled, 1 = fully rolled) as a smoothstep of the strip's rest-center distance from rollX across a curl band ~16% of the container width — strips left of the band are curl 0, right of it are curl 1, inside it interpolate. Each strip's actual style.transform is `translateX(tx) rotateY(angle)` where `angle = -curl * 86deg` and, critically, `tx = (rollX - centerX) * curl` — the translate is what converges every still-rolled strip's center onto the roll cursor as curl approaches 1, bundling them into a dense, foreshortened, shaded cylinder sitting at the leading edge rather than 24 independent slivers spread across the whole width (that translate term is the difference between reading as \"a rolled bolt of cloth\" and reading as \"broken image\"). `filter: brightness(1 - curl*0.45)` darkens curled strips for the shaded side of the roll. transform-origin is `left center` on every strip so the hinge is physically at its own left edge. A single absolutely-positioned shadow div (linear-gradient transparent -> rgba(0,0,0,0.35), ~24px wide) tracks `rollX` via the same per-frame writes, giving the roll's leading edge a soft cast shadow on the already-flat part; it's opacity-hidden outside 0<progress<1. SETTLE: the instant progress reaches 1, a CSS class toggle (removed then re-added after a forced reflow, so replays restart it cleanly) plays one 260ms per-strip `rotateX(-6deg) -> rotateX(0deg)` keyframe with a 14ms stagger (via an inline `animationDelay` set just before the class is added) — the fabric settle ripple — plus, being `loud`, a diagonal sheen sweep (a `::after` layer, `background-position` animated across a wide gradient band) that plays once over the same beat; both are pure CSS keyframes, no JS per-frame work. REDUCED MOTION: the whole strip/tween machinery is skipped — on trigger, `progress` jumps straight to 1 (paint once, no rAF loop) and the strips wrapper gets one opacity fade-in class, so the caller still sees a state change but nothing rolls, rotates, or ripples. A11Y: the real <img>'s alt text is the only accessible description; every strip and the shadow overlay are aria-hidden; the Replay button (owned by the demo, not the component) is a real, labeled, focusable <button>. DEMO: the media box's src is generated once on an offscreen canvas (diagonal bands + a couple of rings in the live --foreground/--border/--ns-accent tokens) precisely so the bare demo never depends on a network image URL; an IntersectionObserver on the box bumps `trigger` the first time it scrolls into view, a visible Replay button bumps it again on demand, and a self-driving interval also bumps it every few seconds so the reveal plays unattended for screenshots."
+      }
+    },
+    {
+      "name": "rime-creep",
+      "type": "registry:ui",
+      "title": "Rime Creep",
+      "description": "A full-bleed pane of window frost growing in real time: dendritic ice ferns advance from nucleation points on a fixed 60-degree lattice, sprout side branches, thicken behind their own tips and stop dead where two grains collide, leaving the clear glass between them slowly closing over before the whole pane thaws and seeds again.",
+      "files": [
+        {
+          "path": "registry/loud/rime-creep/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/rime-creep.tsx"
+        }
+      ],
+      "dependencies": [],
+      "cssVars": {
+        "theme": {
+          "color-ns-muted": "var(--ns-muted)"
+        },
+        "light": {
+          "ns-muted": "#4d4d4d"
+        },
+        "dark": {
+          "ns-muted": "#8f8f8f"
+        }
+      },
+      "meta": {
+        "collection": "loud",
+        "tags": [
+          "background",
+          "hero",
+          "canvas",
+          "webgl",
+          "shader",
+          "simulation",
+          "crystal",
+          "monochrome",
+          "cursor",
+          "decorative"
+        ],
+        "instruction": "Build <RimeCreep density? growth? relief? sparkle? speed? paused? children? className? style?> as a full-bleed WebGL pane of dendritic window frost that is GROWN, not sampled from noise. The component is a CPU tip simulation feeding a persistent GPU accumulation buffer, plus one fragment shader that reads that buffer as ice. GROWTH: every crystal belongs to a grain with one random lattice orientation, and every tip in that grain travels on that lattice and no other — six primary arms at theta0 + k*60 from each nucleation point, side branches sprouting at exactly +/-60 from the parent's heading, which keeps them on the same six-fold lattice for every generation. That fixed angle set is the whole tell: a noise-driven or curvature-driven front gives mushy emergent branch angles, and the eye reads it as smoke rather than as ice. Tips advance at a per-generation speed (primaries fastest, each generation 0.66x) and deposit a segment every ~4px of travel; children inherit width*0.62 and a shorter branch spacing, so an arm tapers into a fern instead of into a bush. COLLISION AND GRAIN BOUNDARIES: a coarse occupancy grid (5 css px cells) is stamped with the grain id along every deposited segment. A tip stepping into a cell owned by a DIFFERENT grain dies on the spot; two fronts advancing at each other therefore both stop a cell short and leave a thin unfrosted seam between them, which is what a grain boundary on real glass looks like. A tip stepping into its OWN grain dies only if that cell is older than a few frames, so a tip cannot suicide on the cell it just wrote. ACCUMULATION: new segments are packed into one dynamic vertex buffer per frame and drawn as two batched passes into an RGBA8 framebuffer that is never cleared — R accumulates density additively, G and B are written source-over as the segment's birth phase and its grain orientation. Cost is O(new segments), not O(total frost), so the pane can carry a hundred thousand deposits at a flat frame cost. Each segment's fragment shader draws its own feather: a gaussian core, a broad low skirt, and BARBS on a lattice along the arm at +/-60 with hashed lengths, so the fern texture is resolved at pixel scale rather than at simulation scale. Core amplitude stays near 0.3 so overlapping hairs build structure instead of clipping R to 1 and flattening the dense regions into blob. THICKENING: nothing redraws old frost. The render pass lowers its coverage threshold with the AGE of each texel (G against the cycle phase), from 0.30 down to 0.055 over ~0.22 of a cycle, so a segment's soft skirt crosses the threshold some seconds after its core did and the arms visibly fatten behind the advancing tips while the clear glass between them closes over. CYCLE: growth, fill, then a thaw ramp over the last quarter of a ~56s cycle that multiplies density down while the next generation of seeds is already nucleating, so the resting frame is never empty and never static. The simulation is PREWARMED at mount by ~13s of accelerated steps, so the first painted frame is already a half-frosted pane and no autoplay descriptor is doing the work of proving it is alive. ICE, NOT A HEIGHTFIELD WITH A LAMP: density is central-differenced for a normal, but the dominant term is SCATTER, not diffuse shading — frost is bright because it is a mess of air-ice interfaces, so luminance climbs with accumulated thickness and climbs again at the gradient, giving every arm a bright edge and every crevice a dark contact line. On top of that sits micro-facet scintillation: a per-pixel hash beaten against two slow temporal frequencies and gated on coverage, so the whole frosted area twinkles continuously and every frame differs everywhere rather than only at the ~200 pixels of advancing tip. PALETTE: five luminance stops from --background, --foreground, --ns-muted and --border via getComputedStyle, re-read on a documentElement class MutationObserver. The glass level is an explicit uniform because the two themes are different pictures, not one picture with the contrast inverted: dark theme is a cold black pane with the ice owning the whole top of the range; light theme sets the clear glass at a mid pale grey so the frost still has headroom ABOVE it for the arm cores and headroom BELOW it for the contact lines, which is the failure mode that washes a pale-on-pale frost out to flat white. POINTER: the pointer is a warm fingertip, and it is destructive — the frost under it is multiplied down in the accumulation buffer through a colorMask that touches the density channel ONLY, since decaying the birth and orientation channels would make melting frost read as older, i.e. thicker, exactly as it should be vanishing. Melting also clears the occupancy grid it passes over, so tips creep back into the cleared glass and refreeze it a few seconds later. The warm halo is expressed purely in luminance — no --ns-accent anywhere in the shader, because a tinted blob parked at the viewport origin is the single fastest way to make a monochrome pane look like a rendered glow sprite. Melt is gated on a real pointerenter/pointermove, so a headless run with the mouse parked at the origin does not scrape a permanent bald corner into the pane. HOST: DPR capped at 2 for the visible canvas with an adaptive render-scale ladder [1, 0.8, 0.62] that steps only after 900ms of sustained wall-clock overrun; the accumulation buffer is sized independently of that ladder, so a scale step cannot wipe the frost. ResizeObserver re-sizes and reseeds; IntersectionObserver and visibilitychange stop the single rAF loop; webglcontextlost/restored rebuild cleanly; paused is polled rather than made an effect dependency. prefers-reduced-motion (and paused) prewarm to a composed still frame of a fully grown pane and draw it once, and pointer input still redraws that frozen frame. The canvas is aria-hidden; children render over the pane and need a token scrim (bg-background/70 + backdrop-blur) because the ice spans the full value range in both themes."
       }
     },
     {
@@ -12028,6 +12147,47 @@
           "spring"
         ],
         "instruction": "Build a full-bleed Canvas 2D hero rendering a deformable ASCII SURFACE, not discrete particles. A hexagonal lattice of 'peak' points is authored directly in PIXEL space (dx = glyph cell size * 2.6, dy = dx * sqrt(3)/2, alternate rows offset by dx/2) so the hexagons stay visually equilateral regardless of the monospace glyph's cell aspect ratio — building the lattice in glyph-cell-index space instead would come out stretched, since a mono cell is taller than it is wide. Each lattice point carries its own scalar height and velocity (two Float32Array buffers, reallocated on resize). Every frame: field strength at a lattice point is (1 - distance/230px)^2 clamped to [0,1] against the eased pointer position (an inner cursor.x/y lerps toward the raw pointer at 0.22/frame, adding a first layer of lag on top of the spring), then passed through smoothstep(0.5, 0.64, field) so the response is a hard phase boundary, not a gradual bulge — nothing happens below threshold, height snaps toward its ceiling just above it. An exclusion rectangle measured from the real DOM children (the headline/CTA wrapper, expanded by 22px padding and a 78px soft feather via smoothstep) multiplies the target toward zero near and under that content regardless of pointer distance, so the surface can never rise under the wordmark — a physical constraint on the field target, not a z-index trick. Each point then springs toward that target with an ASYMMETRIC response chosen by the sign of the error every frame: k=260 stiffness / c=15 damping when rising (fast, slightly underdamped, a visible snap-and-settle 'eruption'), k=26 / c=42 when falling (heavily overdamped, a slow heavy liquid slump, no bounce) — same spring equation, two constant pairs. Rendering: for every glyph cell, a 3x3-candidate hex nearest-neighbor search (checking the lattice row above/at/below the cell's approximate row, each with the column above/at/below) finds the owning peak's height AND the tallest height among those same candidates; if the cell's own height is below 0.55 and the neighborhood max exceeds it by more than 0.22, the cell renders the hollow glyph '˘' (a moat beside a taller spike) instead of its height bucket. Otherwise height buckets at 0.02/0.24/0.5/0.74/1.01 map to the ramp ' · ~ ≈ ∧ ▲' (flat pool through crest), with the bottom two buckets drawn in --ns-muted at low alpha (resting/rising, subtle) and the top three in the canvas's resolved color() (crest, full ink, alpha scaling 0.55 to 1 with bucket). This is a faceted nearest-peak lookup (effectively Voronoi-per-lattice-point), not smoothed interpolation, which is what gives spikes their sharp faceted edges rather than a blurred bump. The physics loop tracks an aggregate energy term (sum of |velocity| + height across all lattice points) each frame and stops requesting frames once it drops below a small epsilon AND no pointer is active — a pointerenter/pointermove/pointerleave triple on the ROOT container (never the canvas, which is pointer-events:none and aria-hidden) toggles pointerActive and re-wakes the loop; the canvas listening on itself would risk stealing events meant for the real headline/CTA layered above it in the same box. Touch/coarse pointers (matchMedia('(pointer: coarse)'), checked once at mount) never receive pointer listeners at all: instead pointerActive is forced permanently true and the eased cursor target follows a slow 15s lissajous lap across the container — the exclusion rect still guards the headline even though the autonomous path pays it no attention, because the guard lives in the field-target math, not the path. prefers-reduced-motion renders exactly one static frame of the FORMED lattice (a virtual magnet placed off-center, heights set directly to their equilibrium target with zero velocity, no spring, no loop, no listeners) rather than the flat rest state — the drama the component exists to show is the erupted phase, and reduced motion should still show it once. Colors are read via getComputedStyle(canvas).color for foreground ink and the --ns-muted custom property for the resting/hollow tone, both re-derived on a documentElement class MutationObserver for live theme flips, and --ns-accent is never painted (interaction-only per the token rule). Props: cellSize (glyph cell px, default 13, also drives lattice spacing), children (rendered in a centered column, its measured bounding box becomes the exclusion rect), className."
+      }
+    },
+    {
+      "name": "sand-lock",
+      "type": "registry:ui",
+      "title": "Sand Lock",
+      "description": "A full-bleed Chladni plate: forty thousand grains of sand storm across a vibrating steel field and collapse onto the nodal lines of a real plate mode every time the sweeping drive frequency lands on a resonance, then break apart into a different figure as it leaves.",
+      "files": [
+        {
+          "path": "registry/loud/sand-lock/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/sand-lock.tsx"
+        }
+      ],
+      "dependencies": [],
+      "cssVars": {
+        "theme": {
+          "color-ns-muted": "var(--ns-muted)",
+          "color-ns-accent": "var(--ns-accent)"
+        },
+        "light": {
+          "ns-muted": "#4d4d4d",
+          "ns-accent": "#006bff"
+        },
+        "dark": {
+          "ns-muted": "#8f8f8f"
+        }
+      },
+      "meta": {
+        "collection": "loud",
+        "tags": [
+          "hero",
+          "background",
+          "canvas",
+          "webgl",
+          "particles",
+          "physics",
+          "cursor",
+          "decorative"
+        ],
+        "instruction": "Build <SandLock grains? speed? plateScale? paused? children? className? style?> as a full-bleed WebGL Chladni plate — tens of thousands of sand grains on a vibrating steel field, resolving out of chaos onto nodal lines and breaking apart again as a driving frequency sweeps. THE FIELD IS AN ACTUAL MODAL SOLUTION, not a decorative squiggle. Each mode of a square plate is the degenerate pair A = sin(n*pi*x)*sin(m*pi*y) and B = sin(m*pi*x)*sin(n*pi*y) sharing the Kirchhoff eigenvalue w = n^2 + m^2; the physical shape at that frequency is a rotation of the pair, cos(th)*A - sin(th)*B, with th varied per mode across the sequence because a real plate settles into one rotation or another depending on where it is clamped, and the two look nothing alike. A single scalar drive u is swept through a sparse set of six modes whose eigenvalues are ~1.4x apart (n^2+m^2 is dense, and two modes four percent apart never separate their responses, so the sweep visits only the frequencies that give a clean figure) (n != m always: n == m makes the antisymmetric combination identically zero), and every mode answers with the steady-state amplitude of a damped oscillator, r_k = 1/sqrt((1-x^2)^2 + (2*zeta*x)^2), x = u/w_k, zeta 0.022. The displacement field is the three strongest responses summed with those weights, and that ONE line is what makes the piece behave: on a resonance a single r_k dominates and the zero set is a clean, sharp, symmetric figure; halfway between two resonances two comparable responses superpose into a field with no stable zero set, so the sand has nothing to land on and storms. Nothing cross-fades one pattern into another — the mess in between is the honest answer to being driven off resonance. COHERENCE, peak_r / sum_r, is the storm signal and drives both the grain mobility and the diffusion. COVERING A WIDE VIEWPORT: a Chladni figure is square and a hero is not, but every one of these modes vanishes on the plate boundary (sin(n*pi) = 0), so the ODD REFLECTION across that boundary is itself an exact mode of the doubled plate. The field is evaluated on a folded coordinate — triangle wave into the unit cell, sign flipped once per crossing — so the viewport tiles with mirrored cells that join continuously along a shared nodal edge instead of showing a seam, giving two-and-a-bit plate cells across a laptop and a full-bleed frame that is still an exact solution. TRANSPORT is physics, not placement: each grain reads |displacement| and its gradient and walks DOWN that gradient at a mobility scaled by coherence, while diffusing with a step proportional to the LOCAL amplitude — violent on an antinode, almost nothing on a nodal line — so sand accumulates at the nodes for the reason it does on a real plate. BOTH ARE GATED BY A FRICTION THRESHOLD on the local amplitude (~0.085 of peak, lowered by bowing and by loss of coherence): below it the grain is not being thrown at all and does not move. That threshold is what makes the figure LINES — an ungated drift still feels the second-order along-the-line component of the gradient and ratchets every grain into the line crossings, leaving a lattice of clumps and no lines within twenty seconds. COST SPLIT: the field is rebuilt every frame on a ~5px grid using separable per-harmonic sine tables (a few hundred thousand multiply-adds, independent of grain count) and each grain takes three bilinear samples, which is what makes 40k grains affordable; grain positions upload once per frame into a POINTS buffer. RENDER: one WebGL context, two passes. A fullscreen pass shades the steel from the same field texture the sim reads, so the plate is lit by its own flexure and the antinodes read as bands of moving sheen; then the grains, in a blend mode chosen by theme — additive on a dark page so piles blow out to a hot line, multiplicative (ZERO, ONE_MINUS_SRC_COLOR) on a light page so they print down into pale steel. Both accumulate, so density reads as value in either theme rather than the light theme washing out. POINTER: the sweep runs with or without input, so a resting frame catches either a locked figure or a storm; the pointer BOWS the plate rather than taking the sweep over — horizontal position detunes the drive by a fraction of the local mode spacing (breaking a locked figure and pulling a neighbour in), a press bows harder and raises the diffusion until the sand storms, and the contact point scatters the grains around it. Smoothing is an exponential follower with a lead term of velocity*tau, because a plain follower's steady-state error is exactly that and the bow would otherwise trail the cursor. TOKENS: --background, --foreground, --ns-muted and --border via getComputedStyle, re-read on a documentElement class MutationObserver; --ns-accent is interaction-only and appears solely on the keyboard focus ring, never on the sand or the plate. Arrow keys bend the drive for keyboard users. The sim is spun up before the first paint and before any still frame, so prefers-reduced-motion and `paused` show a resolved figure and never an undeveloped scatter. Pauses offscreen and on tab hidden; a display-resolution ladder steps down only after a sustained stretch of missed frames."
       }
     },
     {
@@ -12110,6 +12270,89 @@
         ],
         "instruction": "Build a pinned scroll story: a 250vh scroll track wrapping a position:sticky 100vh stage. One full-stage Canvas 2D layer draws a geological core cross-section: 5 strata bands (thickness 12-28% of stage height each), each filled with 2-octave value-noise grain (3px cells) quantized to 3 gray levels interpolated between --border and --ns-muted, with slightly different quantization thresholds per band so bands read distinct in monochrome; exactly one accent vein — a 1.5px --ns-accent polyline at a fixed depth inside band 4. Grain is rendered ONCE per resize/theme into an offscreen band atlas and blitted per frame — never per-frame noise. DRILL: center-left column with a mono-weight chevron bit and drill string stroked in --foreground plus faint depth ticks; depth target = scrollProgress * totalDepth and the rendered depth eases with depth += (target-depth)*(1-exp(-dt*8)) (~120ms lag), with a forced-settle deadline that snaps to target 250ms after the last scroll event so the HUD never ticks forever. While |depth velocity| > 2px/s the bit tip emits 12-particle chip-spray batches (life 400ms, gravity-integrated, pruned array with an explicit full clear per frame — no destination-in accumulation). CAMERA: the scene is overscanned ~1.22x and the canvas translates at 0.15x scroll delta plus a scale 1.00→1.06 across full progress; a DOM label layer rides the identical camera via an offset CSS transform (never absolute canvas/page coords). CONTENT: 5 DOM panels stacked in a right column (45% width, padded surface card rounded-md); when the eased depth crosses a band threshold the outgoing panel fades/slides -12px and the incoming fades/slides in from +12px over 350ms cubic-bezier(0.22,1,0.36,1). HUD: stage-corner font-mono depth readout in meters with 2 decimals updated via direct DOM every frame while moving; the band label gains --ns-accent only while inside the vein band. INTERACTION: band labels along the left edge are focusable buttons that scroll the track to that band; hovering/focusing a label draws a 1px --foreground top-rule on its band in the canvas. REDUCED MOTION: no pin choreography — a static labeled cross-section rendered at full depth, panels as a normal stacked list, HUD frozen. ENGINEERING: all strata/grain/vein/HUD inks derived from getComputedStyle tokens at mount with a MutationObserver on documentElement class re-deriving live and regenerating the band atlas on theme flip; canvas sized via explicit style.width/height with a dpr-scaled backing store (sticky inset does not size a replaced element); rAF sleeps when |depth - target| < 0.1px and the chip list is empty; IntersectionObserver pauses the loop offscreen; zero-size stage guard; scroll listener passive and removed with all observers/rAF on unmount; no React state on the hot path.",
         "rank": 4
+      }
+    },
+    {
+      "name": "shear-billow",
+      "type": "registry:ui",
+      "title": "Shear Billow",
+      "description": "A full-bleed Kelvin-Helmholtz shear layer: two stratified layers slide past each other, the interface between them ripples, steepens, curls into a train of spiral billows and shreds into turbulence downstream, regenerating continuously with no input at all.",
+      "files": [
+        {
+          "path": "registry/loud/shear-billow/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/shear-billow.tsx"
+        }
+      ],
+      "dependencies": [],
+      "cssVars": {
+        "theme": {
+          "color-ns-muted": "var(--ns-muted)",
+          "color-ns-accent": "var(--ns-accent)"
+        },
+        "light": {
+          "ns-muted": "#4d4d4d",
+          "ns-accent": "#006bff"
+        },
+        "dark": {
+          "ns-muted": "#8f8f8f"
+        }
+      },
+      "meta": {
+        "collection": "loud",
+        "tags": [
+          "hero",
+          "background",
+          "canvas",
+          "webgl",
+          "shader",
+          "fluid",
+          "physics",
+          "cursor",
+          "decorative"
+        ],
+        "instruction": "Build <ShearBillow billows? speed? turbulence? strata? stir? paused? children? className? style?> as a full-bleed WebGL background rendering a spatially developing Kelvin-Helmholtz shear layer — the breaking-wave cloud roll. THE MECHANISM is the whole component: the velocity field is Stuart's exact steady solution of the 2D Euler equations for a rolled-up shear layer, psi = (1/k) ln(cosh(k(y - yc)) + rho cos(kx - omega t)), where rho = 0 is a plain tanh shear profile and rho -> 1 is a row of closed cat's-eye vortices. Taking rho as a FUNCTION OF x — smoothstep(0.015, 0.60) growth, saturating at 0.735 and decaying 34% past x = 0.68 — turns the steady solution into a spatially developing layer, which is the picture: a nearly flat rippling line at the upstream edge, a closed cat's eye by mid-frame, fully wound and breaking downstream. u = dpsi/dy and v = -dpsi/dx are taken analytically INCLUDING the drho/dx term (a smoothstep-and-its-derivative helper returns both in one call), so the field stays divergence-free by construction — dropping that term is exactly what makes an x-modulated Stuart field look squeezed rather than advected. Clamp D = cosh + rho*cos to a 0.06 floor: rho + rho2 crossing 1 makes the log singular and punches a hole in the frame. A SUBHARMONIC, rho2 = 0.185 * smoothstep(0.26, 0.98, xn) at cos(kx/2 + 1.37), grows in only downstream — that is vortex PAIRING, alternate billows strengthening at their neighbours' expense, and it is what stops the train from reading as a rubber-stamped periodic row, the failure mode of every analytic version of this. THE IMAGE IS NOT THE FIELD, and this is the second load-bearing decision: nothing draws velocity. Every pixel backward-integrates its own parcel through the flow for TRACE seconds (RK2, a fixed 18 steps so the loop is coherent across the draw) and reads the STRATIFICATION at the position and time it came from. Inside a strong cat's eye the streamlines are closed, so the backward trace circles the core several times and drags the interface sheet around with it; at the upstream edge the same trace is nearly straight and the layers come back flat. The spiral is therefore EARNED by the flow instead of drawn as a primitive, and the braids — sheets of interface pulled taut between adjacent rolls — appear on their own, which is the detail that makes a KH photograph read as KH and not as generic swirl. Trace length is set in eddy turnover times, 1.65 * 2pi/(k*u0): under ~1.2 the cat's eye never closes and the frame is just a wavy line, over ~2.2 the upstream half winds up too and the developing structure is lost. STRATIFICATION, all of it read at the traced-back source point and drifted by -u_m*t so the texture belongs to the fluid rather than to the viewport: a tanh-like density profile across the interface, sinusoidal banding inside each slab (sin(Y*2.7) tilted by a very low-frequency fbm swim so the layers are not drafting-board parallel), laminar wind streaks from one noise sample stretched ~40:1 along the flow so the undisturbed layers read as moving air, the interface SHEET itself as exp(-Y^2 * 1.25) at 0.52 amplitude (the thing that gets wound), and two octaves of advected filament grain that strengthen near the interface. DOWNSTREAM BREAKDOWN: two curl-noise displacements (the curl of one scalar fbm, so the shredding transports the layers instead of inflating them) at 0.30 and 0.055 of min(W,H), gated both by how far downstream the pixel is (smoothstep 0.34 -> 1.02) and by how close its parcel came from to the interface. Applied to the sample point, NOT inside the trace loop — a curl field per step costs eight noise taps per step for detail the eye reads identically at one tap per pixel. PALETTE: stratification reads through value alone. Five stops derived from --background, --foreground, --ns-muted and --border via getComputedStyle, re-read on a documentElement class MutationObserver. The ramp's DIRECTION carries the theme rather than a bias term, because a density field departs from the page in one direction where a reflective surface spans black-to-white in both: dark is a lit interface in a dark column of air (the sheet is the brightest thing on screen), light is the same layer as ink on paper (the sheet is the darkest). Light is the harder case — pale strata over a pale ground wash out — so its stops are written separately, c0 = background with a deliberately small gap to c1 and the top three pushed hard toward the foreground. A mild elliptical vignette toward the deepest stop keeps the frame edges from competing with overlaid type. The pointer's own vortices lift the sheet toward the brightest stop in luminance only, weighted toward the sheet, and reach exactly zero when the last one decays. POINTER: the smoothed pointer is advanced in the frame, never in the event handler, from a target the handlers only assign to, so event cadence and coalescing cannot reach the surface; a one-tau velocity lead cancels the follower's steady-state v*tau lag (lateness reads as the field ignoring the cursor). Deposits are spaced by 46px of travel with a one-frame time ceiling, so cadence is the display's and not the pointer event rate, and they ALTERNATE IN SIGN — a single-sign trail merges into one fat rotating blob within a second, alternating signs shed a row of counter-rotating cores, which is what dragging something through a shear layer actually leaves behind. Four live gaussian vortices in a ring buffer, each a rotational velocity added inside flow() and therefore integrated by the same backward trace as everything else, so a stir winds real spirals rather than smearing pixels; a vortex not yet born at trace time t is skipped or the wake reaches backwards through itself. Amplitude tracks pointer speed so a resting cursor stops stirring, and the whole loop sits behind a coherent u_stir uniform branch, costing nothing at rest. HOST: an internal GLSurface class owns the program, the fullscreen triangle pair and lazily-resolved uniform locations and knows nothing about the shear layer. DPR is capped at 1.5 — the per-pixel cost is 36 streamfunction evaluations plus ~20 noise taps, so the area term dominates and spiral sheets a few px wide survive a 1.5x backing store intact. An adaptive render-scale ladder (1 / 0.75 / 0.55) engages only on measured wall-clock overrun, with asymmetric recovery so a sibling animation blowing the budget cannot soften the surface for the rest of the visit. The clock is integrated and per-frame clamped, so a long frame advances the flow one clamped step instead of teleporting the train sideways, and time stops entirely while the surface is asleep. ResizeObserver resizes and resets the ladder; IntersectionObserver and visibilitychange both stop the single rAF loop; webglcontextlost/restored rebuild cleanly; paused is polled rather than made an effect dependency, since that would recreate the GL context to change a boolean. prefers-reduced-motion (and paused) draw one still frame at t = 34, chosen because the train is fully developed there — flat upstream, two closed cat's eyes mid-frame, a paired shredding roll downstream — never an undeveloped flat line, and pointer input still redraws that frozen frame with one vortex aged into its strongest moment. The canvas is aria-hidden and the component renders no controls; children render over the layer for an eyebrow, subhead and CTA, and because the field spans the full value range they want a token scrim rather than bare type."
+      }
+    },
+    {
+      "name": "sieve-throw",
+      "type": "registry:ui",
+      "title": "Sieve Throw",
+      "description": "A full-screen search overlay built as a gyratory sieve shaker: the corpus is a charge of grain lying on five stacked screens, the query is the grain SIZE, and every keystroke re-sizes the charge so weak matches drop through the mesh deck by deck into the pan while strong ones ride the throw back up onto the coarse top screen.",
+      "files": [
+        {
+          "path": "registry/loud/sieve-throw/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/sieve-throw.tsx"
+        }
+      ],
+      "dependencies": [],
+      "cssVars": {
+        "theme": {
+          "color-ns-muted": "var(--ns-muted)",
+          "color-ns-accent": "var(--ns-accent)"
+        },
+        "light": {
+          "ns-muted": "#4d4d4d",
+          "ns-accent": "#006bff"
+        },
+        "dark": {
+          "ns-muted": "#8f8f8f"
+        }
+      },
+      "meta": {
+        "collection": "loud",
+        "tags": [
+          "search",
+          "overlay",
+          "dialog",
+          "combobox",
+          "command",
+          "physics",
+          "canvas",
+          "filter"
+        ],
+        "instruction": "Build <SieveThrow items? triggerLabel? label? fieldLabel? placeholder? defaultOpen? onSelect? children? className?> as a full-screen search overlay whose filtering is a real separation process rather than a fade. THE MECHANISM: the overlay is a gyratory sieve shaker. Five screens of decreasing aperture (2.00 mm, 1.00 mm, 500 um, 250 um, pan) stack down the viewport as --border hairlines with mono aperture labels and a live per-deck grain count. Every corpus item is a GRAIN — a real DOM button carrying real result text — and the query is the grain SIZE: a subsequence match with contiguity, word-boundary and density bonuses returns 0..1, and that size decides which screen the grain can no longer pass (>=0.72 stays on deck 0, then 0.56, 0.42, anything above 0 on deck 3, no match falls to the pan). With NO query there is no sort to show, so each item falls back to a deterministic natural grain size hashed from its label: the resting deck is a spread charge across all five screens, not one heap on top. Each keystroke changes targets only; the sim is never reset, so grains migrate from wherever they currently are and typing reads as one continuous re-sort. Vertical motion is ballistic, not a transition: a grain that got smaller than its screen goes THROUGH the mesh and falls under gravity (2600 px/s^2) onto the next deck with a 0.24 restitution bounce, and a grain that got bigger can only leave the screen at the top of the shaker stroke — the upward kick is phase-gated on sin(throw) > 0.94 and its impulse is exactly sqrt(2*g*dh), so it arrives at the deck above with no velocity to spare, the way a real deck works grain upward. Horizontal motion is conveyed: a critically damped pull along the screen toward a flow position produced by a left-to-right, pile-upward layout that runs on re-size only, never per frame. TWO DETAILS CARRY THE WHOLE LOOK. First, the stack is SPRUNG: each screen's share of the viewport is half its standing share and half the share of the charge it is currently carrying (capped so a loaded pan cannot swallow the stack), eased at 5/s, so a cleared screen closes up and a loaded one opens and there is never a band of dead deck. Beds are therefore stored as a HEIGHT ABOVE THE MESH, not an absolute y, and resolved against the moving screens every substep — material rides its screen as the stack re-springs — which is also why the fall/kick thresholds are a full 20px rather than a pixel: only a genuine change of deck may put a grain in the air. Second, grain size is fit to the bed: each screen takes the largest type scale (from 1.85 down, x0.86 per try) whose flowed pile still fits between its mesh and the aperture label above it, so the top screen holding the whole corpus is a fine tightly packed bed and the same screen holding three survivors sets them as headlines. The canvas also draws the mesh itself to aperture — tick spacing 30/20/13/8 px down the stack, moving with the throw, and no ticks at all on the pan, which is a solid floor. The whole stack orbits (gyratory throw at 3.05 Hz, a cos/sin lissajous applied as one transform), each grain hops out of phase with its neighbours, and a keystroke kicks energy into the deck (0.34 idle, +0.85 per key, decaying) so the charge visibly jumps when you type. A canvas behind the type carries the FINES: sixteen dust specks per grain, each bound to a grain so the dust migrates with the sort, drawn in --ns-muted at a per-deck alpha. The canvas draws dust ONLY — every word on screen is live DOM type, scaled per deck by transform (1.85 down to 0.46) and inked by opacity, so a match on the top screen is set large and a rejected grain in the pan is a small dim speck of type. ACCESSIBILITY IS THE HARD PART: the field is a real <input> with a visible <label>, role=combobox, aria-expanded, aria-controls, aria-autocomplete=list and aria-activedescendant; the deck is a role=listbox whose grains are role=option buttons with aria-selected, tabIndex -1 (focus stays on the input, as the combobox pattern requires) and aria-disabled on anything that fell to the pan; ArrowUp/ArrowDown/Home/End walk the ranked results, Enter commits the active one, Escape closes, the active grain is marked by an --ns-accent border AND an arrow glyph so it is never colour alone, and a polite aria-live line announces how many passed and how many went to the pan. Focus moves into the field on open, is trapped by a Tab/Shift-Tab wrap bound on both the dialog and the document plus a document focusin listener that pulls stray focus back, and is restored to the trigger by the effect's cleanup so it survives an unmount too. That trap engages only for an overlay the USER opened: defaultOpen exists so a page can render the deck at rest as a display surface, and an overlay mounted open must not seize the document's focus. prefers-reduced-motion skips the rAF loop entirely and settles every grain onto its screen in one paint, so each keystroke shows the separation as a discrete before/after state and the overlay opens, filters, arrows and commits with no motion at all. PERFORMANCE: fixed 1/180 s substeps (a ballistic bounce integrated at wall-clock dt changes character with the frame rate), one transform write per grain per frame with no layout reads, the loop torn down on visibilitychange and by an IntersectionObserver on the stack, and the keystroke handler doing nothing heavier than bumping an energy scalar. PALETTE: --background --foreground --ns-muted --border only, with --ns-accent reserved for the focus ring and the active option — there is no pointer-reactive highlight anywhere, so a resting frame with the cursor parked at the origin carries no accent blob."
       }
     },
     {
@@ -12572,6 +12815,91 @@
           "gravity"
         ],
         "instruction": "Build a two-panel dashboard (Overview / Sessions-detail) whose swap is driven by a canvas grain-pour overlay layered over an otherwise-instant DOM transition. Every element that participates in the pour is tagged data-scree-id (shared ids between the two panels mark matched regions) and data-scree-tone (foreground/muted/border/accent, deciding which house token the grains sample). On trigger: the currently-active panel's marked elements are measured via getBoundingClientRect relative to the container (the OLD rects), React state swaps which panel is mounted (the old DOM is genuinely gone, not hidden — this is the 'navigation is instant' half of the contract), the new panel's heading receives focus immediately via a tabIndex=-1 ref, and an aria-live=polite region announces 'Now showing: X' — none of that waits on the animation. A useLayoutEffect fired by the swap then measures the NEW panel's marked elements (the NEW rects) and spawns grainBudget (default 2400, cap 4000) 2-3px canvas squares: for every old-rect id that also exists in the new rects, grains are seeded inside the old rect and targeted at a random point inside the matching new rect (a funnel-attractor whose spring constant ramps from 4 to 150 via smoothstep over the grain's own 900ms window while a companion gravity term of the same shape fades out, so early motion reads as a gravity-driven fall and late motion reads as a soft landing); for an old-rect id with no counterpart in the new layout, grains instead fall straight down and out of the container under constant gravity and fade — the visible read for content that simply didn't survive the pivot (the Overview view's two side stat cards when pivoting into Detail; the Detail view's description paragraph when pivoting back). New regions with no old counterpart (Detail's description on the way in) simply appear with the rest of the already-mounted, already-accessible DOM — there is deliberately no separate materialize shower, keeping the grain budget spent on departure and arrival of real matter rather than every pixel. Integration is verlet (previous-position implied velocity times a damping factor, plus acceleration times dt^2, no explicit velocity field) so grains carry momentum through the funnel instead of snapping. Grain color is baked once per trigger from --foreground/--ns-muted/--border/--ns-accent read via getComputedStyle on a MutationObserver watching <html>'s class attribute — --ns-accent is reserved for the one region seeded from the interactive control (the View details / Back to overview action), never used decoratively elsewhere. A per-grain release delay up to 140ms staggers the crumble so it reads as a trickle rather than a single synchronized pop; each grain fades to zero over the last 40-50% of its own window so the canvas is provably empty well before the simulation's 900ms mark. Because the new DOM is correct and fully opaque from the instant of the swap, the canvas is purely a pointer-events:none, aria-hidden decorative layer riding on top — an audit of the resting or mid-transition frame always finds the real, accessible interface underneath, and elementFromPoint resolves straight through the canvas to it. prefers-reduced-motion, and a one-shot frame-budget probe (a fixed arithmetic loop timed synchronously at mount; taking meaningfully longer than budget flags the device as low-power), both skip the whole simulation for a plain 150ms opacity cross-fade on the new panel instead — no canvas, no grains, no verlet. Zero dependencies beyond React."
+      }
+    },
+    {
+      "name": "weir-crest",
+      "type": "registry:ui",
+      "title": "Weir Crest",
+      "description": "A full-bleed pricing surface built as a spillway: three plans stand in one rising reservoir as dams of different crest heights, and the volume slider raises a single shared water level until a plan's crest is overtopped and pours, which is exactly the moment its overage starts costing money.",
+      "files": [
+        {
+          "path": "registry/loud/weir-crest/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/weir-crest.tsx"
+        }
+      ],
+      "dependencies": [],
+      "cssVars": {
+        "theme": {
+          "color-ns-muted": "var(--ns-muted)",
+          "color-ns-accent": "var(--ns-accent)",
+          "color-ns-accent-hover": "var(--ns-accent-hover)"
+        },
+        "light": {
+          "ns-muted": "#4d4d4d",
+          "ns-accent": "#006bff",
+          "ns-accent-hover": "#0059d1"
+        },
+        "dark": {
+          "ns-muted": "#8f8f8f"
+        }
+      },
+      "meta": {
+        "collection": "loud",
+        "tags": [
+          "pricing",
+          "webgl",
+          "canvas",
+          "shader",
+          "slider",
+          "section",
+          "hero",
+          "interactive",
+          "ambient",
+          "fluid"
+        ],
+        "instruction": "Build <WeirCrest plans? minUsage? maxUsage? defaultUsage? eyebrow? headline? footnote? annualDiscount? onChange? className?> as a full-bleed usage-pricing section rendered as a spillway. THE MECHANISM: every plan is a dam standing in ONE shared reservoir, its crest height set by its included volume on a log scale (Starter 50k low, Growth 400k mid, Scale 2M high). A single vertical slider on the left rail IS the water level: dragging it up raises one continuous water surface across the whole viewport, and the instant that surface passes a plan's crest the dam is overtopped — a nappe pours down that pier's face into foam at the apron — which is exactly the moment that plan's overage term becomes non-zero. So the comparison is felt as a sequence of overtoppings, not read off three cards: at low volume the cheap short dam holds and is the cheapest; raise the level and it gushes while its price climbs past the taller dam standing dry. The cheapest plan at the current level is marked Recommended and its CTA is the only --ns-accent surface on screen. RENDERING: one full-bleed WebGL fragment shader (fullscreen triangle pair, lazily resolved uniform locations, DPR clamped to 1.5). Water surface is three sines plus an fbm term, amplitude scaled by a slosh value derived from the level spring's velocity, so dragging fast throws real chop and it settles back to a slow ambient swell; below the surface, depth-attenuated caustic sheets, five rising bubbles, and a translucent (0.86) composite so the masonry courses of a submerged pier read through the water. Piers, crest bars, nappe streaks and apron foam are all drawn in the same shader from a vec4[3] uniform (x, width, crestY, spill) measured from the REAL DOM column boxes via ResizeObserver, so the mechanism is registered to the layout at every width rather than approximating it. TYPE IS DOM, ALWAYS: plan names, prices, the base/overage breakdown, feature lists and CTAs are real DOM text in document order inside three <article> elements — nothing numeric is ever rasterized into the canvas, which is aria-hidden. Panels sit on a token scrim (bg-background/78 + backdrop-blur) because a full-bleed reservoir spans most of the value range in both themes. CONTROLS: the level slider is a role=slider tabIndex=0 vertical track (aria-orientation=vertical, aria-valuemin/max/now and an aria-valuetext naming the volume) driven by pointer capture with click-to-jump, plus ArrowUp/Down/Left/Right (one step), PageUp/PageDown (five), Home/End (rails) on the log domain; a monthly/annual segmented control is a real radiogroup. An sr-only aria-live=polite region announces the volume, the recommended plan and its price on COMMIT only (pointerup or keystroke), never per pointermove. PRICING: price = base * (annual ? 1 - annualDiscount : 1) + max(0, usage - included)/1000 * overagePer1k, recomputed in render so the printed number and the water line can never disagree. PALETTE: four stops derived from --background --foreground --ns-muted --border via getComputedStyle, re-read on a documentElement class MutationObserver; both themes deliberate (light reads as a mid-grey reservoir under a pale sky, dark as a lit pour in a dark room) and the shader contains no colour literal and no accent at all — --ns-accent exists only on the recommended CTA and focus rings. REDUCED MOTION: level snaps to target with zero spring, the shader clock is frozen at a composed still (chop settled, the short dam already pouring) and redraws only on state change; every control stays fully usable. PERF: one rAF loop, direct-uniform hot path with no React state per frame, IntersectionObserver and visibilitychange both stop it, webglcontextlost/restored rebuild cleanly, and all observers/listeners tear down on unmount."
+      }
+    },
+    {
+      "name": "weld-pool",
+      "type": "registry:ui",
+      "title": "Weld Pool",
+      "description": "A full-bleed liquid-metal hero whose headline is summed into the shader's height field rather than layered over it, so the letterforms are lit, warped and dented by the same molten surface they sit in.",
+      "files": [
+        {
+          "path": "registry/loud/weld-pool/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/weld-pool.tsx"
+        }
+      ],
+      "dependencies": [],
+      "cssVars": {
+        "theme": {
+          "color-ns-muted": "var(--ns-muted)",
+          "color-ns-accent": "var(--ns-accent)"
+        },
+        "light": {
+          "ns-muted": "#4d4d4d",
+          "ns-accent": "#006bff"
+        },
+        "dark": {
+          "ns-muted": "#8f8f8f"
+        }
+      },
+      "meta": {
+        "collection": "loud",
+        "tags": [
+          "hero",
+          "canvas",
+          "webgl",
+          "shader",
+          "metal",
+          "cursor",
+          "type"
+        ],
+        "instruction": "Build <WeldPool headline? headlineWeight? headlineFit? headlineY? relief? speed? scale? paused? children? className?> as a full-bleed WebGL hero rendering a molten metal pool with real headline type lying IN the surface. ONE HEIGHT FIELD: the whole component is a single fragment shader that evaluates h(x,y,t) and central-differences it (three taps, eps 1.35px, relief 15) for one surface normal. h is the sum of four contributions, and the point of summing them is that the type is then indistinguishable from the metal — it warps, catches light and dents with the flow instead of floating over it. (1) Convecting bulk: a domain-warped fbm, w = vec2(fbm2(q + t*0.055), fbm2(q + 3.71 - t*0.043 + 2.13)) and base = fbm3(q*1.18 + w*1.05 + drift), contributing (base - 0.5)*3.4, with q = p/(min(W,H)*0.62)*scale. (2) Four gaussian lobes at 2.2 amplitude, positions animated on the CPU on lissajous paths and passed as a vec3[4] uniform (x, y, radius) — buoyant volumes rolling under the skin, analytic so they cost four exp() calls and no noise. (3) An ANISOTROPIC advected grain: two octaves sampled on gq = (q + w*0.55)*vec2(4.5, 17.0), i.e. ~4x tighter across the flow than along it, at 0.20 and 0.07 amplitude. Isotropic grain at this amplitude reads as crumpled foil; stretching it turns the same energy into striations being drawn out by a pour. The magnitudes matter more than they look: an early build had the pool's slopes an order of magnitude gentler than the glyph bevel's, and the whole field collapsed into an out-of-focus grey cloud while the letters alone read as chrome. (4) The glyph bevel, sampled at uv = p/size + (w - 0.5)*0.014 — displacing the lookup by the same warp that drives the flow is what makes the letterforms shimmer like a reflection rather than a decal pinned to the pool. THE CALM GATE, which is the single most load-bearing line: a glyph is a solid plate floating in a churning liquid, so the liquid's turbulence is damped across it — the bulk scales by mix(1.0, 0.35, bevel), the lobes by mix(1.0, 0.4, bevel), and the grain by (1 - 0.88*bevel). Without it the pool's detail runs straight through the letters and the headline loses to its own background at exactly the density that makes the pool worth having. GLYPH TEXTURE: the headline is rasterized on a 2D canvas at up to 1024px wide using the wrapper's own computed font-family, auto-fit so the longest line lands on headlineFit of the width; the alpha channel is copied out, box-blurred separably three times at radius ~0.45% of the texture width, and packed as R = max(blurred, sharp) (a plateau with a soft skirt, whose gradient IS the letter's slope) and G = the hard mask. Rasterization repeats after document.fonts.ready — a texture is baked once, so a pre-webfont raster would freeze fallback letterforms permanently — and on any headline change, without recreating the GL context. MONOCHROME METAL: metal normally reads through hue; here the palette is achromatic, so every cue is carried by value, and density comes from the ENVIRONMENT having structure rather than the height field having more noise. r = reflect(-v, n) is looked up in an analytic achromatic studio of five sources at different elevations — a broad sky smoothstep(0.06, 0.68, r.y), a dark floor, and gaussian strips at el 0.13, 0.42, -0.28 and -0.62 — plus two slowly turning azimuthal panels (the only source of horizontal structure, without which the frame reads as pure horizon banding), a polish banding term, two drifting sharp specular lobes (exponents 80 and 34), anisotropic brushed streaks from one noise sample stretched ~50:1 along x, and a fresnel rim at pow(1 - dot(n,v), 5). Several narrow sources mean an almost-flat patch of surface still crosses three or four reflection bands, which is what a real chrome sheet does. G, the hard glyph mask, drives a roughness switch: inside a letter the main strip narrows from sigma 0.085 to 0.038, the polish banding roughly doubles in frequency and the specular exponents rise to 240/110, so inlaid type separates from the pool by being POLISHED TIGHTER, with no colour difference at all. A contact shadow of max(blur - sharp, 0)*0.24 darkens the annulus of surface pulled up around each letter. PALETTE: five stops from --background, --foreground, --ns-muted and --border read via getComputedStyle and re-read on a documentElement class MutationObserver, plus --ns-accent tinting only the hottest specular at 13%. Unlike a thin metal band on a page, a full-bleed sheet IS the page, so the ramp spans near-black to near-white in BOTH themes and the direction never inverts — only the distribution moves (light theme bias +0.02, contrast 1.20, reading as polished steel in a lit room; dark theme bias -0.09, contrast 1.15, the same pool sunk). A mild elliptical vignette toward the deepest stop stops the frame edges competing with the headline. POINTER: pointer positions are pushed into a 6-slot ring buffer at ~18Hz; each becomes a mexican-hat dent, (1 - 1.75r^2)*exp(-1.6r^2), whose radius grows 30 -> ~350px and whose amplitude decays over 1.9s, so a sweep drags a train of expanding rings through the pool and a press drops one full-amplitude ring at the contact point. Pointer-enter alone eases a hover term from 0.4 to 1.0 on the wake amplitude, so hovering differs from rest even with no motion. A u_wake uniform gates the trail loop entirely — a coherent uniform branch, so at rest, which is where the page spends most of its life, the wake costs nothing. HOST: an internal GLSurface class owns the program, the fullscreen triangle pair and lazily-resolved uniform locations and knows nothing about the pool, so a second preset can mount the same host with a different fragment source. DPR is capped at 1.5 rather than 2 because the shader is full-bleed and its cost is three field evaluations per pixel, so the area term dominates. ResizeObserver re-sizes and re-rasterizes; an IntersectionObserver and visibilitychange both stop the single rAF loop; webglcontextlost/restored rebuild cleanly. prefers-reduced-motion (and paused) draw exactly one composed still frame at t=6.4 — lobes spread across the field, striations drawn out and a specular hit on the headline, never a blank grey box — and pointer input still redraws that frozen frame. The accessible copy of the headline is an sr-only <h1>, since the visible one exists only as a height field; children render over the pool for an eyebrow, subhead and CTA, and because the surface spans the full value range they need a token scrim (bg-background/70 + backdrop-blur) rather than bare type."
       }
     }
   ]

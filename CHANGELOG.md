@@ -3,6 +3,31 @@
 Single source of truth for the /changelog page. Each entry is a `## vX.Y.Z - YYYY-MM-DD`
 heading, a `###` title, then one paragraph of body. Newest first.
 
+## v0.23.0 - 2026-08-12
+
+### Focus that vanished on close, and a rate limit a rejection could reset
+
+The mobile nav drawer closed on Escape and backdrop click without returning focus to its
+toggle, leaving a keyboard visitor's focus on an element that had just gone `-translate-x-full
+invisible`; it now restores focus the same way `command-palette.tsx` already did. That palette
+declared `aria-modal="true"` but only handled Escape, Arrow and Enter, so Tab walked focus
+straight out into the sidebar links behind the overlay while the dialog stayed open — Tab is
+now trapped on the one real focusable control, the input. Both search inputs, the palette's
+field and the sidebar tree filter, were `outline-none` with no focus-visible replacement, so
+focusing them produced no visible change at all; `globals.css` had already been written
+assuming a ring that nothing supplied. Separately, the testimonial submission cap counted only
+rows still `status: "pending"`, so an owner rejection cleared the limiter and the same account
+could resubmit immediately — volume was bounded by review speed, not the 24h window. It's now
+durable and status-independent in a new `testimonialRateLimits` table. `validateSubmission`,
+the Convex-side enforcement point a direct caller reaches by skipping the HTTP route, never
+checked `company`, and neither `role` nor `company` had a length bound anywhere; both now share
+`MAX_NAME_LENGTH`. The status-snapshot cron compared `CRON_SECRET` with a plain `!==`; it now
+uses the constant-time helper already in the codebase. And the rate-limit message that promised
+"a submission awaiting review" — untrue once the cap stopped counting pending rows — now states
+the actual rule. Riding along: the changelog page's release tide renders instead of an empty
+axis, and all 1524 prop rows across the registry's 295 components now carry a description, up
+from 706.
+
 ## v0.22.0 - 2026-08-06
 
 ### A search field instead of a chip, and chrome that now reaches every page
