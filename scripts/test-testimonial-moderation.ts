@@ -206,6 +206,22 @@ assert.deepEqual(
 assert.deepEqual(
   validateSubmission({
     ...cleanSubmission,
+    role: "A".repeat(81),
+  }),
+  { ok: false, code: "role_too_long" },
+);
+
+assert.deepEqual(
+  validateSubmission({
+    ...cleanSubmission,
+    company: "A".repeat(81),
+  }),
+  { ok: false, code: "company_too_long" },
+);
+
+assert.deepEqual(
+  validateSubmission({
+    ...cleanSubmission,
     quote: "A".repeat(801),
   }),
   { ok: false, code: "quote_too_long" },
