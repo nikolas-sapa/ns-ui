@@ -27,5 +27,9 @@
   "gate": {
     "openBy": "[data-flyball-cycle]",
     "expect": "[data-flyball-closed-note]"
+  },
+  "card": {
+    "focus": "[data-flyball-root]",
+    "padding": 0.16
   }
 }
