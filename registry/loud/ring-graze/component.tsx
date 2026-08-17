@@ -104,25 +104,40 @@ const TICK_STEP = 1 / TICK_HZ;
 const MAX_TICKS_PER_FRAME = 6; // catch-up clamp after a stalled tab
 const MAX_GROWTH_STEPS_PER_TICK = 8;
 
-// cells/s. Slow on purpose, and the number that decides whether this reads as a
-// RING at all: the grazed interior heals on a `recovery`-second time constant,
-// so the un-recovered band trailing the margin is recovery x FRONT_SPEED cells
-// wide — about 8 at these values, against a ring radius of 40. The original 6
-// cells/s made that band 270 cells wide, i.e. wider than the lattice, so every
-// ring rendered as a solid grazed DISC and the field went uniformly grey once
-// the discs met. That is what the first screenshots showed.
-const FRONT_SPEED = 0.18;
-const SPORE_RATE_PER_SEC = 1.6 / 60; // rings live far longer now, but a field this slow needs more of them started
+// cells/s. The number that decides whether this reads as a RING at all: the
+// grazed interior heals on a `recovery`-second time constant, so the
+// un-recovered band trailing the margin is recovery x FRONT_SPEED cells wide,
+// and (for a fixed warmup duration in seconds) the warmed ring radius is
+// FRONT_SPEED x warmup_seconds — so band/radius = recovery/warmup_seconds,
+// independent of FRONT_SPEED alone. Raising FRONT_SPEED without touching
+// `recovery` or the warmup duration scales BOTH the radius and the band by
+// the same factor and preserves that ratio exactly (verified: the original
+// 6 cells/s failure — a 270-cell band, wider than the lattice, every ring a
+// solid grazed DISC — came from `recovery` being large relative to warmup
+// time, not from FRONT_SPEED in isolation). What follows is a uniform 4x
+// TIME COMPRESSION of the whole piece — FRONT_SPEED x4, `recovery` /4,
+// warmup /4 — which cancels out of every spatial ratio and leaves the
+// resting frame's geometry (ring radius, band width, ring count) identical
+// to before, it just all happens 4x faster: at 0.18 cells/s the growth
+// budget took ~5.5s to bank one front-dilation step, reading as still within
+// the few seconds a catalog card is actually judged on; at 0.72 it banks a
+// step roughly every 1.4s, with MAX_GROWTH_STEPS_PER_TICK still letting
+// several bank in one frame after a stalled tab so a resumed tab catches up
+// instead of visibly stair-stepping.
+const FRONT_SPEED = 0.72;
+const SPORE_RATE_PER_SEC = (1.6 / 60) * 4; // scaled with the same 4x time compression as FRONT_SPEED/recovery below
 const SPAWN_BUDGET_CAP = 2; // don't let a long-starved field burst-spawn once ground frees up
 const SPAWN_ATTEMPTS = 40; // random cells sampled per spawn opportunity
 
-// normal-motion mount warmup, ~100s of sim time — at FRONT_SPEED that is a
-// ~18-cell ring radius trailing an ~8-cell grazed band, i.e. an actual annulus,
-// and small enough that several of them fit in one pane. Warming to a 40-cell
-// radius instead gave one scalloped edge crossing the whole viewport with no
-// ring readable anywhere.
-const PREWARM_TICKS = 1500;
-const REDUCED_SECONDS = 100; // reduced-motion: freeze after this much simulated time, arcs still live
+// normal-motion mount warmup, ~25s of sim time at the 4x-compressed clock —
+// same ~18-cell ring radius trailing an ~8-cell grazed band as the original
+// ~100s warmup at 0.18 cells/s (radius and band both scale with FRONT_SPEED,
+// warmup time scales inversely, so the resting geometry is unchanged). An
+// 18-cell radius is small enough that several rings fit in one pane; ~40
+// cells gave one scalloped edge crossing the whole viewport with no ring
+// readable anywhere.
+const PREWARM_TICKS = 375;
+const REDUCED_SECONDS = 25; // reduced-motion: freeze after this much simulated time, arcs still live — same 4x compression, same resting geometry as before
 const REDUCED_TICKS = REDUCED_SECONDS * TICK_HZ;
 
 const NX = [-1, 0, 1, -1, 1, -1, 0, 1];
@@ -182,7 +197,7 @@ interface RingSlot {
 }
 
 export interface RingGrazeProps {
-  /** Substrate recovery time constant, in seconds — the governing scalar that sets the whole piece's tempo. 0 turns recovery off permanently: every live ring eventually dies at a boundary or a shared seam and the field goes provably still within about two ring lifetimes. @default 45 */
+  /** Substrate recovery time constant, in seconds — the governing scalar that sets the whole piece's tempo. 0 turns recovery off permanently: every live ring eventually dies at a boundary or a shared seam and the field goes provably still within about two ring lifetimes. @default 11 */
   recovery?: number;
   /** Global simulation speed multiplier. @default 1 */
   speed?: number;
@@ -195,7 +210,7 @@ export interface RingGrazeProps {
 }
 
 export function RingGraze({
-  recovery = 45,
+  recovery = 11,
   speed = 1,
   paused = false,
   children,

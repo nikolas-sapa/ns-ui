@@ -90,7 +90,7 @@ interface Tendril {
   dirtyGeom: boolean; // true once new points landed since the last `d` write
 }
 
-const ELONGATE_RATE = 14; // px/s — single elongation constant, search AND coil
+const ELONGATE_RATE = 52; // px/s — single elongation constant, search AND coil; at 14 a tip's visible arc growth over the few seconds a catalog card is judged on was under one sample point, and 28 still measured as a barely-perceptible resting-state pixel change
 const AMP_START = 0.05; // rad, initial nutation curvature amplitude
 const AMP_MAX = 1.3; // rad, amplitude cap once fully widened
 const AMP_RATE = 0.00012; // rad added per ms of search time

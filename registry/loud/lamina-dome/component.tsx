@@ -140,7 +140,7 @@ function makeRng(seed: number) {
 export interface LaminaDomeProps {
   /** Light-cone half-angle in degrees — the single governing scalar of the columnar-to-broad-domed morphospace. Narrow (~8-15) shades a column only from near-vertical neighbours, so the front stays columnar; wide (~55-70) tests a broad hemisphere, so only true local maxima stay lit and the front coarsens hard into a few broad domes. @default 30 */
   coneHalfAngleDeg?: number;
-  /** Deposition rate: height units/second for a fully unshaded column (clearance L=1). @default 5 */
+  /** Deposition rate: height units/second for a fully unshaded column (clearance L=1). @default 10 */
   growthRate?: number;
   /** Global simulation speed multiplier. @default 1 */
   speed?: number;
@@ -154,7 +154,7 @@ export interface LaminaDomeProps {
 
 export function LaminaDome({
   coneHalfAngleDeg = 30,
-  growthRate = 5,
+  growthRate = 10, // was 5 — the resting-state deposit per tick read as near-static within a few seconds of a catalog card glance
   speed = 1,
   paused = false,
   children,

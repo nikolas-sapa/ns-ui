@@ -145,6 +145,7 @@ export function FloretPack({ children, plastochron = 1400, maxPrimordia = 700, c
     let started = false;
     let raf = 0;
     let lastT = 0;
+    let acc = 0;
 
     const measure = () => {
       const rect = root!.getBoundingClientRect();
@@ -329,9 +330,14 @@ export function FloretPack({ children, plastochron = 1400, maxPrimordia = 700, c
     const ro = new ResizeObserver(onResize);
 
     const frame = (now: number) => {
+      // Fixed-timestep accumulator: leftover sub-tick time MUST carry over
+      // frame to frame (acc lives in the outer closure, not reset here) —
+      // rAF fires faster than TICK_MS at most refresh rates, so resetting
+      // acc to dt every call discarded the remainder every time and this
+      // loop advanced physics only on the rare frame-time hiccup.
       const dt = Math.min(200, lastT ? now - lastT : TICK_MS);
       lastT = now;
-      let acc = dt;
+      acc += dt;
       while (acc >= TICK_MS) {
         stepPhysics(TICK_MS, 1);
         acc -= TICK_MS;
