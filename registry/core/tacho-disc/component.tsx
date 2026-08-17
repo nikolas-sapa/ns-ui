@@ -17,7 +17,10 @@ import {
 // angle. Radius encodes category (sign-ins outer, grants middle, revocations
 // inner, the last drawn as a punched hole rather than a line). Older days sit
 // behind as smaller, dimmer discs sharing the same rotation, so the same
-// time-of-day lines up radially across nights.
+// time-of-day lines up radially across nights. A faint hour graduation —
+// ticks every hour, numerals at 00/06/12/18 — shares that same rotation
+// rather than sitting fixed under the stylus, so a tick always sits at its
+// own true hour angle and reads as chart paper under the event ink.
 //
 // ONE governing scalar drives the whole disc: `discAngle`, the real
 // time-of-day angle of "now". Every mark's screen position is its true
@@ -76,6 +79,22 @@ const CX = 140;
 const CY = 140;
 const DISC_R = 132;
 const HOLE_R = 5;
+
+// hour graduation — chart paper under the event ink, drawn once at true,
+// unrotated hour angles and sharing the same group rotation as every event
+// mark (see discAngle below): a tick sits exactly where a same-hour event
+// would land, at every rotation, not just when "now" happens to be that
+// hour. Faint minor ticks every hour, a slightly longer major tick plus a
+// numeral at the four cardinal hours.
+const GRAD_R_OUTER = DISC_R;
+const GRAD_R_MINOR = DISC_R - 4;
+const GRAD_R_MAJOR = DISC_R - 8;
+const GRAD_LABEL_R = DISC_R + 11;
+const HOUR_TICKS = Array.from({ length: 24 }, (_, h) => ({
+  hour: h,
+  angle: (h / 24) * 360,
+  major: h % 6 === 0,
+}));
 
 function clamp(v: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, v));
@@ -447,7 +466,7 @@ export function TachoDisc({ events, historyDays = 2, now: controlledNow, label =
         onPointerCancel={onPointerUp}
         onKeyDown={onDiscKeyDown}
       >
-      <svg viewBox="0 0 280 280" aria-hidden="true" className="block h-full w-full">
+      <svg viewBox="-16 -16 312 312" aria-hidden="true" className="block h-full w-full">
         <circle cx={CX} cy={CY} r={DISC_R} fill="none" stroke="var(--border)" strokeWidth={1} aria-hidden="true" />
 
         {/* fixed stylus at 12 o'clock — outside the rotating group, never moves */}
@@ -458,6 +477,43 @@ export function TachoDisc({ events, historyDays = 2, now: controlledNow, label =
 
         {/* the one governing scalar: discAngle. every layer below shares this rotation. */}
         <g transform={`rotate(${discAngle} ${CX} ${CY})`} className={reduced ? "" : "ns-tacho-rotate"} aria-hidden="true">
+          {/* hour graduation — chart paper, drawn under the event ink and rotating
+              with it so a tick always sits at its own true hour angle. */}
+          <g>
+            {HOUR_TICKS.map(({ hour, angle, major }) => {
+              const inner = polar(major ? GRAD_R_MAJOR : GRAD_R_MINOR, angle);
+              const outer = polar(GRAD_R_OUTER, angle);
+              return (
+                <g key={hour}>
+                  <line
+                    x1={inner.x}
+                    y1={inner.y}
+                    x2={outer.x}
+                    y2={outer.y}
+                    stroke="var(--ns-muted)"
+                    strokeWidth={major ? 1 : 0.5}
+                    strokeOpacity={major ? 0.6 : 0.35}
+                  />
+                  {major && (
+                    <g transform={`rotate(${-discAngle} ${polar(GRAD_LABEL_R, angle).x} ${polar(GRAD_LABEL_R, angle).y})`}>
+                      <text
+                        x={polar(GRAD_LABEL_R, angle).x}
+                        y={polar(GRAD_LABEL_R, angle).y}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        fill="var(--ns-muted)"
+                        fontSize={9}
+                        style={{ fontFamily: "var(--font-mono)" }}
+                      >
+                        {String(hour).padStart(2, "0")}
+                      </text>
+                    </g>
+                  )}
+                </g>
+              );
+            })}
+          </g>
+
           {layers.map(({ offset, events: dayEvents }) => {
             const isToday = offset === 0;
             const layerScale = 1 - offset * 0.13;
@@ -474,7 +530,7 @@ export function TachoDisc({ events, historyDays = 2, now: controlledNow, label =
                         key={ev.id}
                         cx={p.x}
                         cy={p.y}
-                        r={HOLE_R}
+                        r={HOLE_R * layerScale}
                         fill="var(--background)"
                         stroke="var(--border)"
                         strokeWidth={1.5}
