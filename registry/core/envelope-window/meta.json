@@ -1,0 +1,29 @@
+{
+  "name": "envelope-window",
+  "title": "Envelope Window",
+  "description": "An OAuth-style consent screen built as a physical envelope: the user's real account data sits on a sheet underneath, and each granted scope die-cuts a window through an opaque envelope layer so what the app can see is literally what shows through.",
+  "collection": "core",
+  "tags": [
+    "consent",
+    "oauth",
+    "privacy",
+    "switch",
+    "toggle",
+    "scope",
+    "permissions",
+    "accessibility"
+  ],
+  "useWhen": "the requesting app's view of the account is an opaque sheet with real data underneath it, so each scope switch die-cuts (or reseals) a window straight through to the user's actual name, email, repo and calendar rows — pick this when the falsifiable point is *what the app can literally see*, i.e. a consent or connected-apps screen. Prefer consent-scope-redact instead when the surface is a single running sentence and the falsifiable point is which *tokens in that sentence* a switch withholds — there the record stays one flat document and a felt-pen bar crosses out spans in place; here two layers exist (a muted data sheet and an opaque envelope over it) and toggling a scope parts or seals a physical window rather than marking up text.",
+  "autoplay": {
+    "mode": "press",
+    "target": "[data-envelope-switch=\"repos\"]",
+    "period": 4400,
+    "delay": 700
+  },
+  "gate": {
+    "openBy": "[data-envelope-switch=\"repos\"]",
+    "expect": "[data-envelope-row=\"repos\"]"
+  },
+  "instruction": "`<EnvelopeWindow appName scopes={EnvelopeScope[]} onAllow? onDeny? />` renders a two-layer consent card. Layer one is a data sheet in normal document flow: one row per scope, each row rendering that scope's real `fields` (`{ label, value }[]`) in `--ns-muted` text — the user's actual name, email, repo names, calendar entries, never lorem placeholders, because consent is exactly the moment to show the real thing being exposed. Layer two is an opaque envelope (`--background` fill, `1px --border`, a soft inset shadow for paper depth) stacked on top via absolutely-positioned rects measured off each row with `ResizeObserver` + `useLayoutEffect`, so windows track row geometry through reflow. Each scope owns one die-cut rect whose governing scalar is aperture 0..1: it renders as two flaps (top half, bottom half) meeting at a centre seam, each an independent `clip-path: inset()` that shrinks the flap toward its own outer edge as aperture rises — at aperture 0 the two flaps fully cover the rect (window sealed, row hidden beneath an opaque leaf); at aperture 1 both flaps clip to zero area (window cut through, the real row shows and is hit-testable through the gap). The transition runs on `clip-path` alone, 240ms `cubic-bezier(0.16,1,0.3,1)` (ease-out-expo) — never a fade, the reveal is the cut. A subtle inset rim shadow on the rect wrapper gives the die-cut edge depth regardless of aperture. Denying (the Deny button) closes every non-required window by reversing the same aperture scalar back to 0 for each; it never introduces a different animation. `scope.required` scopes render as glassine windows instead: a translucent `color-mix(--background 55%, transparent)` pane plus an SVG diagonal-hatch pattern sit permanently over the row at partial opacity — visible, textured, legibly 'you can always see this', never a plain clear cut and never closable, so the app's true access minimum reads honestly on the sheet itself. The Allow button's label is computed, not authored: `Allow access to ${openCount} of ${total} areas`, where `openCount` counts every currently-open scope (required scopes always count). ACCESSIBILITY IS THE MECHANISM: each scope is a real `role=switch` button, `aria-checked` mirrors its aperture exactly (open=true/closed=false, no separate visual-only state), `aria-labelledby` names the scope label and `aria-describedby` points at a string built from `scope.sample` ('Shows: 14 events this week') so a screen-reader user hears what's behind the window before deciding, and required scopes add 'Required by this app.' to that same description plus `aria-disabled` (a real, focusable, still-announced control — not a `disabled` attribute that would drop it from the tab sequence). The underlying data sheet is never removed or `aria-hidden` regardless of which windows are visually sealed — every row stays one coherent, always-present document for assistive tech, because the switches (not pixel occlusion) are the single source of truth for what's granted; the decorative window/glassine rects carry `aria-hidden` and `pointer-events:none` so they never shadow the real row in the accessibility tree or the hit-test order. An `aria-live=polite` region announces the current Allow label as scopes change. `prefers-reduced-motion: reduce` drops the clip-path/track/thumb/button transitions to instant swaps — every aperture is still reachable, nothing sticks mid-peel. Colors are tokens only (`--background --foreground --ns-muted --border --ns-accent`); `--ns-accent` appears solely as the on-state switch track, the Allow button's border/tint, and focus rings — never a decorative fill. DOM+SVG+CSS only, zero dependencies, no canvas. Distinct from consent-scope-redact: that component is one flat sentence where a switch strikes out the spans it governs in place; this component is two physically stacked layers where a switch cuts (or reseals) a window through an opaque sheet to a completely separate, always-intact data layer underneath — closing a window here protects a specific rectangle of real content, not a run of inline text.",
+  "dependencies": []
+}
