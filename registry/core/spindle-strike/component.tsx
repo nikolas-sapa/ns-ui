@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 // ---------------------------------------------------------------------------
 // SpindleStrike — payment history as a diner-receipt spindle. Every settled
 // transaction is a small card impaled on a shared 1px vertical spine
 // (--border), newest closest to the top. The whole thing hangs off ONE
 // governing scalar per card, `rawY` (px along the spine, computed once in
-// JS from that card's recency index * a 4px CARD_GAP), and everything else
+// JS from that card's recency index * an 8px CARD_GAP), and everything else
 // — translateY, z-index, and how far its ink has drifted from --foreground
 // toward --ns-muted — is derived from that same number, never chosen
 // independently. A brand-new settlement starts CARD_ENTER_DROP above its
@@ -45,9 +45,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 // translateY + z-index only (JS-tracked, not CSS transform on top of the
 // base transform, so it composes with rotation cleanly) — no scale, no
 // opacity change, so the receipt's text never shifts size under focus.
-// prefers-reduced-motion drops both the entrance drop and every transition
-// on transform/opacity (positions still update, they just snap); rotation,
-// being static already, is unaffected either way. Refunds fire one
+// prefers-reduced-motion shortens the entrance drop and every
+// transform/opacity/color transition to a brief, linear pass instead of
+// dropping them — positions still update, but as a short visible move
+// rather than an instant snap; rotation, being static already, is
+// unaffected either way. Refunds fire one
 // aria-live announcement naming the amount returned; each row also carries
 // a real <dl> (date/amount/status) so "refunded" is legible as text, not
 // only as position.
@@ -75,11 +77,19 @@ export interface SpindleStrikeProps {
   className?: string;
 }
 
-const CARD_GAP = 4; // px the stack shoves per settled receipt — the one shared scalar step
-const REFUND_LIFT = 24; // px an existing card is pulled back up the spine on refund
-const MAX_DARK_DEPTH = 56; // px of rawY at which the darken ramp maxes out
+const CARD_GAP = 8; // px the stack shoves per settled receipt — the one shared scalar step
+const REFUND_LIFT = 6 * CARD_GAP; // px an existing card is pulled back up the spine on refund —
+// kept as an exact multiple of CARD_GAP (not a literal) so a refund six settles back always ties
+// the very next new arrival's rawY regardless of CARD_GAP's value, which is what lets that new
+// card win z-order on the first "Settle a payment" press rather than several dead-looking ones.
+const MAX_DARK_DEPTH = 14 * CARD_GAP; // px of rawY at which the darken ramp maxes out — scales
+// with CARD_GAP so the same ~14-receipt pile depth still spans the full ramp instead of pegging
+// every card past the fourth or fifth at max darkness.
 const MAX_DARK_PCT = 62; // darkest a receipt gets — never fully --ns-muted, still legible
-const ENTER_DROP = 40; // px a newly-struck card starts above its landing spot
+const ENTER_DROP = 90; // px a newly-struck card starts above its landing spot at rest (full
+// travel, no-preference motion) — big enough that the strike reads as landing, not fading in.
+const ENTER_DROP_REDUCED = 14; // px equivalent under prefers-reduced-motion: reduce — a short,
+// small-amplitude offset (not zero) so a press still visibly moves rather than snapping silently.
 const CARD_WIDTH = 216;
 const CARD_HEIGHT = 88; // reserved layout height per card, top-of-stack
 
@@ -119,8 +129,20 @@ export function SpindleStrike({
   // Diff against the previous render to find newly-struck ids and any
   // settled -> refunded transitions — never derived from `turn`-less state,
   // so callers can add or refund in any order without extra bookkeeping.
-  useEffect(() => {
+  // useLayoutEffect, not useEffect: this must set the entering offset
+  // BEFORE the browser paints. A brand-new card's very first render
+  // otherwise commits at rest (entering hasn't been set yet, since a
+  // regular effect runs post-paint) and the browser paints that resting
+  // frame — so the offset that follows a moment later is read as an
+  // actual FROM-rest transition, which the retarget-to-rest then
+  // interrupts almost immediately. Measured: with useEffect, the drop
+  // collapsed to a ~1px blip regardless of ENTER_DROP's value, worst on
+  // the reduced-motion path where the short transition leaves no room to
+  // recover. With useLayoutEffect, entering is already true by the first
+  // paint, so the offset is the genuine starting point, no false start.
+  useLayoutEffect(() => {
     const prev = prevStatusRef.current;
+    let clearTimer: ReturnType<typeof setTimeout> | undefined;
     if (mountedRef.current) {
       const added: string[] = [];
       let refundedNow: SpindleTransaction | null = null;
@@ -129,13 +151,19 @@ export function SpindleStrike({
         if (before === undefined) added.push(t.id);
         else if (before === "settled" && t.status === "refunded") refundedNow = t;
       }
-      if (added.length > 0 && !reducedMotion) {
+      if (added.length > 0) {
+        // Reduced motion still gets an entering pass — just a short one
+        // (ENTER_DROP_REDUCED, a fast linear CSS transition below) instead
+        // of skipping straight to rest. A silent snap reads identically to
+        // "nothing happened" to anyone who can't see the drop; a brief,
+        // small-amplitude move reads as the strike landing without the
+        // spring overshoot.
         setEnteringIds(new Set(added));
-        // Clear one frame later so the transition actually plays from the
-        // ENTER_DROP start instead of committing straight to rest.
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => setEnteringIds(new Set()));
-        });
+        // A fixed, frame-independent hold before retargeting to rest — long
+        // enough that the offset has definitely painted (this effect firing
+        // pre-paint already guarantees that) and definitely started
+        // transitioning before it reverses.
+        clearTimer = setTimeout(() => setEnteringIds(new Set()), 32);
       }
       if (refundedNow) {
         const back = refundedNow.refundedAmount ?? refundedNow.amount;
@@ -144,6 +172,9 @@ export function SpindleStrike({
     }
     prevStatusRef.current = new Map(transactions.map((t) => [t.id, t.status]));
     mountedRef.current = true;
+    return () => {
+      if (clearTimer) clearTimeout(clearTimer);
+    };
   }, [transactions, reducedMotion]);
 
   // Recency index among ALL receipts (refunded ones included), newest = 0.
@@ -184,7 +215,7 @@ export function SpindleStrike({
   padding:20px 14px 12px;
   border-radius:12px;
   box-shadow:0 1px 3px color-mix(in srgb, var(--foreground) 14%, transparent);
-  transition:transform 500ms cubic-bezier(.34,1.56,.64,1), opacity 420ms ease-out, color 500ms ease-out;
+  transition:transform 560ms cubic-bezier(.34,1.56,.64,1), opacity 460ms ease-out, color 560ms ease-out;
   cursor:default;
 }
 .ns-spindle-card:focus-visible{outline:2px solid var(--ns-accent);outline-offset:2px}
@@ -199,7 +230,7 @@ export function SpindleStrike({
   transform:translate(-50%,-50%) scale(1);
   opacity:1;
   transition:width 320ms cubic-bezier(.22,1,.36,1), height 320ms cubic-bezier(.22,1,.36,1),
-    opacity 160ms ease-out 340ms, transform 160ms cubic-bezier(.34,1.56,.64,1) 340ms;
+    opacity 160ms ease-out 380ms, transform 160ms cubic-bezier(.34,1.56,.64,1) 380ms;
 }
 .ns-spindle-card[data-status="refunded"] .ns-spindle-puncture{width:3px;height:13px;border-radius:9999px}
 .ns-spindle-card[data-entering="true"] .ns-spindle-puncture{opacity:0;transform:translate(-50%,-50%) scale(.25)}
@@ -210,7 +241,12 @@ export function SpindleStrike({
 .ns-spindle-status{font-family:var(--font-mono);font-size:11px;color:var(--ns-muted)}
 .ns-spindle-card[data-status="refunded"] .ns-spindle-status{color:inherit}
 @media (prefers-reduced-motion: reduce){
-  .ns-spindle-card,.ns-spindle-puncture{transition:none!important}
+  /* Not a snap: the strike still needs to read as a card landing, just
+     short and linear instead of the 560ms spring overshoot — small-scale
+     UI motion on transform/opacity/color, not the ambient or parallax
+     motion prefers-reduced-motion exists to suppress. */
+  .ns-spindle-card{transition:transform 160ms linear, opacity 140ms linear, color 160ms linear!important}
+  .ns-spindle-puncture{transition:width 140ms linear, height 140ms linear, opacity 100ms linear 60ms, transform 100ms linear 60ms!important}
 }
 `}</style>
 
@@ -224,7 +260,8 @@ export function SpindleStrike({
           const refunded = t.status === "refunded";
           const entering = enteringIds.has(t.id);
           const lifted = focusedId === t.id;
-          const y = (entering ? restY - ENTER_DROP : restY) - (lifted ? 2 : 0);
+          const enterOffset = reducedMotion ? ENTER_DROP_REDUCED : ENTER_DROP;
+          const y = (entering ? restY - enterOffset : restY) - (lifted ? 2 : 0);
           const rot = hashRotation(t.id);
           const darkPct = (clamp(rawY, 0, MAX_DARK_DEPTH) / MAX_DARK_DEPTH) * MAX_DARK_PCT;
           const zIndex = lifted ? 6000 : Math.round(3000 - rawY);
