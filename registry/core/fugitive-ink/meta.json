@@ -1,0 +1,33 @@
+{
+  "name": "fugitive-ink",
+  "title": "Fugitive Ink",
+  "description": "A one-time secret panel that prints a new API key or recovery code fully legible, then lets it fade like security ink — armed by the user's own copy or by clicking away, never by a modal you close and lose.",
+  "collection": "core",
+  "tags": [
+    "secret",
+    "api-key",
+    "clipboard",
+    "recovery-code",
+    "reveal",
+    "decay",
+    "aria-live",
+    "accessibility"
+  ],
+  "useWhen": "a one-time secret reveal (new API key, recovery codes) that must leave a permanent identifying record behind after it fades — prefix and last four characters stay legible forever, the middle decays granularly on one shared clock armed by copy-or-blur, and copy-of-the-stub keeps working after the full value expires; not for an entrance effect on already-visible text (vapor-countdown) or a countdown that ends at nothing (decrypt-text).",
+  "autoplay": {
+    "mode": "press",
+    "target": "button.ns-fi-copy-btn",
+    "period": 5200,
+    "delay": 700
+  },
+  "gate": {
+    "openBy": "button.ns-fi-copy-btn",
+    "expect": "[data-ns-fi-countdown]"
+  },
+  "instruction": "A one-time secret panel for key issuance and recovery-code flows: the value renders fully legible in a real role=textbox, aria-readonly, keyboard-focusable, text-selectable element, with a Copy button labelled \"Copy secret key, shown only once\" and a permanent record line underneath (initially \"<prefix>…<suffix> — not yet copied\"). Nothing decays until the user arms the panel by clicking Copy or by letting focus leave the panel entirely (blur past its boundary) — a one-way latch, whichever happens first, never both and never re-triggered by a second copy. Once armed, a single governing scalar t runs from 0 to 1 across `decayMs` (default 60000). It is written once per ~100ms tick as the CSS custom property --fi-t on the panel root and inherited by every character span — there is no per-character JS timer. Each middle character (the prefix and last four characters are permanently exempt and never decay) carries only a static --fi-o offset derived from a hash of its index (0 to 0.4 of the window), and a shared CSS formula turns (t, o) into that character's own local phase, scaled so the latest-offset character still finishes exactly when t reaches 1. That local phase crosses three thresholds — the same formula for every character, just at staggered absolute moments — font-weight 600 to 300, then color --foreground to --ns-muted via color-mix, then a clip-path eating the glyph from its waterline (bottom) upward, capped at 88% so a top hairline always survives; the effect reads as granular, paper-like decay rather than a uniform wipe. A thin rule under the secret drains on the same t (scaleX(1-t)) and is labelled with the real integer seconds remaining, recomputed from wall-clock elapsed time so the label can never say something the pixels haven't caught up to. Clipboard and pixels expire together: the Copy button copies the full value for as long as t < 1; once t reaches 1 the button relabels itself and copies only the identifying stub (prefix…suffix) from then on — full value copy never returns, but the button never dies either. The record line survives decay unchanged and switches to \"<prefix>…<suffix>, copied <HH:MM>, will not be shown again\" (or \"shown\" if arming came from blur, not an explicit copy) — this is the permanent artifact a user comes back hunting for later, deliberately not a modal that closes and takes the record with it. Arming announces assertively via a visually-hidden role=alert (\"Copied. Key becomes unreadable in 60 seconds.\"); crossing the halfway point and full expiry each announce once, politely, via a separate aria-live=polite region. prefers-reduced-motion does not disable the decay — it quantizes the same --fi-t scalar to exactly three values (0, 0.5, 1) at the same three moments the announcements already fire, so the continuous CSS thresholds collapse into three discrete text states instead of a smooth ramp, and per-character transitions are removed. Every color is --background, --foreground, --ns-muted, --border and --ns-accent (focus ring only) — no hex, no gradients, no canvas.",
+  "dependencies": [],
+  "card": {
+    "focus": "[data-ns-fi-focus]",
+    "padding": 0.4
+  }
+}

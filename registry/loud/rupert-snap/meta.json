@@ -1,0 +1,28 @@
+{
+  "name": "rupert-snap",
+  "title": "Rupert Snap",
+  "description": "A hash-chained audit log drawn as a chain of Prince Rupert's drops, one per entry, each drop's tail fused into the next drop's head. Tampering with an entry re-derives every hash from that row down, and a single wavefront detonates the drops strictly tailward from the break — later entries shatter because they depend on the edited one, and nothing above it moves.",
+  "collection": "loud",
+  "tags": [
+    "table",
+    "audit-log",
+    "security",
+    "canvas",
+    "hash-chain",
+    "photoelastic",
+    "shatter"
+  ],
+  "autoplay": {
+    "mode": "press",
+    "target": "[data-rupert-phase=\"tampered\"] [data-rupert-verify], [data-rupert-tamper]",
+    "hold": 220,
+    "period": 4200,
+    "delay": 800
+  },
+  "gate": {
+    "openBy": "[data-rupert-tamper]",
+    "expect": "tr[data-invalidated=\"true\"]"
+  },
+  "instruction": "Build <RupertSnap entries? breakIndex? className?> as a real HTML <table> of audit entries (actor, action, timestamp, truncated hash, note) with a <canvas> laid BEHIND it in a 56px gutter to its left — the audit trail itself is never canvas, only the chain graphic is. Each entry gets one Prince Rupert's drop in that gutter, its bulb centred on the row and its tail drawn down into the next drop's head, so the drops form one physically continuous chain the length of the log. Every intact drop holds visible internal stress as photoelastic fringes: banded contour rings inside the bulb whose phase drifts at 0.02 cycles/second — deliberately too slow to read as 'playing', just alive, the stored-energy cue a real Rupert's drop carries right up until its tail is snipped. THE MECHANISM: a hash chain is tamper-evident because entry i's stored hash is a function of entry i's own fields AND entry (i-1)'s hash. The component keeps two independently-derived chains — storedHashes, computed once from the original entries, and recomputedHashes, computed every render from current field values — using an FNV-1a step over `${prevHash}|${actor}|${action}|${timestamp}` seeded from a fixed GENESIS string, run in two basins and concatenated to 16 hex characters (not cryptographic; order- and content-dependence is the only property the demo needs). A tamper is exactly the first index where the two chains disagree; the component never asserts a break, it finds one. 'Simulate tamper at #k' edits entry k's action in place (appends ` -> escalate:owner`), which re-derives every recomputed hash from k onward and marks entries k..n invalidated (struck through with decoration-border, aria-describedby a shared sr-only note explaining that entry k's recorded hash no longer matches the chain recomputed from its current content). Rows above k are untouched and must stay untouched — that asymmetry is the whole point. THE SHATTER: one wavefront, 6 drops per 100ms (STAGGER_MS = 100/6), travelling strictly tailward from k — never inward from both ends, never per-drop independent, because simultaneity would erase the one fact the component teaches (later hashes depend on earlier content, never the reverse). Each detonating drop throws seeded granules (mulberry32, 42 per drop, hard cap 120) on a 360ms ballistic flight; a drop that has finished detonating is frozen into a static debris-line paint and dropped out of the physics loop entirely, which is what keeps a 50-entry chain inside a 60fps budget rather than asserting it. 'Verify chain' clears the tamper and re-seats every drop. Both controls are idempotent: repeated clicks land in the same state, so a card driver or a verifier press-pass can click either one twice without toggling anything. COLOR: all four canvas inks (--background, --foreground, --ns-muted, --border) are read via getComputedStyle at mount and re-read from a documentElement MutationObserver, so a theme flip repaints without a remount — no color literal is ever baked into the draw code. A ResizeObserver re-seeds geometry; the rAF loop pauses on document.hidden. prefers-reduced-motion renders the finished states directly: no fringe drift, no granule flight, tampered rows simply arrive already shown as broken. The status line is a role=status aria-live=polite region naming the verified count or the first invalidated entry. Props: entries (array of {actor, action, timestamp}, oldest first — chain order is array order), breakIndex (0-based entry the tamper button edits, default length-5 clamped), className.",
+  "dependencies": []
+}
