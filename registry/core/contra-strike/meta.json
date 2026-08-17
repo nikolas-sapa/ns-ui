@@ -1,0 +1,33 @@
+{
+  "name": "contra-strike",
+  "title": "Contra Strike",
+  "description": "Order line-item ledger where a partial refund drags a struck span across the amount bar and, on commit, appends a negative contra row beneath the original — which is never edited, only ever struck through and kept legible.",
+  "collection": "core",
+  "tags": [
+    "table",
+    "ledger",
+    "refund",
+    "billing",
+    "accounting",
+    "svg",
+    "slider",
+    "audit",
+    "commerce",
+    "support-tooling"
+  ],
+  "autoplay": {
+    "mode": "drag",
+    "target": "[data-track=\"0\"]",
+    "from": [0.04, 0.5],
+    "to": [0.9, 0.5],
+    "period": 3600,
+    "delay": 700
+  },
+  "gate": {
+    "openBy": "[data-commit=\"1\"]",
+    "expect": "[data-contra=\"1\"]"
+  },
+  "useWhen": "recording a partial refund or credit against a real order line-item ledger where the original entry must survive unedited and the correction has to read as a signed contra row appended beneath it — support tooling, merchant billing dashboards, anywhere auditability is the deliverable. Reach for approval-inline-diff instead when the job is a human reviewing and editing an agent's proposed arguments before a one-shot approve/deny: that component previews a change AGAINST the original and never keeps both values live at once, where contra-strike never previews anything — it only ever appends a new row after the old one, and the old one's figures never change.",
+  "instruction": "Renders an order's line-item ledger as a real semantic <table> (thead/tbody/tfoot, th scope=row on each item name, th scope=col on each header) where a partial refund is recorded the way double-entry bookkeeping actually records one: the original row's DOM node and figures are never edited or removed, ever — the correction always materialises as a brand-new signed contra row appended directly beneath it. Each line item ({id, description, qty, unitPrice}) renders its amount as a fixed-width bar on ONE shared money-per-px scale derived from the largest line in the table, so every row's bar is visually comparable. Dragging anywhere on that bar (a real role=slider region, aria-label 'Refund <description>', aria-valuetext formatted exactly like '$25.00 of $75.00, 2 of 6 units') arms a single governing scalar, the struck fraction s (0-1): on a quantity line (qty>1) the drag snaps to whole-unit boundaries — s can only land on k/qty, so a partial refund can never claim a fractional unit — while a flat line with qty=1 snaps to the cent instead. That same s simultaneously drives the live refund figure, the length of an SVG line drawn across the amount bar (dash-array '4 3' — genuinely dashed — for as long as the row is only armed, never committed, so a mid-drag selection can never be mistaken for an already-settled correction), and, the instant a real 'Refund $x' button is pressed (its accessible name literally names the amount, and it stays disabled at s=0 — there is nothing to name yet), the width of the new contra row's own bar on the identical shared scale. Committing flips that same SVG rule from dashed to a solid stroke, height-expands the contra row from 0 (two rAF frames apart so the browser actually paints the zero-height frame first, then the real one, or the transition never plays), and re-derives the ledger's Subtotal/Refunded/Balance footer with a brief settle highlight — nothing here is ever mutable after commit; there is no undo, no revert, no toast, because the entire trust story of a ledger is that nothing already booked can un-happen. Once committed, the struck row's slider becomes non-interactive (aria-disabled, removed from tab order) — its qty/description/amount text is completely untouched, decorated with a permanent line-through on the amount (decoration, never deletion, still fully legible) and carries aria-description 'partially refunded, see contra entry below'. The contra row itself reads 'Contra — <description>' with a leading minus on both its unit count and its Geist Mono figure, and a live region (role=status, rendered unconditionally as a sibling of the table, never inside it) announces 'Refund recorded: -$X for <description>. New balance $Y.' the moment it lands. A consumer can pre-seed a line as already armed via defaultStruck (the draft strike renders at rest, same reasoning as approval-inline-diff's initialValues) or as already refunded via committedStruck, mounting straight into the settled state — contra row open, rule solid — with no animation, exactly like replaying a history feed. Keyboard: each slider takes Tab, ArrowLeft/Right (and Up/Down) step by one unit or one cent, PageUp/PageDown take a bigger stride, Home/End jump to 0%/100%; sliders use outline-none paired only with focus-visible:ring-2 focus-visible:ring-ns-accent (never focus-visible:outline-* on the same element), buttons use focus-visible:outline-2 focus-visible:outline-ns-accent with no base outline-none. --ns-accent appears only as those focus rings and a sub-second settle flash tied directly to the commit click — never as a resting fill; the commit button is outlined, not accent-filled. Money is formatted via Intl.NumberFormat with an explicit locale/currency (both overridable props, defaulting en-US/USD) so server and client render identical digits. Under prefers-reduced-motion the dashed-rule transition, the contra row's height-expand, and the settle flash are all skipped outright — the rule, the row, and the new balance simply appear in their final state, fully legible and operable either way. Pure DOM + inline SVG + CSS, no canvas, tokens only (--background --foreground --ns-muted --border --ns-accent), correct in both themes.",
+  "dependencies": []
+}

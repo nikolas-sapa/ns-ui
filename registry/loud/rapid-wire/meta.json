@@ -1,0 +1,31 @@
+{
+  "name": "rapid-wire",
+  "title": "Rapid Wire",
+  "description": "Payment submission as an Edwardian cash railway — the amount folds into a wooden cup that catapults along a sagging catenary wire to the cashier post, rocks there while the server settles, then coasts back carrying the receipt and, when there is one, the change or instant refund as a separate line.",
+  "collection": "loud",
+  "tags": [
+    "payment",
+    "checkout",
+    "submit",
+    "async",
+    "receipt",
+    "refund",
+    "svg",
+    "physics",
+    "aria-live",
+    "accessibility"
+  ],
+  "autoplay": {
+    "mode": "press",
+    "target": "button[data-rw-submit]",
+    "hold": 150,
+    "period": 5200,
+    "delay": 700
+  },
+  "gate": {
+    "openBy": "button[data-rw-submit]",
+    "expect": "[data-rapid-wire][data-busy=\"true\"]"
+  },
+  "instruction": "Build a payment-submit control as an Edwardian cash railway: a till post and a raised cashier post joined by one sagging wire, and a cup that runs the wire in both directions carrying money. There is exactly one governing scalar, `s`, an arc-length position along a single SVG catenary path solved analytically from the two posts' real endpoints (the standard two-point a*cosh formula, not a bezier approximation) and sampled into a static polyline `d`. A second, invisible reference `<path>` carries that same geometry and is queried every animation frame via `getPointAtLength`/`getTotalLength` — never redrawn — so the physics reads real DOM geometry instead of duplicating the math. From the sampled point and its local tangent the frame derives three things, all per-frame, never a keyframe tween: velocity (energy conservation against the wire's actual height climb from till to cashier, so launching downhill off the till post genuinely speeds the cup up and climbing the last stretch to the cashier post genuinely slows it down), cup tilt (the tangent angle, clamped), and — on the separate VISIBLE wire path only — a small gaussian deflection bump centered under the cup's current x, a few px, cosmetic and never fed back into the physics query. On submit the outbound launch speed is solved, not guessed: given the wire's real height climb, v0 is picked so the cup arrives at the far post at a small target speed — it just crests rather than sailing past, with a short additional braking zone in the final ~28px so the crest reads as a landing, not an overshoot. State machine: idle -> outbound (launch, ~1s of gravity-coasting climb) -> settling (parked at the cashier post, rocking gently on a sine wobble while the real async onSubmit promise is in flight, held for a minimum window so the beat reads even if the promise resolves instantly) -> returning (coasts back, net downhill so it naturally accelerates, caught by a braking zone right at the till post so the landing is gentle rather than a physically-accurate slam) -> arrived, where the outcome unfolds as real DOM `<li>` rows inside an `<ol>`, staggered in, never painted SVG/canvas text. The built-in demo cycle (used whenever no `onSubmit` prop is supplied) rotates through the cases that matter for a payment window where value comes back: exact tender (single captured line), change due (captured plus a negative change line), a partial authorization with the remaining balance refunded instantly as its own line, and a decline where the entire hold is released back — each returning line carries a small down-arrow glyph and a leading minus sign distinct from the captured line's plain amount. The submit button is never given a `disabled` attribute; busyness is a guard on the click handler so it stays focusable and keyboard-reachable through the whole trip. Accessibility: one `role=status aria-live=polite aria-atomic=true` region speaks exactly three coarse events per cycle — payment sent, the settle result (e.g. 'Captured — $4.20 change returning.'), and receipt ready — never per-frame position, with a zero-width-space parity toggle so a repeated identical message still forces a re-announcement; the same text also renders as a small always-visible caption so nothing is carried by the graphic alone. The wire/cup SVG is `aria-hidden`; the receipt is a real `<ol>` in document order. `prefers-reduced-motion` swaps in a version where the cup stays parked at the till post — no rAF loop runs at all — while the same status guard, the same three announcements and the same receipt land in the same order, just without the trip. Colors are CSS custom properties only (`--background --foreground --ns-muted --border --ns-accent`) read as `var(...)` directly in SVG attributes; no canvas, no gradients, no hex. Zero dependencies.",
+  "dependencies": []
+}
