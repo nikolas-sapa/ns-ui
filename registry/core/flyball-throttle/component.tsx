@@ -204,6 +204,7 @@ export function FlyballThrottle({
   return (
     <div
       role="group"
+      data-flyball-root
       aria-labelledby={labelId}
       aria-describedby={descId}
       className={`w-full max-w-md rounded-md border border-border bg-background p-5 ${className}`}

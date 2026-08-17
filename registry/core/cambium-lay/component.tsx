@@ -73,7 +73,7 @@ import { useEffect, useRef, useState } from "react";
 // ---------------------------------------------------------------------------
 
 export interface CambiumLayProps {
-  /** ms per virtual growth year — the only speed control. Default 20000 (~one year per 20s). */
+  /** ms per virtual growth year — the only speed control. Default 4000 (~one year per 4s). */
   yearMs?: number;
   /** hard cap on virtual years grown, even for a very old persisted visit. Default 64. */
   maxYears?: number;
@@ -116,7 +116,7 @@ const SCAR_ARC_END = 26; // ~52 degrees of the 96 spokes
 const SCAR_SUPPRESS_MULT = 0.08;
 const SCAR_HEAL_MULT = 1.9;
 
-const YEAR_MS_DEFAULT = 20000;
+const YEAR_MS_DEFAULT = 4000; // ms per virtual year — at 20000 the live front's per-tick radial delta was under a pixel, reading as a still frame within the few seconds a catalog card is actually judged on
 const CAP_YEARS_DEFAULT = 64;
 const INITIAL_YEARS = 14; // seeded age on a first-ever mount, so it never opens on a bare dot
 const REDUCED_RINGS = 40;

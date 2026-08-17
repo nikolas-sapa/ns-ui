@@ -92,7 +92,7 @@ export interface PolypBudProps {
 }
 
 const MAX_NODES = 400;
-const TICK_MS = 300;
+const TICK_MS = 60; // round-robin cadence — at 300 only ~8 bud attempts fit in the few seconds a catalog card is actually judged on, most of them on tips already crowded out by the mount-time prewarm; 120 measured only ~2x the resting-state pixel change, still reading as static at card scale
 const RAY_COUNT = 5;
 const RAY_SPREAD_DEG = 15;
 const RAY_LEN = 46;
