@@ -3,15 +3,20 @@
 import { useEffect, useState } from "react";
 import { BlowdownSeat } from "./component";
 
-// A realistic gateway traffic trace walked on a loop: a climb that crosses
-// `pop` (850 rps @ capacity 1000), a dip that stays *above* `reseat` (790
-// rps) so the vent must stay open through it, then a fall that finally
-// clears `reseat` and reseats. The two-threshold gap is the whole point of
-// this component, so the demo has to actually cross it, not just sit near
-// one number.
+// A realistic gateway traffic trace walked on a loop. It's ordered so the
+// component MOUNTS already past `pop` (900 rps, above the 850 mark) and
+// immediately dips to 800 rps — above `reseat` (720) but below `pop` — and
+// HOLDS there for several ticks. That's the one frame that proves this is a
+// two-threshold valve and not an ordinary single-limit meter: the vent stays
+// open even though load has fallen back under the upper mark, because it
+// hasn't cleared the lower one yet. Holding it for ~3s means the resting
+// screenshot (taken shortly after load) reliably lands on that frame instead
+// of on a random point in the cycle. After the hold, the trace finishes
+// falling clear of `reseat` (closing the vent), bottoms out, then climbs
+// back up to cross `pop` again and loop.
 const TRACE = [
-  380, 520, 660, 780, 830, 870, 920, 960, 910, 860, 830, 800, 780, 740, 690,
-  600, 480, 400,
+  900, 800, 800, 800, 800, 760, 690, 600, 480, 400, 380, 520, 660, 780, 830,
+  870,
 ];
 
 export default function BlowdownSeatDemo() {
@@ -46,13 +51,14 @@ export default function BlowdownSeatDemo() {
             capacity={1000}
             liveRate={liveRate}
             defaultPop={85}
-            defaultReseat={79}
+            defaultReseat={72}
+            scaleMax={110}
           />
         </div>
 
         <p className="mt-3 font-mono text-[11px] text-ns-muted">
           simulated traffic loops on its own — the vent stays open through
-          the dip to 800 rps because it never clears the 790 rps reseat mark
+          the dip to 800 rps because it never clears the 720 rps reseat mark
         </p>
       </div>
     </main>

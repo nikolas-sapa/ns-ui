@@ -491,6 +491,24 @@ export function BlowdownSeat({
             )}
           </g>
 
+          {/* value labels pinned to each handle — a reader shouldn't have to
+              hunt a legend below the drawing to know which mark is which or
+              what it costs in rps; the number sits right next to the mark. */}
+          <text
+            x={RULER_X + 30}
+            y={yPop - 5}
+            className="fill-current font-mono text-[8px] text-foreground"
+          >
+            pop {fmtRps(popEff)}
+          </text>
+          <text
+            x={RULER_X + 30}
+            y={yReseat + 11}
+            className="fill-current font-mono text-[8px] text-ns-muted"
+          >
+            reseat {fmtRps(reseatEff)}
+          </text>
+
           {/* invisible hit target carrying pointer drag for both handles */}
           <rect
             data-blowdown-seat-track
@@ -615,8 +633,8 @@ export function BlowdownSeat({
       </div>
 
       <div className="mt-2 flex items-center justify-between font-mono text-[11px] text-ns-muted">
-        <span>reseat {fmtRps(reseatEff)} rps</span>
         <span>pop {fmtRps(popEff)} rps</span>
+        <span>reseat {fmtRps(reseatEff)} rps</span>
       </div>
 
       {/* real, focusable range inputs — the entire keyboard/a11y surface */}

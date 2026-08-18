@@ -602,6 +602,28 @@ export function SearNotch({
                 strokeLinecap="round"
               />
             </g>
+
+            {/* the two tuned values, printed right on the notch — a reader
+                should never have to compare the shoulder gap's pixel width
+                against the time axis to know the duration; the number is
+                right there. */}
+            <text
+              x={leftEdgeX - 4}
+              y={floorY - 5}
+              textAnchor="end"
+              className="fill-current font-mono text-[8px] text-ns-muted"
+            >
+              {fmt(threshold)}
+              {unit}
+            </text>
+            <text
+              x={(leftEdgeX + rightEdgeX) / 2}
+              y={TOP_PAD + 8}
+              textAnchor="middle"
+              className="fill-current font-mono text-[8px] text-ns-muted"
+            >
+              for {durationLabel(forMs)}
+            </text>
           </svg>
 
           {/* threshold — role=slider, vertical, hit area spans the full

@@ -23,21 +23,21 @@ function smoothstep(t: number) {
   return c * c * (3 - 2 * c);
 }
 
-// six spikes of deliberately varied duration: a couple of seconds (never
-// fires, any duration bucket), ~45s (fires only at 30s), ~95s (30s/1m),
-// ~7min (30s/1m/5m), ~18min (fires at every bucket including 15m), and one
-// more short near-miss near the end — so dragging the duration handle
-// across its four stops visibly reclassifies a different subset each time.
+// Two dominant spikes, sized so at rest (threshold 280ms, dwell 5m) each
+// classified excursion is a real fraction of the chart, not a hairline: a
+// ~224s excursion (about 60px wide) stays hollow because it never dwelled
+// the required 5 minutes, and a ~484s excursion (about 130px wide) fires
+// solid because it did. A third ~17s blip is background noise the rule
+// correctly ignores, not one of the two shapes the demo is built around. A
+// 30-minute window keeps both real excursions legible instead of shrinking
+// them to a sliver against a full hour.
 const SPIKES: { start: number; dur: number; peak: number }[] = [
-  { start: 180, dur: 6, peak: 420 },
-  { start: 420, dur: 45, peak: 400 },
-  { start: 760, dur: 95, peak: 410 },
-  { start: 1150, dur: 420, peak: 430 },
-  { start: 1900, dur: 1100, peak: 440 },
-  { start: 3100, dur: 20, peak: 405 },
+  { start: 100, dur: 15, peak: 300 },
+  { start: 300, dur: 220, peak: 340 },
+  { start: 700, dur: 480, peak: 350 },
 ];
 
-const WINDOW_S = 3660;
+const WINDOW_S = 1800;
 const STEP_S = 5;
 const BASELINE = 180;
 
@@ -45,7 +45,7 @@ function buildData(): SearNotchPoint[] {
   const rand = mulberry32(20260817);
   const points: SearNotchPoint[] = [];
   for (let s = 0; s <= WINDOW_S; s += STEP_S) {
-    let v = BASELINE + 22 * Math.sin(s / 210) + (rand() - 0.5) * 16;
+    let v = BASELINE + 15 * Math.sin(s / 210) + (rand() - 0.5) * 12;
     for (const spike of SPIKES) {
       const edge = 4; // seconds of ramp in/out
       if (s >= spike.start - edge && s <= spike.start + spike.dur + edge) {
@@ -62,7 +62,7 @@ function buildData(): SearNotchPoint[] {
 
 const DATA = buildData();
 const LAST_VALUE = DATA[DATA.length - 1].v;
-const SPIKE_VALUE = 430;
+const SPIKE_VALUE = 340;
 
 export default function SearNotchDemo() {
   const [simulateLive, setSimulateLive] = useState(false);
@@ -81,12 +81,12 @@ export default function SearNotchDemo() {
         <div className="mt-5 rounded-md border border-border p-5">
           <SearNotch
             metricLabel="Checkout p99 latency"
-            windowLabel="past 1h"
+            windowLabel="past 30 min"
             unit="ms"
             data={DATA}
             liveValue={simulateLive ? SPIKE_VALUE : LAST_VALUE}
-            defaultThreshold={350}
-            defaultForMs={60_000}
+            defaultThreshold={280}
+            defaultForMs={300_000}
           />
         </div>
 
