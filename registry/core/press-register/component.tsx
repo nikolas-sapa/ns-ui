@@ -463,14 +463,68 @@ const CSS = `
 .ns-pr-strike{animation:ns-pr-strike ${STRIKE_MS}ms ease-out;}
 
 dialog.ns-pr-dialog{
+  /* A host that resets margin to 0 on every element (Tailwind preflight,
+     most CSS resets) kills the UA stylesheet's own <dialog> centering,
+     which depends on margin:auto with an implicit inset. Pin position and
+     centering explicitly instead of relying on that default. */
+  position:fixed;
+  top:50%;
+  left:50%;
+  margin:0;
+  transform:translate(-50%, -50%) scale(0.96);
   border:1px solid var(--border);
   border-radius:12px;
   background:var(--background);
   color:var(--foreground);
   padding:16px;
   width:min(26rem, calc(100vw - 2rem));
+  opacity:0;
+  transition:opacity 180ms cubic-bezier(0.16,1,0.3,1), transform 180ms cubic-bezier(0.16,1,0.3,1), overlay 180ms allow-discrete, display 180ms allow-discrete;
 }
+dialog.ns-pr-dialog[open]{
+  opacity:1;
+  transform:translate(-50%, -50%) scale(1);
+}
+@starting-style{
+  dialog.ns-pr-dialog[open]{
+    opacity:0;
+    transform:translate(-50%, -50%) scale(0.96);
+  }
+}
+/* Never a hardcoded grey: the scrim is a translucent wash of --background
+   itself (not --foreground), so it reads as a soft dim of the page in
+   whichever theme is active rather than a flat mid-grey overlay, with a
+   blur for the "more smooth" ask instead of a harder darkening trick. */
 dialog.ns-pr-dialog::backdrop{
-  background:color-mix(in srgb, var(--foreground) 45%, transparent);
+  background:color-mix(in srgb, var(--background) 55%, transparent);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  opacity:0;
+  transition:opacity 180ms cubic-bezier(0.16,1,0.3,1), display 180ms allow-discrete, overlay 180ms allow-discrete;
+}
+dialog.ns-pr-dialog[open]::backdrop{
+  opacity:1;
+}
+@starting-style{
+  dialog.ns-pr-dialog[open]::backdrop{
+    opacity:0;
+  }
+}
+@media (prefers-reduced-motion: reduce){
+  dialog.ns-pr-dialog{
+    transition:opacity 120ms linear;
+    transform:translate(-50%, -50%);
+  }
+  dialog.ns-pr-dialog[open]{
+    transform:translate(-50%, -50%);
+  }
+  @starting-style{
+    dialog.ns-pr-dialog[open]{
+      transform:translate(-50%, -50%);
+    }
+  }
+  dialog.ns-pr-dialog::backdrop{
+    transition:opacity 120ms linear;
+  }
 }
 `;
