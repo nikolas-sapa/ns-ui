@@ -1,0 +1,27 @@
+{
+  "name": "index-contour",
+  "title": "Index Contour",
+  "description": "A travel-time reach editor: one slider handle sets minutes, and the reach renders as topographic-style contour bands re-thresholded from a real per-node cost field via marching squares, with every third line heavier and labelled inline in a break in its own stroke.",
+  "collection": "core",
+  "tags": [
+    "slider",
+    "svg",
+    "isochrone",
+    "map",
+    "contour",
+    "input",
+    "data-viz",
+    "geo"
+  ],
+  "useWhen": "a delivery zone, commute limit, or service-area input set by TIME rather than distance — the isochrone control any logistics, retail-siting, or real-estate product needs, where the shape must visibly hug the real road network (marching squares over a supplied cost field) rather than draw a circle; pick hero-isobar-contours instead when the contours are ambient hero decoration around a CTA with no numeric meaning at all.",
+  "instruction": "Build a functional isochrone input, not a decorative contour field. MECHANISM: one governing scalar t (minutes, quantized to multiples of 5) drives which bands render; each band at level L (5, 10, 15, ... up to t) is a marching-squares re-threshold of a single caller-supplied per-node cost field (ContourCostField: cols, rows, values[] in minutes row-major, Infinity meaning unreachable, optional roads polylines, optional metersPerCell). Every band is derived from that one field — none is independently authored — so run marching squares fresh per level: 16-case edge table with linear interpolation between opposite-state corners (barrier/Infinity corners hug the interpolated point tight against themselves at t=0.1/0.9 rather than producing NaN), then stitch loose segments into polylines by shared endpoint (closed loops where the field is an island, open chains where a partial band clips at the grid edge or an unreachable pocket — that clipping is what 'the outermost partial band clips at t' means, and it falls out of the algorithm with no special case). If every node's cost is Infinity (no data yet), marching squares emits zero segments at every level by construction — that IS the loading state: the supplied `roads` skeleton keeps drawing (muted, permanent context) and no reach appears at all. A Euclidean radius/speed fallback must never be substituted, not even as a loading placeholder. INDEX-CONTOUR RULE: every 3rd line (15-minute multiples, 3:1 ratio on the 5-minute interval, matching USGS index-contour convention) draws 2px --foreground with its minute value set INSIDE a break in the stroke itself: measure the label's real rendered width via SVG getBBox() in a layout effect (not estimated), turn that into a stroke-dasharray gap sized to the label plus padding, and position the gap via stroke-dashoffset centered on the arc-length position of that band's own topmost vertex (computed from the polyline's own point list, not from getTotalLength on the DOM). Intermediate lines are 1px --ns-muted, no label. Never a filled gradient wash — every band is stroke-only, fill:none; a filled reach is both banned and illegible without a key. EMERGENCE: growing t does not fade a newly-revealed outer band in — it mounts at transform:scale(0.9) anchored on transform-origin set to the field's own cost-minimum node (the origin, found by argmin over the field, not a caller-supplied point), then a requestAnimationFrame flips it to scale(1) under a 220ms cubic-bezier(0.16,1,0.3,1) (ease-out-expo) transition, so it visibly inflates outward from the previous line rather than appearing by opacity. prefers-reduced-motion skips the tween (renders the settled shape directly, still fully legible — never disabled, just not animated). A11Y: the control is a single role=slider div, tabIndex=0, aria-valuemin/max/now plus aria-valuetext formatted 'N minutes, reach covers approx. X km²' (optionally ', approx. Y people' when populationPerKm2 is supplied) — the area is derived by counting reachable nodes (finite cost <= t) and multiplying by the field's own (metersPerCell/1000)^2, never guessed. ArrowLeft/Right/Up/Down step by the visible 5-minute unit (announced step equals visible unit), PageUp/PageDown step by the 15-minute index interval, Home/End go to the domain rails. The whole SVG (roads + every contour + every label) is aria-hidden, since it is derived geometry, not the source of truth — band count and the same derived area/population land instead in a separate sr-only role=status aria-live=polite region that updates on every committed (quantized) value change, and a visible Geist Mono readout (aria-hidden, since the slider already owns the value) mirrors the number beside the eyebrow label. INK: grid is rendered at a fixed real pixel scale (no viewBox rescaling) so 1px/2px stroke widths and the getBBox label measurement are both already true screen px with nothing to reconcile; every color is a token utility (text-foreground, text-ns-muted, text-border, bg-ns-muted, focus-visible:ring-ns-accent) — no canvas, no hex, no gradient.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "drag",
+    "target": "[data-index-contour-track]",
+    "from": [0.08, 0.5],
+    "to": [0.85, 0.5],
+    "period": 5600,
+    "delay": 700
+  }
+}
