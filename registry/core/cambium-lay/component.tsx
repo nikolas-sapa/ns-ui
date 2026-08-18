@@ -16,7 +16,7 @@ import { useEffect, useRef, useState } from "react";
 // earlywood-end → final) are committed as static DOM — two <path>s, smoothed
 // through the 96 spokes with a closed Catmull-Rom curve — and never touched
 // again. Only the CURRENT, still-forming annulus mutates, and only its `d`
-// attribute: one write per tick, three ticks a second, nothing else moves.
+// attribute: one write per tick, ~8 ticks a second, nothing else moves.
 //
 // Two long-lived deformations ride on top of the per-year budget, both
 // expressed as a per-spoke multiplier on that spoke's share of the year's
@@ -120,7 +120,21 @@ const YEAR_MS_DEFAULT = 4000; // ms per virtual year — at 20000 the live front
 const CAP_YEARS_DEFAULT = 64;
 const INITIAL_YEARS = 14; // seeded age on a first-ever mount, so it never opens on a bare dot
 const REDUCED_RINGS = 40;
-const TICK_MS = 333; // ~3 attribute writes/sec
+const TICK_MS = 120; // was 333 — 3 writes/sec sampled the travelling front (below) too coarsely to read as motion; ~8/sec is still trivial cost for a 96-spoke path rebuild
+
+// The cambium doesn't lay the whole ring's width down everywhere at once —
+// growth is a front that circulates the circumference as the season runs.
+// FRONT_REVS_PER_PHASE is how many times that front sweeps fully around the
+// ring within one phase (earlywood or latewood); FRONT_LAG_FRAC is how far a
+// spoke's local progress can lead or lag the phase's mean progress while the
+// front is near or far from it. Both apply ONLY to the live, still-forming
+// boundary shown between ticks — the taper below forces the lag to exactly 0
+// at the start and end of every phase, so the two committed boundaries
+// (earlyEnd, final) that `growYear` produces are completely unaffected: this
+// reshapes how a ring visibly arrives at its real target, not the target
+// itself.
+const FRONT_REVS_PER_PHASE = 1.4;
+const FRONT_LAG_FRAC = 0.32;
 // reduced-motion still needs to be honest that this is a living illustration
 // — a single static frame that never changes again reads as broken, not
 // calm. Every REDUCED_RING_INTERVAL_MS it commits exactly one more whole
@@ -182,15 +196,39 @@ function growYear(year: number, start: Radii, ctx: GrowCtx): { earlyEnd: Radii; 
   return { earlyEnd, final };
 }
 
-/** Linear interpolation of the live boundary within the current year, given u = season fraction elapsed. */
+/**
+ * Per-spoke local progress within a phase, given the phase's mean progress
+ * `p` (0..1). The front's azimuth sweeps FRONT_REVS_PER_PHASE times around
+ * the ring as `p` goes 0 -> 1; a spoke near the front's current azimuth is
+ * running slightly AHEAD of the mean (already at this instant's leading
+ * edge), one near the opposite azimuth slightly BEHIND (still settling into
+ * place before the front reaches it again). `taper` is 0 at p=0 and p=1 by
+ * construction, so every spoke lands exactly on the phase's real endpoint
+ * regardless of the wave — only the path it takes to get there bulges.
+ */
+function frontLocalProgress(p: number, theta: number): number {
+  const clampedP = clamp(p, 0, 1);
+  const frontAngle = FRONT_REVS_PER_PHASE * TWO_PI * clampedP;
+  const taper = Math.sin(Math.PI * clampedP);
+  const lag = FRONT_LAG_FRAC * taper * Math.cos(frontAngle - theta);
+  return clamp(clampedP + lag, 0, 1);
+}
+
+/** Interpolation of the live, still-forming boundary within the current year, given u = season fraction elapsed. Each spoke rides its own front-relative progress (see frontLocalProgress) rather than a single shared fraction, so the boundary that's currently accreting visibly bulges and travels around the ring as it forms, instead of the whole edge advancing in lockstep. */
 function currentBoundary(u: number, start: Radii, earlyEnd: Radii, final: Radii): Radii {
   const out: Radii = new Float64Array(N_SPOKES);
   if (u <= EARLY_TIME_FRAC) {
     const p = u / EARLY_TIME_FRAC;
-    for (let i = 0; i < N_SPOKES; i++) out[i] = start[i] + (earlyEnd[i] - start[i]) * p;
+    for (let i = 0; i < N_SPOKES; i++) {
+      const pi = frontLocalProgress(p, THETAS[i]!);
+      out[i] = start[i] + (earlyEnd[i] - start[i]) * pi;
+    }
   } else {
     const p = (u - EARLY_TIME_FRAC) / (1 - EARLY_TIME_FRAC);
-    for (let i = 0; i < N_SPOKES; i++) out[i] = earlyEnd[i] + (final[i] - earlyEnd[i]) * p;
+    for (let i = 0; i < N_SPOKES; i++) {
+      const pi = frontLocalProgress(p, THETAS[i]!);
+      out[i] = earlyEnd[i] + (final[i] - earlyEnd[i]) * pi;
+    }
   }
   return out;
 }

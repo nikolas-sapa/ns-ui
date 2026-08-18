@@ -122,6 +122,19 @@ export function FloretPack({ children, plastochron = 1400, maxPrimordia = 700, c
     const oy = new Float32Array(n);
     const posX = new Float32Array(n);
     const posY = new Float32Array(n);
+    // Render-interpolation buffers: the physics tick is fixed at 30Hz
+    // (TICK_MS) but rAF fires at display rate (60/120Hz). Without these, the
+    // last tick's posX/posY got re-applied verbatim to the DOM on every
+    // in-between frame, so a tracked dot's per-frame render delta alternated
+    // "0px for 1-2 frames, then a multi-px jump" — a beat between the 30Hz
+    // physics step and the display's refresh rate, not smooth advection.
+    // prevPosX/Y hold the position as of the second-most-recent tick;
+    // applyToDOM lerps toward the latest tick by the leftover accumulator
+    // fraction every frame, so the rendered position moves a little every
+    // single frame instead of only on tick boundaries.
+    const prevPosX = new Float32Array(n);
+    const prevPosY = new Float32Array(n);
+    const prevBornOrder = new Int32Array(n).fill(-1);
     const maturity = new Float32Array(n);
     const dx = new Float32Array(n);
     const dy = new Float32Array(n);
@@ -278,7 +291,12 @@ export function FloretPack({ children, plastochron = 1400, maxPrimordia = 700, c
       }
     };
 
-    const applyToDOM = () => {
+    // `alpha` is the fraction of the way from the previous completed tick to
+    // the latest one (0 right after a tick, approaching 1 just before the
+    // next). alpha=1 means "render the latest tick's position outright" —
+    // used by warmup and resize reprojection, which aren't running inside
+    // the interpolated rAF loop.
+    const applyToDOM = (alpha = 1) => {
       for (let slot = 0; slot < n; slot++) {
         const el = elRefs.current[slot];
         if (!el) continue;
@@ -286,12 +304,26 @@ export function FloretPack({ children, plastochron = 1400, maxPrimordia = 700, c
           el.style.opacity = "0";
           continue;
         }
+        const curX = posX[slot] ?? 0;
+        const curY = posY[slot] ?? 0;
+        let rx = curX;
+        let ry = curY;
+        // Only interpolate a floret that already existed at the previous
+        // tick under this same slot — a just-spawned or just-recycled slot
+        // has no meaningful "previous" position and must snap, not lerp in
+        // from stale/garbage coordinates.
+        if (alpha < 1 && prevBornOrder[slot] === bornOrder[slot]) {
+          const px = prevPosX[slot] ?? curX;
+          const py = prevPosY[slot] ?? curY;
+          rx = px + (curX - px) * alpha;
+          ry = py + (curY - py) * alpha;
+        }
         const m = maturity[slot] ?? 0;
         const fadeIn = Math.min(1, m / BIRTH_FADE_FRAC);
         const fadeOut = m <= RIM_FADE_START ? 1 : Math.max(0, 1 - (m - RIM_FADE_START) / (1 - RIM_FADE_START));
         const opacity = fadeIn * fadeOut;
         const scale = DOT_MIN_SCALE + (1 - DOT_MIN_SCALE) * fadeIn;
-        el.style.transform = `translate3d(${(posX[slot] ?? 0).toFixed(1)}px, ${(posY[slot] ?? 0).toFixed(1)}px, 0) scale(${scale.toFixed(3)})`;
+        el.style.transform = `translate3d(${rx.toFixed(1)}px, ${ry.toFixed(1)}px, 0) scale(${scale.toFixed(3)})`;
         el.style.opacity = opacity.toFixed(3);
         const colorIdx = m < 1 / 3 ? 0 : m < 2 / 3 ? 1 : 2;
         if (lastColorIdx[slot] !== colorIdx) {
@@ -349,10 +381,16 @@ export function FloretPack({ children, plastochron = 1400, maxPrimordia = 700, c
       lastT = now;
       acc += dt;
       while (acc >= TICK_MS) {
+        // Snapshot the pre-step state as "previous" right before overwriting
+        // it, so prevPos always trails posX/posY by exactly one tick even
+        // when a laggy frame runs several catch-up ticks in a row.
+        prevPosX.set(posX);
+        prevPosY.set(posY);
+        prevBornOrder.set(bornOrder);
         stepPhysics(TICK_MS, 1);
         acc -= TICK_MS;
       }
-      applyToDOM();
+      applyToDOM(acc / TICK_MS);
       raf = requestAnimationFrame(frame);
     };
 
