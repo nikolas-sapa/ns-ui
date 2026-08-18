@@ -1,0 +1,28 @@
+{
+  "name": "clock-card",
+  "title": "Clock Card Rack",
+  "description": "A catch-up digest as a punch-clock card rack: one bordered card per collaborator, unread bursts holding the card proud of a shared top datum by up to 6px until a real 'Mark caught up' button settles it flush.",
+  "collection": "core",
+  "tags": [
+    "digest",
+    "activity",
+    "feed",
+    "rack",
+    "card",
+    "time",
+    "mono",
+    "aria-live",
+    "accessibility",
+    "collaboration"
+  ],
+  "useWhen": "the morning 'what happened while I was away' panel on a shared project, where every entry is a time-punched row grouped on its author's own card so one person's rhythm stays intact — pick this over a single interleaved activity feed ('3 people made 12 edits'), which forces per-line avatar decoding this rack is built to avoid. Differs from memory-ledger-decay (patina-ledger): that one ages a record's ink color the longer it sits unreferenced; this one never recolors anything — unread is a physical position (proud vs. flush) against a datum line, cleared by a button, not a decay curve read off elapsed time.",
+  "autoplay": {
+    "mode": "press",
+    "target": ".ns-clockcard-caughtup:not(:disabled)",
+    "hold": 260,
+    "period": 3400,
+    "delay": 700
+  },
+  "instruction": "A punch-clock card rack for a 'what happened while I was away' digest: one radius-12 bordered card per collaborator (rounded-xl border border-border bg-background), stacked in a rail under one shared hairline datum. Every entry is a time-punched row rendered on its author's own card ('edited section 2 — 14:10 to 14:32', real <time dateTime> elements, Geist Mono) — the interleaved anonymous feed pattern is structurally impossible here, not just avoided by convention, because rows only ever exist inside a collaborator's own <ul>. Time is the single governing scalar and nothing else is: it sorts rows within a card (latest punch first), sorts cards across the rack (the card whose most recent burst end-time is newest sits on top, recomputed fresh every render from `Math.max` over each card's bursts, never a stored index — so the rack keeps itself sorted for free as new punches land), and sets how far a card sits proud of the shared top datum when it holds unread work: `2px + 1px per 12 cumulative unread hours` (summed duration of that card's unread bursts), clamped at 6px so a two-week backlog cannot eject a card off the physical range the rack renders in — the clamp is what keeps 'proud' legible as a binary-ish 'there is unread work here' signal rather than a magnitude gauge. A card with zero unread bursts sits at exactly 0 offset (flush), never at the clamped floor. Settling is a single CSS custom property (--nsc-offset) driving `transform: translateY()`, transitioned 300ms cubic-bezier(.16,1,.3,1) (ease-out-expo) — a pure transform, no layout is touched, so marking a card caught up costs one composited animation. Reading is opt-in and explicit: each card has a real, per-card 'Mark caught up' button (disabled once nothing is unread, guarded with disabled:pointer-events-none so the disabled state never fires its own hover style) that reports via `onMarkCaughtUp(collaboratorId)` — the component holds no model of its own, `collaborators` is the only prop and every derived value (row order, rack order, proud offset, unread count) is recomputed from it on every render, so the caller flipping `unread` flags is the only way state changes. Completion is announced through a polite aria-live region reading 'Caught up with <name>'. A brand new punch row (a burst id not present in the previous commit, detected by diffing id sets against a ref updated inside a layout effect so the diff runs and the new row already renders clipped-shut on the very first paint, never flashing open and then replaying) plays a single 340ms clip-path reveal, like a card being dropped into its slot — a genuinely new punch, not merely 'this data changed'. A11y: each card is a `<section aria-labelledby>` pointing at a real `<h3>` holding the person's name, with a plain-text unread count immediately after it ('4 unread bursts' / 'Caught up') so the state is legible without inferring anything from a color or a pixel offset; rows are `<li>` inside a `<ul>`, each holding two real `<time dateTime>` elements, never a styled `<span>` standing in for one; rack re-sorting is a pure reorder of `<section>` elements keyed by collaborator id, so React moves the existing DOM nodes rather than remounting them and focus survives a re-sort for free. Props: `collaborators` (`{id, name, bursts: {id, section, start, end, unread?}[]}[]`), `onMarkCaughtUp`, `ariaLabel` (default 'Catch-up digest'), `className`. prefers-reduced-motion drops the 300ms settle transition and the row-reveal animation entirely — proud/flush and new/existing rows just render in their resting state directly, every control stays fully operable. Pure DOM + CSS + inline `<time>` — no canvas, no SVG. Demo: three collaborators at different proud depths (one two-burst backlog, one single fresh punch, one already caught up) plus a 'Simulate new punch' control that appends a new unread burst and shows the reveal-and-possible-resort together.",
+  "dependencies": []
+}

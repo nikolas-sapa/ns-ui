@@ -1,0 +1,35 @@
+{
+  "name": "running-belay",
+  "title": "Running Belay",
+  "description": "A deploy pipeline drawn as a climbing pitch: stages are protection anchors bolted up a vertical line, the current deploy is the climber-end of a rope clipped through every passed anchor, and rollback is a fall arrest that catches at the last healthy anchor with visible rope stretch.",
+  "collection": "core",
+  "tags": [
+    "deploy",
+    "pipeline",
+    "rollout",
+    "status",
+    "canary",
+    "rollback",
+    "ops",
+    "dashboard",
+    "mono"
+  ],
+  "useWhen": "the status card a team stares at during a rollout, where a rollback needs a visible destination before you commit to it. Health is rope slack rather than a badge, and arrest is a real button that computes and shows exactly which checkpoint it returns to. Distinct from passing-loop (a continuous traffic controller with no notion of a destination) and wizard-canal-lock (a forward-only validation gate with no rollback concept at all) — running-belay's whole contribution is that a rollback has a legible landing point before you need it.",
+  "autoplay": {
+    "mode": "press",
+    "target": "button[data-belay-arrest]",
+    "hold": 500,
+    "period": 5200,
+    "delay": 900
+  },
+  "gate": {
+    "openBy": "button[data-belay-arrest]",
+    "expect": "[data-belay-state=\"arrested\"]"
+  },
+  "instruction": "Build <RunningBelay stages headroom onArrest? ariaLabel? className?> as a vertical climbing pitch. DATA: `stages: {id,label,status,timestamp?}[]` in pipeline order (e.g. build, canary, 10%, 50%, 100%), status one of pending|active|passed|failed; `headroom: number` 0..1, the caller-aggregated canary-health margin. GEOMETRY: one 96px row per stage, a fixed 40px SVG rail on the left carries a vertical line at its centre — a faint --border hairline runs its full length as the permanent conduit; --foreground solid segments overlay it between every pair of ADJACENT passed anchors (the already-clipped chain). Anchors are small circles on that line: filled --foreground when passed, an open --foreground ring when active, plain --border when still pending, and an X (two crossing --foreground strokes, never a color) when failed — status is shape, never hue, matching the rest of the registry's no-color-coding rule. A passed anchor also carries a faint carabiner ring (an ellipse, opacity 0.5) that flashes to full opacity for one 140ms beat the instant that anchor newly becomes passed, then settles back — a one-frame clip, not a celebration. THE LIVE ROPE: from the greatest passed anchor to the current leader position (the active stage, or the furthest passed stage once nothing is active) is drawn as a single quadratic bezier, `M lineX,y0 Q lineX+offset,midY lineX,y1`, where offset = clamp(headroom,0,1) * 24, hard-capped at 28px — past that cap the curve would cross back over its own anchor line and stop reading as clipped through. headroom near 1 reads as visible slack; headroom near 0 pulls the rope visibly taut, legible before any automated abort actually fires. No live segment is drawn once the leader sits exactly on the greatest passed anchor (nothing left to bow). THE LEADER: a small ringed dot translated to the current stage's y with a single CSS transform transition — ease-out-expo (cubic-bezier(0.16,1,0.3,1), 600ms) for ordinary forward advancement between renders, cubic-bezier(0.34,1.56,0.64,1) 700ms (one overshoot-and-settle spring, never a stage-by-stage reverse walk) specifically for an arrest. ARREST: a real <button data-belay-arrest> labeled 'Arrest rollout', disabled only when there is no passed anchor yet to fall back to, carrying aria-describedby pointing at a permanently-mounted sr-only span reading the exact target, e.g. 'Rolls back to 10% cohort, deployed 14:02.' On click the target is computed ONLY as the greatest passed anchor (recorded-healthy) at that instant — this is a fall-arrest catch, not a negotiated multi-step rollback — the leader makes one spring-eased translate straight there (cubic-bezier(0.34,1.56,0.64,1), 700ms), the target anchor gets a one-shot ring flash (500ms), and onArrest(stageId) fires. For that same 700ms a second, dashed rope segment is drawn between the target anchor and wherever the leader fell from, bowed to the identical 28px hard cap as the live rope and fading to transparent over the spring's own duration — the catch shows the rope taking the load, not just a dot relocating with nothing attached to it. The arrest position is a local optimistic override that is released automatically the moment the caller's own `stages` prop independently confirms the deploy is back at that same stage (a real rollback landing), so the component never fights a parent that is the actual source of truth. A repeat press while already arrested at the same target is a harmless no-op replay, not a toggle — arrest has no 'undo' click, matching a real fall-arrest catch. RENDER + A11Y: stages render as a real <ol> (not the SVG) with each stage's name and a 'status · timestamp' line as plain text, aria-current='step' on the stage the leader is currently at — the active/furthest-passed stage at rest, or the arrest's landing anchor once arrested, so the list never goes silent about where the deploy actually is; the rope/anchor SVG is aria-hidden. A permanently-mounted <p aria-live='polite'> (sr-only) announces every stage status change in plain language ('canary is now passed, 13:52.'); a separate <p aria-live='assertive'> (sr-only) announces only the arrest ('Arrested. Rolled back to 10% cohort, deployed 14:02.'). REDUCED MOTION: the leader's transition is removed entirely (teleports to its resting position), the live rope's bow offset is forced to 0 regardless of headroom (always redraws straight), and arrest is instant — the target still gets its one-shot ring flash, which is a single state change, not a repeating animation, so it stays inside prefers-reduced-motion. Every color is var(--background)/var(--foreground)/var(--ns-muted)/var(--border)/var(--ns-accent) — no hex, no rgb()/hsl(), --ns-accent used only for the arrest button's own focus-visible ring, never as a status or health indicator. Pure DOM + SVG + CSS transform transitions, no canvas, no rAF loop. Props: stages, headroom, onArrest(stageId), ariaLabel (default 'Deploy pipeline'), className.",
+  "dependencies": [],
+  "card": {
+    "focus": "[role=group]",
+    "padding": 0.24
+  }
+}

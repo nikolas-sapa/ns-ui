@@ -1,0 +1,31 @@
+{
+  "name": "due-slip",
+  "title": "Due Slip",
+  "description": "A ruled read-receipt card styled as a library date-due slip: the first time each collaborator opens a shared doc, their initials and an HH:MM timestamp stamp into the next free row, so row position alone is reading order — no hover, no collapsing '+N' pile.",
+  "collection": "core",
+  "tags": [
+    "read-receipt",
+    "presence",
+    "list",
+    "ledger",
+    "stamp",
+    "timestamp",
+    "aria-live",
+    "accessibility",
+    "collaboration"
+  ],
+  "useWhen": "a durable, ordered per-person read ledger for a shared doc, spec, or release note — who opened it and when, legible at rest as plain stamped text in fixed row order. Pick avatar-stack-flock instead when the question is who is present right now (an ambient, anonymous, currently-online cluster that's meant to collapse to a count) rather than who has read this and in what order — that record must never depend on hovering to recover identity, which is exactly what due-slip is built to avoid.",
+  "autoplay": {
+    "mode": "press",
+    "target": ".due-slip-autoplay",
+    "hold": 700,
+    "period": 4200,
+    "delay": 700
+  },
+  "gate": {
+    "openBy": "button[aria-expanded]",
+    "expect": ".ns-due-name"
+  },
+  "instruction": "Build a read-receipt ledger styled as a physical library book's date-due slip, not an avatar stack. The component (`DueSlip`) is fully controlled: a single `readers` prop, an array of `{ id, name, initials?, readAt }` in arrival order — index 0 is whoever opened the document first. It holds no ledger state of its own, only transient UI state (which rows are mid press-animation, whether the full-name view is open, the live-region message). MECHANISM: one governing scalar, arrival index (a reader's position in the array), derives every visual on that row — row position is plain document order in a real `<ol>`, and ink alpha eases from 1.0 down to a hard 0.55 floor by the 14th row (`alphaFloorRow`, default 14) so a long ledger's tail stays legible instead of dissolving to nothing. Stamp rotation is seeded independently, from a hash of the reader's `id` and clamped to +/-2.5deg, specifically so re-sorting or filtering the same list never reshuffles a person's tilt — bigger than that clamp would read sloppy, exactly zero would read typeset rather than stamped. Each new arrival (a reader present now but absent from the previous render — the initial mount does NOT animate, those rows are history) plays a 320ms ease-out-expo press-in (`scale` 1.06 -> 1.0, via the CSS individual `scale`/`rotate` properties rather than a compound `transform` string, so the static tilt and the transient press never fight each other) on just its ink chip, nothing else on the row. RULED CARD: a 12px-radius bordered card, 1px `--border` rules between rows (row height a 4px-rhythm multiple), showing up to `visibleRows` (default 6) rows. Once readers exceed that, the primary card's first N rows stay exactly where they are — row position is permanent, chronological, and never reflows — and a second card appears 4px down-and-right behind it, bearing a real integer (`readers.length - visibleRows`), the library-card equivalent of starting a fresh card once the old one is full. That integer is the ONLY thing about the overflowed readers shown outside the full list; it is deliberately not an avatar pile, because a pile's '+N' hides identity behind a hover and collapses exactly when the record is most worth reading — this counter never claims to BE the record, the full ordered list already exists underneath and is one interaction away. EXPAND: the card's title bar is the only focusable control in the whole component (a real accessible-name-bearing button, aria-expanded reflecting state) — activating it (click or Enter/Space) reveals every reader's full name alongside their initials and removes the row cap (the list gets a max-height + scroll instead of growing unbounded). Critically, activating that control only ever OPENS it — it is not a toggle-on-click — and Escape (while it holds focus) is the only way to close it again, so a verifier or user who has already pressed it once before checking the expanded state still finds it open, not flipped back. A11Y: the slip is a real `<ol>`, each reader a real `<li>` whose accessible name reads 'Read by {name}, {HH:MM}' (matching the visible initials + `<time datetime=...>` content), so identity and order are carried entirely by DOM text and structure, never recoverable only through hover. A new arrival's stamp announces once through a polite, visually-hidden live region, phrased the same way. Colors are strictly the five shared tokens (`--background`, `--foreground`, `--ns-muted`, `--border`, `--ns-accent`); `--ns-accent` appears nowhere but the expand control's `:focus-visible` ring — never on a stamp, never as a persistent hover fill. Under `prefers-reduced-motion`, the press spring is stripped outright (belt-and-suspenders: a JS `matchMedia` check plus a CSS media-query fallback) but the row's static rotation and alpha stay, since a fixed tilt is not itself motion — stamps simply render at rest, fully legible, on the very first paint after they arrive. Pure DOM+CSS, zero dependencies, no canvas.",
+  "dependencies": []
+}
