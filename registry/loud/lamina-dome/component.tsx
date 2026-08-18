@@ -100,6 +100,13 @@ const PREWARM_LAMINAE_TARGET = 34;
 const PREWARM_SAFETY_TICKS = 3000;
 const REDUCED_LAMINAE_TARGET = 80;
 const REDUCED_SAFETY_TICKS = 6000;
+// Reduced-motion still needs to keep visibly living, just without a
+// continuous rAF sweep: every REDUCED_LIVE_INTERVAL_MS it runs a short burst
+// of ticks (REDUCED_LIVE_TICKS at TICK_STEP each) and repaints once — a
+// slow, discrete pulse of growth rather than a frozen frame or a smooth
+// per-frame crawl.
+const REDUCED_LIVE_INTERVAL_MS = 2200;
+const REDUCED_LIVE_TICKS = 10;
 
 type RGB = [number, number, number];
 
@@ -408,7 +415,14 @@ export function LaminaDome({
     let last = 0;
     let acc = 0;
     let visible = true;
-    let staticMode = reduced || pausedRef.current;
+    // "paused" (explicit prop) always means a hard freeze. "reduced" no
+    // longer means that: a single static frame that never changes again for
+    // the life of the mount reads as broken, not calm, to anyone who lingers
+    // on it — so reduced motion instead advances the front in slow, discrete
+    // pulses on a plain timeout (never rAF, so there is no continuous
+    // per-frame camera-like motion, which is what the vestibular guard is
+    // actually protecting against) rather than freezing it outright.
+    let reducedTimer = 0;
 
     const loop = (now: number) => {
       const dt = last === 0 ? 1 / 60 : Math.min(0.1, (now - last) / 1000);
@@ -421,7 +435,7 @@ export function LaminaDome({
         ran++;
       }
       if (ran > 0) render();
-      if (visible && !document.hidden && !staticMode) {
+      if (visible && !document.hidden && !reduced && !pausedRef.current) {
         raf = requestAnimationFrame(loop);
       } else {
         raf = 0;
@@ -429,13 +443,28 @@ export function LaminaDome({
     };
 
     const wake = () => {
-      if (raf || staticMode || !visible || document.hidden) return;
+      if (raf || reduced || pausedRef.current || !visible || document.hidden) return;
       last = 0;
       raf = requestAnimationFrame(loop);
     };
     const sleep = () => {
       if (raf) cancelAnimationFrame(raf);
       raf = 0;
+    };
+
+    const reducedPulse = () => {
+      reducedTimer = 0;
+      for (let i = 0; i < REDUCED_LIVE_TICKS; i++) tick(TICK_STEP);
+      render();
+      wakeReduced();
+    };
+    const wakeReduced = () => {
+      if (reducedTimer || !reduced || pausedRef.current || !visible || document.hidden) return;
+      reducedTimer = window.setTimeout(reducedPulse, REDUCED_LIVE_INTERVAL_MS);
+    };
+    const sleepReduced = () => {
+      if (reducedTimer) window.clearTimeout(reducedTimer);
+      reducedTimer = 0;
     };
 
     const ro = new ResizeObserver(resize);
@@ -445,23 +474,40 @@ export function LaminaDome({
     const io = new IntersectionObserver(
       (entries) => {
         visible = entries.some((e) => e.isIntersecting);
-        if (visible) wake();
-        else sleep();
+        if (visible) {
+          wake();
+          wakeReduced();
+        } else {
+          sleep();
+          sleepReduced();
+        }
       },
       { threshold: 0 }
     );
     io.observe(wrap);
 
     const onVis = () => {
-      if (document.hidden) sleep();
-      else wake();
+      if (document.hidden) {
+        sleep();
+        sleepReduced();
+      } else {
+        wake();
+        wakeReduced();
+      }
     };
     document.addEventListener("visibilitychange", onVis);
 
     const applyMode = () => {
-      staticMode = reduced || pausedRef.current;
-      if (staticMode) sleep();
-      else wake();
+      if (pausedRef.current) {
+        sleep();
+        sleepReduced();
+      } else if (reduced) {
+        sleep();
+        wakeReduced();
+      } else {
+        sleepReduced();
+        wake();
+      }
     };
     const onMq = () => {
       reduced = mq.matches;
@@ -493,6 +539,7 @@ export function LaminaDome({
 
     return () => {
       sleep();
+      sleepReduced();
       ro.disconnect();
       io.disconnect();
       themeObserver.disconnect();

@@ -92,7 +92,15 @@ export interface PolypBudProps {
 }
 
 const MAX_NODES = 400;
-const TICK_MS = 60; // round-robin cadence — at 300 only ~8 bud attempts fit in the few seconds a catalog card is actually judged on, most of them on tips already crowded out by the mount-time prewarm; 120 measured only ~2x the resting-state pixel change, still reading as static at card scale
+const TICK_MS = 45; // round-robin cadence — at 300 only ~8 bud attempts fit in the few seconds a catalog card is actually judged on, most of them on tips already crowded out by the mount-time prewarm; 120 measured only ~2x the resting-state pixel change, still reading as static at card scale
+// Owner feedback on the 60ms/1-attempt-per-tick version: "more movement,
+// more wild, fast, too boring/slow". One round-robin decision per tick
+// means only ONE tip anywhere in the colony can bud per 60ms, no matter how
+// many tips are simultaneously exposed — the colony was cadence-starved,
+// not the ray/exposure mechanism itself. Pushing both cadence (TICK_MS) and
+// how much happens per tick (below) is what makes it read as visibly fast
+// and busy rather than one slow trickle of buds.
+const BUDS_PER_TICK = 4;
 const RAY_COUNT = 5;
 const RAY_SPREAD_DEG = 15;
 const RAY_LEN = 46;
@@ -108,6 +116,9 @@ const BLEACH_MAX_MS = 5400;
 const BLEACH_DURATION_MS = 2600;
 const BLEACH_DEATH_PROB = 0.34;
 const REDUCED_MOTION_ATTEMPTS = 600;
+// reduced-motion keep-alive: slow, discrete batches after the initial prewarm
+const REDUCED_LIVE_INTERVAL_MS = 2600;
+const REDUCED_LIVE_BUDS = 3;
 // Same synchronous round-robin the reduced-motion path runs, but shorter, and
 // run in the animated path too: at TICK_MS=300 a cold mount shows five ~15px
 // stubs for the first half-minute, which reads as an empty ornament rather
@@ -258,6 +269,7 @@ export function PolypBud({
     let disposed = false;
     let budTimer: ReturnType<typeof setInterval> | undefined;
     let bleachTimer: ReturnType<typeof setTimeout> | undefined;
+    let reducedTimer: ReturnType<typeof setInterval> | undefined;
     const reduced = prefersReducedMotion();
 
     const inBounds = (x: number, y: number): boolean => {
@@ -411,7 +423,22 @@ export function PolypBud({
           attemptOneBud(true);
         }
         setGen((g) => g + 1);
-        return; // headless: no timers, no bleaching
+        // Reduced motion keeps the fixed light angle and never schedules
+        // bleaching (both unchanged — this is still the same headless
+        // mechanism), but a colony that never buds again after mount reads
+        // as broken, not calm, to anyone who lingers on it. A slow plain
+        // timeout — not a rAF loop, so there's no continuous per-frame
+        // motion — keeps proposing a small batch of buds every few seconds
+        // so the skeleton is still visibly, if slowly, growing.
+        reducedTimer = setInterval(() => {
+          if (disposed || nodesRef.current.length >= MAX_NODES) {
+            if (reducedTimer) clearInterval(reducedTimer);
+            return;
+          }
+          for (let i = 0; i < REDUCED_LIVE_BUDS; i++) attemptOneBud(true);
+          setGen((g) => g + 1);
+        }, REDUCED_LIVE_INTERVAL_MS);
+        return; // headless: no rAF/bud-cadence timer, no bleaching
       }
 
       for (let i = 0; i < PREWARM_ATTEMPTS && nodesRef.current.length < MAX_NODES; i++) {
@@ -420,7 +447,7 @@ export function PolypBud({
 
       budTimer = setInterval(() => {
         if (disposed) return;
-        attemptOneBud(false);
+        for (let i = 0; i < BUDS_PER_TICK; i++) attemptOneBud(false);
         setGen((g) => g + 1);
       }, TICK_MS);
       scheduleBleach();
@@ -453,6 +480,7 @@ export function PolypBud({
       disposed = true;
       if (budTimer) clearInterval(budTimer);
       if (bleachTimer) clearTimeout(bleachTimer);
+      if (reducedTimer) clearInterval(reducedTimer);
       window.clearTimeout(resizeTimer);
       ro.disconnect();
     };

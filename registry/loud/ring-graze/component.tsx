@@ -137,8 +137,12 @@ const SPAWN_ATTEMPTS = 40; // random cells sampled per spawn opportunity
 // cells gave one scalloped edge crossing the whole viewport with no ring
 // readable anywhere.
 const PREWARM_TICKS = 375;
-const REDUCED_SECONDS = 25; // reduced-motion: freeze after this much simulated time, arcs still live — same 4x compression, same resting geometry as before
+const REDUCED_SECONDS = 25; // reduced-motion: prewarm to this much simulated time, arcs still live — same 4x compression, same resting geometry as before
 const REDUCED_TICKS = REDUCED_SECONDS * TICK_HZ;
+// After the prewarm, reduced motion keeps living in slow discrete pulses
+// rather than freezing forever — see reducedPulse() below.
+const REDUCED_LIVE_INTERVAL_MS = 2400;
+const REDUCED_LIVE_TICKS = 6;
 
 const NX = [-1, 0, 1, -1, 1, -1, 0, 1];
 const NY = [-1, -1, -1, 0, 0, 1, 1, 1];
@@ -439,6 +443,43 @@ export function RingGraze({
           data[p + 3] = 255;
         }
       }
+      // PREVIEW BLEND — the discrete dilation in growOnce() only fires once
+      // growthBudget banks a whole cell (~every 1.4s at FRONT_SPEED), so
+      // without this the front edge held dead still between steps and then
+      // popped a whole cellSize outward in one frame — reads as a stepped
+      // jump, not growth. This paints the cells the NEXT growOnce() call
+      // would claim (same alternating von-Neumann/Moore kernel, same S >
+      // ADVANCE_THRESHOLD test, read-only — nothing here mutates S or the
+      // ring's actual front) at partial opacity equal to the banked
+      // fraction of growthBudget, so the edge visibly brightens/advances
+      // continuously across the ~1.4s between real claims instead of
+      // sitting frozen and popping. Purely cosmetic: the falsifiable
+      // claim/no-self-recrossing mechanism is untouched, this only softens
+      // how the same discrete steps get painted.
+      const previewAlpha = Math.max(0, Math.min(1, growthBudget));
+      if (previewAlpha > 0.01) {
+        const kMaxPreview = (growStep + 1) % 2 === 0 ? 8 : 4;
+        for (let r = 0; r < ringPool.length; r++) {
+          const ring = ringPool[r]!;
+          if (!ring.alive) continue;
+          for (let ci = 0; ci < ring.front.length; ci++) {
+            const i = ring.front[ci]!;
+            const x = i % cols;
+            const y = (i / cols) | 0;
+            for (let k = 0; k < kMaxPreview; k++) {
+              const nx = x + (kMaxPreview === 8 ? NX[k]! : N4X[k]!);
+              const ny = y + (kMaxPreview === 8 ? NY[k]! : N4Y[k]!);
+              if (nx < 0 || ny < 0 || nx >= cols || ny >= rows) continue;
+              const ni = ny * cols + nx;
+              if (S[ni]! <= ADVANCE_THRESHOLD) continue;
+              const p = ni * 4;
+              data[p] = Math.round(data[p]! + (fg[0] - data[p]!) * previewAlpha);
+              data[p + 1] = Math.round(data[p + 1]! + (fg[1] - data[p + 1]!) * previewAlpha);
+              data[p + 2] = Math.round(data[p + 2]! + (fg[2] - data[p + 2]!) * previewAlpha);
+            }
+          }
+        }
+      }
       offCtx.putImageData(img, 0, 0);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.imageSmoothingEnabled = true;
@@ -513,7 +554,12 @@ export function RingGraze({
     let last = 0;
     let acc = 0;
     let visible = true;
-    let staticMode = reduced || pausedRef.current;
+    // "paused" (explicit prop) is a hard freeze. "reduced" is not — a field
+    // that never changes again for the life of the mount reads as broken,
+    // not calm. Reduced motion instead advances via a slow plain-timeout
+    // pulse (never rAF, so there's no continuous per-frame motion) rather
+    // than freezing outright, same treatment as lamina-dome/cambium-lay.
+    let reducedTimer = 0;
 
     const loop = (now: number) => {
       const dt = last === 0 ? 1 / 60 : Math.min(0.1, (now - last) / 1000);
@@ -526,7 +572,7 @@ export function RingGraze({
         ran++;
       }
       if (ran > 0) render();
-      if (visible && !document.hidden && !staticMode) {
+      if (visible && !document.hidden && !reduced && !pausedRef.current) {
         raf = requestAnimationFrame(loop);
       } else {
         raf = 0;
@@ -534,13 +580,28 @@ export function RingGraze({
     };
 
     const wake = () => {
-      if (raf || staticMode || !visible || document.hidden) return;
+      if (raf || reduced || pausedRef.current || !visible || document.hidden) return;
       last = 0;
       raf = requestAnimationFrame(loop);
     };
     const sleep = () => {
       if (raf) cancelAnimationFrame(raf);
       raf = 0;
+    };
+
+    const reducedPulse = () => {
+      reducedTimer = 0;
+      for (let i = 0; i < REDUCED_LIVE_TICKS; i++) tick();
+      render();
+      wakeReduced();
+    };
+    const wakeReduced = () => {
+      if (reducedTimer || !reduced || pausedRef.current || !visible || document.hidden) return;
+      reducedTimer = window.setTimeout(reducedPulse, REDUCED_LIVE_INTERVAL_MS);
+    };
+    const sleepReduced = () => {
+      if (reducedTimer) window.clearTimeout(reducedTimer);
+      reducedTimer = 0;
     };
 
     const ro = new ResizeObserver(resize);
@@ -550,16 +611,26 @@ export function RingGraze({
     const io = new IntersectionObserver(
       (entries) => {
         visible = entries.some((e) => e.isIntersecting);
-        if (visible) wake();
-        else sleep();
+        if (visible) {
+          wake();
+          wakeReduced();
+        } else {
+          sleep();
+          sleepReduced();
+        }
       },
       { threshold: 0 }
     );
     io.observe(wrap);
 
     const onVis = () => {
-      if (document.hidden) sleep();
-      else wake();
+      if (document.hidden) {
+        sleep();
+        sleepReduced();
+      } else {
+        wake();
+        wakeReduced();
+      }
     };
     document.addEventListener("visibilitychange", onVis);
 
@@ -567,9 +638,16 @@ export function RingGraze({
     // seen at mount; a LIVE flip just freezes/resumes wherever the field
     // currently is, same as toggling `paused`
     const applyMode = () => {
-      staticMode = reduced || pausedRef.current;
-      if (staticMode) sleep();
-      else wake();
+      if (pausedRef.current) {
+        sleep();
+        sleepReduced();
+      } else if (reduced) {
+        sleep();
+        wakeReduced();
+      } else {
+        sleepReduced();
+        wake();
+      }
     };
     const onMq = () => {
       reduced = mq.matches;
@@ -601,6 +679,7 @@ export function RingGraze({
 
     return () => {
       sleep();
+      sleepReduced();
       ro.disconnect();
       io.disconnect();
       themeObserver.disconnect();

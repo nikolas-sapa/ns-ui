@@ -39,7 +39,7 @@ const TICK_MS = 1000 / 30; // fixed 30Hz physics step
 const R0 = 3; // meristem birth radius, px
 const NEIGHBOR_WINDOW = 10; // +-N birth-order slots searched for spatial neighbours
 const NEIGHBOR_COUNT = 4; // 4-neighbour soft repulsion
-const DESIRED_SPACING = 4; // px — matches the render quantisation base
+const DESIRED_SPACING = 4; // px — the repulsion pass's target inter-floret spacing
 const REPEL_STRENGTH = 0.9;
 const MAX_STEP_PX = 0.3; // capped displacement per 30Hz tick
 const RIM_FADE_START = 0.85; // senescence band: last 15% of the radial lifetime
@@ -186,11 +186,21 @@ export function FloretPack({ children, plastochron = 1400, maxPrimordia = 700, c
         const age = Math.max(0, simAge - (bornAt[slot] ?? 0));
         const m = Math.min(1, age / lifetimeMs);
         maturity[slot] = m;
+        // Continuous, not quantised: rounding this to a 4px grid (the old
+        // behaviour) reads as fine-grained packing structure once you're
+        // comparing sampled positions, but every floret's radius crosses a
+        // 4px boundary at a different moment and pops there instantly — with
+        // the accumulator fix elsewhere in this file actually running
+        // physics at its intended ~30Hz (it previously fired only a handful
+        // of times in 3s, which buried this), those pops became frequent
+        // enough to read as the whole field stuttering rather than smooth
+        // outward advection. The repulsion pass below still enforces
+        // DESIRED_SPACING in continuous space, so the parastichy packing is
+        // unaffected — only the render position stops jumping.
         const rBase = Math.sqrt(R0 * R0 + 2 * growthK * age);
-        const rQ = Math.round(rBase / 4) * 4;
         const t = theta[slot] ?? 0;
-        posX[slot] = cx + rQ * Math.cos(t) + (ox[slot] ?? 0);
-        posY[slot] = cy + rQ * Math.sin(t) + (oy[slot] ?? 0);
+        posX[slot] = cx + rBase * Math.cos(t) + (ox[slot] ?? 0);
+        posY[slot] = cy + rBase * Math.sin(t) + (oy[slot] ?? 0);
       }
     };
 

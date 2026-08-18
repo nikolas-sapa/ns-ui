@@ -121,6 +121,14 @@ const CAP_YEARS_DEFAULT = 64;
 const INITIAL_YEARS = 14; // seeded age on a first-ever mount, so it never opens on a bare dot
 const REDUCED_RINGS = 40;
 const TICK_MS = 333; // ~3 attribute writes/sec
+// reduced-motion still needs to be honest that this is a living illustration
+// — a single static frame that never changes again reads as broken, not
+// calm. Every REDUCED_RING_INTERVAL_MS it commits exactly one more whole
+// ring (a discrete pop, not an interpolated sweep — no continuous per-frame
+// boundary motion, which is what the vestibular guard is actually about),
+// so a viewer who lingers on the card for a few seconds sees the tree
+// genuinely still growing, just slowly and step-wise instead of smoothly.
+const REDUCED_RING_INTERVAL_MS = 2200;
 
 const THETAS = Array.from({ length: N_SPOKES }, (_, i) => (i / N_SPOKES) * TWO_PI);
 const COS = THETAS.map(Math.cos);
@@ -273,9 +281,24 @@ export function CambiumLay({
     const ctx = buildCtx(safeMaxYears);
 
     if (reduced) {
-      const { rings: pre } = simulateYears(Math.min(REDUCED_RINGS, safeMaxYears), ctx);
+      let n = Math.min(REDUCED_RINGS, safeMaxYears);
+      const { rings: pre, start: preStart } = simulateYears(n, ctx);
       setRings(pre);
-      return;
+      if (n >= safeMaxYears) return; // already fully grown at this cap — genuinely nothing left to show
+
+      let start = preStart;
+      const id = window.setInterval(() => {
+        if (n >= safeMaxYears) {
+          window.clearInterval(id);
+          return;
+        }
+        const g = growYear(n, start, ctx);
+        const ring = buildRingPaths(start, g.earlyEnd, g.final);
+        start = g.final;
+        n += 1;
+        setRings((prev) => prev.concat([ring]));
+      }, REDUCED_RING_INTERVAL_MS);
+      return () => window.clearInterval(id);
     }
 
     const capMs = safeMaxYears * yearMs;
