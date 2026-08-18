@@ -50,11 +50,14 @@ const MAX_RING_WIDTH = 14;
 // the divisor alone.
 const DELTA_TO_PX = 25;
 const PADDING_MIN = 14;
-// The disc rotates 8deg about its own bottom tangent to open the "discard"
-// flap, which pushes its rightmost point out by roughly sin(8deg) (~13.9%)
-// of the outer radius. A fixed pixel padding runs out once the ring stack
-// gets big enough — a proportional floor keeps the swing inside the
-// viewBox no matter how many versions or how wide their rings get.
+// The discard flap tilts open about its own bottom tangent via a 3D
+// rotateX fold (see the "discarded" group below), not a flat in-plane
+// rotate — a flat rotate of a full closed ring just produces a second,
+// off-center ring, which is the actual bug this was chasing. The fold's
+// foreshortening still pushes the far edge outward a bit. A fixed pixel
+// padding runs out once the ring stack gets big enough — a proportional
+// floor keeps the swing inside the viewBox no matter how many versions or
+// how wide their rings get.
 const HINGE_CLEARANCE_RATIO = 0.2;
 const HINGE_DEG = 8;
 
@@ -329,7 +332,19 @@ export function GrowthRing({
               className="ns-growth-outer"
               style={{
                 transformOrigin: `${hingeX}px ${hingeY}px`,
-                transform: `rotate(${HINGE_DEG}deg)`,
+                // A flat in-plane rotate() here was the actual bug: these
+                // are full closed rings, and rotating a closed circle about
+                // a point on its own rim in 2D just produces a second,
+                // same-radius circle with a *different center* — it reads
+                // as "misaligned," not "hinged open," because there's no
+                // such thing as a partial-arc 2D rotation of a full ring
+                // that stays concentric. A hinge that lifts away from the
+                // viewer needs the Z axis: rotateX about the hinge line
+                // keeps the near (bottom) edge anchored to the kept rings
+                // and tilts the far edge back/up with real foreshortening,
+                // which is what "opening like a lid" actually looks like.
+                transform: `perspective(560px) rotateX(-${HINGE_DEG}deg)`,
+                transformStyle: "preserve-3d",
                 opacity: 0.4,
               }}
             >

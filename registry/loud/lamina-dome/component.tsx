@@ -64,7 +64,7 @@ import { useEffect, useRef } from "react";
 // then paints that one static banded field and never schedules a rAF.
 // ---------------------------------------------------------------------------
 
-const TICK_HZ = 8;
+const TICK_HZ = 12; // was 8 — a slower tick made the per-frame occlusion shift too small to read as travel, not just a smoothness issue
 const TICK_STEP = 1 / TICK_HZ;
 const MAX_TICKS_PER_FRAME = 6;
 
@@ -74,13 +74,22 @@ const K_RAYS = 5; // samples across the cone
 
 const SURFACE_TENSION = 0.2; // fixed — see header comment on the 0.1/0.4 bounds
 
+// LIGHT DIRECTION is a single parallel-ray angle shared by every column, so
+// swinging it doesn't move a beam laterally across the field — what it does
+// is shift where each tall column's cast shadow lands, since a ray's
+// horizontal reach is `rise * tan(angle)`. As the angle rocks, that shadow
+// boundary next to every peak visibly slides sideways across its shorter
+// neighbours — a real, physically-grounded traveling occlusion edge, not a
+// decorative overlay. At the old 90s period that slide covered a few px
+// over a whole minute, invisible within the few seconds a card is judged
+// on; at 6s it completes most of a swing within one glance.
 const LIGHT_BASE_DEG = -18; // steady lean ("palaeo-north")
-const LIGHT_ARC_DEG = 12; // slow swing amplitude on top of the lean
-const LIGHT_ARC_PERIOD_S = 90;
+const LIGHT_ARC_DEG = 22; // was 12 — bigger swing, bigger visible shadow travel
+const LIGHT_ARC_PERIOD_S = 6; // was 90
 const MAX_LIGHT_DEG = 80; // clamp so tan() never blows up
 
 const SEA_AMPL = 26; // raw height units
-const SEA_PERIOD_S = 55;
+const SEA_PERIOD_S = 14; // was 55 — the drown/wake pulse now completes fast enough to read as motion, not a fixed backdrop
 const SEA_CHASE = 0.01; // per-tick lerp of sea center toward mean height
 const DROWN_FACTOR = 0.12;
 
@@ -161,7 +170,7 @@ export interface LaminaDomeProps {
 
 export function LaminaDome({
   coneHalfAngleDeg = 30,
-  growthRate = 10, // was 5 — the resting-state deposit per tick read as near-static within a few seconds of a catalog card glance
+  growthRate = 16, // was 10 — still read as "bigger" rather than "moving" at 10; the faster rise plus the sped-up light/sea cycles below make the front's travel legible within a card-scale glance
   speed = 1,
   paused = false,
   children,

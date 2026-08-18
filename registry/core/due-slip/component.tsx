@@ -185,8 +185,13 @@ export function DueSlip({
         <button
           type="button"
           className="ns-due-trigger"
+          data-expanded={expanded || undefined}
           aria-expanded={expanded}
-          aria-label={`Expand ${label} to show full names`}
+          aria-label={
+            expanded
+              ? `${label} expanded — press Escape to collapse`
+              : `Expand ${label} to show full names`
+          }
           onClick={() => setExpanded(true)}
           onKeyDown={(e) => {
             if (e.key === "Escape" && expanded) {
@@ -197,7 +202,21 @@ export function DueSlip({
           }}
         >
           <span className="ns-due-trigger-title">{label}</span>
-          <ChevronGlyph expanded={expanded} />
+          {/* Opening is one-way by click — activating this control again
+              while already expanded is a no-op, only Escape closes it (see
+              the keydown handler above). That's deliberate: a real reader
+              scanning full names shouldn't have their view yanked shut by a
+              stray re-click. Once expanded, swap the affordance itself so
+              the control stops reading as a broken toggle: the hint spells
+              out the real close path and the chevron freezes instead of
+              inviting another click. */}
+          {expanded ? (
+            <span className="ns-due-trigger-hint" aria-hidden="true">
+              Esc to collapse
+            </span>
+          ) : (
+            <ChevronGlyph expanded={expanded} />
+          )}
         </button>
 
         <ol role="list" aria-label={label} className="ns-due-rows" data-scroll={expanded || undefined}>
@@ -252,6 +271,9 @@ export function DueSlip({
 .ns-due-trigger{display:flex;width:100%;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border:none;border-bottom:1px solid var(--border);background:transparent;color:var(--foreground);font-family:var(--font-mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;outline:none;transition:background-color 150ms ease-out}
 .ns-due-trigger:hover{background:color-mix(in srgb, var(--foreground) 5%, transparent)}
 .ns-due-trigger:focus-visible{outline:2px solid var(--ns-accent);outline-offset:-2px;border-radius:6px}
+.ns-due-trigger[data-expanded]{cursor:default}
+.ns-due-trigger[data-expanded]:hover{background:transparent}
+.ns-due-trigger-hint{flex-shrink:0;font-family:var(--font-mono);font-size:10px;letter-spacing:0.04em;text-transform:none;color:var(--ns-muted)}
 .ns-due-chevron{color:var(--ns-muted);transition:transform 180ms cubic-bezier(0.22,1,0.36,1)}
 .ns-due-chevron[data-expanded="true"]{transform:rotate(90deg)}
 .ns-due-rows{list-style:none;margin:0;padding:0}

@@ -29,7 +29,17 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 // rather than coming off it. Depth-darkening reads off the *unshifted* rawY,
 // so a lifted refund reads brighter (less "handled"), and z-index is
 // `constant - rawY`, so whichever card ends up highest on the spine wins
-// the stack order for free, refunded or not.
+// the stack order for free, refunded or not — EXCEPT that REFUND_LIFT is
+// deliberately an exact multiple of CARD_GAP (see below), so a refunded
+// card's rawY can exactly equal a settled card's rawY, and once it does it
+// STAYS equal every press after (both age by the same CARD_GAP per settle,
+// nothing resolves the tie on its own). Two cards genuinely sharing a
+// z-index falls back to paint order, i.e. whichever <li> is later in the
+// DOM — arbitrary from the model's point of view, and it is what let a
+// refunded card sit permanently hidden behind a same-z settled card for
+// several presses in a row, reading as "the refund did nothing" even
+// though rawY says it should be frontmost. zIndex below breaks that tie
+// explicitly, in the refund's favor, instead of leaving it to paint order.
 //
 // Fully controlled: `transactions` is the only data in, in caller-supplied
 // chronological order (oldest first) — that is also the <li> DOM order,
@@ -79,9 +89,12 @@ export interface SpindleStrikeProps {
 
 const CARD_GAP = 8; // px the stack shoves per settled receipt — the one shared scalar step
 const REFUND_LIFT = 6 * CARD_GAP; // px an existing card is pulled back up the spine on refund —
-// kept as an exact multiple of CARD_GAP (not a literal) so a refund six settles back always ties
-// the very next new arrival's rawY regardless of CARD_GAP's value, which is what lets that new
-// card win z-order on the first "Settle a payment" press rather than several dead-looking ones.
+// kept as an exact multiple of CARD_GAP (not a literal) so a refund six settles back reaches the
+// same rawY as the settled card born 6 presses later, rather than staying permanently deeper (and
+// permanently z-behind) than every new arrival, which is what made refund reads look inert on the
+// first pass. Because it's an exact multiple, that rawY match is an exact tie, and because both
+// cards age by the same CARD_GAP every subsequent settle, the tie does not resolve itself — it
+// holds for as long as both cards share the pile. Z_TIE_BREAK below (not paint order) decides it.
 const MAX_DARK_DEPTH = 14 * CARD_GAP; // px of rawY at which the darken ramp maxes out — scales
 // with CARD_GAP so the same ~14-receipt pile depth still spans the full ramp instead of pegging
 // every card past the fourth or fifth at max darkness.
@@ -92,6 +105,13 @@ const ENTER_DROP_REDUCED = 14; // px equivalent under prefers-reduced-motion: re
 // small-amplitude offset (not zero) so a press still visibly moves rather than snapping silently.
 const CARD_WIDTH = 216;
 const CARD_HEIGHT = 88; // reserved layout height per card, top-of-stack
+const Z_SCALE = 100; // multiplies every real (3000 - rawY) gap before the tie-break is added, so
+// Z_TIE_BREAK can never leak into ordering two cards whose rawY actually differs (the smallest
+// real gap is one CARD_GAP, i.e. >=800 once scaled — comfortably clear of a +/-1 nudge).
+const Z_TIE_BREAK = 1; // an exact rawY tie (REFUND_LIFT lands a refunded card on a settled card's
+// slot) is resolved in the refund's favor, explicitly, instead of falling through to paint/DOM
+// order — which is what let a refunded card sit invisibly behind a same-depth settled card.
+const Z_LIFTED = 10_000_000; // focus-lift always wins regardless of the scaled range above
 
 function hashRotation(id: string): number {
   let h = 0;
@@ -264,7 +284,9 @@ export function SpindleStrike({
           const y = (entering ? restY - enterOffset : restY) - (lifted ? 2 : 0);
           const rot = hashRotation(t.id);
           const darkPct = (clamp(rawY, 0, MAX_DARK_DEPTH) / MAX_DARK_DEPTH) * MAX_DARK_PCT;
-          const zIndex = lifted ? 6000 : Math.round(3000 - rawY);
+          const zIndex = lifted
+            ? Z_LIFTED
+            : Math.round(3000 - rawY) * Z_SCALE + (refunded ? Z_TIE_BREAK : 0);
           const returned = t.refundedAmount ?? t.amount;
           const statusText = refunded ? `Refunded, $${returned.toFixed(2)} returned` : "Settled";
           const label = `${t.date}, $${t.amount.toFixed(2)}, ${statusText}`;

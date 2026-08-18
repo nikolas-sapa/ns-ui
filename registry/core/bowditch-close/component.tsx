@@ -67,7 +67,8 @@ export interface BowditchCloseProps {
 type Phase = "drawing" | "unbalanced" | "balancing" | "balanced";
 
 const CLOSE_RADIUS = 22; // px — how near vertex 0 a click must land to become the closing vertex
-const VERTEX_R = 6; // 12px circle
+const VERTEX_R = 6; // 12px circle, visible dot size
+const VERTEX_HIT_R = 12; // 24px invisible hit area, centered on the same point
 const SPRING_K = 230;
 const SPRING_ZETA = 0.9; // just under critical — one small overshoot, like a drawstring taking up the last of the slack
 const SPRING_C = 2 * SPRING_ZETA * Math.sqrt(SPRING_K);
@@ -391,7 +392,14 @@ export function BowditchClose({
           ) : null}
         </svg>
 
-        <div className="absolute inset-0">
+        {/* pointer-events-none: this wrapper spans the full canvas so its
+            children can be absolutely positioned at each vertex, but an
+            empty positioned div still counts as a hit-test target for its
+            whole box in Chrome/Safari even with nothing painted in it — left
+            at the default (auto) it silently ate every click meant for the
+            SVG's onCanvasClick rect underneath, so drawing-phase clicks never
+            placed a vertex. Re-enabled per-button below. */}
+        <div className="pointer-events-none absolute inset-0">
           {pts.map((p, i) => (
             <button
               key={i}
@@ -403,14 +411,22 @@ export function BowditchClose({
               disabled={phase === "balancing"}
               onKeyDown={(e) => onVertexKeyDown(i, e)}
               aria-label={`Vertex ${i + 1} of ${pts.length}${i === pts.length - 1 && phase === "unbalanced" ? ", misclosure point" : ""}`}
-              className="absolute rounded-full border border-border bg-background transition-colors duration-150 hover:border-ns-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
+              className="group pointer-events-auto absolute flex items-center justify-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
               style={{
-                left: p.x - VERTEX_R,
-                top: p.y - VERTEX_R,
-                width: VERTEX_R * 2,
-                height: VERTEX_R * 2,
+                left: p.x - VERTEX_HIT_R,
+                top: p.y - VERTEX_HIT_R,
+                width: VERTEX_HIT_R * 2,
+                height: VERTEX_HIT_R * 2,
               }}
-            />
+            >
+              {/* visible dot stays VERTEX_R; the button itself widens the hit
+                  area to VERTEX_HIT_R without changing what's drawn */}
+              <span
+                aria-hidden
+                className="rounded-full border border-border bg-background transition-colors duration-150 group-hover:border-ns-muted"
+                style={{ width: VERTEX_R * 2, height: VERTEX_R * 2 }}
+              />
+            </button>
           ))}
         </div>
       </div>

@@ -56,16 +56,23 @@ const LABEL_H = 26;
 const CARET_BOTTOM_GAP = 14;
 const STACK_GAP = 32;
 
-const MAX_OFFSET = 48;
+const MAX_OFFSET = 72;
 const DECAY_MS = 1400;
 const BASE_FIELD = 1;
 const TYPING_MULT = 3;
+// Hovering a label is this component's own way of asking "let me read that
+// one" — it feeds the same field-strength mechanism typing does (so the
+// separation is real physics, not a tooltip layer), decaying back on the
+// same curve once the pointer leaves so it settles rather than snapping.
+const HOVER_MULT = 5;
 const SPRING_K = 46; // s^-2
 const SPRING_ZETA = 0.85;
 // Chosen so two idle (F=1) labels ~50px apart settle a few px off anchor,
-// and a typing (F=3x) neighbour pushes that toward the clamp: at
-// equilibrium offset ~= REPULSE_K * Fi*Fj / (SPRING_K * d^2).
-const REPULSE_K = 1_200_000;
+// and a typing/hovered (F=3x) neighbour pushes that toward the clamp: at
+// equilibrium offset ~= REPULSE_K * Fi*Fj / (SPRING_K * d^2). Raised
+// alongside MAX_OFFSET so a crowded band of 4 long names can actually clear
+// each other at full field strength instead of clamping short of it.
+const REPULSE_K = 2_000_000;
 const MIN_D = 24; // px, floor on pairwise distance so near-overlap can't slam the clamp in one tick
 const MAX_VEL = 900; // px/s
 const TICK_MS = 1000 / 30; // 30fps throttle
@@ -91,6 +98,10 @@ export function PoleShy({ users, className = "" }: PoleShyProps) {
   const [reducedMotion, setReducedMotion] = useState(false);
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [announcement, setAnnouncement] = useState("");
+  // Which label is currently under the pointer — the only thing this drives
+  // is field strength (below) and paint order (so the revealed label draws
+  // over its neighbours instead of losing a coin-flip on DOM order).
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const widthRef = useRef(0);
@@ -98,6 +109,9 @@ export function PoleShy({ users, className = "" }: PoleShyProps) {
   const leaderRefs = useRef<Map<string, SVGLineElement>>(new Map());
   const physicsRef = useRef<Map<string, LabelPhysics>>(new Map());
   const lastTypingAtRef = useRef<Map<string, number>>(new Map());
+  const lastHoverAtRef = useRef<Map<string, number>>(new Map());
+  const hoveredIdRef = useRef<string | null>(null);
+  hoveredIdRef.current = hoveredId;
   const usersRef = useRef<PoleShyUser[]>(users);
   usersRef.current = users;
 
@@ -188,6 +202,10 @@ export function PoleShy({ users, className = "" }: PoleShyProps) {
     for (const id of lastTypingAtRef.current.keys()) {
       if (!ids.has(id)) lastTypingAtRef.current.delete(id);
     }
+    for (const id of lastHoverAtRef.current.keys()) {
+      if (!ids.has(id)) lastHoverAtRef.current.delete(id);
+    }
+    setHoveredId((h) => (h && !ids.has(h) ? null : h));
   }, [users]);
 
   // ---- physics loop (skipped entirely under reduced motion) --------------
@@ -247,14 +265,25 @@ export function PoleShy({ users, className = "" }: PoleShyProps) {
         }
 
         // Field strength per member: 3x base the instant `typing` is true,
-        // decaying back toward 1x base over DECAY_MS of not typing.
+        // decaying back toward 1x base over DECAY_MS of not typing. Hovering
+        // a label drives the same field through its own independent decay,
+        // so "let me read that one" uses the identical repulsion mechanism
+        // as "I'm typing here" rather than a second, unrelated affordance.
         const field = new Map<string, number>();
+        const hovered = hoveredIdRef.current;
         for (const u of members) {
           const lastTyping = lastTypingAtRef.current.get(u.id) ?? -Infinity;
           if (u.typing) lastTypingAtRef.current.set(u.id, now);
-          const idle = u.typing ? 0 : now - lastTyping;
-          const mult = 1 + (TYPING_MULT - 1) * Math.exp(-idle / DECAY_MS);
-          field.set(u.id, BASE_FIELD * mult);
+          const typingIdle = u.typing ? 0 : now - lastTyping;
+          const typingMult = 1 + (TYPING_MULT - 1) * Math.exp(-typingIdle / DECAY_MS);
+
+          const isHovered = u.id === hovered;
+          const lastHover = lastHoverAtRef.current.get(u.id) ?? -Infinity;
+          if (isHovered) lastHoverAtRef.current.set(u.id, now);
+          const hoverIdle = isHovered ? 0 : now - lastHover;
+          const hoverMult = 1 + (HOVER_MULT - 1) * Math.exp(-hoverIdle / DECAY_MS);
+
+          field.set(u.id, BASE_FIELD * Math.max(typingMult, hoverMult));
         }
 
         for (const u of members) {
@@ -376,6 +405,7 @@ export function PoleShy({ users, className = "" }: PoleShyProps) {
         const top = stacked
           ? rowTop(u.row) + LABEL_TOP_IN_ROW + info!.stackIndex * STACK_GAP
           : rowTop(u.row) + LABEL_TOP_IN_ROW;
+        const isHovered = u.id === hoveredId;
         return (
           <div
             key={u.id}
@@ -384,11 +414,20 @@ export function PoleShy({ users, className = "" }: PoleShyProps) {
               else labelRefs.current.delete(u.id);
             }}
             className="absolute flex items-center gap-1.5 rounded-full border border-border bg-background px-2 py-1 shadow-sm"
+            onMouseEnter={() => setHoveredId(u.id)}
+            onMouseLeave={() => setHoveredId((h) => (h === u.id ? null : h))}
             style={{
               left: `${u.x * 100}%`,
               top,
               transform: "translateX(-50%)",
               whiteSpace: "nowrap",
+              // Hovering is this component's own reveal mechanism (stronger
+              // field -> neighbours yield further, see the physics loop
+              // above) — pulling the hovered chip's paint order above its
+              // crowded neighbours is the other half: without it the label
+              // could still lose an arbitrary DOM-order coin-flip against
+              // an un-hovered sibling sitting closer to its own anchor.
+              zIndex: isHovered ? 10 : 1,
             }}
           >
             <span className="rounded-full border border-border px-1 font-mono text-[9px] leading-[14px] text-ns-muted">
