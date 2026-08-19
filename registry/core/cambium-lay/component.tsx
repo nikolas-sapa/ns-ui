@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 // ---------------------------------------------------------------------------
 // CambiumLay — a tree cross-section accreting live in SVG. A 96-spoke
@@ -13,16 +13,15 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 // that year's radial width, latewood the remaining ~30%, because equal
 // halves would read as two soft bands instead of one ring closing on a dense
 // line. At the moment a year completes, its two boundary curves (start →
-// earlywood-end → final) are committed as static DOM — two <path>s, smoothed
-// through the 96 spokes with a closed Catmull-Rom curve — and never touched
-// again as GEOMETRY: `d` is written once, at commit, and never again for that
-// ring. Only the CURRENT, still-forming annulus mutates its `d`, one write per
-// tick, ~8 ticks a second. Every already-laid ring DOES still carry a slow CSS
-// opacity shimmer (a per-ring `animation-delay`, no per-frame JS, no `d`
-// writes) so the interior of the section reads as alive rather than inert —
-// this is a deliberate legibility affordance, not a physical claim: a real
-// cambium's earlier rings do not move once laid. See the CSS block below for
-// the honest accounting of what that is and why.
+// earlywood-end → final) are committed as the RADII record — a Float64Array
+// per boundary, pushed once into `boundariesRef` and never touched again as
+// DATA. That record is the accretion history and is what "committed" means
+// here; it is not the same claim as "the rendered `d` never changes again"
+// (see INTERIOR UNDULATION below, which is a fifth-pass correction of an
+// earlier version of this file that conflated the two and shipped an opacity
+// shimmer instead of real displacement). Only the CURRENT, still-forming
+// annulus mutates its own `d` independent of the interior loop, one write
+// per tick, ~8 ticks a second.
 //
 // Two long-lived deformations ride on top of the per-year budget, both
 // expressed as a per-spoke multiplier on that spoke's share of the year's
@@ -180,8 +179,52 @@ const REDUCED_RING_INTERVAL_MS = 2200;
 //                   any path's geometry at all.
 const MOTION: "front-bulge" | "wavy-rings" | "pulse-sweep" = "wavy-rings";
 const WAVE_AMPL = 0.75; // "wavy-rings" only — +/- fraction of that year's radial budget
-const WAVE_HARMONIC = 5; // "wavy-rings" only — wave crests per full revolution
+const WAVE_HARMONIC = 5; // "wavy-rings" only — wave crests per full revolution; also reused as the interior undulation's harmonic (below) so both waves read as the same physical texture
 const WAVE_PHASE_PER_YEAR = Math.PI * 0.6; // "wavy-rings" only — phase advance per virtual year, what makes the wave read as travelling ring to ring
+
+// --- INTERIOR UNDULATION (fifth pass — supersedes the opacity shimmer) ----
+// "wavy-rings" above bakes a spatial wave into each ring's geometry AT
+// COMMIT and never touches it again — that alone does not read as "the
+// inside is moving" because a static wavy shape is still a still frame.
+// This is a SEPARATE, per-frame effect: every committed boundary's radii
+// (the immutable accretion record in `boundariesRef`) get a small
+// additional sinusoidal offset, recomputed every animation frame, so the
+// interior rings genuinely displace — real geometry motion, not a
+// brightness change. Same harmonic as "wavy-rings" (reads as one texture,
+// not two competing effects), phase-shifted by BOUNDARY INDEX (not just
+// ring index — a boundary is shared between the ring inside it and the
+// ring outside it, so indexing by boundary is what keeps adjacent rings
+// seamless) and rotated by wall-clock time, so a wave crest at a fixed
+// angle visibly migrates from outer boundaries toward the pith as time
+// advances — same "rim -> pith" direction as the opacity shimmer it
+// replaces, now as literal displacement instead of a brightness delta.
+// The per-boundary phase STEP is kept small on purpose: absolute amplitude
+// and the differential between adjacent boundaries are different knobs —
+// a small step keeps neighbouring boundaries moving nearly in lockstep
+// (no self-intersecting annulus) while the *stack* still swings by the
+// full amplitude, and it's what makes the inward crest-migration read
+// dominate over in-place rotation (crest travels across boundary indices
+// much faster than the θ-rotation term shifts the wave azimuthally).
+// A monotonic clamp is applied outward-to-inward-first (see
+// `displaceBoundaries`) as a hard guarantee against inversion regardless
+// of amplitude tuning: every boundary's displaced radius is forced to stay
+// at least MIN_GAP past its inward neighbour's, per spoke. Amplitude ramps
+// to 0 over the outermost few boundaries so the newest committed boundary
+// — shared with the still-forming live front, which this loop does not
+// touch — never develops a seam.
+// Gated on `!reduced`: prefers-reduced-motion keeps the existing discrete
+// ring-commit progression (a pop, not a continuous sweep) as its motion —
+// see the REDUCED_RING_INTERVAL_MS comment above ("no continuous per-frame
+// boundary motion, which is what the vestibular guard is actually about").
+// Adding a continuous undulation on top of that would be exactly the thing
+// that comment argues against, so under reduced motion the interior stays
+// genuinely static between ring-commit pops.
+const INTERIOR_WAVE_AMPL = 3.2; // viewBox units, absolute — the whole stack's peak radial swing
+const INTERIOR_WAVE_PHASE_STEP = 0.11; // rad per boundary index — kept small so adjacent boundaries stay coherent
+const INTERIOR_WAVE_OMEGA = 0.7; // rad/sec — time-rotation rate; sign convention below makes crests migrate inward as t grows
+const INTERIOR_WAVE_RAMP_BOUNDARIES = 6; // outermost N and innermost N boundaries fade amplitude to 0 — joins the live front seamlessly on one end, keeps the pith a crisp dot on the other
+const INTERIOR_WAVE_MIN_GAP = 0.06; // viewBox units — hard floor on the gap between adjacent displaced boundaries, prevents inversion
+const INTERIOR_WAVE_UPDATE_HZ = 24; // throttle for the rAF-driven recompute — well past the ~8-10fps floor for smooth-reading motion, far under redoing it every frame for no visible gain
 
 const THETAS = Array.from({ length: N_SPOKES }, (_, i) => (i / N_SPOKES) * TWO_PI);
 const COS = THETAS.map(Math.cos);
@@ -323,34 +366,67 @@ function buildRingPaths(start: Radii, earlyEnd: Radii, final: Radii): RingPaths 
   };
 }
 
-function simulateYears(n: number, ctx: GrowCtx): { rings: RingPaths[]; start: Radii } {
+function simulateYears(n: number, ctx: GrowCtx): { rings: RingPaths[]; start: Radii; boundaries: Radii[] } {
   let start: Radii = new Float64Array(N_SPOKES).fill(PITH_R);
   const rings: RingPaths[] = [];
+  const boundaries: Radii[] = [start];
   for (let y = 0; y < n; y++) {
     const g = growYear(y, start, ctx);
     rings.push(buildRingPaths(start, g.earlyEnd, g.final));
+    boundaries.push(g.earlyEnd, g.final);
     start = g.final;
   }
-  return { rings, start };
+  return { rings, start, boundaries };
 }
 
-// INTERIOR SHIMMER — a legibility affordance, not physics: a real cambium's
-// already-laid rings never move again once committed (see the "committed as
-// static DOM ... never touched again" note above, which stays literally true
-// for the `d` attribute). What moves here is CSS `opacity` only, on the <g>
-// wrapping each committed ring's two paths — geometry is untouched, so every
-// falsifiability claim about `d` above still holds. Each ring gets a fixed
-// per-ring `animation-delay` (see the `--cl-shimmer-delay` custom property
-// set inline per ring below) so the same shared keyframe reads as one slow
-// pulse of brightness travelling radially INWARD through the stack: the
-// newest (outermost) ring leads the phase, each older ring toward the pith
-// catches up slightly later, on an infinite loop. That direction (rim ->
-// pith) is arbitrary relative to real cambium biology — chosen only because
-// it reads as "the growing edge's energy propagating back through the
-// tree's history", which is legible; the reverse direction would look
-// equally plausible. The amplitude is a gentle 12% opacity swing, not a
-// value/hue change, so it never competes with the earlywood/latewood tone
-// contrast that actually encodes the ring structure.
+/**
+ * Per-frame displacement pass over the committed boundary stack — see the
+ * INTERIOR UNDULATION block above for why this exists and how the constants
+ * were chosen. `boundaries[0]` is the pith, `boundaries[k]` for k >= 1
+ * alternates earlywood-end/final radii walking outward; a ring at index i
+ * sits between `boundaries[2i]` and `boundaries[2i+2]`, sharing each edge
+ * with its neighbour, so displacing by boundary index (not ring index) is
+ * what keeps rings joined with no gap. Returns one smoothed SVG path
+ * fragment per boundary — callers slice adjacent pairs to build a ring's
+ * two annulus `d` strings.
+ */
+function displaceBoundaries(boundaries: Radii[], t: number): string[] {
+  const n = boundaries.length;
+  const displaced: Radii[] = new Array(n);
+  for (let k = 0; k < n; k++) {
+    const distFromFront = n - 1 - k;
+    const rampOut = distFromFront >= INTERIOR_WAVE_RAMP_BOUNDARIES ? 1 : distFromFront / INTERIOR_WAVE_RAMP_BOUNDARIES;
+    // Symmetric ramp on the pith side too: boundary 0 IS the pith (a
+    // constant-radius circle, sitting right next to the separately-drawn
+    // solid pith dot), and a flat INTERIOR_WAVE_AMPL there is enormous
+    // relative to its ~6-unit radius — measured result was a 5-petal
+    // rosette where a crisp dot should be, because the wave's angular
+    // frequency (WAVE_HARMONIC=5) reads as scalloping once amplitude
+    // approaches the shape's own radius. Radius-proportional scaling alone
+    // does not fix this (it scales the distortion down but the RATIO, and
+    // therefore the rosette shape, stays the same at every radius) — an
+    // index ramp identical in kind to the outer one is what a real fix
+    // needs: the first few boundaries stay essentially undisplaced and the
+    // wave fades in only once there's enough ring stack for it to read as
+    // undulation rather than a shape change.
+    const rampIn = k >= INTERIOR_WAVE_RAMP_BOUNDARIES ? 1 : k / INTERIOR_WAVE_RAMP_BOUNDARIES;
+    const ampl = INTERIOR_WAVE_AMPL * rampOut * rampIn;
+    const b = boundaries[k];
+    const out: Radii = new Float64Array(N_SPOKES);
+    const prev = k > 0 ? displaced[k - 1] : null;
+    for (let i = 0; i < N_SPOKES; i++) {
+      const wave = ampl * Math.sin(WAVE_HARMONIC * THETAS[i] + k * INTERIOR_WAVE_PHASE_STEP + t * INTERIOR_WAVE_OMEGA);
+      let v = b[i] + wave;
+      if (prev) v = Math.max(v, prev[i] + INTERIOR_WAVE_MIN_GAP);
+      out[i] = Math.min(v, R_SAFE);
+    }
+    displaced[k] = out;
+  }
+  const paths = new Array<string>(n);
+  for (let k = 0; k < n; k++) paths[k] = smoothClosedPath(toPoints(displaced[k]));
+  return paths;
+}
+
 const CSS = `
 .ns-cl-live{fill:var(--ns-muted);transition:fill 900ms ease}
 .ns-cl-live.ns-cl-late{fill:var(--foreground)}
@@ -364,23 +440,11 @@ const CSS = `
   transform-origin:center;
   animation:ns-cl-pulse-sweep 3200ms linear infinite;
 }
-@keyframes ns-cl-shimmer{
-  0%,100%{opacity:0.88}
-  50%{opacity:1}
-}
-.ns-cl-ring{
-  animation:ns-cl-shimmer var(--cl-shimmer-dur,3200ms) ease-in-out infinite;
-  animation-delay:var(--cl-shimmer-delay,0s);
-}
 @media (prefers-reduced-motion: reduce){
   .ns-cl-live{transition:none}
   .ns-cl-pulse{animation-duration:9000ms}
-  .ns-cl-ring{animation-duration:11000ms}
 }
 `;
-
-const SHIMMER_STAGGER_S = 0.16; // per-ring delay step — sets how many rings the wavefront visibly spans at once
-const SHIMMER_DUR_MS = 3200; // one full dim->bright->dim cycle per ring
 
 export function CambiumLay({
   yearMs = YEAR_MS_DEFAULT,
@@ -397,6 +461,15 @@ export function CambiumLay({
   const lastYearRef = useRef(-1);
   const lateRef = useRef(false);
 
+  // The immutable accretion record the interior undulation displaces from —
+  // see displaceBoundaries above. Index 0 is the pith; index k for k >= 1
+  // alternates earlywood-end/final radii walking outward. Ref, not state:
+  // it changes on the same cadence as `rings` but is read every animation
+  // frame, so it must not go through React's render cycle.
+  const boundariesRef = useRef<Radii[]>([new Float64Array(N_SPOKES).fill(PITH_R)]);
+  const earlyPathRefs = useRef<(SVGPathElement | null)[]>([]);
+  const latePathRefs = useRef<(SVGPathElement | null)[]>([]);
+
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     setReduced(mq.matches);
@@ -411,8 +484,9 @@ export function CambiumLay({
 
     if (reduced) {
       let n = Math.min(REDUCED_RINGS, safeMaxYears);
-      const { rings: pre, start: preStart } = simulateYears(n, ctx);
+      const { rings: pre, start: preStart, boundaries } = simulateYears(n, ctx);
       setRings(pre);
+      boundariesRef.current = boundaries; // static under reduced motion — the interior loop never runs (see gate below)
       if (n >= safeMaxYears) return; // already fully grown at this cap — genuinely nothing left to show
 
       let start = preStart;
@@ -426,6 +500,7 @@ export function CambiumLay({
         start = g.final;
         n += 1;
         setRings((prev) => prev.concat([ring]));
+        boundariesRef.current = boundariesRef.current.concat([g.earlyEnd, g.final]);
       }, REDUCED_RING_INTERVAL_MS);
       return () => window.clearInterval(id);
     }
@@ -450,14 +525,17 @@ export function CambiumLay({
 
     let start: Radii = new Float64Array(N_SPOKES).fill(PITH_R);
     const committed: RingPaths[] = [];
+    const boundaries: Radii[] = [start];
     const elapsedAtMount = Math.min(Date.now() - firstSeen, capMs);
     const wholeYears = Math.min(Math.floor(elapsedAtMount / yearMs), safeMaxYears);
     for (let y = 0; y < wholeYears; y++) {
       const g = growYear(y, start, ctx);
       committed.push(buildRingPaths(start, g.earlyEnd, g.final));
+      boundaries.push(g.earlyEnd, g.final);
       start = g.final;
     }
     setRings(committed);
+    boundariesRef.current = boundaries;
     startRef.current = start;
     lastYearRef.current = wholeYears - 1;
     lateRef.current = false;
@@ -473,15 +551,20 @@ export function CambiumLay({
 
       if (yIdx > lastYearRef.current) {
         const newRings: RingPaths[] = [];
+        const newBoundaries: Radii[] = [];
         let s = startRef.current;
         for (let y = lastYearRef.current + 1; y < yIdx && y < safeMaxYears; y++) {
           const g = growYear(y, s, ctx);
           newRings.push(buildRingPaths(s, g.earlyEnd, g.final));
+          newBoundaries.push(g.earlyEnd, g.final);
           s = g.final;
         }
         startRef.current = s;
         lastYearRef.current = yIdx - 1;
-        if (newRings.length) setRings((prev) => prev.concat(newRings));
+        if (newRings.length) {
+          setRings((prev) => prev.concat(newRings));
+          boundariesRef.current = boundariesRef.current.concat(newBoundaries);
+        }
         if (yIdx < safeMaxYears) {
           targetRef.current = growYear(yIdx, s, ctx);
           lateRef.current = false;
@@ -515,6 +598,65 @@ export function CambiumLay({
   const ringCount = rings.length;
   const showLive = !reduced && ringCount < Math.max(1, Math.floor(maxYears));
 
+  // Paint committed rings with a correct (undisplaced) `d` synchronously on
+  // every ring-count change, before the browser paints — otherwise a newly
+  // mounted <path> would render with no `d` attribute at all (a genuinely
+  // blank shape) for however long it takes the rAF loop below to run its
+  // first frame. This is the ONLY writer of `d` when `reduced` is true,
+  // since the interior loop is gated off in that mode.
+  useLayoutEffect(() => {
+    const boundaries = boundariesRef.current;
+    const n = boundaries.length;
+    if (n < 3) return;
+    const smoothed = new Array<string>(n);
+    for (let k = 0; k < n; k++) smoothed[k] = smoothClosedPath(toPoints(boundaries[k]));
+    const rc = Math.floor((n - 1) / 2);
+    for (let i = 0; i < rc; i++) {
+      earlyPathRefs.current[i]?.setAttribute("d", `${smoothed[2 * i]} ${smoothed[2 * i + 1]}`);
+      latePathRefs.current[i]?.setAttribute("d", `${smoothed[2 * i + 1]} ${smoothed[2 * i + 2]}`);
+    }
+  }, [ringCount]);
+
+  // The interior undulation itself — one rAF loop, throttled to
+  // INTERIOR_WAVE_UPDATE_HZ, reading boundariesRef fresh every frame so it
+  // always displaces from whatever has actually been committed so far
+  // (never stale). Writes `d` directly via refs, bypassing React state —
+  // see the useLayoutEffect above for why JSX never carries a `d` prop for
+  // committed rings when `!reduced`: if it did, the next unrelated re-render
+  // (a ring commit, a prop change) would snap every displaced path back to
+  // its undisplaced shape, because React would re-assert the JSX value.
+  useEffect(() => {
+    if (reduced) return; // see INTERIOR UNDULATION comment above — reduced motion keeps the discrete ring-commit pop only
+    let raf = 0;
+    let running = true;
+    const startedAt = performance.now();
+    const minFrameMs = 1000 / INTERIOR_WAVE_UPDATE_HZ;
+    let lastFrameAt = 0;
+    const step = (now: number) => {
+      if (!running) return;
+      if (now - lastFrameAt >= minFrameMs) {
+        lastFrameAt = now;
+        const t = (now - startedAt) / 1000;
+        const boundaries = boundariesRef.current;
+        const n = boundaries.length;
+        if (n >= 3) {
+          const smoothed = displaceBoundaries(boundaries, t);
+          const rc = Math.floor((n - 1) / 2);
+          for (let i = 0; i < rc; i++) {
+            earlyPathRefs.current[i]?.setAttribute("d", `${smoothed[2 * i]} ${smoothed[2 * i + 1]}`);
+            latePathRefs.current[i]?.setAttribute("d", `${smoothed[2 * i + 1]} ${smoothed[2 * i + 2]}`);
+          }
+        }
+      }
+      raf = window.requestAnimationFrame(step);
+    };
+    raf = window.requestAnimationFrame(step);
+    return () => {
+      running = false;
+      window.cancelAnimationFrame(raf);
+    };
+  }, [reduced]);
+
   return (
     <div className={`relative h-full w-full overflow-hidden ${className}`} data-cambium-lay>
       <style>{CSS}</style>
@@ -529,23 +671,23 @@ export function CambiumLay({
       >
         <circle cx={CENTER} cy={CENTER} r={PITH_R * 0.55} fill="var(--foreground)" />
         {rings.map((r, i) => (
-          <g
-            key={i}
-            className="ns-cl-ring"
-            style={
-              {
-                "--cl-shimmer-dur": `${SHIMMER_DUR_MS}ms`,
-                // negative delay = already this far into its cycle at mount,
-                // so the wave is mid-flight immediately rather than needing
-                // one full period to "arrive" — larger i (further from the
-                // pith) is more negative, i.e. leads the phase; the pith-most
-                // ring (i=0) lags, so brightness reads as travelling inward.
-                "--cl-shimmer-delay": `-${(i * SHIMMER_STAGGER_S).toFixed(2)}s`,
-              } as CSSProperties
-            }
-          >
-            <path d={r.earlywood} fill="var(--ns-muted)" fillRule="evenodd" />
-            <path d={r.latewood} fill="var(--foreground)" fillRule="evenodd" />
+          <g key={i}>
+            <path
+              ref={(el) => {
+                earlyPathRefs.current[i] = el;
+              }}
+              d={reduced ? r.earlywood : undefined}
+              fill="var(--ns-muted)"
+              fillRule="evenodd"
+            />
+            <path
+              ref={(el) => {
+                latePathRefs.current[i] = el;
+              }}
+              d={reduced ? r.latewood : undefined}
+              fill="var(--foreground)"
+              fillRule="evenodd"
+            />
           </g>
         ))}
         {showLive && <path ref={liveRef} className="ns-cl-live" fillRule="evenodd" d="" />}
