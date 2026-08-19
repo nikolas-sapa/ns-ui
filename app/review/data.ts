@@ -331,18 +331,6 @@ export const REVIEW_ITEMS: ReviewItem[] = [
     note: "Drag the rollout slider and watch the traced perimeter jump to outline only the single largest connected wet cluster, computed from real grid adjacency, not a radial guess.",
   },
   {
-    slug: "sear-notch",
-    group: "expansion",
-    lane: "reliability",
-    note: "Drag the notch's shoulders and floor cut into the sparkline and watch past excursions flip from hollow to solid the instant their real dwell duration reaches the new threshold.",
-  },
-  {
-    slug: "blowdown-seat",
-    group: "expansion",
-    lane: "reliability",
-    note: "The pressure-relief valve only reseats once load falls below the separate, lower reseat mark — not the moment it dips back under the pop threshold.",
-  },
-  {
     slug: "night-store",
     group: "expansion",
     lane: "reliability",
