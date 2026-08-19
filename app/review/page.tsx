@@ -123,8 +123,12 @@ export default function ReviewPage() {
     reliability: true,
     wayfinding: true,
   });
+  // Working rows are hidden from the list by default — a verdict already
+  // recorded shouldn't keep taking up screen space. The "Working" filter
+  // button doubles as the way back in (requirement 2): flip it on and the
+  // judged rows return, collapsed, ready to be re-judged.
   const [statusOn, setStatusOn] = useState<Record<"working" | "flagged" | "untouched", boolean>>({
-    working: true,
+    working: false,
     flagged: true,
     untouched: true,
   });
@@ -262,7 +266,12 @@ export default function ReviewPage() {
   });
 
   const q = query.trim().toLowerCase();
+  // Before the state file has loaded, every row would read "untouched" (the
+  // default for an empty entry) — filtering on that would show all 59 rows
+  // for a beat, mount extra iframes, then yank 51 of them the moment the
+  // real verdicts arrive. Hold the list empty until hydrated instead.
   const filtered = useMemo(() => {
+    if (!hydrated) return [];
     return REVIEW_ITEMS.filter((item) => {
       if (!groupsOn[item.group]) return false;
       if (item.lane && !lanesOn[item.lane]) return false;
@@ -274,7 +283,7 @@ export default function ReviewPage() {
         .toLowerCase();
       return haystack.includes(q);
     });
-  }, [q, groupsOn, lanesOn, statusOn, state]);
+  }, [hydrated, q, groupsOn, lanesOn, statusOn, state]);
 
   const fixedItems = filtered.filter((i) => i.group === "fixed");
   const untestedItems = filtered.filter((i) => i.group === "untested");
@@ -303,6 +312,18 @@ export default function ReviewPage() {
     for (const item of REVIEW_ITEMS) counts[effectiveStatus(state[item.slug])]++;
     return counts;
   }, [state]);
+
+  // True only when the empty list is caused by working rows being hidden,
+  // not by a search term or a group/lane/status filter narrowing things out
+  // — those still fall through to the generic "no match" message.
+  const allSettled =
+    filtered.length === 0 &&
+    q === "" &&
+    GROUPS.every((g) => groupsOn[g]) &&
+    LANES.every((l) => lanesOn[l]) &&
+    statusOn.flagged &&
+    statusOn.untouched &&
+    statusCounts.flagged + statusCounts.untouched === 0;
 
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "error">("idle");
   const copyStatusTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -358,6 +379,11 @@ export default function ReviewPage() {
           nearby handful also run live inline. &ldquo;Tested&rdquo; and notes persist to a local
           file (<code className="font-mono text-[13px]">.review-state.json</code>) via a
           dev-only API route — never the deployed site.
+        </p>
+        <p className="mt-3 font-mono text-xs text-ns-muted">
+          {hydrated
+            ? `${statusCounts.working} working, ${statusCounts.flagged} flagged, ${statusCounts.untouched} untouched of ${REVIEW_ITEMS.length}.`
+            : "Loading saved verdicts…"}
         </p>
       </header>
 
@@ -446,6 +472,19 @@ export default function ReviewPage() {
             })}
           </div>
 
+          {hydrated && statusCounts.working > 0 ? (
+            <button
+              type="button"
+              aria-pressed={statusOn.working}
+              onClick={() => setStatusOn((p) => ({ ...p, working: !p.working }))}
+              className="min-h-11 shrink-0 rounded-sm border border-border px-2.5 py-1 text-sm text-foreground outline-none transition-colors hover:border-ns-accent focus-visible:ring-2 focus-visible:ring-ns-accent sm:min-h-0"
+            >
+              {statusOn.working
+                ? "Hide working"
+                : `Show ${statusCounts.working} working`}
+            </button>
+          ) : null}
+
           <button
             type="button"
             onClick={() => void copyAllNotes()}
@@ -507,8 +546,12 @@ export default function ReviewPage() {
         isOnScreen={isOnScreen}
       />
 
-      {filtered.length === 0 ? (
-        <p className="mt-16 text-sm text-ns-muted">Nothing matches that filter.</p>
+      {hydrated && filtered.length === 0 ? (
+        <p className="mt-16 text-sm text-ns-muted">
+          {allSettled
+            ? `All caught up — ${statusCounts.working} working, nothing flagged or untouched.`
+            : "Nothing matches that filter."}
+        </p>
       ) : null}
     </main>
   );
