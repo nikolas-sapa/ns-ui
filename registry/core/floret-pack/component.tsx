@@ -55,23 +55,35 @@ const JITTER_MAX_PX = 2.2;
 // to perceive (measured ~0.4px/s at r=100 with the pre-existing defaults) and
 // only ever moved in one register (outward). These are three DIFFERENT
 // motion treatments, not three more tunings of the same one:
-//   "drift" — the component's existing analytic radial outflow, just run
-//             fast enough (via the demo's plastochron/maxPrimordia, not a
-//             change to this component's documented defaults) that
-//             individual florets visibly stream from meristem to rim inside
-//             a few seconds instead of appearing frozen.
-//   "spin"  — "drift", plus the whole resolved field rotating as one rigid
-//             frame (a fixed deg/s added uniformly to every floret's render
-//             angle) — the 34/55 spiral families visibly turn as a unit on
-//             top of flowing outward.
+//   "drift" — the component's existing analytic radial outflow on its own,
+//             for comparison/debugging — individual florets stream from
+//             meristem to rim, nothing else moves.
+//   "spin"  — the shipped default: "drift" PLUS the whole resolved field
+//             rotating as one rigid frame (a fixed deg/s added uniformly to
+//             every floret's render angle, applied at the theta->x/y
+//             resolution step, so it rides on top of the unchanged radial
+//             advection and birth-order relaxation rather than replacing
+//             either). The 34/55 spiral families visibly turn as a unit
+//             WHILE still streaming outward at the same speed as "drift" —
+//             this is the "rotating growth" the owner asked for, not a
+//             separate spinning-graphic mode.
 //   "pulse" — "drift", plus a slow sinusoidal multiplier on every floret's
 //             resolved radius, so the whole head rhythmically breathes
 //             in/out rather than only advecting one direction.
 // All three still run the same emission clock, golden-angle placement and
 // birth-order repulsion — only how the resolved (theta, r) maps to (x, y)
 // changes, so packing/relaxation history is identical across variants.
-const MOTION: "drift" | "spin" | "pulse" = "drift";
-const SPIN_DEG_PER_S = 5; // "spin" only — deg/s the whole head rotates
+const MOTION: "drift" | "spin" | "pulse" = "spin";
+// deg/s the whole head rotates in "spin". Chosen so a floret's own radial
+// lifetime (how long it takes one primordium to travel meristem -> rim)
+// completes well under one full head rotation: at the demo's ~25s lifetime,
+// 6deg/s is a 150deg turn per floret generation — enough that the spiral
+// families visibly precess between frames a few seconds apart, not enough
+// that any single rotation reads as a spinning logo. At the documented
+// production defaults (plastochron 1400ms/maxPrimordia 700, ~980s lifetime)
+// the same 6deg/s reads as calm long-run drift of the whole pattern, never a
+// pinwheel.
+const SPIN_DEG_PER_S = 6;
 const PULSE_AMPL = 0.06; // "pulse" only — +/- fraction of resolved radius
 const PULSE_PERIOD_S = 3.2; // "pulse" only — one breathe in + out
 

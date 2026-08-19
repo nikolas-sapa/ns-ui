@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 // ---------------------------------------------------------------------------
 // CambiumLay — a tree cross-section accreting live in SVG. A 96-spoke
@@ -15,8 +15,14 @@ import { useEffect, useRef, useState } from "react";
 // line. At the moment a year completes, its two boundary curves (start →
 // earlywood-end → final) are committed as static DOM — two <path>s, smoothed
 // through the 96 spokes with a closed Catmull-Rom curve — and never touched
-// again. Only the CURRENT, still-forming annulus mutates, and only its `d`
-// attribute: one write per tick, ~8 ticks a second, nothing else moves.
+// again as GEOMETRY: `d` is written once, at commit, and never again for that
+// ring. Only the CURRENT, still-forming annulus mutates its `d`, one write per
+// tick, ~8 ticks a second. Every already-laid ring DOES still carry a slow CSS
+// opacity shimmer (a per-ring `animation-delay`, no per-frame JS, no `d`
+// writes) so the interior of the section reads as alive rather than inert —
+// this is a deliberate legibility affordance, not a physical claim: a real
+// cambium's earlier rings do not move once laid. See the CSS block below for
+// the honest accounting of what that is and why.
 //
 // Two long-lived deformations ride on top of the per-year budget, both
 // expressed as a per-spoke multiplier on that spoke's share of the year's
@@ -328,6 +334,23 @@ function simulateYears(n: number, ctx: GrowCtx): { rings: RingPaths[]; start: Ra
   return { rings, start };
 }
 
+// INTERIOR SHIMMER — a legibility affordance, not physics: a real cambium's
+// already-laid rings never move again once committed (see the "committed as
+// static DOM ... never touched again" note above, which stays literally true
+// for the `d` attribute). What moves here is CSS `opacity` only, on the <g>
+// wrapping each committed ring's two paths — geometry is untouched, so every
+// falsifiability claim about `d` above still holds. Each ring gets a fixed
+// per-ring `animation-delay` (see the `--cl-shimmer-delay` custom property
+// set inline per ring below) so the same shared keyframe reads as one slow
+// pulse of brightness travelling radially INWARD through the stack: the
+// newest (outermost) ring leads the phase, each older ring toward the pith
+// catches up slightly later, on an infinite loop. That direction (rim ->
+// pith) is arbitrary relative to real cambium biology — chosen only because
+// it reads as "the growing edge's energy propagating back through the
+// tree's history", which is legible; the reverse direction would look
+// equally plausible. The amplitude is a gentle 12% opacity swing, not a
+// value/hue change, so it never competes with the earlywood/latewood tone
+// contrast that actually encodes the ring structure.
 const CSS = `
 .ns-cl-live{fill:var(--ns-muted);transition:fill 900ms ease}
 .ns-cl-live.ns-cl-late{fill:var(--foreground)}
@@ -341,11 +364,23 @@ const CSS = `
   transform-origin:center;
   animation:ns-cl-pulse-sweep 3200ms linear infinite;
 }
+@keyframes ns-cl-shimmer{
+  0%,100%{opacity:0.88}
+  50%{opacity:1}
+}
+.ns-cl-ring{
+  animation:ns-cl-shimmer var(--cl-shimmer-dur,3200ms) ease-in-out infinite;
+  animation-delay:var(--cl-shimmer-delay,0s);
+}
 @media (prefers-reduced-motion: reduce){
   .ns-cl-live{transition:none}
   .ns-cl-pulse{animation-duration:9000ms}
+  .ns-cl-ring{animation-duration:11000ms}
 }
 `;
+
+const SHIMMER_STAGGER_S = 0.16; // per-ring delay step — sets how many rings the wavefront visibly spans at once
+const SHIMMER_DUR_MS = 3200; // one full dim->bright->dim cycle per ring
 
 export function CambiumLay({
   yearMs = YEAR_MS_DEFAULT,
@@ -494,7 +529,21 @@ export function CambiumLay({
       >
         <circle cx={CENTER} cy={CENTER} r={PITH_R * 0.55} fill="var(--foreground)" />
         {rings.map((r, i) => (
-          <g key={i}>
+          <g
+            key={i}
+            className="ns-cl-ring"
+            style={
+              {
+                "--cl-shimmer-dur": `${SHIMMER_DUR_MS}ms`,
+                // negative delay = already this far into its cycle at mount,
+                // so the wave is mid-flight immediately rather than needing
+                // one full period to "arrive" — larger i (further from the
+                // pith) is more negative, i.e. leads the phase; the pith-most
+                // ring (i=0) lags, so brightness reads as travelling inward.
+                "--cl-shimmer-delay": `-${(i * SHIMMER_STAGGER_S).toFixed(2)}s`,
+              } as CSSProperties
+            }
+          >
             <path d={r.earlywood} fill="var(--ns-muted)" fillRule="evenodd" />
             <path d={r.latewood} fill="var(--foreground)" fillRule="evenodd" />
           </g>
