@@ -315,7 +315,7 @@ export function RaftMoor({
               }}
               onClick={() => jump(c)}
               aria-label={labelFor(c)}
-              className="flex h-5 w-5 select-none items-center justify-center rounded-sm border border-border bg-background font-mono text-[9px] font-medium leading-none text-foreground opacity-0 transition-[opacity] duration-300 ease-out hover:border-ns-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
+              className="flex h-5 w-5 select-none items-center justify-center rounded-sm border border-border bg-background font-mono text-[9px] font-medium leading-none text-foreground opacity-0 transition-[opacity,border-color] duration-300 ease-out hover:border-ns-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent"
             >
               <span aria-hidden>{initialsOf(c)}</span>
             </button>
