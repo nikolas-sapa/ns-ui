@@ -268,7 +268,7 @@ export function ParticleHero({
           {eyebrow}
         </motion.p>
         <motion.h1
-          className="mt-4 text-5xl font-semibold tracking-tight sm:text-6xl"
+          className="ns-phw-h1 mt-4 text-5xl font-semibold tracking-tight sm:text-6xl"
           {...revealProps(reduced, 1)}
         >
           {headline}

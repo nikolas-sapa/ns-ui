@@ -19,7 +19,7 @@
   "instruction": "A destructive-action button requiring press-and-hold, rendered as a canvas ink fill: holding pours monochrome ink (foreground token) up from the press point with a live rippling meniscus edge, subtle grain, and a pressure microshake as it nears the top; the label inverts over the ink via a difference blend. Releasing early (including pointercancel or blur) recoils the ink with an elastic damped spring; when the fill completes, the button pops with one spring overshoot and the label swaps. Works with pointer and keyboard (hold Space/Enter). Canvas colors derive from computed CSS tokens and re-derive on theme change; the rAF loop sleeps when settled and pauses offscreen; prefers-reduced-motion still holds-to-confirm but renders a plain clean fill with no waves, grain, shake, or pop.",
   "dependencies": [],
   "card": {
-    "focus": "button",
+    "focus": ".ns-chi-btn",
     "padding": 1.8
   }
 }

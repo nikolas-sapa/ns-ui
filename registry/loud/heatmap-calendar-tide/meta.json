@@ -20,7 +20,7 @@
     "period": 5200
   },
   "card": {
-    "focus": "figure",
+    "focus": ".ns-hct-figure",
     "padding": 0.35
   },
   "useWhen": "A dense per-day (or per-slot) magnitude grid — contribution calendars, uptime, volume per weekday — where the shape of the whole period matters more than any single value. Reach for histogram-live-grain when the question is the distribution of a sample rather than its position in time.",

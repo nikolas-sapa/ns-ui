@@ -3,10 +3,25 @@
   "title": "Chart Radar Dither",
   "description": "Canvas radar/spider chart in ordered-dither ink density, swept by a continuously rotating radar line that locally resolves each axis wedge to sharper ink as it passes.",
   "collection": "core",
-  "tags": ["chart", "radar", "spider", "data-viz", "dither", "canvas", "ink"],
+  "tags": [
+    "chart",
+    "radar",
+    "spider",
+    "data-viz",
+    "dither",
+    "canvas",
+    "ink"
+  ],
   "useWhen": "comparing several axes of one or two entities where a literal, continuously-scanning radar reads as an intentional pun rather than gimmick — pick chart-bar-dither instead when the axes are independent categories with no shared 0-100 scale, or chart-line-dither for a single series over time rather than a multi-axis snapshot.",
-  "autoplay": { "mode": "pointer-path", "path": "orbit", "target": ".ns-crd-hit" },
-  "card": { "focus": "canvas", "padding": 0.15 },
+  "autoplay": {
+    "mode": "pointer-path",
+    "path": "orbit",
+    "target": ".ns-crd-hit"
+  },
+  "card": {
+    "focus": ".ns-crd-canvas",
+    "padding": 0.15
+  },
   "instruction": "The dithered-chart family's radar/spider chart, its fourth CANVAS member. The polygon's interior is tiled into one triangular wedge per axis (center to each pair of adjacent vertices), each filled with the family's shared ordered-dither ramp (4x4 Bayer matrix, 17 ink levels) at a density averaging that wedge's two adjacent axis fractions — the usual redundant channel alongside the polygon's own radius, which remains the chart's only true magnitude encoding. The mechanic unique to this family member: a literal radar sweep line rotates continuously around the center (one revolution per 6s) and, as it crosses a wedge, that wedge's ink cell eases from a coarse 6px down to a fine 2px, then decays back to coarse over a trailing 650ms echo once the sweep has moved on — every axis is visited and briefly sharpened in turn, entirely ambient. Hovering or focusing an axis (a real, circular <button> at its vertex, role=option inside a role=listbox with roving tabindex — ArrowLeft/Right or ArrowUp/Down cycle axes) independently pins that axis's two adjacent wedges to fine resolution regardless of where the sweep currently is, and raises a live value readout above the chart. Resolution is the only channel either mechanic touches; colour never encodes data — pure var(--foreground) ink on var(--background) paper, var(--ns-accent) reserved for the sweep line itself, the hovered vertex, and keyboard focus, matching the rest of the family. Tokens are read via getComputedStyle on the document root at mount and re-read through a MutationObserver on its class attribute. On mount the polygon scales in from the center over 460ms; prefers-reduced-motion freezes the sweep line at a fixed bearing with no rotation and no persistent rAF loop, while hover/focus still snaps the touched wedges to fine resolution instantly, so the interaction stays available without motion. A VIEW TABLE toggle swaps the chart for a real HTML table listing each axis's value against its own max. Requires at least 3 axes. Zero dependencies.",
   "dependencies": []
 }

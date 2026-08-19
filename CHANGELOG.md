@@ -3,6 +3,30 @@
 Single source of truth for the /changelog page. Each entry is a `## vX.Y.Z - YYYY-MM-DD`
 heading, a `###` title, then one paragraph of body. Newest first.
 
+## v0.24.0 - 2026-08-19
+
+### Round 7: 63 new components, a card that framed itself on the cursor, and the guard that closes it
+
+Sixty-three components landed across six lanes — identity/access & trust (12), money in motion
+(12), multiplayer/presence & annotation (12), living systems & growth (12), wayfinding & spatial
+(9), reliability & operations (6) — taking the registry from 326 to 389. Two more, sear-notch and
+blowdown-seat, were built, passed the gate, and got cut anyway: both worked, neither could be
+read. Component pages now carry sidebar prev/next navigation with a position counter, instead of
+leaving Newest-sort as the only way to move between them. A reduced-motion audit swept 117
+suspects and found four components suppressing state-change feedback rather than vestibular
+motion — gauge-capacity-waterline had no passive readout at all, so its value changed with
+nothing on screen to show it; the other 107 were already correct and untouched. Separately,
+chart-bar-halftone, chart-donut-halftone and loader-thread-spool were framing their catalog cards
+on `<SmoothCursor>`'s own `<svg>`, injected into every route ahead of any demo's markup, and
+rendering blank — three of the four components that shipped this way, and three of those were
+live in production before it was caught. `card.focus` now has to be a scoped selector: `build-autoplay.ts`
+fails the build on a bare tag name, naming the component and the actual failure (a bare tag
+matches global layout chrome before the demo's own element, not just "invalid selector"), and the
+twenty other bare-tag values already in the registry — mostly `canvas` and `button`, verified
+harmless only because `svg` happens to be the one tag the layout injects unconditionally — were
+converted to scoped selectors rather than grandfathered in, so the next global element the layout
+gains doesn't reopen the same hole silently.
+
 ## v0.23.0 - 2026-08-12
 
 ### Focus that vanished on close, and a rate limit a rejection could reset

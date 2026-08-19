@@ -359,6 +359,7 @@ export function ChartRadarDither({ data = [], title = "Chart", className = "" }:
           <canvas
             ref={canvasRef}
             aria-hidden="true"
+            className="ns-crd-canvas"
             style={{ width: SIZE, height: SIZE, maxWidth: "100%", display: "block" }}
           />
 

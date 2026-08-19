@@ -215,7 +215,7 @@ export function GlyphCast({
 
   return (
     <div ref={wrapRef} className={`relative w-full ${className}`}>
-      <canvas ref={canvasRef} aria-hidden className="block w-full text-foreground" />
+      <canvas ref={canvasRef} aria-hidden className="ns-haw-canvas block w-full text-foreground" />
       <span className="sr-only">{text}</span>
     </div>
   );

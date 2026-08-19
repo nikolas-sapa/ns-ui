@@ -319,6 +319,7 @@ export function ChartBarDither({ data = [], title = "Chart", className = "" }: C
           <canvas
             ref={canvasRef}
             aria-hidden="true"
+            className="ns-cbd-canvas"
             style={{ width: viewW, height: viewH, maxWidth: "100%", display: "block" }}
           />
 

@@ -383,6 +383,7 @@ export function BoxplotAsciiWhisker({ groups, title = "Chart", className = "" }:
         <canvas
           ref={canvasRef}
           aria-hidden="true"
+          className="ns-baw-canvas"
           style={{ width: viewW, height: viewH, maxWidth: "100%", display: "block" }}
         />
 

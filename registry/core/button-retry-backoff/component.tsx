@@ -343,7 +343,7 @@ export function TorsionRetry({
         disabled={busy}
         aria-describedby={descId}
         className={[
-          "inline-flex items-center gap-2 rounded-sm border px-3 py-1.5 text-sm font-medium",
+          "ns-brb-btn inline-flex items-center gap-2 rounded-sm border px-3 py-1.5 text-sm font-medium",
           "border-border bg-background text-foreground",
           "hover:border-ns-muted hover:bg-border/60",
           "disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-background",

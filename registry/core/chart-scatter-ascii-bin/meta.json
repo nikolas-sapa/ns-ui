@@ -3,10 +3,25 @@
   "title": "Chart Scatter ASCII Bin",
   "description": "Two-dimensional scatter plot rendered as a glyph-density grid, with a pointer- or keyboard-driven brush that live re-bins the exact points under it and reads out the selection.",
   "collection": "core",
-  "tags": ["chart", "scatter", "data-viz", "ascii", "canvas", "brush"],
+  "tags": [
+    "chart",
+    "scatter",
+    "data-viz",
+    "ascii",
+    "canvas",
+    "brush"
+  ],
   "useWhen": "showing the joint distribution of two continuous variables where a brushed region needs an exact live readout — pick histogram-live-grain for a single dimension's rolling tally, or chart-bar-dither for a single discrete series compared across categories.",
-  "autoplay": { "mode": "pointer-path", "path": "orbit", "target": ".ns-csab-hit", "inset": -0.1 },
-  "card": { "focus": "canvas", "padding": 0.15 },
+  "autoplay": {
+    "mode": "pointer-path",
+    "path": "orbit",
+    "target": ".ns-csab-hit",
+    "inset": -0.1
+  },
+  "card": {
+    "focus": ".ns-csab-canvas",
+    "padding": 0.15
+  },
   "instruction": "A scatter plot rendered entirely as a glyph-density grid: every raw (x, y) sample is binned into a fixed 42x20 cell grid and each cell's character comes from the shared 10-step ASCII ramp ' .:-=+*#%@', scaled to that cell's point count relative to the densest cell — a static joint-distribution print, redundant with nothing else in the registry (histogram-live-grain tallies one dimension, stem-and-leaf-live keeps every digit, neither bins two continuous axes at once). The real mechanic is the brush: a circular region tracks the pointer over the plot, or an arrow-key-steerable focus target for keyboard users (Shift moves it in larger steps, Escape clears it), and on every move it re-bins the RAW points — not the grid cells — by exact Euclidean distance to the brush centre, so the live readout above the plot ('N pts · mean (x, y)') is an exact statistic over the selection, not a cell-count approximation. Every glyph currently touched by the brush relinks from var(--foreground) to var(--ns-accent) ink in place, and a thin accent ring traces the brush radius — the only colour anywhere in the piece, reserved for the live interaction exactly as chart-bar-dither reserves accent for keyboard focus. Losing focus or pointer-leave clears the brush and every glyph returns to plain ink. Tokens are read via getComputedStyle at mount and re-read through a MutationObserver on the document root's class attribute, so both themes repaint correctly on toggle. On mount, the whole grid fades in over 320ms; prefers-reduced-motion renders it at full opacity immediately and the brush still updates instantly on interaction (no animated lerp, no persistent rAF loop once settled). Zero dependencies.",
   "dependencies": []
 }
