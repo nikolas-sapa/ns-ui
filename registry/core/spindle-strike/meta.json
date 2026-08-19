@@ -1,0 +1,38 @@
+{
+  "name": "spindle-strike",
+  "title": "Spindle Strike",
+  "description": "Payment history as a diner-receipt spindle: settled transactions pile up impaled on a shared 1px spine, and a refund doesn't remove the card — it pulls the same pierced node a few px back up the spine with its puncture elongated into a slot.",
+  "collection": "core",
+  "tags": [
+    "billing",
+    "payment-history",
+    "receipt",
+    "transactions",
+    "list",
+    "refund",
+    "spring",
+    "hash-rotation",
+    "mono",
+    "aria-live",
+    "accessibility"
+  ],
+  "useWhen": "transaction/payment history in a billing dashboard where paid vs. refunded needs to read from position, not a filtered-out or re-styled row — a refund stays pierced on the same spine, just pulled up and marked with an elongated hole, never a badge-and-strikethrough table row.",
+  "autoplay": {
+    "mode": "press",
+    "target": "[data-action=\"settle\"]",
+    "hold": 220,
+    "period": 4200,
+    "delay": 700
+  },
+  "gate": {
+    "openBy": "[data-action=\"refund\"]",
+    "expect": "li[data-id=\"txn-8\"][data-status=\"refunded\"]",
+    "resetBefore": true
+  },
+  "instruction": "A payment-history list rendered as a diner-receipt spindle. Each transaction is a small card (rounded-md, border-border, bg-background) impaled on a shared 1px vertical spine (--border) running down the middle of the stack, newest closest to the top. Every card carries exactly one governing scalar, `rawY` — its recency index (0 = newest, computed among ALL transactions including refunded ones, so a refunded card's old slot stays reserved and reads as a gap in the pile) times an 8px CARD_GAP, minus a fixed 48px REFUND_LIFT (kept as an exact 6x multiple of CARD_GAP) when its status is 'refunded'. translateY, z-index (`3000 - rawY`, so whichever card sits highest wins the stack order automatically) and depth-proportional ink (color-mix from --foreground toward --ns-muted, ramping to 0 over the first 112px of *unshifted* depth so a lifted refund never reads as 'handled') all derive from that one number — none of the three is set independently. Rotation is a djb2-style hash of the transaction id clamped to +-3deg, not Math.random(), so SSR and re-renders agree and the tilt never jitters. A newly-settled transaction starts 90px above its landing spot (14px under prefers-reduced-motion: reduce) at opacity 0; clearing that offset one frame after mount lets the card's own transform/opacity transition — one shared rule, cubic-bezier(.34,1.56,.64,1), 560ms (160ms linear under reduced motion), identical on every card, no per-card delay — carry it down past rest once and settle, which is also what makes the rest of the pile appear to shove down in sync, since every other card's rawY shifted by exactly the same CARD_GAP and is animating under the exact same rule: there is no separate 'shove' animation choreographed per card. A 3px puncture dot (color-mix from --foreground toward --ns-muted) sits at each card's rotation origin (50% 16px) and pops in shortly before the drop settles, timed to read as the strike landing rather than the card just fading in whole. A refund is a prop update on the SAME transaction object — the caller flips `status` to 'refunded' and supplies `refundedAmount` — not a removal-and-reinsert, so the existing <li> (same React key) is the node that moves: it eases up the spine by REFUND_LIFT under the identical shared transition, its puncture widens from a 3px dot into a 13px rounded slot (its own transition, decoupled from the position spring since it's a shape change, not a move), and its ink resets toward full --foreground since darkening reads off the unshifted depth. Filtering the refunded card out of the list and re-rendering a restyled copy with a badge would break the entire premise — the pierce has to survive the reversal. Fully controlled: `transactions` is the only data in, always in caller-supplied chronological order (oldest first), which is also the <li> DOM order inside the <ol> — independent of the visual stacking, so assistive tech always gets the story in time order even though sighted users see newest-on-top. Each <li> is a real listitem containing a <dl> (date, amount, status — status reads 'Refunded, $30.00 returned' for a refund, plain 'Settled' otherwise) plus an aria-label summarizing the same three facts, is individually focusable, and lifts 2px clear of the pile on focus via translateY + z-index only (JS-tracked focus state composed into the same transform string, so it stacks correctly with the rotation) — no scale or opacity change, so the receipt's text never resizes under focus. A refund fires one aria-live=polite announcement naming the amount returned. prefers-reduced-motion shortens the entrance drop and every transform/opacity/color transition to a brief linear pass rather than dropping them — a press still visibly moves, just without the spring overshoot or the full-distance travel; rotation, being static in the first place, is unaffected either way. Props: `transactions` (`{id, date, amount, status: 'settled'|'refunded', refundedAmount?}[]`), `ariaLabel` (default 'Payment history'), `className`. Pure DOM + inline SVG-free CSS — no canvas. Demo: an 8-receipt history with one already refunded (so the elevated, slotted card is visible at rest, not only after interaction), a 'Settle a payment' button that drops a new receipt onto the spike, and a 'Refund newest settled' button that pulls the current top-of-pile receipt back up the spine.",
+  "dependencies": [],
+  "card": {
+    "focus": ".ns-spindle",
+    "padding": 1.2
+  }
+}

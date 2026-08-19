@@ -92,7 +92,11 @@ function useReducedMotion() {
 }
 
 function transitionStyle(kind: TransitionKind, reduced: boolean) {
-  if (reduced) return { transitionDuration: "0ms" };
+  // The strip's curvature IS the reading (latched vs. clear) — a 0ms jump
+  // removes the only passive signal that value crossed a threshold. Keep a
+  // short, non-overshooting linear settle instead of the full snap/rearm
+  // spring curves.
+  if (reduced) return { transitionDuration: "140ms", transitionTimingFunction: "linear" };
   if (kind === "snap") {
     return {
       transitionDuration: "320ms",
@@ -191,7 +195,7 @@ export function BimetalTrip({
       <style>{`
 .ns-bimetal-strip{transition-property:d}
 @media (prefers-reduced-motion: reduce){
-  .ns-bimetal-strip{transition:none !important}
+  .ns-bimetal-strip{transition-duration:140ms !important;transition-timing-function:linear !important}
 }
 `}</style>
 

@@ -1,0 +1,36 @@
+{
+  "name": "rack-seat",
+  "title": "Rack Seat",
+  "description": "Step-up auth drawn as switchgear racking — a sensitive-actions group sits 12px back on a visible rail with its contacts unmade until fresh verification racks it in, then physically withdraws over the elevation window instead of expiring invisibly into a 401.",
+  "collection": "core",
+  "tags": [
+    "auth",
+    "mfa",
+    "step-up",
+    "verification",
+    "settings",
+    "danger-zone",
+    "svg",
+    "aria-live",
+    "accessibility",
+    "mono"
+  ],
+  "useWhen": "a group of sensitive actions (delete org, rotate a signing key) should stay visible and legible while gated behind recent re-authentication, and elevation should be felt lapsing over a window rather than discovered as a failed request. Pick guardrail-interlock-keys instead when several independent policy checks gate one piece of already-produced output at the moment it's released, and dashpot-latch or a plain confirm when the point is a single irreversible act at the instant of pressing, not a standing privilege state over a whole group.",
+  "autoplay": {
+    "mode": "press",
+    "target": "[data-verify-button], [data-rack-action]",
+    "hold": 220,
+    "period": 5000,
+    "delay": 700
+  },
+  "gate": {
+    "openBy": "[data-verify-button]",
+    "expect": "[data-rack-action]:not([aria-disabled])"
+  },
+  "card": {
+    "focus": "[data-rack-seat]",
+    "padding": 0.18
+  },
+  "instruction": "`<RackSeat actions={RackAction[]} expiresAt elevationMs? accelerateMs? label? title? onRequestVerification? onVerify? onActivate? className? />` renders a group of sensitive actions as switchgear racking rather than a disabled-and-dimmed button row. One governing scalar, rackTravel (0..1), computed purely from `expiresAt` (an owner-supplied epoch ms, or null) against the real clock, drives every visual: the action group's own `transform: translateX(-(1-rackTravel)*12px)` (12px of physical travel, racked out to the left at 0, flush/seated at 1), a paired contact-chevron gap in a fixed 36px rail zone to the group's left that closes over the same 12px as travel rises, and a 6-tick gauge on that rail's centerline that fills tick-by-tick from --border to solid --foreground as `Math.round(travel*6)` crosses each tick. RACKING IN: when `expiresAt` transitions from null/lapsed to a fresh future timestamp, travel is driven by the SAME per-frame clock computation but the group's transform additionally gets `transition: transform 450ms cubic-bezier(0.16,1,0.3,1)` (ease-out-expo) for exactly that 450ms window, so the seat reads as one deliberate mechanical motion, not a snap. WITHDRAWAL: for the rest of the window travel is recomputed every animation frame directly from elapsed-vs-elevationMs with no CSS transition at all (the continuous function itself is the motion) — a plateau phase drifts travel from 1.000 down to 0.995 (sub-pixel, purely for physical continuity: 'creeps back continuously through the window'), then the final `accelerateMs` (default 10s, clamped to elevationMs) plunges it from 0.995 to 0 on an ease-in cubic (`0.995 * (1-p**3)`), which is the visibly accelerating pull-back the brief calls for. THE INTERACTIVE FLIP — aria-disabled and what a click does — is derived from the same scalar via `seated = travel >= 0.995`: true for the entire plateau (so a verified group is genuinely usable for the whole window, not for one animation frame) and false for the entire final accelerate segment, so the group is already back to its locked behavior for the full length of the visible withdrawal the user is watching — elevation lapses in view, never invisibly at the last millisecond. Every action renders as a real, always-focusable `<button>` with `pointer-events` never touched and no disabled attribute — only `aria-disabled` (present only while `!seated`) and `aria-describedby` flip, pointed at one of two sr-only paragraphs: 'Requires recent verification. Activating starts verification.' while racked out, 'Verified. Activating performs this action.' once seated. Pressing a racked-out action calls `onRequestVerification(id)` and opens an inline step-up strip in place (never a dialog) with a 'Verify identity' button; pressing a seated action calls `onActivate(id)`, the real action. The strip is rendered BEFORE the rail/group in DOM source order but reflowed after it visually via `order-*` (head=order-1, strip=order-3, track=order-2) — deliberate: the demo driver and the verifier's own pre-gate press both walk the DOM in tree order and re-query `target` every cycle, so once the strip exists a union selector's first match becomes the Verify button instead of re-finding a rack action, letting one autoplay descriptor script open-then-complete step-up without special-casing it. Pressing 'Verify identity' calls `onVerify()` — the actual MFA belongs to the host app; this component only asks for it — and the strip self-closes the moment `seated` goes true, whatever produced that (an instant mock in the demo, a slower real flow in production). SEATED READOUT and STATUS: a Geist Mono line above the rail reads 'Locked · requires verification', 'Unlocked · 4:32 remaining' (live mm:ss), or 'Withdrawing · 0:07 remaining' once the accelerate phase starts, so the countdown itself narrates which phase is live. A visually-hidden `role=status`/`aria-live=polite` region announces exactly once per transition: 'Verified. Sensitive actions unlocked for 5 minutes.' on seat and 'Verification expired, sensitive actions locked.' on the window running out — both derived from the real clock crossing zero inside the same per-frame check, not from a prop merely changing, so a window that simply elapses without the owner touching `expiresAt` still announces correctly. The whole group is `role=region` with `aria-label` defaulting to 'Sensitive actions, verification required'. REDUCED MOTION (`matchMedia` with a live change listener) drops the per-frame creep entirely: a coarse 1s interval sets travel to a flat 0 or 1, the 450ms seat transition and tick/chevron fade transitions are removed, and the readout collapses to exactly two literal strings — 'Locked, requires verification' / 'Unlocked for 5 minutes' — so the state is carried by static position and plain text, never motion alone. No disabled-opacity veil anywhere: every action stays fully legible and physically present at every travel value, which is the falsifiable property this component is built to satisfy. Colours are `--background --foreground --ns-muted --border` only via Tailwind token classes and `currentColor`, plus a visible `--ns-accent` focus-visible ring on every control — `--ns-accent` never marks state. DOM + SVG + CSS, no canvas, zero dependencies.",
+  "dependencies": []
+}

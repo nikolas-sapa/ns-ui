@@ -1,0 +1,33 @@
+{
+  "name": "mull-hinge",
+  "title": "Mull Hinge",
+  "description": "A margin comment thread glued to its anchored phrase by a translucent tissue-strip hinge whose shear, opacity and tearing are a live readout of anchor health under concurrent edits.",
+  "collection": "core",
+  "tags": [
+    "comments",
+    "annotation",
+    "margin",
+    "collaboration",
+    "thread",
+    "svg",
+    "spring",
+    "aria-live",
+    "accessibility"
+  ],
+  "card": {
+    "focus": ".max-w-lg",
+    "padding": 0.14
+  },
+  "autoplay": {
+    "mode": "press",
+    "target": "[data-simulate-edit]",
+    "hold": 400,
+    "period": 4200
+  },
+  "gate": {
+    "openBy": "[data-simulate-delete]",
+    "expect": "[data-mullhinge-orphaned-badge]"
+  },
+  "instruction": "A margin comment thread whose connector to its anchored phrase is a stateful strain gauge, not decoration. The component is controlled: the consumer's collab/document layer supplies `driftPx` (currentAnchorTop minus anchorTopAtCreation, in px — positive means the anchored text moved down as other people's edits landed above it) and `orphaned` (true once the anchored text itself was deleted upstream); MullHinge owns only the physics and the render, never the measurement. STRUCTURE: a flex row — a small quoted-phrase marker on the left (the anchor), a short SVG tissue strip in the middle (the hinge), and the thread card on the right, laid out as a real <section aria-labelledby aria-describedby> containing an <h3> heading, an <ul> of existing comments each with its own 'Reply to {author}' button, a real <textarea> composer, and a 'Post reply' submit button. PHYSICS: driftPx changes are never applied directly — they drive a damped spring (stiffness 210 s^-2, zeta 0.9) whose displayed value is what everything else reads, so a large upstream paste reads as the hinge being yanked into its new position rather than teleporting there. From that displayed drift, shear angle = atan(drift / hingeLength) is computed and clamped to +/-38deg: past that angle the strip would visually slip off the card's glued edge and read as broken when the anchor is in fact still perfectly attached, so the cap exists specifically to prevent that false impression. Both the quoted-text marker's own vertical offset and the hinge polygon's anchor-side edge are driven off this SAME capped value — never the raw uncapped drift — which is what keeps the hard constraint true: the strip is glued at both endpoints at all times, it only refuses to look torn before it actually is. Tissue fill-opacity falls from 0.5 at rest to 0.25 as the capped shear ratio approaches its cap (stretched tissue reads thinner). Once raw |driftPx| exceeds 120px a 'Mend' button fades into the card header — clicking it calls onMend so the consumer can accept the current position as the new baseline. ORPHAN: the hinge is always rendered as two SVG pieces sharing one precomputed jagged clip-path polyline (fixed at build time, never recomputed per-frame) that sit flush and invisible as a seam at rest; when `orphaned` flips true they separate along that exact boundary via a 300ms ease-out CSS transform transition, then the card-side piece plays one damped ~4deg sway (a second spring, stiffness 70 s^-2, zeta 0.32) pivoting around the point still glued to the card, while the text-side remainder becomes an inert, drooped, frayed stub. A visible 'Orphaned' badge appears in the card header at the same moment, and the card keeps the last-known quoted snapshot inline in its comment list permanently — nothing about an orphaned thread is ever hidden or deleted. A11Y: the SVG hinge is aria-hidden and every fact it encodes is duplicated as plain text via aria-describedby: 'anchored to \"<quote>\", drifted N paragraphs down/up' while attached, or 'original text deleted' once orphaned. A 'Jump to anchor' button moves focus to the quoted-phrase marker and scrolls it into view (also firing an optional onJumpToAnchor callback for apps that own a real document to scroll). Reduced motion swaps the drift spring and the sway spring for instant snaps (set directly to target, no interpolation) and drops all CSS transform transitions to none, via a scoped @media(prefers-reduced-motion: reduce) block — the tear still happens, instantly, with no sway. Differs on purpose from a static margin-citation component: that kind of furniture never claims to track anything, so it can never be wrong. Here the connector is stateful and its entire point is to make broken attachment legible before you read a single reply — the alternative, which every shipped margin-comment competitor ships instead, is a leader line that always looks pristine and silently orphans. Pure DOM + inline SVG + CSS, no canvas, no dependencies. Colors are --background, --foreground, --ns-muted, --border and --ns-accent only; --ns-accent appears solely on focus rings and the Mend affordance, never as permanent decoration.",
+  "dependencies": []
+}

@@ -1,0 +1,34 @@
+{
+  "name": "growth-ring",
+  "title": "Growth Ring",
+  "description": "Version history as a dendrochronological cross-section: one ring per save, ring width proportional to change size, a dark line wherever authorship changed hands, and restoring an older version previews the discard as outer rings hinging open before you confirm.",
+  "collection": "core",
+  "tags": [
+    "version-history",
+    "restore",
+    "listbox",
+    "svg",
+    "data-viz",
+    "confirmation",
+    "destructive",
+    "mono",
+    "accessibility"
+  ],
+  "useWhen": "the version-history-and-restore panel for a shared doc, where the ring chart's own geometry has to carry three facts at once — chronological order (radius, strictly monotonic, never re-sorted by author), each save's change size (ring width, clamped 2-14px) and exactly where authorship handed off (a dark latewood line) — and restoring an older version previews precisely what gets cut before it's cut. Pick core-sample-scroll instead when the strata metaphor is for scroll position or content depth rather than a restorable version history, and sediment-stack for accumulated content depth with no restore action at all.",
+  "autoplay": {
+    "mode": "press",
+    "target": "[data-growth-version=\"v10\"]",
+    "period": 4600,
+    "delay": 700
+  },
+  "gate": {
+    "openBy": "[data-growth-version=\"v10\"]",
+    "expect": "[data-growth-confirm]"
+  },
+  "card": {
+    "focus": "[data-growth-root]",
+    "padding": 0.14
+  },
+  "instruction": "GrowthRing pairs an authoritative listbox of versions with a decorative SVG cross-section that mirrors the same data as concentric rings. Props: `versions` (`{id,label,author,delta,deltaLabel,time}[]`, newest first — the component reverses this internally so the oldest save sits at the core and radius always grows outward with time, matching the physical read of tree rings), `onRestore` (fires once a restore is actually confirmed, with the restored version), `ariaLabel`, `className`. The listbox (`role=listbox`) is the only interactive and only authoritative surface: each `role=option` renders its facts as real text in document order — label, author, delta, timestamp, then 'Current' on the newest row or 'Restore' on every older one — so an option's accessible name alone reads e.g. 'v9, Jae Lin, +76 words, Yesterday 17:12, Restore'. Roving tabindex drives keyboard nav (Up/Down/Home/End move the tabbable option and DOM focus together); Enter, Space, or a click on any option except the newest arms that version as a restore candidate. The SVG beside the list is `aria-hidden` end to end and derives everything from one governing scalar per version — its index in time. Radius is that index's cumulative position (strictly monotonic; grouping or sorting rings by author is never done, because position-equals-date is the entire point of the metaphor). Ring width is `clamp(|delta| / 25, 2, 14)`px, so an ordinary edit reads as a thin band and a giant paste still clamps to the same 14px ceiling instead of swallowing the rest of the chart. Adjacent rings alternate `--ns-muted`/`--background` fill with a 1px `--border` boundary circle between them; wherever the boundary's two neighboring versions have different authors, that boundary renders instead as a tight `--foreground` line (1.6px) — a latewood mark, readable independently of the alternating fill. The option currently holding real DOM focus gets a `--ns-accent` left rail on its row (the component's one non-button use of that token) and its matching ring gets an author-initials label in Geist Mono set along an invisible circular guide path; hovering *or* focusing a row pulses its ring by increasing `stroke-width` alone, on a 200ms transition, with no color, scale, or opacity change. Arming a version (everything but the newest) is the restore preview: an announcement text and Cancel/Confirm panel appear, the armed version's own outer edge is redrawn as a 2px `--foreground` cut line, and every ring chronologically after it — the versions a restore would discard — is regrouped into one `<g>` that folds open 8deg around a shared hinge line at the bottom of the disc — a 3D `perspective()/rotateX()` fold, not a flat 2D `rotate()`, because rotating a full closed ring in-plane just produces a second, off-center ring rather than a hinged lid — and drops to 40% opacity, so the discard is shown as a physical flap opening before anything is lost. Re-arming (clicking a different older row) just re-targets the same preview; Cancel or Escape drops it with no side effect. Confirm restore — the only other `--ns-accent` surface in the component, and a genuine second step — truncates the version list down to the armed version and everything older, calls `onRestore`, and returns to the resting, unarmed cross-section with the restored version now on top. Every arm/cancel/confirm transition writes a plain-language sentence ('Restoring to v10 removes 4 newer versions by 2 authors.', 'Restore cancelled.', 'Restored to v10.') into a single `role=status`/`aria-live=polite` region, so the destructive scope is announced in words, not left to the geometry. Under `prefers-reduced-motion: reduce` the hinge rotation is dropped entirely (the discarded rings' transform stays `none`) and only the opacity dim plays, and the hover/focus stroke-width pulse loses its transition and applies instantly — both still fully legible. No canvas, no dependency; every color used anywhere in the component is one of `--background`, `--foreground`, `--ns-muted`, `--border`, or `--ns-accent`.",
+  "dependencies": []
+}

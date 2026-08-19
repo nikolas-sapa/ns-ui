@@ -3,10 +3,25 @@
   "title": "Map Choropleth ASCII",
   "description": "ASCII-density choropleth over a fully synthetic hand-seeded tessellation. Hovering or keying through a region isolates it and the legend rescales to a band around its value.",
   "collection": "core",
-  "tags": ["chart", "map", "choropleth", "data-viz", "ascii", "canvas"],
+  "tags": [
+    "chart",
+    "map",
+    "choropleth",
+    "data-viz",
+    "ascii",
+    "canvas"
+  ],
   "useWhen": "showing a synthetic per-region index across an abstract tessellated plane where isolating one region's value against a rescaled legend matters — pick heatmap-year-stipple for a date-keyed calendar instead, or table-heat-shimmer when the rows are a literal ops list rather than spatial regions.",
-  "autoplay": { "mode": "pointer-path", "path": "figure8", "target": ".ns-mca-hit", "inset": -0.08 },
-  "card": { "focus": "canvas", "padding": 0.15 },
+  "autoplay": {
+    "mode": "pointer-path",
+    "path": "figure8",
+    "target": ".ns-mca-hit",
+    "inset": -0.08
+  },
+  "card": {
+    "focus": ".ns-mca-canvas",
+    "padding": 0.15
+  },
   "instruction": "The registry's first choropleth. The geography is entirely invented: eight hand-placed seed points on a fixed 24x13 cell grid are tessellated by nearest-seed (a plain Voronoi partition computed in-memory, no geo dependency, no GeoJSON, no real coastline or border), each cell resolving to one of eight abstract 'sectors' with a synthetic index value. Region fill uses the family's shared ASCII ramp ' .:-=+*#%@', density tracking each sector's value against the global min/max, with a small fixed-hash per-cell jitter (deterministic, not Math.random) so a solid sector still reads as ink texture rather than a flat block; thin var(--border) lines trace every sector boundary at rest. The mechanic: pointing at a cell (exact grid lookup under the cursor) or moving keyboard focus through the sector list (Tab into the map, then ArrowLeft/Right or Up/Down cycle sectors; Escape clears) isolates that sector — every other sector's cells drop to a fixed low background density at reduced opacity, muted-ink, while the isolated sector keeps its true density and gains its own boundary re-traced in var(--ns-accent) — and the legend gradient bar beneath the map rescales its domain from the global min/max to a tight +/-14 band around the isolated sector's own value, with an accent tick marking exactly where that value falls in the rescaled band. Losing hover or focus restores the global view and the full-domain legend. var(--ns-accent) never appears in the data fill itself, only the isolation boundary and the legend marker, matching the family's reserved-for-interaction convention. Tokens are read via getComputedStyle at mount and re-read through a MutationObserver on the document root's class attribute, so both themes repaint correctly on toggle. On mount the whole map fades in over 340ms; prefers-reduced-motion renders at full opacity immediately and isolation still updates instantly on interaction. Zero dependencies, zero geo/mapping libraries.",
   "dependencies": []
 }

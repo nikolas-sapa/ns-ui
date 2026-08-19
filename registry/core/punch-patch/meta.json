@@ -1,0 +1,30 @@
+{
+  "name": "punch-patch",
+  "title": "Punch Patch",
+  "description": "A role x permission matrix rendered as a Jacquard card where authority is asymmetric material: granting punches a clean hole through the card stock, revoking never un-punches — it pastes a visible patch over the hole instead, so a cell that was ever revoked stays permanently distinguishable from one that was never touched.",
+  "collection": "core",
+  "tags": [
+    "matrix",
+    "permissions",
+    "access-control",
+    "grid",
+    "checkbox",
+    "admin",
+    "svg",
+    "aria-grid",
+    "micro-interaction"
+  ],
+  "instruction": "Build a role x permission access matrix styled as a punch card whose material remembers its own history. DATA: roles (rows) x permissions (columns, some carrying a `requires` id naming another permission in the same set), plus defaultGranted, defaultRevoked (cells that start already patched — off, but previously held) and inherited (roleId+permissionId+from, rendered as sealed non-interactive eyelets) props. STRUCTURE: real ARIA grid — role=grid on the wrapper, role=row per row, role=columnheader for each permission, role=rowheader for each role name, role=gridcell wrapping each control. Every directly-editable cell is a real button role=checkbox aria-checked, accessible name '{role}: {permission}' (e.g. 'Editors: delete projects'). STATE PER CELL: two booleans, granted (current) and patched (sticky for the session — true forever once the cell has ever been revoked). RENDER LAYERS (all SVG, back to front): a faint dashed punch-site rim in --border; if patched, a patch group (a 1px-offset shadow rect in --foreground at low opacity, a solid --ns-muted patch rect 1px smaller than the rim on every side so the rim peeks through, and two small torn-corner tick marks in --foreground) that mounts once, ever, animating in with a 200ms ease-out translateX+opacity entrance the first time patched flips true, and stays mounted permanently after — this is what a re-grant punches through; a hole circle, always mounted, radius 8 on bare stock or 6 when patched (so it reads as a smaller void cut through the patch's centre), filled var(--background), scaled 0->1 and faded 0->1 on every grant/revoke via a 160ms cubic-bezier(0.3,0.9,0.4,1) transform transition with no overshoot (percussive, hard stop, not springy) — this single scale/opacity pair is what animates both a fresh punch and a punch-through-patch identically; a transient chad piece (small --ns-muted disc) that mounts only on a live user-triggered grant (never for seeded defaultGranted state) and plays a 200ms translateY(10px)+fade-out keyframe animation once via natural conditional mount/unmount, never replayed while the cell stays granted. TOGGLE: click or Space on a cell flips granted; going true->false sets patched=true (revoke, sticky) and announces '{permission} revoked for {role}. Previously granted.'; going false->true is a grant — if the permission has `requires` and the role doesn't yet hold that dependency, cascade-grant it in the SAME state update (both cells' hole transitions start together, not sequenced) and additionally fire one shared 'punch bar' — a thin --ns-accent bar measured from the two cells' real getBoundingClientRect()s via a ref map, positioned absolutely over the row, playing one 320ms scaleX(0->1)+fade keyframe connecting them — then announce '{permission} granted for {role}. Also granted: {dependency}.' via a single aria-live=polite status region; a plain grant with no cascade announces '{permission} granted for {role}.'. INHERITED CELLS: role=checkbox aria-checked=true aria-disabled=true aria-describedby pointing at a per-cell tooltip node reading 'Inherited from {parent role}' (kept in the accessibility tree at all times via opacity, not visibility/display, so assistive tech always gets it; shown visually on hover/focus via group-hover/group-focus-visible opacity), rendered as a sealed eyelet — solid rim circle stroke var(--foreground) plus a smaller inner ring, no punch/patch mechanics, not clickable (no onClick), but still reachable by grid navigation and Tab. PATCHED-CELL DESCRIPTION: every currently-off, ever-patched cell carries aria-describedby pointing at one shared sr-only node reading 'Previously granted, later revoked.' — the accessible description that keeps history honest even though aria-checked reads false. NAVIGATION: roving tabindex over the interactive+eyelet cells in a 2D roles x permissions array — only the focused cell has tabIndex 0, arrow keys move focus row/column-wise (clamped, no wrap), Home/End jump to the row's first/last column; real buttons already give Space/Enter the native click, no extra key handling needed for toggling. TOKENS: --background --foreground --ns-muted --border --ns-accent only, --ns-accent used exclusively for the transient cascade punch bar and focus rings (interaction-only). Reduced motion: every keyframe animation and the punch/patch CSS transition collapse to none via a top-level @media query plus a JS matchMedia read at mount, so grant/revoke/cascade apply their end states instantly with no chad and no bar. No canvas.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "press",
+    "target": "button[data-pp-idx=\"6\"]",
+    "hold": 220,
+    "period": 3400,
+    "delay": 700
+  },
+  "gate": {
+    "openBy": "button[data-pp-idx=\"9\"]",
+    "expect": "button[data-pp-idx=\"9\"][aria-checked=\"true\"]"
+  }
+}

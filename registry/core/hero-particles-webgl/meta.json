@@ -25,7 +25,7 @@
     "delay": 600
   },
   "card": {
-    "focus": "h1",
+    "focus": ".ns-phw-h1",
     "padding": 0.13
   }
 }

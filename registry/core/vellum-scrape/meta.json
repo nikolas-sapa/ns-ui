@@ -1,0 +1,27 @@
+{
+  "name": "vellum-scrape",
+  "title": "Vellum Scrape",
+  "description": "A version-history rail styled as scraping vellum: dragging a vertical depth slider reveals each paragraph's overwritten text exactly where it lived, in real selectable DOM, with a per-run restore control to re-ink an old passage as the document's true content.",
+  "collection": "core",
+  "tags": [
+    "version-history",
+    "diff",
+    "slider",
+    "range",
+    "scrub",
+    "document",
+    "revision",
+    "restore",
+    "accessibility"
+  ],
+  "autoplay": {
+    "mode": "drag",
+    "target": "[data-vellum-rail]",
+    "from": [0.5, 0.05],
+    "to": [0.5, 0.92],
+    "period": 4800,
+    "delay": 700
+  },
+  "instruction": "Build VellumScrape, a document viewer where a single vertical rail (a real input[type=range], min 0, max versions.length-1) scrubs the whole document's edit history at once. Props: `versions` (NEWEST FIRST — index 0 is depth 0, the current save), `runs` (the document as an ordered flat list of `{id, paragraph, current, ghost?, revealedAt?, overwrittenBy?}` — a run with no `ghost` has never been overwritten and renders as a plain span, untouched by any of this), controlled/uncontrolled `depth`/`defaultDepth`, `onDepthChange`, `onRestore`, `label`, `className`. MECHANISM: every run carrying a ghost gets a static per-run CSS custom property `--rd` (its `revealedAt` threshold); the document root carries the one value that actually changes on drag, `--scrape-depth`. Each run computes its own reveal fraction in pure CSS as `--show: clamp(0, calc(var(--scrape-depth) - var(--rd) + 1), 1)`, which is always exactly 0 or exactly 1 for any integer depth vs. any integer threshold — a clean step with no per-run JS bookkeeping. Setting the single `--scrape-depth` var on the doc root is what makes every run's opacity/color/filter (ordinary animatable properties, each with its own `transition: … 420ms`, not a transition on the custom property itself) pick up the step and ease across it together: current text crossfades toward `--ns-muted` at 35% opacity while the ghost fades in at reduced weight with a 0.5px blur. This is a CSS-driven reveal, not a JS-computed diff view or a strikethrough overlay — the revealed past is real DOM text, selectable and readable, never an image. RESTORE: a per-run button (never a descendant of the faded ghost element, so it never inherits its opacity/blur) opens an inline confirm strip beside it (Restore/Cancel), never a modal. Confirming sets that run's `restored` flag, which a `data-restored` attribute on the run wrapper uses to permanently pin the ghost to full `--foreground` ink (no blur, no muted crossfade) and hide the superseded current text, animating over 500ms cubic-bezier(0.16,1,0.3,1) — the \"one wet stroke\" re-inking, independent of the rail's depth from that point on. The confirm trigger itself is never removed from the DOM; only the confirm strip beside it toggles, and opening it is idempotent (`setConfirmingId(id)`, never a toggle), so a second click on an already-open trigger cannot close it. A11Y: the rail carries `aria-valuetext` naming the version, its author and save time — standard slider semantics, so arrow keys/Home/End work for free with no extra keydown handling. A separate visible + `aria-live=\"polite\"` summary line announces what the current depth revealed (\"Showing version N of total: k paragraphs differ\"), independent of whether the rail has focus. Every transition this component declares is zeroed under `prefers-reduced-motion`, a pure CSS switch with no JS branching in the drag or reveal path. Colors are strictly --background/--foreground/--ns-muted/--border/--ns-accent, read as CSS custom properties, never hardcoded hex. Zero dependencies, DOM+CSS only, no canvas.",
+  "dependencies": []
+}

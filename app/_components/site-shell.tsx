@@ -2,8 +2,8 @@
 
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { locate, type NavGroup, type NavItem, type NavKind } from "@/lib/nav-data";
+import { usePathname, useRouter } from "next/navigation";
+import { flatOrder, locate, type NavGroup, type NavItem, type NavKind } from "@/lib/nav-data";
 import { SIDEBAR_HIDDEN_KEY } from "@/lib/sidebar";
 import { McpPopup } from "./mcp-popup";
 import { SiteAuth } from "./site-auth";
@@ -116,6 +116,7 @@ export function SiteShell({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [cmdkOpen, setCmdkOpen] = useState(false);
 
@@ -168,6 +169,55 @@ export function SiteShell({
   // the ~300 `NavLink`s, which used to each subscribe to the router's own
   // pathname and so all re-rendered on *any* navigation, active tree or not.
   const isOnComponentPage = pathname.startsWith("/components/");
+
+  // Prev/next for the sidebar's own arrows — same order the tree reads
+  // top-to-bottom (category -> kind -> loose item, deduped to first
+  // occurrence) that `flatOrder` already gives the page-bottom Previous/Next
+  // on `/components/[name]`. Reusing it rather than inventing a second order
+  // keeps the two controls always agreeing, and it's the one order that's
+  // actually knowable here: the catalog's sort mode is client state scoped
+  // to `/`, not something a component page (or this shell, which renders on
+  // every route) can read. Wraps at the ends instead of disabling — an
+  // owner clicking through hundreds of pages back-to-back has no reason to
+  // stop at #1 or #391, and wrapping sidesteps a disabled state that would
+  // otherwise need every `hover:` utility stripped off it to keep the
+  // source-invariants gate happy.
+  const flat = useMemo(() => flatOrder(groups), [groups]);
+  const flatIndex = useMemo(
+    () => (isOnComponentPage && active ? flat.findIndex((i) => i.name === active) : -1),
+    [flat, active, isOnComponentPage],
+  );
+  const prevItem = flatIndex >= 0 ? flat[(flatIndex - 1 + flat.length) % flat.length] : null;
+  const nextItem = flatIndex >= 0 ? flat[(flatIndex + 1) % flat.length] : null;
+
+  // ArrowLeft/ArrowRight step to the previous/next component, mirroring the
+  // arrows below — but only when focus isn't inside something that owns
+  // arrow keys itself: a text field, contenteditable, or a slider/roving-
+  // tabindex control. The live demo can't leak an arrow key here even
+  // without this guard (DemoStage iframes it — a keydown inside an iframe's
+  // own document never reaches this window's listener), but the sidebar's
+  // own filter input and any slider-like control elsewhere on the page
+  // (e.g. a props table, a future host-rendered slider) are same-document
+  // and very much would.
+  useEffect(() => {
+    if (flatIndex < 0 || !prevItem || !nextItem) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+      if (e.repeat || e.metaKey || e.ctrlKey || e.altKey || cmdkOpen) return;
+      const el = e.target as HTMLElement | null;
+      if (el) {
+        const tag = el.tagName;
+        if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || el.isContentEditable) {
+          return;
+        }
+        if (el.closest('[role="slider"], [contenteditable]')) return;
+      }
+      e.preventDefault();
+      router.push(`/components/${e.key === "ArrowLeft" ? prevItem.name : nextItem.name}`);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [flatIndex, prevItem, nextItem, cmdkOpen, router]);
 
   // Where the active component lives in the tree, computed from the same
   // pathname both the server and the client already agree on — nothing here
@@ -449,6 +499,35 @@ export function SiteShell({
             </button>
           </div>
         </div>
+
+        {/* Prev/next through the component the sidebar tree walks —
+            deliberately sitting above the search field, outside the tree's
+            own `overflow-y-auto` box, so it's reachable without scrolling
+            regardless of where the visitor is in a ~300-item list. Renders
+            nothing off the component pages (the landing grid, /status, …)
+            where "previous/next" has no meaning — rule 6 of the brief this
+            shipped against: dead arrows are worse than no arrows. */}
+        {flatIndex >= 0 && prevItem && nextItem ? (
+          <div className="flex items-center justify-between gap-2 px-4 pb-3">
+            <Link
+              href={`/components/${prevItem.name}`}
+              aria-label={`Previous component: ${prevItem.title}`}
+              className="relative inline-flex size-7 shrink-0 items-center justify-center rounded-sm text-ns-muted outline-none transition-colors hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
+            >
+              <RailChevron direction="left" />
+            </Link>
+            <span className="font-mono text-[11px] tabular-nums text-ns-muted">
+              {flatIndex + 1} of {flat.length}
+            </span>
+            <Link
+              href={`/components/${nextItem.name}`}
+              aria-label={`Next component: ${nextItem.title}`}
+              className="relative inline-flex size-7 shrink-0 items-center justify-center rounded-sm text-ns-muted outline-none transition-colors hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
+            >
+              <RailChevron direction="right" />
+            </Link>
+          </div>
+        ) : null}
 
         <div className="px-4 pb-3">
           {/* Site-wide jump-to (command-palette.tsx), redesigned as a proper

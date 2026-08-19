@@ -1,0 +1,34 @@
+{
+  "name": "bitting-cut",
+  "title": "Bitting Cut",
+  "description": "Every passkey in a sign-in-methods list gets a physical key blade whose six notch depths are cut deterministically from its credential id, so the MacBook passkey and the phone passkey stay visually distinct objects across sessions.",
+  "collection": "core",
+  "tags": [
+    "passkey",
+    "webauthn",
+    "settings",
+    "security",
+    "list",
+    "svg",
+    "aria-live",
+    "accessibility"
+  ],
+  "useWhen": "a Settings > Sign-in methods list where each passkey needs a recognizable, non-random visual fingerprint derived from its own credential id — enroll plays a one-shot key-cutting pass, remove arms then files the profile flat before the row leaves. Pick pin-tumbler instead when the point is animating the ACT of unlocking rather than fingerprinting a stored credential, and card-number-emboss when the physical-object metaphor is a payment card, not a key.",
+  "autoplay": {
+    "mode": "press",
+    "target": "[aria-label=\"Add passkey\"]",
+    "hold": 200,
+    "period": 3200,
+    "delay": 700
+  },
+  "gate": {
+    "openBy": "[aria-label^=\"Remove \"]",
+    "expect": "[data-armed=\"true\"]"
+  },
+  "card": {
+    "focus": ".max-w-md",
+    "padding": 0.12
+  },
+  "instruction": "`<BittingCut initialPasskeys={Passkey[]} maxPasskeys? ariaLabel? onAdd? onRemove? className? />` renders a Settings > Sign-in methods list where every passkey draws its own key: a 112x40 inline SVG per row — a stroked ring bow (fill:none, 3px --foreground stroke, so the ring's centre reads as a literal hole) carrying a small device glyph (phone/laptop/tablet/desktop/hardware-key/generic, inferred from the row's name when `device` isn't set) drawn in --foreground strokes inside that hole, and a solid --foreground blade rendered as ONE closed SVG path whose bottom edge steps through six notch cells at one of five quantized depths. THE BITTING IS DETERMINISTIC: `bittingDepths(credentialId)` FNV-1a-hashes `credentialId#i` for i in 0..5 and takes `hash % 5` per notch — a pure function of the row's `id`, same output every call, every mount, forever. There is no `Math.random()` anywhere in that derivation; decorative randomized teeth are the explicitly forbidden alternative, because the whole point is that the SAME credential looks the SAME key on the next visit. ENROLLMENT: a passkey added at runtime (via the header's real 'Add passkey' button, which fabricates a fresh credential id from `crypto.randomUUID()` and stops offering itself once the list reaches `maxPasskeys`, default 6) mounts with cutPhase 'entering' and plays a 700ms one-shot pass: a cutter graphic (a short vertical line with a small circular head, hidden at rest) sweeps smoothly from the blade's shoulder to its tip on a CSS transform transition, while each of the six notches STEPS — not tweens — to its final hashed depth via a `setTimeout` scheduled at the moment the sweep's linear position crosses that notch's centre (a cutting wheel commits a depth as it passes, it does not interpolate one in), each step also flashing a 1px --foreground rect at that notch's x-position (direct ref style write: opacity 1 with transition:none, then next frame opacity 0 over 160ms — never React state, so the flash can't itself cause a re-render loop). Passkeys present in `initialPasskeys` at mount start at cutPhase 'settled' with their target depths already drawn — no entrance animation, because for a credential enrolled before this page loaded, that key was already cut; only a genuinely NEW enrollment plays the pass. REMOVAL runs the identical mechanism inverted: cutPhase 'filing' sweeps the same cutter across the same blade, but each notch it passes steps back to depth 0 (flat/blank) instead of toward a target — 'flattening the profile to blank' — and once every notch is blank the row transitions to 'exiting', collapsing via `grid-template-rows: 1fr -> 0fr` + opacity over 260ms (mirrors this repo's existing arm-then-confirm row-eviction pattern), after which it is spliced out of state, `onRemove(id)` fires, and a `role=status aria-live=polite` region announces 'Passkey {name} removed, {n remain}' (singular '1 remains', otherwise '{n} remain') — the only thing that ever announces; adding is silent. REMOVE ITSELF is a real per-row button that arms on first press (`data-armed`, accessible name flips from 'Remove {name}' to 'Confirm remove {name}', border/text tint to --ns-accent — the only place --ns-accent appears, since arming is an active interaction state, not decoration) and commits on a second press on the SAME button; losing focus (`onBlur`) or pressing Escape while armed reverts it unconfirmed. The button is `disabled` for the whole entering/filing/exiting span of its own row, so it cannot be re-armed mid-cut or double-filed. TEXT: every row shows the device name, 'Created {Month Day}' and a last-used phrase ('Last used today' / 'yesterday' / 'N days ago' / 'N weeks ago' / a date, or 'Never used' for a freshly enrolled key with no lastUsedAt) as plain sibling text next to the art — the key SVG is `aria-hidden`, decorative, and never the row's sole identifier; a screen reader gets the same facts as the graphic conveys visually. The list is a real `<ul role=\"list\">`/`<li>` structure with an accessible name. Last-used text follows this repo's SSR-safe pattern: `now` starts `null` and is set from `Date.now()` inside a mount effect, so the very first client render never reads the clock during render and can't mismatch a server pass; before that effect fires the row shows an inert '…' placeholder for last-used only (created-date, month/day only, needs no clock and is never a placeholder). REDUCED MOTION (`matchMedia` with a live change listener) makes both the cutting and filing passes land in a single synchronous step — full target depths or full blank depths applied immediately, cutter never becomes visible, row collapse has zero transition duration — so an assistive-tech user or anyone with the OS preference set never waits on an animation to see a stable, legible, already-finished key or an already-gone row. Colors are `--background --foreground --ns-muted --border --ns-accent` only, no hex/rgb/hsl literals anywhere including inside the SVG paths. DOM + SVG + CSS, no canvas, zero dependencies.",
+  "dependencies": []
+}

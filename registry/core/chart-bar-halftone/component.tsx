@@ -161,6 +161,7 @@ export function ChartBarHalftone({ data = [], title = "Chart", className = "" }:
       ) : (
         <div className="relative">
           <svg
+            className="ns-cbh-svg"
             viewBox={`0 0 ${viewW} ${viewH}`}
             width={viewW}
             style={{ maxWidth: "100%" }}

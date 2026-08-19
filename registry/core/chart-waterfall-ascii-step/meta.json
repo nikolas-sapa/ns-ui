@@ -3,11 +3,28 @@
   "title": "Chart Waterfall ASCII Step",
   "description": "ASCII-ramp waterfall chart where toggling a step excludes or restores its delta and every bar after it — plus the running total — visibly recomputes and re-animates, not just a hover tooltip.",
   "collection": "core",
-  "tags": ["chart", "waterfall", "data-viz", "ascii", "canvas"],
+  "tags": [
+    "chart",
+    "waterfall",
+    "data-viz",
+    "ascii",
+    "canvas"
+  ],
   "useWhen": "showing how a sequence of signed deltas bridges a start value to an end value, where the audience needs to see what the total would look like without one step — pick chart-funnel-stage-drop for a single monotonic total's own drop-off, or chart-bar-dither for unrelated categorical bars with no running dependency between them.",
-  "autoplay": { "mode": "pointer-path", "path": "sweep", "target": ".ns-cwas-hit" },
-  "card": { "focus": "canvas", "padding": 0.15 },
+  "autoplay": {
+    "mode": "pointer-path",
+    "path": "sweep",
+    "target": ".ns-cwas-hit"
+  },
+  "card": {
+    "focus": ".ns-cwas-canvas",
+    "padding": 0.15
+  },
   "instruction": "The registry's first waterfall chart: a start bar, a chain of floating delta bars (each spanning the running cumulative before and after it), and a trailing running-total bar. Every bar fill uses the family's shared 10-step ASCII ramp ' .:-=+*#%@' tiled at a small cell size, with density tracking |delta| relative to the largest bar on the chart — redundant with bar height, exactly like chart-bar-dither's own colour rule (pure var(--foreground) ink, var(--ns-accent) reserved for the hovered or keyboard-focused step). The real mechanic: every intermediate step (not the start, not the total) has a genuine toggle — a transparent hit button sized to its full slot, roving tabindex with ArrowLeft/ArrowRight moving focus between steps, aria-pressed reflecting whether the step is currently included. Activating it (click, or Enter/Space via keyboard) excludes that step's delta from the chain or restores it, and the recompute is rendered as real motion: every bar from that step onward, and the trailing total, eases its floating top/bottom to the newly recomputed cumulative over roughly 420ms, with the displayed numeric label tracking the same lerp — this is what makes it a genuine recompute rather than a tooltip. Hovering or focusing without activating shows a small tooltip with that step's exact contribution and its before/after cumulative, so the numbers are readable before committing to a change. A dashed connector line links each bar's resolved edge to the next bar's start so the chain reads as one continuous bridge even mid-animation. Tokens are read via getComputedStyle at mount and re-read through a MutationObserver on the document root's class attribute, so both themes repaint correctly on toggle with no remount. prefers-reduced-motion snaps every recompute to its final position/value in one paint instead of lerping, and the toggle itself remains fully functional. Zero dependencies.",
-  "gate": { "openBy": ".ns-cwas-hit[aria-pressed]", "expect": ".ns-cwas-hit[aria-pressed='false']", "resetBefore": true },
+  "gate": {
+    "openBy": ".ns-cwas-hit[aria-pressed]",
+    "expect": ".ns-cwas-hit[aria-pressed='false']",
+    "resetBefore": true
+  },
   "dependencies": []
 }

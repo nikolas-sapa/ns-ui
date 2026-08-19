@@ -199,7 +199,14 @@ export function ChartDonutHalftone({
           </table>
         ) : (
           <div className="relative" style={{ width: SIZE, height: SIZE }}>
-            <svg viewBox={`0 0 ${SIZE} ${SIZE}`} width={SIZE} height={SIZE} focusable="false" role="presentation">
+            <svg
+              className="ns-cdh-svg"
+              viewBox={`0 0 ${SIZE} ${SIZE}`}
+              width={SIZE}
+              height={SIZE}
+              focusable="false"
+              role="presentation"
+            >
               <defs>
                 {Array.from({ length: LEVELS + 1 }, (_, level) => (
                   <pattern

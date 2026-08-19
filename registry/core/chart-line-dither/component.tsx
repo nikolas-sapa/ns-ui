@@ -393,6 +393,7 @@ export function ChartLineDither({ data = [], title = "Chart", className = "" }: 
           <canvas
             ref={canvasRef}
             aria-hidden="true"
+            className="ns-cld-canvas"
             style={{ width: viewW, height: viewH, maxWidth: "100%", display: "block", cursor: "crosshair" }}
           />
 

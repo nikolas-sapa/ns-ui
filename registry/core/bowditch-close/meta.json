@@ -1,0 +1,30 @@
+{
+  "name": "bowditch-close",
+  "title": "Bowditch Close",
+  "description": "A geofence/traverse polygon editor built like a real closed survey traverse: the last click never auto-snaps to the first, the gap between them is drawn as the misclosure, and Balance runs the 1807 Bowditch compass rule to redistribute it across every leg in proportion to its length.",
+  "collection": "core",
+  "tags": [
+    "geofence",
+    "polygon",
+    "map",
+    "svg",
+    "cartography",
+    "drag",
+    "form",
+    "data-viz"
+  ],
+  "useWhen": "a polygon geofence/plot editor where the shape has an explicit closing action and the closing error is a real, visible, graded quantity — not a slider. Vertices are placed by click, the ring never silently teleports the last point onto the first, and Balance redistributes the misclosure across legs by the 1807 compass rule (proportional to leg length, never per-vertex). Pick pecked-ring instead for a single-radius circular geofence with no polygon shape and nothing to close.",
+  "instruction": "Build a geofence/traverse polygon editor that behaves like a real closed survey traverse, not a stock click-a-ring polygon tool. Vertices are placed by click in a drawing phase; once 3+ exist, clicking within CLOSE_RADIUS (22px) of vertex 0 places one more vertex — the closing vertex — and ends drawing. That closing click is NEVER snapped onto vertex 0: the ring is drawn open between the closing vertex and vertex 0, and the gap is drawn as a --ns-accent hairline, the misclosure, graded live as a Geist Mono ratio (perimeter / misclosure-length, e.g. '1:44') exactly as a Bowditch survey report would state it. THE ONE GOVERNING MECHANISM, falsifiable: pressing Balance traverse runs the 1807 Bowditch compass rule — for each vertex i, correction_i = misclosure * (chainage_i / totalPerimeter), where chainage_i is the cumulative leg distance walked to reach vertex i from vertex 0. Vertex 0 (chainage 0) never moves; the closing vertex (chainage = totalPerimeter) receives the FULL misclosure and lands exactly on vertex 0, merging into it. Every vertex between carries a fraction of the correction set by how much distance IT ran, not by its position in the vertex list. This forbids the two tempting wrong alternatives: the misclosure is NOT split equally per vertex (that treats a 5m leg and a 200m leg as equally suspect), and it is NOT dumped entirely onto the last point before closing (that treats every earlier vertex as perfectly surveyed, which is never true — real error accumulates continuously along the walk). A short first leg barely moves; the long final leg absorbs most of the correction, because Bowditch's rule assumes error is proportional to distance run. MOTION: all corrected targets are pre-computed once, then every vertex is driven by ONE shared spring scalar s (0 -> 1, k=92, zeta=0.9, one small overshoot) via position_i = origin_i + (target_i - origin_i) * s — the whole ring reads as a single drawstring pulling taut, never one point jumping to close a gap while the rest sit still. On settle, the closing vertex is dropped (it has merged into vertex 0) and the result (closure ratio, perimeter, area in hectares via the shoelace formula) fires through onBalance. RESET keeps a dashed --ns-muted ghost of the pre-balance ring visible under prefers-reduced-motion (where the spring is skipped and the correction snaps in a short transition instead of freezing — a state change is not the kind of motion reduced-motion exists to suppress). INTERACTION: placing a vertex is pointer-only (no natural keyboard equivalent to 'click here'); every placed vertex is a focusable button, and ArrowUp/Down/Left/Right nudge the focused vertex by 1 pxPerMeter (10x with Shift) while still in the unbalanced phase, so a misplaced corner can be corrected precisely by keyboard before balancing. ACCESSIBILITY: the drawing region carries an accessible label; each vertex button gets an aria-label naming its index and, on the closing vertex, that it IS the misclosure point; a role=status aria-live=polite region announces phase transitions and the live closure ratio; Balance and New traverse are disabled/enabled by phase rather than hidden. Colors are --background/--foreground/--ns-muted/--border/--ns-accent only, --ns-accent reserved for the misclosure hairline and focus rings — DOM + SVG + CSS only, no canvas.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "press",
+    "target": "button[data-bowditch-balance]",
+    "hold": 500,
+    "period": 4200,
+    "delay": 700
+  },
+  "gate": {
+    "openBy": "button[data-bowditch-balance]",
+    "expect": "[data-bowditch-area]"
+  }
+}

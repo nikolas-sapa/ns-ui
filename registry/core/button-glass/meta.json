@@ -12,7 +12,7 @@
   "instruction": "A liquid-glass button: translucent blurred surface, thin light border, subtle hover lift and press scale, visible keyboard focus ring, for a dark minimal (Geist-style) design system.",
   "dependencies": [],
   "card": {
-    "focus": "button",
+    "focus": ".ns-bg-btn",
     "padding": 1.1
   },
   "autoplay": {

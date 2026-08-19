@@ -35,6 +35,16 @@ for (const collection of ["core", "loud"]) {
       if (!card || typeof card !== "object" || typeof card.focus !== "string" || !card.focus.trim()) {
         console.error(`  ! ${name}: meta.json card.focus must be a non-empty CSS selector`);
         bad++;
+      } else if (!/[.#[\s>:]/.test(card.focus.trim())) {
+        console.error(
+          `  ! ${name}: meta.json card.focus "${card.focus}" is a bare tag name. ` +
+            `The card queries this selector against the WHOLE preview document, and the root ` +
+            `layout's <SmoothCursor> injects <svg> elements earlier in DOM order than any demo — ` +
+            `a bare tag matches the global cursor SVG (or other layout chrome) before the ` +
+            `component's own markup, and the card crops to that instead. Scope the selector to ` +
+            `the component's own element (a class or data-attribute on it), not a bare tag.`,
+        );
+        bad++;
       } else if (card.padding !== undefined && !(typeof card.padding === "number" && card.padding >= 0)) {
         console.error(`  ! ${name}: meta.json card.padding must be a number >= 0`);
         bad++;

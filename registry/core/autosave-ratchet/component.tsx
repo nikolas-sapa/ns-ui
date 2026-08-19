@@ -47,9 +47,11 @@ import {
 // session count, time since the last successful save), and Escape closes
 // it. The failed state additionally renders the plain visible words
 // "Not saved" beside the wheel, so the state is never carried by the
-// graphic alone. prefers-reduced-motion drops the wind-up and the spring
-// entirely — ack and failure both land as an instant discrete step to their
-// resolved angle, no easing, no anticipation.
+// graphic alone. prefers-reduced-motion drops the wind-up anticipation
+// entirely (pure flourish, no state of its own), but ack and failure keep a
+// short 140ms linear settle rather than jumping straight to their resolved
+// angle — the wheel's position is the only passive signal a save just
+// landed, so it still has to visibly move.
 // ---------------------------------------------------------------------------
 
 export type PawlTickStatus = "idle" | "saving" | "saved" | "error";
@@ -82,6 +84,11 @@ const SETTLE_MS = 200;
 const ANTICIPATE_MS = 130;
 const KICK_MS = 160;
 const PAWL_MS = 160;
+// Reduced motion drops the wind-up anticipation (pure flourish) but keeps a
+// short, non-eased settle on the ack/fail step itself — the wheel angle is
+// the only passive signal that a save just landed, so it needs to visibly
+// move rather than teleport.
+const REDUCED_MS = 140;
 
 const ANNOUNCE_THROTTLE_MS = 30_000;
 const HOVER_OPEN_DELAY_MS = 400;
@@ -241,10 +248,10 @@ export function PawlTick({ status, size = 20, className = "" }: PawlTickProps) {
 
     if (status === "saved") {
       const target = successBaseRef.current + TOOTH_DEG;
-      setWheelAngle(wheelRef.current, target, reduced ? 0 : SETTLE_MS, EASE_OUT_EXPO);
+      setWheelAngle(wheelRef.current, target, reduced ? REDUCED_MS : SETTLE_MS, reduced ? "linear" : EASE_OUT_EXPO);
       angleRef.current = target;
       successBaseRef.current = target;
-      setPawlPose(pawlRef.current, false, reduced ? 0 : PAWL_MS);
+      setPawlPose(pawlRef.current, false, reduced ? REDUCED_MS : PAWL_MS);
       setFailed(false);
       lastSavedAtRef.current = Date.now();
       setCount((c) => c + 1);
@@ -254,9 +261,9 @@ export function PawlTick({ status, size = 20, className = "" }: PawlTickProps) {
 
     if (status === "error") {
       const target = successBaseRef.current - FAIL_KICK_DEG;
-      setWheelAngle(wheelRef.current, target, reduced ? 0 : KICK_MS, EASE_KICK);
+      setWheelAngle(wheelRef.current, target, reduced ? REDUCED_MS : KICK_MS, reduced ? "linear" : EASE_KICK);
       angleRef.current = target;
-      setPawlPose(pawlRef.current, true, reduced ? 0 : PAWL_MS);
+      setPawlPose(pawlRef.current, true, reduced ? REDUCED_MS : PAWL_MS);
       setFailed(true);
       announce("Save failed", true);
       return;
@@ -442,6 +449,6 @@ const CSS = `
 .ns-pt-wheel{transform-box:fill-box;transform-origin:center;}
 .ns-pt-pawl{transform-box:fill-box;transform-origin:center;}
 @media (prefers-reduced-motion: reduce){
-  .ns-pt-wheel,.ns-pt-pawl{transition:none !important;}
+  .ns-pt-wheel,.ns-pt-pawl{transition-duration:140ms !important;transition-timing-function:linear !important;}
 }
 `;
