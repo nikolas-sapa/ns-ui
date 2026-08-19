@@ -162,7 +162,6 @@ export function SpindleStrike({
   // paint, so the offset is the genuine starting point, no false start.
   useLayoutEffect(() => {
     const prev = prevStatusRef.current;
-    let clearTimer: ReturnType<typeof setTimeout> | undefined;
     if (mountedRef.current) {
       const added: string[] = [];
       let refundedNow: SpindleTransaction | null = null;
@@ -177,13 +176,14 @@ export function SpindleStrike({
         // of skipping straight to rest. A silent snap reads identically to
         // "nothing happened" to anyone who can't see the drop; a brief,
         // small-amplitude move reads as the strike landing without the
-        // spring overshoot.
-        setEnteringIds(new Set(added));
-        // A fixed, frame-independent hold before retargeting to rest — long
-        // enough that the offset has definitely painted (this effect firing
-        // pre-paint already guarantees that) and definitely started
-        // transitioning before it reverses.
-        clearTimer = setTimeout(() => setEnteringIds(new Set()), 32);
+        // spring overshoot. Merge rather than replace: a second card struck
+        // while the first is still entering must not drop the first from the
+        // set before its own clear fires below.
+        setEnteringIds((cur) => {
+          const next = new Set(cur);
+          for (const id of added) next.add(id);
+          return next;
+        });
       }
       if (refundedNow) {
         const back = refundedNow.refundedAmount ?? refundedNow.amount;
@@ -192,10 +192,27 @@ export function SpindleStrike({
     }
     prevStatusRef.current = new Map(transactions.map((t) => [t.id, t.status]));
     mountedRef.current = true;
-    return () => {
-      if (clearTimer) clearTimeout(clearTimer);
-    };
   }, [transactions, reducedMotion]);
+
+  // Owns the entering-flag's clear, independent of whatever triggered
+  // enteringIds to become non-empty. Previously this timer lived inline in
+  // the diff effect above and was only *rescheduled* when that effect found
+  // a newly-added id — but React tears down and reruns that whole effect
+  // (cancelling any pending timer via its cleanup) on every `transactions`
+  // change, added or not. A refund landing on a card within its own 32ms
+  // entering window re-ran the diff effect with `added: []` (the card
+  // already existed), which cancelled the pending clear but scheduled no
+  // replacement: `entering` stayed true forever, pinning that card at
+  // opacity 0 with its entrance offset applied — permanently invisible.
+  // Keying this effect on `enteringIds` itself instead means it reschedules
+  // exactly when the set actually changes, and an unrelated transactions
+  // update (like that refund) that doesn't touch enteringIds can't cancel a
+  // clear that's already in flight.
+  useEffect(() => {
+    if (enteringIds.size === 0) return;
+    const clearTimer = setTimeout(() => setEnteringIds(new Set()), 32);
+    return () => clearTimeout(clearTimer);
+  }, [enteringIds]);
 
   // Recency index among ALL receipts (refunded ones included), newest = 0.
   // Refunded cards keep the index their position implies, so the pile below

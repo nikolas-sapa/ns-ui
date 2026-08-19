@@ -104,9 +104,20 @@ function toCents(raw: string | undefined): number {
 }
 
 function formatCents(cents: number, currency: string): string {
-  const dollars = Math.floor(cents / 100);
-  const rem = cents % 100;
-  return `${currency}${dollars.toLocaleString("en-US")}.${String(rem).padStart(2, "0")}`;
+  // A negative allocation is legitimate bookkeeping (a credit line), so the
+  // input regex in toCents keeps '-' anywhere, not just leading. But
+  // splitting sign off the FLOORED/MODULO'd value, rather than the raw
+  // magnitude, put the sign on the dollars term and left it on the cents
+  // remainder too (JS '%' preserves the dividend's sign): -55025 cents
+  // rendered as "$-551.-25" (floor(-550.25) = -551, -55025 % 100 = -25)
+  // instead of "-$550.25". Take the sign off the magnitude once, up front,
+  // then floor/mod the absolute value so dollars and cents never carry a
+  // second, independent sign.
+  const sign = cents < 0 ? "−" : "";
+  const abs = Math.abs(cents);
+  const dollars = Math.floor(abs / 100);
+  const rem = abs % 100;
+  return `${sign}${currency}${dollars.toLocaleString("en-US")}.${String(rem).padStart(2, "0")}`;
 }
 
 function formatSigned(diffCents: number, currency: string): string {
