@@ -1,8 +1,19 @@
 import { notFound } from "next/navigation";
-import { demos } from "@/registry/index";
+import registry from "@/registry.json";
 import autoplayMap from "@/lib/autoplay.generated.json";
 import { parseAutoplay } from "@/lib/autoplay";
 import { AutoplayDriver } from "@/app/_components/autoplay-driver";
+import { DemoLazy } from "@/app/_components/demo-lazy";
+
+// Existence check only — never `import { demos }` here. `demos` is a
+// Record<string, ComponentType> of 389 `lazy(() => import(...))` entries; a
+// Server Component that renders `demos[name]` directly makes every one of
+// those 389 targets look "reachable" to Next's client-reference-manifest
+// (it can't know which key a runtime string picks), so all 389 shipped
+// eagerly in one ~3MB chunk on every `/preview/<name>` request. The actual
+// lookup+render now happens in `DemoLazy`, a Client Component, where
+// Turbopack can genuinely code-split per demo. See that file's docblock.
+const registryNames = new Set(registry.items.map((i) => i.name));
 
 /**
  * The single implementation shared by both routes that render a component:
@@ -24,8 +35,7 @@ export function DemoFrame({
   autoplay?: string;
   interactive?: string;
 }) {
-  const Demo = demos[name];
-  if (!Demo) notFound();
+  if (!registryNames.has(name)) notFound();
 
   // `?embed=1` is how the landing-page cards load this page inside an iframe.
   // It changes nothing visual — this stays the reference the cards are
@@ -66,7 +76,7 @@ export function DemoFrame({
       inert={embedded && !interactiveEmbed}
       data-autoplay-root={spec ? "" : undefined}
     >
-      <Demo />
+      <DemoLazy name={name} />
       {spec ? <AutoplayDriver spec={spec} /> : null}
     </div>
   );
