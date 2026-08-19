@@ -39,11 +39,15 @@ import { useId, useRef, useState } from "react";
 // is the only signal that it's being torn free. When the tween lands, the
 // coin re-strikes: the outstanding amount drops by the refund and the
 // chord resets to the disc's edge (0% again), ready for the next partial
-// refund. The only --ns-accent in the component is the live cut line
-// inside the coin (the chord's visible position, doubling as the
-// otherwise-invisible role=slider handle's value indicator) and the
-// keyboard focus ring — both genuinely interaction-tied, never rest-state
-// decoration.
+// refund. The live cut line inside the coin (the chord's visible
+// position, doubling as the otherwise-invisible role=slider handle's
+// value indicator) is drawn in --border, the same value the disc's own
+// edge stroke uses — it reads as another physical seam of the coin, not
+// an accent highlight. The clip boundary alone can't carry that job: the
+// two halves are deliberately pixel-identical to one undivided coin at
+// rest, so the boundary itself is invisible until commit tears the cut
+// half free. --ns-accent appears only on the keyboard focus ring — the
+// one genuinely interaction-tied, never rest-state, use of it.
 // ---------------------------------------------------------------------------
 
 const VB = 200; // svg viewBox is VB x VB
@@ -424,13 +428,15 @@ export function SpecieClip({
             <DiscFace label={fmt(chargeValue, currencySymbol)} />
           </g>
 
-          {/* the live cut line — authoritative, always current */}
+          {/* the live cut line — authoritative, always current. Drawn in
+              --border (the same stroke the disc's own edge uses), not
+              --ns-accent: it's the coin's physical seam, not a UI accent. */}
           <line
             x1={chordXpx}
             y1={CY - OUTER_R - 4}
             x2={chordXpx}
             y2={CY + OUTER_R + 4}
-            stroke="var(--ns-accent)"
+            stroke="var(--border)"
             strokeWidth={1}
             vectorEffect="non-scaling-stroke"
           />
