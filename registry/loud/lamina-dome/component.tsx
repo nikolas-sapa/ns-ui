@@ -89,7 +89,26 @@ const LIGHT_ARC_PERIOD_S = 6; // was 90
 const MAX_LIGHT_DEG = 80; // clamp so tan() never blows up
 
 const SEA_AMPL = 26; // raw height units
-const SEA_PERIOD_S = 14; // was 55 — the drown/wake pulse now completes fast enough to read as motion, not a fixed backdrop
+// SEA_PERIOD_S is the actual driver of the columnar/domed silhouette, not
+// LIGHT_ARC_PERIOD_S: the drown/wake pulse is a single scalar shared by every
+// column, so it suppresses (DROWN_FACTOR) or restores each column's deposit
+// in lockstep with everyone else. When this period is close to (or a small
+// integer ratio of) the prewarm window, the suppression cycles average out
+// before a tall column can pull durably ahead of its neighbours — variance
+// injected by light-occlusion competition gets removed by the constant
+// per-tick surface-tension diffusion faster than growth can re-inject it, and
+// the front reads as flat. Measured on the sim harness (300 cols, 34-lamina
+// prewarm matching mount warmup, then converted to the actual ON-SCREEN
+// silhouette via this file's own `capPx/max(runningMax,capPx)` render scale,
+// since raw height-unit variance is not what the owner looks at — a taller
+// field compresses more, so raw variance alone overstates a fast-growth
+// config): 14 (the value this constant briefly held) -> ~0.01px, dead flat.
+// 55 (the pre-regression value, with the old slow growthRate/TICK_HZ) ->
+// ~32px. 28, paired with the now-fast LIGHT_ARC_PERIOD_S below, is not a
+// resonance point and -> ~30px across the neighbouring 26-40s band — matches
+// the pre-regression on-screen amplitude while running 2x faster, so the
+// drown/wake pulse itself stays legible within a card-scale glance.
+const SEA_PERIOD_S = 28; // was 14 (regression: flattened the ridge silhouette — see comment above), before that 55
 const SEA_CHASE = 0.01; // per-tick lerp of sea center toward mean height
 const DROWN_FACTOR = 0.12;
 

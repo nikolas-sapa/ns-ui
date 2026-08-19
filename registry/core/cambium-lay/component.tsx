@@ -144,6 +144,39 @@ const FRONT_LAG_FRAC = 0.32;
 // genuinely still growing, just slowly and step-wise instead of smoothly.
 const REDUCED_RING_INTERVAL_MS = 2200;
 
+// --- MOTION VARIANT (switchable, ship value below) --------------------
+// Three tuning passes on FRONT_REVS_PER_PHASE/FRONT_LAG_FRAC (the live,
+// still-forming boundary's per-tick wobble) each measured out at roughly
+// 0.4 viewBox units of peak excursion on the demo's actual per-year budget
+// — a fraction of a screen pixel at card scale. That is not a "wavy effect
+// [that] doesn't work", it is one that was never renderable, because the
+// taper deliberately forces it back to zero at every phase boundary so
+// committed rings stay untouched. These three are genuinely different
+// treatments, not further tunings of that same capped wobble:
+//   "front-bulge" — the pre-existing behaviour: only the live, forming
+//                   boundary ripples (frontLocalProgress), reset to 0 at
+//                   every phase start/end; every committed ring is a plain
+//                   Catmull-Rom circle-ish shape once laid.
+//   "wavy-rings"  — a phase-advancing per-spoke sinusoid multiplies
+//                   growYear's radial budget directly, so the wave is
+//                   COMMITTED into every ring's real geometry (never reset)
+//                   and its phase shifts year to year — successive rings
+//                   are visibly wavy relative to each other and the wave
+//                   reads as travelling outward as the tree ages. Measured
+//                   on the standalone sim (same growYear math, 96 spokes,
+//                   maxYears=64): WAVE_AMPL=0.75, WAVE_HARMONIC=5 ->
+//                   ring-boundary peak excursion ~4.3 viewBox units by
+//                   year 13, ~5-6px at typical card scale (well past the
+//                   ~3-4px visibility floor front-bulge never cleared).
+//   "pulse-sweep" — a decorative light ring (CSS transform+opacity, no
+//                   canvas, --foreground only) sweeping outward over the
+//                   already-committed rings on a fixed loop — no change to
+//                   any path's geometry at all.
+const MOTION: "front-bulge" | "wavy-rings" | "pulse-sweep" = "wavy-rings";
+const WAVE_AMPL = 0.75; // "wavy-rings" only — +/- fraction of that year's radial budget
+const WAVE_HARMONIC = 5; // "wavy-rings" only — wave crests per full revolution
+const WAVE_PHASE_PER_YEAR = Math.PI * 0.6; // "wavy-rings" only — phase advance per virtual year, what makes the wave read as travelling ring to ring
+
 const THETAS = Array.from({ length: N_SPOKES }, (_, i) => (i / N_SPOKES) * TWO_PI);
 const COS = THETAS.map(Math.cos);
 const SIN = THETAS.map(Math.sin);
@@ -189,9 +222,16 @@ function growYear(year: number, start: Radii, ctx: GrowCtx): { earlyEnd: Radii; 
   for (let i = 0; i < N_SPOKES; i++) {
     const mult = clamp(1 + LOBE_BIAS[i] + leanBias(THETAS[i], year), 0.2, 1.5);
     const scar = scarMultiplier(i, year);
-    const e = start[i] + earlyBudget * mult * scar;
+    // "wavy-rings" only: a phase-advancing sinusoid on top of the budget,
+    // never clamped through the lobe/lean 0.2-1.5 range (it would fight the
+    // lobe/lean headroom there and flatten its own peaks) — applied as its
+    // own multiplier so it is COMMITTED into earlyEnd/final, unlike the
+    // live-front wobble below which is forced to 0 at every phase boundary.
+    const wave =
+      MOTION === "wavy-rings" ? 1 + WAVE_AMPL * Math.sin(WAVE_HARMONIC * THETAS[i] + year * WAVE_PHASE_PER_YEAR) : 1;
+    const e = start[i] + earlyBudget * mult * scar * wave;
     earlyEnd[i] = e;
-    final[i] = e + lateBudget * mult * scar;
+    final[i] = e + lateBudget * mult * scar * wave;
   }
   return { earlyEnd, final };
 }
@@ -208,6 +248,11 @@ function growYear(year: number, start: Radii, ctx: GrowCtx): { earlyEnd: Radii; 
  */
 function frontLocalProgress(p: number, theta: number): number {
   const clampedP = clamp(p, 0, 1);
+  // Only "front-bulge" carries this wobble — for the other two variants it
+  // would be an invisible, uncredited fourth effect riding under whichever
+  // one is actually being judged, so a fair A/B needs it isolated to its
+  // own variant.
+  if (MOTION !== "front-bulge") return clampedP;
   const frontAngle = FRONT_REVS_PER_PHASE * TWO_PI * clampedP;
   const taper = Math.sin(Math.PI * clampedP);
   const lag = FRONT_LAG_FRAC * taper * Math.cos(frontAngle - theta);
@@ -286,8 +331,19 @@ function simulateYears(n: number, ctx: GrowCtx): { rings: RingPaths[]; start: Ra
 const CSS = `
 .ns-cl-live{fill:var(--ns-muted);transition:fill 900ms ease}
 .ns-cl-live.ns-cl-late{fill:var(--foreground)}
+@keyframes ns-cl-pulse-sweep{
+  0%{transform:scale(0.05);opacity:0.55}
+  85%{opacity:0}
+  100%{transform:scale(1);opacity:0}
+}
+.ns-cl-pulse{
+  transform-box:fill-box;
+  transform-origin:center;
+  animation:ns-cl-pulse-sweep 3200ms linear infinite;
+}
 @media (prefers-reduced-motion: reduce){
   .ns-cl-live{transition:none}
+  .ns-cl-pulse{animation-duration:9000ms}
 }
 `;
 
@@ -444,6 +500,17 @@ export function CambiumLay({
           </g>
         ))}
         {showLive && <path ref={liveRef} className="ns-cl-live" fillRule="evenodd" d="" />}
+        {MOTION === "pulse-sweep" && (
+          <circle
+            className="ns-cl-pulse"
+            cx={CENTER}
+            cy={CENTER}
+            r={R_SAFE}
+            fill="none"
+            stroke="var(--foreground)"
+            strokeWidth={2}
+          />
+        )}
       </svg>
       <span role="status" aria-live="polite" className="sr-only">
         decorative tree-ring illustration, {ringCount} ring{ringCount === 1 ? "" : "s"}
