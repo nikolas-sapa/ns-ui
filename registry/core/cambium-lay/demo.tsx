@@ -5,7 +5,7 @@ import { CambiumLay } from "./component";
 
 export default function CambiumLayDemo() {
   // Bucketed by 20s of real wall-clock time — comfortably under the default
-  // 64-year cap at 900ms/year (64*900ms = 57.6s), which is what the live
+  // 64-year cap at 500ms/year (64*500ms = 32s), which is what the live
   // front permanently freezes at. Measured: a card whose iframe has existed
   // (open tab, or reused localStorage across remounts while scrolling) for
   // more than that shows a fully-grown, permanently static tree — reads as
@@ -28,12 +28,13 @@ export default function CambiumLayDemo() {
   return (
     <div className="relative min-h-screen">
       <div className="absolute inset-0">
-        {/* Demo-only pace: 900ms per virtual year (default is 4000ms) so the
-            live front's boundary sweep — and the scar at years 5-6 with the
-            healing that follows — reads as visibly moving within the few
-            seconds a catalog card is actually judged on, not just within a
-            longer direct-link viewing window. */}
-        <CambiumLay yearMs={900} storageKey={storageKey} />
+        {/* Demo-only pace: 500ms per virtual year (default is 4000ms, was
+            900ms in a prior pass — still judged too slow) so several rings
+            land, wave and all, within the few seconds a catalog card is
+            actually judged on, and the scar at years 5-6 with the healing
+            that follows reads as visibly moving rather than a longer
+            direct-link-only viewing window. */}
+        <CambiumLay yearMs={500} storageKey={storageKey} />
       </div>
       <div className="pointer-events-none absolute inset-x-0 bottom-10 flex justify-center px-4">
         <p

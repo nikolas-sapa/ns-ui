@@ -49,6 +49,32 @@ const DOT_MIN_SCALE = 0.35;
 const WARMUP_PLASTOCHRONS = 500;
 const JITTER_MAX_PX = 2.2;
 
+// --- MOTION VARIANT (switchable, ship value at the bottom) -----------------
+// Three passes of tuning the existing radial-advection smoothness each still
+// read as "movement is bad" — the field was moving correctly but too slowly
+// to perceive (measured ~0.4px/s at r=100 with the pre-existing defaults) and
+// only ever moved in one register (outward). These are three DIFFERENT
+// motion treatments, not three more tunings of the same one:
+//   "drift" — the component's existing analytic radial outflow, just run
+//             fast enough (via the demo's plastochron/maxPrimordia, not a
+//             change to this component's documented defaults) that
+//             individual florets visibly stream from meristem to rim inside
+//             a few seconds instead of appearing frozen.
+//   "spin"  — "drift", plus the whole resolved field rotating as one rigid
+//             frame (a fixed deg/s added uniformly to every floret's render
+//             angle) — the 34/55 spiral families visibly turn as a unit on
+//             top of flowing outward.
+//   "pulse" — "drift", plus a slow sinusoidal multiplier on every floret's
+//             resolved radius, so the whole head rhythmically breathes
+//             in/out rather than only advecting one direction.
+// All three still run the same emission clock, golden-angle placement and
+// birth-order repulsion — only how the resolved (theta, r) maps to (x, y)
+// changes, so packing/relaxation history is identical across variants.
+const MOTION: "drift" | "spin" | "pulse" = "drift";
+const SPIN_DEG_PER_S = 5; // "spin" only — deg/s the whole head rotates
+const PULSE_AMPL = 0.06; // "pulse" only — +/- fraction of resolved radius
+const PULSE_PERIOD_S = 3.2; // "pulse" only — one breathe in + out
+
 function mulberry32(seed: number): () => number {
   let a = seed >>> 0 || 1;
   return () => {
@@ -194,6 +220,13 @@ export function FloretPack({ children, plastochron = 1400, maxPrimordia = 700, c
     // CURRENT cx/cy/growthK. Reused after a resize (reproject in place, no
     // physics advance) and as the first pass of stepPhysics.
     const computePositions = () => {
+      // Rigid rotation and radial breathing are applied here, at the
+      // theta/r -> x/y resolution step, so they ride on top of the
+      // unchanged analytic advection and repulsion history rather than
+      // replacing either — see the MOTION comment above.
+      const spinRad = MOTION === "spin" ? ((simAge / 1000) * SPIN_DEG_PER_S * Math.PI) / 180 : 0;
+      const pulseMult =
+        MOTION === "pulse" ? 1 + PULSE_AMPL * Math.sin(((simAge / 1000 / PULSE_PERIOD_S) * Math.PI) * 2) : 1;
       for (let slot = 0; slot < n; slot++) {
         if (bornOrder[slot] < 0) continue;
         const age = Math.max(0, simAge - (bornAt[slot] ?? 0));
@@ -210,8 +243,8 @@ export function FloretPack({ children, plastochron = 1400, maxPrimordia = 700, c
         // outward advection. The repulsion pass below still enforces
         // DESIRED_SPACING in continuous space, so the parastichy packing is
         // unaffected — only the render position stops jumping.
-        const rBase = Math.sqrt(R0 * R0 + 2 * growthK * age);
-        const t = theta[slot] ?? 0;
+        const rBase = Math.sqrt(R0 * R0 + 2 * growthK * age) * pulseMult;
+        const t = (theta[slot] ?? 0) + spinRad;
         posX[slot] = cx + rBase * Math.cos(t) + (ox[slot] ?? 0);
         posY[slot] = cy + rBase * Math.sin(t) + (oy[slot] ?? 0);
       }
@@ -404,6 +437,26 @@ export function FloretPack({ children, plastochron = 1400, maxPrimordia = 700, c
       }
     };
 
+    // reduced-motion still needs to keep visibly living — a single warmed-up
+    // frame that never changes again for the life of the mount is a frozen
+    // frame, not a calm one. Every REDUCED_PULSE_INTERVAL_MS it runs a short
+    // discrete burst of physics ticks and repaints once (a slow, stepped
+    // pulse of continued growth/advection, never a continuous per-frame rAF
+    // sweep, which is what the vestibular guard actually targets).
+    const REDUCED_PULSE_INTERVAL_MS = 2200;
+    const REDUCED_PULSE_TICKS = 24;
+    let reducedTimer = 0;
+    const reducedPulse = () => {
+      reducedTimer = 0;
+      if (!reduced || document.hidden) {
+        reducedTimer = window.setTimeout(reducedPulse, REDUCED_PULSE_INTERVAL_MS);
+        return;
+      }
+      for (let i = 0; i < REDUCED_PULSE_TICKS; i++) stepPhysics(TICK_MS, 1);
+      applyToDOM();
+      reducedTimer = window.setTimeout(reducedPulse, REDUCED_PULSE_INTERVAL_MS);
+    };
+
     function trySetup() {
       if (started) return;
       measure();
@@ -415,6 +468,8 @@ export function FloretPack({ children, plastochron = 1400, maxPrimordia = 700, c
       if (!reduced) {
         document.addEventListener("visibilitychange", onVisibility);
         raf = requestAnimationFrame(frame);
+      } else {
+        reducedTimer = window.setTimeout(reducedPulse, REDUCED_PULSE_INTERVAL_MS);
       }
     }
 
@@ -423,6 +478,7 @@ export function FloretPack({ children, plastochron = 1400, maxPrimordia = 700, c
 
     return () => {
       if (raf) cancelAnimationFrame(raf);
+      if (reducedTimer) window.clearTimeout(reducedTimer);
       ro.disconnect();
       themeObserver.disconnect();
       document.removeEventListener("visibilitychange", onVisibility);
