@@ -41,13 +41,20 @@ export const FEATURED: string[] = [
   "wizard-dovetail", // core
   "hero-gravity-well", // loud
   "filter-facet-mesh", // core
+  // Round 7 additions: five of the strongest new mechanisms, kept to five so
+  // the list stays mixed rather than an all-canvas reel.
+  "rupert-snap", // loud   audit log as fused Prince Rupert's drops, tamper = shatter
+  "lamina-dome", // loud   stromatolite columns competing for light-occlusion clearance
+  "forage-vein", // loud   Physarum plasmodium foraging the page's own content
+  "murmur-shear", // loud   ~1500-boid starling murmuration, true flocking
+  "thallus-siege", // loud   lichen colonies growing across a shared lattice
   // Tail: the rest of the previous curation, order preserved.
+  "grid-magnetic-lattice",
   "minimap-pantograph",
   "refresh-pull-flywheel",
   "view-toggle-rails",
   "undo-ghost-row",
   "hero-dipole-field",
-  "grid-magnetic-lattice",
   "hero-vortex-street",
   "toc-minimap-mercury",
   "citation-grounding-hatch",

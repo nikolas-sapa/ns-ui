@@ -44,7 +44,10 @@ export const CATEGORIES: Category[] = [
     label: "Buttons",
     tags: ["button", "control", "confirm", "confirmation", "destructive"],
     // swipe-row-detent is a swipe-to-act list row — an action, not a list.
-    extra: ["swipe-row-detent"],
+    // brass-check (hold-to-confirm session revoke), frank-register and
+    // rapid-wire (payment-commit actions) are the same shape: the payload
+    // looks like a list/receipt but the actual job is the commit action.
+    extra: ["swipe-row-detent", "brass-check", "frank-register", "rapid-wire"],
   },
   {
     id: "forms",
@@ -68,6 +71,11 @@ export const CATEGORIES: Category[] = [
       "dial",
       "knob",
     ],
+    // bitting-cut (passkey list) and rack-seat (step-up auth) are account
+    // security controls with no form-role tag; idler-drop and punch-patch
+    // are permission/delegation toggles, same shape as envelope-window and
+    // manifold-bleed which already match here on "switch"/"permissions".
+    extra: ["bitting-cut", "rack-seat", "idler-drop", "punch-patch"],
   },
   {
     id: "navigation",
@@ -109,8 +117,19 @@ export const CATEGORIES: Category[] = [
       "network",
     ],
     // memory-ledger-decay is a data/list display (agent memory ledger) with no tag
-    // this list's roles cover.
-    extra: ["memory-ledger-decay"],
+    // this list's roles cover. punch-figure (amount ledger), spindle-strike
+    // (payment-history spindle) and tally-cleave (invite list) are the same
+    // shape. vellum-scrape (version-history rail) and zipper-stall (merge/
+    // diff resolution) are history/version-control views with no "timeline"
+    // or "table" tag to match on.
+    extra: [
+      "memory-ledger-decay",
+      "punch-figure",
+      "spindle-strike",
+      "tally-cleave",
+      "vellum-scrape",
+      "zipper-stall",
+    ],
   },
   {
     id: "feedback",
@@ -142,6 +161,10 @@ export const CATEGORIES: Category[] = [
       "presence",
       "typing-indicator",
     ],
+    // return-aviso's read-receipt/delivery-status is a status readout with
+    // no tag saying "status"; fugitive-ink's reveal-then-decay is the same
+    // kind of live state readout, just for a secret instead of a message.
+    extra: ["return-aviso", "fugitive-ink"],
   },
   {
     id: "scroll",
@@ -178,7 +201,9 @@ export const CATEGORIES: Category[] = [
       "coach-mark",
       "shortcuts",
     ],
-    extra: ["dropdown-drape", "command-palette-orbit", "date-picker-moon"],
+    // mull-hinge is a margin annotation thread anchored to content, the same
+    // overlay role as a hover-card/tooltip, with no tag saying so.
+    extra: ["dropdown-drape", "command-palette-orbit", "date-picker-moon", "mull-hinge"],
   },
   {
     id: "media",
