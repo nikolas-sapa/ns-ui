@@ -38,13 +38,13 @@ import { useEffect, useRef } from "react";
 // LIGHT DIRECTION arcs slowly (LIGHT_BASE_DEG lean + a slow sine swing) —
 // domes accrete more on the side of their crest that keeps clearance toward
 // that lean, so they visibly lean the way real fossil stromatolite domes
-// lean toward palaeo-north. INSOLATION ADVANTAGE (see its own comment below,
-// near ADVANTAGE_PERIOD_S) is the separate, non-oscillating term that makes
-// peaks genuinely migrate sideways rather than just lean in place — a
-// favoured strip of growth-rate advantage sweeps continuously in one
-// direction across the pane and wraps, so which columns currently win the
-// light-occlusion competition changes over time instead of locking in
-// permanently. SEA LEVEL is a single scalar that chases the
+// lean toward palaeo-north. CREST DRIFT (see its own comment below, near
+// DRIFT_COLS_PER_S) is the separate term that makes peaks genuinely migrate
+// sideways rather than just lean in place: the whole accreted stack — the
+// live heightfield AND every committed lamina beneath it — is advected
+// sideways by whole columns at a steady rate, a lossless integer rotation
+// of the column arrays rather than a growth-rate modulation. SEA LEVEL is a
+// single scalar that chases the
 // field's mean height (slowly, so it stays relevant as the front grows) plus
 // a slow sine on top of that; a column below it gets its deposit multiplied
 // by DROWN_FACTOR — the front nearly stalls under a transgression and wakes
@@ -99,42 +99,50 @@ const LIGHT_ARC_DEG = 22; // was 12 — bigger swing, bigger visible shadow trav
 const LIGHT_ARC_PERIOD_S = 6; // was 90
 const MAX_LIGHT_DEG = 80; // clamp so tan() never blows up
 
-// INSOLATION ADVANTAGE — sixth pass, "i want the mountains to move on the x
-// axis" taken literally. LIGHT_ARC above swings the shadow-casting ANGLE,
-// which slides the occlusion boundary sideways next to an already-tall
-// column but does nothing to WHERE a column becomes tall in the first
-// place — light-occlusion coarsening is rich-get-richer (a column with any
-// early lead keeps L close to 1 and simply keeps winning at whatever angle
-// the light currently holds), so the previous pass was correct that this
-// alone locks winners in place permanently: measured baseline, the global-
-// max column's x sat within an ~10px jitter band with ~0 net drift over an
-// 8-frame/3s sample — noise, not migration.
-// This is the real, non-stationary mechanism that was missing: the same
-// swinging sun ALSO changes how much raw insolation a given stretch of the
-// pane receives, independent of shadow direction — a hillside catches more
-// direct light when it's facing the sun than when the sun has swung past
-// it, same physical cause (the light angle), different effect (intensity,
-// not occlusion). ADVANTAGE_CENTER sweeps continuously and monotonically
-// across the pane (a full one-way pass every ADVANTAGE_PERIOD_S, then
-// wraps — not a back-and-forth oscillation, so the favoured strip reads as
-// travelling in one direction, matching a sun's azimuth actually advancing
-// through a day rather than rocking). Columns within
-// ADVANTAGE_HALF_WIDTH_FRAC of the current center get a raised-cosine
-// growth-rate boost (up to ADVANTAGE_MAX_MULT); columns far from it are
-// throttled down to ADVANTAGE_MIN_MULT. Because the sweep runs during
-// PREWARM too (same tAccum clock), no single column gets to compound an
-// unbounded historical lead before the favour band moves on and a
-// currently-favoured neighbour gets its own uncontested growth window —
-// that's what makes a later sweep able to genuinely overtake an earlier
-// winner's absolute height, not just modulate its brightness. Measured
-// (this file's own sim, 480px pane, ADVANTAGE_PERIOD_S=9): global-max
-// column x travels ~40-70px net across a 12s sample (roughly 1.3
-// sweep periods), well past the ~10px noise floor measured without this
-// term.
-const ADVANTAGE_PERIOD_S = 9; // one full one-way sweep of the favoured strip across the pane, then wraps
-const ADVANTAGE_HALF_WIDTH_FRAC = 0.22; // favoured strip half-width, as a fraction of pane width
-const ADVANTAGE_MIN_MULT = 0.12; // growth-rate multiplier far from the favoured strip
-const ADVANTAGE_MAX_MULT = 1.7; // growth-rate multiplier at the favoured strip's centre
+// CREST DRIFT — sixth pass, "i want the mountains to move on the x axis"
+// taken literally, after two prior attempts at this both failed. LIGHT_ARC
+// above swings the shadow-casting ANGLE, which slides the occlusion
+// boundary sideways next to an already-tall column but does nothing to
+// WHERE a column becomes tall in the first place — light-occlusion
+// coarsening is rich-get-richer (a column with any early lead keeps L close
+// to 1 and simply keeps winning at whatever angle the light currently
+// holds), so angle-swing alone locks winners in place permanently
+// (measured: ~10px jitter, ~0 net drift over a 3s sample). The FIFTH pass
+// tried a travelling favoured-growth-rate strip instead (boost near a
+// sweeping centre, throttle far from it): that produced real lateral
+// motion but the throttle floor (0.12x) suppressed deposit almost
+// everywhere almost always, so per-tick surface-tension diffusion (the
+// fixed 0.2 neighbour blend, unconditional every tick) had nothing to
+// fight and washed the ridge flat — variance and migration were sharing
+// one knob in opposite directions, and any throttle floor gentle enough
+// to keep the ridge alive turned out too gentle to make the crest hop
+// within a 3s glance either (measured across MIN_MULT 0.3-0.8: either the
+// ridge stayed flat or the crest didn't move inside 3s at all — no point
+// on that curve held both).
+//
+// CREST DRIFT instead makes the lateral motion a translation, not a growth
+// modulation: translating a heightfield preserves its peak-to-trough
+// variance exactly, by construction, so amplitude and migration stop
+// competing. Every tick, driftAcc accumulates DRIFT_COLS_PER_S * dt; once
+// it reaches a whole column, the ENTIRE column arrays — the live
+// heightfield h[] and every already-committed lamina snapshot — are
+// rotated sideways by exactly that many whole columns (wrapping at the
+// pane edge), never by a fractional/interpolated amount. An integer
+// rotation is lossless: it relabels which x each height belongs to without
+// resampling or blending any value, so it cannot itself inject or remove
+// silhouette variance the way even a small continuous shift with
+// interpolation would. Because the whole committed stack (not just the
+// live front) advects together, no band is ever left behind to poke
+// through a newer one — the ridge and its rock visibly travel together,
+// reading as one solid mass drifting, not the crest alone sliding across a
+// stationary base. At DRIFT_COLS_PER_S below, a full lap of a ~480px pane
+// (COL_WIDTH_BASE=2, so ~240 columns) takes ~20s, so it reads as
+// continuous one-direction travel — like a reef belt migrating along a
+// shoreline over geological time, compressed — never a back-and-forth
+// rock. Occlusion competition (CLEARANCE/DEPOSIT above) is completely
+// unmodified by this term: it is the sole source of height variance, exactly
+// as it was when the ridge was last accepted.
+const DRIFT_COLS_PER_S = 12; // ~24px/s at COL_WIDTH_BASE=2 — full lap of a 480px/240-col pane in ~20s
 
 const SEA_AMPL = 26; // raw height units
 // SEA_PERIOD_S is the actual driver of the columnar/domed silhouette, not
@@ -303,6 +311,7 @@ export function LaminaDome({
     let sinceCommit = 0;
     let seaCenter = 0;
     let runningMax = 1;
+    let driftAcc = 0; // fractional columns of CREST DRIFT owed, see header comment
 
     const rebuild = () => {
       if (cssW < 2 || cssH < 2) return;
@@ -322,6 +331,7 @@ export function LaminaDome({
       sinceCommit = 0;
       seaCenter = 1;
       runningMax = 1;
+      driftAcc = 0;
 
       const warm = reduced ? REDUCED_SAFETY_TICKS : PREWARM_SAFETY_TICKS;
       const laminaeTarget = reduced ? REDUCED_LAMINAE_TARGET : PREWARM_LAMINAE_TARGET;
@@ -336,6 +346,17 @@ export function LaminaDome({
 
     // --- simulation -------------------------------------------------------
     const tanCache = new Float32Array(K_RAYS);
+
+    // CREST DRIFT — see header comment above. A lossless integer rotation:
+    // every value simply moves to its neighbour's slot, wrapping at the
+    // edge, so it can't itself inject or remove silhouette variance the way
+    // even a small interpolated shift would.
+    const rotateColumnsRight = (arr: Float32Array) => {
+      if (cols < 2) return;
+      const last = arr[cols - 1]!;
+      for (let i = cols - 1; i > 0; i--) arr[i] = arr[i - 1]!;
+      arr[0] = last;
+    };
 
     const tick = (dt: number) => {
       tAccum += dt;
@@ -362,14 +383,6 @@ export function LaminaDome({
 
       const g = Math.max(0, growthRef.current);
 
-      // INSOLATION ADVANTAGE — see the header comment above. A continuous,
-      // one-way sweep (not back-and-forth) of a favoured strip's centre
-      // across the pane, wrapping every ADVANTAGE_PERIOD_S. Computed once
-      // per tick, not per column-per-ray: this modulates growth RATE, not
-      // shadow geometry, so it doesn't belong inside the ray march above.
-      const advCenter = ((tAccum / ADVANTAGE_PERIOD_S) % 1) * cols;
-      const advHalfWidth = ADVANTAGE_HALF_WIDTH_FRAC * cols;
-
       for (let x = 0; x < cols; x++) {
         const base = h[x]!;
         let clearSum = 0;
@@ -390,14 +403,7 @@ export function LaminaDome({
         }
         const L = clearSum / K_RAYS;
         const drowned = base < seaLevel;
-        // Circular (wrapping) distance from the favoured strip's centre —
-        // the pane's two edges are adjacent for this term's purposes, so
-        // the sweep re-enters cleanly at x=0 with no seam.
-        let dx = Math.abs(x - advCenter);
-        if (dx > cols - dx) dx = cols - dx;
-        const advBump = dx < advHalfWidth ? 0.5 * (1 + Math.cos((Math.PI * dx) / advHalfWidth)) : 0;
-        const advantage = ADVANTAGE_MIN_MULT + (ADVANTAGE_MAX_MULT - ADVANTAGE_MIN_MULT) * advBump;
-        const deposit = g * L * dt * (drowned ? DROWN_FACTOR : 1) * advantage;
+        const deposit = g * L * dt * (drowned ? DROWN_FACTOR : 1);
         hNext[x] = base + deposit;
       }
 
@@ -406,6 +412,17 @@ export function LaminaDome({
         const l = x > 0 ? hNext[x - 1]! : hNext[x]!;
         const r = x < cols - 1 ? hNext[x + 1]! : hNext[x]!;
         h[x] = hNext[x]! * (1 - 2 * SURFACE_TENSION) + SURFACE_TENSION * (l + r);
+      }
+
+      // CREST DRIFT — translate the whole accreted stack sideways by whole
+      // columns only (see rotateColumnsRight above and the header comment).
+      // Every already-committed lamina moves with the live front so the
+      // ridge and its rock read as one solid mass travelling together.
+      driftAcc += DRIFT_COLS_PER_S * dt;
+      while (driftAcc >= 1) {
+        driftAcc -= 1;
+        rotateColumnsRight(h);
+        for (let li = 0; li < laminae.length; li++) rotateColumnsRight(laminae[li]!);
       }
 
       for (let x = 0; x < cols; x++) if (h[x]! > runningMax) runningMax = h[x]!;
