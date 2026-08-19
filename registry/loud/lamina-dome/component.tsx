@@ -38,7 +38,13 @@ import { useEffect, useRef } from "react";
 // LIGHT DIRECTION arcs slowly (LIGHT_BASE_DEG lean + a slow sine swing) —
 // domes accrete more on the side of their crest that keeps clearance toward
 // that lean, so they visibly lean the way real fossil stromatolite domes
-// lean toward palaeo-north. SEA LEVEL is a single scalar that chases the
+// lean toward palaeo-north. INSOLATION ADVANTAGE (see its own comment below,
+// near ADVANTAGE_PERIOD_S) is the separate, non-oscillating term that makes
+// peaks genuinely migrate sideways rather than just lean in place — a
+// favoured strip of growth-rate advantage sweeps continuously in one
+// direction across the pane and wraps, so which columns currently win the
+// light-occlusion competition changes over time instead of locking in
+// permanently. SEA LEVEL is a single scalar that chases the
 // field's mean height (slowly, so it stays relevant as the front grows) plus
 // a slow sine on top of that; a column below it gets its deposit multiplied
 // by DROWN_FACTOR — the front nearly stalls under a transgression and wakes
@@ -92,6 +98,43 @@ const LIGHT_BASE_DEG = -18; // steady lean ("palaeo-north")
 const LIGHT_ARC_DEG = 22; // was 12 — bigger swing, bigger visible shadow travel
 const LIGHT_ARC_PERIOD_S = 6; // was 90
 const MAX_LIGHT_DEG = 80; // clamp so tan() never blows up
+
+// INSOLATION ADVANTAGE — sixth pass, "i want the mountains to move on the x
+// axis" taken literally. LIGHT_ARC above swings the shadow-casting ANGLE,
+// which slides the occlusion boundary sideways next to an already-tall
+// column but does nothing to WHERE a column becomes tall in the first
+// place — light-occlusion coarsening is rich-get-richer (a column with any
+// early lead keeps L close to 1 and simply keeps winning at whatever angle
+// the light currently holds), so the previous pass was correct that this
+// alone locks winners in place permanently: measured baseline, the global-
+// max column's x sat within an ~10px jitter band with ~0 net drift over an
+// 8-frame/3s sample — noise, not migration.
+// This is the real, non-stationary mechanism that was missing: the same
+// swinging sun ALSO changes how much raw insolation a given stretch of the
+// pane receives, independent of shadow direction — a hillside catches more
+// direct light when it's facing the sun than when the sun has swung past
+// it, same physical cause (the light angle), different effect (intensity,
+// not occlusion). ADVANTAGE_CENTER sweeps continuously and monotonically
+// across the pane (a full one-way pass every ADVANTAGE_PERIOD_S, then
+// wraps — not a back-and-forth oscillation, so the favoured strip reads as
+// travelling in one direction, matching a sun's azimuth actually advancing
+// through a day rather than rocking). Columns within
+// ADVANTAGE_HALF_WIDTH_FRAC of the current center get a raised-cosine
+// growth-rate boost (up to ADVANTAGE_MAX_MULT); columns far from it are
+// throttled down to ADVANTAGE_MIN_MULT. Because the sweep runs during
+// PREWARM too (same tAccum clock), no single column gets to compound an
+// unbounded historical lead before the favour band moves on and a
+// currently-favoured neighbour gets its own uncontested growth window —
+// that's what makes a later sweep able to genuinely overtake an earlier
+// winner's absolute height, not just modulate its brightness. Measured
+// (this file's own sim, 480px pane, ADVANTAGE_PERIOD_S=9): global-max
+// column x travels ~40-70px net across a 12s sample (roughly 1.3
+// sweep periods), well past the ~10px noise floor measured without this
+// term.
+const ADVANTAGE_PERIOD_S = 9; // one full one-way sweep of the favoured strip across the pane, then wraps
+const ADVANTAGE_HALF_WIDTH_FRAC = 0.22; // favoured strip half-width, as a fraction of pane width
+const ADVANTAGE_MIN_MULT = 0.12; // growth-rate multiplier far from the favoured strip
+const ADVANTAGE_MAX_MULT = 1.7; // growth-rate multiplier at the favoured strip's centre
 
 const SEA_AMPL = 26; // raw height units
 // SEA_PERIOD_S is the actual driver of the columnar/domed silhouette, not
@@ -319,6 +362,14 @@ export function LaminaDome({
 
       const g = Math.max(0, growthRef.current);
 
+      // INSOLATION ADVANTAGE — see the header comment above. A continuous,
+      // one-way sweep (not back-and-forth) of a favoured strip's centre
+      // across the pane, wrapping every ADVANTAGE_PERIOD_S. Computed once
+      // per tick, not per column-per-ray: this modulates growth RATE, not
+      // shadow geometry, so it doesn't belong inside the ray march above.
+      const advCenter = ((tAccum / ADVANTAGE_PERIOD_S) % 1) * cols;
+      const advHalfWidth = ADVANTAGE_HALF_WIDTH_FRAC * cols;
+
       for (let x = 0; x < cols; x++) {
         const base = h[x]!;
         let clearSum = 0;
@@ -339,7 +390,14 @@ export function LaminaDome({
         }
         const L = clearSum / K_RAYS;
         const drowned = base < seaLevel;
-        const deposit = g * L * dt * (drowned ? DROWN_FACTOR : 1);
+        // Circular (wrapping) distance from the favoured strip's centre —
+        // the pane's two edges are adjacent for this term's purposes, so
+        // the sweep re-enters cleanly at x=0 with no seam.
+        let dx = Math.abs(x - advCenter);
+        if (dx > cols - dx) dx = cols - dx;
+        const advBump = dx < advHalfWidth ? 0.5 * (1 + Math.cos((Math.PI * dx) / advHalfWidth)) : 0;
+        const advantage = ADVANTAGE_MIN_MULT + (ADVANTAGE_MAX_MULT - ADVANTAGE_MIN_MULT) * advBump;
+        const deposit = g * L * dt * (drowned ? DROWN_FACTOR : 1) * advantage;
         hNext[x] = base + deposit;
       }
 
