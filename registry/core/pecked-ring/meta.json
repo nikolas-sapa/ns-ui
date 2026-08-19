@@ -1,0 +1,26 @@
+{
+  "name": "pecked-ring",
+  "title": "Pecked Ring",
+  "description": "A geofence radius editor whose circle is drawn in pecked chart line-work where each dash is exactly 100 metres of ground circumference, so dragging the handle outward visibly grows the dash count and the radius reads by eye with no scale legend.",
+  "collection": "core",
+  "tags": [
+    "slider",
+    "geofence",
+    "radius",
+    "map",
+    "svg",
+    "drag",
+    "form",
+    "data-viz"
+  ],
+  "instruction": "Build a geofence/alert-radius editor whose ring IS the scale bar, not a decorated slider with a legend beside it. One governing scalar, r (radius in metres). dashCount = round(2*pi*r / 100) — every dash subtends exactly 100m of ground circumference, never a fixed pixel length. The circle's stroke-dasharray is a [dashLen, gapLen] pair derived from dashCount so that dashCount*(dashLen+gapLen) equals the circle's pixel circumference EXACTLY, every render — the pattern always closes around the ring with no seam, because segment length comes FROM the integer dash count rather than being assumed; a fixed pixel dasharray is exactly the thing this forbids, since its dashes mean nothing and shear visibly wherever the radius doesn't divide evenly into it. Because circumference_m cancels out of dashCount*spacing, per-dash pixel spacing collapses to roughly 100/metersPerPixel regardless of r — spacing tracks the map's scale, not visual comfort: change metersPerPixel and every dash re-spaces, the stroke never re-spaces on its own for legibility. Below a 3px spacing threshold the individual dashes would be indistinguishable, so the ring switches to 10-dash bundles (each bundled dash = 1000m) rather than drawing a denser pattern that no longer means anything — same falsifiable-by-eye rule, coarser unit. On every dash-count crossing (continuous while dragging: a new dash is born roughly every 100/(2*pi) metres of radius) the segment pair eases to its new length over 120ms via a plain CSS transition on stroke-dasharray, guarded motion-reduce:transition-none — instant re-spacing shimmers like moire against the pecked pattern, slower detaches the ring visibly from the dragging hand. Every 10th dash gets a heavier radial tick line (independent geometry from the dash stroke itself) marking the 1km index normally, the 10km index once bundled. INTERACTION: a single fixed-bearing handle (north) whose distance from the ring's centre sets r; drag reads pointer distance from centre directly (magnitude only, any direction commits), pointer capture on the drag region. ACCESSIBILITY: role=slider on the drag region with aria-valuemin/max/now in metres and aria-valuetext formatted like '1.4 km radius, area 6.2 km²'; ArrowLeft/Right/Up/Down step ±100m (one dash, matching the announced unit), Shift+Arrow steps ±1000m (one tick index), Home/End jump to the rails. The SVG is aria-hidden throughout; a visible Geist Mono numeric input mirrors r for direct entry, sharing the slider's accessible name via aria-labelledby on a common label id rather than duplicating the string. The Geist Mono radius readout is positioned riding the handle (painted with a background-colour stroke halo for legibility over the ring); the derived area (pi*r^2, formatted km² or m²) sits dead centre in --ns-muted, clearly secondary to the governing radius. Only the handle's own border tints toward --ns-accent, and only on hover/focus/drag — the ring itself stays --foreground always. DOM + SVG + CSS only, no canvas, no WebGL; all ink from --background --foreground --ns-muted --border --ns-accent, nothing hardcoded.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "drag",
+    "target": "#pecked-ring-primary",
+    "from": [0.5, 0.48],
+    "to": [0.5, 0.09],
+    "period": 4200,
+    "delay": 700
+  }
+}

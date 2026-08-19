@@ -39,7 +39,7 @@ const TICK_MS = 1000 / 30; // fixed 30Hz physics step
 const R0 = 3; // meristem birth radius, px
 const NEIGHBOR_WINDOW = 10; // +-N birth-order slots searched for spatial neighbours
 const NEIGHBOR_COUNT = 4; // 4-neighbour soft repulsion
-const DESIRED_SPACING = 4; // px — matches the render quantisation base
+const DESIRED_SPACING = 4; // px — the repulsion pass's target inter-floret spacing
 const REPEL_STRENGTH = 0.9;
 const MAX_STEP_PX = 0.3; // capped displacement per 30Hz tick
 const RIM_FADE_START = 0.85; // senescence band: last 15% of the radial lifetime
@@ -48,6 +48,44 @@ const DOT_SIZE = 10; // px, fully-grown dot diameter — sized against the ~27px
 const DOT_MIN_SCALE = 0.35;
 const WARMUP_PLASTOCHRONS = 500;
 const JITTER_MAX_PX = 2.2;
+
+// --- MOTION VARIANT (switchable, ship value at the bottom) -----------------
+// Three passes of tuning the existing radial-advection smoothness each still
+// read as "movement is bad" — the field was moving correctly but too slowly
+// to perceive (measured ~0.4px/s at r=100 with the pre-existing defaults) and
+// only ever moved in one register (outward). These are three DIFFERENT
+// motion treatments, not three more tunings of the same one:
+//   "drift" — the component's existing analytic radial outflow on its own,
+//             for comparison/debugging — individual florets stream from
+//             meristem to rim, nothing else moves.
+//   "spin"  — the shipped default: "drift" PLUS the whole resolved field
+//             rotating as one rigid frame (a fixed deg/s added uniformly to
+//             every floret's render angle, applied at the theta->x/y
+//             resolution step, so it rides on top of the unchanged radial
+//             advection and birth-order relaxation rather than replacing
+//             either). The 34/55 spiral families visibly turn as a unit
+//             WHILE still streaming outward at the same speed as "drift" —
+//             this is the "rotating growth" the owner asked for, not a
+//             separate spinning-graphic mode.
+//   "pulse" — "drift", plus a slow sinusoidal multiplier on every floret's
+//             resolved radius, so the whole head rhythmically breathes
+//             in/out rather than only advecting one direction.
+// All three still run the same emission clock, golden-angle placement and
+// birth-order repulsion — only how the resolved (theta, r) maps to (x, y)
+// changes, so packing/relaxation history is identical across variants.
+const MOTION: "drift" | "spin" | "pulse" = "spin";
+// deg/s the whole head rotates in "spin". Chosen so a floret's own radial
+// lifetime (how long it takes one primordium to travel meristem -> rim)
+// completes well under one full head rotation: at the demo's ~25s lifetime,
+// 6deg/s is a 150deg turn per floret generation — enough that the spiral
+// families visibly precess between frames a few seconds apart, not enough
+// that any single rotation reads as a spinning logo. At the documented
+// production defaults (plastochron 1400ms/maxPrimordia 700, ~980s lifetime)
+// the same 6deg/s reads as calm long-run drift of the whole pattern, never a
+// pinwheel.
+const SPIN_DEG_PER_S = 6;
+const PULSE_AMPL = 0.06; // "pulse" only — +/- fraction of resolved radius
+const PULSE_PERIOD_S = 3.2; // "pulse" only — one breathe in + out
 
 function mulberry32(seed: number): () => number {
   let a = seed >>> 0 || 1;
@@ -122,6 +160,19 @@ export function FloretPack({ children, plastochron = 1400, maxPrimordia = 700, c
     const oy = new Float32Array(n);
     const posX = new Float32Array(n);
     const posY = new Float32Array(n);
+    // Render-interpolation buffers: the physics tick is fixed at 30Hz
+    // (TICK_MS) but rAF fires at display rate (60/120Hz). Without these, the
+    // last tick's posX/posY got re-applied verbatim to the DOM on every
+    // in-between frame, so a tracked dot's per-frame render delta alternated
+    // "0px for 1-2 frames, then a multi-px jump" — a beat between the 30Hz
+    // physics step and the display's refresh rate, not smooth advection.
+    // prevPosX/Y hold the position as of the second-most-recent tick;
+    // applyToDOM lerps toward the latest tick by the leftover accumulator
+    // fraction every frame, so the rendered position moves a little every
+    // single frame instead of only on tick boundaries.
+    const prevPosX = new Float32Array(n);
+    const prevPosY = new Float32Array(n);
+    const prevBornOrder = new Int32Array(n).fill(-1);
     const maturity = new Float32Array(n);
     const dx = new Float32Array(n);
     const dy = new Float32Array(n);
@@ -181,16 +232,33 @@ export function FloretPack({ children, plastochron = 1400, maxPrimordia = 700, c
     // CURRENT cx/cy/growthK. Reused after a resize (reproject in place, no
     // physics advance) and as the first pass of stepPhysics.
     const computePositions = () => {
+      // Rigid rotation and radial breathing are applied here, at the
+      // theta/r -> x/y resolution step, so they ride on top of the
+      // unchanged analytic advection and repulsion history rather than
+      // replacing either — see the MOTION comment above.
+      const spinRad = MOTION === "spin" ? ((simAge / 1000) * SPIN_DEG_PER_S * Math.PI) / 180 : 0;
+      const pulseMult =
+        MOTION === "pulse" ? 1 + PULSE_AMPL * Math.sin(((simAge / 1000 / PULSE_PERIOD_S) * Math.PI) * 2) : 1;
       for (let slot = 0; slot < n; slot++) {
         if (bornOrder[slot] < 0) continue;
         const age = Math.max(0, simAge - (bornAt[slot] ?? 0));
         const m = Math.min(1, age / lifetimeMs);
         maturity[slot] = m;
-        const rBase = Math.sqrt(R0 * R0 + 2 * growthK * age);
-        const rQ = Math.round(rBase / 4) * 4;
-        const t = theta[slot] ?? 0;
-        posX[slot] = cx + rQ * Math.cos(t) + (ox[slot] ?? 0);
-        posY[slot] = cy + rQ * Math.sin(t) + (oy[slot] ?? 0);
+        // Continuous, not quantised: rounding this to a 4px grid (the old
+        // behaviour) reads as fine-grained packing structure once you're
+        // comparing sampled positions, but every floret's radius crosses a
+        // 4px boundary at a different moment and pops there instantly — with
+        // the accumulator fix elsewhere in this file actually running
+        // physics at its intended ~30Hz (it previously fired only a handful
+        // of times in 3s, which buried this), those pops became frequent
+        // enough to read as the whole field stuttering rather than smooth
+        // outward advection. The repulsion pass below still enforces
+        // DESIRED_SPACING in continuous space, so the parastichy packing is
+        // unaffected — only the render position stops jumping.
+        const rBase = Math.sqrt(R0 * R0 + 2 * growthK * age) * pulseMult;
+        const t = (theta[slot] ?? 0) + spinRad;
+        posX[slot] = cx + rBase * Math.cos(t) + (ox[slot] ?? 0);
+        posY[slot] = cy + rBase * Math.sin(t) + (oy[slot] ?? 0);
       }
     };
 
@@ -268,7 +336,12 @@ export function FloretPack({ children, plastochron = 1400, maxPrimordia = 700, c
       }
     };
 
-    const applyToDOM = () => {
+    // `alpha` is the fraction of the way from the previous completed tick to
+    // the latest one (0 right after a tick, approaching 1 just before the
+    // next). alpha=1 means "render the latest tick's position outright" —
+    // used by warmup and resize reprojection, which aren't running inside
+    // the interpolated rAF loop.
+    const applyToDOM = (alpha = 1) => {
       for (let slot = 0; slot < n; slot++) {
         const el = elRefs.current[slot];
         if (!el) continue;
@@ -276,12 +349,26 @@ export function FloretPack({ children, plastochron = 1400, maxPrimordia = 700, c
           el.style.opacity = "0";
           continue;
         }
+        const curX = posX[slot] ?? 0;
+        const curY = posY[slot] ?? 0;
+        let rx = curX;
+        let ry = curY;
+        // Only interpolate a floret that already existed at the previous
+        // tick under this same slot — a just-spawned or just-recycled slot
+        // has no meaningful "previous" position and must snap, not lerp in
+        // from stale/garbage coordinates.
+        if (alpha < 1 && prevBornOrder[slot] === bornOrder[slot]) {
+          const px = prevPosX[slot] ?? curX;
+          const py = prevPosY[slot] ?? curY;
+          rx = px + (curX - px) * alpha;
+          ry = py + (curY - py) * alpha;
+        }
         const m = maturity[slot] ?? 0;
         const fadeIn = Math.min(1, m / BIRTH_FADE_FRAC);
         const fadeOut = m <= RIM_FADE_START ? 1 : Math.max(0, 1 - (m - RIM_FADE_START) / (1 - RIM_FADE_START));
         const opacity = fadeIn * fadeOut;
         const scale = DOT_MIN_SCALE + (1 - DOT_MIN_SCALE) * fadeIn;
-        el.style.transform = `translate3d(${(posX[slot] ?? 0).toFixed(1)}px, ${(posY[slot] ?? 0).toFixed(1)}px, 0) scale(${scale.toFixed(3)})`;
+        el.style.transform = `translate3d(${rx.toFixed(1)}px, ${ry.toFixed(1)}px, 0) scale(${scale.toFixed(3)})`;
         el.style.opacity = opacity.toFixed(3);
         const colorIdx = m < 1 / 3 ? 0 : m < 2 / 3 ? 1 : 2;
         if (lastColorIdx[slot] !== colorIdx) {
@@ -339,10 +426,16 @@ export function FloretPack({ children, plastochron = 1400, maxPrimordia = 700, c
       lastT = now;
       acc += dt;
       while (acc >= TICK_MS) {
+        // Snapshot the pre-step state as "previous" right before overwriting
+        // it, so prevPos always trails posX/posY by exactly one tick even
+        // when a laggy frame runs several catch-up ticks in a row.
+        prevPosX.set(posX);
+        prevPosY.set(posY);
+        prevBornOrder.set(bornOrder);
         stepPhysics(TICK_MS, 1);
         acc -= TICK_MS;
       }
-      applyToDOM();
+      applyToDOM(acc / TICK_MS);
       raf = requestAnimationFrame(frame);
     };
 
@@ -356,6 +449,26 @@ export function FloretPack({ children, plastochron = 1400, maxPrimordia = 700, c
       }
     };
 
+    // reduced-motion still needs to keep visibly living — a single warmed-up
+    // frame that never changes again for the life of the mount is a frozen
+    // frame, not a calm one. Every REDUCED_PULSE_INTERVAL_MS it runs a short
+    // discrete burst of physics ticks and repaints once (a slow, stepped
+    // pulse of continued growth/advection, never a continuous per-frame rAF
+    // sweep, which is what the vestibular guard actually targets).
+    const REDUCED_PULSE_INTERVAL_MS = 2200;
+    const REDUCED_PULSE_TICKS = 24;
+    let reducedTimer = 0;
+    const reducedPulse = () => {
+      reducedTimer = 0;
+      if (!reduced || document.hidden) {
+        reducedTimer = window.setTimeout(reducedPulse, REDUCED_PULSE_INTERVAL_MS);
+        return;
+      }
+      for (let i = 0; i < REDUCED_PULSE_TICKS; i++) stepPhysics(TICK_MS, 1);
+      applyToDOM();
+      reducedTimer = window.setTimeout(reducedPulse, REDUCED_PULSE_INTERVAL_MS);
+    };
+
     function trySetup() {
       if (started) return;
       measure();
@@ -367,6 +480,8 @@ export function FloretPack({ children, plastochron = 1400, maxPrimordia = 700, c
       if (!reduced) {
         document.addEventListener("visibilitychange", onVisibility);
         raf = requestAnimationFrame(frame);
+      } else {
+        reducedTimer = window.setTimeout(reducedPulse, REDUCED_PULSE_INTERVAL_MS);
       }
     }
 
@@ -375,6 +490,7 @@ export function FloretPack({ children, plastochron = 1400, maxPrimordia = 700, c
 
     return () => {
       if (raf) cancelAnimationFrame(raf);
+      if (reducedTimer) window.clearTimeout(reducedTimer);
       ro.disconnect();
       themeObserver.disconnect();
       document.removeEventListener("visibilitychange", onVisibility);

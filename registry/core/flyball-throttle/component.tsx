@@ -219,7 +219,12 @@ export function FlyballThrottle({
   transform-origin:${CX}px ${ARM_PIVOT_Y}px;
 }
 @media (prefers-reduced-motion: reduce){
-  .ns-flyball-part{transition:none !important}
+  /* Not a snap: a state change (a press moving omega) still needs to read as
+     movement, just without the ambient never-ending spin blur, which is the
+     part reduced-motion is actually meant to suppress. Short, linear, no
+     overshoot — small-amplitude SVG attribute interpolation, not parallax
+     or anything vestibular. */
+  .ns-flyball-part{transition-duration:120ms !important; transition-timing-function:linear !important}
   .ns-flyball-spin-group{animation:none !important}
 }
 `}</style>

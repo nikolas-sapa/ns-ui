@@ -1,0 +1,27 @@
+{
+  "name": "chain-scale",
+  "title": "Chain Scale",
+  "description": "A map zoom control that is the scale bar: drag its end handle in log space to zoom, and the bar's length always reads a sayable 1-2-5 round distance, snapping with a 180ms width spring at every ladder crossing instead of drawing an arbitrary raw number.",
+  "collection": "core",
+  "tags": [
+    "slider",
+    "map",
+    "zoom",
+    "scale-bar",
+    "cartography",
+    "drag",
+    "form",
+    "micro-interaction"
+  ],
+  "useWhen": "the zoom control on an embedded map, floorplan, or coverage view, where the control itself should always answer 'how far is that' — one scalar (metersPerPixel) drives both the zoom and a checkerboard scale bar whose printed distance is always a round 1-2-5 number, the bar's own pixel length breathing to fit around it; pick slider-vernier instead for an ordinary bounded numeric input read off a fixed-length caliper scale, where there is no map, no zoom, and the track's length never changes.",
+  "instruction": "Build a scale bar that doubles as the zoom control, governed by one scalar, metersPerPixel (m). At any m, the bar's rendered length is denom/m, where denom is the LARGEST value from the 1-2-5 preferred series (…0.5 1 2 5 10 20 50 100 200 500 1000…, spanning roughly 1cm to 10,000km) whose length still fits a maxWidth prop — pickIndex(m, maxWidth) walks the ascending ladder and keeps the last rung whose v/m <= maxWidth. This is the falsifiable contract: the printed distance is ALWAYS a 1-2-5 round number, never the raw drag value. Because the formula is continuous in m while the ladder is discrete, holding denom fixed and changing m makes the bar's pixel length grow or shrink continuously (following the pointer with zero added lag), right up until the next rung overtakes it — at that instant denom jumps and the bar visibly snaps to the new fraction of maxWidth. Animate exactly that snap and nothing else: on a ladder crossing, ease the bar's width from its pre-crossing pixel length to the new target over 180ms ease-out-expo (a cubic tween written directly to refs via rAF, restarting from whatever the visual width currently is if a new crossing arrives mid-tween), flash a 1px --foreground tick at the new edge as the detent mark, and slide the round-number label out/in. Within a single denomination, width/handle/label positions are set directly via refs with NO easing — only React re-renders for the checkerboard's block COUNT and fill pattern, which are ordinary state driven by the denomination's leading digit (mantissa 1 -> 2 blocks, 2 -> 2 blocks, 5 -> 5 blocks), alternating --foreground fill and transparent, 1px --border rules between them, no interior numerals — only '0' at the left and the current denomination's label at the right, in Geist Mono. Never let React's render-time style props touch the animated width/x values (that fight is what makes the spring flash and this is the exact anti-pattern to avoid); the wrapper div carrying role=slider is the ONLY place the drag/keyboard/wheel handlers live, and the checkerboard/tick/label/handle beneath it are all aria-hidden presentation. INTERACTION: pointerdown on the wrapper starts a drag that maps handle dx to metersPerPixel in LOG space (m = clamp(exp(startLogM - dx*k))) — never linear, or a city-to-street zoom would take a hundred screens of drag; wheel over the wrapper walks the same log mapping one WHEEL_LOG_STEP per notch; ArrowLeft/Right/Up/Down step exactly one ladder rung by setting m so the new rung sits at exactly maxWidth (an inherent detent, not a quantized continuous value); Home/End jump to the ladder's min/max rung; double-click resets m so the CURRENT rung's bar sits at exactly 3/4 of maxWidth. ACCESSIBILITY: the wrapper is role=slider tabIndex=0 with aria-valuemin/max as the ladder's index bounds, aria-valuenow the current rung's index, and aria-valuetext combining the denomination and the raw per-pixel reading (e.g. '500 m — 1px = 3.2 m'); aria-describedby points at a visually-hidden aria-live=polite sentence ('Scale: 500 metres. 1 pixel equals 3.2 metres.') rendered at a stable `${id}-desc` id so a host map region's own aria-describedby can reference the same live text; prefers-reduced-motion cancels the width spring and tick flash entirely, snapping straight to the new geometry. Zero dependencies, DOM + CSS only — no canvas, no SVG required for the geometry (plain divs), no hex or Tailwind palette colors anywhere in markup or inline style.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "drag",
+    "target": "[data-chain-scale-slider]",
+    "from": [0.85, 0.5],
+    "to": [0.15, 0.5],
+    "period": 4600,
+    "delay": 600
+  }
+}

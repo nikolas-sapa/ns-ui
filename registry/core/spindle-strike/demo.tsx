@@ -7,14 +7,15 @@ const INITIAL: SpindleTransaction[] = [
   { id: "txn-1", date: "Jun 28", amount: 89.99, status: "settled" },
   { id: "txn-2", date: "Jul 05", amount: 68.2, status: "settled" },
   // Refunded 6 slots back from the newest on purpose, not closer: REFUND_LIFT
-  // (24px) is exactly 6 * CARD_GAP (4px) in the component, so a refund pulled
+  // (48px) is exactly 6 * CARD_GAP (8px) in the component, so a refund pulled
   // up from any nearer than that outranks every new arrival's z-index until
   // enough fresh settles have piled up beneath it to catch up — with the
   // refund on txn-6 (2 slots back) that took 4 clicks of "Settle a payment"
   // with zero visible change on the card before the topmost card finally
   // moved, reading as broken. Six slots back means the very next settle
-  // already ties (and, on the tie, wins via later DOM order), so the demo's
-  // primary interaction reads as live on the first press.
+  // already ties it exactly; the component resolves that tie explicitly in
+  // the refund's favor (Z_TIE_BREAK), so the demo's primary interaction
+  // reads as live on the first press without depending on DOM/paint order.
   { id: "txn-3", date: "Jul 12", amount: 150.0, status: "refunded", refundedAmount: 150.0 },
   { id: "txn-4", date: "Jul 19", amount: 41.0, status: "settled" },
   { id: "txn-5", date: "Jul 26", amount: 96.4, status: "settled" },

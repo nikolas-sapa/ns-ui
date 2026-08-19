@@ -34,14 +34,20 @@ import { useId, useRef, useState } from "react";
 // rAF writing the SVG `transform`/`opacity` attributes directly — CSS
 // transitions on inline SVG groups are ambiguous about px-vs-user-space
 // under viewBox scaling, so this keeps the shear numerically exact in the
-// same coordinate system as the ticks it's carrying with it. A thin
-// --ns-accent line riding just inside the departing group's clip boundary
-// ramps opacity 0->1 against the group's own 1->0 fade, so the exposed cut
-// face flashes bright mid-tear and is gone by the time it settles — the
-// only place --ns-accent appears, tied to the commit interaction itself,
-// never present as rest-state decoration. When the tween lands, the coin
-// re-strikes: the outstanding amount drops by the refund and the chord
-// resets to the disc's edge (0% again), ready for the next partial refund.
+// same coordinate system as the ticks it's carrying with it. The shear
+// reads from that geometry alone — the departing <g>'s own translate+fade
+// is the only signal that it's being torn free. When the tween lands, the
+// coin re-strikes: the outstanding amount drops by the refund and the
+// chord resets to the disc's edge (0% again), ready for the next partial
+// refund. The live cut line inside the coin (the chord's visible
+// position, doubling as the otherwise-invisible role=slider handle's
+// value indicator) is drawn in --border, the same value the disc's own
+// edge stroke uses — it reads as another physical seam of the coin, not
+// an accent highlight. The clip boundary alone can't carry that job: the
+// two halves are deliberately pixel-identical to one undivided coin at
+// rest, so the boundary itself is invisible until commit tears the cut
+// half free. --ns-accent appears only on the keyboard focus ring — the
+// one genuinely interaction-tied, never rest-state, use of it.
 // ---------------------------------------------------------------------------
 
 const VB = 200; // svg viewBox is VB x VB
@@ -257,7 +263,6 @@ export function SpecieClip({
   const coinBoxRef = useRef<HTMLDivElement>(null);
   const handleRef = useRef<HTMLDivElement>(null);
   const cutGroupRef = useRef<SVGGElement>(null);
-  const cutFaceRef = useRef<SVGLineElement>(null);
 
   const keptClipId = useId();
   const cutClipId = useId();
@@ -344,10 +349,8 @@ export function SpecieClip({
 
     const finalize = () => {
       const g = cutGroupRef.current;
-      const face = cutFaceRef.current;
       g?.removeAttribute("transform");
       g?.removeAttribute("opacity");
-      face?.setAttribute("opacity", "0");
       if (!isChargeControlled) setChargeInternal(remaining);
       if (!isFracControlled) setFracInternal(0);
       onRefundFracChange?.(0);
@@ -362,11 +365,9 @@ export function SpecieClip({
     };
 
     const g = cutGroupRef.current;
-    const face = cutFaceRef.current;
     if (reduced || !g) {
       g?.setAttribute("transform", `translate(${SHEAR_DX} 0)`);
       g?.setAttribute("opacity", "0");
-      face?.setAttribute("opacity", "0");
       finalize();
       return;
     }
@@ -377,7 +378,6 @@ export function SpecieClip({
       const e = easeOutExpo(t);
       g.setAttribute("transform", `translate(${SHEAR_DX * e} 0)`);
       g.setAttribute("opacity", String(1 - e));
-      face?.setAttribute("opacity", String(e));
       if (t < 1) requestAnimationFrame(step);
       else finalize();
     };
@@ -428,27 +428,15 @@ export function SpecieClip({
             <DiscFace label={fmt(chargeValue, currencySymbol)} />
           </g>
 
-          {/* bright cut face: rides just inside the departing sector, only
-              lit up mid-tear (see the rAF step above) — the sole use of
-              --ns-accent tied to the commit interaction itself */}
-          <line
-            ref={cutFaceRef}
-            x1={chordXpx + 0.6}
-            y1={CY - OUTER_R}
-            x2={chordXpx + 0.6}
-            y2={CY + OUTER_R}
-            stroke="var(--ns-accent)"
-            strokeWidth={1.5}
-            opacity={0}
-          />
-
-          {/* the live cut line — authoritative, always current */}
+          {/* the live cut line — authoritative, always current. Drawn in
+              --border (the same stroke the disc's own edge uses), not
+              --ns-accent: it's the coin's physical seam, not a UI accent. */}
           <line
             x1={chordXpx}
             y1={CY - OUTER_R - 4}
             x2={chordXpx}
             y2={CY + OUTER_R + 4}
-            stroke="var(--ns-accent)"
+            stroke="var(--border)"
             strokeWidth={1}
             vectorEffect="non-scaling-stroke"
           />
