@@ -311,7 +311,7 @@ export function FeatureGridAsciiRule({ items, cols = 3, className = "" }: Featur
 
   return (
     <div ref={containerRef} className={`relative w-full ${className}`}>
-      <canvas ref={canvasRef} aria-hidden className="pointer-events-none absolute inset-0 z-10" />
+      <canvas ref={canvasRef} aria-hidden className="ns-fgar-canvas pointer-events-none absolute inset-0 z-10" />
       <div
         className="relative grid gap-x-10 gap-y-8"
         style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}

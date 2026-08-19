@@ -104,7 +104,7 @@ export function ThemeToggleAscii({
       aria-pressed={mounted ? isDark : undefined}
       aria-label={mounted ? (isDark ? "Switch to light theme" : "Switch to dark theme") : "Toggle theme"}
       suppressHydrationWarning
-      className={`group inline-flex items-center gap-2 rounded-sm border border-border px-2 py-1.5 font-mono text-xs text-foreground transition-colors hover:border-foreground/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent ${className}`}
+      className={`ns-tta-btn group inline-flex items-center gap-2 rounded-sm border border-border px-2 py-1.5 font-mono text-xs text-foreground transition-colors hover:border-foreground/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent ${className}`}
     >
       <span
         ref={chipRef}

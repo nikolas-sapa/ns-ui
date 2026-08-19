@@ -347,6 +347,7 @@ export function MapChoroplethAscii({ regions, title = "Regional index", classNam
         <canvas
           ref={canvasRef}
           aria-hidden="true"
+          className="ns-mca-canvas"
           style={{
             width: LEFT_PAD + MAP_W + RIGHT_PAD,
             height: TOP_PAD + MAP_H + LEGEND_H,

@@ -267,7 +267,7 @@ export function ScrollIsland({
   }, [hovered, focusExpanded, reduced, compact, applyFrame]);
 
   return (
-    <header className={`fixed inset-x-0 top-0 z-40 flex justify-center ${className}`}>
+    <header className={`ns-hsp-header fixed inset-x-0 top-0 z-40 flex justify-center ${className}`}>
       <div
         ref={pillRef}
         role="navigation"

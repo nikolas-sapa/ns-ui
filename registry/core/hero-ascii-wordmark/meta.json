@@ -12,7 +12,7 @@
   ],
   "useWhen": "a display headline built from ASCII block-letters lit by the pointer like a torch, so the wordmark itself is the ASCII rather than a backdrop behind separate type; pick hero-ascii-terrain or hero-ascii-tunnel instead when the hero is a place or a corridor with DOM type laid over it, or background-ascii-dither when the glyph field is a background rather than the headline.",
   "card": {
-    "focus": "canvas",
+    "focus": ".ns-haw-canvas",
     "padding": 0.25
   },
   "autoplay": {

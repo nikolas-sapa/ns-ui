@@ -21,7 +21,7 @@
   "instruction": "An empty state for a list that has nothing in it yet: a headline, one line of muted supporting copy, one accent CTA, and an optional icon slot above the headline. The boundary is the interaction — a single SVG rect stroked with a dashed line in the muted token at low opacity, its stroke-dashoffset drifting on a seamless nine-second CSS loop so the panel reads as a plot marked out and waiting rather than a dead box. Pointing at (or keyboard-focusing) the CTA tints the outline to the accent token and contracts it toward the button on a spring-like ease, with the transform-origin measured from the button's real centre via a ResizeObserver so it stays true at any panel size or copy length. Deliberately renders no ghost or placeholder content rows — the emptiness is the message, and that silhouette belongs to a skeleton loader. CSS and SVG only: no canvas, no requestAnimationFrame, no timers, and the observer is disconnected on unmount. Colors come from --ns-muted, --ns-accent, --border and --foreground, so it reads correctly in both themes. prefers-reduced-motion leaves the outline static and un-contracting, still fully readable and usable.",
   "dependencies": [],
   "card": {
-    "focus": "button",
+    "focus": ".ns-esd-btn",
     "padding": 1.6
   }
 }

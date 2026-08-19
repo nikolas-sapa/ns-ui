@@ -65,7 +65,7 @@ export function TideLedger({
   const shown = active !== null ? cells[active] : null;
 
   return (
-    <figure className={["inline-flex flex-col gap-3", className].join(" ")}>
+    <figure className={["ns-hct-figure inline-flex flex-col gap-3", className].join(" ")}>
       <figcaption className="flex items-baseline justify-between gap-6 font-mono text-[11px] uppercase tracking-[0.18em] text-ns-muted">
         <span>{label}</span>
         {/* The readout is the direct label: one value, the hovered one, rather

@@ -255,7 +255,7 @@ export function PostListAsciiIndex({ posts, className = "" }: PostListAsciiIndex
       <span ref={liveRef} aria-live="polite" className="sr-only" />
       <div className="flex">
         <div className="relative shrink-0" style={{ width: GUTTER_W }}>
-          <canvas ref={canvasRef} aria-hidden className="absolute inset-0 h-full w-full" />
+          <canvas ref={canvasRef} aria-hidden className="ns-plai-canvas absolute inset-0 h-full w-full" />
         </div>
         <div ref={listRef} className="min-w-0 flex-1">
           {posts.map((post, i) => {
