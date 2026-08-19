@@ -1,12 +1,16 @@
 /**
  * Static content for /review — disposable local-only tooling, not part of
- * the catalog. Hand-authored from the round-7 fix list plus each new
+ * the catalog. Hand-authored from the latest fix list plus each new
  * component's own meta.json description where no note was given. Never read
  * by build-registry.ts or anything else; safe to edit freely.
  *
  * Three groups this round:
  *   A "fixed"     — re-test, owner already flagged these with a note (see
  *                   .review-state.json, keyed by slug — never cleared here).
+ *                   Row copy (change/watch) must describe the MOST RECENT
+ *                   fix, not whichever round first added the row — update
+ *                   both fields whenever a fixed component gets another
+ *                   pass, and bump COPY_ROUND_LABEL in page.tsx alongside.
  *   B "untested"  — the rest of the first batch nobody has looked at yet.
  *   C "expansion" — three new lanes: multiplayer, reliability, and
  *                   wayfinding (chain-scale, hachure-fall, index-contour,
@@ -15,6 +19,10 @@
  *                   originally scoped; bowditch-close finished after that
  *                   list was written). feat/r7-lab-6 has now merged into
  *                   feat/r7-integration, so the lane is included below.
+ *                   Group sizes are read live off this array's own group
+ *                   field in page.tsx (FIXED_COUNT/UNTESTED_COUNT/
+ *                   EXPANSION_COUNT) — never hardcode a count in prose here
+ *                   or there.
  */
 
 export type Lane = "identity" | "money" | "living" | "multiplayer" | "reliability" | "wayfinding";
@@ -46,14 +54,14 @@ export const REVIEW_ITEMS: ReviewItem[] = [
     slug: "cambium-lay",
     group: "fixed",
     change:
-      "The demo persisted wall-clock age to localStorage, so the tree froze permanently 57.6s after first mount and stayed frozen across reloads; storage key now rolls every 20s.",
-    watch: "Rings should keep accumulating even on a page you've had open a while.",
+      "The settled interior rings now shimmer, staggered by ring index, so brightness travels radially inward through material already laid down; the outer boundary keeps its wave.",
+    watch: "Motion inside the rings, not only at the growing edge.",
   },
   {
     slug: "floret-pack",
     group: "fixed",
-    change: "Render position was quantized to 4px steps, which is the stutter; quantization removed.",
-    watch: "Motion should be continuous now, not steppy.",
+    change: "The head now rotates as well as streaming outward, 6 degrees per second.",
+    watch: "The spiral pattern turning between glances while florets still drift out.",
   },
   {
     slug: "ring-graze",
@@ -71,8 +79,9 @@ export const REVIEW_ITEMS: ReviewItem[] = [
   {
     slug: "lamina-dome",
     group: "fixed",
-    change: "Reduced-motion painted one frame and never scheduled anything again; now a slow pulse.",
-    watch: "Should be alive either way.",
+    change:
+      "The whole ridge now breathes, driven by the same oscillator and phase as the sea level that suppresses drowned columns; no column's real height ever decreases.",
+    watch: "The mountain silhouette rising and settling, not a static ridge.",
   },
   {
     slug: "flyball-throttle",
@@ -83,8 +92,16 @@ export const REVIEW_ITEMS: ReviewItem[] = [
   {
     slug: "spindle-strike",
     group: "fixed",
-    change: "The entering offset was applied after paint, so the entrance collapsed to a ~1.5px blip; moved pre-paint and travel raised.",
-    watch: "Settle a payment should land with weight.",
+    change:
+      "Nothing. A hard hunt (settle at 20/50/100/300/600ms, rapid doubles, 15 presses at 16ms, settle+refund at every offset from 1 to 31ms, 60 zero-delay clicks, all repeated under reduced motion) reproduced no defect.",
+    watch: "If it misbehaves again, note what you were doing — click cadence, tab switching, resizing, or how long the page had been open.",
+  },
+  {
+    slug: "specie-clip",
+    group: "fixed",
+    change:
+      "The live chord line dropped from the blue accent to --border; accent now appears only on focus rings. It was kept rather than deleted because the two coin halves render identically, so there is no visible clip edge to show the slider's position.",
+    watch: "No blue anywhere except when you focus a control.",
   },
 
   // Group B — Still untested from the first batch. Lane order: identity, money, living.
@@ -141,12 +158,6 @@ export const REVIEW_ITEMS: ReviewItem[] = [
     group: "untested",
     lane: "money",
     note: "Type a wrong number, the gap should open to the size of the error.",
-  },
-  {
-    slug: "specie-clip",
-    group: "untested",
-    lane: "money",
-    note: "Drag the coin; half the diameter is not half the money.",
   },
   {
     slug: "remnant-cut",

@@ -39,6 +39,15 @@ const GROUP_LABEL: Record<ReviewItem["group"], string> = {
   expansion: "New — three more lanes",
 };
 
+const FIXED_COUNT = REVIEW_ITEMS.filter((i) => i.group === "fixed").length;
+const UNTESTED_COUNT = REVIEW_ITEMS.filter((i) => i.group === "untested").length;
+const EXPANSION_COUNT = REVIEW_ITEMS.filter((i) => i.group === "expansion").length;
+
+/** Bump this string, not a version number, when data.ts's Changed/Look-for
+ *  copy is rewritten for a new fix round — the only signal the owner has
+ *  that the row copy describes the CURRENT build, not a stale one. */
+const COPY_ROUND_LABEL = "Row copy last updated 2026-08-19 (latest fix round).";
+
 const GROUPS: ReviewItem["group"][] = ["fixed", "untested", "expansion"];
 const LANES: Lane[] = ["identity", "money", "living", "multiplayer", "reliability", "wayfinding"];
 const UNTESTED_LANES: Lane[] = ["identity", "money", "living"];
@@ -373,18 +382,20 @@ export default function ReviewPage() {
           Round 7 review console.
         </h1>
         <p className="mt-5 max-w-2xl text-[15px] leading-7 text-ns-muted">
-          Disposable tooling, not a catalog page: seven fixes to re-verify, twenty-three
-          components from the first batch still untested, and twenty-nine new components across
-          three more lanes. Each row links to the full component page and to its card in isolation; a
-          nearby handful also run live inline. &ldquo;Tested&rdquo; and notes persist to a local
-          file (<code className="font-mono text-[13px]">.review-state.json</code>) via a
-          dev-only API route — never the deployed site.
+          Disposable tooling, not a catalog page: {FIXED_COUNT} fixes to re-verify,{" "}
+          {UNTESTED_COUNT} components from the first batch still untested, and {EXPANSION_COUNT}{" "}
+          new components across three more lanes. Each row links to the full component page and to
+          its card in isolation; a nearby handful also run live inline. &ldquo;Tested&rdquo; and
+          notes persist to a local file (
+          <code className="font-mono text-[13px]">.review-state.json</code>) via a dev-only API
+          route — never the deployed site.
         </p>
         <p className="mt-3 font-mono text-xs text-ns-muted">
           {hydrated
             ? `${statusCounts.working} working, ${statusCounts.flagged} flagged, ${statusCounts.untouched} untouched of ${REVIEW_ITEMS.length}.`
             : "Loading saved verdicts…"}
         </p>
+        <p className="mt-1 font-mono text-xs text-ns-muted">{COPY_ROUND_LABEL}</p>
       </header>
 
       {/* Controls */}
