@@ -54,6 +54,11 @@ import { useEffect, useRef } from "react";
 // dome is always pinned at capPx (40% of the pane) and everything below,
 // laminae included, compacts proportionally as the field keeps growing.
 // Growth in raw units never actually stops; only what's on screen saturates.
+// That base scale is then modulated +/-9% in lockstep with the same
+// sea-level sinusoid that already suppresses growth for a drowned column
+// (see PEAK BREATHING below), so the whole ridge — every peak and every
+// committed lamina under it — visibly rises and falls on screen even though
+// no column's raw height ever decreases.
 //
 // RENDER: canvas only, no DOM per-cell nodes. Band fill alternates two
 // colors mixed from --ns-muted and --foreground over --background (read via
@@ -111,6 +116,28 @@ const SEA_AMPL = 26; // raw height units
 const SEA_PERIOD_S = 28; // was 14 (regression: flattened the ridge silhouette — see comment above), before that 55
 const SEA_CHASE = 0.01; // per-tick lerp of sea center toward mean height
 const DROWN_FACTOR = 0.12;
+
+// PEAK BREATHING — the ridge silhouette used to only ever grow: once a
+// column pulled ahead in the light-occlusion competition it stayed pinned at
+// the top of the screen forever, because DEPOSIT never subtracts (raw height
+// is monotonic by construction — a stromatolite doesn't erode in this model)
+// and the OLD render used a scale that only tracked runningMax slowly. The
+// same transgression/regression cycle that already suppresses a drowned
+// column's growth (DROWN_FACTOR, above) is the physically-honest source for
+// visible peak motion too: as sea level rises toward a peak, less of its
+// height reads as "exposed dome" on screen; as it falls back, the peak reads
+// taller again. BREATHE_AMPL modulates the render scale itself (not the raw
+// heightfield) in lockstep with the exact same seaLevel sinusoid already
+// driving DROWN_FACTOR — so every peak, and the whole committed lamina
+// stack beneath it, visibly rises and falls together on the same cadence
+// that already governs whether growth is suppressed. It's deliberately a
+// uniform breathing of the whole ridge rather than per-peak independent
+// motion: light-occlusion competition changes WHICH columns win the raw
+// growth race (already modeled, already what makes lamina bands wavy from
+// column to column), and this reuses the sea cycle — the model's other
+// already-shared scalar — to also change how tall the WINNERS currently
+// read, rather than inventing an unrelated third oscillator.
+const BREATHE_AMPL = 0.09; // +/- fraction of display scale — tuned to read clearly within a 3s glance at SEA_PERIOD_S's cadence without looking like a zoom/pan of the canvas
 
 const COMMIT_INTERVAL_MS = 2000;
 const MAX_LAMINAE = 200;
@@ -366,7 +393,13 @@ export function LaminaDome({
       ctx.clearRect(0, 0, cssW, cssH);
 
       const capPx = cssH * CAP_FRACTION;
-      const scale = capPx / Math.max(runningMax, capPx);
+      const baseScale = capPx / Math.max(runningMax, capPx);
+      // Same phase as the sea-level sinusoid driving DROWN_FACTOR (see the
+      // PEAK BREATHING comment above) — computed fresh every render, not
+      // cached, so it stays exactly in lockstep with tAccum even across a
+      // resize-triggered extra render.
+      const breathe = 1 + BREATHE_AMPL * Math.sin((tAccum / SEA_PERIOD_S) * Math.PI * 2);
+      const scale = baseScale * breathe;
       const baselineY = cssH;
       const xAt = (i: number) => i * colWidth;
       const yAt = (height: number) => baselineY - height * scale;
