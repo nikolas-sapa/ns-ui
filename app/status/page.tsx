@@ -120,22 +120,38 @@ const cachedTestimonialsApproved = unstable_cache(
   { revalidate: 3600 }
 );
 
-/** The board's rows, in declaration order. Each id is the check id
- *  lib/status-checks.ts already uses, and the `serviceId` the snapshot job
- *  writes against. */
-function serviceRows(): ServiceRow[] {
+/**
+ * The board's rows, in declaration order. Each id is the check id
+ * lib/status-checks.ts already uses, and the `serviceId` the snapshot job
+ * writes against. `services` is THIS render's live read (the same array
+ * `bannerState()` ranks for the headline above) — each row carries its own
+ * slice of it as `live`, so a card can never show a stale "operational" while
+ * the banner it sits under says "Degraded" for that exact check. See the
+ * "now" vs. "last recorded day" split in `ServiceCard`.
+ */
+function serviceRows(services: StatusCheck[]): ServiceRow[] {
   const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
+  const liveOf = (id: string): { state: CheckState; detail: string } => {
+    const check = services.find((c) => c.id === id);
+    // Every id below is one `serviceChecks()` always returns, so this is
+    // reachable only if a row here and the check array in lib/status-checks.ts
+    // have drifted apart — fail loudly rather than render a fabricated OK.
+    if (!check) throw new Error(`serviceRows: no live check found for "${id}"`);
+    return { state: check.state, detail: check.detail };
+  };
   return [
     {
       id: "live-origin",
       name: "Registry origin",
       subtitle: hostOf(REGISTRY_ORIGIN),
+      live: liveOf("live-origin"),
     },
     {
       id: "convex-read-path",
       name: "Convex read path",
       // No identifier rather than an empty one when the URL is unset.
       subtitle: convexUrl ? hostOf(convexUrl) : undefined,
+      live: liveOf("convex-read-path"),
     },
     // The CLI and the MCP server are published separately from separate
     // package.json files and can be stale independently, so they are two
@@ -145,12 +161,14 @@ function serviceRows(): ServiceRow[] {
       name: "Published CLI package",
       subtitle: CLI_PACKAGE,
       note: SPLIT_NOTE,
+      live: liveOf("published-cli"),
     },
     {
       id: "published-mcp",
       name: "Published MCP package",
       subtitle: MCP_PACKAGE,
       note: SPLIT_NOTE,
+      live: liveOf("published-mcp"),
     },
   ];
 }
@@ -248,7 +266,7 @@ export default async function StatusPage() {
   );
   const banner = bannerState(services);
   const days = dayWindow();
-  const rows = serviceRows();
+  const rows = serviceRows(services);
 
   return (
     <main className="mx-auto w-full max-w-3xl px-6 pb-32 sm:px-10">
