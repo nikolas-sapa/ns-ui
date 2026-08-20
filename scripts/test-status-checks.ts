@@ -18,6 +18,7 @@ import {
   fetchPublishedCli,
   fetchPublishedMcp,
   probeConvex,
+  driftOf,
   EM_DASH,
   type StatusBuild,
   type StatusCheck,
@@ -274,6 +275,39 @@ for (const check of notMeasured) {
   assert.equal(check.state, "unknown");
   assert.equal(check.value, EM_DASH);
 }
+
+// --- driftOf, against the REAL 2026-08-20 incident numbers ---------------
+// This is the comparison app/api/status-snapshot/route.ts now runs at poll
+// time (it did not before this change — see convex/schema.ts's note on
+// `state`), shared with `packageCheck` above via `driftOf` so the poller and
+// §3 of /status can never describe the same drift in different words. The
+// numbers below are not invented: `@nikolas.sapa/ns-ui` published 0.6.0 with
+// 326 components on 2026-08-12 while this repo was already at 389 (verified
+// against registry.npmjs.org's `time` field and unpkg's
+// data/registry-index.json for that version), and republished 0.7.0 with all
+// 389 components at 2026-08-20T17:06:54Z, resolving it.
+assert.deepEqual(
+  driftOf({ version: "0.6.0", localVersion: "0.7.0", components: 326, buildComponents: 389 }),
+  [
+    "0.6.0 published vs 0.7.0 in this repo",
+    "326 components in the published package vs 389 in this build",
+  ],
+  "the incident's own numbers did not register as drift",
+);
+assert.deepEqual(
+  driftOf({ version: "0.7.0", localVersion: "0.7.0", components: 389, buildComponents: 389 }),
+  [],
+  "matching version and count still registered as drift",
+);
+// A count-only drift (same version, different count) must ALSO be caught —
+// the poller's whole reason for fetching the published index instead of
+// stopping at the dist-tag is that a republish can reuse a version number
+// over a changed index.
+assert.deepEqual(
+  driftOf({ version: "0.7.0", localVersion: "0.7.0", components: 380, buildComponents: 389 }).length,
+  1,
+  "a count-only drift with a matching version was not caught",
+);
 
 // --- injected Convex probe -----------------------------------------------
 assert.equal(await probeConvex(async () => ({ ok: true })), true);

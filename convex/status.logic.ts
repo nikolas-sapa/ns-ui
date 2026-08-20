@@ -37,10 +37,12 @@ export const SNAPSHOT_WINDOW_DAYS = 90;
 /**
  * The three states a snapshot may record. `"degraded"` is present because the
  * status layer already expresses it (`serviceChecks` in lib/status-checks.ts
- * marks `published-cli` and `published-mcp` degraded on version drift) — but see the note in
- * `convex/schema.ts`: the daily writer cannot currently MEASURE drift, so no
- * bar has ever been recorded degraded. A missing degraded bar is evidence of
- * nothing.
+ * marks `published-cli` and `published-mcp` degraded on version drift). The
+ * poller (app/api/status-snapshot/route.ts) can now measure it too — see the
+ * note in `convex/schema.ts` — by comparing the published version and
+ * component count against the build-time facts in
+ * `lib/status.generated.json`, which it reaches the same way
+ * `app/status/page.tsx` does: a static import, not a runtime read.
  */
 export type SnapshotState = "ok" | "degraded" | "down";
 
@@ -66,8 +68,17 @@ export type SnapshotCounts = {
 };
 
 /** The stored row: the day's derived state plus the evidence for it. The
- *  pre-accumulation fields are unchanged, so an existing row still reads. */
-export type SnapshotRow = SnapshotSample & SnapshotCounts;
+ *  pre-accumulation fields are unchanged, so an existing row still reads.
+ *
+ *  `lastState` is NOT an aggregate like `state` — it is simply the state of
+ *  whichever sample landed most recently, overwritten unconditionally on
+ *  every call. It exists so a recovered day (worst state degraded/down, but
+ *  the last sample of the day was ok) can be told apart from a day still
+ *  actively bad as of its last sample — both read as the same `state` and
+ *  would otherwise be indistinguishable on the strip. A legacy row written
+ *  before this field existed carries none, which must read as "ordering
+ *  unknown", never as recovered and never as still-bad. */
+export type SnapshotRow = SnapshotSample & SnapshotCounts & { lastState: SnapshotState };
 
 /**
  * The day's state, derived from its samples and from nothing else:
@@ -161,6 +172,7 @@ export async function recordSample<Id>(
   if (existing === null) {
     const row: SnapshotRow = {
       ...sample,
+      lastState: sample.state,
       sampleCount: 1,
       degradedCount: sample.state === "degraded" ? 1 : 0,
       downCount: sample.state === "down" ? 1 : 0,
@@ -195,6 +207,11 @@ export async function recordSample<Id>(
     state,
     detail,
     recordedAt: sample.recordedAt,
+    // Unlike `detail`, `lastState` is overwritten unconditionally — it never
+    // "keeps" a prior value the way a non-matching sample's detail does. It
+    // is not the aggregate; it is a plain record of what the newest sample
+    // said, so a reader can tell a recovered day from a still-bad one.
+    lastState: sample.state,
     ...counts,
   });
   return "updated";
@@ -219,9 +236,24 @@ export type HistoryEntry = {
   serviceId: string;
   state: string;
   detail?: string | null;
+  /** The state of the LAST sample recorded that day — not an aggregate, and
+   *  typed as a plain string for the same reason `state` is: narrowed here,
+   *  not trusted. Absent on a row written before this field existed, which
+   *  reads as ordering-unknown (see `Bar.recovered`). */
+  lastState?: string | null;
 };
 
-export type Bar = { day: string; state: BarState; detail: string | null };
+export type Bar = {
+  day: string;
+  state: BarState;
+  detail: string | null;
+  /** True only when the day's worst state was degraded/down AND its last
+   *  recorded sample was ok — a day that went bad and came back, same UTC
+   *  day. `false` for a day that never degraded (nothing to recover from)
+   *  and for a legacy row with no `lastState` (ordering unknown, so this
+   *  never guesses recovered). Never true for `"nodata"`. */
+  recovered: boolean;
+};
 
 /** Whitelist, not a blacklist: only the three recorded states survive, and
  *  everything else — `""`, `"OK"`, `"unknown"`, a trailing space — is NO DATA. */
@@ -281,6 +313,12 @@ export function summarizeService(
   const bars: Bar[] = days.map((day) => {
     const row = byDay.get(day);
     const state: BarState = row ? toBarState(row.state) : "nodata";
+    // Recovered = the day's worst state was bad, but the newest sample that
+    // day read ok. `lastState` absent (legacy row) leaves this false — an
+    // unknown ordering is never rendered as a recovery.
+    const lastState = row?.lastState != null ? toBarState(row.lastState) : null;
+    const recovered =
+      (state === "degraded" || state === "down") && lastState === "ok";
     return {
       day,
       state,
@@ -290,6 +328,7 @@ export function summarizeService(
       // a bar that says nothing was measured. The state is the thing that could
       // not be read; its caption describes a state we are not showing.
       detail: state === "nodata" ? null : row?.detail ?? null,
+      recovered,
     };
   });
 

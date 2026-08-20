@@ -41,6 +41,20 @@
  * A colour-blind reader therefore never has to resolve --success vs --error by
  * hue: the word is on the card, in the legend, and in every bar's own name.
  *
+ * A RECOVERED day (worst state degraded/down, but the day's last sample was
+ * ok — `Bar.recovered`, derived in `summarizeService`) keeps the SAME colour
+ * as a still-bad day of that state: worst-of-day is the whole point of the
+ * aggregate and a recovery does not get to soften it. The distinction is text
+ * only, appended to the bar's name and tooltip ("degraded, recovered — last
+ * sample ok"). Deliberately not phrased as the day having concluded: on the
+ * rightmost (today's) bar the day has not ended and could still go bad again,
+ * and this
+ * page refuses claims it has not measured — what was actually measured is
+ * that the newest sample read ok, so that is exactly what it says. No fifth
+ * swatch, no separate legend entry — the smallest signal that answers "did
+ * this get fixed" without building the incident-log UI this page
+ * deliberately does not have.
+ *
  * The uptime figure is computed from days that have data and from nothing else,
  * and it always prints its own denominator, so a reader can reconstruct it from
  * the bars in front of them. With zero recorded days it prints words, never a
@@ -161,14 +175,15 @@ export function ServiceCard({
   // `service.live` is THIS render's read of the same check — the one
   // `bannerState()` ranked to write the banner headline above the whole grid.
   // It is deliberately a SEPARATE fact from `latest`, never merged into it:
-  // the daily snapshot writer cannot currently measure package-version drift
-  // (see the note on `SnapshotState` in convex/status.logic.ts), so `latest`
-  // can read "operational" on a day the live read is degraded — that split is
-  // exactly what made the banner read "Degraded" over four rows that all said
-  // "operational" with nothing on the card naming which one or why. Showing
-  // both, each under its own word, is what makes BANNER_CAPTION's "the rows
-  // below name which" (app/status/page.tsx) an actually true sentence rather
-  // than a promise the card couldn't keep.
+  // the daily snapshot writer polls at most every ~10 minutes (see
+  // .github/workflows/status-poll.yml) while this render happens on every
+  // request, so `latest` — yesterday's or earlier today's worst recorded
+  // sample — can legitimately lag a live read that changed since the last
+  // poll. That lag is exactly what made the banner read "Degraded" over four
+  // rows that all said "operational" with nothing on the card naming which
+  // one or why. Showing both, each under its own word, is what makes
+  // BANNER_CAPTION's "the rows below name which" (app/status/page.tsx) an
+  // actually true sentence rather than a promise the card couldn't keep.
   const live = service.live;
 
   return (
@@ -210,7 +225,12 @@ export function ServiceCard({
           gesture. */}
       <div className="mt-4 flex h-6 w-full touch-pan-y items-stretch gap-[2px]">
         {bars.map((bar, i) => {
-          const name = `${prettyDay(bar.day)} — ${WORD[bar.state]}${bar.detail ? `: ${bar.detail}` : ""}`;
+          // A recovered day IS a degraded/down day — its bar keeps that
+          // colour, worst-of-day is not softened for having ended well — but
+          // its name says so, the smallest honest way to tell "this happened
+          // and was resolved" apart from "this is still going" without a
+          // second colour or a whole incident-log UI.
+          const name = `${prettyDay(bar.day)} — ${WORD[bar.state]}${bar.recovered ? ", recovered — last sample ok" : ""}${bar.detail ? `: ${bar.detail}` : ""}`;
           // Centered (`left-1/2 -translate-x-1/2`) is right for every bar except
           // the handful nearest either end of the strip, where a centered,
           // whitespace-nowrap tooltip spills past the card's own edge — and,
@@ -258,6 +278,7 @@ export function ServiceCard({
                   <span aria-hidden className={`h-2 w-2 rounded-[3px] ${BAR[bar.state]}`} />
                   <span>
                     {WORD[bar.state]}
+                    {bar.recovered ? ", recovered — last sample ok" : ""}
                     {bar.detail ? `: ${bar.detail}` : ""}
                   </span>
                 </div>

@@ -31,17 +31,19 @@ import {
   windowStartDay,
   type SnapshotCounts,
   type SnapshotRow,
+  type SnapshotState,
   type SnapshotStore,
 } from "./status.logic.ts";
 
 // The same shape `convex/status.ts` builds over `ctx.db`, backed by an array.
 // `patch` mirrors Convex's semantics: an explicit `undefined` removes a field.
-// The counters are optional here and NOT in `SnapshotRow`, on purpose: a row
-// as it exists in the deployment today was written before accumulation
-// shipped and carries none. The fake stores that shape faithfully so the
-// legacy path is exercised against the real code rather than assumed to work.
-type Legacy = Omit<SnapshotRow, "sampleCount" | "degradedCount" | "downCount">;
-type Stored = Legacy & Partial<SnapshotCounts> & { id: number };
+// The counters and `lastState` are optional here and NOT in `SnapshotRow`, on
+// purpose: a row as it exists in the deployment today was written before
+// accumulation (or before `lastState`) shipped and carries none of them. The
+// fake stores that shape faithfully so the legacy path is exercised against
+// the real code rather than assumed to work.
+type Legacy = Omit<SnapshotRow, "sampleCount" | "degradedCount" | "downCount" | "lastState">;
+type Stored = Legacy & Partial<SnapshotCounts> & Partial<{ lastState: SnapshotState }> & { id: number };
 
 function makeStore(seed: Legacy[] = []) {
   const rows: Stored[] = [];
@@ -82,6 +84,9 @@ function makeStore(seed: Legacy[] = []) {
       row.sampleCount = fields.sampleCount;
       row.degradedCount = fields.degradedCount;
       row.downCount = fields.downCount;
+      // Always overwritten, never conditionally kept — unlike `detail`, this
+      // is not an aggregate, see the doc comment on `SnapshotRow.lastState`.
+      row.lastState = fields.lastState;
       if (fields.detail === undefined) delete row.detail;
       else row.detail = fields.detail;
     },
@@ -391,6 +396,65 @@ assert.throws(() => deriveState({ sampleCount: 0, degradedCount: 0, downCount: 0
     assert.equal(summary.okDays, 0);
   }
 
+  // B2. THE OWNER'S EXACT SCENARIO — degraded, then ok, same day: the day
+  // resolves to degraded, not ok, and is distinguishable from a day that was
+  // never degraded ("recovered by end of day" on the bar). This is the
+  // 2026-08-20 incident shape: a stale published package, then a republish
+  // that fixed it, both on the same UTC day.
+  {
+    const { store, rows, since } = makeStore();
+    await recordSample(store, {
+      day,
+      serviceId: "published-cli",
+      state: "degraded",
+      detail: "0.6.0 published vs 0.7.0 in this repo; 326 components in the published package vs 389 in this build",
+      recordedAt: at(0),
+    });
+    await recordSample(store, {
+      day,
+      serviceId: "published-cli",
+      state: "ok",
+      detail: "npm dist-tags latest for @nikolas.sapa/ns-ui: 0.7.0, and data/registry-index.json indexes every component in this build",
+      recordedAt: at(480),
+    });
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].state, "degraded", "an ok sample after a degraded one flipped the day to ok");
+    assert.equal(rows[0].lastState, "ok", "the last sample's own state was not recorded");
+    assert.deepEqual(
+      [rows[0].sampleCount, rows[0].degradedCount, rows[0].downCount],
+      [2, 1, 0],
+    );
+    // `detail` follows `state`, not the newest sample — see the doc comment
+    // on `recordSample`. The ok sample's detail must NOT caption this day.
+    assert.equal(rows[0].detail?.includes("326 components"), true);
+
+    const summary = summarizeService(
+      "published-cli",
+      dayWindow(new Date(today)),
+      since(windowStartDay(today)),
+    );
+    const bar = summary.bars[summary.bars.length - 1];
+    assert.equal(bar.state, "degraded", "the day did not resolve to degraded");
+    assert.equal(bar.recovered, true, "a degraded-then-ok day was not marked recovered");
+    assert.equal(summary.okDays, 0, "a recovered day counted toward okDays");
+    assert.equal(summary.latest, "degraded");
+
+    // A day that was NEVER degraded must not read as recovered.
+    const cleanStore = makeStore();
+    await recordSample(cleanStore.store, {
+      day,
+      serviceId: "published-mcp",
+      state: "ok",
+      recordedAt: at(0),
+    });
+    const cleanSummary = summarizeService(
+      "published-mcp",
+      dayWindow(new Date(today)),
+      cleanStore.since(windowStartDay(today)),
+    );
+    assert.equal(cleanSummary.bars[cleanSummary.bars.length - 1].recovered, false);
+  }
+
   // C. a later ok sample cannot flip a down day back to ok — including a day
   //    in the PAST, read back after the days that followed it were written.
   {
@@ -634,6 +698,26 @@ assert.throws(() => deriveState({ sampleCount: 0, degradedCount: 0, downCount: 0
   // The one thing a colour map cannot say: down and degraded must not share a
   // swatch with ok.
   assert.ok(!map.includes("degraded: \"bg-[var(--success)]\""));
+
+  // A recovered day's ONLY signal is this text, in both the accessible name
+  // and its aria-hidden tooltip twin — there is no separate colour or legend
+  // entry for it (see the file-level note on `Bar.recovered`). Proven
+  // literally, the same way the colour map above is: if this string is
+  // deleted or the `bar.recovered` guard around it is removed, this bit of
+  // the change has no other test that would catch it.
+  const RECOVERED_TEXT = ", recovered — last sample ok";
+  const occurrences = src.split(RECOVERED_TEXT).length - 1;
+  assert.ok(
+    occurrences >= 2,
+    `"${RECOVERED_TEXT}" must appear at least twice (accessible name + tooltip) — found ${occurrences}`,
+  );
+  assert.ok(
+    src.includes(`bar.recovered ? "${RECOVERED_TEXT}"`),
+    "the recovered text is not gated on bar.recovered",
+  );
+  // Never a claim about the day being OVER — see the file-level note on why
+  // this is worded as "last sample ok" rather than "by end of day".
+  assert.ok(!src.includes("end of day"), 'uptime.tsx must not claim a day is "over"');
 }
 
 console.log(

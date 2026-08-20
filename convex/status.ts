@@ -50,6 +50,10 @@ const publicSnapshot = v.object({
   sampleCount: v.optional(v.number()),
   degradedCount: v.optional(v.number()),
   downCount: v.optional(v.number()),
+  // The newest sample's own state — not an aggregate, see convex/schema.ts.
+  // Optional for the same reason the counters are: a row written before this
+  // field existed carries none.
+  lastState: v.optional(snapshotState),
 });
 
 /**
@@ -84,6 +88,7 @@ export const recent = query({
             degradedCount: doc.degradedCount ?? 0,
             downCount: doc.downCount ?? 0,
           }),
+      ...(doc.lastState === undefined ? {} : { lastState: doc.lastState }),
     }));
   },
 });

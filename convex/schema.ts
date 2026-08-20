@@ -232,11 +232,12 @@ export default defineSchema({
   //
   // `state` carries `"degraded"` because the check layer already expresses it
   // (`serviceChecks` marks `published-cli` and `published-mcp` degraded on
-  // version drift),
-  // but the snapshot writer cannot currently measure drift — that comparison
-  // needs the build-time versions in lib/status.generated.json, which a
-  // runtime cron does not have. So no row has ever been recorded degraded,
-  // and a strip with no degraded bars is evidence of nothing. `"down"` is
+  // version drift), and the snapshot writer (app/api/status-snapshot/route.ts)
+  // measures it the same way: by comparing the published version and
+  // component count against the build-time facts in
+  // `lib/status.generated.json`, reached the same way `app/status/page.tsx`
+  // reaches them — a static import baked in at build time, not a runtime
+  // filesystem read a cron lacks. `"down"` is
   // only ever written for `live-origin`, and only when the origin itself
   // answered with a 5xx; every other failure mode is recorded as absence,
   // because a fetch that throws cannot tell an outage from this machine's
@@ -276,6 +277,16 @@ export default defineSchema({
     sampleCount: v.optional(v.number()), // samples recorded this day
     degradedCount: v.optional(v.number()), // of those, how many were degraded
     downCount: v.optional(v.number()), // of those, how many were down
+    // The state of the newest sample, not an aggregate: overwritten
+    // unconditionally on every recordSample call (convex/status.logic.ts).
+    // Lets a recovered day (worst state bad, last sample ok) render
+    // differently from a day still bad as of its last sample — both would
+    // otherwise share the same `state`. Optional because rows written before
+    // this field existed carry none, which reads as ordering-unknown, never
+    // as recovered.
+    lastState: v.optional(
+      v.union(v.literal("ok"), v.literal("degraded"), v.literal("down")),
+    ),
   }).index("by_day_service", ["day", "serviceId"]),
 
   // Durable rate limit for `testimonials.submit`, same shape and same
