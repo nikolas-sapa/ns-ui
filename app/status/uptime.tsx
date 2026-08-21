@@ -55,6 +55,15 @@
  * this get fixed" without building the incident-log UI this page
  * deliberately does not have.
  *
+ * A BACKFILLED day (`Bar.backfilled`, from the sticky flag `convex/status.ts`'s
+ * `backfill` mutation sets — see its doc comment) is the same story again: same
+ * colour a live day of that state would have, distinguished by text only,
+ * appended right after the recovered text if both apply. "backfilled — entered
+ * after the fact" is deliberately not softer language ("estimated",
+ * "reconstructed") — the row's own state and detail are exact, evidence-derived
+ * facts (npm registry timestamps, git history), the ONLY thing not live is when
+ * they were typed in.
+ *
  * The uptime figure is computed from days that have data and from nothing else,
  * and it always prints its own denominator, so a reader can reconstruct it from
  * the bars in front of them. With zero recorded days it prints words, never a
@@ -230,7 +239,7 @@ export function ServiceCard({
           // its name says so, the smallest honest way to tell "this happened
           // and was resolved" apart from "this is still going" without a
           // second colour or a whole incident-log UI.
-          const name = `${prettyDay(bar.day)} — ${WORD[bar.state]}${bar.recovered ? ", recovered — last sample ok" : ""}${bar.detail ? `: ${bar.detail}` : ""}`;
+          const name = `${prettyDay(bar.day)} — ${WORD[bar.state]}${bar.recovered ? ", recovered — last sample ok" : ""}${bar.backfilled ? ", backfilled — entered after the fact" : ""}${bar.detail ? `: ${bar.detail}` : ""}`;
           // Centered (`left-1/2 -translate-x-1/2`) is right for every bar except
           // the handful nearest either end of the strip, where a centered,
           // whitespace-nowrap tooltip spills past the card's own edge — and,
@@ -279,6 +288,7 @@ export function ServiceCard({
                   <span>
                     {WORD[bar.state]}
                     {bar.recovered ? ", recovered — last sample ok" : ""}
+                    {bar.backfilled ? ", backfilled — entered after the fact" : ""}
                     {bar.detail ? `: ${bar.detail}` : ""}
                   </span>
                 </div>

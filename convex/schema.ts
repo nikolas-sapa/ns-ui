@@ -297,6 +297,20 @@ export default defineSchema({
     lastState: v.optional(
       v.union(v.literal("ok"), v.literal("degraded"), v.literal("down")),
     ),
+
+    // Set (unconditionally, `true`/`false`) by every write this schema's own
+    // era knows about — `v.optional` only so a row written before this field
+    // existed still validates and reads correctly, exactly like `lastState`
+    // above; such a row reads as "not known to be backfilled", never as
+    // "backfilled". `true` once any sample contributing to this row's current
+    // aggregate arrived through `status.backfill` rather than `status.record`
+    // — sticky, never cleared back to `false` by a later live sample, because
+    // the row's audit trail must say a human entered part of this day's
+    // evidence after the fact for as long as that evidence is still part of
+    // the aggregate. See `status.backfill`'s header comment for why a second,
+    // narrow mutation exists rather than teaching `record` to accept a caller
+    // -supplied day.
+    backfilled: v.optional(v.boolean()),
   }).index("by_day_service", ["day", "serviceId"]),
 
   // Durable rate limit for `testimonials.submit`, same shape and same

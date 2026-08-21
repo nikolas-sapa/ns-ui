@@ -19,11 +19,16 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import {
+  BACKFILL_WINDOW_DAYS,
   SNAPSHOT_WINDOW_DAYS,
+  backfillDetail,
   dayWindow,
   deriveState,
+  isDayInBackfillWindow,
+  isValidCalendarDay,
   prettyDay,
   recordSample,
+  secretMatches,
   summarizeService,
   toBarState,
   uptimeFigure,
@@ -42,8 +47,10 @@ import {
 // accumulation (or before `lastState`) shipped and carries none of them. The
 // fake stores that shape faithfully so the legacy path is exercised against
 // the real code rather than assumed to work.
-type Legacy = Omit<SnapshotRow, "sampleCount" | "degradedCount" | "downCount" | "lastState">;
-type Stored = Legacy & Partial<SnapshotCounts> & Partial<{ lastState: SnapshotState }> & { id: number };
+type Legacy = Omit<SnapshotRow, "sampleCount" | "degradedCount" | "downCount" | "lastState" | "backfilled">;
+type Stored = Legacy &
+  Partial<SnapshotCounts> &
+  Partial<{ lastState: SnapshotState; backfilled: boolean }> & { id: number };
 
 function makeStore(seed: Legacy[] = []) {
   const rows: Stored[] = [];
@@ -63,6 +70,7 @@ function makeStore(seed: Legacy[] = []) {
         sampleCount: row.sampleCount,
         degradedCount: row.degradedCount,
         downCount: row.downCount,
+        backfilled: row.backfilled,
       };
     },
     insert: async (row) => {
@@ -87,6 +95,8 @@ function makeStore(seed: Legacy[] = []) {
       // Always overwritten, never conditionally kept — unlike `detail`, this
       // is not an aggregate, see the doc comment on `SnapshotRow.lastState`.
       row.lastState = fields.lastState;
+      // Sticky, see the doc comment on `SnapshotRow.backfilled`.
+      row.backfilled = fields.backfilled;
       if (fields.detail === undefined) delete row.detail;
       else row.detail = fields.detail;
     },
@@ -720,8 +730,243 @@ assert.throws(() => deriveState({ sampleCount: 0, degradedCount: 0, downCount: 0
   assert.ok(!src.includes("end of day"), 'uptime.tsx must not claim a day is "over"');
 }
 
+// --- 9. backfill guards: day validity, the trailing window, future days ---
+{
+  // Strict shape, not just plausible-looking.
+  assert.equal(isValidCalendarDay("2026-08-19"), true);
+  for (const bogus of [
+    "2026-8-19",
+    "26-08-19",
+    "2026/08/19",
+    "2026-08-19T00:00:00Z",
+    "2026-13-01", // no month 13
+    "2026-02-30", // no such day, even though it round-trips through Date
+    "2026-00-10", // no month 0
+    "",
+    "2026-08-19 ",
+  ]) {
+    assert.equal(isValidCalendarDay(bogus), false, `"${bogus}" was accepted as a calendar day`);
+  }
+
+  const now = Date.UTC(2026, 7, 21, 12, 0, 0); // fixed clock: 2026-08-21 noon UTC
+  assert.equal(BACKFILL_WINDOW_DAYS, 30);
+
+  // Today itself is in the window.
+  assert.equal(isDayInBackfillWindow(utcDay(now), now), true);
+  // The two days this task backfills.
+  assert.equal(isDayInBackfillWindow("2026-08-19", now), true);
+  assert.equal(isDayInBackfillWindow("2026-08-20", now), true);
+  // Exactly 30 days back (BACKFILL_WINDOW_DAYS counts today inclusive, same
+  // convention as `windowStartDay`/`SNAPSHOT_WINDOW_DAYS`) is the oldest day
+  // still in the window; 31 days back is not.
+  const day30back = utcDay(now - 29 * DAY_MS);
+  const day31back = utcDay(now - 30 * DAY_MS);
+  assert.equal(isDayInBackfillWindow(day30back, now), true, "the last day inside the window was rejected");
+  assert.equal(isDayInBackfillWindow(day31back, now), false, "a day outside the window was accepted");
+
+  // A future day is always rejected, even if it would otherwise fall inside
+  // the trailing window's arithmetic.
+  assert.equal(isDayInBackfillWindow(utcDay(now + DAY_MS), now), false, "a future day was accepted");
+  assert.equal(isDayInBackfillWindow(utcDay(now + 365 * DAY_MS), now), false);
+}
+
+// --- 10. the shared secret check: closed by default, exact match only ----
+{
+  assert.equal(secretMatches("s3cret", "s3cret"), true);
+  assert.equal(secretMatches("wrong", "s3cret"), false);
+  assert.equal(secretMatches("", "s3cret"), false);
+  // Unset/empty configured secret never matches, including an equally-empty
+  // guess — closed by default, same rule `requireSnapshotSecret` states.
+  assert.equal(secretMatches("", ""), false);
+  assert.equal(secretMatches("s3cret", ""), false);
+}
+
+// --- 11. a backfilled sample lands on the day it names, not today --------
+{
+  const { store, rows } = makeStore();
+  const now = Date.UTC(2026, 7, 21, 9, 0, 0); // "today" the mutation would run on
+  const target = "2026-08-19"; // NOT utcDay(now)
+
+  const result = await recordSample(store, {
+    day: target,
+    serviceId: "published-cli",
+    state: "degraded",
+    detail:
+      "0.6.0 published vs 0.7.0 in this repo; 326 components in the published package vs 389 in this build",
+    recordedAt: now,
+    backfilled: true,
+  });
+
+  assert.equal(result, "inserted");
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].day, target, "a backfilled sample did not land on its named day");
+  assert.notEqual(rows[0].day, utcDay(now), "a backfilled sample landed on today instead of its named day");
+  assert.equal(rows[0].backfilled, true, "a backfilled row was not flagged");
+}
+
+// --- 12. a backfilled row is flagged, sticky, and distinguishable --------
+{
+  // (a) a fresh backfilled insert is flagged.
+  {
+    const { store, rows } = makeStore();
+    await recordSample(store, {
+      day: "2026-08-19",
+      serviceId: "published-cli",
+      state: "degraded",
+      recordedAt: Date.now(),
+      backfilled: true,
+    });
+    assert.equal(rows[0].backfilled, true);
+  }
+
+  // (b) a live (non-backfilled) sample is NOT flagged.
+  {
+    const { store, rows } = makeStore();
+    await recordSample(store, {
+      day: utcDay(Date.now()),
+      serviceId: "live-origin",
+      state: "ok",
+      recordedAt: Date.now(),
+    });
+    assert.equal(rows[0].backfilled, false, "a live sample was flagged as backfilled");
+  }
+
+  // (c) the flag is STICKY: a later, non-backfilled sample the same day does
+  // not clear a flag a backfilled sample already set.
+  {
+    const { store, rows } = makeStore();
+    const day = "2026-08-20";
+    await recordSample(store, {
+      day,
+      serviceId: "published-cli",
+      state: "degraded",
+      recordedAt: Date.now(),
+      backfilled: true,
+    });
+    await recordSample(store, {
+      day,
+      serviceId: "published-cli",
+      state: "ok",
+      recordedAt: Date.now() + 1000,
+      // no `backfilled` here — a plain live sample
+    });
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].backfilled, true, "a live sample cleared a sticky backfilled flag");
+  }
+
+  // (d) that flag reads through to the render side (`HistoryEntry.backfilled`
+  // -> `Bar.backfilled`), and a NO DATA day is never marked backfilled.
+  {
+    const { store, since } = makeStore();
+    const day = "2026-08-19";
+    await recordSample(store, {
+      day,
+      serviceId: "published-cli",
+      state: "degraded",
+      recordedAt: Date.now(),
+      backfilled: true,
+    });
+    const window = dayWindow(new Date(Date.UTC(2026, 7, 21)));
+    const summary = summarizeService("published-cli", window, since(windowStartDay(Date.UTC(2026, 7, 21))));
+    const bar = summary.bars.find((b) => b.day === day);
+    assert.ok(bar);
+    assert.equal(bar.backfilled, true, "a backfilled row did not read back as backfilled");
+    // Every other bar in the window is NO DATA and therefore not backfilled.
+    assert.ok(
+      summary.bars.filter((b) => b.day !== day).every((b) => b.backfilled === false),
+      "an unrecorded (NO DATA) day read as backfilled",
+    );
+  }
+
+  // (e) the UI text is gated on `bar.backfilled`, the same literal-string
+  // proof style test 7 uses for `bar.recovered`.
+  {
+    const src = readFileSync(new URL("../app/status/uptime.tsx", import.meta.url), "utf8");
+    const BACKFILLED_TEXT = ", backfilled — entered after the fact";
+    const occurrences = src.split(BACKFILLED_TEXT).length - 1;
+    assert.ok(
+      occurrences >= 2,
+      `"${BACKFILLED_TEXT}" must appear at least twice (accessible name + tooltip) — found ${occurrences}`,
+    );
+    assert.ok(
+      src.includes(`bar.backfilled ? "${BACKFILLED_TEXT}"`),
+      "the backfilled text is not gated on bar.backfilled",
+    );
+  }
+}
+
+// --- 13. backfill still resolves through recordSample/deriveState --------
+// The exact B2 scenario from test 3 (degraded, then a same-day ok sample
+// resolves to degraded and reads recovered) replayed with BOTH samples
+// marked `backfilled: true`, and `detail` run through `backfillDetail` the
+// way `status.backfill` itself does — proving the backfill path is not a
+// second, diverging way to set `state`, but the same aggregation code a live
+// poller uses, just with samples dated, flagged and captioned differently.
+{
+  const { store, rows, since } = makeStore();
+  const day = "2026-08-19";
+  const at = (m: number) => Date.UTC(2026, 7, 19, 0, m);
+
+  await recordSample(store, {
+    day,
+    serviceId: "published-cli",
+    state: "degraded",
+    detail: backfillDetail(
+      "0.6.0 published vs 0.7.0 in this repo; 326 components in the published package vs 389 in this build",
+    ),
+    recordedAt: at(0),
+    backfilled: true,
+  });
+  await recordSample(store, {
+    day,
+    serviceId: "published-cli",
+    state: "ok",
+    detail: backfillDetail(
+      "npm dist-tags latest for @nikolas.sapa/ns-ui: 0.7.0, and data/registry-index.json indexes every component in this build",
+    ),
+    recordedAt: at(480),
+    backfilled: true,
+  });
+
+  assert.equal(rows.length, 1);
+  // Same `deriveState` result a live B2 sample pair produces: down/degraded
+  // beats a later ok, the day is degraded, not ok.
+  assert.equal(rows[0].state, "degraded", "backfill did not route through deriveState's worst-of-day rule");
+  assert.equal(rows[0].lastState, "ok");
+  assert.deepEqual([rows[0].sampleCount, rows[0].degradedCount, rows[0].downCount], [2, 1, 0]);
+  assert.equal(rows[0].backfilled, true);
+  // The measurement text survives verbatim...
+  assert.equal(rows[0].detail?.includes("326 components"), true);
+  // ...with the after-the-fact marker appended, not substituted for it.
+  assert.equal(rows[0].detail?.endsWith("(entered after the fact; not measured live)"), true);
+
+  const window = dayWindow(new Date(Date.UTC(2026, 7, 21)));
+  const summary = summarizeService("published-cli", window, since(windowStartDay(Date.UTC(2026, 7, 21))));
+  const bar = summary.bars.find((b) => b.day === day);
+  assert.ok(bar);
+  assert.equal(bar.state, "degraded");
+  assert.equal(bar.recovered, true, "backfill did not produce the same recovered=true a live pair would");
+  assert.equal(bar.backfilled, true);
+}
+
+// --- 14. backfillDetail: appends the marker, never invents one ------------
+{
+  assert.equal(backfillDetail(undefined), undefined, "an absent detail grew a marker from nothing");
+  assert.equal(
+    backfillDetail("326 components in the published package vs 389 in this build"),
+    "326 components in the published package vs 389 in this build (entered after the fact; not measured live)",
+  );
+  // The measurement text is a prefix of the result — nothing is dropped or
+  // reworded, only appended.
+  const original = "0.6.0 published vs 0.7.0 in this repo; 326 components in the published package vs 389 in this build";
+  const withMarker = backfillDetail(original);
+  assert.ok(withMarker?.startsWith(original), "backfillDetail altered the original measurement text");
+  assert.ok(withMarker !== original, "backfillDetail did not distinguish a backfilled detail at all");
+}
+
 console.log(
   "convex/status.logic.ts: one bar per day/service, samples aggregate, " +
     "unmeasured days absent, degraded never rounded up, past days stable, " +
-    "gaps hold their slot, unknown states read NO DATA — ok",
+    "gaps hold their slot, unknown states read NO DATA, backfill guards hold " +
+    "and route through the same deriveState path — ok",
 );
