@@ -284,6 +284,16 @@ export default defineSchema({
     // otherwise share the same `state`. Optional because rows written before
     // this field existed carry none, which reads as ordering-unknown, never
     // as recovered.
+    //
+    // Deploy note: `record`'s ARGUMENTS did not change when this field was
+    // added — lastState is derived inside recordSample, never caller-supplied.
+    // So a Next-only deploy is NOT the hazard: it simply leaves the old
+    // function bundle running against the old schema, which is self-consistent.
+    // The real failure is a PARTIAL Convex push — new functions (which write
+    // lastState unconditionally) against a schema that has not been told the
+    // field exists, which Convex rejects on write. vercel.json pushes schema
+    // and functions as one atomic step, so this repo has no path to that state;
+    // do not introduce one with a manual `npx convex deploy`.
     lastState: v.optional(
       v.union(v.literal("ok"), v.literal("degraded"), v.literal("down")),
     ),
