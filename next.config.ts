@@ -37,8 +37,16 @@ const nextConfig: NextConfig = {
         },
         // Everything else, minus the prefixes with no prose to serve. `/api/`
         // in particular is what keeps the rewrite from pointing at itself.
+        //
+        // `[^.]*`, not `.*`: `beforeFiles` runs AHEAD of the filesystem, so a
+        // `.*` here rewrote /llms.txt, /llms-full.txt, /registry.json,
+        // /sitemap.xml and /robots.txt to the markdown route — which has no
+        // entry for them — and handed a 404 to any client sending
+        // `Accept: text/markdown, */*`. That is the exact audience these files
+        // exist for. Prose routes never contain a dot; every static file does,
+        // so excluding dotted paths is the whole rule.
         {
-          source: "/:path((?!api/|_next/|r/|\\.well-known/).*)",
+          source: "/:path((?!api/|_next/|r/|\\.well-known/)[^.]*)",
           has: [{ type: "header", key: "accept", value: ".*text/markdown.*" }],
           destination: "/api/md/:path",
         },

@@ -108,14 +108,34 @@ async function markdownNegotiation() {
   );
   check("  it carries the install command", componentBody.includes("npx shadcn add"));
 
-  const unsupported = await fetch(url("/api/health"), {
+  // A real path inside the route's own NO_MARKDOWN set, so the 406 branch
+  // actually executes — /api/* is excluded from the rewrite entirely and
+  // never reaches the markdown route to be refused.
+  const unsupported = await fetch(url("/preview/hero-particles-webgl"), {
     headers: { accept: "text/markdown" },
   });
   check(
-    "a route with no markdown representation is not served as markdown",
-    !(unsupported.headers.get("content-type") ?? "").includes("text/markdown"),
-    `got "${unsupported.headers.get("content-type")}"`,
+    "a route with no markdown representation answers 406",
+    unsupported.status === 406,
+    `got ${unsupported.status}`,
   );
+
+  // The machine-readable files are the reason this feature exists; a
+  // `beforeFiles` rewrite runs ahead of the filesystem and once served all of
+  // them as a markdown 404 to exactly the clients they are for.
+  for (const [path, expected] of [
+    ["/llms.txt", "text/plain"],
+    ["/registry.json", "application/json"],
+    ["/sitemap.xml", "xml"],
+    ["/robots.txt", "text/plain"],
+  ] as const) {
+    const file = await fetch(url(path), { headers: { accept: "text/markdown, */*" } });
+    check(
+      `${path} survives an Accept that mentions markdown`,
+      file.status === 200 && (file.headers.get("content-type") ?? "").includes(expected),
+      `${file.status} ${file.headers.get("content-type")}`,
+    );
+  }
 }
 
 async function agentFriendly404() {
@@ -147,6 +167,9 @@ async function mcpEndpoint() {
   const doc = (await safeJson<Record<string, unknown>>(manifest)) ?? {};
   check("  declares a transport", typeof doc.transport === "string", String(doc.transport));
   check("  lists tools", Array.isArray(doc.tools) && doc.tools.length > 0);
+
+  const stream = await fetch(url("/.well-known/mcp"), { headers: { accept: "text/event-stream" } });
+  check("GET asking for an SSE stream → 405", stream.status === 405, `got ${stream.status}`);
 
   const rpc = async (body: unknown) =>
     fetch(url("/.well-known/mcp"), {

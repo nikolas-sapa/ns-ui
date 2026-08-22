@@ -263,6 +263,43 @@ export function SiteShell({
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
+  // Move focus into the drawer when it opens on mobile. Required by the DOM
+  // reorder below (the nav now renders after the main content): Tab from the
+  // toggle used to land on the first thing in the menu that had just opened,
+  // and without this it would walk into the page behind the drawer instead.
+  // Escape still returns focus to the toggle, above.
+  const navRef = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    if (!open) return;
+    const nav = navRef.current;
+    if (!nav) return;
+    // After the slide-in finishes, not on the next frame: `visibility` is in
+    // this nav's transition list, and a transitioned visibility stays
+    // `hidden` until the animation flips it — `focus()` on a hidden element
+    // is a silent no-op, so an earlier call left focus on the toggle
+    // (measured, both on rAF and immediately).
+    const focusFirst = () => {
+      nav
+        .querySelector<HTMLElement>(
+          'a[href], button:not([disabled]), input, summary, [tabindex]:not([tabindex="-1"])',
+        )
+        ?.focus();
+    };
+    // The timeout is the real path under reduced motion (no transition runs,
+    // so `transitionend` never fires); the listener is what keeps this from
+    // depending on a hardcoded duration matching the CSS.
+    const fallback = setTimeout(focusFirst, 400);
+    const onEnd = () => {
+      clearTimeout(fallback);
+      focusFirst();
+    };
+    nav.addEventListener("transitionend", onEnd, { once: true });
+    return () => {
+      clearTimeout(fallback);
+      nav.removeEventListener("transitionend", onEnd);
+    };
+  }, [open]);
+
   // ⌘K / Ctrl+K opens the command palette from anywhere on the page —
   // registered here rather than inside CommandPalette itself, since it has
   // to fire while that component is unmounted (cmdkOpen === false).
@@ -431,6 +468,7 @@ export function SiteShell({
           order; the skip link above stays regardless, since it is still the
           shortest path to the same place. */}
       <nav
+        ref={navRef}
         id="site-nav"
         aria-label="Components"
         className={`fixed inset-y-0 left-0 z-40 flex w-[17rem] flex-col border-r border-border bg-background transition-[transform,translate,visibility] lg:sticky lg:top-0 lg:order-first lg:h-screen lg:translate-x-0 motion-reduce:transition-none ${

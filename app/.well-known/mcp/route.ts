@@ -167,8 +167,25 @@ function handle(request: JsonRpcRequest): object | null {
   }
 }
 
-/** Discovery: what this endpoint is, for anything that only does a GET. */
-export function GET(): Response {
+/**
+ * Discovery: what this endpoint is, for anything that only does a GET.
+ *
+ * Streamable HTTP reserves GET for the server-to-client SSE stream, and a
+ * server that does not offer one must answer 405 — so a client asking for
+ * `text/event-stream` gets exactly that, and everything else (a browser, a
+ * directory crawler, `curl`) gets the manifest. Both readings of GET are
+ * satisfied without pretending to hold a stream this stateless handler has
+ * no way to feed.
+ */
+export function GET(request: Request): Response {
+  const accept = request.headers.get("accept") ?? "";
+  if (accept.includes("text/event-stream") && !accept.includes("application/json")) {
+    return new Response("This MCP server does not offer a server-to-client stream.", {
+      status: 405,
+      headers: { allow: "POST" },
+    });
+  }
+
   return Response.json(
     {
       name: SERVER_NAME,
