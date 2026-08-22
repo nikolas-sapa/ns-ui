@@ -11,6 +11,7 @@ import { CATEGORY_COPY } from "@/lib/category-copy";
 const COMPONENT_COUNT = registry.items.length;
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/categories" },
   title: "Categories — ns-ui",
   description: `Browse ns-ui's ${COMPONENT_COUNT} React components by category — heroes, navigation, forms, charts, feedback and more.`,
 };

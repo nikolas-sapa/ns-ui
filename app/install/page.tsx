@@ -12,6 +12,7 @@ const description =
   "How to install one ns-ui component into a project: the shadcn command, what it assumes about your app, and what the gate does and doesn't guarantee about it.";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/install" },
   title,
   description,
   openGraph: { title, description },

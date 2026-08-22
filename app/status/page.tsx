@@ -57,6 +57,7 @@ const description =
   "What is actually working in ns-ui, measured: ninety days of recorded snapshots, whether a component installs, whether an agent can read the registry, and what this repo cannot measure at all.";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/status" },
   title,
   description,
   openGraph: { title, description },

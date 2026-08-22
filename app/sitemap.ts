@@ -61,6 +61,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${REGISTRY_ORIGIN}/guidelines`,
       lastModified: new Date(),
     },
+    // Trust anchors. Listed for the same reason /preview stopped being
+    // excluded above: a page nothing links to from the sitemap is a page an
+    // agent verifying this project's legitimacy has to guess the URL of.
+    {
+      url: `${REGISTRY_ORIGIN}/about`,
+      lastModified: new Date(),
+    },
+    {
+      url: `${REGISTRY_ORIGIN}/privacy`,
+      lastModified: new Date(),
+    },
     ...categoryPages().map((c) => ({
       url: `${REGISTRY_ORIGIN}/categories/${c.id}`,
       lastModified: new Date(),

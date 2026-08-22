@@ -386,10 +386,54 @@ export function SiteShell({
         />
       ) : null}
 
+
+      {/* The rail that survives hiding the sidebar — CSS-only visibility
+          (see the `.sidebar-restore` rule in globals.css) so it appears in
+          the exact same paint as the collapse itself, pre-hydration
+          included, instead of the button vanishing along with the nav it
+          controls. Desktop-only by construction: that CSS rule only ever
+          applies at the `lg` breakpoint. */}
+      <button
+        type="button"
+        onClick={() => setSidebarHiddenPersisted(false)}
+        aria-expanded={mounted ? !sidebarHidden : undefined}
+        aria-controls="site-nav"
+        className="sidebar-restore fixed left-0 top-4 z-40 h-11 w-6 items-center justify-center rounded-r-md border border-l-0 border-border bg-background text-ns-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
+      >
+        <span className="sr-only">Show sidebar</span>
+        <RailChevron direction="right" />
+      </button>
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        {/* The skip link above and the route-change focus effect both target
+            this — `tabIndex={-1}` makes it (or, more often, the first `h1`
+            inside it) programmatically focusable without adding it to the
+            normal Tab order. */}
+        <div id="main" ref={mainRef} tabIndex={-1} className="min-w-0 flex-1 outline-none">
+          {children}
+        </div>
+        <SiteFooter />
+      </div>
+
+      {/* DOM order: main content first, sidebar after — visually unchanged
+          because this is the flex container's `lg:order-first` child at lg,
+          and below lg the nav is `fixed` (a drawer), where source order has
+          no layout effect at all.
+
+          The reason is what a crawler sees. This tree is ~230KB of markup
+          for ~300 components x every category it belongs to, and it used to
+          sit ahead of every page's <h1>: the homepage heading landed at byte
+          296,479, past where agents that truncate a fetch stop reading. That
+          is why an agent audit reported "no H1" on a page that has always
+          server-rendered one.
+
+          It also moves ~300 links out from in front of the content in the Tab
+          order; the skip link above stays regardless, since it is still the
+          shortest path to the same place. */}
       <nav
         id="site-nav"
         aria-label="Components"
-        className={`fixed inset-y-0 left-0 z-40 flex w-[17rem] flex-col border-r border-border bg-background transition-[transform,translate,visibility] lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 motion-reduce:transition-none ${
+        className={`fixed inset-y-0 left-0 z-40 flex w-[17rem] flex-col border-r border-border bg-background transition-[transform,translate,visibility] lg:sticky lg:top-0 lg:order-first lg:h-screen lg:translate-x-0 motion-reduce:transition-none ${
           open ? "translate-x-0" : "-translate-x-full invisible lg:visible"
         }`}
       >
@@ -582,34 +626,6 @@ export function SiteShell({
           <SiteAuth />
         </div>
       </nav>
-
-      {/* The rail that survives hiding the sidebar — CSS-only visibility
-          (see the `.sidebar-restore` rule in globals.css) so it appears in
-          the exact same paint as the collapse itself, pre-hydration
-          included, instead of the button vanishing along with the nav it
-          controls. Desktop-only by construction: that CSS rule only ever
-          applies at the `lg` breakpoint. */}
-      <button
-        type="button"
-        onClick={() => setSidebarHiddenPersisted(false)}
-        aria-expanded={mounted ? !sidebarHidden : undefined}
-        aria-controls="site-nav"
-        className="sidebar-restore fixed left-0 top-4 z-40 h-11 w-6 items-center justify-center rounded-r-md border border-l-0 border-border bg-background text-ns-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
-      >
-        <span className="sr-only">Show sidebar</span>
-        <RailChevron direction="right" />
-      </button>
-
-      <div className="flex min-w-0 flex-1 flex-col">
-        {/* The skip link above and the route-change focus effect both target
-            this — `tabIndex={-1}` makes it (or, more often, the first `h1`
-            inside it) programmatically focusable without adding it to the
-            normal Tab order. */}
-        <div id="main" ref={mainRef} tabIndex={-1} className="min-w-0 flex-1 outline-none">
-          {children}
-        </div>
-        <SiteFooter />
-      </div>
 
       {/* /connect is where this popup would send someone — pointless there.
           Every /preview/<name> shape (bare route + /embed, the screenshot

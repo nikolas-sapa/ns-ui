@@ -12,6 +12,7 @@ const description =
   "The taste this registry is held to: what counts as one interaction, why both themes are non-negotiable, why the card matters as much as the preview, and what gets rejected.";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/guidelines" },
   title,
   description,
   openGraph: { title, description },

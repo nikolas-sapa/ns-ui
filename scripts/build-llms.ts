@@ -611,6 +611,16 @@ is the whole dependency.
 - ${MCP_LINE}
 - ${CLI_LINE}
 
+Developer resources, by URL (every one of these is live — no key, no account):
+- MCP over HTTP, no install: POST JSON-RPC to ${HOMEPAGE}/.well-known/mcp
+  (GET the same URL for the manifest: transport, protocol version, tool list).
+- Registry index (shadcn schema, every component): ${HOMEPAGE}/registry.json
+- One component's install spec and real source: ${HOMEPAGE}/r/<name>.json
+- Human-readable page per component: ${HOMEPAGE}/components/<name>
+- Markdown of any page: send \`Accept: text/markdown\` to it (acceptmarkdown.com).
+- Agent-facing docs index: ${HOMEPAGE}/connect · Sitemap: ${HOMEPAGE}/sitemap.xml
+- Who maintains this and how to reach them: ${HOMEPAGE}/about · ${HOMEPAGE}/privacy
+
 Requirements before you use any of these:
 - Colors MUST come from CSS custom properties already in scope: --background --foreground
   --ns-muted --border --ns-accent --surface --error --warning. Never hardcode hex — these

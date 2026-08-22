@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import registry from "@/registry.json";
 import { loadUseWhen } from "@/lib/use-when";
 import { kindOf } from "@/lib/kind";
@@ -90,6 +91,8 @@ const collectionPageJsonLd = {
   "@type": "CollectionPage",
   name: "ns-ui",
   url: REGISTRY_ORIGIN,
+  isPartOf: { "@id": `${REGISTRY_ORIGIN}/#software` },
+  publisher: { "@id": `${REGISTRY_ORIGIN}/#organization` },
   mainEntity: {
     "@type": "ItemList",
     numberOfItems: registry.items.length,
@@ -102,10 +105,87 @@ const collectionPageJsonLd = {
   },
 };
 
+// Identity, separate from the catalog listing above: `CollectionPage` says
+// what this PAGE is, and an agent reading it still cannot tell what ns-ui IS
+// or who stands behind it. SoftwareApplication + Organization are the two
+// types that answer those, linked by @id so the three read as one graph
+// rather than three unrelated blocks.
+//
+// `address` is deliberately absent — schema.org PostalAddress wants a real
+// one, and this project has no published business address. An invented
+// address is worse than a missing field. See the change summary.
+const identityJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "@id": `${REGISTRY_ORIGIN}/#software`,
+      name: "ns-ui",
+      url: REGISTRY_ORIGIN,
+      description:
+        "A registry of React components you install by URL — each built around a single interaction, each installed as plain source with no runtime package.",
+      applicationCategory: "DeveloperApplication",
+      applicationSubCategory: "React component registry",
+      operatingSystem: "Any",
+      softwareRequirements: "React 19+, Tailwind CSS v4",
+      license: "https://opensource.org/licenses/MIT",
+      // Free, and saying so in the field agents actually read for price.
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      codeRepository: "https://github.com/nikolas-sapa/ns-ui",
+      author: { "@id": `${REGISTRY_ORIGIN}/#organization` },
+      publisher: { "@id": `${REGISTRY_ORIGIN}/#organization` },
+    },
+    {
+      "@type": "Organization",
+      "@id": `${REGISTRY_ORIGIN}/#organization`,
+      name: "ns-ui",
+      alternateName: "ns-ui component registry",
+      url: REGISTRY_ORIGIN,
+      logo: `${REGISTRY_ORIGIN}/opengraph-image`,
+      description:
+        "The maintainer of ns-ui, an open-source (MIT) registry of React components for shadcn-compatible tooling.",
+      founder: { "@type": "Person", name: "Nikolas Sapalidis" },
+      sameAs: [
+        "https://github.com/nikolas-sapa/ns-ui",
+        "https://www.npmjs.com/package/@nikolas.sapa/ns-ui",
+        "https://www.npmjs.com/package/@nikolas.sapa/ns-ui-mcp",
+      ],
+      // The same address SECURITY.md and CODE_OF_CONDUCT.md already publish —
+      // not a new one invented for this markup.
+      contactPoint: [
+        {
+          "@type": "ContactPoint",
+          contactType: "technical support",
+          email: "nikolas.sapalidis@gmail.com",
+          url: `${REGISTRY_ORIGIN}/about`,
+          availableLanguage: ["English"],
+        },
+        {
+          "@type": "ContactPoint",
+          contactType: "security",
+          email: "nikolas.sapalidis@gmail.com",
+          url: "https://github.com/nikolas-sapa/ns-ui/security/advisories/new",
+        },
+      ],
+    },
+  ],
+};
+
+export const metadata: Metadata = {
+  // The audited gap: without this, every agent resolving the homepage has to
+  // guess which host is canonical (the vercel.app alias also serves this
+  // exact HTML — see lib/registry-origin.ts).
+  alternates: { canonical: "/" },
+};
+
 export default async function Home() {
   const stars = await getStarCount();
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(identityJsonLd) }}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdScript(collectionPageJsonLd) }}
