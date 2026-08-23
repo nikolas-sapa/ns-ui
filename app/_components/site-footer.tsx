@@ -44,6 +44,10 @@ const COLUMNS: { heading: string; links: FooterLink[] }[] = [
   {
     heading: "For AI agents",
     links: [
+      // Named "Developer docs", not "/docs": this is the row someone scans
+      // for when they are looking for an API, and the path alone did not say
+      // that.
+      { href: "/docs", label: "Developer docs" },
       { href: "/llms.txt", label: "/llms.txt" },
       { href: "/llms-full.txt", label: "/llms-full.txt" },
     ],

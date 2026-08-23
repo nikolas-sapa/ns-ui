@@ -77,6 +77,27 @@ async function markdownNegotiation() {
     `got "${html.headers.get("content-type")}"`,
   );
 
+  // The tie rule. An indexer saying "markdown is fine, so is anything else"
+  // must get the real page — serving it markdown replaces the document (and
+  // its <h1>) with a text file, which is what an audit read as a missing
+  // heading.
+  const wildcard = await fetch(url("/"), { headers: { accept: "text/markdown, */*" } });
+  check(
+    "markdown tied with a wildcard still gets HTML",
+    (wildcard.headers.get("content-type") ?? "").includes("text/html"),
+    `got "${wildcard.headers.get("content-type")}"`,
+  );
+
+  // ...but naming markdown above the wildcard is a real preference.
+  const explicit = await fetch(url("/"), {
+    headers: { accept: "text/markdown, */*;q=0.5" },
+  });
+  check(
+    "markdown ranked above a wildcard gets markdown",
+    (explicit.headers.get("content-type") ?? "").includes("text/markdown"),
+    `got "${explicit.headers.get("content-type")}"`,
+  );
+
   // A browser (or a bare `curl`, which sends the wildcard) must be untouched.
   const plain = await fetch(url("/"), { headers: { accept: "*/*" } });
   check(
@@ -212,6 +233,18 @@ async function mcpEndpoint() {
   const text = callBody.result?.content?.[0]?.text ?? "";
   check("tools/call returns results", text.includes('"results"'), text.slice(0, 60));
 
+  // Clients disagree about where an MCP server lives; all three URLs are the
+  // same handler, so all three must hand-shake.
+  for (const alias of ["/mcp", "/.well-known/mcp.json"]) {
+    const aliased = await fetch(url(alias), {
+      method: "POST",
+      headers: { "content-type": "application/json", accept: "application/json" },
+      body: JSON.stringify({ jsonrpc: "2.0", id: 9, method: "tools/list" }),
+    });
+    const body = (await safeJson<{ result?: { tools?: unknown[] } }>(aliased)) ?? {};
+    check(`${alias} answers the same handshake`, (body.result?.tools?.length ?? 0) > 0, `got ${aliased.status}`);
+  }
+
   const unknown = await rpc({ jsonrpc: "2.0", id: 4, method: "tools/call", params: { name: "nope" } });
   const unknownBody = (await safeJson<{ error?: { code?: number } }>(unknown)) ?? {};
   check("unknown tool is a JSON-RPC error", unknownBody.error?.code === -32602, JSON.stringify(unknownBody.error));
@@ -274,11 +307,47 @@ async function homepageMetadata() {
   // put it ~290KB in.
   const h1 = html.indexOf("<h1");
   check("homepage has an H1 in raw HTML", h1 !== -1);
-  check("  H1 is within the first 100KB", h1 !== -1 && h1 < 100_000, `at byte ${h1}`);
+  // 20KB, not 100: the catalog's ItemList JSON-LD is ~55KB on its own, and
+  // while it sat above the markup the heading was at byte 63,882. Anything
+  // that large creeping back in front of the content fails here.
+  check("  H1 is within the first 20KB", h1 !== -1 && h1 < 20_000, `at byte ${h1}`);
 
   for (const tag of ['property="og:image"', 'property="og:type"', 'lang="en"']) {
     check(`homepage has ${tag}`, html.includes(tag));
   }
+}
+
+async function developerResources() {
+  console.log("\nDeveloper resource discoverability");
+
+  const docs = await fetch(url("/docs"));
+  const html = await docs.text();
+  check("/docs responds 200", docs.status === 200, `got ${docs.status}`);
+  // The audit's complaint was name-based: a search for the product's docs
+  // found nothing. The product name has to be IN the title and the heading,
+  // not just implied by the domain.
+  const title = html.match(/<title>([^<]*)<\/title>/)?.[1] ?? "";
+  check("  /docs names the product in its <title>", /ns-ui/i.test(title), title);
+  const h1 = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/)?.[1]?.replace(/<[^>]+>/g, "") ?? "";
+  check("  /docs names the product in its H1", /ns-ui/i.test(h1), h1.trim());
+  for (const path of ["/openapi.json", "/.well-known/mcp", "/llms.txt", "/registry.json"]) {
+    check(`  /docs links ${path}`, html.includes(path));
+  }
+
+  const spec = await fetch(url("/openapi.json"));
+  const doc = (await safeJson<Record<string, unknown>>(spec)) ?? {};
+  check("/openapi.json responds 200", spec.status === 200, `got ${spec.status}`);
+  check("  is an OpenAPI 3.1 document", String(doc.openapi ?? "").startsWith("3.1"), String(doc.openapi));
+  const paths = Object.keys((doc.paths as Record<string, unknown>) ?? {});
+  check("  documents the registry index", paths.includes("/registry.json"), paths.join(", "));
+  check("  documents the MCP endpoint", paths.includes("/.well-known/mcp"), paths.join(", "));
+
+  const llms = await (await fetch(url("/llms.txt"))).text();
+  check("llms.txt names the docs index", llms.includes("/docs"));
+  check("llms.txt names the OpenAPI spec", llms.includes("/openapi.json"));
+
+  const sitemap = await (await fetch(url("/sitemap.xml"))).text();
+  check("sitemap lists /docs", sitemap.includes("/docs"));
 }
 
 async function trustAnchors() {
@@ -316,6 +385,7 @@ await markdownNegotiation();
 await agentFriendly404();
 await mcpEndpoint();
 await homepageMetadata();
+await developerResources();
 await trustAnchors();
 
 console.log(`\n${checks - failures}/${checks} checks passed`);

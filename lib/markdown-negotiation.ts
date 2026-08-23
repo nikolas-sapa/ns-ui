@@ -29,31 +29,24 @@ function parseAccept(header: string): Ranked[] {
     .filter((r) => r.type.length > 0);
 }
 
-// Highest q for `type`, honouring the "*/*" and "text/*" wildcard ranges.
-function qFor(ranked: Ranked[], type: string): number {
-  const [group] = type.split("/");
-  let best = 0;
-  for (const r of ranked) {
-    if (r.type === type || r.type === `${group}/*` || r.type === "*/*") {
-      best = Math.max(best, r.q);
-    }
-  }
-  return best;
-}
-
 /**
- * True only when the client named `text/markdown` explicitly AND ranked it at
- * least as high as `text/html`.
+ * True only when the client named `text/markdown` explicitly AND ranked it
+ * STRICTLY above whatever else it will accept.
  *
- * Explicitly, not "no text/html found": a bare `curl` sends the catch-all
- * wildcard range, and
- * every unknown crawler that omits the header entirely resolves to the same
- * wildcard. Serving those markdown would change what the site returns to most
- * non-browser traffic, which is a far bigger blast radius than the one this
- * feature is for.
+ * Explicitly, because a bare `curl` and every crawler that omits the header
+ * resolve to the catch-all range, and serving those markdown would change
+ * what most non-browser traffic gets.
  *
- * Ties go to markdown: a client that bothered to list `text/markdown` at equal
- * weight is asking for it.
+ * Strictly, because of what ties mean in practice. `Accept: text/markdown`
+ * on its own is a client that wants markdown and nothing else — the exact
+ * request acceptmarkdown.com's conformance check sends, and it still gets
+ * markdown here. A markdown listing alongside the catch-all range is a
+ * different animal: an
+ * indexer saying "markdown is fine, so is anything else", and handing that
+ * one markdown swaps the page's real HTML — headings, structured data, the
+ * whole document — for a text file, which is how an agent audit came to
+ * report "no H1" on this site. Equal weight is not a preference, so the
+ * catch-all wins and HTML is served.
  */
 export function prefersMarkdown(accept: string | null): boolean {
   if (!accept) return false;
@@ -62,5 +55,12 @@ export function prefersMarkdown(accept: string | null): boolean {
     (r) => r.type === "text/markdown" || r.type === "text/x-markdown",
   );
   if (!markdown || markdown.q === 0) return false;
-  return markdown.q >= qFor(ranked, "text/html");
+
+  // Everything the client would also take: HTML by name, plus either wildcard
+  // range. The markdown entry itself is excluded so it never outranks itself.
+  const alternatives = ranked.filter(
+    (r) => r !== markdown && (r.type === "text/html" || r.type === "text/*" || r.type === "*/*"),
+  );
+  if (alternatives.length === 0) return true;
+  return markdown.q > Math.max(...alternatives.map((r) => r.q));
 }

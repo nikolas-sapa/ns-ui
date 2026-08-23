@@ -65,6 +65,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // excluded above: a page nothing links to from the sitemap is a page an
     // agent verifying this project's legitimacy has to guess the URL of.
     {
+      url: `${REGISTRY_ORIGIN}/docs`,
+      lastModified: new Date(),
+    },
+    {
       url: `${REGISTRY_ORIGIN}/about`,
       lastModified: new Date(),
     },
