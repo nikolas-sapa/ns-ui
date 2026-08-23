@@ -345,7 +345,7 @@ export function HoldToConfirm({
       ref={btnRef}
       type="button"
       className={[
-        "relative isolate inline-flex select-none touch-none items-center justify-center overflow-hidden",
+        "ns-chi-btn relative isolate inline-flex select-none touch-none items-center justify-center overflow-hidden",
         "rounded-sm border border-border bg-surface px-5 py-2.5 text-sm font-medium text-foreground",
         "hover:border-ns-muted hover:bg-border/60",
         "transition-[border-color,background-color] duration-150",

@@ -1,0 +1,706 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+
+// ---------------------------------------------------------------------------
+// LaminaDome — stromatolites accreting upward from the bottom edge of the
+// pane. A heightfield of one column per ~2 css px grows by LIGHT-OCCLUSION
+// COMPETITION between neighbouring columns, not by summed sine bumps or a
+// noise field with stripes drawn on top. Every simulation tick, in order:
+//
+//   1. CLEARANCE — for each column x, cast K rays spanning a cone of
+//      `coneHalfAngleDeg` on either side of the current light direction.
+//      Each ray marches upward in fixed height steps; at each step the ray's
+//      height is compared against whatever column its horizontal offset now
+//      lands on. A neighbour tall enough to reach the ray height BLOCKS it —
+//      the rest of that ray's steps don't count toward clearance. L[x] is
+//      the fraction of ray-steps, averaged over all K rays, that stayed
+//      unblocked: 1.0 for a column with open sky in the whole cone, lower
+//      for one sitting in another column's shadow.
+//   2. DEPOSIT — h[x] += growthRate * L[x] * dt, then a fixed 0.2
+//      surface-tension blend with the two neighbours (below 0.1 the front
+//      grows hairline single-column spikes; above 0.4 neighbouring domes
+//      blur into one mound — 0.2 sits in the middle of that range and is not
+//      exposed as a prop). A column whose growth stays capped low because a
+//      taller neighbour keeps shading its cone falls further behind every
+//      tick — that widening gap, not a fixed rule, is the coarsening: a few
+//      tall columns keep winning L and pull away, many short ones measurably
+//      stop accreting once they're buried in shadow.
+//
+// `coneHalfAngleDeg` is the one governing scalar and it alone traverses the
+// real morphospace: narrow (~10deg) tests only near-vertical sky, so a
+// column is shaded solely by whatever sits almost directly upslope of it —
+// most columns keep some clearance and the front stays columnar, many
+// similar-height ridges. Wide (~65deg) tests a broad hemisphere, so nearly
+// any taller neighbour anywhere nearby blocks you — only the true local
+// maxima stay lit, and the front coarsens hard into a few broad domes.
+//
+// LIGHT DIRECTION arcs slowly (LIGHT_BASE_DEG lean + a slow sine swing) —
+// domes accrete more on the side of their crest that keeps clearance toward
+// that lean, so they visibly lean the way real fossil stromatolite domes
+// lean toward palaeo-north. CREST DRIFT (see its own comment below, near
+// DRIFT_COLS_PER_S) is the separate term that makes peaks genuinely migrate
+// sideways rather than just lean in place: the whole accreted stack — the
+// live heightfield AND every committed lamina beneath it — is advected
+// sideways by whole columns at a steady rate, a lossless integer rotation
+// of the column arrays rather than a growth-rate modulation. SEA LEVEL is a
+// single scalar that chases the
+// field's mean height (slowly, so it stays relevant as the front grows) plus
+// a slow sine on top of that; a column below it gets its deposit multiplied
+// by DROWN_FACTOR — the front nearly stalls under a transgression and wakes
+// back up on the following regression, one line moving uniformly, not a
+// per-column rule.
+//
+// LAMINA COMMIT — every ~2s the current front polyline is pushed as a
+// banded stripe (a Float32Array snapshot of h[]). Capped at MAX_LAMINAE:
+// past that, the OLDEST TWO are averaged into one rather than the oldest
+// simply dropped — real compaction, and it bounds memory. The display scale
+// itself is `capPx / max(runningMaxHeight, capPx)`, computed fresh every
+// render from the tallest column's all-time raw height — so the tallest
+// dome is always pinned at capPx (40% of the pane) and everything below,
+// laminae included, compacts proportionally as the field keeps growing.
+// Growth in raw units never actually stops; only what's on screen saturates.
+// That base scale is then modulated +/-9% in lockstep with the same
+// sea-level sinusoid that already suppresses growth for a drowned column
+// (see PEAK BREATHING below), so the whole ridge — every peak and every
+// committed lamina under it — visibly rises and falls on screen even though
+// no column's raw height ever decreases.
+//
+// RENDER: canvas only, no DOM per-cell nodes. Band fill alternates two
+// colors mixed from --ns-muted and --foreground over --background (read via
+// getComputedStyle at mount and on a documentElement class mutation). A
+// thin sea-level line uses --border. Canvas is aria-hidden and
+// pointer-events:none — nothing here is interactive. prefers-reduced-motion
+// runs the tick function synchronously at mount until ~80 laminae exist,
+// then paints that one static banded field and never schedules a rAF.
+// ---------------------------------------------------------------------------
+
+const TICK_HZ = 12; // was 8 — a slower tick made the per-frame occlusion shift too small to read as travel, not just a smoothness issue
+const TICK_STEP = 1 / TICK_HZ;
+const MAX_TICKS_PER_FRAME = 6;
+
+const STEP_H = 3; // px per ray marching step
+const STEPS = 18; // -> 54px max occlusion reach
+const K_RAYS = 5; // samples across the cone
+
+const SURFACE_TENSION = 0.2; // fixed — see header comment on the 0.1/0.4 bounds
+
+// LIGHT DIRECTION is a single parallel-ray angle shared by every column, so
+// swinging it doesn't move a beam laterally across the field — what it does
+// is shift where each tall column's cast shadow lands, since a ray's
+// horizontal reach is `rise * tan(angle)`. As the angle rocks, that shadow
+// boundary next to every peak visibly slides sideways across its shorter
+// neighbours — a real, physically-grounded traveling occlusion edge, not a
+// decorative overlay. At the old 90s period that slide covered a few px
+// over a whole minute, invisible within the few seconds a card is judged
+// on; at 6s it completes most of a swing within one glance.
+const LIGHT_BASE_DEG = -18; // steady lean ("palaeo-north")
+const LIGHT_ARC_DEG = 22; // was 12 — bigger swing, bigger visible shadow travel
+const LIGHT_ARC_PERIOD_S = 6; // was 90
+const MAX_LIGHT_DEG = 80; // clamp so tan() never blows up
+
+// CREST DRIFT — sixth pass, "i want the mountains to move on the x axis"
+// taken literally, after two prior attempts at this both failed. LIGHT_ARC
+// above swings the shadow-casting ANGLE, which slides the occlusion
+// boundary sideways next to an already-tall column but does nothing to
+// WHERE a column becomes tall in the first place — light-occlusion
+// coarsening is rich-get-richer (a column with any early lead keeps L close
+// to 1 and simply keeps winning at whatever angle the light currently
+// holds), so angle-swing alone locks winners in place permanently
+// (measured: ~10px jitter, ~0 net drift over a 3s sample). The FIFTH pass
+// tried a travelling favoured-growth-rate strip instead (boost near a
+// sweeping centre, throttle far from it): that produced real lateral
+// motion but the throttle floor (0.12x) suppressed deposit almost
+// everywhere almost always, so per-tick surface-tension diffusion (the
+// fixed 0.2 neighbour blend, unconditional every tick) had nothing to
+// fight and washed the ridge flat — variance and migration were sharing
+// one knob in opposite directions, and any throttle floor gentle enough
+// to keep the ridge alive turned out too gentle to make the crest hop
+// within a 3s glance either (measured across MIN_MULT 0.3-0.8: either the
+// ridge stayed flat or the crest didn't move inside 3s at all — no point
+// on that curve held both).
+//
+// CREST DRIFT instead makes the lateral motion a translation, not a growth
+// modulation: translating a heightfield preserves its peak-to-trough
+// variance exactly, by construction, so amplitude and migration stop
+// competing. Every tick, driftAcc accumulates DRIFT_COLS_PER_S * dt; once
+// it reaches a whole column, the ENTIRE column arrays — the live
+// heightfield h[] and every already-committed lamina snapshot — are
+// rotated sideways by exactly that many whole columns (wrapping at the
+// pane edge), never by a fractional/interpolated amount. An integer
+// rotation is lossless: it relabels which x each height belongs to without
+// resampling or blending any value, so it cannot itself inject or remove
+// silhouette variance the way even a small continuous shift with
+// interpolation would. Because the whole committed stack (not just the
+// live front) advects together, no band is ever left behind to poke
+// through a newer one — the ridge and its rock visibly travel together,
+// reading as one solid mass drifting, not the crest alone sliding across a
+// stationary base. At DRIFT_COLS_PER_S below, a full lap of a ~480px pane
+// (COL_WIDTH_BASE=2, so ~240 columns) takes ~20s, so it reads as
+// continuous one-direction travel — like a reef belt migrating along a
+// shoreline over geological time, compressed — never a back-and-forth
+// rock. Occlusion competition (CLEARANCE/DEPOSIT above) is completely
+// unmodified by this term: it is the sole source of height variance, exactly
+// as it was when the ridge was last accepted.
+const DRIFT_COLS_PER_S = 12; // ~24px/s at COL_WIDTH_BASE=2 — full lap of a 480px/240-col pane in ~20s
+
+const SEA_AMPL = 26; // raw height units
+// SEA_PERIOD_S is the actual driver of the columnar/domed silhouette, not
+// LIGHT_ARC_PERIOD_S: the drown/wake pulse is a single scalar shared by every
+// column, so it suppresses (DROWN_FACTOR) or restores each column's deposit
+// in lockstep with everyone else. When this period is close to (or a small
+// integer ratio of) the prewarm window, the suppression cycles average out
+// before a tall column can pull durably ahead of its neighbours — variance
+// injected by light-occlusion competition gets removed by the constant
+// per-tick surface-tension diffusion faster than growth can re-inject it, and
+// the front reads as flat. Measured on the sim harness (300 cols, 34-lamina
+// prewarm matching mount warmup, then converted to the actual ON-SCREEN
+// silhouette via this file's own `capPx/max(runningMax,capPx)` render scale,
+// since raw height-unit variance is not what the owner looks at — a taller
+// field compresses more, so raw variance alone overstates a fast-growth
+// config): 14 (the value this constant briefly held) -> ~0.01px, dead flat.
+// 55 (the pre-regression value, with the old slow growthRate/TICK_HZ) ->
+// ~32px. 28, paired with the now-fast LIGHT_ARC_PERIOD_S below, is not a
+// resonance point and -> ~30px across the neighbouring 26-40s band — matches
+// the pre-regression on-screen amplitude while running 2x faster, so the
+// drown/wake pulse itself stays legible within a card-scale glance.
+const SEA_PERIOD_S = 28; // was 14 (regression: flattened the ridge silhouette — see comment above), before that 55
+const SEA_CHASE = 0.01; // per-tick lerp of sea center toward mean height
+const DROWN_FACTOR = 0.12;
+
+// PEAK BREATHING — the ridge silhouette used to only ever grow: once a
+// column pulled ahead in the light-occlusion competition it stayed pinned at
+// the top of the screen forever, because DEPOSIT never subtracts (raw height
+// is monotonic by construction — a stromatolite doesn't erode in this model)
+// and the OLD render used a scale that only tracked runningMax slowly. The
+// same transgression/regression cycle that already suppresses a drowned
+// column's growth (DROWN_FACTOR, above) is the physically-honest source for
+// visible peak motion too: as sea level rises toward a peak, less of its
+// height reads as "exposed dome" on screen; as it falls back, the peak reads
+// taller again. BREATHE_AMPL modulates the render scale itself (not the raw
+// heightfield) in lockstep with the exact same seaLevel sinusoid already
+// driving DROWN_FACTOR — so every peak, and the whole committed lamina
+// stack beneath it, visibly rises and falls together on the same cadence
+// that already governs whether growth is suppressed. It's deliberately a
+// uniform breathing of the whole ridge rather than per-peak independent
+// motion: light-occlusion competition changes WHICH columns win the raw
+// growth race (already modeled, already what makes lamina bands wavy from
+// column to column), and this reuses the sea cycle — the model's other
+// already-shared scalar — to also change how tall the WINNERS currently
+// read, rather than inventing an unrelated third oscillator.
+const BREATHE_AMPL = 0.09; // +/- fraction of display scale — tuned to read clearly within a 3s glance at SEA_PERIOD_S's cadence without looking like a zoom/pan of the canvas
+
+const COMMIT_INTERVAL_MS = 2000;
+const MAX_LAMINAE = 200;
+const CAP_FRACTION = 0.4; // front never displays past 40% of pane height
+
+const COL_WIDTH_BASE = 2; // 1 column per 2 css px, before the perf budget
+const MAX_COLS = 900;
+
+// Normal-motion mount warmup. Grows to a lamina count rather than a fixed tick
+// budget, same as the reduced path: a flat tick cap left the heightfield a
+// near-invisible sliver at the bottom edge on first paint (and in the resting
+// screenshot), which is the one state the piece is judged on. Both paths keep a
+// hard tick cap so a pathological prop can't hang the mount.
+const PREWARM_LAMINAE_TARGET = 34;
+const PREWARM_SAFETY_TICKS = 3000;
+const REDUCED_LAMINAE_TARGET = 80;
+const REDUCED_SAFETY_TICKS = 6000;
+// Reduced-motion still needs to keep visibly living, just without a
+// continuous rAF sweep: every REDUCED_LIVE_INTERVAL_MS it runs a short burst
+// of ticks (REDUCED_LIVE_TICKS at TICK_STEP each) and repaints once — a
+// slow, discrete pulse of growth rather than a frozen frame or a smooth
+// per-frame crawl.
+const REDUCED_LIVE_INTERVAL_MS = 2200;
+const REDUCED_LIVE_TICKS = 10;
+
+type RGB = [number, number, number];
+
+function parseHex(raw: string): RGB | null {
+  const m = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(raw.trim());
+  if (!m) return null;
+  let h = m[1];
+  if (h.length === 3) h = h.split("").map((c) => c + c).join("");
+  const n = parseInt(h, 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+function mixRGB(a: RGB, b: RGB, t: number): RGB {
+  const k = t < 0 ? 0 : t > 1 ? 1 : t;
+  return [
+    Math.round(a[0] + (b[0] - a[0]) * k),
+    Math.round(a[1] + (b[1] - a[1]) * k),
+    Math.round(a[2] + (b[2] - a[2]) * k),
+  ];
+}
+
+function rgbCss([r, g, b]: RGB, alpha = 1): string {
+  return alpha >= 1 ? `rgb(${r},${g},${b})` : `rgba(${r},${g},${b},${alpha})`;
+}
+
+// xorshift32 — deterministic across mounts, so the shipped resting frame
+// (and the reduced-motion static frame) don't drift screenshot to screenshot
+function makeRng(seed: number) {
+  let s = seed >>> 0 || 1;
+  return () => {
+    s ^= s << 13;
+    s ^= s >>> 17;
+    s ^= s << 5;
+    return ((s >>> 0) % 1_000_000) / 1_000_000;
+  };
+}
+
+export interface LaminaDomeProps {
+  /** Light-cone half-angle in degrees — the single governing scalar of the columnar-to-broad-domed morphospace. Narrow (~8-15) shades a column only from near-vertical neighbours, so the front stays columnar; wide (~55-70) tests a broad hemisphere, so only true local maxima stay lit and the front coarsens hard into a few broad domes. @default 30 */
+  coneHalfAngleDeg?: number;
+  /** Deposition rate: height units/second for a fully unshaded column (clearance L=1). @default 10 */
+  growthRate?: number;
+  /** Global simulation speed multiplier. @default 1 */
+  speed?: number;
+  /** Freezes the front on its current frame without unmounting. */
+  paused?: boolean;
+  /** Rendered over the plate in ordinary accessible DOM — this layer alone is aria-hidden. */
+  children?: React.ReactNode;
+  className?: string;
+  style?: React.CSSProperties;
+}
+
+export function LaminaDome({
+  coneHalfAngleDeg = 30,
+  growthRate = 16, // was 10 — still read as "bigger" rather than "moving" at 10; the faster rise plus the sped-up light/sea cycles below make the front's travel legible within a card-scale glance
+  speed = 1,
+  paused = false,
+  children,
+  className = "",
+  style,
+}: LaminaDomeProps) {
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  const coneRef = useRef(coneHalfAngleDeg);
+  coneRef.current = coneHalfAngleDeg;
+  const growthRef = useRef(growthRate);
+  growthRef.current = growthRate;
+  const speedRef = useRef(speed);
+  speedRef.current = speed;
+  const pausedRef = useRef(paused);
+  pausedRef.current = paused;
+
+  useEffect(() => {
+    const wrap = wrapRef.current;
+    const canvas = canvasRef.current;
+    if (!wrap || !canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let reduced = mq.matches;
+
+    let cssW = 0;
+    let cssH = 0;
+    let dpr = 1;
+    let cols = 0;
+    let colWidth = COL_WIDTH_BASE;
+
+    let h = new Float32Array(0);
+    let hNext = new Float32Array(0);
+    let laminae: Float32Array[] = [];
+    let rng = makeRng(0x51a1cb1e);
+
+    let tAccum = 0;
+    let sinceCommit = 0;
+    let seaCenter = 0;
+    let runningMax = 1;
+    let driftAcc = 0; // fractional columns of CREST DRIFT owed, see header comment
+
+    const rebuild = () => {
+      if (cssW < 2 || cssH < 2) return;
+      colWidth = COL_WIDTH_BASE;
+      let c = Math.max(20, Math.ceil(cssW / colWidth));
+      while (c > MAX_COLS) {
+        colWidth++;
+        c = Math.max(20, Math.ceil(cssW / colWidth));
+      }
+      cols = c;
+      h = new Float32Array(cols);
+      hNext = new Float32Array(cols);
+      rng = makeRng(0x51a1cb1e);
+      for (let i = 0; i < cols; i++) h[i] = rng() * 2;
+      laminae = [];
+      tAccum = 0;
+      sinceCommit = 0;
+      seaCenter = 1;
+      runningMax = 1;
+      driftAcc = 0;
+
+      const warm = reduced ? REDUCED_SAFETY_TICKS : PREWARM_SAFETY_TICKS;
+      const laminaeTarget = reduced ? REDUCED_LAMINAE_TARGET : PREWARM_LAMINAE_TARGET;
+      let ticks = 0;
+      while (ticks < warm) {
+        tick(TICK_STEP);
+        ticks++;
+        if (laminae.length >= laminaeTarget) break;
+      }
+      render();
+    };
+
+    // --- simulation -------------------------------------------------------
+    const tanCache = new Float32Array(K_RAYS);
+
+    // CREST DRIFT — see header comment above. A lossless integer rotation:
+    // every value simply moves to its neighbour's slot, wrapping at the
+    // edge, so it can't itself inject or remove silhouette variance the way
+    // even a small interpolated shift would.
+    const rotateColumnsRight = (arr: Float32Array) => {
+      if (cols < 2) return;
+      const last = arr[cols - 1]!;
+      for (let i = cols - 1; i > 0; i--) arr[i] = arr[i - 1]!;
+      arr[0] = last;
+    };
+
+    const tick = (dt: number) => {
+      tAccum += dt;
+
+      let lightDeg =
+        LIGHT_BASE_DEG + LIGHT_ARC_DEG * Math.sin((tAccum / LIGHT_ARC_PERIOD_S) * Math.PI * 2);
+      lightDeg = Math.max(-MAX_LIGHT_DEG, Math.min(MAX_LIGHT_DEG, lightDeg));
+      const lightRad = (lightDeg * Math.PI) / 180;
+      const halfRad =
+        (Math.max(5, Math.min(70, coneRef.current)) * Math.PI) / 180;
+
+      for (let k = 0; k < K_RAYS; k++) {
+        const off = (k / (K_RAYS - 1)) * 2 - 1; // -1..1, K_RAYS is fixed > 1
+        const a = Math.max(-MAX_LIGHT_DEG * (Math.PI / 180), Math.min(MAX_LIGHT_DEG * (Math.PI / 180), lightRad + off * halfRad));
+        tanCache[k] = Math.tan(a);
+      }
+
+      let meanH = 0;
+      for (let i = 0; i < cols; i++) meanH += h[i]!;
+      meanH /= Math.max(1, cols);
+      seaCenter += (meanH - seaCenter) * SEA_CHASE;
+      const seaLevel =
+        seaCenter + SEA_AMPL * Math.sin((tAccum / SEA_PERIOD_S) * Math.PI * 2);
+
+      const g = Math.max(0, growthRef.current);
+
+      for (let x = 0; x < cols; x++) {
+        const base = h[x]!;
+        let clearSum = 0;
+        for (let k = 0; k < K_RAYS; k++) {
+          const tanA = tanCache[k]!;
+          let clear = 0;
+          for (let s = 1; s <= STEPS; s++) {
+            const rise = s * STEP_H;
+            const nx = x + Math.round((rise * tanA) / colWidth);
+            if (nx < 0 || nx >= cols) {
+              clear++;
+              continue;
+            }
+            if (h[nx]! >= base + rise) break;
+            clear++;
+          }
+          clearSum += clear / STEPS;
+        }
+        const L = clearSum / K_RAYS;
+        const drowned = base < seaLevel;
+        const deposit = g * L * dt * (drowned ? DROWN_FACTOR : 1);
+        hNext[x] = base + deposit;
+      }
+
+      // surface tension: 0.2 blend with clamped neighbours
+      for (let x = 0; x < cols; x++) {
+        const l = x > 0 ? hNext[x - 1]! : hNext[x]!;
+        const r = x < cols - 1 ? hNext[x + 1]! : hNext[x]!;
+        h[x] = hNext[x]! * (1 - 2 * SURFACE_TENSION) + SURFACE_TENSION * (l + r);
+      }
+
+      // CREST DRIFT — translate the whole accreted stack sideways by whole
+      // columns only (see rotateColumnsRight above and the header comment).
+      // Every already-committed lamina moves with the live front so the
+      // ridge and its rock read as one solid mass travelling together.
+      driftAcc += DRIFT_COLS_PER_S * dt;
+      while (driftAcc >= 1) {
+        driftAcc -= 1;
+        rotateColumnsRight(h);
+        for (let li = 0; li < laminae.length; li++) rotateColumnsRight(laminae[li]!);
+      }
+
+      for (let x = 0; x < cols; x++) if (h[x]! > runningMax) runningMax = h[x]!;
+
+      sinceCommit += dt * 1000;
+      if (sinceCommit >= COMMIT_INTERVAL_MS) {
+        sinceCommit = 0;
+        laminae.push(h.slice());
+        if (laminae.length > MAX_LAMINAE) {
+          const merged = new Float32Array(cols);
+          const a = laminae[0]!;
+          const b = laminae[1]!;
+          for (let i = 0; i < cols; i++) merged[i] = (a[i]! + b[i]!) * 0.5;
+          laminae.splice(0, 2, merged);
+        }
+      }
+    };
+
+    // --- palette ------------------------------------------------------------
+    let background: RGB = [255, 255, 255];
+    let muted: RGB = [77, 77, 77];
+    let foreground: RGB = [23, 23, 23];
+    let border: RGB = [235, 235, 235];
+    let bandA = "rgb(120,120,120)";
+    let bandB = "rgb(150,150,150)";
+    let seaStroke = "rgba(120,120,120,0.5)";
+
+    const readColors = () => {
+      const cs = getComputedStyle(document.documentElement);
+      background = parseHex(cs.getPropertyValue("--background")) ?? background;
+      muted = parseHex(cs.getPropertyValue("--ns-muted")) ?? muted;
+      foreground = parseHex(cs.getPropertyValue("--foreground")) ?? foreground;
+      border = parseHex(cs.getPropertyValue("--border")) ?? border;
+      bandA = rgbCss(mixRGB(background, muted, 0.5));
+      bandB = rgbCss(mixRGB(background, foreground, 0.14));
+      seaStroke = rgbCss(mixRGB(background, border, 0.9), 0.7);
+    };
+    readColors();
+
+    // --- render ---------------------------------------------------------
+    const render = () => {
+      if (cols <= 0 || cssW < 2 || cssH < 2) return;
+      ctx.clearRect(0, 0, cssW, cssH);
+
+      const capPx = cssH * CAP_FRACTION;
+      const baseScale = capPx / Math.max(runningMax, capPx);
+      // Same phase as the sea-level sinusoid driving DROWN_FACTOR (see the
+      // PEAK BREATHING comment above) — computed fresh every render, not
+      // cached, so it stays exactly in lockstep with tAccum even across a
+      // resize-triggered extra render.
+      const breathe = 1 + BREATHE_AMPL * Math.sin((tAccum / SEA_PERIOD_S) * Math.PI * 2);
+      const scale = baseScale * breathe;
+      const baselineY = cssH;
+      const xAt = (i: number) => i * colWidth;
+      const yAt = (height: number) => baselineY - height * scale;
+
+      const bands = [...laminae, h];
+      let prevTop: Float32Array | null = null;
+      for (let bi = 0; bi < bands.length; bi++) {
+        const top = bands[bi]!;
+        ctx.beginPath();
+        ctx.moveTo(0, yAt(prevTop ? prevTop[0]! : 0));
+        if (prevTop) {
+          for (let i = 1; i < cols; i++) ctx.lineTo(xAt(i), yAt(prevTop[i]!));
+        } else {
+          ctx.lineTo(xAt(cols - 1), yAt(0));
+        }
+        for (let i = cols - 1; i >= 0; i--) ctx.lineTo(xAt(i), yAt(top[i]!));
+        ctx.closePath();
+        ctx.fillStyle = bi % 2 === 0 ? bandA : bandB;
+        ctx.fill();
+        prevTop = top;
+      }
+
+      // sea level line
+      const capPxUnits = capPx / Math.max(scale, 1e-6);
+      const seaLevel =
+        seaCenter + SEA_AMPL * Math.sin((tAccum / SEA_PERIOD_S) * Math.PI * 2);
+      if (seaLevel > 0 && seaLevel < capPxUnits * 1.4) {
+        const y = yAt(seaLevel);
+        if (y > 0 && y < cssH) {
+          ctx.strokeStyle = seaStroke;
+          ctx.lineWidth = 1;
+          ctx.setLineDash([5, 4]);
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(cssW, y);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+      }
+    };
+
+    // --- sizing -----------------------------------------------------------
+    const applyBacking = () => {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.max(1, Math.round(cssW * dpr));
+      canvas.height = Math.max(1, Math.round(cssH * dpr));
+      canvas.style.width = `${cssW}px`;
+      canvas.style.height = `${cssH}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    let rebuildTimer = 0;
+    const resize = () => {
+      const rect = wrap.getBoundingClientRect();
+      if (rect.width < 2 || rect.height < 2) return;
+      const widthChanged = Math.abs(rect.width - cssW) > 0.5;
+      cssW = rect.width;
+      cssH = rect.height;
+      applyBacking();
+      if (widthChanged) {
+        if (cols === 0) {
+          rebuild();
+        } else {
+          window.clearTimeout(rebuildTimer);
+          rebuildTimer = window.setTimeout(rebuild, 260);
+        }
+      } else {
+        render();
+      }
+    };
+
+    // --- loop ---------------------------------------------------------------
+    let raf = 0;
+    let last = 0;
+    let acc = 0;
+    let visible = true;
+    // "paused" (explicit prop) always means a hard freeze. "reduced" no
+    // longer means that: a single static frame that never changes again for
+    // the life of the mount reads as broken, not calm, to anyone who lingers
+    // on it — so reduced motion instead advances the front in slow, discrete
+    // pulses on a plain timeout (never rAF, so there is no continuous
+    // per-frame camera-like motion, which is what the vestibular guard is
+    // actually protecting against) rather than freezing it outright.
+    let reducedTimer = 0;
+
+    const loop = (now: number) => {
+      const dt = last === 0 ? 1 / 60 : Math.min(0.1, (now - last) / 1000);
+      last = now;
+      acc += dt * Math.max(0, speedRef.current);
+      let ran = 0;
+      while (acc >= TICK_STEP && ran < MAX_TICKS_PER_FRAME) {
+        tick(TICK_STEP);
+        acc -= TICK_STEP;
+        ran++;
+      }
+      if (ran > 0) render();
+      if (visible && !document.hidden && !reduced && !pausedRef.current) {
+        raf = requestAnimationFrame(loop);
+      } else {
+        raf = 0;
+      }
+    };
+
+    const wake = () => {
+      if (raf || reduced || pausedRef.current || !visible || document.hidden) return;
+      last = 0;
+      raf = requestAnimationFrame(loop);
+    };
+    const sleep = () => {
+      if (raf) cancelAnimationFrame(raf);
+      raf = 0;
+    };
+
+    const reducedPulse = () => {
+      reducedTimer = 0;
+      for (let i = 0; i < REDUCED_LIVE_TICKS; i++) tick(TICK_STEP);
+      render();
+      wakeReduced();
+    };
+    const wakeReduced = () => {
+      if (reducedTimer || !reduced || pausedRef.current || !visible || document.hidden) return;
+      reducedTimer = window.setTimeout(reducedPulse, REDUCED_LIVE_INTERVAL_MS);
+    };
+    const sleepReduced = () => {
+      if (reducedTimer) window.clearTimeout(reducedTimer);
+      reducedTimer = 0;
+    };
+
+    const ro = new ResizeObserver(resize);
+    ro.observe(wrap);
+    resize();
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        visible = entries.some((e) => e.isIntersecting);
+        if (visible) {
+          wake();
+          wakeReduced();
+        } else {
+          sleep();
+          sleepReduced();
+        }
+      },
+      { threshold: 0 }
+    );
+    io.observe(wrap);
+
+    const onVis = () => {
+      if (document.hidden) {
+        sleep();
+        sleepReduced();
+      } else {
+        wake();
+        wakeReduced();
+      }
+    };
+    document.addEventListener("visibilitychange", onVis);
+
+    const applyMode = () => {
+      if (pausedRef.current) {
+        sleep();
+        sleepReduced();
+      } else if (reduced) {
+        sleep();
+        wakeReduced();
+      } else {
+        sleepReduced();
+        wake();
+      }
+    };
+    const onMq = () => {
+      reduced = mq.matches;
+      applyMode();
+    };
+    mq.addEventListener("change", onMq);
+
+    let lastPolledPaused = pausedRef.current;
+    let poll = 0;
+    const pollPaused = () => {
+      if (pausedRef.current !== lastPolledPaused) {
+        lastPolledPaused = pausedRef.current;
+        applyMode();
+      }
+      poll = window.setTimeout(pollPaused, 150);
+    };
+    pollPaused();
+
+    const themeObserver = new MutationObserver(() => {
+      readColors();
+      render();
+    });
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    applyMode();
+
+    return () => {
+      sleep();
+      sleepReduced();
+      ro.disconnect();
+      io.disconnect();
+      themeObserver.disconnect();
+      mq.removeEventListener("change", onMq);
+      document.removeEventListener("visibilitychange", onVis);
+      window.clearTimeout(rebuildTimer);
+      window.clearTimeout(poll);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div
+      ref={wrapRef}
+      className={`relative isolate h-full w-full overflow-hidden bg-background ${className}`}
+      style={style}
+    >
+      <canvas
+        ref={canvasRef}
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 block h-full w-full"
+      />
+      {children ? <div className="relative z-[1] h-full w-full">{children}</div> : null}
+    </div>
+  );
+}
+
+LaminaDome.displayName = "LaminaDome";

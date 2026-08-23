@@ -1,0 +1,31 @@
+{
+  "name": "back-bearing",
+  "title": "Back Bearing",
+  "description": "A sighting-compass bearing picker: the graduated card rotates under a fixed lubber line and the instrument always shows the fore reading plus its reciprocal, the way a surveyor verifies a shot.",
+  "collection": "core",
+  "tags": [
+    "compass",
+    "bearing",
+    "dial",
+    "slider",
+    "physics",
+    "svg",
+    "azimuth",
+    "accessibility"
+  ],
+  "useWhen": "any direction input measured as a compass bearing (wind direction, antenna azimuth, camera or drone heading, departure bearing, sun angle for a shading control) where a rotating-card readout that also surfaces the +-180deg reciprocal matters, e.g. verifying a shot has no transposed digit; pick dial-moire instead when the deliverable is a weighted tuning knob whose reward is a hidden message resolving at a detent, not a directional value with a reciprocal.",
+  "instruction": "A bearing picker built like a real sighting compass rather than a generic rotary knob: a 240px SVG instrument where the graduated CARD is the only thing that rotates (transform rotate(-theta) applied via the SVG transform attribute on a <g>, never a CSS needle-over-static-rose), under a FIXED lubber line drawn as a static triangle at 12 o'clock outside the rotating group. One governing scalar, theta (degrees true, continuous float internally so 22.5deg intercardinal detents are exactly representable, displayed and reported rounded to an integer 0-359): card rotation, the fore readout, the back readout ((theta+180) mod 360, smaller, --ns-muted, rendered at a fixed position diametrically opposite the fore readout across the instrument), and the tick weighting are all pure derivations of theta, never independent state. The card is one SVG ring: 1px ticks every 2deg (180 of them), 2px ticks every 10deg, and N/E/S/W cardinal letters at the quadrants in Geist Mono, all inside the rotating group; the bezel circle, lubber-line triangle, a smaller muted back-sight index triangle at 6 o'clock, and the center pivot dot sit outside it and never move. Dragging anywhere on the card computes pointer atan2 about the instrument's center each move and accumulates the SHORTEST signed delta from the previous pointer angle into a continuous unbounded raw angle (never unwinding the long way around); the card tracks the pointer 1:1 while dragging. On release, the residual angular velocity from the last few pointer deltas hands off to a second-order damped spring (k=260 deg/s^2, zeta=0.85 -- just under critical, the same tuning confirm-dial-align uses for its one-small-overshoot snap) that lets the card coast past its resting angle by a hair and settle back, the signature of a liquid-damped marine card rather than a springy double-bounce UI dial. Holding Shift while dragging snaps theta live to the nearest 22.5deg intercardinal detent. Keyboard: role=slider on the draggable region, min 0 max 359, aria-valuenow the rounded fore bearing, aria-valuetext formatted exactly as 'bearing 042 degrees, back bearing 222'; arrow keys step 1deg, Shift+arrow steps to the next 22.5deg detent in that direction, both routed through the same settle-spring so keyboard nudges get the identical single-overshoot feel with zero initial velocity (a step response of an underdamped spring still overshoots once on its own). The fore readout is not a popup: it is an always-present 3-digit Geist Mono <input> that free-types digits and commits theta on every valid keystroke, kept in sync with drag/keyboard commits except while it holds focus so typing is never fought. A single direct-DOM rAF loop (SVG transform attribute writes only) is the sole animator; React state holds just the committed theta. Under prefers-reduced-motion the settle spring is skipped entirely (instant snap) while the Shift detents and drag/keyboard/typing behavior are unchanged. Zero dependencies, no canvas.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "drag",
+    "target": "[role=slider]",
+    "from": [0.24, 0.36],
+    "to": [0.76, 0.3],
+    "period": 4800,
+    "delay": 700
+  },
+  "card": {
+    "focus": ".max-w-xs",
+    "padding": 0.16
+  }
+}

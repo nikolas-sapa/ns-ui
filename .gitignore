@@ -41,6 +41,10 @@ mcp/dist/
 .scratch-dbg/
 recordings/
 
+# /review console's local state file (app/api/review-state/route.ts) —
+# per-developer notes/tested flags, never shipped.
+/.review-state.json
+
 # Local-only working material: research inventories, session notes, ad-hoc
 # debug scripts, agent prompts. Kept on disk, deliberately out of the repo.
 /.internal/

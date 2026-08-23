@@ -22,7 +22,7 @@
     "expect": "[data-wind-caption][data-phase=\"determinate\"]"
   },
   "card": {
-    "focus": "svg",
+    "focus": "[data-thread-spool-svg]",
     "padding": 0.8
   }
 }

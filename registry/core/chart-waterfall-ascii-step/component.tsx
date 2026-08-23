@@ -366,6 +366,7 @@ export function ChartWaterfallAsciiStep({
         <canvas
           ref={canvasRef}
           aria-hidden="true"
+          className="ns-cwas-canvas"
           style={{ width: viewW, height: viewH, maxWidth: "100%", display: "block" }}
         />
 

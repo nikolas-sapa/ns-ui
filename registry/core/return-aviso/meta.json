@@ -1,0 +1,33 @@
+{
+  "name": "return-aviso",
+  "title": "Return Aviso",
+  "description": "An @mention chip that behaves like registered post: a stub tears off along a dashed perforation on send and only returns — filled, timestamped — once the mentioned person actually looks.",
+  "collection": "core",
+  "tags": [
+    "mention",
+    "chip",
+    "read-receipt",
+    "delivery-status",
+    "link",
+    "micro-interaction",
+    "accessibility"
+  ],
+  "useWhen": "a per-mention read receipt for the person who wrote the @mention — a stub tears off a dashed perforation on send, holds detached at 40% opacity through delivery, and only travels back to dock as a filled corner notch with an HH:MM stamp once the mentioned person genuinely opens the thread, driven solely by a controlled 0/1/2 sync-layer state with no optimistic 'seen'. Pick badge-unread-tarnish instead for the opposite direction — the current viewer's OWN unread count aging over elapsed time on a nav item, not a round-trip acknowledgment of someone else's attention.",
+  "card": {
+    "focus": "[data-ns-aviso-focus]",
+    "padding": 0.4
+  },
+  "autoplay": {
+    "mode": "press",
+    "target": "[data-ns-aviso-mark-seen]",
+    "hold": 500,
+    "period": 4400,
+    "delay": 700
+  },
+  "gate": {
+    "openBy": "[data-ns-aviso-mark-seen]",
+    "expect": "[data-ns-aviso-focus] .ns-aviso-time-inner"
+  },
+  "instruction": "A radius-6 bordered @mention chip, name set in Geist Sans with no fill, whose entire visual life is a pure function of one controlled scalar prop, deliveryState: 0 (sent), 1 (delivered) or 2 (seen) — there is no other animation input, and the component never advances this itself. A thin 3px stub sits along a dashed perforation cut into the chip's trailing edge, always visible as a faint scored line even at rest. While deliveryState is 0 or 1 the stub is detached: translated 12px clear of the chip, unfilled (border-only), holding at 40% opacity — sent and delivered render byte-identical on purpose, because the mentioned person hasn't looked either way and the chip has nothing new to report until they do. The instant deliveryState reaches 2, the stub travels back over 220ms cubic-bezier(0.22,1,0.36,1) and docks flush against the chip's own corner radius, widening and filling solid with --foreground — a permanent filled notch, not a temporary highlight — while a 10px Geist Mono HH:MM timestamp unfurls beside it via an animated CSS grid track (0fr to 1fr) rather than a hard reflow, so the receipt eases into place instead of popping. The HH:MM text is supplied pre-formatted by the caller (a seenAt string prop, not a Date) precisely so the same receipt can't read a different clock time on the server that renders it than on the browser that hydrates it — formatting is the caller's timezone/locale call, not this component's. Hard constraint: deliveryState is fully controlled and driven only by confirmed events from the sync layer; nothing inside this component ever sets or infers a seen state optimistically on send, since a receipt that fires before the fact is decoration wearing a receipt's clothes. The chip itself is a real <a> to the mentioned person — its accessible name is the plain-text \"@name\" content — carrying aria-description \"mentioned, seen 14:22\" or \"mentioned, not yet seen\" so the exact same information the shape carries is always available as text; the stub, the perforation and the inline timestamp are all aria-hidden, since they would otherwise just duplicate that description rather than add to it. A visually-hidden aria-live=\"polite\" region announces the not-seen -> seen crossing (\"@name saw your mention at 14:22\"), but only when the optional authoredByViewer prop is true and only past the first render — a chip that mounts already seen (a reloaded page, say) has no fresh news to announce, and a receipt is only news to the person who sent the mention, not to every other viewer of a thread that happens to mention them. prefers-reduced-motion removes the stub's travel and width change entirely — it sits permanently docked and the three states crossfade through opacity and fill alone, still fully legible, just without the physical journey. Pure DOM/CSS, no canvas; colors are --background, --foreground, --ns-muted and --border only, with --ns-accent reserved strictly for the focus-visible ring. Differs from badge-unread-tarnish on purpose: that component ages the CURRENT user's own unread state over elapsed clock time; this one tracks a discrete, event-driven round-trip acknowledgment of someone ELSE's attention, and never touches a clock on its own.",
+  "dependencies": []
+}

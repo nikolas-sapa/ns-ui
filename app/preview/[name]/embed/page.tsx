@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { demos } from "@/registry/index";
+import registry from "@/registry.json";
 import autoplayMap from "@/lib/autoplay.generated.json";
 import { parseAutoplay } from "@/lib/autoplay";
 import { AutoplayDriver } from "@/app/_components/autoplay-driver";
+import { DemoLazy } from "@/app/_components/demo-lazy";
 import { ANIMATION_GATE_SCRIPT } from "./animation-gate";
+
+// Existence check only — see the same comment in `demo-frame.tsx` for why
+// `demos` (the lazy() map) is never imported directly from a Server
+// Component here.
+const registryNames = new Set(registry.items.map((i) => i.name));
 
 /**
  * The card thumbnail route — what every catalog and featured card loads in its
@@ -58,8 +64,7 @@ export default async function EmbedPreviewPage({
   params: Promise<{ name: string }>;
 }) {
   const { name } = await params;
-  const Demo = demos[name];
-  if (!Demo) notFound();
+  if (!registryNames.has(name)) notFound();
 
   const spec = parseAutoplay((autoplayMap as Record<string, unknown>)[name]);
 
@@ -72,7 +77,7 @@ export default async function EmbedPreviewPage({
           client component's effects. See the docblock at the top of
           `animation-gate.ts` for what it does and why. */}
       <script dangerouslySetInnerHTML={{ __html: ANIMATION_GATE_SCRIPT }} />
-      <Demo />
+      <DemoLazy name={name} />
       {spec ? <AutoplayDriver spec={spec} /> : null}
     </div>
   );

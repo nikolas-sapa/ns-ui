@@ -363,6 +363,7 @@ export function WindSpool({
         height={184}
         aria-hidden="true"
         className="max-w-full"
+        data-thread-spool-svg
       >
         {/* feed line: taut thread entering from a fixed anchor */}
         <line

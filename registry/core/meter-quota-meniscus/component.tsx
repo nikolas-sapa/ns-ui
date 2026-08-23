@@ -180,7 +180,7 @@ export function MeniscusMeter({
 }
 .ns-meniscus-bead{animation:ns-meniscus-drip 900ms cubic-bezier(0.55,0,0.85,0.35) 1}
 @media (prefers-reduced-motion: reduce){
-  .ns-meniscus-fill,.ns-meniscus-surface{transition:none}
+  .ns-meniscus-fill,.ns-meniscus-surface{transition-duration:140ms;transition-timing-function:linear}
   .ns-meniscus-bead{animation:none}
 }
 `}</style>

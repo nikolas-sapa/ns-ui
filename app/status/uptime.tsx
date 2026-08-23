@@ -41,6 +41,29 @@
  * A colour-blind reader therefore never has to resolve --success vs --error by
  * hue: the word is on the card, in the legend, and in every bar's own name.
  *
+ * A RECOVERED day (worst state degraded/down, but the day's last sample was
+ * ok — `Bar.recovered`, derived in `summarizeService`) keeps the SAME colour
+ * as a still-bad day of that state: worst-of-day is the whole point of the
+ * aggregate and a recovery does not get to soften it. The distinction is text
+ * only, appended to the bar's name and tooltip ("degraded, recovered — last
+ * sample ok"). Deliberately not phrased as the day having concluded: on the
+ * rightmost (today's) bar the day has not ended and could still go bad again,
+ * and this
+ * page refuses claims it has not measured — what was actually measured is
+ * that the newest sample read ok, so that is exactly what it says. No fifth
+ * swatch, no separate legend entry — the smallest signal that answers "did
+ * this get fixed" without building the incident-log UI this page
+ * deliberately does not have.
+ *
+ * A BACKFILLED day (`Bar.backfilled`, from the sticky flag `convex/status.ts`'s
+ * `backfill` mutation sets — see its doc comment) is the same story again: same
+ * colour a live day of that state would have, distinguished by text only,
+ * appended right after the recovered text if both apply. "backfilled — entered
+ * after the fact" is deliberately not softer language ("estimated",
+ * "reconstructed") — the row's own state and detail are exact, evidence-derived
+ * facts (npm registry timestamps, git history), the ONLY thing not live is when
+ * they were typed in.
+ *
  * The uptime figure is computed from days that have data and from nothing else,
  * and it always prints its own denominator, so a reader can reconstruct it from
  * the bars in front of them. With zero recorded days it prints words, never a
@@ -59,6 +82,7 @@
 // uptime figure offline. This file owns the colour and the words, and nothing
 // else. Re-exported here so the page keeps one import for the strip.
 import { CopyButton } from "@/app/_components/copy-button";
+import type { CheckState } from "@/lib/status-checks";
 import {
   dayWindow,
   prettyDay,
@@ -85,6 +109,27 @@ const WORD: Record<BarState, string> = {
   nodata: "no data",
 };
 
+/**
+ * `CheckState` (this render's live read) and `BarState` (a recorded day) are
+ * different vocabularies that happen to share three words — see the header
+ * word vs. "now" split below for why they are never collapsed into one. An
+ * `unknown` live read reuses the "no data" swatch: it is not a failure and
+ * must never render in `--error` or `--success`, and "we could not look" is
+ * visually the same shrug as "nobody recorded this day".
+ */
+const LIVE_BAR: Record<CheckState, string> = {
+  ok: BAR.ok,
+  degraded: BAR.degraded,
+  down: BAR.down,
+  unknown: BAR.nodata,
+};
+const LIVE_WORD: Record<CheckState, string> = {
+  ok: "operational",
+  degraded: "degraded",
+  down: "down",
+  unknown: "unknown",
+};
+
 export type ServiceRow = {
   /** Matches the check id in lib/status-checks.ts and the `serviceId` written
    *  by the snapshot job. */
@@ -101,6 +146,14 @@ export type ServiceRow = {
    * message. Never used to explain away a bar that IS drawn.
    */
   note?: string;
+  /**
+   * THIS render's live read for this exact service id — the same
+   * `StatusCheck` `bannerState()` ranked to choose the banner's headline.
+   * Required, not optional: a card with no live fact is the bug this field
+   * exists to close. See the header-vs-"now" split in `ServiceCard` for why
+   * this is never blended into `latest`.
+   */
+  live: { state: CheckState; detail: string };
 };
 
 /**
@@ -123,10 +176,24 @@ export function ServiceCard({
   const summary = summarizeService(service.id, days, history);
   const bars = summary.bars;
   const figure = uptimeFigure(summary);
-  // The most recent bar's own state, not the recorded-days-only figure above:
-  // this is the word the card's header states out loud, and it must agree
-  // with the colour of the rightmost bar a reader is looking at.
+  // The most recent RECORDED day's own state, not the recorded-days-only
+  // figure above: this is the word the card's header states out loud, and it
+  // must agree with the colour of the rightmost bar a reader is looking at.
   const latest = summary.latest;
+
+  // `service.live` is THIS render's read of the same check — the one
+  // `bannerState()` ranked to write the banner headline above the whole grid.
+  // It is deliberately a SEPARATE fact from `latest`, never merged into it:
+  // the daily snapshot writer polls at most every ~10 minutes (see
+  // .github/workflows/status-poll.yml) while this render happens on every
+  // request, so `latest` — yesterday's or earlier today's worst recorded
+  // sample — can legitimately lag a live read that changed since the last
+  // poll. That lag is exactly what made the banner read "Degraded" over four
+  // rows that all said "operational" with nothing on the card naming which
+  // one or why. Showing both, each under its own word, is what makes
+  // BANNER_CAPTION's "the rows below name which" (app/status/page.tsx) an
+  // actually true sentence rather than a promise the card couldn't keep.
+  const live = service.live;
 
   return (
     <article className="rounded-md border border-border p-5 sm:p-6">
@@ -135,9 +202,19 @@ export function ServiceCard({
           <h3 className="text-[15px] font-medium tracking-[-0.01em] text-foreground">
             {service.name}
           </h3>
-          <span className="flex items-center gap-1.5 font-mono text-[11px] text-ns-muted">
+          <span
+            className="flex items-center gap-1.5 font-mono text-[11px] text-ns-muted"
+            title={`Live, read for this render: ${LIVE_WORD[live.state]} — ${live.detail}`}
+          >
+            <span aria-hidden className={`h-2 w-2 rounded-full ${LIVE_BAR[live.state]}`} />
+            now: {LIVE_WORD[live.state]}
+          </span>
+          <span
+            className="flex items-center gap-1.5 font-mono text-[11px] text-ns-muted"
+            title={`Most recent recorded day (${bars[bars.length - 1]?.day ?? "—"}): ${WORD[latest]}`}
+          >
             <span aria-hidden className={`h-2 w-2 rounded-full ${BAR[latest]}`} />
-            {WORD[latest]}
+            last recorded day: {WORD[latest]}
           </span>
         </div>
         {service.subtitle ? (
@@ -147,6 +224,9 @@ export function ServiceCard({
           </span>
         ) : null}
       </div>
+      {live.state !== "ok" ? (
+        <p className="mt-2 max-w-prose text-xs leading-5 text-ns-muted">{live.detail}</p>
+      ) : null}
 
       {/* Uniform-height, colour-only bars — see the file-level note on where
           the non-colour cue moved. touch-pan-y lets a touch user scroll the
@@ -154,7 +234,12 @@ export function ServiceCard({
           gesture. */}
       <div className="mt-4 flex h-6 w-full touch-pan-y items-stretch gap-[2px]">
         {bars.map((bar, i) => {
-          const name = `${prettyDay(bar.day)} — ${WORD[bar.state]}${bar.detail ? `: ${bar.detail}` : ""}`;
+          // A recovered day IS a degraded/down day — its bar keeps that
+          // colour, worst-of-day is not softened for having ended well — but
+          // its name says so, the smallest honest way to tell "this happened
+          // and was resolved" apart from "this is still going" without a
+          // second colour or a whole incident-log UI.
+          const name = `${prettyDay(bar.day)} — ${WORD[bar.state]}${bar.recovered ? ", recovered — last sample ok" : ""}${bar.backfilled ? ", backfilled — entered after the fact" : ""}${bar.detail ? `: ${bar.detail}` : ""}`;
           // Centered (`left-1/2 -translate-x-1/2`) is right for every bar except
           // the handful nearest either end of the strip, where a centered,
           // whitespace-nowrap tooltip spills past the card's own edge — and,
@@ -202,6 +287,8 @@ export function ServiceCard({
                   <span aria-hidden className={`h-2 w-2 rounded-[3px] ${BAR[bar.state]}`} />
                   <span>
                     {WORD[bar.state]}
+                    {bar.recovered ? ", recovered — last sample ok" : ""}
+                    {bar.backfilled ? ", backfilled — entered after the fact" : ""}
                     {bar.detail ? `: ${bar.detail}` : ""}
                   </span>
                 </div>

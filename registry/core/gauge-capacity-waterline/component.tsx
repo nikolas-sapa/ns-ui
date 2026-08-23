@@ -18,8 +18,11 @@ import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } f
 // Motion: a single rAF loop drives two critically-damped springs (waterline Y,
 // hull sink offset) plus, only when motion is allowed, a continuous sine lap
 // added on top of the waterline — its amplitude doubles while overloaded.
-// prefers-reduced-motion drops the springs and the lap entirely: value/limit
-// changes land as an instant discrete step, still fully legible. The
+// prefers-reduced-motion drops the ambient lap entirely and swaps the two
+// springs for stiffer, critically-damped ones (no overshoot, well under
+// 200ms to settle): value/limit changes still visibly travel to their new
+// level rather than teleporting there, since the waterline height is the
+// only passive signal of the current value. The
 // depth-sounding line (hover or keyboard focus) is a direct, event-driven DOM
 // write — two plain divs (a hairline + a mono readout chip), never SVG
 // dasharray tricks, following the project's known dash/non-scaling-stroke
@@ -55,6 +58,16 @@ const HULL_C = 2 * 0.9 * Math.sqrt(HULL_K);
 const LAP_AMP = 1.6;
 const LAP_AMP_OVERLOAD = 3.4;
 const LAP_FREQ = 0.55; // Hz
+// Reduced-motion still needs the waterline to visibly travel to its new
+// level — a snap-to-target with no interpolation reads as "nothing
+// happened," not as reduced motion. These are critically damped (no
+// overshoot, no ambient lap) and stiff enough to settle in well under
+// 200ms, short of a spring "effect" but long enough to register as motion.
+const REDUCED_K = 500;
+const REDUCED_ZETA = 1;
+const REDUCED_C = 2 * REDUCED_ZETA * Math.sqrt(REDUCED_K);
+const REDUCED_HULL_K = 400;
+const REDUCED_HULL_C = 2 * 1 * Math.sqrt(REDUCED_HULL_K);
 
 function toY(percent: number): number {
   const y = KEEL_Y - (percent / 100) * (KEEL_Y - DECK_Y);
@@ -154,16 +167,6 @@ export function PlimsollGauge({ value, limit = 100, className = "" }: PlimsollGa
     const targetHullSink = Math.min(10, Math.max(0, (Math.min(value, 130) / 100) * 8));
     waterSpring.current.target = targetWaterY;
     hullSpring.current.target = targetHullSink;
-
-    if (reducedRef.current) {
-      waterSpring.current.pos = targetWaterY;
-      waterSpring.current.v = 0;
-      hullSpring.current.pos = targetHullSink;
-      hullSpring.current.v = 0;
-      writeWater(targetWaterY);
-      writeHull(targetHullSink);
-      return;
-    }
     ensureLoop();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
@@ -178,18 +181,29 @@ export function PlimsollGauge({ value, limit = 100, className = "" }: PlimsollGa
     const dt = Math.min(0.032, lastRef.current ? (now - lastRef.current) / 1000 : 1 / 60);
     lastRef.current = now;
 
+    const reduced = reducedRef.current;
+    const kWater = reduced ? REDUCED_K : SPRING_K;
+    const cWater = reduced ? REDUCED_C : SPRING_C;
+    const kHull = reduced ? REDUCED_HULL_K : HULL_K;
+    const cHull = reduced ? REDUCED_HULL_C : HULL_C;
+
     const w = waterSpring.current;
-    const wA = SPRING_K * (w.target - w.pos) - SPRING_C * w.v;
+    const wA = kWater * (w.target - w.pos) - cWater * w.v;
     w.v += wA * dt;
     w.pos += w.v * dt;
 
     const h = hullSpring.current;
-    const hA = HULL_K * (h.target - h.pos) - HULL_C * h.v;
+    const hA = kHull * (h.target - h.pos) - cHull * h.v;
     h.v += hA * dt;
     h.pos += h.v * dt;
 
-    const lap = Math.sin(now / 1000 * Math.PI * 2 * LAP_FREQ) *
-      (overloadRef.current ? LAP_AMP_OVERLOAD : LAP_AMP);
+    // The idle lap is the continuous, ambient part — dropped entirely under
+    // reduced motion. The spring settle above stays (critically damped, no
+    // overshoot) so a value change still visibly travels to its new level.
+    const lap = reduced
+      ? 0
+      : Math.sin(now / 1000 * Math.PI * 2 * LAP_FREQ) *
+        (overloadRef.current ? LAP_AMP_OVERLOAD : LAP_AMP);
 
     writeWater(w.pos + lap);
     writeHull(h.pos);

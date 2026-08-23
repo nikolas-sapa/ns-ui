@@ -411,6 +411,38 @@ export function serviceChecks(
  * There is no path to `down` here: npm failing to answer is a fact about npm,
  * not about this package, and a fetch that throws cannot tell the two apart.
  */
+/**
+ * The comparison at the heart of a published-package row: does what npm
+ * serves match what this build shipped, on BOTH the version and the
+ * component count? Returns one string per drift found, empty when the two
+ * sides agree completely. Symmetric wording on purpose — the published index
+ * can legitimately lead this build (a publish landed ahead of a deploy, or
+ * components were deleted since), and a subtraction phrased one way renders
+ * "-5 components".
+ *
+ * Exported and shared rather than left inline in `packageCheck` so
+ * `app/api/status-snapshot/route.ts` — which now measures the same drift at
+ * poll time, not just at page-render time — states it in the exact same
+ * words. Two copies of this comparison drifting apart in wording is exactly
+ * the class of split `app/status/uptime.tsx`'s `now:` / `last recorded day:`
+ * fix exists to warn against.
+ */
+export function driftOf(args: {
+  version: string;
+  localVersion: string | null;
+  components: number;
+  buildComponents: number;
+}): string[] {
+  return [
+    args.version === args.localVersion
+      ? null
+      : `${args.version} published vs ${args.localVersion ?? EM_DASH} in this repo`,
+    args.components === args.buildComponents
+      ? null
+      : `${args.components} components in the published package vs ${args.buildComponents} in this build`,
+  ].filter((d): d is string => d !== null);
+}
+
 function packageCheck(args: {
   id: string;
   label: string;
@@ -448,17 +480,13 @@ function packageCheck(args: {
 
   // Local and published disagreeing means a release is sitting unpublished (or
   // a publish landed ahead of this build). Both sides get named — a row that
-  // says "drift" without saying drift from what is not a check. Symmetric
-  // wording on the counts on purpose: the published index can legitimately lead
-  // this build, and a subtraction phrased one way renders "-5 components".
-  const drifts = [
-    version === args.localVersion
-      ? null
-      : `${version} published vs ${args.localVersion ?? EM_DASH} in this repo`,
-    components === args.buildComponents
-      ? null
-      : `${components} components in the published package vs ${args.buildComponents} in this build`,
-  ].filter((d): d is string => d !== null);
+  // says "drift" without saying drift from what is not a check.
+  const drifts = driftOf({
+    version,
+    localVersion: args.localVersion,
+    components,
+    buildComponents: args.buildComponents,
+  });
 
   return {
     id,
@@ -592,9 +620,15 @@ async function fetchPublishedIndex(
   // ponytail: unpkg is an external host with no precedent in this repo.
   // Ceiling: unpkg availability, plus a staleness window between the two hops
   // if a publish lands between them, plus the download itself — the CLI's
-  // index is 412 KB and the MCP's snapshot is 5.8 MB, once an hour, server-side
-  // only and never shipped to a client. The MCP file is over Next's 2 MB data
-  // cache ceiling, so it is refetched per ISR revalidation rather than cached.
+  // index is under a megabyte (566 KB measured 2026-08-20) and the MCP's
+  // snapshot is multiple megabytes and growing with the registry (measured
+  // 2026-08-20: 8.98 MB read directly, 11,974,538 bytes as this build's own
+  // fetch reported it — the two methods disagree by enough that neither
+  // number should be trusted to the byte, but both agree it is comfortably
+  // multi-megabyte and was 5.8 MB when this comment was first written), once
+  // an hour, server-side only and never shipped to a client. The MCP file is
+  // over Next's 2 MB data cache ceiling, so it is refetched per ISR
+  // revalidation rather than cached.
   // Bounded by FETCH_TIMEOUT_MS on both hops now: unpkg was measured hanging
   // past two minutes cold and taking the whole build down with it (Next's
   // per-page budget is 60s); a slow host now times out into the same UNKNOWN

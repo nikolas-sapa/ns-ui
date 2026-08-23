@@ -232,11 +232,12 @@ export default defineSchema({
   //
   // `state` carries `"degraded"` because the check layer already expresses it
   // (`serviceChecks` marks `published-cli` and `published-mcp` degraded on
-  // version drift),
-  // but the snapshot writer cannot currently measure drift — that comparison
-  // needs the build-time versions in lib/status.generated.json, which a
-  // runtime cron does not have. So no row has ever been recorded degraded,
-  // and a strip with no degraded bars is evidence of nothing. `"down"` is
+  // version drift), and the snapshot writer (app/api/status-snapshot/route.ts)
+  // measures it the same way: by comparing the published version and
+  // component count against the build-time facts in
+  // `lib/status.generated.json`, reached the same way `app/status/page.tsx`
+  // reaches them — a static import baked in at build time, not a runtime
+  // filesystem read a cron lacks. `"down"` is
   // only ever written for `live-origin`, and only when the origin itself
   // answered with a 5xx; every other failure mode is recorded as absence,
   // because a fetch that throws cannot tell an outage from this machine's
@@ -276,6 +277,40 @@ export default defineSchema({
     sampleCount: v.optional(v.number()), // samples recorded this day
     degradedCount: v.optional(v.number()), // of those, how many were degraded
     downCount: v.optional(v.number()), // of those, how many were down
+    // The state of the newest sample, not an aggregate: overwritten
+    // unconditionally on every recordSample call (convex/status.logic.ts).
+    // Lets a recovered day (worst state bad, last sample ok) render
+    // differently from a day still bad as of its last sample — both would
+    // otherwise share the same `state`. Optional because rows written before
+    // this field existed carry none, which reads as ordering-unknown, never
+    // as recovered.
+    //
+    // Deploy note: `record`'s ARGUMENTS did not change when this field was
+    // added — lastState is derived inside recordSample, never caller-supplied.
+    // So a Next-only deploy is NOT the hazard: it simply leaves the old
+    // function bundle running against the old schema, which is self-consistent.
+    // The real failure is a PARTIAL Convex push — new functions (which write
+    // lastState unconditionally) against a schema that has not been told the
+    // field exists, which Convex rejects on write. vercel.json pushes schema
+    // and functions as one atomic step, so this repo has no path to that state;
+    // do not introduce one with a manual `npx convex deploy`.
+    lastState: v.optional(
+      v.union(v.literal("ok"), v.literal("degraded"), v.literal("down")),
+    ),
+
+    // Set (unconditionally, `true`/`false`) by every write this schema's own
+    // era knows about — `v.optional` only so a row written before this field
+    // existed still validates and reads correctly, exactly like `lastState`
+    // above; such a row reads as "not known to be backfilled", never as
+    // "backfilled". `true` once any sample contributing to this row's current
+    // aggregate arrived through `status.backfill` rather than `status.record`
+    // — sticky, never cleared back to `false` by a later live sample, because
+    // the row's audit trail must say a human entered part of this day's
+    // evidence after the fact for as long as that evidence is still part of
+    // the aggregate. See `status.backfill`'s header comment for why a second,
+    // narrow mutation exists rather than teaching `record` to accept a caller
+    // -supplied day.
+    backfilled: v.optional(v.boolean()),
   }).index("by_day_service", ["day", "serviceId"]),
 
   // Durable rate limit for `testimonials.submit`, same shape and same

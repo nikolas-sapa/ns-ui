@@ -305,6 +305,7 @@ export function ChartScatterAsciiBin({
         <canvas
           ref={canvasRef}
           aria-hidden="true"
+          className="ns-csab-canvas"
           style={{
             width: LEFT_PAD + PLOT_W + RIGHT_PAD,
             height: TOP_PAD + PLOT_H + BOTTOM_PAD,

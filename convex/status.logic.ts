@@ -37,10 +37,12 @@ export const SNAPSHOT_WINDOW_DAYS = 90;
 /**
  * The three states a snapshot may record. `"degraded"` is present because the
  * status layer already expresses it (`serviceChecks` in lib/status-checks.ts
- * marks `published-cli` and `published-mcp` degraded on version drift) — but see the note in
- * `convex/schema.ts`: the daily writer cannot currently MEASURE drift, so no
- * bar has ever been recorded degraded. A missing degraded bar is evidence of
- * nothing.
+ * marks `published-cli` and `published-mcp` degraded on version drift). The
+ * poller (app/api/status-snapshot/route.ts) can now measure it too — see the
+ * note in `convex/schema.ts` — by comparing the published version and
+ * component count against the build-time facts in
+ * `lib/status.generated.json`, which it reaches the same way
+ * `app/status/page.tsx` does: a static import, not a runtime read.
  */
 export type SnapshotState = "ok" | "degraded" | "down";
 
@@ -53,6 +55,11 @@ export type SnapshotSample = {
   state: SnapshotState;
   detail?: string;
   recordedAt: number;
+  /** True only for a sample entered through `status.backfill` — a caller
+   *  holding the snapshot secret writing a specific past day, rather than a
+   *  poller measuring "now". Absent/false for every live sample; `record`
+   *  never sets this. See `SnapshotRow.backfilled` for how it accumulates. */
+  backfilled?: boolean;
 };
 
 /** The counters a day's bar is derived from. `sampleCount` counts every
@@ -66,8 +73,24 @@ export type SnapshotCounts = {
 };
 
 /** The stored row: the day's derived state plus the evidence for it. The
- *  pre-accumulation fields are unchanged, so an existing row still reads. */
-export type SnapshotRow = SnapshotSample & SnapshotCounts;
+ *  pre-accumulation fields are unchanged, so an existing row still reads.
+ *
+ *  `lastState` is NOT an aggregate like `state` — it is simply the state of
+ *  whichever sample landed most recently, overwritten unconditionally on
+ *  every call. It exists so a recovered day (worst state degraded/down, but
+ *  the last sample of the day was ok) can be told apart from a day still
+ *  actively bad as of its last sample — both read as the same `state` and
+ *  would otherwise be indistinguishable on the strip. A legacy row written
+ *  before this field existed carries none, which must read as "ordering
+ *  unknown", never as recovered and never as still-bad. */
+/** `backfilled` is STICKY, not an aggregate like the counters and not a
+ *  plain-overwrite like `lastState`: once true it stays true for as long as
+ *  the row exists, because a later live sample does not retroactively make
+ *  the evidence already folded into this day's counters any less
+ *  after-the-fact. Always written explicitly (`true`/`false`), never omitted
+ *  — a legacy row with the key absent reads as "not known to be backfilled"
+ *  via `=== true`, same pattern `lastState` established. */
+export type SnapshotRow = SnapshotSample & SnapshotCounts & { lastState: SnapshotState; backfilled: boolean };
 
 /**
  * The day's state, derived from its samples and from nothing else:
@@ -118,6 +141,73 @@ export function windowStartDay(nowMs: number, days = SNAPSHOT_WINDOW_DAYS): stri
   return utcDay(nowMs - (days - 1) * MS_PER_DAY);
 }
 
+// ---------------------------------------------------------------------------
+// BACKFILL GUARDS — pure, so `convex/status.test.ts` (plain node, no Convex
+// bundler) can prove them directly rather than only through a live mutation
+// call this file's own header explains plain node cannot make.
+// ---------------------------------------------------------------------------
+
+/** How far into the past `status.backfill` may write. Independent of
+ *  `SNAPSHOT_WINDOW_DAYS` (the public read's 90-day window) on purpose: this
+ *  is a write-side guard against rewriting distant history, not a read-side
+ *  display length, and there is no reason the two numbers must ever match. */
+export const BACKFILL_WINDOW_DAYS = 30;
+
+/** Strict `YYYY-MM-DD`, and a real calendar date on top of the regex — a
+ *  string like `2026-02-30` matches the shape but is not a day, and
+ *  `new Date(...)` silently rolling it into March would let a malformed day
+ *  land on a plausible-looking neighbour instead of being rejected. */
+export function isValidCalendarDay(day: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return false;
+  const [y, m, d] = day.split("-").map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, d));
+  return (
+    dt.getUTCFullYear() === y && dt.getUTCMonth() === m - 1 && dt.getUTCDate() === d
+  );
+}
+
+/** True when `day` is today or an earlier day within `BACKFILL_WINDOW_DAYS`
+ *  — never a future day, and never further back than the trailing window.
+ *  String comparison, not date subtraction: a zero-padded `YYYY-MM-DD` sorts
+ *  lexicographically exactly as it sorts chronologically (the same fact
+ *  `windowStartDay`'s callers already rely on), and `day` is assumed valid —
+ *  callers must run `isValidCalendarDay` first. */
+export function isDayInBackfillWindow(
+  day: string,
+  nowMs: number,
+  windowDays = BACKFILL_WINDOW_DAYS,
+): boolean {
+  const today = utcDay(nowMs);
+  if (day > today) return false;
+  return day >= windowStartDay(nowMs, windowDays);
+}
+
+/** The one comparison `status.record`/`status.backfill`'s shared secret check
+ *  reduces to, pulled out so it can be proven directly: closed by default
+ *  (an unset/empty `configured` never matches anything, including another
+ *  empty string), open only on an exact match. Not constant-time — see the
+ *  comment on `requireSnapshotSecret` in `convex/status.ts` for why that is
+ *  an accepted tradeoff here, not an oversight. */
+export function secretMatches(provided: string, configured: string): boolean {
+  return configured.length > 0 && provided === configured;
+}
+
+/** The exact suffix a caller-supplied `detail` gets when it is written
+ *  through `status.backfill`. Kept as its own function, applied inside
+ *  `status.backfill` itself rather than trusted from the caller, for the same
+ *  reason the sticky `backfilled` flag lives on the row and not on a caller
+ *  argument: a marker the caller has to remember to type is exactly the kind
+ *  of thing an invisible rewrite skips. Preserves the measurement text
+ *  verbatim (the same `driftOf`/`checkPublishedPackage` wording a live sample
+ *  would carry) and appends what changed about how it arrived, not what was
+ *  measured. Absent `detail` stays absent — there is no "(entered after the
+ *  fact)" to append to nothing, and `recordSample`'s own omit-vs-undefined
+ *  handling for a missing detail is unaffected. */
+export function backfillDetail(detail: string | undefined): string | undefined {
+  if (detail === undefined) return undefined;
+  return `${detail} (entered after the fact; not measured live)`;
+}
+
 /** What `find` hands back: enough of the existing row to add a sample to it.
  *  The counters are optional because rows written before accumulation
  *  existed do not carry them — see `countsOf`. */
@@ -127,6 +217,9 @@ export type ExistingSnapshot = {
   sampleCount?: number;
   degradedCount?: number;
   downCount?: number;
+  /** Absent on a row written before this field existed, which reads as
+   *  "not known to be backfilled" — see `SnapshotRow.backfilled`. */
+  backfilled?: boolean;
 };
 
 /** The narrow slice of `ctx.db` this logic needs, so the same code runs
@@ -161,9 +254,11 @@ export async function recordSample<Id>(
   if (existing === null) {
     const row: SnapshotRow = {
       ...sample,
+      lastState: sample.state,
       sampleCount: 1,
       degradedCount: sample.state === "degraded" ? 1 : 0,
       downCount: sample.state === "down" ? 1 : 0,
+      backfilled: sample.backfilled === true,
     };
     // Insert OMITS `detail` entirely when nothing was measured, rather than
     // passing an explicit `undefined` key: `patch`'s undefined-means-delete
@@ -195,6 +290,14 @@ export async function recordSample<Id>(
     state,
     detail,
     recordedAt: sample.recordedAt,
+    // Unlike `detail`, `lastState` is overwritten unconditionally — it never
+    // "keeps" a prior value the way a non-matching sample's detail does. It
+    // is not the aggregate; it is a plain record of what the newest sample
+    // said, so a reader can tell a recovered day from a still-bad one.
+    lastState: sample.state,
+    // Sticky: true if either the row already carried the flag or this
+    // sample is itself a backfill. Never flips back to false.
+    backfilled: existing.backfilled === true || sample.backfilled === true,
     ...counts,
   });
   return "updated";
@@ -219,9 +322,36 @@ export type HistoryEntry = {
   serviceId: string;
   state: string;
   detail?: string | null;
+  /** The state of the LAST sample recorded that day — not an aggregate, and
+   *  typed as a plain string for the same reason `state` is: narrowed here,
+   *  not trusted. Absent on a row written before this field existed, which
+   *  reads as ordering-unknown (see `Bar.recovered`). */
+  lastState?: string | null;
+  /** Whether any sample behind this row arrived through `status.backfill`.
+   *  Absent on a legacy row, which reads as not-backfilled, same rule as
+   *  `lastState`. */
+  backfilled?: boolean | null;
 };
 
-export type Bar = { day: string; state: BarState; detail: string | null };
+export type Bar = {
+  day: string;
+  state: BarState;
+  detail: string | null;
+  /** True only when the day's worst state was degraded/down AND its last
+   *  recorded sample was ok — a day that went bad and came back, same UTC
+   *  day. `false` for a day that never degraded (nothing to recover from)
+   *  and for a legacy row with no `lastState` (ordering unknown, so this
+   *  never guesses recovered). Never true for `"nodata"`. */
+  recovered: boolean;
+  /** True when the day's row carries the sticky `backfilled` flag — some or
+   *  all of the evidence behind this bar was entered after the fact through
+   *  `status.backfill`, not measured live by the poller. Never true for
+   *  `"nodata"` (there is no row to carry the flag). Same "state and its
+   *  provenance are different facts" reasoning as `recovered` above: a
+   *  backfilled bar keeps the exact colour a live bar of that state would
+   *  have, and the distinction is text only. */
+  backfilled: boolean;
+};
 
 /** Whitelist, not a blacklist: only the three recorded states survive, and
  *  everything else — `""`, `"OK"`, `"unknown"`, a trailing space — is NO DATA. */
@@ -281,6 +411,12 @@ export function summarizeService(
   const bars: Bar[] = days.map((day) => {
     const row = byDay.get(day);
     const state: BarState = row ? toBarState(row.state) : "nodata";
+    // Recovered = the day's worst state was bad, but the newest sample that
+    // day read ok. `lastState` absent (legacy row) leaves this false — an
+    // unknown ordering is never rendered as a recovery.
+    const lastState = row?.lastState != null ? toBarState(row.lastState) : null;
+    const recovered =
+      (state === "degraded" || state === "down") && lastState === "ok";
     return {
       day,
       state,
@@ -290,6 +426,8 @@ export function summarizeService(
       // a bar that says nothing was measured. The state is the thing that could
       // not be read; its caption describes a state we are not showing.
       detail: state === "nodata" ? null : row?.detail ?? null,
+      recovered,
+      backfilled: state !== "nodata" && row?.backfilled === true,
     };
   });
 
