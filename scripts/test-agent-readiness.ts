@@ -263,6 +263,11 @@ async function homepageMetadata() {
     (m) => m[1],
   );
   check("homepage carries JSON-LD", blocks.length > 0, `${blocks.length} block(s)`);
+  // Present is not enough: an auditing fetch that truncates a 2.3MB document
+  // found no JSON-LD at all when the identity graph rendered after the
+  // content. It lives in <head> now, and this is what keeps it there.
+  const firstBlock = html.indexOf('type="application/ld+json"');
+  check("  first JSON-LD block is within the first 20KB", firstBlock !== -1 && firstBlock < 20_000, `at byte ${firstBlock}`);
   const types = new Set<string>();
   for (const block of blocks) {
     try {
@@ -340,14 +345,122 @@ async function developerResources() {
   check("  is an OpenAPI 3.1 document", String(doc.openapi ?? "").startsWith("3.1"), String(doc.openapi));
   const paths = Object.keys((doc.paths as Record<string, unknown>) ?? {});
   check("  documents the registry index", paths.includes("/registry.json"), paths.join(", "));
-  check("  documents the MCP endpoint", paths.includes("/.well-known/mcp"), paths.join(", "));
+  check("  documents the MCP endpoint", paths.includes("/mcp"), paths.join(", "));
+
+  // Typed error model, versioning, and the schema coverage a function-calling
+  // model needs — each one its own audit line.
+  const schemas = ((doc.components as { schemas?: Record<string, unknown> })?.schemas ?? {});
+  check("  defines an RFC 9457 Problem schema", "Problem" in schemas, Object.keys(schemas).join(", "));
+  const info = (doc.info ?? {}) as { description?: string };
+  check(
+    "  documents a deprecation policy",
+    /Sunset/i.test(info.description ?? "") && /Deprecation/i.test(info.description ?? ""),
+  );
+  const servers = (doc.servers ?? []) as { url?: string }[];
+  check(
+    "  declares a versioned server base",
+    servers.some((server) => /\/v1$/.test(server.url ?? "")),
+    servers.map((server) => server.url).join(", "),
+  );
+
+  const operations = Object.values((doc.paths as Record<string, Record<string, unknown>>) ?? {}).flatMap(
+    (methods) => Object.values(methods) as Record<string, unknown>[],
+  );
+  const withOperationId = operations.filter((op) => typeof op.operationId === "string");
+  const withDescription = operations.filter((op) => typeof op.description === "string");
+  const typedJson = operations.filter((op) => {
+    const ok = (op.responses as Record<string, { content?: Record<string, { schema?: unknown }> }>)?.["200"];
+    return !!ok?.content?.["application/json"]?.schema;
+  });
+  const typedErrors = operations.filter((op) => {
+    const responses = (op.responses ?? {}) as Record<string, { content?: Record<string, unknown> }>;
+    return Object.entries(responses).some(
+      ([status, body]) => /^[45]/.test(status) && !!body?.content?.["application/problem+json"],
+    );
+  });
+  check("  every operation has an operationId", withOperationId.length === operations.length, `${withOperationId.length}/${operations.length}`);
+  check("  every operation has a description", withDescription.length === operations.length, `${withDescription.length}/${operations.length}`);
+  check(
+    "  >60% of operations type their JSON response",
+    typedJson.length / operations.length > 0.6,
+    `${typedJson.length}/${operations.length}`,
+  );
+  check(
+    "  every operation types its error responses",
+    typedErrors.length === operations.length,
+    `${typedErrors.length}/${operations.length}`,
+  );
+
+  // Versioned aliases must actually serve, not just be claimed in the spec.
+  for (const [path, expected] of [
+    ["/v1/registry.json", "application/json"],
+    ["/v1/openapi.json", "application/json"],
+    ["/v1/llms.txt", "text/plain"],
+  ] as const) {
+    const res = await fetch(url(path));
+    check(
+      `${path} serves`,
+      res.status === 200 && (res.headers.get("content-type") ?? "").includes(expected),
+      `${res.status} ${res.headers.get("content-type")}`,
+    );
+  }
+  const versionedMcp = await fetch(url("/v1/mcp"), {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list" }),
+  });
+  check("/v1/mcp answers the handshake", versionedMcp.status === 200, `got ${versionedMcp.status}`);
 
   const llms = await (await fetch(url("/llms.txt"))).text();
   check("llms.txt names the docs index", llms.includes("/docs"));
   check("llms.txt names the OpenAPI spec", llms.includes("/openapi.json"));
 
-  const sitemap = await (await fetch(url("/sitemap.xml"))).text();
-  check("sitemap lists /docs", sitemap.includes("/docs"));
+  const sitemapXml = await (await fetch(url("/sitemap.xml"))).text();
+  check("sitemap lists /docs", sitemapXml.includes("/docs"));
+
+  const homepage = await (await fetch(url("/"))).text();
+  const docsLink = homepage.indexOf('href="/docs"');
+  check("homepage links /docs", docsLink !== -1);
+  check("  the link is within the first 100KB", docsLink !== -1 && docsLink < 100_000, `at byte ${docsLink}`);
+}
+
+async function jsonErrors() {
+  console.log("\nJSON error responses");
+
+  const cases: [string, string, RequestInit?][] = [
+    ["/api/does-not-exist", "not_found"],
+    ["/r/definitely-not-a-component.json", "component_not_found"],
+    ["/v1/does-not-exist", "not_found"],
+  ];
+  for (const [path, code] of cases) {
+    const res = await fetch(url(path), { headers: { accept: "application/json" } });
+    const type = res.headers.get("content-type") ?? "";
+    check(`${path} returns 404`, res.status === 404, `got ${res.status}`);
+    check(
+      `  as application/problem+json`,
+      type.includes("application/problem+json"),
+      `got "${type}"`,
+    );
+    const body = (await safeJson<Record<string, unknown>>(res)) ?? {};
+    check(`  with code "${code}"`, body.code === code, String(body.code));
+    // The three fields that turn an error into something an agent can act on.
+    for (const field of ["type", "title", "status", "detail", "resolution"]) {
+      check(`  carries ${field}`, field in body, Object.keys(body).join(", "));
+    }
+  }
+
+  // Rate-limit headers on the endpoints an agent actually calls.
+  for (const path of ["/openapi.json", "/.well-known/mcp", "/api/does-not-exist"]) {
+    const res = await fetch(url(path));
+    const limit = res.headers.get("ratelimit-limit");
+    const remaining = res.headers.get("ratelimit-remaining");
+    check(
+      `${path} returns RateLimit headers`,
+      !!limit && !!remaining,
+      `limit=${limit} remaining=${remaining}`,
+    );
+    check(`  and a RateLimit-Policy`, !!res.headers.get("ratelimit-policy"), String(res.headers.get("ratelimit-policy")));
+  }
 }
 
 async function trustAnchors() {
@@ -386,6 +499,7 @@ await agentFriendly404();
 await mcpEndpoint();
 await homepageMetadata();
 await developerResources();
+await jsonErrors();
 await trustAnchors();
 
 console.log(`\n${checks - failures}/${checks} checks passed`);

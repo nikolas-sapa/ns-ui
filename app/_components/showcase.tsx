@@ -490,6 +490,23 @@ export function Showcase({
             {" for any component name, or copy a card’s exact command."}
           </p>
 
+          {/* The homepage's only link to the API surface, and it sits here
+              rather than in the footer for a mechanical reason: this page is
+              ~2.3MB of markup, and an agent audit that truncates its fetch
+              reported "documentation found at /docs but not linked from the
+              homepage" while the footer link was the only one. Next to the
+              install command is also where someone wondering "can I automate
+              this?" actually is. */}
+          <p className="mt-3 text-xs leading-relaxed text-ns-muted">
+            <a
+              href="/docs"
+              className="rounded-sm underline underline-offset-2 outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
+            >
+              Developer docs
+            </a>
+            {" — registry API, OpenAPI spec and the MCP server."}
+          </p>
+
           {/* Same moment as the install box above: deciding whether the
               registry is worth pulling in. Compact row, no repeated
               heading/copy — the "Install" label above already sets the
