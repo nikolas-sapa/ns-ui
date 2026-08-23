@@ -12,6 +12,8 @@ import { NO_FLASH_SIDEBAR_SCRIPT } from "@/lib/sidebar";
 import { CATALOG_GATE_SCRIPT } from "@/lib/catalog-gate";
 import { navGroups } from "@/lib/nav-data";
 import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
+import { jsonLdScript } from "@/lib/json-ld";
+import { identityJsonLd } from "@/lib/site-identity";
 
 const title = "ns-ui";
 // Shown only in the unfurl card, not in the browser tab: `title` stays bare so
@@ -64,6 +66,17 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        {/* Identity (SoftwareApplication + Organization) in <head>, so it is
+            within the first few KB of every page. It used to render in the
+            homepage body next to the catalog's ItemList; that block has to
+            come after the content (it is ~55KB and was burying the <h1>), and
+            when identity moved down with it, an agent audit stopped finding
+            any JSON-LD on a 2.3MB page. Small, stable, and required to be
+            found — so it goes as early as markup allows. */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLdScript(identityJsonLd) }}
+        />
         <link rel="llms-txt" href="/llms.txt" />
         <link rel="llms-txt" href="/llms-full.txt" title="full" />
         {/* Runs before hydration so there's no flash of the wrong theme. See

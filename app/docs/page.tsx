@@ -34,6 +34,11 @@ type Entry = { url: string; what: string; note?: string };
 
 const REGISTRY_API: Entry[] = [
   {
+    url: "/v1/registry.json",
+    what: "Versioned base URL. Every path below also answers under /v1 — same handler, so the two can never disagree.",
+    note: "The unversioned paths stay supported; /v1 is the one to integrate against.",
+  },
+  {
     url: "/registry.json",
     what: `The shadcn registry index — all ${registry.items.length} items with names, titles, descriptions and tags.`,
     note: "Also served at /r/registry.json; both are the same file.",
@@ -130,6 +135,89 @@ export default function DocsPage() {
         <Section heading="Agent surface" entries={AGENT_SURFACE} />
         <Section heading="Packages" entries={PACKAGES} />
       </div>
+
+      <section className="mt-10 max-w-2xl" id="errors">
+        <h2 className={H2}>Errors</h2>
+        <p className={P}>
+          Every error is an{" "}
+          <a href="https://www.rfc-editor.org/rfc/rfc9457" className={LINK} target="_blank" rel="noreferrer">
+            RFC 9457
+          </a>{" "}
+          problem document, served as{" "}
+          <code className="font-mono text-foreground">application/problem+json</code>
+          . Never an HTML page — a client that asked for JSON gets JSON, including
+          on a 404.
+        </p>
+        <pre className="mt-3 overflow-x-auto rounded-md border border-border bg-surface p-3 font-mono text-xs leading-6 text-foreground">
+{`{
+  "type": "${REGISTRY_ORIGIN}/docs#errors",
+  "title": "No such component",
+  "status": 404,
+  "detail": "No component named \"acordion-latch\" exists in this registry.",
+  "code": "component_not_found",
+  "resolution": "Check the index at ${REGISTRY_ORIGIN}/registry.json…",
+  "instance": "/r/acordion-latch.json",
+  "requestedName": "acordion-latch"
+}`}
+        </pre>
+        <p className={P}>
+          <code className="font-mono text-foreground">code</code> is the field to
+          branch on — it is stable, unlike the prose in{" "}
+          <code className="font-mono text-foreground">title</code> and{" "}
+          <code className="font-mono text-foreground">detail</code>. Current codes:{" "}
+          <code className="font-mono text-foreground">not_found</code>,{" "}
+          <code className="font-mono text-foreground">component_not_found</code>,{" "}
+          <code className="font-mono text-foreground">rate_limited</code>,{" "}
+          <code className="font-mono text-foreground">stream_not_supported</code>.
+        </p>
+      </section>
+
+      <section className="mt-10 max-w-2xl">
+        <h2 className={H2}>Rate limits</h2>
+        <p className={P}>
+          Every response carries{" "}
+          <code className="font-mono text-foreground">RateLimit-Limit</code>,{" "}
+          <code className="font-mono text-foreground">RateLimit-Remaining</code>,{" "}
+          <code className="font-mono text-foreground">RateLimit-Reset</code> and{" "}
+          <code className="font-mono text-foreground">RateLimit-Policy</code> (
+          <a href="https://www.rfc-editor.org/rfc/rfc9331" className={LINK} target="_blank" rel="noreferrer">
+            RFC 9331
+          </a>{" "}
+          field names), so a client can pace itself instead of discovering the
+          limit by hitting it. Going over returns{" "}
+          <code className="font-mono text-foreground">429</code> with{" "}
+          <code className="font-mono text-foreground">Retry-After</code> and the
+          same problem-document shape.
+        </p>
+        <p className={P}>
+          The window is 120 requests per minute per client, counted per serving
+          instance — deliberately generous. It exists so agents can self-throttle,
+          not to meter usage; the registry files themselves are static and
+          CDN-cached.
+        </p>
+      </section>
+
+      <section className="mt-10 max-w-2xl">
+        <h2 className={H2}>Versioning and deprecation</h2>
+        <p className={P}>
+          Integrate against{" "}
+          <code className="font-mono text-foreground">/v1</code>. Within it,
+          response shapes only ever gain fields; anything that would break an
+          existing client becomes <code className="font-mono text-foreground">/v2</code>{" "}
+          instead. The unversioned paths are aliases onto the same handlers and
+          stay supported.
+        </p>
+        <p className={P}>
+          If an endpoint is ever retired, its responses carry{" "}
+          <code className="font-mono text-foreground">Deprecation</code> and{" "}
+          <code className="font-mono text-foreground">Sunset</code> headers for at
+          least 180 days before removal, and the change is announced in the{" "}
+          <Link href="/changelog" className={LINK}>
+            changelog
+          </Link>
+          . Nothing is deprecated today.
+        </p>
+      </section>
 
       <section className="mt-10 max-w-2xl">
         <h2 className={H2}>Authentication</h2>

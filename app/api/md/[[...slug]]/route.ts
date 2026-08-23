@@ -1,5 +1,6 @@
 import { prefersMarkdown } from "@/lib/markdown-negotiation";
 import { renderMarkdown } from "@/lib/markdown-pages";
+import { rateLimit, rateLimited } from "@/lib/api-response";
 
 // The `Accept: text/markdown` variant of every prose page (acceptmarkdown.com).
 //
@@ -33,10 +34,12 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ slug?: string[] }> },
 ): Promise<Response> {
+  const state = rateLimit(request);
   const url = new URL(request.url);
   const { slug } = await params;
   const path = slug?.length ? `/${slug.map(decodeURIComponent).join("/")}` : "/";
   const accept = request.headers.get("accept");
+  if (!state.ok) return rateLimited(state, path);
 
   // The rewrite can only match "the string text/markdown appears somewhere in
   // Accept" — it cannot compare q-values. A client that ranked HTML above
@@ -62,6 +65,7 @@ export async function GET(
     headers: {
       "content-type": status === 406 ? "text/plain; charset=utf-8" : MARKDOWN,
       vary: VARY,
+      ...state.headers,
       // Same posture as the HTML variant: revalidate every time, let the CDN
       // hold it. The body is derived from build-time data, so it only changes
       // on deploy.

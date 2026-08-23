@@ -105,79 +105,6 @@ const collectionPageJsonLd = {
   },
 };
 
-// Identity, separate from the catalog listing above: `CollectionPage` says
-// what this PAGE is, and an agent reading it still cannot tell what ns-ui IS
-// or who stands behind it. SoftwareApplication + Organization are the two
-// types that answer those, linked by @id so the three read as one graph
-// rather than three unrelated blocks.
-//
-// `address` is deliberately absent — schema.org PostalAddress wants a real
-// one, and this project has no published business address. An invented
-// address is worse than a missing field. See the change summary.
-const identityJsonLd = {
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "SoftwareApplication",
-      "@id": `${REGISTRY_ORIGIN}/#software`,
-      name: "ns-ui",
-      alternateName: "ns ui",
-      url: REGISTRY_ORIGIN,
-      description:
-        "A registry of React components you install by URL — each built around a single interaction, each installed as plain source with no runtime package.",
-      applicationCategory: "DeveloperApplication",
-      applicationSubCategory: "React component registry",
-      operatingSystem: "Any",
-      softwareRequirements: "React 19+, Tailwind CSS v4",
-      license: "https://opensource.org/licenses/MIT",
-      // Free, and saying so in the field agents actually read for price.
-      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-      codeRepository: "https://github.com/nikolas-sapa/ns-ui",
-      author: { "@id": `${REGISTRY_ORIGIN}/#organization` },
-      publisher: { "@id": `${REGISTRY_ORIGIN}/#organization` },
-    },
-    {
-      "@type": "Organization",
-      "@id": `${REGISTRY_ORIGIN}/#organization`,
-      name: "ns-ui",
-      // Both spellings, because people search the spaced one: "ns ui" is what
-      // gets typed, "ns-ui" is what the package and the domain are called.
-      alternateName: ["ns ui", "ns-ui component registry"],
-      url: REGISTRY_ORIGIN,
-      logo: `${REGISTRY_ORIGIN}/opengraph-image`,
-      description:
-        "The maintainer of ns-ui, an open-source (MIT) registry of React components for shadcn-compatible tooling.",
-      founder: { "@type": "Person", name: "Nikolas Sapalidis" },
-      // Country only. There is no published street address for this project,
-      // and a schema.org PostalAddress does not require one — an invented
-      // street is worse markup than an honest partial address.
-      address: { "@type": "PostalAddress", addressCountry: "GR" },
-      sameAs: [
-        "https://github.com/nikolas-sapa/ns-ui",
-        "https://www.npmjs.com/package/@nikolas.sapa/ns-ui",
-        "https://www.npmjs.com/package/@nikolas.sapa/ns-ui-mcp",
-      ],
-      // The same address SECURITY.md and CODE_OF_CONDUCT.md already publish —
-      // not a new one invented for this markup.
-      contactPoint: [
-        {
-          "@type": "ContactPoint",
-          contactType: "technical support",
-          email: "nikolas.sapalidis@gmail.com",
-          url: `${REGISTRY_ORIGIN}/about`,
-          availableLanguage: ["English"],
-        },
-        {
-          "@type": "ContactPoint",
-          contactType: "security",
-          email: "nikolas.sapalidis@gmail.com",
-          url: "https://github.com/nikolas-sapa/ns-ui/security/advisories/new",
-        },
-      ],
-    },
-  ],
-};
-
 export const metadata: Metadata = {
   // The audited gap: without this, every agent resolving the homepage has to
   // guess which host is canonical (the vercel.app alias also serves this
@@ -190,19 +117,19 @@ export default async function Home() {
   return (
     <>
       <Showcase items={items} featured={featured} stars={stars} />
-      {/* Structured data LAST, not first. Position is irrelevant to
-          schema.org — a parser reads the whole document — but it is not
-          irrelevant to a crawler that truncates: `collectionPageJsonLd`
-          serializes ~55KB of ItemList for the full catalog, and while it sat
-          ahead of the markup it pushed the page's <h1> to byte 63,882, past
-          where agents that cut a fetch short stop reading. That offset is the
-          entire reason an agent audit reported "no H1" on a page that has
-          always server-rendered one. Moving these two blocks below the
-          content puts the heading at ~8KB and changes nothing else. */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: jsonLdScript(identityJsonLd) }}
-      />
+      {/* The catalog listing goes LAST: it serializes ~55KB of ItemList for
+          the full registry, and while it sat ahead of the markup it pushed
+          this page's <h1> to byte 63,882 — past where agents that truncate a
+          fetch stop reading, which is why an audit reported "no H1" on a page
+          that has always server-rendered one.
+
+          The identity graph (SoftwareApplication + Organization) does NOT
+          live here for the mirror-image reason: moved down with this block,
+          it fell off the end of a 2.3MB document and the next audit reported
+          no JSON-LD at all. It is small and it is required to be found, so it
+          renders in <head> from app/layout.tsx instead — early enough that no
+          truncation can miss it, and on every page rather than just this
+          one. */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdScript(collectionPageJsonLd) }}

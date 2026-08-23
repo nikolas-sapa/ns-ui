@@ -1,6 +1,7 @@
 import registry from "@/registry.json";
 import pkg from "@/package.json";
 import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
+import { problem, rateLimit, rateLimited } from "@/lib/api-response";
 
 // Live MCP endpoint + manifest for the ns-ui registry.
 //
@@ -178,12 +179,22 @@ function handle(request: JsonRpcRequest): object | null {
  * no way to feed.
  */
 export function GET(request: Request): Response {
+  const state = rateLimit(request);
+  if (!state.ok) return rateLimited(state, "/.well-known/mcp");
+
   const accept = request.headers.get("accept") ?? "";
   if (accept.includes("text/event-stream") && !accept.includes("application/json")) {
-    return new Response("This MCP server does not offer a server-to-client stream.", {
-      status: 405,
-      headers: { allow: "POST" },
-    });
+    return problem(
+      {
+        status: 405,
+        code: "stream_not_supported",
+        title: "No server-to-client stream",
+        detail: "This MCP server is stateless and does not open an SSE stream on GET.",
+        resolution: "POST JSON-RPC to this same URL, or GET it without text/event-stream in Accept to read the manifest.",
+        instance: "/.well-known/mcp",
+      },
+      { allow: "POST", ...state.headers },
+    );
   }
 
   return Response.json(
@@ -203,18 +214,25 @@ export function GET(request: Request): Response {
         },
       ],
     },
-    { headers: { "cache-control": "public, max-age=0, must-revalidate" } },
+    { headers: { "cache-control": "public, max-age=0, must-revalidate", ...state.headers } },
   );
 }
 
 export async function POST(request: Request): Promise<Response> {
+  const state = rateLimit(request);
+  if (!state.ok) return rateLimited(state, "/.well-known/mcp");
+
   let payload: unknown;
   try {
     payload = await request.json();
   } catch {
+    // JSON-RPC's own error envelope, not a problem document: a client that
+    // POSTs here speaks JSON-RPC and parses `error.code`, and handing it a
+    // different shape for one failure mode is how a client crashes on the
+    // path it least expects to.
     return Response.json(
       { jsonrpc: "2.0", id: null, error: { code: -32700, message: "Parse error" } },
-      { status: 400 },
+      { status: 400, headers: state.headers },
     );
   }
 
@@ -225,7 +243,9 @@ export async function POST(request: Request): Promise<Response> {
     .filter((r): r is object => r !== null);
 
   // All-notifications batch: 202 with no body, as the transport spec requires.
-  if (responses.length === 0) return new Response(null, { status: 202 });
+  if (responses.length === 0) return new Response(null, { status: 202, headers: state.headers });
 
-  return Response.json(Array.isArray(payload) ? responses : responses[0]);
+  return Response.json(Array.isArray(payload) ? responses : responses[0], {
+    headers: state.headers,
+  });
 }

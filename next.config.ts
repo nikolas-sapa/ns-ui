@@ -46,7 +46,7 @@ const nextConfig: NextConfig = {
         // exist for. Prose routes never contain a dot; every static file does,
         // so excluding dotted paths is the whole rule.
         {
-          source: "/:path((?!api/|_next/|r/|mcp|\\.well-known/)[^.]*)",
+          source: "/:path((?!api/|_next/|r/|v1/|mcp|\\.well-known/)[^.]*)",
           has: [{ type: "header", key: "accept", value: ".*text/markdown.*" }],
           destination: "/api/md/:path",
         },
@@ -60,6 +60,19 @@ const nextConfig: NextConfig = {
         // there is no second copy of the handshake to drift.
         { source: "/mcp", destination: "/.well-known/mcp" },
         { source: "/.well-known/mcp.json", destination: "/.well-known/mcp" },
+        // `/v1` — URL-path versioning for the public read-only API. These are
+        // aliases, not copies: one handler each, so the versioned and
+        // unversioned URLs cannot answer differently. What the prefix buys is
+        // a promise — `/v1` keeps its current shapes, and a breaking change
+        // becomes `/v2` with the old prefix carrying `Deprecation`/`Sunset`
+        // headers for the documented window (see /docs and openapi.json).
+        // Unmatched `/v1/*` falls through to app/v1/[...path], which answers
+        // with the same JSON problem document as the rest of the API.
+        { source: "/v1/registry.json", destination: "/r/registry.json" },
+        { source: "/v1/r/:name.json", destination: "/r/:name.json" },
+        { source: "/v1/openapi.json", destination: "/openapi.json" },
+        { source: "/v1/llms.txt", destination: "/llms.txt" },
+        { source: "/v1/mcp", destination: "/.well-known/mcp" },
       ],
     };
   },
