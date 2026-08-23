@@ -8,6 +8,7 @@ const description =
   "Every --ns-* token in the registry: what it controls, its light/dark values, how to override it, and why it's namespaced instead of reusing stock shadcn tokens.";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/theming" },
   title,
   description,
   openGraph: { title, description },

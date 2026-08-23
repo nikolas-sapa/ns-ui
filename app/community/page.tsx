@@ -22,6 +22,7 @@ const description =
   "How developers and designers use ns-ui, in their own words. Share your own experience — every submission is reviewed before it appears.";
 
 export const metadata = {
+  alternates: { canonical: "/community" },
   title,
   description,
   openGraph: { title, description },

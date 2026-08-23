@@ -54,6 +54,12 @@ const COLUMNS: { heading: string; links: FooterLink[] }[] = [
       { href: "/writing", label: "Writing" },
       { href: "/community", label: "Community" },
       { href: "/connect", label: "Connect" },
+      // The two pages an agent looks for before it will recommend this
+      // registry to anyone — /about carries the contact address, /privacy
+      // what is stored. Filed here rather than in a fifth column: the grid is
+      // sm:grid-cols-4 and a fifth would rewrap it.
+      { href: "/about", label: "About" },
+      { href: "/privacy", label: "Privacy" },
       { href: "https://github.com/nikolas-sapa/ns-ui", label: "GitHub", external: true },
       {
         href: "https://github.com/nikolas-sapa/ns-ui/issues/new?template=component_request.yml",

@@ -36,6 +36,33 @@ export default function NotFound() {
         secondaryHref="/changelog"
       />
 
+      {/* Recovery links, for the visitor that isn't a person: a 404 that only
+          says "not found" is a dead end for a crawler or an agent following a
+          stale URL, and the two links it needs (the catalog index and the
+          machine-readable feeds) are otherwise nowhere on this page. A client
+          asking for `Accept: text/markdown` gets the same thing as a real
+          markdown document instead — see lib/markdown-pages.ts. */}
+      <nav
+        aria-label="Where to go next"
+        className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 border-t border-border px-6 py-3 font-mono text-xs text-ns-muted sm:justify-start sm:px-10"
+      >
+        <a href="/" className="rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none">
+          All components
+        </a>
+        <a href="/sitemap.xml" className="rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none">
+          /sitemap.xml
+        </a>
+        <a href="/llms.txt" className="rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none">
+          /llms.txt
+        </a>
+        <a href="/registry.json" className="rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none">
+          /registry.json
+        </a>
+        <a href="/connect" className="rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none">
+          For agents
+        </a>
+      </nav>
+
       <footer className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 border-t border-border px-6 py-3 font-mono text-xs leading-relaxed text-ns-muted sm:justify-start sm:px-10">
         <span>
           This page is{" "}
