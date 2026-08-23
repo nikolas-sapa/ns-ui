@@ -121,6 +121,7 @@ const identityJsonLd = {
       "@type": "SoftwareApplication",
       "@id": `${REGISTRY_ORIGIN}/#software`,
       name: "ns-ui",
+      alternateName: "ns ui",
       url: REGISTRY_ORIGIN,
       description:
         "A registry of React components you install by URL — each built around a single interaction, each installed as plain source with no runtime package.",
@@ -139,12 +140,18 @@ const identityJsonLd = {
       "@type": "Organization",
       "@id": `${REGISTRY_ORIGIN}/#organization`,
       name: "ns-ui",
-      alternateName: "ns-ui component registry",
+      // Both spellings, because people search the spaced one: "ns ui" is what
+      // gets typed, "ns-ui" is what the package and the domain are called.
+      alternateName: ["ns ui", "ns-ui component registry"],
       url: REGISTRY_ORIGIN,
       logo: `${REGISTRY_ORIGIN}/opengraph-image`,
       description:
         "The maintainer of ns-ui, an open-source (MIT) registry of React components for shadcn-compatible tooling.",
       founder: { "@type": "Person", name: "Nikolas Sapalidis" },
+      // Country only. There is no published street address for this project,
+      // and a schema.org PostalAddress does not require one — an invented
+      // street is worse markup than an honest partial address.
+      address: { "@type": "PostalAddress", addressCountry: "GR" },
       sameAs: [
         "https://github.com/nikolas-sapa/ns-ui",
         "https://www.npmjs.com/package/@nikolas.sapa/ns-ui",
