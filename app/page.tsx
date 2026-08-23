@@ -189,6 +189,16 @@ export default async function Home() {
   const stars = await getStarCount();
   return (
     <>
+      <Showcase items={items} featured={featured} stars={stars} />
+      {/* Structured data LAST, not first. Position is irrelevant to
+          schema.org — a parser reads the whole document — but it is not
+          irrelevant to a crawler that truncates: `collectionPageJsonLd`
+          serializes ~55KB of ItemList for the full catalog, and while it sat
+          ahead of the markup it pushed the page's <h1> to byte 63,882, past
+          where agents that cut a fetch short stop reading. That offset is the
+          entire reason an agent audit reported "no H1" on a page that has
+          always server-rendered one. Moving these two blocks below the
+          content puts the heading at ~8KB and changes nothing else. */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdScript(identityJsonLd) }}
@@ -197,7 +207,6 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdScript(collectionPageJsonLd) }}
       />
-      <Showcase items={items} featured={featured} stars={stars} />
     </>
   );
 }

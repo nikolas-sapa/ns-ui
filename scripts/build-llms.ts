@@ -612,8 +612,11 @@ is the whole dependency.
 - ${CLI_LINE}
 
 Developer resources, by URL (every one of these is live — no key, no account):
+- Developer docs index (every endpoint below, with its shape): ${HOMEPAGE}/docs
+- OpenAPI 3.1 spec for this API: ${HOMEPAGE}/openapi.json
 - MCP over HTTP, no install: POST JSON-RPC to ${HOMEPAGE}/.well-known/mcp
   (GET the same URL for the manifest: transport, protocol version, tool list).
+  The same handler answers at ${HOMEPAGE}/mcp and ${HOMEPAGE}/.well-known/mcp.json.
 - Registry index (shadcn schema, every component): ${HOMEPAGE}/registry.json
 - One component's install spec and real source: ${HOMEPAGE}/r/<name>.json
 - Human-readable page per component: ${HOMEPAGE}/components/<name>

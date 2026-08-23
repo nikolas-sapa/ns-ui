@@ -46,12 +46,21 @@ const nextConfig: NextConfig = {
         // exist for. Prose routes never contain a dot; every static file does,
         // so excluding dotted paths is the whole rule.
         {
-          source: "/:path((?!api/|_next/|r/|\\.well-known/)[^.]*)",
+          source: "/:path((?!api/|_next/|r/|mcp|\\.well-known/)[^.]*)",
           has: [{ type: "header", key: "accept", value: ".*text/markdown.*" }],
           destination: "/api/md/:path",
         },
       ],
-      afterFiles: [{ source: "/registry.json", destination: "/r/registry.json" }],
+      afterFiles: [
+        { source: "/registry.json", destination: "/r/registry.json" },
+        // Two aliases onto the one MCP handler, because clients disagree about
+        // where a server lives: `/mcp` is what most config snippets use, and
+        // `.json` is what a crawler expecting a static manifest tries. Same
+        // route, so GET and POST behave identically at all three URLs and
+        // there is no second copy of the handshake to drift.
+        { source: "/mcp", destination: "/.well-known/mcp" },
+        { source: "/.well-known/mcp.json", destination: "/.well-known/mcp" },
+      ],
     };
   },
   // The HTML half of the same negotiation, best-effort.
