@@ -35,3 +35,18 @@ Without it the pending submission is still reviewed as-is, it just cannot be edi
 Why it matters: an agent-readiness audit found `design.helpmarq.com` absent from a plain
 "ns-ui" search, and the cause is that nothing on the web links to the subdomain. Directory
 listings and the npm package pages are the first inbound links.
+
+---
+
+# awesome-shadcn-ui — status
+
+**SUBMITTED 2026-08-23** · <https://github.com/birobirobiro/awesome-shadcn-ui/pull/599>
+
+One row in the `Registries` section, inserted alphabetically between `neobrutalism-vue`
+and `registry.directory`, with no Date cell — a workflow on `main` fills that column and
+only writes into empty cells, so a hand-written date permanently records the wrong day.
+Checked for duplicates first: neither the name nor the URL appears anywhere in the README.
+
+The failing `Vercel` check on that PR is their own preview deployment refusing to build for
+an outside fork ("Authorization required to deploy"), not anything about the row.
+GitGuardian passes.
