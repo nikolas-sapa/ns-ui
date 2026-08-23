@@ -256,6 +256,18 @@ async function homepageMetadata() {
     .flatMap((p) => (p?.["@graph"] as Record<string, unknown>[] | undefined) ?? (p ? [p] : []))
     .find((n) => n["@type"] === "Organization");
   check("  Organization has a contactPoint", Array.isArray(org?.contactPoint) && org.contactPoint.length > 0);
+  check(
+    "  Organization has an address with a country",
+    typeof (org?.address as { addressCountry?: string } | undefined)?.addressCountry === "string",
+    JSON.stringify(org?.address),
+  );
+  // The spaced spelling is what people type into a search box; it appears
+  // nowhere in the visible copy, so the markup is the only place it lives.
+  check(
+    "  Organization lists the spaced brand spelling",
+    JSON.stringify(org?.alternateName ?? "").includes("ns ui"),
+    JSON.stringify(org?.alternateName),
+  );
 
   // The H1 has always been server-rendered; what regressed was where. An
   // agent that truncates a fetch has to reach it — the sidebar tree used to
