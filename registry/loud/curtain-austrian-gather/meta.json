@@ -1,0 +1,30 @@
+{
+  "name": "curtain-austrian-gather",
+  "title": "Curtain Austrian Gather",
+  "description": "A full-bleed route curtain modeled on a real Austrian (brail) stage drape \u2014 sewn-in-fullness fabric hoisted bottom-up on parallel vertical lift lines, so it doesn't slide flat but gathers into a row of scalloped swags whose bellies deepen and breathe on independent phase-offset sines, both at rest and as the drape hoists.",
+  "collection": "loud",
+  "tags": [
+    "preloader",
+    "curtain",
+    "route",
+    "svg",
+    "physics",
+    "loading",
+    "reveal"
+  ],
+  "gate": {
+    "openBy": "[data-curtain-trigger]",
+    "expect": "[data-curtain-open]",
+    "resetBefore": true
+  },
+  "autoplay": {
+    "mode": "press",
+    "target": "[data-curtain-trigger]",
+    "hold": 200,
+    "period": 4300,
+    "delay": 700
+  },
+  "useWhen": "a full-bleed preloader/route-transition curtain built from a real Austrian/brail stage-drape rigging \u2014 bottom-up hoist on parallel vertical lift lines that gathers the sewn-in fullness into a row of scalloped, deepening swags; pick curtain-traveler-draw instead for a horizontal parting drape with sagging pleats on a corded track, or curtain-tab-diagonal for a diagonal tab-peel, or curtain-leader-countdown when the loading moment should read as a numeric SMPTE film-leader countdown rather than any parting/hoisting drape.",
+  "instruction": "Build <CurtainAustrianGather onLiftComplete? paused? className?> as a full-bleed route curtain modeled on a real Austrian (brail) stage drape \u2014 the rigging that hoists BOTTOM-UP on parallel vertical lift lines, distinct from a traveler curtain (curtain-traveler-draw), which parts horizontally on a corded track, and a tab curtain (curtain-tab-diagonal), which peels diagonally toward one wing. Because an Austrian drape carries roughly 100% sewn-in fullness, the fabric does not slide flat as the lift lines rise: it SCALLOPS and BUNCHES upward into a row of swags, one swag per lift-line span, each swag belonging to its own pair of lift lines. CLOSED means the fabric hangs low and full-bleed with only a shallow scallop at each swag's hem; hoisting (via the component's own built-in 'Skip curtain' trigger button, marked data-curtain-trigger) raises every lift line together, and as the panel's height shrinks the swag bellies grow dramatically deeper and the fabric visibly bunches toward the header \u2014 the signature scalloped-swag silhouette, not a straight parting edge. A small per-lift-line stagger and a brief rope-give overshoot-and-settle at the end of the hoist (an easeRise timeline whose overshoot resolves back to the exact hoisted height rather than extending duration) read as real rope-and-pulley rigging, not a mechanical slide. SVG, NOT CANVAS: each swag is one closed path \u2014 a straight top edge pinned to the header track, two vertical sides riding its bounding lift lines, and a cubic-bezier belly for the scallop curve \u2014 filled with a per-swag horizontal gradient (a --foreground-tinted shadow band and a --background-tinted highlight band, both layered as partial opacity over the opaque --ns-muted fabric body, never --border, which is a separator token at ~1.1:1 contrast against --background in light theme and effectively invisible used as fabric ink). Lift-line ropes are thin --foreground strokes from the header track down to each swag boundary's current hem height. PALETTE: fabric body in --ns-muted, swag shadow/highlight gradients shade toward --foreground and --background respectively, blocked/revealed page area in --background \u2014 --ns-accent never touches the fabric, reserved only for the built-in skip/dismiss button's interaction chrome. Colors are read once via getComputedStyle(document.documentElement) and re-read on a MutationObserver watching documentElement's class \u2014 no hex or rgb() literals anywhere in the draw code. IDLE IS UNCONDITIONAL AND PER-SWAG: even fully lowered, every swag's belly depth breathes independently on its own slow ~4.3s sine, phase-offset from its neighbours by index, and each swag's internal gradient crease breathes on its own separate phase offset \u2014 individual scallops visibly deepen and relax, and shading shifts within them, frame to frame; this is not a whole-panel opacity or scale pulse, which is exactly what the no-autoplay verifier grades apart. Because the interesting state (hoisted) is non-resting, a gate descriptor (openBy the trigger button, expect a small dedicated marker rect, centred well below the fully-hoisted belly's maximum reach and well above the resting hem, positioned in paint order beneath the ropes and swags \u2014 covered by the fabric while lowered, exposed and hittable at its own centre once every lift line has risen clear of it) triggers it for its own screenshot. prefers-reduced-motion holds a single mid-breath frame at peak swag-belly depth, where scallops read as three-dimensional gathered fabric, and cuts hard (no tween, no rAF) between lowered and hoisted on trigger rather than tweening. role=status/aria-live=polite announces a loading state while lowered; the whole overlay goes aria-hidden once fully hoisted so the revealed route becomes the real focus target, and the trigger button unmounts at that point rather than staying focusable behind an aria-hidden ancestor.",
+  "dependencies": []
+}

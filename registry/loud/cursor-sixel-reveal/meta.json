@@ -1,0 +1,15 @@
+{
+  "name": "cursor-sixel-reveal",
+  "title": "Cursor Sixel Reveal",
+  "description": "A full-bleed ASCII plasma field rendered twice from one shared scalar field — quantized to glyphs everywhere, and as a true raw-pixel grayscale raster inside a soft circular window — literalizing the real sixel/kitty-graphics-protocol-vs-character-fallback split. The window sweeps an idle Lissajous path and eases to the pointer on hover.",
+  "collection": "loud",
+  "tags": ["ascii", "background", "canvas", "cursor", "raster", "terminal"],
+  "useWhen": "a full-bleed background whose payoff is literalizing the terminal graphics sixel/kitty-vs-ASCII-fallback boundary — one procedural field shown two ways at once, glyph-quantized outside a window and raw-pixel raster inside it — rather than lens-ascii-magnify's density-only zoom, which stays glyph-quantized throughout and never crosses into true raster.",
+  "instruction": "Build a full-bleed Canvas 2D field running the same three-octave value-noise recipe as background-ascii-plasma, rendered twice from one shared field: everywhere as glyphs through the ' .:-=+*#%@' ramp, and inside a soft-edged circular window as true raw-pixel raster — literalizing the real sixel/kitty-graphics-protocol-vs-character-fallback boundary rather than a cosmetic magnifier. The window follows an idle Lissajous sweep at rest and eases to the pointer on hover, so the boundary is demonstrated continuously without requiring input. Feather the boundary by alpha, never a stroke. The canvas must fill its own backing rect with --background before either pass, every frame, so the glyph-pass alpha-composite and the raster-pass lerp share the exact same base color in both themes — do not rely on the DOM behind the canvas matching the token. Props: cellSize (default 13), windowRadius (default 90), className.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "pointer-path",
+    "path": "figure8",
+    "period": 6000
+  }
+}

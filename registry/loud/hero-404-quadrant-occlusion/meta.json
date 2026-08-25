@@ -1,0 +1,19 @@
+{
+  "name": "hero-404-quadrant-occlusion",
+  "title": "Hero 404 Quadrant Occlusion",
+  "description": "A full-bleed 404 hero where the numerals and an orbiting occluding disc are rendered from one shared silhouette at half-cell precision using Unicode quadrant/half-block glyphs (▘▝▖▗▚▞▛▜▙▟█▀▄▌▐), so the disc's curved edge stays crisp instead of stair-stepping at one glyph per cell.",
+  "collection": "loud",
+  "tags": [
+    "ascii",
+    "404",
+    "hero",
+    "not-found",
+    "canvas",
+    "cursor",
+    "occlusion",
+    "typography"
+  ],
+  "instruction": "Build a full-bleed Canvas 2D 404 hero whose entire silhouette — both the '404' numeral and an orbiting occluding disc — is rendered through Unicode quadrant/half-block glyphs (▘▝▖▗▚▞▛▜▙▟█▀▄▌▐), each glyph cell addressing a 2x2 sub-grid (TL/TR/BL/BR) instead of the single full-cell density value every other ASCII component in this registry quantizes to. The '404' numeral is rasterized ONCE, after document.fonts.ready, into an offscreen alpha mask (bold weight, font-size derived from min(width,height) with real margin, per the registry's scale rule) and area-averaged (not point-sampled — averaging over each sub-cell's rectangle, threshold ~0.42, is what keeps thin numeral strokes from breaking up at small preview-card sizes) into a static per-sub-cell coverage table that is built once and reused every frame, since the numeral itself never moves. The occluder is a disc with a low-order radial harmonic on its edge — r(theta) = R * (1 + 0.22*sin(3*theta + 0.6t)) — tested analytically (a distance compare, no raster) at the same 4 sub-positions every frame. Per cell, per frame, TWO draws rather than one: numOnly = numeralBits & ~occluderBits is drawn in --ns-muted (the numeral, minus whatever the disc currently covers) and occluderBits is drawn in --foreground on top — so the boundary between them is a genuine sub-cell shape step wherever the disc crosses ink, not a full-cell color swap, and the disc still reads by shape alone over empty background where numeralBits is 0. The occluder orbits the numeral center continuously and unconditionally on an incommensurate Lissajous (never damping to a stop); the pointer BIASES that orbit with an eased offset rather than replacing it, so parking the pointer mid-canvas cannot freeze the demonstration. Cell metrics come from measureText('█'), not a letter — block glyphs tile by their own ink box, which can differ from a letter's advance in the loaded font — with textAlign='left'/textBaseline='alphabetic' draws at (col*cellW, row*cellH + ascent) so cells tile edge-to-edge by construction. Tokens (--foreground, --ns-muted) are read via getComputedStyle(document.documentElement) synchronously before any observer or rAF is armed, and re-read on a MutationObserver watching documentElement's class, so no path can ever paint a placeholder value. prefers-reduced-motion freezes the occluder parked off-center over the numeral — the phase that maximizes the count of cells whose 4-bit code is neither 0 (empty) nor 15 (solid), i.e. genuinely partial half-cell cells, rather than a position fully clear of or fully inside the numeral. Loop pauses on IntersectionObserver (offscreen) and document.hidden. Optional children render as real DOM below the field. Props: cellSize (grid cell px, default 16), occluderRadius (px, default derives proportionally from the container's smaller dimension), children, className.",
+  "dependencies": [],
+  "useWhen": "Pick hero-404-quadrant-occlusion for a 404 whose payoff is a moving object with a genuinely crisp curved silhouette on the ASCII grid, distinct from not-found-knockout (numerals punched as literal absence through a carved surface plane, with cursor-reactive edge springs) and not-found-postmark (reads as a returned/undeliverable letter, not a hole or a glyph grid)."
+}

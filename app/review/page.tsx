@@ -5,10 +5,14 @@
  * scrolling the full catalog. Disposable tooling: not in the site nav, does
  * not touch any component or meta.json, reads nothing the catalog reads.
  *
- * Three static groups (see ./data.ts): components just fixed (verify the fix
- * landed), the rest of the first batch nobody has looked at yet, and a third
- * batch across three more lanes (multiplayer, reliability, wayfinding).
- * Client-side filter over a static list, no data fetching.
+ * Four static groups (see ./data.ts): components just fixed (verify the fix
+ * landed), the rest of the first batch nobody has looked at yet, a third
+ * batch across three more lanes (multiplayer, reliability, wayfinding), and
+ * round 8a's 34 components (flat, no lane). The round a row belongs to
+ * (`ReviewItem.round`) is a separate, additive axis from group — the round
+ * filter bar only appears once more than one round exists in the data, so
+ * adding a round is a data.ts edit, not a page edit. Client-side filter over
+ * a static list, no data fetching.
  *
  * "Tested" and a free-text note per row persist to a file on disk via
  * `/api/review-state` (app/api/review-state/route.ts), not localStorage —
@@ -37,18 +41,26 @@ const GROUP_LABEL: Record<ReviewItem["group"], string> = {
   fixed: "Re-test — fixed since you flagged it",
   untested: "Still untested from the first batch",
   expansion: "New — three more lanes",
+  r8a: "Round 8a — 34 new components",
 };
 
 const FIXED_COUNT = REVIEW_ITEMS.filter((i) => i.group === "fixed").length;
 const UNTESTED_COUNT = REVIEW_ITEMS.filter((i) => i.group === "untested").length;
 const EXPANSION_COUNT = REVIEW_ITEMS.filter((i) => i.group === "expansion").length;
+const R8A_COUNT = REVIEW_ITEMS.filter((i) => i.group === "r8a").length;
 
-/** Bump this string, not a version number, when data.ts's Changed/Look-for
- *  copy is rewritten for a new fix round — the only signal the owner has
- *  that the row copy describes the CURRENT build, not a stale one. */
-const COPY_ROUND_LABEL = "Row copy last updated 2026-08-19 (latest fix round).";
+/** Every round value present in the data, in first-seen order — deriving
+ *  this from REVIEW_ITEMS itself (rather than hardcoding a list) is what
+ *  makes the round filter "generic over round": a new round is a data edit
+ *  in data.ts, never a page edit here. Replaces the old COPY_ROUND_LABEL
+ *  manual date string, which could silently go stale. */
+const ROUNDS: string[] = Array.from(new Set(REVIEW_ITEMS.map((i) => i.round ?? "r7")));
+const ROUND_COUNTS: Record<string, number> = ROUNDS.reduce(
+  (acc, r) => ({ ...acc, [r]: REVIEW_ITEMS.filter((i) => (i.round ?? "r7") === r).length }),
+  {} as Record<string, number>,
+);
 
-const GROUPS: ReviewItem["group"][] = ["fixed", "untested", "expansion"];
+const GROUPS: ReviewItem["group"][] = ["fixed", "untested", "expansion", "r8a"];
 const LANES: Lane[] = ["identity", "money", "living", "multiplayer", "reliability", "wayfinding"];
 const UNTESTED_LANES: Lane[] = ["identity", "money", "living"];
 const EXPANSION_LANES: Lane[] = ["multiplayer", "reliability", "wayfinding"];
@@ -123,7 +135,11 @@ export default function ReviewPage() {
     fixed: true,
     untested: true,
     expansion: true,
+    r8a: true,
   });
+  const [roundsOn, setRoundsOn] = useState<Record<string, boolean>>(
+    () => Object.fromEntries(ROUNDS.map((r) => [r, true])),
+  );
   const [lanesOn, setLanesOn] = useState<Record<Lane, boolean>>({
     identity: true,
     money: true,
@@ -283,20 +299,22 @@ export default function ReviewPage() {
     if (!hydrated) return [];
     return REVIEW_ITEMS.filter((item) => {
       if (!groupsOn[item.group]) return false;
+      if (!roundsOn[item.round ?? "r7"]) return false;
       if (item.lane && !lanesOn[item.lane]) return false;
       if (!statusOn[effectiveStatus(state[item.slug])]) return false;
       if (!q) return true;
-      const haystack = [item.slug, item.change, item.watch, item.note, state[item.slug]?.note]
+      const haystack = [item.slug, item.change, item.watch, item.note, item.eyeball, state[item.slug]?.note]
         .filter(Boolean)
         .join(" ")
         .toLowerCase();
       return haystack.includes(q);
     });
-  }, [hydrated, q, groupsOn, lanesOn, statusOn, state]);
+  }, [hydrated, q, groupsOn, roundsOn, lanesOn, statusOn, state]);
 
   const fixedItems = filtered.filter((i) => i.group === "fixed");
   const untestedItems = filtered.filter((i) => i.group === "untested");
   const expansionItems = filtered.filter((i) => i.group === "expansion");
+  const r8aItems = filtered.filter((i) => i.group === "r8a");
 
   const remaining = (group: ReviewItem["group"]) => {
     const items = REVIEW_ITEMS.filter((i) => i.group === group);
@@ -306,11 +324,21 @@ export default function ReviewPage() {
   const fixedRemaining = remaining("fixed");
   const untestedRemaining = remaining("untested");
   const expansionRemaining = remaining("expansion");
+  const r8aRemaining = remaining("r8a");
   const groupRemaining: Record<ReviewItem["group"], { untested: number; total: number }> = {
     fixed: fixedRemaining,
     untested: untestedRemaining,
     expansion: expansionRemaining,
+    r8a: r8aRemaining,
   };
+
+  // Jump index over the currently-filtered set, in list order — lets the
+  // owner jump straight to a row without scrolling past everything the
+  // filters already excluded.
+  const jumpIndex = useMemo(
+    () => filtered.map((item) => ({ slug: item.slug, group: item.group })),
+    [filtered],
+  );
 
   // Live counts for the working / flagged / untouched filter bar — computed
   // over the whole list (not `filtered`), same as the group counts above,
@@ -329,6 +357,7 @@ export default function ReviewPage() {
     filtered.length === 0 &&
     q === "" &&
     GROUPS.every((g) => groupsOn[g]) &&
+    ROUNDS.every((r) => roundsOn[r]) &&
     LANES.every((l) => lanesOn[l]) &&
     statusOn.flagged &&
     statusOn.untouched &&
@@ -343,6 +372,7 @@ export default function ReviewPage() {
       fixed: [],
       untested: [],
       expansion: [],
+      r8a: [],
     };
     for (const item of flagged) byGroup[item.group].push(item);
 
@@ -379,13 +409,13 @@ export default function ReviewPage() {
           ns-ui / review — local only
         </p>
         <h1 className="mt-5 text-3xl font-semibold leading-[1.15] tracking-tight sm:text-4xl">
-          Round 7 review console.
+          Review console.
         </h1>
         <p className="mt-5 max-w-2xl text-[15px] leading-7 text-ns-muted">
           Disposable tooling, not a catalog page: {FIXED_COUNT} fixes to re-verify,{" "}
-          {UNTESTED_COUNT} components from the first batch still untested, and {EXPANSION_COUNT}{" "}
-          new components across three more lanes. Each row links to the full component page and to
-          its card in isolation; a nearby handful also run live inline. &ldquo;Tested&rdquo; and
+          {UNTESTED_COUNT} components from the first batch still untested, {EXPANSION_COUNT} across
+          three more lanes, and {R8A_COUNT} from round 8a. Each row links to the full component page
+          and to its card in isolation; a nearby handful also run live inline. &ldquo;Tested&rdquo; and
           notes persist to a local file (
           <code className="font-mono text-[13px]">.review-state.json</code>) via a dev-only API
           route — never the deployed site.
@@ -395,7 +425,9 @@ export default function ReviewPage() {
             ? `${statusCounts.working} working, ${statusCounts.flagged} flagged, ${statusCounts.untouched} untouched of ${REVIEW_ITEMS.length}.`
             : "Loading saved verdicts…"}
         </p>
-        <p className="mt-1 font-mono text-xs text-ns-muted">{COPY_ROUND_LABEL}</p>
+        <p className="mt-1 font-mono text-xs text-ns-muted">
+          By round: {ROUNDS.map((r) => `${r} (${ROUND_COUNTS[r]})`).join(", ")}.
+        </p>
       </header>
 
       {/* Controls */}
@@ -439,6 +471,29 @@ export default function ReviewPage() {
               );
             })}
           </div>
+
+          {ROUNDS.length > 1 ? (
+            <div role="group" aria-label="Filter by round" className="flex items-center gap-1">
+              {ROUNDS.map((r) => {
+                const selected = roundsOn[r];
+                return (
+                  <button
+                    key={r}
+                    type="button"
+                    aria-pressed={selected}
+                    onClick={() => setRoundsOn((p) => ({ ...p, [r]: !p[r] }))}
+                    className={`min-h-11 rounded-sm border px-2 py-1 font-mono text-xs uppercase tracking-wider transition-colors sm:min-h-0 ${
+                      selected
+                        ? "border-ns-accent bg-ns-accent/10 text-foreground"
+                        : "border-transparent text-ns-muted hover:text-foreground"
+                    }`}
+                  >
+                    {r}
+                  </button>
+                );
+              })}
+            </div>
+          ) : null}
 
           <div role="group" aria-label="Filter by lane" className="flex flex-wrap items-center gap-1">
             {LANES.map((lane) => {
@@ -507,6 +562,20 @@ export default function ReviewPage() {
         </div>
       </div>
 
+      {hydrated && jumpIndex.length > 0 ? (
+        <nav aria-label="Jump to row" className="mt-4 flex flex-wrap gap-x-3 gap-y-1">
+          {jumpIndex.map(({ slug }) => (
+            <a
+              key={slug}
+              href={`#row-${slug}`}
+              className="rounded-sm font-mono text-[11px] text-ns-muted underline-offset-2 outline-none transition-colors hover:text-foreground hover:underline focus-visible:ring-2 focus-visible:ring-ns-accent"
+            >
+              {slug}
+            </a>
+          ))}
+        </nav>
+      ) : null}
+
       {/* Group A */}
       <Section
         title={GROUP_LABEL.fixed}
@@ -546,6 +615,22 @@ export default function ReviewPage() {
         remaining={expansionRemaining}
         items={expansionItems}
         lanes={EXPANSION_LANES}
+        state={state}
+        hydrated={hydrated}
+        onSetVerdict={setVerdict}
+        onNoteChange={setNote}
+        onNoteCommit={commitNote}
+        saveStatus={saveStatus}
+        registerRef={registerRef}
+        isActive={isActive}
+        isOnScreen={isOnScreen}
+      />
+
+      {/* Group D — round 8a, flat (no lane) */}
+      <Section
+        title={GROUP_LABEL.r8a}
+        remaining={r8aRemaining}
+        items={r8aItems}
         state={state}
         hydrated={hydrated}
         onSetVerdict={setVerdict}
@@ -756,6 +841,12 @@ function Row({
   const hasNote = note.trim().length > 0;
   const noteId = `note-${item.slug}`;
 
+  // Per-row remount, for components whose interesting state isn't the
+  // resting one (the curtains: closed by default, only interesting mid-
+  // draw). Bumping the counter changes the LivePreviewFrame's `key`, which
+  // forces React to tear down and remount the iframe from scratch.
+  const [remountCount, setRemountCount] = useState(0);
+
   // Settled ("working", no open note) rows collapse to a quiet one-liner so
   // the untested ones stay dense on screen. Flagged and untouched rows
   // always show in full — nothing to hide there. Auto-collapses the moment
@@ -806,8 +897,9 @@ function Row({
   return (
     <article
       ref={setRef}
+      id={`row-${item.slug}`}
       data-name={item.slug}
-      className={`grid gap-3 rounded-md border p-4 transition-colors ${
+      className={`grid gap-3 scroll-mt-24 rounded-md border p-4 transition-colors ${
         status === "flagged"
           ? "border-border border-l-2 border-l-ns-accent"
           : status === "working"
@@ -890,6 +982,12 @@ function Row({
               </button>
             ) : null}
 
+            {item.eyeball ? (
+              <p className="mt-2 text-[13px] leading-relaxed text-foreground">
+                <span className="text-ns-muted">Eyeball:</span> {item.eyeball}
+              </p>
+            ) : null}
+
             {item.group === "fixed" ? (
               <div className="mt-2 space-y-1 text-[13px] leading-relaxed text-ns-muted">
                 <p>
@@ -918,6 +1016,15 @@ function Row({
               >
                 Card in isolation ↗
               </Link>
+              {item.resetLabel ? (
+                <button
+                  type="button"
+                  onClick={() => setRemountCount((c) => c + 1)}
+                  className="rounded-sm text-ns-accent outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ns-accent"
+                >
+                  {item.resetLabel}
+                </button>
+              ) : null}
               <span
                 aria-live="polite"
                 className="w-12 shrink-0 font-mono text-[10px] uppercase tracking-wider text-ns-muted"
@@ -952,6 +1059,7 @@ function Row({
 
       {expanded ? (
         <LivePreviewFrame
+          key={remountCount}
           name={item.slug}
           title={item.slug}
           active={isActive(item.slug)}

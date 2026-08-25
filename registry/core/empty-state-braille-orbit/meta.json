@@ -1,0 +1,15 @@
+{
+  "name": "empty-state-braille-orbit",
+  "title": "Empty State Braille Orbit",
+  "description": "A small ambient icon for empty states: an unbroken stroke traced through braille's 2x4 sub-cell dot addressing along a closed 3:2 Lissajous orbit, sampled by arc length so the curve never gaps or clusters.",
+  "collection": "core",
+  "tags": ["empty-state", "icon", "ascii", "braille", "mono", "ambient"],
+  "useWhen": "an empty-state icon where a single continuous curve, not a static glyph or icon-font mark, is the whole point — braille's 2x4 addressable sub-grid draws a real 2D trajectory (a comet-like orbit) rather than loader-braille's 1D bar/progress fill. Pick loader-braille instead when the surface is a determinate/indeterminate loading bar, not a resting empty state.",
+  "autoplay": { "mode": "none" },
+  "instruction": "A small ambient icon for empty states: a single unbroken stroke traced through Unicode braille's 2x4 sub-cell dot addressing (U+2800 base + bitmask) along a closed 3:2 Lissajous curve, x = A*sin(0.35t), y = B*sin(0.233t + PI/2), giving each glyph cell an addressable 2-wide/4-tall dot sub-grid. The curve is sampled by ARC LENGTH, never a fixed time-step: each new point is found by bisecting the step in curve-parameter t until it lands within 0.6 dot-units of the previous point, guaranteeing no two consecutive dots ever gap by more than one dot — fixed-t sampling would gap at high curvature and cluster at low curvature. A ~140-sample ring buffer of the most recent curve points is remapped to glyph cells and sub-dot bits every frame, giving a slow comet-orbit read (bright head, fading tail) distinct from loader-braille's bar/dot progress fill, which spends the same addressable grid on a 1D tone instead of a 2D trajectory. The head-to-tail fade is an alpha ramp, not color arithmetic: every lit cell is drawn once in --ns-muted at full alpha, then again in --foreground at an alpha equal to the freshest sample touching it, so the two-pass crossfade works unmodified even if a token is ever redefined as non-grayscale. Amplitude eases 0-100% over 1.2s ease-out-expo once on mount; after that the orbit is a steady, undamped, energy-conserving loop with a ~27s period that never settles or stops. Cell metrics come from an offscreen measureText call after document.fonts.ready, and both tokens are re-read via getComputedStyle on a MutationObserver watching documentElement's class, so both themes render correctly without a remount. prefers-reduced-motion freezes on one baked ~90-dot curved arc (starting past the axis crossing near t=0, so the frozen segment reads as a legible orbit fragment rather than a straight dead line) — no ring buffer, no rAF. Purely decorative: the canvas is aria-hidden; the empty state's real accessible content (a heading and description) lives as ordinary DOM alongside it, never encoded in the glyph art. Props: cellSize (default 14, braille glyph cell px), size (default 120, icon box px, square), className.",
+  "dependencies": [],
+  "card": {
+    "focus": "[data-braille-orbit-card]",
+    "padding": 0.15
+  }
+}
