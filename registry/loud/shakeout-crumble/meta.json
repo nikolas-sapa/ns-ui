@@ -1,0 +1,34 @@
+{
+  "name": "shakeout-crumble",
+  "title": "Shakeout Crumble",
+  "description": "Destructive-action confirm rendered as a foundry shakeout conveyor: a green-sand mould loses cohesion under vibration and crumbles away to reveal the casting, unforced and looping at rest, with a click-arm-then-confirm gesture layered on top to actually commit.",
+  "collection": "loud",
+  "tags": [
+    "button",
+    "destructive",
+    "confirmation",
+    "canvas",
+    "particles",
+    "foundry",
+    "physics",
+    "accessibility"
+  ],
+  "useWhen": "a destructive confirm that stays visibly alive and demonstrating itself even with no input — an unforced ~7s foundry cycle (mould compacts, vibrates apart, reveals, reclaims) runs forever, and a click-arm-then-second-click-commits exchange gates the actual action; pick confirm-hold-ink instead for a time-based press-and-hold with no ambient idle animation, confirm-slide-shatter for a distance-dragged confirm, or confirm-dial-align when the gate should be fine-motor accuracy rather than a two-step click.",
+  "instruction": "Build a destructive-action confirm button sourced from real green-sand casting foundry practice: a friable sand mould is vibrated on a shakeout conveyor until compaction fails and it crumbles away, revealing the casting inside, after which the sand is reclaimed and re-compacted into a fresh mould for the next pour. That is granular COMPACTION FAILURE UNDER VIBRATION — each of a budgeted ~2600-grain field detaches individually past its own random threshold and either settles into a loose pile at the bottom or drifts off entirely as fading dust — categorically different from a wipe (dew-coalesce's condensation runoff) or a chemical front sweeping a surface (kamacite-etch's acid etch): here cohesion fails locally and grain-by-grain, nothing sweeps across in a front. A single scalar drive (0 = mould intact over the casting, 1 = fully shaken out) is all that ever changes; every grain's position and alpha is a pure function of drive against its own static escape threshold, so the same render code handles crumbling forward and reclaiming backward with no separate undo animation. ALIVE AT REST: with no input at all, drive runs a continuous ~7s envelope (settle, vibrate/crumble, hold the reveal, reclaim, settle) forever, and even the terminal committed state keeps a low, constant grain-jitter floor so dust never stops sifting — there is no fully static frame at any point in the component's life, matching the real conveyor's unforced cycle. GESTURE: distinct from every other destructive confirm in the registry (confirm-hold-ink gates on time held, confirm-slide-shatter on distance dragged, confirm-dial-align on accuracy) — this is a plain <button> gated on click-arm-then-confirm. First activation (pointer click, or Space/Enter, free on a real button element) arms it: the mould visibly shakes harder as a countdown window runs, teasing the shakeout without completing it — reversible, nothing is destroyed yet. A second activation inside that window commits: the crumble finishes, the casting is fully revealed, and onConfirm fires once, exactly at the moment the reveal animation completes. Letting the window expire, pressing Escape while armed, or losing focus all de-arm: drive eases back down and the mould visibly reclaims itself over the same envelope the idle loop uses. A dedicated aria-live=polite status span (separate from the button's own text, which also changes per phase for a clear accessible name) announces 'Awaiting confirmation', 'Cancelled', or 'Cleared', with a zero-width-space parity toggle so repeated identical announcements still re-fire. The terminal committed state uses aria-disabled rather than a native disabled attribute so the button stays focusable and its final label stays announced. Grain positions/alpha, casting shape and colors are all direct canvas draws from --foreground (casting fill) and --ns-muted (grains) tokens read via getComputedStyle(document.documentElement) and re-derived on a MutationObserver watching its class attribute, assigned before first paint; --border and --background only frame the DOM label chip, and --ns-accent appears solely as the button's focus ring, never in the granular field. Per-frame draw batches grains into 6 alpha buckets and issues one canvas fill() per non-empty bucket, so draw-call count stays flat regardless of grain count; grain spacing (and therefore size) is derived from the button's own smaller dimension against a hard MAX_GRAINS=2600 budget rather than a fixed density, so it reads as fine grain at any card size instead of coarse blobs. DPR is capped at 2 (button-scale canvas, not a full-bleed shader). The rAF loop wakes on demand, sleeps whenever nothing is animating it back to idle, pauses on IntersectionObserver and visibilitychange, and never runs at all under prefers-reduced-motion: reduced motion instead snaps discretely between three static drive values (0.5 resting — a deliberately non-t0 frame with both intact mould and revealed casting visible at once, 0.85 armed, 1.0 committed) with zero vibration jitter and zero grain sifting, while every keyboard and click path stays fully operable. Props: label (default 'Clear all'), armedLabel (default 'Confirm clear all?'), clearedLabel (default 'Cleared'), armMs (default 4000), onConfirm, className.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "press",
+    "target": ".ns-shakeout-btn",
+    "hold": 800,
+    "period": 8000,
+    "delay": 900
+  },
+  "gate": {
+    "openBy": ".ns-shakeout-btn",
+    "expect": ".ns-shakeout-label"
+  },
+  "card": {
+    "focus": ".ns-shakeout-btn",
+    "padding": 0.6
+  }
+}

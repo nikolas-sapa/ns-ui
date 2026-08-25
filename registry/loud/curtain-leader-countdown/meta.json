@@ -1,0 +1,16 @@
+{
+  "name": "curtain-leader-countdown",
+  "title": "Curtain Leader Countdown",
+  "description": "A full-bleed route curtain modeled on the SMPTE Universal Leader film countdown, compressed to preview-card scale and stated as a departure, not a fidelity claim.",
+  "collection": "loud",
+  "tags": [
+    "preloader",
+    "route-curtain",
+    "countdown",
+    "canvas",
+    "transition"
+  ],
+  "instruction": "Build <CurtainLeaderCountdown onComplete? loop? paused? className?> as a full-bleed route curtain modeled on the SMPTE Universal Leader film countdown — the real broadcast/projection standard, not an invented loading screen. A rotating clock-arm sweeps a circular target once per digit step while numerals tick 8->2 on a canvas-drawn countdown field; C/C/F/F control-frame glyphs flash in the ring's corners only during the '4' step, exactly where the real leader places them. COMPRESSED, NOT LITERAL: the historical leader runs one numeral per real second (~9s total); this component compresses to ~450ms per digit (~3.5s/cycle) for preview-card scale, a deliberate departure from the standard, not a fidelity claim. THE 2-POP HAS NO VISUAL EQUIVALENT IN THE SOURCE: the leader's '2-pop' is an audio cue; here it's translated as a one-frame flash of the target ring to full --foreground plus a brief scale-pulse, an invented stand-in, stated as such. PALETTE: ring and numerals in --foreground, black field in --background, ghost/inactive digit in --ns-muted, control-frame hairlines in --border — no --ns-accent anywhere, including the flash, which goes to full luminance instead. The countdown-and-flash cycle is the unconditional idle loop from mount, no autoplay descriptor needed; any phase must read as complete (numeral + arm angle + ring together) since the no-autoplay verifier can land anywhere in the cycle. prefers-reduced-motion freezes on the '4' step, where control-frame glyphs are visible and the arm sits at a clean quadrant angle — the most structured single frame, not t=0.",
+  "dependencies": [],
+  "useWhen": "a full-bleed preloader/route-transition curtain built as a timing instrument, not a drape — a canvas-drawn SMPTE film-leader countdown ticking numerals to a cut, with no fabric and no rigging choreography at all; pick curtain-traveler-draw, curtain-tab-diagonal or curtain-austrian-gather instead when the loading moment should read as a real curtain parting, peeling or gathering rather than a broadcast countdown."
+}

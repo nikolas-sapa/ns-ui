@@ -4,7 +4,7 @@
  * component's own meta.json description where no note was given. Never read
  * by build-registry.ts or anything else; safe to edit freely.
  *
- * Three groups this round:
+ * Four groups now (round r8a added a fourth, see bottom of the array):
  *   A "fixed"     — re-test, owner already flagged these with a note (see
  *                   .review-state.json, keyed by slug — never cleared here).
  *                   Row copy (change/watch) must describe the MOST RECENT
@@ -21,15 +21,21 @@
  *                   feat/r7-integration, so the lane is included below.
  *                   Group sizes are read live off this array's own group
  *                   field in page.tsx (FIXED_COUNT/UNTESTED_COUNT/
- *                   EXPANSION_COUNT) — never hardcode a count in prose here
- *                   or there.
+ *                   EXPANSION_COUNT/R8A_COUNT) — never hardcode a count in
+ *                   prose here or there.
+ *   D "r8a"       — round 8a's 34 components, ported from the throwaway
+ *                   app/r8a/page.tsx lab (left in place, untouched). No
+ *                   lane: r8a's own thematic groupings (curtains,
+ *                   backgrounds, heroes, ...) are a different axis than the
+ *                   identity/money/living lane enum, so they live in each
+ *                   row's `eyeball` text and the page's jump index instead.
  */
 
 export type Lane = "identity" | "money" | "living" | "multiplayer" | "reliability" | "wayfinding";
 
 export type ReviewItem = {
   slug: string;
-  group: "fixed" | "untested" | "expansion";
+  group: "fixed" | "untested" | "expansion" | "r8a";
   lane?: Lane;
   /** Group A only: one line of what changed. */
   change?: string;
@@ -37,6 +43,19 @@ export type ReviewItem = {
   watch?: string;
   /** Group B/C only: one line, either the hand-written note or the meta.json description. */
   note?: string;
+  /** The diagnostic "what to look at" line: names the SPECIFIC way this
+   *  component's mechanic can be faked, inverted, or misread — not a
+   *  generic description. Ported verbatim from wherever a round first wrote
+   *  it (app/r8a/page.tsx for r8a); never invented fresh here. */
+  eyeball?: string;
+  /** Label for a per-row remount control, for components whose interesting
+   *  state isn't the resting one (e.g. the curtains, closed by default). */
+  resetLabel?: string;
+  /** Which round added this row — "r7" for everything above pre-dating this
+   *  field. Lets data.ts accumulate rounds instead of being rewritten each
+   *  time; the round filter in page.tsx derives its options from whatever
+   *  values are actually present here. */
+  round?: string;
 };
 
 export const LANE_LABEL: Record<Lane, string> = {
@@ -400,5 +419,296 @@ export const REVIEW_ITEMS: ReviewItem[] = [
     group: "expansion",
     lane: "wayfinding",
     note: "Hover the panel and toggle a layer off: it should spring sideways off the registration pins into a parked, translucent slot rather than fade away, while the fan itself is driven by one shared explode scalar.",
+  },
+
+  // Round 8a — 34 new components, ported from app/r8a/page.tsx (the
+  // throwaway manual test lab). `eyeball` is that page's diagnostic
+  // "what to look at" line, verbatim; `note` carries its "replaces:" line.
+  // No lane: r8a's groupings (curtains, backgrounds, heroes, ...) are a
+  // different axis than the identity/money/living lane enum, so they live
+  // in the eyeball text and the jump index instead of being forced into it.
+  {
+    slug: "curtain-leader-countdown",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: preloader / route curtain.",
+    eyeball:
+      "The 2-pop flash (right before the cut to black) must be pure ink value, no color tint — sample it in both themes. The black beat between cycles must still show the ring outline and a ghost of the target, never a truly empty frame.",
+    resetLabel: "Re-trigger countdown",
+  },
+  {
+    slug: "curtain-traveler-draw",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: preloader / route curtain.",
+    eyeball:
+      "Use the demo's own \"Skip curtain\" button to draw it open. Watch one individual pleat's shadow/highlight line, not the panel's outer edge — it should visibly shift on its own ~4s breathing cycle even while closed. If only the whole panel pulses opacity/scale while the fold lines stay put, the breathing is faked. Parts horizontally on a corded track — compare against Austrian Gather (bottom-up) and Tab Diagonal (one corner only) below.",
+    resetLabel: "Reset curtain (closed)",
+  },
+  {
+    slug: "curtain-austrian-gather",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: preloader / route curtain.",
+    eyeball:
+      "Use the demo's own \"Skip curtain\" button to hoist it. The fabric should SCALLOP and BUNCH upward into a row of swags as it lifts — bottom-up, not sliding flat sideways (that's Traveler Draw) or peeling from one diagonal corner (that's Tab Diagonal). Each swag should belong visibly to its own pair of lift lines.",
+    resetLabel: "Reset curtain (closed)",
+  },
+  {
+    slug: "curtain-tab-diagonal",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: preloader / route curtain.",
+    eyeball:
+      "Use the demo's own \"Skip curtain\" button to haul it. Only the bottom-inner (center-meeting) corner should lift diagonally toward a fixed tie-off point — the top edge and the outer wing corner must stay put. If the whole panel slides or the top edge moves, this isn't distinct from the traveler curtain.",
+    resetLabel: "Reset curtain (closed)",
+  },
+  {
+    slug: "background-halftone-rosette",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: full-bleed ambient background.",
+    eyeball:
+      "High-coverage centre must be FURTHER from the page background in value than the low-coverage edges — in BOTH themes. If the centre looks closer to the background in dark mode, the blend mode is inverted for that theme.",
+  },
+  {
+    slug: "background-capillary-wick",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: full-bleed ambient background.",
+    eyeball:
+      "Ink should only ever travel along a fixed vein lattice, front by front, snapping along discrete branching lines — never spreading as a soft, open-fluid cloud (that would be its sibling, dye-whorl, a different mechanic). Watch a single front advance along one edge, then branch at a junction.",
+  },
+  {
+    slug: "background-engine-turn-guilloche",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: full-bleed ambient background.",
+    eyeball:
+      "Three overlapping ring patterns should visibly beat/drift against each other — their lathe ratios are deliberately mismatched — reading as a banknote security pattern that's alive, not a frozen decorative engraving. If it looks like a static print, the ratios collapsed to something too close together.",
+  },
+  {
+    slug: "hero-404-quadrant-occlusion",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: hero / 404 page.",
+    eyeball:
+      "Zoom into the numeral edges: strokes should look like real half/quadrant blocks (▘▝▖▗▚▞ etc.), each cell independently choosing which quarter is filled — not one single density glyph per cell like the rest of the registry. Thin numeral strokes should stay legible, not break up into noise.",
+  },
+  {
+    slug: "not-found-attribute-clash",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: 404 background.",
+    eyeball:
+      "This is a MONOCHROME stand-in for ZX Spectrum colour clash — there must be no hue anywhere, in either theme. Look for cells where a glyph/weight visibly snaps or blocks out detail because two overlapping regions are fighting over one cell's single glyph+weight budget.",
+  },
+  {
+    slug: "divider-petscii-vu",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: divider.",
+    eyeball:
+      "Every cell must be strictly on/off — a solid --foreground block or nothing, never a partial-alpha or ramped glyph. If any cell looks like it's fading in/out rather than snapping between two states, the density-ramp mechanic (used elsewhere in the registry) has leaked in here, which this component is built to avoid.",
+  },
+  {
+    slug: "divider-teletext-mosaic",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: divider.",
+    eyeball:
+      "Look at the sub-cell structure: this addresses a 2-wide x 3-tall sextant grid (six positions), not the 2x2 quadrant blocks or the 2x4 braille dots used elsewhere in the registry. Patterns should read chunkier and more angular than a quadrant-block divider.",
+  },
+  {
+    slug: "empty-state-braille-orbit",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: empty state.",
+    eyeball:
+      "Head bright (--foreground), tail fading to --ns-muted — pure grey, no hue creeping into the fade. The orbit must never settle to a point or stop; it should still be moving whenever you look back at it.",
+  },
+  {
+    slug: "empty-state-mezzotint",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: empty state.",
+    eyeball:
+      "This should read as built SUBTRACTIVELY — starts near-solid and light is scraped/burnished in, the opposite of every other density-ramp glyph in the registry, which builds density up from empty. If it looks like it's filling in from nothing rather than being worn away from solid, the polarity is backward.",
+  },
+  {
+    slug: "nav-blue-noise-scrim",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: nav / overlay scrim.",
+    eyeball:
+      "The dimming grain behind the nav should read as fine, isotropic noise reshuffling every frame — never a visible repeating crosshatch/lattice. A regular repeating pattern means it fell back to ordered dithering instead of true blue noise.",
+  },
+  {
+    slug: "nav-overstrike-typewriter",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: nav.",
+    eyeball:
+      "The ruled line beneath the current nav link should read as the deepest, darkest stack — several characters struck into the SAME cell — distinctly denser than the other links' lines. That's overstrike compositing in one cell, not this registry's usual single-glyph density ramp.",
+  },
+  {
+    slug: "loader-ascii-diffuse-fill",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: loader.",
+    eyeball:
+      "The texture should look grainy and organic, with error propagating diagonally across the grid frame to frame — never a repeating fixed checkerboard-like pattern. A visible repeating lattice means it fell back to ordered (Bayer) dithering instead of real Floyd-Steinberg error diffusion.",
+  },
+  {
+    slug: "progress-nlq-overstrike",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: progress bar.",
+    eyeball:
+      "At the fill boundary, look for two dot lattices offset by exactly half a cell pitch (two interleaved passes) — not stacked glyphs in one cell (that's Nav Overstrike Typewriter's different mechanic). The boundary should stay alive at rest, cycling single-pass → double-pass → paper-feed gap, even while the value isn't changing. Documented limit, not a bug: below ~40px of bar height the two passes visually fuse into one denser dot and the interleave stops being perceptible (still reads correctly as dense-vs-sparse progress).",
+  },
+  {
+    slug: "cursor-sixel-reveal",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: hero / full-bleed background.",
+    eyeball:
+      "The circular window's edge must dissolve into the glyph field — no hard rim, no lighter/darker disc around it. Check both themes; a visible ring is worst in dark and means the canvas isn't painting an opaque --background fill before each pass.",
+  },
+  {
+    slug: "cursor-subpixel-fringe",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: hero / full-bleed background.",
+    eyeball:
+      "Each cell should show three separate vertical --foreground slivers (RGB-stripe stand-ins), brightest where the underlying field's slope is steepest — not one blended glyph per cell. Fringing should track edges/gradients in the field, not appear uniformly everywhere.",
+  },
+  {
+    slug: "gallery-ascii-gradient-orientation",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: gallery.",
+    eyeball:
+      "Toggle theme: the same cells should stay lit, only their ink color should change. If a different set of glyphs lights up per theme, the Sobel pass is reading canvas pixels instead of the shared noise array.",
+  },
+  {
+    slug: "card-dot-gain-screen",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: card.",
+    eyeball:
+      "Diagonal sweep across the card, highlight (top-left, sparse dots) to shadow (bottom-right): shadow dots should visibly BRIDGE and plug into solid ink rather than staying separate circles all the way to full coverage. That nonlinear plugging near the shadow end is the real dot-gain curve — a linear-looking gradient means the gain terms aren't applied.",
+  },
+  {
+    slug: "crack-arrest-hole",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: confirm / abort control.",
+    eyeball:
+      "This needs a real HOLD (Space/Enter, or press-and-hold pointer) — a plain click won't arrest it. Holding should grow a jagged crack from the left edge toward a fixed drilled hole; releasing early should heal it back to nothing on a spring and re-seed a visibly different crack path for the next attempt. Reaching the hole is what stops it — an arrest, not a destructive break-through.",
+  },
+  {
+    slug: "shakeout-crumble",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: destructive confirm button.",
+    eyeball:
+      "Click (or Space/Enter) once to arm, then click again within the countdown window to commit — or let it expire, or press Escape, to cancel and watch the sand reclaim itself back over the casting. At rest it should already be alive on its own ~7s vibrate/settle cycle even with zero input. ~2600 individually-thresholded grains: it should read as granular compaction failure, not a wipe or a sweeping front.",
+  },
+  {
+    slug: "glaze-crawl-heal",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: status badge.",
+    eyeball:
+      "The demo shows all three statuses side by side (a cycling live badge plus three fixed reference rows: healthy/degraded/down) specifically so the states can be compared behaviourally, not by colour — healthy closes a crater in under a second, degraded lingers 1-3s, down never closes and leaves ragged bare patches. Documented limit, not a bug: below ~14px badge diameter the mechanic itself stops resolving and only the text label still carries the state.",
+  },
+  {
+    slug: "jominy-quench",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: comparison card.",
+    eyeball:
+      "Rows are hoverable and focusable (Tab through them) — the accent highlight should only ever appear on the hovered/focused bar's row, never in the resting render. Temperature is mapped to LUMINANCE, not hue (this registry has no orange) — the hottest point on each bar should blend toward --foreground, not toward a warm color.",
+  },
+  {
+    slug: "spark-test-id",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: file upload / detector.",
+    eyeball:
+      "A low idle spark shower should run unconditionally from mount, before any file is dropped — it must never be a dead frame. Drop or select a file (any of the accepted types) to see the shower change signature: image files throw dense, repeatedly-forking short bursts; audio/video throws long sparse straight lines; archives/binaries throw short dense low-lying streams.",
+  },
+  {
+    slug: "hero-faraday-wave-cell",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: hero / full-bleed background.",
+    eyeball:
+      "The standing-wave pattern should tessellate into stripes, squares, or hexagons depending on which wave triad is active, and drift slowly rather than sit static. Heavy: evaluates roughly 30k trig operations per frame, so it's one of the two components this page's lazy-mount is specifically protecting against — if scroll stutters near it, that's the thing to check first.",
+  },
+  {
+    slug: "divider-telephone-cord-delam",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: divider.",
+    eyeball:
+      "The ridge should wander side to side as it advances (a 'telephone cord' buckling pattern), with occasional branch points where it visibly forks into two — not a clean single sine wave. Compare against the other two dividers on this page: PETSCII VU is strictly two-state on/off, Teletext Mosaic addresses a 2x3 sextant grid; this one is a continuous wandering ridge, closer to a hand-drawn line than either.",
+  },
+  {
+    slug: "kelvin-wake",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: nav.",
+    eyeball:
+      "The wake pattern beneath the links should stay confined inside a V-shaped envelope held at a constant ~19.47° half-angle regardless of anything else changing — that angle is the real, famous invariant of the physics, not a stylistic choice. Documented limit, not a bug: below ~24-28px of strip height the envelope collapses and stops reading clearly.",
+  },
+  {
+    slug: "shearer-advance",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: loader / infinite-scroll strip.",
+    eyeball:
+      "The conveyor's dash pattern should scroll in ONE constant direction regardless of which way the shearer itself is currently traversing — those two motions are deliberately independent, exactly like a real armoured face conveyor. Roof supports should advance in a travelling wave one at a time behind the shearer, not all flip together. Author's own flag: this may still read as generic bouncing dots rather than a directional conveyor — a plan-view rebuild is the known fix if so.",
+  },
+  {
+    slug: "hero-slice-comb",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: hero / full-bleed background.",
+    eyeball:
+      "Brightness must come from pure overlap accumulation — the rim where slices pile up tangent to the camera denser than the sparse head-on interior — with no shading/lighting term added on top. If any face looks shaded rather than built from stacked slice density, the mechanic is wrong.",
+  },
+  {
+    slug: "hero-text-ring-funnel",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: hero / full-bleed background.",
+    eyeball:
+      "This should read as typography given depth by phase lag between rings, not a glyph-grid tunnel. Documented limit, not a bug: below ~420px container height the far rings hit the 9px font floor and the taper flattens out.",
+  },
+  {
+    slug: "background-text-branch-canopy",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: background.",
+    eyeball:
+      "Every limb is real words drawn with fillText — this should read as text-as-geometry, not strokes with a texture. Documented limit, not a bug: at small container sizes the outermost limbs degrade to a single short word.",
+  },
+  {
+    slug: "surface-crt-glass",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: card / panel surface.",
+    eyeball:
+      "The glass curves, the content does NOT — this is an overlay sitting in front of untouched DOM, not a texture warp on the content itself. overflow-hidden on the panel clips any child that needs to escape it (dropdowns, popovers), so check those separately.",
+  },
+  {
+    slug: "hero-glyph-silhouette-pack",
+    group: "r8a",
+    round: "r8a",
+    note: "Replaces: hero / full-bleed background.",
+    eyeball:
+      "The wordmark silhouette needs more resolved particles per unit area than the star or orbit silhouettes to read cleanly, so it's the first of the three to degrade at card size — check it specifically at small containers, not just full-bleed.",
   },
 ];
