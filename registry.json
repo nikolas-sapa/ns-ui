@@ -16383,34 +16383,6 @@
       }
     },
     {
-      "name": "surface-crt-glass",
-      "type": "registry:ui",
-      "title": "Surface CRT Glass",
-      "description": "A curved-glass overlay that wraps any real card or panel: a barrel-mapped scanline grid, a rolling brightness bar and a drifting specular sheen sit in front of untouched, fully accessible DOM content.",
-      "files": [
-        {
-          "path": "registry/loud/surface-crt-glass/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/surface-crt-glass.tsx"
-        }
-      ],
-      "dependencies": [],
-      "meta": {
-        "collection": "loud",
-        "tags": [
-          "card",
-          "panel",
-          "canvas",
-          "crt",
-          "glass",
-          "mono",
-          "wrapper",
-          "ambient"
-        ],
-        "instruction": "Build <SurfaceCrtGlass children curvature? scanlineOpacity? bezel? className?> as a wrapper treatment: a curved-glass overlay in front of ARBITRARY real children (a pricing card, a hero panel, a terminal-style feature block — never its own hardcoded content), not another flat effect that owns its own markup. IMPLEMENTATION ROUTE, stated explicitly because it matters: this does not rasterize children to a texture and warp that texture through a shader — there is no reliable dependency-free way to sample arbitrary live DOM into a canvas (an html2canvas-style rasterizer is exactly the dependency this repo avoids, and it would also destroy real, selectable, focusable, screen-reader-ordered content, which is the actual point of a wrapper over arbitrary children). Instead, children render as completely ordinary, untouched DOM, and every glass cue lives in a single pointer-events-none aria-hidden canvas layered on top: a scanline grid whose row spacing is warped through a literal cubic pincushion map (equal steps in normalized position land unevenly in y, compressing rows toward the top/bottom edges — real geometry of the overlay grid, not a filter), each row additionally carries a continuous per-row horizontal dash-offset jitter (canvas lineDashOffset animated by a smooth per-row-phased sine, not frame noise, so it drifts rather than strobes), a rolling brightness bar making one full top-to-bottom pass every 9s with shadowBlur giving it a soft phosphor-style bleed, a specular sheen drifting on a ~41s ambient cycle, and a background-toned radial vignette that recedes edges into the panel's own --background in both themes rather than a hue or a foreground wash. Phosphor bleed is honestly scoped to the overlay's own light sources (the rolling bar, the sheen) via shadowBlur — it never blurs the real content pixels underneath. Distinct from flyback-tear (also a CRT-family component in this registry): flyback-tear is a full-bleed WebGL simulation of a broadcast signal actively failing — rolling desync, tear bursts, dropout, snow, its own generated test-pattern content. This component is a working, well-adjusted screen: no failure states, no signal loss, content is someone else's real card, and the mechanism is a lightweight 2D canvas overlay, not a shader. Tokens (--background, --foreground) read via getComputedStyle(document.documentElement) at mount into fields that start empty and are assigned unconditionally in useLayoutEffect before first paint, re-read on a MutationObserver watching documentElement's class — no color literal anywhere, including the zero-alpha gradient stops, which use the CSS `transparent` keyword rather than concatenating an alpha suffix onto a token's hex string (token hex length is 3- or 6-digit and unsafe to string-concat). --ns-accent never appears in the glass treatment; any accent inside the wrapped content (e.g. a CTA button) is the content's own and untouched. Scanline pitch, row count, jitter amplitude and rolling-bar height all derive from the host's smaller dimension via ResizeObserver, so the same component reads correctly at pricing-card scale and full-panel scale. Render loop pauses via IntersectionObserver (scrolled offscreen) and visibilitychange (tab hidden), matching the registry's full-bleed canvas host checklist. prefers-reduced-motion freezes on STATIC_TIME = 3.1s — not t=0 — chosen because the rolling bar sits mid-height clear of the vignette-heavy edges, the dash-jitter phase is mid-cycle rather than aligned to a seam, and the sheen has already drifted off its start position: the most fully-formed static frame the loop passes through. No rAF, no jitter, no rolling-bar motion in that mode; content underneath remains fully readable in every mode since it is never touched. ACCESSIBILITY: children are real DOM in normal flow — selectable, focusable, correctly ordered for assistive tech — the canvas overlay is aria-hidden and pointer-events:none so it can never intercept a click or hide content from a screen reader; treatment opacities are kept low (scanlineOpacity default 0.06, sheen and roll-bar alpha under 0.13) specifically because scanlines over real body copy get unreadable fast, and this wrapper's whole justification is that it composes over content the registry already has rather than owning its own. CAVEAT: bezel/curvature is implemented with overflow-hidden on the host, so a child that must escape the panel's bounds (a popover, an open dropdown) will be clipped — document this, it is a real limit of the wrapper, not an oversight. Props: children (required), curvature (0..1, default 0.5, scanline pincushion strength), scanlineOpacity (default 0.06), bezel (default true, draws a --border ring), className."
-      }
-    },
-    {
       "name": "terrain-erosion-carve",
       "type": "registry:ui",
       "title": "Terrain Erosion Carve",

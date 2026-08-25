@@ -54,6 +54,7 @@ const RAMP_S = 1.2; // amplitude ease-in duration, seconds
 const RING_SIZE = 140;
 const MAX_ARC_DOT = 0.6; // max dot-unit distance between consecutive samples
 const MAX_EMITS_PER_FRAME = 80; // safety cap, not expected to bind at 60fps
+const MAX_STEP_T = 0.5; // ceiling on the arc-march step guess, seconds
 const DT_MAX = 0.05;
 const REDUCED_ARC_DOTS = 90;
 const REDUCED_START_T = 0.9; // clear of the axis crossing near t=0
@@ -190,14 +191,19 @@ export function BrailleOrbit({ cellSize = 14, size = 120, className = "" }: Brai
         return;
       }
       let emits = 0;
-      while (lastEmitT < targetT && emits < MAX_EMITS_PER_FRAME) {
-        const stepCap = Math.min(marchGuessDT, targetT - lastEmitT);
-        const r = stepArc(lastEmitT, lastEmitX, lastEmitY, stepCap);
+      while (emits < MAX_EMITS_PER_FRAME) {
+        // the arc-length step is sized by curvature alone, never by how much
+        // real time this frame has left — clamping it to targetT-lastEmitT
+        // would force one sample per frame regardless of curve speed, which
+        // collapses the trail to a handful of frame-spaced points instead of
+        // a curve sampled evenly by arc length.
+        const r = stepArc(lastEmitT, lastEmitX, lastEmitY, marchGuessDT);
+        if (r.t > targetT) break;
         pushSample(r.x, r.y);
         lastEmitT = r.t;
         lastEmitX = r.x;
         lastEmitY = r.y;
-        marchGuessDT = r.d < MAX_ARC_DOT * 0.5 ? r.stepT * 1.6 : r.stepT;
+        marchGuessDT = r.d < MAX_ARC_DOT * 0.5 ? Math.min(MAX_STEP_T, r.stepT * 1.6) : r.stepT;
         if (marchGuessDT < 1e-4) marchGuessDT = 1e-4;
         emits++;
       }

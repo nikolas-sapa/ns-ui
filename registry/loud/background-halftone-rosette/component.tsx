@@ -26,8 +26,13 @@ import type { CSSProperties } from "react";
 // unreadable mid-grey — a bad backdrop for type. A third layer expresses a
 // coverage gradient instead: near-transparent at the visual center (full
 // dot contrast, the rosette is the point) diluting toward a background-
-// tinted scrim at the frame edges (~8% effective coverage, a readable zone
-// for headline/CTA content sitting over the corners).
+// tinted scrim at the frame edges. The dilution ramp is deliberately steep
+// (see the stops below) rather than a slow fade: at hero/card scale, real
+// headline copy docked toward an edge still lands well inside where the
+// ramp has only reached its midpoint, not fully diluted — a slower fade
+// left the mid-coverage moiré zone (the ~50%-grey region the docblock above
+// warns is the least readable) sitting under real text instead of just
+// under the empty corners.
 //
 // Blend mode is chosen FROM THE THEME, never hardcoded. The invariant that
 // must hold in both themes: overlap value moves monotonically AWAY from
@@ -197,9 +202,10 @@ export function BackgroundHalftoneRosette({
           inset: 0,
           backgroundImage: `radial-gradient(ellipse closest-side at 50% 50%,
             transparent 0%,
-            transparent 38%,
-            color-mix(in srgb, var(--background) 60%, transparent) 70%,
-            color-mix(in srgb, var(--background) 88%, transparent) 100%)`,
+            transparent 20%,
+            color-mix(in srgb, var(--background) 55%, transparent) 45%,
+            color-mix(in srgb, var(--background) 85%, transparent) 70%,
+            color-mix(in srgb, var(--background) 95%, transparent) 100%)`,
         }}
       />
       <style>{`

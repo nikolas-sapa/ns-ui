@@ -32,11 +32,22 @@ import type { ReactNode } from "react";
 //
 // READABILITY: a uniform-density guilloché field would fight overlaid type,
 // so ring opacity is NOT uniform — it follows a coverage gradient from
-// near-clear at the center (s=0, ~4-5%) up to full engraved density at the
-// frame edge (s=1, ~85%), the mirror of a banknote's clear portrait window
-// sitting inside a dense engraved border. Center is exactly where hero
-// copy/CTA content conventionally sits, so `children` render centered above
-// the canvas in the least-covered part of the field.
+// near-clear at the center up to full engraved density at the frame edge
+// (s=1, ~85%), the mirror of a banknote's clear portrait window sitting
+// inside a dense engraved border. Center is exactly where hero copy/CTA
+// content conventionally sits, so `children` render centered above the
+// canvas in the least-covered part of the field. Two refinements make that
+// window actually hold real hero copy at card size rather than just a
+// point: (1) the envelope each ring is traced into is an ELLIPSE sized off
+// the container's own width and height independently, not a circle
+// inscribed in the smaller dimension — real engine-turned ovals on a
+// banknote are wide-short to match the wide-short cartouche they frame, and
+// a circular window sized off `min(w,h)` left almost no horizontal margin
+// once the frame got as wide as a real card; (2) the density ramp itself
+// does not start climbing at s=0 (RAMP_START below) — the portrait window
+// is a genuinely flat low-density plateau out to that radius, not just the
+// smoothstep's already-slow start, which measured out to only about a
+// quarter of the ring radius at the previous card-scale test.
 //
 // SUBSTRATE: Canvas 2D, not SVG. 3 passes x 36 rings x 260 samples ~= 28,000
 // line segments/frame at full density — an SVG node per stroke would be
@@ -59,6 +70,8 @@ const ALPHA_BUCKETS = 8;
 const REBUILD_MS = 140; // curve-table rebuild cadence — ratio drift is far slower than this
 const TILT_EASE = 0.06;
 const TILT_TAU_MS = 900; // how quickly the tilt scalar relaxes back to 0 on pointer leave
+const ENVELOPE_COVER = 0.47; // each axis's max ring radius, as a fraction of that axis's own size
+const RAMP_START = 0.42; // ring scale s below this stays at alphaMin flat — the actual portrait window
 
 interface Pass {
   k0: number;
@@ -155,7 +168,8 @@ export function GuillocheField({
     let h = 0;
     let cx = 0;
     let cy = 0;
-    let maxRadius = 0;
+    let maxRadiusX = 0;
+    let maxRadiusY = 0;
     let sized = false;
     let visible = true;
     let raf = 0;
@@ -199,13 +213,25 @@ export function GuillocheField({
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       cx = w / 2;
       cy = h / 2;
-      // proportional to the container's SMALLER dimension, so the weave
-      // reads at both full-bleed hero scale and a small preview card
-      maxRadius = Math.min(w, h) * 0.46;
+      // envelope is an ellipse sized off each axis independently — a wide
+      // container gets a wide-short portrait window (matching an engine-
+      // turned banknote oval) instead of a circle inscribed in whichever
+      // axis is shorter, which left almost no horizontal clearance once the
+      // container got as wide as a real hero/card frame.
+      maxRadiusX = w * ENVELOPE_COVER;
+      maxRadiusY = h * ENVELOPE_COVER;
       sized = true;
     };
 
     const ringScale = (i: number) => 0.05 + (0.95 * i) / Math.max(1, rings - 1);
+    // coverage stays flat at alphaMin out to RAMP_START, THEN smoothsteps up
+    // to alphaMax by s=1 — the flat run is the actual readable window, not
+    // just smoothstep's slow start (which alone still put visible density
+    // under a hero-sized headline at card scale).
+    const coverageOf = (s: number) => {
+      const u = RAMP_START >= 1 ? 0 : Math.max(0, Math.min(1, (s - RAMP_START) / (1 - RAMP_START)));
+      return smoothstep(u);
+    };
 
     const draw = () => {
       if (!sized || !fgColor || !tablesReady) return;
@@ -226,22 +252,27 @@ export function GuillocheField({
 
         for (let i = 0; i < rings; i++) {
           const s = ringScale(i);
-          const radius = s * maxRadius;
-          const alpha = pass.alphaMin + (pass.alphaMax - pass.alphaMin) * smoothstep(s);
+          const radiusX = s * maxRadiusX;
+          const radiusY = s * maxRadiusY;
+          const alpha = pass.alphaMin + (pass.alphaMax - pass.alphaMin) * coverageOf(s);
           const bucket = Math.min(ALPHA_BUCKETS - 1, Math.floor(alpha * ALPHA_BUCKETS));
           const path = buckets[bucket];
           bucketHasPoints[bucket] = 1;
 
           const ux0 = table[0];
           const uy0 = table[1];
-          let px = cx + radius * (ux0 * cosT - uy0 * sinT);
-          let py = cy + radius * (ux0 * sinT + uy0 * cosT);
+          let rx = ux0 * cosT - uy0 * sinT;
+          let ry = ux0 * sinT + uy0 * cosT;
+          let px = cx + rx * radiusX;
+          let py = cy + ry * radiusY;
           path.moveTo(px, py);
           for (let j = 1; j < SAMPLES; j++) {
             const ux = table[j * 2];
             const uy = table[j * 2 + 1];
-            px = cx + radius * (ux * cosT - uy * sinT);
-            py = cy + radius * (ux * sinT + uy * cosT);
+            rx = ux * cosT - uy * sinT;
+            ry = ux * sinT + uy * cosT;
+            px = cx + rx * radiusX;
+            py = cy + ry * radiusY;
             path.lineTo(px, py);
           }
           path.closePath();

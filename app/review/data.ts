@@ -696,14 +696,6 @@ export const REVIEW_ITEMS: ReviewItem[] = [
       "Every limb is real words drawn with fillText — this should read as text-as-geometry, not strokes with a texture. Documented limit, not a bug: at small container sizes the outermost limbs degrade to a single short word.",
   },
   {
-    slug: "surface-crt-glass",
-    group: "r8a",
-    round: "r8a",
-    note: "Replaces: card / panel surface.",
-    eyeball:
-      "The glass curves, the content does NOT — this is an overlay sitting in front of untouched DOM, not a texture warp on the content itself. overflow-hidden on the panel clips any child that needs to escape it (dropdowns, popovers), so check those separately.",
-  },
-  {
     slug: "hero-glyph-silhouette-pack",
     group: "r8a",
     round: "r8a",

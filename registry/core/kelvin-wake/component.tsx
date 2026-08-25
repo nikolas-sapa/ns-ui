@@ -396,6 +396,11 @@ export function KelvinWake({
                   href={link.href}
                   aria-current={isActive ? "page" : undefined}
                   onClick={(e) => {
+                    // this embed has no real #process section to land on; the
+                    // wake/active-link response below is the entire effect of
+                    // a click, so stop the browser's own fragment navigation
+                    // (matters for autoplay's synthetic clicks on a timer)
+                    e.preventDefault();
                     setActiveHref(link.href);
                     const canvas = canvasRef.current;
                     if (canvas) {

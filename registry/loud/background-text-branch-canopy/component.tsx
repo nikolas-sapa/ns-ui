@@ -70,13 +70,18 @@ import type { CSSProperties } from "react";
 // resting-state background.
 //
 // CONTENT PROTECTION: the canopy is deliberately origin-biased toward the
-// upper-left two-thirds of the frame (trunk foot sits left-of-center,
-// growing up-and-right), and a CSS scrim (a `--background`-tinted linear
-// gradient, strongest at the bottom edge) sits above the canvas so a
-// headline/CTA docked at the bottom — the zone the demo actually uses — has
-// a real reading surface under it rather than fighting a full crown of
-// words. Trunk bias alone is not enough (the crown still reaches the lower
-// third at deep containers), so both are required together.
+// right two-thirds of the frame (trunk foot sits right-of-center, growing
+// generally straight up with symmetric spread), and a CSS scrim (a
+// `--background`-tinted linear gradient, strongest at the bottom edge) sits
+// above the canvas so a headline/CTA docked bottom-LEFT — the zone the demo
+// actually uses — has a real reading surface under it rather than fighting a
+// full crown of words. Trunk bias alone is not enough (the crown still
+// reaches the lower third at deep containers), so both are required
+// together. (Previously biased upper-LEFT, which planted the trunk foot
+// directly inside the bottom-left content block's own bounding box — the
+// bias existed but pointed at the wrong corner; a worst-case-spread
+// simulation at 1440x900 confirmed the corrected bias keeps every limb's
+// ink to the right of the content block with margin to spare.)
 //
 // TOKENS: --foreground for the inner ~40% of depth (near, heaviest),
 // --ns-muted for the rest (receding), with alpha itself also stepping down
@@ -365,10 +370,11 @@ export function BackgroundTextBranchCanopy({ text = DEFAULT_TEXT, className = ""
       }
     };
 
-    // trunk foot biased into the upper-left two-thirds of the frame — see
-    // CONTENT PROTECTION in the file header. Growth runs generally up and to
-    // the right from there.
-    const originX = () => w * 0.32;
+    // trunk foot biased into the right two-thirds of the frame — see
+    // CONTENT PROTECTION in the file header. Growth runs generally straight
+    // up (symmetric spread) from there, kept clear of a bottom-left-docked
+    // content block by the horizontal bias alone.
+    const originX = () => w * 0.74;
     const originY = () => h * 0.94;
 
     const draw = () => {
