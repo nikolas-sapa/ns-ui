@@ -74,6 +74,12 @@ type Grain = {
 const MAX_GRAINS = 2600;
 const AMBIENT_PERIOD = 7000; // ms, one full compact -> shakeout -> reclaim loop
 const ARM_MS = 4000; // window to land the second activation before de-arming
+// `committed` below is terminal (see "terminal" comment ~line 175 and the
+// early return ~line 401): this state never resets itself. This card's
+// meta.json autoplay presses the button on a period > ARM_MS on purpose, so
+// each arm window expires and re-arms instead of committing. Drop the
+// autoplay period below ARM_MS and cycle 2 will commit — the card latches
+// on "Cleared" forever.
 const DEARM_MS = 900;
 const COMMIT_MS = 650;
 const ESCAPE_SPAN = 0.4; // fraction of drive range a triggered grain takes to finish moving

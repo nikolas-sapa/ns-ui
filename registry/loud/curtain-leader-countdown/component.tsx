@@ -432,7 +432,7 @@ export function CurtainLeaderCountdown({
       className={`relative h-full w-full overflow-hidden bg-background ${className}`}
       style={style}
     >
-      <canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0 block" />
+      <canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0 block h-full w-full" />
       {/* separate siblings, not nested — an aria-busy=true ancestor tells AT
           to withhold updates from its whole subtree, which would silently
           swallow the throttled live-region announcements below */}

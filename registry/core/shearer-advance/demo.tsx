@@ -8,6 +8,7 @@ const ROW_BATCH = 4;
 const MAX_ROWS = 18;
 const FETCH_MS = 2600; // one simulated "loading more rows" round trip
 const HOLD_MS = 1400; // sit on the freshly-appended rows before fetching again
+const EXHAUSTED_HOLD_MS = 2600; // sit on "no more rows" before the demo resets
 
 export default function ShearerAdvanceDemo() {
   const [rows, setRows] = useState(ROW_COUNT_START);
@@ -16,7 +17,10 @@ export default function ShearerAdvanceDemo() {
 
   // ambient state machine: appends a batch of rows every couple of seconds
   // until the list is exhausted, so the "list growing" side of the mapping
-  // is visible right next to the mechanism driving it — no scrolling needed
+  // is visible right next to the mechanism driving it — no scrolling needed.
+  // Exhausted is a real terminal state consumers will hit, so it's held
+  // legible for a beat, then the demo resets back to the start and loops
+  // forever rather than parking dead on a thumbnail.
   useEffect(() => {
     const timers: number[] = [];
     const step = () => {
@@ -34,6 +38,14 @@ export default function ShearerAdvanceDemo() {
           setLoading(!exhaustedNow);
           if (!exhaustedNow) {
             timers.push(window.setTimeout(step, HOLD_MS));
+          } else {
+            timers.push(
+              window.setTimeout(() => {
+                if (runRef.current !== myRun) return;
+                setRows(ROW_COUNT_START);
+                step();
+              }, EXHAUSTED_HOLD_MS)
+            );
           }
         }, FETCH_MS)
       );

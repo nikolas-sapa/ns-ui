@@ -129,6 +129,15 @@ export function CurtainTravelerDraw({ onOpenComplete, paused = false, className 
   const rightGroupRef = useRef<SVGGElement | null>(null);
   const leftRectRefs = useRef<(SVGRectElement | null)[]>([]);
   const rightRectRefs = useRef<(SVGRectElement | null)[]>([]);
+  // Opaque --ns-muted base, one per pleat, painted behind the gradient
+  // overlay rect. The overlay's crease notch dips stop-opacity to 0 across
+  // ~40% of each cell (by design — that's what makes the fold read as a
+  // fold), which would otherwise let the track/marker show straight through
+  // wherever two panels' notches happen to land over the same point at
+  // once (the resting overlap band). Same base+overlay split
+  // curtain-austrian-gather and curtain-tab-diagonal already use.
+  const leftBaseRefs = useRef<(SVGRectElement | null)[]>([]);
+  const rightBaseRefs = useRef<(SVGRectElement | null)[]>([]);
   const leftStopRefs = useRef<StopRefs[]>(Array.from({ length: PLEATS }, emptyStopRefs));
   const rightStopRefs = useRef<StopRefs[]>(Array.from({ length: PLEATS }, emptyStopRefs));
   const leftSagRef = useRef<SVGPathElement | null>(null);
@@ -185,6 +194,7 @@ export function CurtainTravelerDraw({ onOpenComplete, paused = false, className 
     if (bgRectRef.current) bgRectRef.current.setAttribute("fill", t.background);
     if (leftSagRef.current) leftSagRef.current.setAttribute("stroke", t.foreground);
     if (rightSagRef.current) rightSagRef.current.setAttribute("stroke", t.foreground);
+    for (const base of [...leftBaseRefs.current, ...rightBaseRefs.current]) base?.setAttribute("fill", t.muted);
     for (const refs of [...leftStopRefs.current, ...rightStopRefs.current]) {
       refs.base0?.setAttribute("stop-color", t.muted);
       refs.base1?.setAttribute("stop-color", t.muted);
@@ -243,6 +253,7 @@ export function CurtainTravelerDraw({ onOpenComplete, paused = false, className 
       side: "left" | "right",
       layout: { x: number; w: number }[],
       rectRefs: (SVGRectElement | null)[],
+      baseRefs: (SVGRectElement | null)[],
       stopRefs: StopRefs[],
       groupEl: SVGGElement | null,
       tx: number,
@@ -253,10 +264,18 @@ export function CurtainTravelerDraw({ onOpenComplete, paused = false, className 
       if (groupEl) groupEl.setAttribute("transform", `translate(${tx} 0)`);
       for (let i = 0; i < PLEATS; i++) {
         const rect = rectRefs[i];
+        const base = baseRefs[i];
         const cell = layout[i];
-        if (rect && cell) {
-          rect.setAttribute("x", String(cell.x));
-          rect.setAttribute("width", String(Math.max(0.5, cell.w)));
+        if (cell) {
+          const w = String(Math.max(0.5, cell.w));
+          if (rect) {
+            rect.setAttribute("x", String(cell.x));
+            rect.setAttribute("width", w);
+          }
+          if (base) {
+            base.setAttribute("x", String(cell.x));
+            base.setAttribute("width", w);
+          }
         }
         const phase = breathPhaseBase + i * 0.37 + (side === "right" ? 1.7 : 0);
         const crease = 0.5 + BREATH_AMP * Math.sin(phase);
@@ -275,8 +294,8 @@ export function CurtainTravelerDraw({ onOpenComplete, paused = false, className 
       }
     };
 
-    paintPanel("left", leftLayout, leftRectRefs.current, leftStopRefs.current, leftGroupRef.current, -OPEN_TX * progress, leftSagRef.current, 1, LEFT_X1);
-    paintPanel("right", rightLayout, rightRectRefs.current, rightStopRefs.current, rightGroupRef.current, OPEN_TX * progress, rightSagRef.current, -1, RIGHT_X0);
+    paintPanel("left", leftLayout, leftRectRefs.current, leftBaseRefs.current, leftStopRefs.current, leftGroupRef.current, -OPEN_TX * progress, leftSagRef.current, 1, LEFT_X1);
+    paintPanel("right", rightLayout, rightRectRefs.current, rightBaseRefs.current, rightStopRefs.current, rightGroupRef.current, OPEN_TX * progress, rightSagRef.current, -1, RIGHT_X0);
   };
 
   // --- reduced motion: one static peak-amplitude frame, no rAF ----------
@@ -323,18 +342,18 @@ export function CurtainTravelerDraw({ onOpenComplete, paused = false, className 
       if (leftGroupRef.current) leftGroupRef.current.setAttribute("transform", `translate(${-OPEN_TX} 0)`);
       if (rightGroupRef.current) rightGroupRef.current.setAttribute("transform", `translate(${OPEN_TX} 0)`);
       leftLayout.forEach((cell, i) => {
-        const rect = leftRectRefs.current[i];
-        if (rect) {
-          rect.setAttribute("x", String(cell.x));
-          rect.setAttribute("width", String(Math.max(0.5, cell.w)));
-        }
+        const w = String(Math.max(0.5, cell.w));
+        leftRectRefs.current[i]?.setAttribute("x", String(cell.x));
+        leftRectRefs.current[i]?.setAttribute("width", w);
+        leftBaseRefs.current[i]?.setAttribute("x", String(cell.x));
+        leftBaseRefs.current[i]?.setAttribute("width", w);
       });
       rightLayout.forEach((cell, i) => {
-        const rect = rightRectRefs.current[i];
-        if (rect) {
-          rect.setAttribute("x", String(cell.x));
-          rect.setAttribute("width", String(Math.max(0.5, cell.w)));
-        }
+        const w = String(Math.max(0.5, cell.w));
+        rightRectRefs.current[i]?.setAttribute("x", String(cell.x));
+        rightRectRefs.current[i]?.setAttribute("width", w);
+        rightBaseRefs.current[i]?.setAttribute("x", String(cell.x));
+        rightBaseRefs.current[i]?.setAttribute("width", w);
       });
       openRef.current = true;
       setOpen(true);
@@ -397,17 +416,27 @@ export function CurtainTravelerDraw({ onOpenComplete, paused = false, className 
   const renderPleats = (side: "left" | "right", x0: number, x1: number) => {
     const layout = layoutPleats(side, x0, x1, 0);
     return layout.map((cell, i) => (
-      <rect
-        key={i}
-        ref={(el) => {
-          (side === "left" ? leftRectRefs : rightRectRefs).current[i] = el;
-        }}
-        x={cell.x}
-        y={0}
-        width={cell.w}
-        height={VH}
-        fill={`url(#${gid(side, i)})`}
-      />
+      <g key={i}>
+        <rect
+          ref={(el) => {
+            (side === "left" ? leftBaseRefs : rightBaseRefs).current[i] = el;
+          }}
+          x={cell.x}
+          y={0}
+          width={cell.w}
+          height={VH}
+        />
+        <rect
+          ref={(el) => {
+            (side === "left" ? leftRectRefs : rightRectRefs).current[i] = el;
+          }}
+          x={cell.x}
+          y={0}
+          width={cell.w}
+          height={VH}
+          fill={`url(#${gid(side, i)})`}
+        />
+      </g>
     ));
   };
 
