@@ -3,6 +3,50 @@
 Single source of truth for the /changelog page. Each entry is a `## vX.Y.Z - YYYY-MM-DD`
 heading, a `###` title, then one paragraph of body. Newest first.
 
+## v0.25.0 - 2026-08-26
+
+### Round 8a: 34 components on two sourcing axes, and six card bugs a Retina display found
+
+Thirty-four components landed, taking the registry from 389 to 423. Two sourcing axes, both
+grounded in observed mechanics rather than invented categories. The first: glyph rendering
+TECHNIQUE. The registry's ~62 existing ASCII slugs all shared one pattern — simulate a scalar
+field, map luminance through a ramp glyph, keep most cells empty — so "which field to simulate"
+was exhausted and the open axis was the technique itself: sub-cell quadrant blocks, braille 2x4
+dot addressing, Sobel gradient ANGLE rather than magnitude, Floyd-Steinberg propagated error as
+against the existing ordered-dither family, void-and-cluster blue noise, PETSCII binary reverse
+video, sixel raster-versus-glyph contrast, teletext 2x3 sextants, typewriter overstrike, dot-matrix
+NLQ half-pitch, mezzotint (the registry's only subtractive mechanic), ZX Spectrum attribute clash,
+ClearType subpixel slivers, contact-screen dot gain. The second: real physical and industrial
+process — SMPTE film leader, three theatrical curtain riggings, same-ink halftone moire,
+rose-engine guilloche, capillary wicking, Jominy end-quench, green-sand shakeout, glaze
+bubble-and-heal, spark testing, longwall mining, Kelvin wake, crack-arrest stop-drilling, Faraday
+waves, thin-film telephone-cord buckling, axial slice-comb, text-as-geometry, silhouette glyph
+packing. Five components were cut on review after passing every gate: a storage tube, a cloud
+chamber, a gauge-block wringing panel, an eddy-current brake and a CRT glass wrapper — all built,
+all working, none earning their place. Then the owner looked at a card on a Retina display and
+found curtain-leader-countdown drawing itself past the bottom-right corner. A canvas is a replaced
+element, so `absolute inset-0` with no width/height CSS falls back to its intrinsic size: at dpr 2
+the CSS box became 4000x1800 inside a 2000x900 container, and at dpr 1 it coincidentally matched,
+which is why every automated check passed it. The audit that finding triggered turned up five more,
+each invisible to the gates for its own reason. empty-state-braille-orbit clamped its arc-length
+march to the per-frame time budget, forcing one sample per frame spaced by wall-clock time so the
+arc-length control never engaged at all, rendering a wandering four-dot fragment instead of an
+orbit. All three fabric curtains declared `autoplay: press`, and the embed card's driver fired a
+real click that opened them permanently — so the thumbnail recorded the revealed empty page rather
+than the drape, a bug `verify.ts` structurally cannot see because it navigates without the autoplay
+parameter. shearer-advance's demo was a one-shot state machine that filled to MAX_ROWS and stopped,
+freezing its card pixel-identical from t=13s onward. Three backgrounds had content-protection
+mechanisms that did not work at card size: the guilloche "portrait window" was a circle inscribed
+in min(w,h), starved by the shorter axis on a wide hero, and the canopy's protective origin bias
+sat inside its own content block, planting the trunk under the copy it existed to avoid. And two
+components rendered correctly but framed themselves badly — a grinding wheel pinned to a corner
+with 60% of its card empty, a ship wake filling its strip edge to edge. Hardening from the same
+sweep: shakeout-crumble's terminal committed state survives autoplay only because its period
+exceeds its arm window, which is now documented as load-bearing rather than left as a coincidence.
+docs/review-workflow.md records the whole review and verify recipe — the three-route split, the
+launch steps, the gate's hittability test, and every failure mode hit along the way — so the next
+round does not rediscover them.
+
 ## v0.24.0 - 2026-08-19
 
 ### Round 7: 63 new components, a card that framed itself on the cursor, and the guard that closes it
