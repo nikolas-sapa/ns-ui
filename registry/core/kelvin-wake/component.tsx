@@ -195,17 +195,35 @@ export function KelvinWake({
       if (cssW <= 0 || cssH <= 0) return;
 
       const halfH = cssH / 2;
+      // WAVE_MARGIN keeps the whole pattern — envelope, crests AND the
+      // diverging tails — inside a budget short of the strip's own edges,
+      // so ink never touches the frame and never hard-clips against the
+      // canvas bitmap mid-stroke. Budget is in the same lateral units the
+      // envelope angle produces (R·sin(PHI_MAX)), so it bounds every drawn
+      // element the same way, not just the crest arcs.
+      const WAVE_MARGIN = 0.82;
+      const budget = halfH * WAVE_MARGIN;
       // WAVELEN scales with the strip's own height, never a fixed px
       // constant, so crest spacing stays proportional at any rail scale.
-      const wavelen = clamp(cssH * 0.5, 8, 26);
-      const rMaxAllowed = halfH * 3.2; // sin(PHI_MAX) = 1/3 exactly, so R·sin(PHI_MAX) is the lateral reach
-      const n = Math.round(clamp(Math.floor(rMaxAllowed / wavelen), 2, 6));
+      // The 0.38 multiplier (down from a naive 0.5) is chosen so that,
+      // combined with WAVE_MARGIN above, three rings still fit the budget
+      // instead of collapsing to the documented floor of two.
+      const wavelen = clamp(cssH * 0.38, 8, 26);
+      // sin(PHI_MAX) = 1/3 exactly: k·wavelen·sin(PHI_MAX) is crest k's
+      // lateral reach, so the largest k that still fits inside budget is
+      // budget / (wavelen·sin(PHI_MAX)) — the exact invariant stays
+      // load-bearing here rather than hardcoding 3.
+      const n = clamp(Math.floor(budget / (wavelen * Math.sin(PHI_MAX))), 2, 6);
 
       const behindAngle = headingSign > 0 ? Math.PI : 0;
 
       // the envelope itself — drawn directly so the constant angle reads at
-      // a glance, not only implied by where crests happen to cusp
-      const envLen = Math.max(cssW, cssH) * 2;
+      // a glance, not only implied by where crests happen to cusp. Length is
+      // capped at the same budget (physically correct: the real wake DOES
+      // grow taller the further back you draw it, so the strip's height is
+      // exactly what limits how far behind the source it can be legibly
+      // drawn before it would exceed the frame).
+      const envLen = budget / Math.sin(PHI_MAX);
       ctx.strokeStyle = muted || "currentColor";
       ctx.lineWidth = 1;
       ctx.globalAlpha = 0.34;
@@ -233,7 +251,13 @@ export function KelvinWake({
         ctx.arc(sourceX, cy, r, angleA, angleB);
         ctx.stroke();
 
-        const divLen = wavelen * 1.6;
+        // cusp k already sits at k·wavelen·sin(PHI_MAX) of the budget; each
+        // ring's diverging tail is clamped to whatever budget remains
+        // beyond its own cusp, so the outermost ring's tail shortens
+        // instead of shooting past the frame and hard-clipping.
+        const cuspLateral = r * Math.sin(PHI_MAX);
+        const headroom = Math.max(0, budget - cuspLateral);
+        const divLen = Math.min(wavelen * 1.6, headroom / Math.cos(PHI_MAX));
         for (const ang of [angleA, angleB]) {
           const cuspX = sourceX + Math.cos(ang) * r;
           const cuspY = cy + Math.sin(ang) * r;
@@ -374,7 +398,7 @@ export function KelvinWake({
     <nav
       ref={navRef}
       aria-label="Primary"
-      className={`relative w-full border-b border-border bg-background ${className}`}
+      className={`relative w-full border-b border-border bg-background pb-2 ${className}`}
     >
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 pt-4">
         <a
