@@ -391,16 +391,19 @@ export function SparkTestId({
     let particles: Spark[] = [];
     let spawnAcc = 0;
 
-    // origin: the "wheel contact point" — fixed low-left, scaled to the
-    // container's smaller dimension so density/length read at any preview
-    // size, per the scale rule.
+    // origin: the "wheel contact point" — centre-left rather than the
+    // corner, scaled to the container's smaller dimension so density/length
+    // read at any preview size, per the scale rule. Sitting mid-height
+    // leaves the ballistic cone room to arc up through the top of the
+    // frame and fall back down without colliding with the label block
+    // pinned to the bottom of the dropzone.
     const scaleDim = () => Math.min(w, h);
-    const originX = () => w * 0.14;
-    const originY = () => h * 0.82;
+    const originX = () => w * 0.22;
+    const originY = () => h * 0.52;
     const baseAngle = -55; // degrees, up-and-right cone axis
     const gravity = () => scaleDim() * 1.7; // px/s^2, arcs the stream down
-    const baseSpeed = () => scaleDim() * 1.15; // px/s
-    const baseLife = 0.62; // s, before signature carrierMul
+    const baseSpeed = () => scaleDim() * 1.55; // px/s
+    const baseLife = 0.78; // s, before signature carrierMul
 
     const spawnSpark = (
       arr: Spark[],
