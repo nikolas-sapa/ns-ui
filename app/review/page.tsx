@@ -140,8 +140,11 @@ export default function ReviewPage() {
     r8a: true,
     r8b: true,
   });
+  // Opens on the newest round only — older rounds have already been judged,
+  // and their state lives in .review-state.json. Toggle them back on in the
+  // filter bar to re-review anything earlier.
   const [roundsOn, setRoundsOn] = useState<Record<string, boolean>>(
-    () => Object.fromEntries(ROUNDS.map((r) => [r, true])),
+    () => Object.fromEntries(ROUNDS.map((r) => [r, r === ROUNDS[ROUNDS.length - 1]])),
   );
   const [lanesOn, setLanesOn] = useState<Record<Lane, boolean>>({
     identity: true,
@@ -455,6 +458,11 @@ export default function ReviewPage() {
             className="min-h-11 w-full min-w-0 flex-1 rounded-sm border border-border bg-surface px-2.5 py-1 text-sm text-foreground outline-none transition-colors placeholder:text-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none sm:min-h-0 sm:w-56 sm:flex-none"
           />
 
+          <details className="w-full">
+            <summary className="w-fit cursor-pointer list-none text-sm text-ns-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent">
+              Filters
+            </summary>
+            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2.5">
           <div role="group" aria-label="Filter by group" className="flex items-center gap-1">
             {GROUPS.map((g) => {
               const selected = groupsOn[g];
@@ -523,6 +531,8 @@ export default function ReviewPage() {
               );
             })}
           </div>
+            </div>
+          </details>
 
           <div role="group" aria-label="Filter by verdict" className="flex items-center gap-1">
             {STATUSES.map((s) => {
@@ -571,17 +581,22 @@ export default function ReviewPage() {
       </div>
 
       {hydrated && jumpIndex.length > 0 ? (
-        <nav aria-label="Jump to row" className="mt-4 flex flex-wrap gap-x-3 gap-y-1">
-          {jumpIndex.map(({ slug }) => (
-            <a
-              key={slug}
-              href={`#row-${slug}`}
-              className="rounded-sm font-mono text-[11px] text-ns-muted underline-offset-2 outline-none transition-colors hover:text-foreground hover:underline focus-visible:ring-2 focus-visible:ring-ns-accent"
-            >
-              {slug}
-            </a>
-          ))}
-        </nav>
+        <details className="mt-4">
+          <summary className="w-fit cursor-pointer list-none font-mono text-[11px] text-ns-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent">
+            Jump to row ({jumpIndex.length})
+          </summary>
+          <nav aria-label="Jump to row" className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
+            {jumpIndex.map(({ slug }) => (
+              <a
+                key={slug}
+                href={`#row-${slug}`}
+                className="rounded-sm font-mono text-[11px] text-ns-muted underline-offset-2 outline-none transition-colors hover:text-foreground hover:underline focus-visible:ring-2 focus-visible:ring-ns-accent"
+              >
+                {slug}
+              </a>
+            ))}
+          </nav>
+        </details>
       ) : null}
 
       {/* Group A */}

@@ -22,26 +22,30 @@ import { useEffect, useRef } from "react";
 //
 // THE ROW-SCAN ARTIFACT: a real multiplex board's per-row scan is invisible
 // at rest — that's the whole point of persistence of vision. It only ever
-// becomes visible when something samples the panel faster or slower than
-// its own full-panel refresh, e.g. filming an LED sign with a camera whose
-// shutter/frame rate doesn't divide evenly into the panel's scan rate
-// produces a rolling dark band drifting through the image — a real,
-// well-documented artifact (the reason dashcam footage often shows black
-// bars through LED traffic signage). This component reproduces that
-// honestly rather than faking it: the scan clock runs at the real
-// ROW_SCAN_HZ, and a browser's paint rate is never an even multiple of the
-// resulting full-panel refresh, so the currently-addressed row naturally
-// drifts through the panel frame to frame — the same beat/alias artifact,
-// for real, not simulated separately from the actual scan timing.
+// becomes visible when something samples the panel at a rate that doesn't
+// divide evenly into its own full-panel refresh, e.g. filming an LED sign
+// with a camera whose shutter/frame rate doesn't line up with the panel's
+// scan rate produces a soft band drifting through the image (the reason
+// dashcam footage sometimes shows a faint bar through LED signage). A literal
+// 1:1 real-time render of the raw ROW_SCAN_HZ clock against a ~60Hz browser
+// paint rate aliases close enough to the paint rate itself to read as a hard
+// strobe/flicker — a rendering-pipeline artifact, not the calm hardware
+// phenomenon it's meant to represent. So the scan address (ROW_SCAN_HZ,
+// documented below, is the real underlying clock) is deliberately mapped onto
+// a slow, continuous sweep position instead of a discrete per-frame row
+// index: a soft brightness gradient a couple of rows wide, low amplitude,
+// drifting the full height of the panel and back over several seconds — the
+// same round-robin row addressing concept, legible on a second look, without
+// ever strobing near the paint rate.
 // ---------------------------------------------------------------------------
 
 const ROWS = 5;
-const ROW_SCAN_HZ = 240; // each row is the active scan target for 1000/240 ~= 4.17ms
-const ROW_SLICE_MS = 1000 / ROW_SCAN_HZ;
-const FULL_CYCLE_MS = ROWS * ROW_SLICE_MS; // ~20.8ms, ~48Hz full-panel refresh
+const ROW_SCAN_HZ = 240; // real per-row multiplex clock this component represents
 const PWM_LEVELS = 8; // 3-bit duty-cycle depth
 const GUTTER_PX = 3; // gap between dots, ~2-4px per spec
-const SCAN_HIGHLIGHT_ALPHA = 0.22; // luminance-only boost on the actively-scanned row
+const SWEEP_PERIOD_S = 7.5; // one full down-and-back sweep across the panel
+const SWEEP_SIGMA_ROWS = 1.4; // gradient softness, in rows — wide, not a 1-row strip
+const SCAN_HIGHLIGHT_ALPHA = 0.055; // luminance-only, low-amplitude boost at the sweep's center
 const MIN_ON_ALPHA = 0.16; // floor so PWM band 1/8 never rounds to invisible in light theme
 
 // slow generative "sensor" field used only when no external `value` prop is
@@ -52,6 +56,14 @@ function sensorValue(t: number) {
     Math.sin(t * 0.17) + 0.5 * Math.sin(t * 0.43 + 1.3) + 0.3 * Math.sin(t * 0.08 + 2.1);
   const norm = f / 1.8; // amplitude sum 1.8 -> -1..1
   return 55 + norm * 32; // ~23..87
+}
+
+// continuous sweep position, in row units (0..ROWS-1), a slow triangle wave
+// so the drift is smooth and reverses without a jump-cut at either end
+function sweepPosition(t: number) {
+  const phase = (t % SWEEP_PERIOD_S) / SWEEP_PERIOD_S; // 0..1
+  const tri = phase < 0.5 ? phase * 2 : 2 - phase * 2; // 0 -> 1 -> 0
+  return tri * (ROWS - 1);
 }
 
 export interface MeterMatrixScanProps {
@@ -121,13 +133,9 @@ export function MeterMatrixScan({
       sized = true;
     };
 
-    // globalT: seconds, drives the simulated sensor field when `value` is
-    // uncontrolled. Never resets.
+    // globalT: seconds, drives both the simulated sensor field (when
+    // `value` is uncontrolled) and the sweep position. Never resets.
     let globalT = 0;
-    // scanClock: ms, the real row-scan clock. Advances 1:1 with wall time
-    // regardless of the browser's paint rate — the beat between this and
-    // the render rate is what makes the scan band drift, not a fudge.
-    let scanClock = 0;
 
     const currentValue = () => {
       const external = valueRef.current;
@@ -135,7 +143,7 @@ export function MeterMatrixScan({
       return Math.min(max, Math.max(0, v));
     };
 
-    const draw = (scanRow: number | null) => {
+    const draw = (sweepPos: number | null) => {
       if (!sized) return;
       const w = cols * cellSize;
       ctx.clearRect(0, 0, w, height);
@@ -151,7 +159,14 @@ export function MeterMatrixScan({
 
       for (let r = 0; r < ROWS; r++) {
         const cy = r * cellSize + cellSize / 2;
-        const rowScanning = scanRow !== null && r === scanRow;
+        // soft Gaussian weight of this row against the sweep's current
+        // center — a wide, low-amplitude bump, not a hard on/off strip, so
+        // several rows share a gentle gradient rather than one strobing
+        let sweepBoost = 0;
+        if (sweepPos !== null) {
+          const d = r - sweepPos;
+          sweepBoost = SCAN_HIGHLIGHT_ALPHA * Math.exp(-(d * d) / (2 * SWEEP_SIGMA_ROWS * SWEEP_SIGMA_ROWS));
+        }
         for (let c = 0; c < cols; c++) {
           let level = 0;
           if (c < fullCols) level = PWM_LEVELS;
@@ -160,7 +175,7 @@ export function MeterMatrixScan({
 
           let alpha = level / PWM_LEVELS;
           alpha = Math.max(MIN_ON_ALPHA, alpha);
-          if (rowScanning) alpha = Math.min(1, alpha + SCAN_HIGHLIGHT_ALPHA);
+          alpha = Math.min(1, alpha + sweepBoost);
 
           const cx = c * cellSize + cellSize / 2;
           ctx.globalAlpha = alpha;
@@ -169,19 +184,19 @@ export function MeterMatrixScan({
           ctx.arc(cx, cy, radius, 0, Math.PI * 2);
           ctx.fill();
         }
+
+        // the same soft gradient laid across only the off (background)
+        // columns of this row — what makes the sweep legible independent of
+        // the value fill, luminance only, never a hard band. Confined to the
+        // unlit region so it never stacks on top of an already-boosted dot.
+        const offStartX = Math.min(w, (fullCols + 1) * cellSize);
+        if (sweepBoost > 0.002 && offStartX < w) {
+          ctx.globalAlpha = sweepBoost * 0.7;
+          ctx.fillStyle = fg;
+          ctx.fillRect(offStartX, r * cellSize, w - offStartX, cellSize);
+        }
       }
       ctx.globalAlpha = 1;
-
-      // the scan indicator itself: a faint full-width band at the
-      // currently-addressed row's position, visible even across the off
-      // (background) region — this is what makes the row-scan mechanic
-      // legible independent of the value fill, luminance only.
-      if (scanRow !== null) {
-        ctx.globalAlpha = SCAN_HIGHLIGHT_ALPHA * 0.6;
-        ctx.fillStyle = fg;
-        ctx.fillRect(0, scanRow * cellSize, w, cellSize);
-        ctx.globalAlpha = 1;
-      }
 
       wrapper.setAttribute("aria-valuenow", String(Math.round(currentValue())));
     };
@@ -194,9 +209,7 @@ export function MeterMatrixScan({
       const dtMs = last ? Math.min(250, now - last) : 1000 / 60;
       last = now;
       globalT += dtMs / 1000;
-      scanClock += dtMs;
-      const scanRow = Math.floor((scanClock % FULL_CYCLE_MS) / ROW_SLICE_MS);
-      draw(scanRow);
+      draw(sweepPosition(globalT));
       if (!document.hidden) raf = requestAnimationFrame(loop);
     };
 
@@ -216,7 +229,7 @@ export function MeterMatrixScan({
         resizeTimer = null;
         readTokens();
         resize();
-        draw(reduced ? null : Math.floor((scanClock % FULL_CYCLE_MS) / ROW_SLICE_MS));
+        draw(reduced ? null : sweepPosition(globalT));
       }, 150);
     };
     const ro = new ResizeObserver(onResize);
@@ -251,14 +264,14 @@ export function MeterMatrixScan({
     resize();
 
     if (reduced) {
-      // freeze with the scan phase locked at row 0 — no partial mid-scan
-      // row visible, every row rendered as if simultaneously lit — at a
-      // value past the field's cold-start instant, same convention as this
-      // registry's other generative components.
+      // freeze with the sweep locked off entirely — no gradient visible,
+      // every row rendered as if simultaneously lit at its true duty level —
+      // at a value past the field's cold-start instant, same convention as
+      // this registry's other generative components.
       globalT = 1.4;
       draw(null);
     } else {
-      draw(0);
+      draw(sweepPosition(globalT));
       raf = requestAnimationFrame(loop);
     }
 
