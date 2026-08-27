@@ -4,7 +4,8 @@
  * component's own meta.json description where no note was given. Never read
  * by build-registry.ts or anything else; safe to edit freely.
  *
- * Four groups now (round r8a added a fourth, see bottom of the array):
+ * Five groups now (round r8a added a fourth, round r8b a fifth, see bottom
+ * of the array):
  *   A "fixed"     — re-test, owner already flagged these with a note (see
  *                   .review-state.json, keyed by slug — never cleared here).
  *                   Row copy (change/watch) must describe the MOST RECENT
@@ -21,21 +22,24 @@
  *                   feat/r7-integration, so the lane is included below.
  *                   Group sizes are read live off this array's own group
  *                   field in page.tsx (FIXED_COUNT/UNTESTED_COUNT/
- *                   EXPANSION_COUNT/R8A_COUNT) — never hardcode a count in
- *                   prose here or there.
+ *                   EXPANSION_COUNT/R8A_COUNT/R8B_COUNT) — never hardcode a
+ *                   count in prose here or there.
  *   D "r8a"       — round 8a's 34 components, ported from the throwaway
  *                   app/r8a/page.tsx lab (left in place, untouched). No
  *                   lane: r8a's own thematic groupings (curtains,
  *                   backgrounds, heroes, ...) are a different axis than the
  *                   identity/money/living lane enum, so they live in each
  *                   row's `eyeball` text and the page's jump index instead.
+ *   E "r8b"       — round 8b's 16 components, registered normally (unlike
+ *                   r8a, no throwaway lab page was needed). Also flat, no
+ *                   lane, same reasoning as r8a.
  */
 
 export type Lane = "identity" | "money" | "living" | "multiplayer" | "reliability" | "wayfinding";
 
 export type ReviewItem = {
   slug: string;
-  group: "fixed" | "untested" | "expansion" | "r8a";
+  group: "fixed" | "untested" | "expansion" | "r8a" | "r8b";
   lane?: Lane;
   /** Group A only: one line of what changed. */
   change?: string;
@@ -702,5 +706,136 @@ export const REVIEW_ITEMS: ReviewItem[] = [
     note: "Replaces: hero / full-bleed background.",
     eyeball:
       "The wordmark silhouette needs more resolved particles per unit area than the star or orbit silhouettes to read cleanly, so it's the first of the three to degrade at card size — check it specifically at small containers, not just full-bleed.",
+  },
+
+  // Group E — round 8b's 16 components, flat (no lane), same reasoning as
+  // r8a. Core tier first, then loud.
+  {
+    slug: "gravure-cell-wipe",
+    group: "r8b",
+    round: "r8b",
+    note: "Replaces: divider / background texture strip.",
+    eyeball:
+      "Look for a genuine engraved-depth story, not a scanline: individual cell alpha should vary by depth (some cells read darker than their neighbours at the same wipe-age), and roughly half the strip should read raw/unwiped-dense at any instant with the other half settled — not just a thin band trailing the blade. Count cells across the short axis; fewer than ~20 means the pitch clamp failed and the mechanic is illegible.",
+  },
+  {
+    slug: "riso-drum-pass",
+    group: "r8b",
+    round: "r8b",
+    note: "Replaces: loader / background ambient texture.",
+    eyeball:
+      "Check the cumulative registration offset across the three passes — each pass should visibly land ~1.3px/0.7px off the last, producing real moiré/drift where dot fields overlap, not a static halftone. Builder flag: DOT_THRESHOLD and THRESHOLD_DELTA weren't specified in the spec — dot density and the inter-pass registration doubling are the builder's own guesses, so judge whether the density and drift both actually read at card scale rather than assuming the numbers are load-bearing. If it looks like one flat dither pattern with no drift or drum-rotation sweep, the mechanic has collapsed into chart-bar-halftone's territory.",
+  },
+  {
+    slug: "screen-flood-stroke",
+    group: "r8b",
+    round: "r8b",
+    note: "Replaces: loader / ambient progress indicator.",
+    eyeball:
+      "Two distinct passes must be visible: a light, low-alpha flood smear and a firm high-alpha print pass that actually leaves ink behind, decaying toward a residual ghost floor rather than fully clearing — check for a lingering stain, not a wipe to nothing. Builder flag: the reduced-motion freeze lands at 1140ms (the spec's named '60%-printed' frame), not the spec's literal 1500ms — confirm that's still a legible mid-print-stroke read, not a drift into the wrong phase.",
+  },
+  {
+    slug: "roller-occlusion",
+    group: "r8b",
+    round: "r8b",
+    note: "Replaces: loader / progress ambient.",
+    eyeball:
+      "The tube must pinch fully closed (~4% width) under an occluding roller and rebound asymmetrically (60ms close / 90ms release), not a symmetric squash. Builder flag: roller radius is built at 0.62x tube diameter, not the spec's 12% — at 12% the roller could never physically flatten the tube to full occlusion, so check specifically whether the tube actually closes to near-zero width at contact, or just dents.",
+  },
+  {
+    slug: "peen-coverage",
+    group: "r8b",
+    round: "r8b",
+    note: "Replaces: background / ambient card texture.",
+    eyeball:
+      "Watch for the Avrami saturation story: new impacts should increasingly land on already-dimpled area as coverage climbs (patchy, then dense stipple), not an even tiled fill-in. At the cycle's peak the whole surface should visibly fade back to blank over ~700ms and restart — check that reads as a deliberate 'fresh part loaded' beat, not a glitch or a dead frame.",
+  },
+  {
+    slug: "eink-waveform-ghost",
+    group: "r8b",
+    round: "r8b",
+    note: "Replaces: empty state.",
+    eyeball:
+      "At any glance, a scattered handful of cells — not the whole panel — should be mid-transition, each flashing briefly to full black/white before landing on its true grey; that per-cell shoot-through must be the dominant motion, not the periodic ~14s full-panel black/white refresh flash. If you only ever notice motion during the refresh flash, the continuous per-cell layer has failed to register.",
+  },
+  {
+    slug: "lcd-response-smear",
+    group: "r8b",
+    round: "r8b",
+    note: "Replaces: card.",
+    eyeball:
+      "The overshoot must read as a discrete spike-then-settle, not a soft trailing blur (that would be kelvin-wake's mechanic, not this one) — and the rising overshoot should look visibly different from the falling undershoot. Builder flag: GtG keyframe timings are scaled 20x the spec's literal ms values (ratios kept exact) specifically so the overshoot is perceptible at 60fps at all — verify it still reads as a fast discrete settle, not a slow smear that's drifted into motion-blur territory.",
+  },
+  {
+    slug: "divider-mosaic-split",
+    group: "r8b",
+    round: "r8b",
+    note: "Replaces: divider.",
+    eyeball:
+      "The gap between lit sub-cell blocks must be a real unpainted background gap, not an optical illusion of contrast — check specifically in light theme at small card widths that each tile still looks separated, not fused into a solid contiguous shape (which would make it indistinguishable from divider-teletext-mosaic). Confirm the column-wise write sweep reads as a genuinely different cadence from the teletext sibling's row-wise sweep.",
+  },
+  {
+    slug: "meter-matrix-scan",
+    group: "r8b",
+    round: "r8b",
+    note: "Replaces: meter.",
+    eyeball:
+      "Brightness bands must look like 8 discrete quantized steps, not a smooth analog gradient — check adjacent LEDs for banding rather than a blend, especially the faintest 'on' band against a light-theme background. Also check for a fleeting moment where the row-scan structure itself (one row lit ahead of the others) is visible, not just a permanently-simultaneous static readout — a panel that never shows scan banding has faked the multiplex mechanic in software only.",
+  },
+  {
+    slug: "overflow-chip-mux",
+    group: "r8b",
+    round: "r8b",
+    note: "Replaces: list/tag overflow indicator.",
+    eyeball:
+      "Seed with more than 8 items (below budget, nothing should multiplex at all) and watch the visible chip subset actually rotate every ~130ms — a different set of 8 at t0/2.5s/5s. Check the accessibility layer independently of the visual flicker: an sr-only list of every item plus a visible 'N of M shown' count must both be present at all times, not just the flickering subset.",
+  },
+  {
+    slug: "bed-fluidize",
+    group: "r8b",
+    round: "r8b",
+    note: "Replaces: hero background.",
+    eyeball:
+      "Track one bubble's full life: it should nucleate small near the floor, visibly grow as it rises, possibly merge with another bubble it touches, then burst at the surface with an ejected particle spray — not generic noise churn. Builder flag: this was built in 2D canvas, not the WebGL the spec calls for — judge whether particle density and bubble legibility still hold up at card scale despite the lower-cost renderer, since sparse-at-card-scale is exactly the failure mode WebGL was specified against.",
+  },
+  {
+    slug: "tray-weep",
+    group: "r8b",
+    round: "r8b",
+    note: "Replaces: divider / background band.",
+    eyeball:
+      "Find a weeping cap: during a weep event its bubbling should visibly reverse to a downward droplet, not just pause — that direction reversal is the one mechanic that makes this read as a distillation tray rather than generic bubbling. Also check that trays are NOT in phase with each other (each should sit at a different froth/spill point) — if every band looks identical, it's been tiled rather than cascaded.",
+  },
+  {
+    slug: "offset-fountain-split",
+    group: "r8b",
+    round: "r8b",
+    note: "Replaces: hero / background.",
+    eyeball:
+      "Watch one region of banding over several seconds: it should visibly even out as the roller cascade smears it, while a new uneven band forms elsewhere — never settling flat, since the fountain-key drift never stops. If it just looks like drifting cloud noise with no evening-out/reforming story, or needs color to read the split, it's failed. Builder flag: built in 2D canvas, not the WebGL the spec calls for — check performance and banding legibility at full-bleed scale specifically.",
+  },
+  {
+    slug: "film-gate-weave",
+    group: "r8b",
+    round: "r8b",
+    note: "Replaces: background.",
+    eyeball:
+      "The gate rectangle (2px, full-opacity foreground) must never move — only the crosshair/circle test pattern inside it drifts and bounces. Confirm there's a genuine, always-nonzero gap between the fixed gate edge and the drifting content at any glance, not just at select instants; the content should never sit flush. This has no sprocket-hole chrome at all — if it's being confused with scrubber-film-strip, something's wrong.",
+  },
+  {
+    slug: "rolling-shutter-skew",
+    group: "r8b",
+    round: "r8b",
+    note: "Replaces: background.",
+    eyeball:
+      "The vertical rule grid should bend smoothly into a parallelogram, never jump or tear — a discontinuity would mean this has drifted into flyback-tear's failure mode, which this concept exists specifically to avoid. Builder flag: pan amplitude is scaled ~6x over the spec's literal numbers — at the spec's literal value the skew would only be 2-3px and invisible on a laptop panel — check whether the shear now reads as a deliberate rolling-shutter bend or has become an obviously exaggerated wobble.",
+  },
+  {
+    slug: "hero-beam-glyph",
+    group: "r8b",
+    round: "r8b",
+    note: "Replaces: hero wordmark.",
+    eyeball:
+      "Corners and stroke endpoints should visibly glow brighter than long straight runs — check this holds in both themes, not just dark. Builder flag: the stroke font is hand-authored, not a real digitized Hershey set — check the B, R, S, and 8 letterforms specifically for stroke topology that doesn't actually match how those letters are conventionally drawn (open counters, wrong stroke count/order) before trusting the wordmark reads correctly at a glance.",
   },
 ];
