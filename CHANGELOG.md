@@ -3,6 +3,12 @@
 Single source of truth for the /changelog page. Each entry is a `## vX.Y.Z - YYYY-MM-DD`
 heading, a `###` title, then one paragraph of body. Newest first.
 
+## v0.26.0 - 2026-08-27
+
+### Round 8b: 16 components across four sourcing axes, and two the owner sent back
+
+Sixteen components took the registry from 423 to 439, sourced on four axes rather than round 8a's two: glyph and character-cell rendering technique (NAPLPS separated mosaic, row-multiplexed LED panel, sprite multiplexing, vector-display beam retrace), print and bindery process (rotogravure doctor-blade wipe, risograph multi-pass registration drift, screen-print flood-and-stroke, web-offset ink-train cascade), industrial and fluid process (peristaltic pump occlusion, shot-peening coverage saturation, gas-fluidized bed, bubble-cap distillation tray), and display-hardware artifacts (e-ink waveform ghosting, LCD overdrive overshoot, CMOS rolling shutter, projector gate weave). All sixteen passed the automated gate on the first review pass, and fourteen passed owner review untouched. The two that came back were both legibility failures rather than mechanism failures: meter-matrix-scan's 240Hz row-scan clock aliased against the 60Hz paint rate and read as a strobe rather than as multiplexing, fixed by decoupling the visual into a 7.5s soft sweep while keeping the PWM boundary-column quantization that is the component's actual identity; and overflow-chip-mux rotated its slots every 130ms, which is faster than anyone can follow, now 1100ms with an explicit leave-then-arrive rather than a blink. The client JS budget was re-baselined from 1778 KB to 2033 KB, and the growth was traced before accepting it: the largest chunk is the registry metadata index carrying every component's description and instruction prose, not component code, so the honest upgrade path is to stop shipping the instruction field to the client rather than to keep raising the ceiling.
+
 ## v0.25.0 - 2026-08-26
 
 ### Round 8a: 34 components on two sourcing axes, and six card bugs a Retina display found
