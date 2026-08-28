@@ -147,8 +147,11 @@ function computeGeom(w: number, h: number): Geom {
   const diffStartX = throatX + throatZoneHalf;
   const sidePortX = coneEndX - ductLen * 0.05;
   const sideT = clamp01((sidePortX - ductLeft) / Math.max(1, coneEndX - ductLeft));
-  const sideWallHalf = lerp(inletHalf, throatHalf, sideT ** 3);
-  const sidePortY = centerY - sideWallHalf * 1.9;
+  // Must match widthHalfAt's cone easing (smoothstep, not the old cubic) so
+  // this anchor and drawOutline's wallY agree — otherwise the "stub" stretches
+  // from wherever this landed down to the actual wall, sometimes off-canvas.
+  const sideWallHalf = lerp(inletHalf, throatHalf, smoothstep(sideT));
+  const sidePortY = centerY - sideWallHalf - inletHalf * 0.45;
   const mergeX = throatX - throatZoneHalf * 0.9;
   const cell = min / 40;
   return {
