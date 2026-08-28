@@ -4,8 +4,8 @@
  * component's own meta.json description where no note was given. Never read
  * by build-registry.ts or anything else; safe to edit freely.
  *
- * Five groups now (round r8a added a fourth, round r8b a fifth, see bottom
- * of the array):
+ * Six groups now (round r8a added a fourth, round r8b a fifth, round r9 a
+ * sixth, see bottom of the array):
  *   A "fixed"     — re-test, owner already flagged these with a note (see
  *                   .review-state.json, keyed by slug — never cleared here).
  *                   Row copy (change/watch) must describe the MOST RECENT
@@ -33,13 +33,19 @@
  *   E "r8b"       — round 8b's 16 components, registered normally (unlike
  *                   r8a, no throwaway lab page was needed). Also flat, no
  *                   lane, same reasoning as r8a.
+ *   F "r9"        — round 9's 28 components, registered normally, same flat
+ *                   no-lane shape as r8b. `eyeball` lines fold in each
+ *                   builder's own self-flagged deviations/risks (e.g. a
+ *                   spec number deliberately not followed, an unverified
+ *                   light-theme pass) verbatim, so the owner judges those
+ *                   directly rather than discovering them independently.
  */
 
 export type Lane = "identity" | "money" | "living" | "multiplayer" | "reliability" | "wayfinding";
 
 export type ReviewItem = {
   slug: string;
-  group: "fixed" | "untested" | "expansion" | "r8a" | "r8b";
+  group: "fixed" | "untested" | "expansion" | "r8a" | "r8b" | "r9";
   lane?: Lane;
   /** Group A only: one line of what changed. */
   change?: string;
@@ -837,5 +843,234 @@ export const REVIEW_ITEMS: ReviewItem[] = [
     note: "Replaces: hero wordmark.",
     eyeball:
       "Corners and stroke endpoints should visibly glow brighter than long straight runs — check this holds in both themes, not just dark. Builder flag: the stroke font is hand-authored, not a real digitized Hershey set — check the B, R, S, and 8 letterforms specifically for stroke topology that doesn't actually match how those letters are conventionally drawn (open counters, wrong stroke count/order) before trusting the wordmark reads correctly at a glance.",
+  },
+
+  // Group F — round 9's 28 components, flat (no lane), same reasoning as
+  // r8a/r8b. `eyeball` folds in each builder's own self-flagged deviations
+  // and unverified risks verbatim (see the header comment above) alongside
+  // the spec's own kill criteria / legibility line.
+  {
+    slug: "interlace-field-comb",
+    group: "r9",
+    round: "r9",
+    note: "Replaces: full-bleed hero / background band.",
+    eyeball:
+      "The comb serration must appear only on a moving diagonal edge and visibly grow then shrink on the ~4.0s re-weave cycle (divergence -> clean weave -> divergence) — if the 1-3px scanline pitch reads as a static soft gradient with no comb at any phase, that's the spec's named kill condition. Confirm the weave-to-clean moment is genuinely sharp, not a residual blur.",
+  },
+  {
+    slug: "chargen-rom-slice",
+    group: "r9",
+    round: "r9",
+    note: "Replaces: loader / status glyph moment.",
+    eyeball:
+      "Track one glyph's hard horizontal seam moving down through its 8 rows at 35ms/row (~280ms/glyph) — if it reads as a generic fade/wipe rather than discrete slice-by-slice fetch, that's the named kill condition. Builder flag: t0 is deliberately seeded 170ms into the cycle so the t0/2.5s/5s screenshots don't all land on the same 500ms hold — if that offset or any timing constant gets retuned, re-check the three samples still actually differ.",
+  },
+  {
+    slug: "scroll-fine-register",
+    group: "r9",
+    round: "r9",
+    note: "Replaces: divider / footer band.",
+    eyeball:
+      "Confirm the numeric coarse/fine readout is genuinely tied to the visible tile snap, not decorative debug text that could be deleted with zero loss of legibility (the named kill condition) — watch one tile slide over the 480ms sawtooth and the coarse counter tick exactly once per snap. Builder flags: the marker only travels ~7px per sweep at the 8px cell floor any divider-height band will hit, which may read as jitter rather than followable motion — exactly round 8b's legibility failure — check this specifically at divider height; also unverified is the bracket's contrast over the tile strip in light theme.",
+  },
+  {
+    slug: "bitplane-cascade",
+    group: "r9",
+    round: "r9",
+    note: "Replaces: full-bleed hero / background band.",
+    eyeball:
+      "Watch plane 0's coarse silhouette hold fixed while three more binary-weighted planes visibly step in around it at a 350ms cadence — if it reads as smooth interpolation rather than four distinct stepped arrivals, that's the named kill condition. Builder flag: built MSB-first, not the spec's literal LSB-first place-value order — confirm the coarse-to-fine reveal still reads correctly (coarsest structure first) despite the reversed bit order.",
+  },
+  {
+    slug: "delta-frame-macroblock",
+    group: "r9",
+    round: "r9",
+    note: "Replaces: background band / divider.",
+    eyeball:
+      "Pick one flagged block and confirm its outline flashes then fades over ~340ms while every neighboring block visibly does nothing — if the flagged/unflagged distinction reads as generic grid shimmer instead of discrete per-block change events, that's the named kill condition. Builder flag: flags-per-tick capped to 2-4 blocks instead of the spec's 6-10%, because 6-10% overlapped into continuous shimmer — judge whether 2-4 blocks/tick still reads as a legible, countable change-detection decision rather than under-selling the mechanic.",
+  },
+  {
+    slug: "grinding-chatter-lobes",
+    group: "r9",
+    round: "r9",
+    note: "Replaces: loader / activity indicator.",
+    eyeball:
+      "Watch the rim grow from near-circular to visibly scalloped over the full 6s growth arc, then check it holds a fixed lobe count until a dress event clears it — lobe count changing mid-growth, or amplitude falling below the perceptual floor at minimum card width before the 2.5s checkpoint, are both named kill conditions. Builder flags: pointer boost scales amplitude rather than warping the growth curve; rim gradient contrast in light theme is unverified — check both.",
+  },
+  {
+    slug: "profilometer-trace",
+    group: "r9",
+    round: "r9",
+    note: "Replaces: divider.",
+    eyeball:
+      "Watch the ring-buffer wrap point specifically for a visible jump/seam — that's a named kill condition — and confirm scroll speed holds steady at 24px/s regardless of frame rate (elapsed-time-driven, not frame-count-driven). Check trace amplitude doesn't fall below the perceptual floor at minimum divider height/card width.",
+  },
+  {
+    slug: "edm-crater-field",
+    group: "r9",
+    round: "r9",
+    note: "Replaces: hero / full-bleed background.",
+    eyeball:
+      "Pick one crater and watch its full 5.5s birth-to-fade lifetime — the field's overall density must hold visually constant (steady-state birth rate balanced by erosion), never accumulating toward a saturated, static-looking surface, which is the named kill condition and exactly the failure this spec exists to avoid. Confirm the raised-rim glint reads from value/shading alone, no hue.",
+  },
+  {
+    slug: "cmm-probe-touch",
+    group: "r9",
+    round: "r9",
+    note: "Replaces: empty state.",
+    eyeball:
+      "Watch one station's full approach-touch-flash-retract-travel cycle at 1.2s/station — a station-to-station jump that reads as instant/blinking rather than showing real approach/retract motion is the named kill condition (the exact overflow-chip-mux failure). Confirm the lap never completes and stops (it must index forever) and that the trailing fade of recently-touched points reads as a legible recent-history trail, not noise.",
+  },
+  {
+    slug: "honing-crosshatch",
+    group: "r9",
+    round: "r9",
+    note: "Replaces: background / ambient card texture.",
+    eyeball:
+      "Pick a single scratch stroke and watch it fade over its full 4.5s lifetime while the two crosshatch families' angle stays visually fixed (a controlled process parameter, not incidental) and aggregate density holds steady — angle drift/scatter, or density saturating solid or emptying out, are both named kill conditions. Builder flag: light theme is unverified.",
+  },
+  {
+    slug: "toner-fuse-streak",
+    group: "r9",
+    round: "r9",
+    note: "Replaces: loader / progress indicator.",
+    eyeball:
+      "Confirm the toner-starvation streak and edge-deletion thinning are both visibly present and load-bearing, not decorative — if the wipe reads as a generic loading shimmer with those two artifacts removed mentally, that's the named kill condition. Check it still renders convincingly without a caller-supplied content mask, using only the built-in placeholder pattern. Builder flag: light theme is unverified.",
+  },
+  {
+    slug: "fiche-step-repeat",
+    group: "r9",
+    round: "r9",
+    note: "Replaces: gallery / thumbnail grid.",
+    eyeball:
+      "Watch the raster-order fill sweep — cells should populate in a legible left-to-right, top-to-bottom sequence, not read as random cells popping in (the named kill condition). Check the index-strip typing feels integral to the sheet completing, not a bolted-on afterthought — the spec says cut it rather than ship it half-realized.",
+  },
+  {
+    slug: "carbon-ply-fade",
+    group: "r9",
+    round: "r9",
+    note: "Replaces: activity feed / notification fanout.",
+    eyeball:
+      "Confirm each ply in the stack shows a visibly different falloff (opacity/scale) from its neighbors — a generic drop-shadowed card pile with no visible per-ply difference is the named kill condition — and that the strike cadence never needs to exceed ~1/s to feel alive (a faster cadence would break the round-9 legibility rule and should have been killed, not sped up). Builder flag: rows were made contiguous rather than the spec's overlapping offset stack, because an overlapping stack would have buried the lower plies' text — judge whether contiguous rows still read as one strike propagating through ranked plies.",
+  },
+  {
+    slug: "fax-line-slip",
+    group: "r9",
+    round: "r9",
+    note: "Replaces: loading / connecting state.",
+    eyeball:
+      "The paper-slip fault band must be readable as 'one thing went wrong here' on a first, uninstructed look — if it needs the spec's explanation to register, that's the named kill condition (a Filter 2 'striking at first glance' failure). Check the handshake-tone waveform and the top-to-bottom scan build both read as real fax mechanics, not generic loading motion.",
+  },
+  {
+    slug: "photostat-reverse",
+    group: "r9",
+    round: "r9",
+    note: "Replaces: hero / full-bleed background.",
+    eyeball:
+      "Watch the negative/positive tone-flip at its 1.3s cadence — if it reads as strobing rather than a legible alternation, that's the named kill condition (this whole axis exists to avoid exactly that failure mode). Confirm the SDF-based softening reads as generation loss (progressive thickening/blur across repeated copies), not a stock blur filter applied once.",
+  },
+  {
+    slug: "kymograph-smoke-trace",
+    group: "r9",
+    round: "r9",
+    note: "Replaces: hero.",
+    eyeball:
+      "Watch the bright scratch trace lengthen at the stylus tip with one twitch spike every 3.2s — confirm the subtractive soot-vs-paper identity is distinguishable at a glance from dye-whorl's additive ink diffusion (a named kill condition if it isn't). Check the resmoking brush pass reads as a distinct, harder-edged wipe, not a soft fade — a fade would make the infinite-loop mechanism read as a bug, not a feature.",
+  },
+  {
+    slug: "helicorder-line-wrap",
+    group: "r9",
+    round: "r9",
+    note: "Replaces: loader / ambient status indicator.",
+    eyeball:
+      "Watch the pen wrap from the right margin of one row to the left margin of the row below, once every 12s with an explicit 200ms fade transition — if the vertical stack-and-step-down isn't visually distinguishable from a plain looping ticker, that's the named kill condition. Confirm 8 rows stay legible (not hairlines) at minimum card width, and that the 25px/s sweep doesn't alias against 60fps paint. Builder flag: light theme is unverified.",
+  },
+  {
+    slug: "barograph-drum-week",
+    group: "r9",
+    round: "r9",
+    note: "Replaces: card.",
+    eyeball:
+      "Confirm the DOM pen-arm overlay's tip stays exactly synced to the canvas ink's actual endpoint at every frame — any drift between the two is a named disqualifying bug, not a rough edge. Watch the day-gridline crossing every 6.4s as the ink trail's leading edge lengthens; if this is indistinguishable from a generic sparkline once the printed-paper grid and DOM pen arm are removed mentally, that's the named kill condition. Also check the 168-tick gridline mesh reads as a faint ruling, never a solid wash, in both themes. Builder flag: light theme is unverified.",
+  },
+  {
+    slug: "bias-hysteresis",
+    group: "r9",
+    round: "r9",
+    note: "Replaces: level/capacity meter or gauge.",
+    eyeball:
+      "Without reading the axis labels, check whether the loop is still distinguishable from generic oscilloscope Lissajous decoration — if not, that's the named kill condition (risk of reading as a hero-oscilloscope restyle). Confirm the envelope's breathing is actually noticeable inside a 5-second sample, not just a static-looking loop with a moving dot. Builder flag: the 0.05-alpha enclosed-area fill is unverified in light theme and may need raising to ~0.08 — check specifically there.",
+  },
+  {
+    slug: "groove-pitch",
+    group: "r9",
+    round: "r9",
+    note: "Replaces: loader / progress indicator.",
+    eyeball:
+      "Confirm the finished spiral is unmistakably different from loader-spirograph-trace at a glance — the pitch (spacing between turns changing, wide-here/narrow-there) must be the load-bearing difference, not the shape; visual indistinguishability from that sibling is the named kill condition. Check the pitch-band transitions read as a legible pattern, not noise.",
+  },
+  {
+    slug: "capstan-slip",
+    group: "r9",
+    round: "r9",
+    note: "Replaces: determinate progress bar.",
+    eyeball:
+      "Confirm the mechanic reads through transport geometry itself — a driven shaft, a nip, a periodic slip-and-recover — and not as a generic 'loading with dots/segments' motif once the transport chrome is mentally stripped away (the named kill condition). Check it isn't visually confusable with idler-drop's gear-train motif at a glance — capstan-slip has no teeth or ratio, only continuous linear tape speed with a slip.",
+  },
+  {
+    slug: "tonearm-skate",
+    group: "r9",
+    round: "r9",
+    note: "Replaces: read-only quality/tracking gauge.",
+    eyeball:
+      "Without axis/label context, check whether the sweeping needle still reads as a geometric tracking-error function with two exact zero points, or just as noisy jitter — the latter is the named kill condition ('null point' meaning nothing to a glance-level viewer). Confirm the disc-plus-sweeping-arm silhouette doesn't get confused with a plain clock hand (clock-card) or with dial-moire's drag-driven rotary control — this one is ambient and autonomous, zero user input.",
+  },
+  {
+    slug: "cylinder-hillndale",
+    group: "r9",
+    round: "r9",
+    note: "Replaces: divider.",
+    eyeball:
+      "Watch the carriage's sideways creep and confirm it visibly steps by exactly one wrap per full cylinder turn — if it just looks like 'a barrel spinning' with no legible link between rotation and the carriage's lateral motion, that's the named kill condition. Check it doesn't read as a restyle of loader-thread-spool's radial coiling. Builder flag: wrap spacing scales with width instead of a literal 6px, specifically to keep both the pitch and the 26s traversal true — check spacing still reads correctly at both small and large container widths.",
+  },
+  {
+    slug: "jacquard-card-chain",
+    group: "r9",
+    round: "r9",
+    note: "Replaces: ambient status/activity strip.",
+    eyeball:
+      "Watch the needle-bank ripple resolve left-to-right over 160ms at each 900ms card read — random flicker instead of a legible ripple-to-held-pattern is the named kill condition, as is dropping cadence below ~700ms/card (the overflow-chip-mux failure mode the spec names explicitly — never speed up to fix it, only slow down further). Confirm the 220ms card slide reads as a clear departure/arrival, and that this reads as a mechanical process, not a settings/config toggle array. Builder flag: card stock is a 0.35-alpha --ns-muted fill, resolving a spec that asked for both outline-only AND punched holes — judge whether the fill still reads as physical card stock rather than a generic panel.",
+  },
+  {
+    slug: "tufting-gun-loop-pile",
+    group: "r9",
+    round: "r9",
+    note: "Replaces: empty-state / background texture fill.",
+    eyeball:
+      "Watch the gun head/crosshair sweep one row at ~30 cells/s (~1.1s/row) with tufts popping in just behind it — if the row-by-row order isn't visually distinguishable from peen-coverage's random scatter at a glance, that's the named kill condition (the ordered sweep is this component's entire reason for existing). Confirm the scrolling feed reads as a smooth, steady conveyor, not jittery. Builder flag: light theme is unverified.",
+  },
+  {
+    slug: "knit-ladder-run",
+    group: "r9",
+    round: "r9",
+    note: "Replaces: ambient status/health feedback moment.",
+    eyeball:
+      "Track the ladder gap itself — its position, and whether it's opening or closing — at the spec's one-row-per-300-350ms cadence; propagation/repair reading too fast to track that direction would be the round 8b overflow-chip-mux failure this spec is written against. Confirm the ladder always fully repairs (never reaches the top edge unrepaired) and that the fault reads as an intentional recurring self-heal, not a broken render. Builder flag: two builders wrote this slug concurrently; the surviving version is the second one, verified coherent across all three files (component.tsx, demo.tsx, meta.json) — worth a fresh end-to-end look rather than assuming the first pass's shape.",
+  },
+  {
+    slug: "bobbin-lace-pricking",
+    group: "r9",
+    round: "r9",
+    note: "Replaces: decorative divider / empty-state ornament.",
+    eyeball:
+      "Track the working band's position and the pull of the one pin just behind it — the load-bearing removal-behind-the-band mechanic no sibling lattice (mesh-lash, seep-lattice, pin-register) has. If the crossing motion is too fine-grained to read at card scale (pin pitch under ~10px), or if the whole thing reads as a generic abstract 'connecting dots' network rather than legible crossing pairs with a visible working band, those are the spec's named kill conditions.",
+  },
+  {
+    slug: "warp-knit-tricot-lapping",
+    group: "r9",
+    round: "r9",
+    note: "Replaces: ambient background/divider texture.",
+    eyeball:
+      "Watch the guide bar's alternating shog direction (left vs right) at each course — one shog every 500ms with a 200ms directional slide is the one thing to track. Builder flag: the builder says if this reads as a flat mat rather than a legible zigzag chevron, that is a kill, not a tweak — judge accordingly. Also check it stays visually distinct from background-truchet-weave's continuous arc weave and never converges toward loader-loom-weave's full-width shuttle-pass look (both named kill conditions).",
   },
 ];

@@ -1,0 +1,27 @@
+{
+  "name": "grinding-chatter-lobes",
+  "title": "Grinding Chatter Lobes",
+  "description": "A card-scale loader substitute driven by regenerative chatter in cylindrical grinding: a rotating disc's rim grows a lobed profile as it re-cuts its own previous pass, the wave self-amplifying then self-limiting until a dress event clears it and a new lobe count begins.",
+  "collection": "core",
+  "tags": [
+    "canvas",
+    "loader",
+    "activity-indicator",
+    "grinding",
+    "chatter",
+    "regenerative-vibration",
+    "self-excited",
+    "generative",
+    "physics"
+  ],
+  "useWhen": "a card-scale loading/activity indicator whose motion has a real self-excited-process mechanic (growth, saturation, periodic reset) instead of an arbitrary rotation, and a few seconds of continuous ramp reads better than a discrete swap; pick loader-spirograph-trace instead when progress has an actual determinate value to report against a fixed route, loader-iris when a small fixed-footprint indeterminate glyph is enough with no ramping narrative, or loader-thread-spool when the wait should visibly convert from an unknown-duration wait into a determinate gauge once a total arrives.",
+  "autoplay": {
+    "mode": "none"
+  },
+  "instruction": "Build <GrindingChatterLobes label? className?> as a self-contained Canvas 2D loader, DPR-clamped to 2, direct-DOM rAF as the sole writer, zero dependencies. Disc radius = 0.38 * min(container width, height). The rim is sampled at 360 angular bins (1deg resolution) and rebuilt from a coefficient (lobe count N, amplitude, phase, rotation) every frame rather than accumulated as pixel history, so cost stays flat. The whole rim rotates continuously at 0.15 rev/s (slowed from real 1-5 rev/s wheelhead speeds to stay legible at card scale) via an incrementally accumulated rotation angle (never derived from absolute elapsed time, so long sessions don't lose precision). Each growth cycle picks a lobe count N from {5,6,7,8,9,10,11} and a random phase, both held fixed for the whole cycle (real chatter locks to one harmonic per stable cycle) via a mulberry32 PRNG reseeded per cycle index from the mount clock — real chatter theory (Tobias/Merritt) says the wave locks, not jitters. Amplitude follows a logistic self-limiting curve A(t) = Amax / (1 + exp(-r*(t - 3))), Amax = 0.06 * radius, r = ln(19)/3 so growth visibly ramps ~5%->~95% of Amax over the first 6s of a 40s growth window, then plateaus (matches real self-limiting saturation against contact stiffness). Every 40s a dress event fires: the rim's amplitude eases out (cubic) from its plateau value to zero over 1.2s while N holds, then the next 40s window picks a fresh N and phase and growth restarts from zero amplitude. The whole 41.2s cycle is phase-desynced by an offset derived from `Date.now()` at mount (not always zero), so any two page loads show different states and the resting loop is alive at rest: visibly different at t0/2.5s/5s with zero input, unbounded. Pointer interaction: moving the pointer over the card tracks its angle in SCREEN space (the simulated contact point stays fixed while the disc spins under it, converted to the disc's local rotating frame each frame) and locally boosts rim amplitude up to 1.5x within a 30deg window (raised-cosine falloff) around that angle, the boost envelope easing in while the pointer is present and decaying to zero over ~500ms after pointerleave; this never recolors the rim with --ns-accent (accent is not used anywhere in the component) and never touches the global 40s dress-event clock, which stays independent of pointer input. Rendering: rim stroke is var(--foreground) at 1.5px; rim fill is a radial gradient from var(--background) at the center to var(--ns-muted) (alpha-compressed to 0.55, derived at runtime via a canvas fillStyle probe so it stays a real RGB blend, never a colour literal) at the outer edge, so scalloping reads as depth rather than colour, checked in light theme first so the blended edge stays clearly short of --border-adjacent values. Colours are read via getComputedStyle(document.documentElement) before the first paint and re-derived on a MutationObserver watching the documentElement's class attribute, so a theme flip repaints correctly with no colour literal anywhere. A ResizeObserver rebuilds geometry on layout change and an IntersectionObserver pauses/resumes the rAF loop off-screen. Under prefers-reduced-motion the component renders one static frame named FREEZE_PHASE = 'lobe-70pct': amplitude fixed at 70% of Amax with a representative 8-lobe profile at a non-zero rotation — the most structured single frame, not t0 or a plateaued extreme — and the loop, pointer listeners, and IntersectionObserver are never attached, though the ResizeObserver and MutationObserver stay live so the frozen frame still resizes and retints correctly. Accessibility: the root carries role=\"status\" with a visually-hidden label (default 'Loading'); the canvas is aria-hidden. Props: label (status text, default 'Loading'), className (merged onto the root).",
+  "dependencies": [],
+  "card": {
+    "focus": "[role='status']",
+    "padding": 0.12
+  }
+}

@@ -5,11 +5,12 @@
  * scrolling the full catalog. Disposable tooling: not in the site nav, does
  * not touch any component or meta.json, reads nothing the catalog reads.
  *
- * Five static groups (see ./data.ts): components just fixed (verify the fix
+ * Six static groups (see ./data.ts): components just fixed (verify the fix
  * landed), the rest of the first batch nobody has looked at yet, a third
  * batch across three more lanes (multiplayer, reliability, wayfinding),
- * round 8a's 34 components, and round 8b's 16 components (both flat, no
- * lane). The round a row belongs to (`ReviewItem.round`) is a separate,
+ * round 8a's 34 components, round 8b's 16 components, and round 9's 28
+ * components (all three of the latter flat, no lane). The round a row
+ * belongs to (`ReviewItem.round`) is a separate,
  * additive axis from group — the round filter bar only appears once more
  * than one round exists in the data, so adding a round is a data.ts edit,
  * not a page edit. Client-side filter over a static list, no data fetching.
@@ -43,6 +44,7 @@ const GROUP_LABEL: Record<ReviewItem["group"], string> = {
   expansion: "New — three more lanes",
   r8a: "Round 8a — 34 new components",
   r8b: "Round 8b — 16 new components",
+  r9: "Round 9 — 28 new components",
 };
 
 const FIXED_COUNT = REVIEW_ITEMS.filter((i) => i.group === "fixed").length;
@@ -50,6 +52,7 @@ const UNTESTED_COUNT = REVIEW_ITEMS.filter((i) => i.group === "untested").length
 const EXPANSION_COUNT = REVIEW_ITEMS.filter((i) => i.group === "expansion").length;
 const R8A_COUNT = REVIEW_ITEMS.filter((i) => i.group === "r8a").length;
 const R8B_COUNT = REVIEW_ITEMS.filter((i) => i.group === "r8b").length;
+const R9_COUNT = REVIEW_ITEMS.filter((i) => i.group === "r9").length;
 
 /** Every round value present in the data, in first-seen order — deriving
  *  this from REVIEW_ITEMS itself (rather than hardcoding a list) is what
@@ -62,7 +65,7 @@ const ROUND_COUNTS: Record<string, number> = ROUNDS.reduce(
   {} as Record<string, number>,
 );
 
-const GROUPS: ReviewItem["group"][] = ["fixed", "untested", "expansion", "r8a", "r8b"];
+const GROUPS: ReviewItem["group"][] = ["fixed", "untested", "expansion", "r8a", "r8b", "r9"];
 const LANES: Lane[] = ["identity", "money", "living", "multiplayer", "reliability", "wayfinding"];
 const UNTESTED_LANES: Lane[] = ["identity", "money", "living"];
 const EXPANSION_LANES: Lane[] = ["multiplayer", "reliability", "wayfinding"];
@@ -139,6 +142,7 @@ export default function ReviewPage() {
     expansion: true,
     r8a: true,
     r8b: true,
+    r9: true,
   });
   // Opens on the newest round only — older rounds have already been judged,
   // and their state lives in .review-state.json. Toggle them back on in the
@@ -322,6 +326,7 @@ export default function ReviewPage() {
   const expansionItems = filtered.filter((i) => i.group === "expansion");
   const r8aItems = filtered.filter((i) => i.group === "r8a");
   const r8bItems = filtered.filter((i) => i.group === "r8b");
+  const r9Items = filtered.filter((i) => i.group === "r9");
 
   const remaining = (group: ReviewItem["group"]) => {
     const items = REVIEW_ITEMS.filter((i) => i.group === group);
@@ -333,12 +338,14 @@ export default function ReviewPage() {
   const expansionRemaining = remaining("expansion");
   const r8aRemaining = remaining("r8a");
   const r8bRemaining = remaining("r8b");
+  const r9Remaining = remaining("r9");
   const groupRemaining: Record<ReviewItem["group"], { untested: number; total: number }> = {
     fixed: fixedRemaining,
     untested: untestedRemaining,
     expansion: expansionRemaining,
     r8a: r8aRemaining,
     r8b: r8bRemaining,
+    r9: r9Remaining,
   };
 
   // Jump index over the currently-filtered set, in list order — lets the
@@ -383,6 +390,7 @@ export default function ReviewPage() {
       expansion: [],
       r8a: [],
       r8b: [],
+      r9: [],
     };
     for (const item of flagged) byGroup[item.group].push(item);
 
@@ -424,7 +432,8 @@ export default function ReviewPage() {
         <p className="mt-5 max-w-2xl text-[15px] leading-7 text-ns-muted">
           Disposable tooling, not a catalog page: {FIXED_COUNT} fixes to re-verify,{" "}
           {UNTESTED_COUNT} components from the first batch still untested, {EXPANSION_COUNT} across
-          three more lanes, {R8A_COUNT} from round 8a, and {R8B_COUNT} from round 8b. Each row links
+          three more lanes, {R8A_COUNT} from round 8a, {R8B_COUNT} from round 8b, and {R9_COUNT} from
+          round 9. Each row links
           to the full component page and to its card in isolation; a nearby handful also run live
           inline. &ldquo;Tested&rdquo; and
           notes persist to a local file (
@@ -670,6 +679,22 @@ export default function ReviewPage() {
         title={GROUP_LABEL.r8b}
         remaining={r8bRemaining}
         items={r8bItems}
+        state={state}
+        hydrated={hydrated}
+        onSetVerdict={setVerdict}
+        onNoteChange={setNote}
+        onNoteCommit={commitNote}
+        saveStatus={saveStatus}
+        registerRef={registerRef}
+        isActive={isActive}
+        isOnScreen={isOnScreen}
+      />
+
+      {/* Group F — round 9, flat (no lane) */}
+      <Section
+        title={GROUP_LABEL.r9}
+        remaining={r9Remaining}
+        items={r9Items}
         state={state}
         hydrated={hydrated}
         onSetVerdict={setVerdict}
