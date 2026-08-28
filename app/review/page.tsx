@@ -5,12 +5,13 @@
  * scrolling the full catalog. Disposable tooling: not in the site nav, does
  * not touch any component or meta.json, reads nothing the catalog reads.
  *
- * Six static groups (see ./data.ts): components just fixed (verify the fix
+ * Nine static groups (see ./data.ts): components just fixed (verify the fix
  * landed), the rest of the first batch nobody has looked at yet, a third
  * batch across three more lanes (multiplayer, reliability, wayfinding),
- * round 8a's 34 components, round 8b's 16 components, and round 9's 28
- * components (all three of the latter flat, no lane). The round a row
- * belongs to (`ReviewItem.round`) is a separate,
+ * round 8a's 34 components, round 8b's 16 components, round 9's 28
+ * components, round 10's 30 components, round 11's 30 components, and
+ * round 12's 30 components (all six of the latter flat, no lane). The
+ * round a row belongs to (`ReviewItem.round`) is a separate,
  * additive axis from group — the round filter bar only appears once more
  * than one round exists in the data, so adding a round is a data.ts edit,
  * not a page edit. Client-side filter over a static list, no data fetching.
@@ -45,6 +46,9 @@ const GROUP_LABEL: Record<ReviewItem["group"], string> = {
   r8a: "Round 8a — 34 new components",
   r8b: "Round 8b — 16 new components",
   r9: "Round 9 — 28 new components",
+  r10: "Round 10 — 30 new components",
+  r11: "Round 11 — 30 new components",
+  r12: "Round 12 — 30 new components",
 };
 
 const FIXED_COUNT = REVIEW_ITEMS.filter((i) => i.group === "fixed").length;
@@ -53,6 +57,9 @@ const EXPANSION_COUNT = REVIEW_ITEMS.filter((i) => i.group === "expansion").leng
 const R8A_COUNT = REVIEW_ITEMS.filter((i) => i.group === "r8a").length;
 const R8B_COUNT = REVIEW_ITEMS.filter((i) => i.group === "r8b").length;
 const R9_COUNT = REVIEW_ITEMS.filter((i) => i.group === "r9").length;
+const R10_COUNT = REVIEW_ITEMS.filter((i) => i.group === "r10").length;
+const R11_COUNT = REVIEW_ITEMS.filter((i) => i.group === "r11").length;
+const R12_COUNT = REVIEW_ITEMS.filter((i) => i.group === "r12").length;
 
 /** Every round value present in the data, in first-seen order — deriving
  *  this from REVIEW_ITEMS itself (rather than hardcoding a list) is what
@@ -65,7 +72,17 @@ const ROUND_COUNTS: Record<string, number> = ROUNDS.reduce(
   {} as Record<string, number>,
 );
 
-const GROUPS: ReviewItem["group"][] = ["fixed", "untested", "expansion", "r8a", "r8b", "r9"];
+const GROUPS: ReviewItem["group"][] = [
+  "fixed",
+  "untested",
+  "expansion",
+  "r8a",
+  "r8b",
+  "r9",
+  "r10",
+  "r11",
+  "r12",
+];
 const LANES: Lane[] = ["identity", "money", "living", "multiplayer", "reliability", "wayfinding"];
 const UNTESTED_LANES: Lane[] = ["identity", "money", "living"];
 const EXPANSION_LANES: Lane[] = ["multiplayer", "reliability", "wayfinding"];
@@ -143,6 +160,9 @@ export default function ReviewPage() {
     r8a: true,
     r8b: true,
     r9: true,
+    r10: true,
+    r11: true,
+    r12: true,
   });
   // Opens on the newest round only — older rounds have already been judged,
   // and their state lives in .review-state.json. Toggle them back on in the
@@ -327,6 +347,9 @@ export default function ReviewPage() {
   const r8aItems = filtered.filter((i) => i.group === "r8a");
   const r8bItems = filtered.filter((i) => i.group === "r8b");
   const r9Items = filtered.filter((i) => i.group === "r9");
+  const r10Items = filtered.filter((i) => i.group === "r10");
+  const r11Items = filtered.filter((i) => i.group === "r11");
+  const r12Items = filtered.filter((i) => i.group === "r12");
 
   const remaining = (group: ReviewItem["group"]) => {
     const items = REVIEW_ITEMS.filter((i) => i.group === group);
@@ -339,6 +362,9 @@ export default function ReviewPage() {
   const r8aRemaining = remaining("r8a");
   const r8bRemaining = remaining("r8b");
   const r9Remaining = remaining("r9");
+  const r10Remaining = remaining("r10");
+  const r11Remaining = remaining("r11");
+  const r12Remaining = remaining("r12");
   const groupRemaining: Record<ReviewItem["group"], { untested: number; total: number }> = {
     fixed: fixedRemaining,
     untested: untestedRemaining,
@@ -346,6 +372,9 @@ export default function ReviewPage() {
     r8a: r8aRemaining,
     r8b: r8bRemaining,
     r9: r9Remaining,
+    r10: r10Remaining,
+    r11: r11Remaining,
+    r12: r12Remaining,
   };
 
   // Jump index over the currently-filtered set, in list order — lets the
@@ -391,6 +420,9 @@ export default function ReviewPage() {
       r8a: [],
       r8b: [],
       r9: [],
+      r10: [],
+      r11: [],
+      r12: [],
     };
     for (const item of flagged) byGroup[item.group].push(item);
 
@@ -432,8 +464,9 @@ export default function ReviewPage() {
         <p className="mt-5 max-w-2xl text-[15px] leading-7 text-ns-muted">
           Disposable tooling, not a catalog page: {FIXED_COUNT} fixes to re-verify,{" "}
           {UNTESTED_COUNT} components from the first batch still untested, {EXPANSION_COUNT} across
-          three more lanes, {R8A_COUNT} from round 8a, {R8B_COUNT} from round 8b, and {R9_COUNT} from
-          round 9. Each row links
+          three more lanes, {R8A_COUNT} from round 8a, {R8B_COUNT} from round 8b, {R9_COUNT} from
+          round 9, {R10_COUNT} from round 10, {R11_COUNT} from round 11, and {R12_COUNT} from round
+          12. Each row links
           to the full component page and to its card in isolation; a nearby handful also run live
           inline. &ldquo;Tested&rdquo; and
           notes persist to a local file (
@@ -695,6 +728,54 @@ export default function ReviewPage() {
         title={GROUP_LABEL.r9}
         remaining={r9Remaining}
         items={r9Items}
+        state={state}
+        hydrated={hydrated}
+        onSetVerdict={setVerdict}
+        onNoteChange={setNote}
+        onNoteCommit={commitNote}
+        saveStatus={saveStatus}
+        registerRef={registerRef}
+        isActive={isActive}
+        isOnScreen={isOnScreen}
+      />
+
+      {/* Group G — round 10, flat (no lane) */}
+      <Section
+        title={GROUP_LABEL.r10}
+        remaining={r10Remaining}
+        items={r10Items}
+        state={state}
+        hydrated={hydrated}
+        onSetVerdict={setVerdict}
+        onNoteChange={setNote}
+        onNoteCommit={commitNote}
+        saveStatus={saveStatus}
+        registerRef={registerRef}
+        isActive={isActive}
+        isOnScreen={isOnScreen}
+      />
+
+      {/* Group H — round 11, flat (no lane) */}
+      <Section
+        title={GROUP_LABEL.r11}
+        remaining={r11Remaining}
+        items={r11Items}
+        state={state}
+        hydrated={hydrated}
+        onSetVerdict={setVerdict}
+        onNoteChange={setNote}
+        onNoteCommit={commitNote}
+        saveStatus={saveStatus}
+        registerRef={registerRef}
+        isActive={isActive}
+        isOnScreen={isOnScreen}
+      />
+
+      {/* Group I — round 12, flat (no lane) */}
+      <Section
+        title={GROUP_LABEL.r12}
+        remaining={r12Remaining}
+        items={r12Items}
         state={state}
         hydrated={hydrated}
         onSetVerdict={setVerdict}
