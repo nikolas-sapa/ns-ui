@@ -47,17 +47,25 @@ function lerpRGB(
   return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
 }
 
-const GROWTH_SECONDS = 2.2;
+// Owner feedback on the first build: "it needs to be faster" — the 14s fill
+// at 0.6 cells/s and the 4-7s recap gap left the surface looking static most
+// of the time. Growth, seeding and the post-fill idle are all pushed up
+// substantially here; the per-wall spring is also faster (SPRING_K raised)
+// but the relaxation itself stays a real, watchable multi-frame transition —
+// only the SEED_RATE / GROWTH_SECONDS / recap-gap changed the pace at which
+// new relaxations are triggered, never the "walls straighten, not fade"
+// mechanic itself.
+const GROWTH_SECONDS = 0.9;
 const RADIUS_FRAC = 0.62; // of spacing s
 const OVERLAP_TRIGGER_FRAC = 0.06; // of s
-const SPRING_K = 90;
+const SPRING_K = 170;
 const SPRING_DAMP = 1.0; // critical
-const SEED_RATE = 0.6; // cells/s
+const SEED_RATE = 6; // cells/s
 const FILL_CAP = 0.85;
-const RECAP_MIN = 4;
-const RECAP_MAX = 7;
-const RECAP_FLASH = 0.26;
-const RECAP_FADE = 0.9;
+const RECAP_MIN = 0.6;
+const RECAP_MAX = 1.6;
+const RECAP_FLASH = 0.22;
+const RECAP_FADE = 0.6;
 const SAMPLES = 36; // boundary samples per cell, for the polygon outline
 
 // Standard "odd-r" offset-triangular-lattice neighbour offsets — six

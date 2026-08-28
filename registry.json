@@ -214,45 +214,6 @@
       }
     },
     {
-      "name": "auger-flighting-spoil",
-      "type": "registry:ui",
-      "title": "Auger Flighting Spoil",
-      "description": "A continuous-work loader: a helical auger scrolls its flighting texture while material discharges at the top and free-falls into a growing spoil pile whose silhouette is governed by a real 37deg angle-of-repose check — the accumulating byproduct, not the spinning tube, is the primary read.",
-      "files": [
-        {
-          "path": "registry/core/auger-flighting-spoil/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/auger-flighting-spoil.tsx"
-        }
-      ],
-      "dependencies": [],
-      "cssVars": {
-        "theme": {
-          "color-ns-muted": "var(--ns-muted)"
-        },
-        "light": {
-          "ns-muted": "#4d4d4d"
-        },
-        "dark": {
-          "ns-muted": "#8f8f8f"
-        }
-      },
-      "meta": {
-        "collection": "core",
-        "tags": [
-          "loader",
-          "canvas",
-          "auger",
-          "spoil-pile",
-          "angle-of-repose",
-          "particle-system",
-          "ambient",
-          "unbounded"
-        ],
-        "instruction": "A 2D canvas loader rendering a continuous-flight auger feeding a growing spoil pile. Every extent (tube position, tube width, drop point, spoil-zone span, particle radius, gravity scale) is a fraction of S = min(container width, container height) and centred on the container's centre point, so the whole scene scales as one unit and a tall-narrow card never distorts the pile's available spread relative to its height. The auger tube is a vertical rect (width 0.13S) whose top sits at cy-0.34S and bottom at cy+0.1S, clipped and filled with a repeating diagonal two-tone band texture: each pitch (0.45 x tube-width, giving ~7-8 visible turns over the tube's height) is split into two half-pitch bands, BOTH drawn with the SAME --foreground token at two widely separated alphas (0.18 and 0.55) rather than crossing two different tokens — a single token composites monotonically against --background in either theme, so the step between bands is guaranteed to survive a theme flip instead of two different tokens happening to composite to the same value in one theme. The scroll offset advances every frame by pitch-length x 0.833 rev/s x dt (50 RPM) — a continuous sub-pixel-per-frame texture scroll, never a discrete per-flight-turn geometry step, which is what keeps a real 50 RPM rotation from aliasing against a ~60Hz paint into a strobe; the real RPM sets scroll SPEED only. The initial offset is seeded to an arbitrary fractional phase (never zero), so the texture is never caught aligned to its own start. A short static chute line runs from the tube's top to a fixed drop point 1.6 tube-widths to the right, from which one particle is spawned every 420ms (slow enough to watch each one fall and land individually) at a slightly jittered x and free-falls straight down under a gravity constant of 800px/s^2 scaled by S/400 (so fall duration reads consistently regardless of card size or aspect ratio). Landing is resolved against a 26-column heightmap spanning a spoil zone 0.9S wide, centred on the drop point (not the container) with real slack on both flanks for a full 85%-cap cone at the 37deg repose angle; a falling particle's column is derived from its jittered x, and it settles the instant it reaches that column's current surface height, keeping its render x rather than snapping to the column centre so the pile texture stays granular. Each landing adds a fixed contribution (capHeight x 0.045) to its column, then a relax pass enforces the 37deg angle-of-repose limit by transferring height between any adjacent columns whose difference exceeds columnWidth x tan(37deg) — repeated until stable — which is what turns a straight-down discharge into a symmetric cone (apex under the drop point) instead of a spike. The pile's outline is redrawn every frame as a filled path connecting each column's current surface point, plus individual particle dots (falling, settled, and fading) layered on top for texture. Once the tallest column reaches 85% of the available spoil-zone height, every subsequent landing also retires the single oldest still-settled dot: it fades over 600ms and, on completing, its contribution is subtracted from its column's height and a relax pass re-smooths the resulting dip, holding the pile in steady-state turnover (new landings balanced by old retirements) rather than ever overflowing past the cap, collapsing into a crater at the apex, or shrinking back to nothing. At mount the pile is pre-seeded to 40% of cap height (a symmetric cone computed in closed form, apex under the drop column) with a few particles already mid-fall, so t0 never reads as an empty start; by ~2.5s roughly six more particles have landed and the silhouette has visibly grown and reshaped; by ~5s the pile is at or near the 85% cap with the retire-fade cycle visibly running (one dot fading out as another lands), which is the visible difference between the build-up phase and the steady-state phase that makes the loop read as alive and unbounded rather than a process that finishes. Colours are read via getComputedStyle(document.documentElement) for --foreground/--ns-muted before the first paint (no colour-literal fallback — an empty read means \"not ready,\" and the draw call itself re-attempts the read and bails without painting rather than falling back to a hardcoded value), cached, and refreshed by a MutationObserver on documentElement's class attribute; the tube outline and helix bands use --foreground value steps, the pile fill and settled/retiring dots use --ns-muted, falling dots use --foreground, and --ns-accent is never touched anywhere in the component. Canvas is sized via ResizeObserver reading the container's actual box (devicePixelRatio-scaled, CSS pixel style dimensions set explicitly) and every geometric constant is rederived from that measurement, so the pile always resolves at card scale regardless of aspect ratio. An IntersectionObserver pauses the rAF loop when the card scrolls offscreen and resumes it cleanly on return. `autoplay: none` because the loop runs on its own internal clock with no pointer/scroll/press input to drive. Under prefers-reduced-motion the component renders exactly one static frame, re-attempting the token read on every animation frame until colours are available: the pile pre-seeded directly to a full symmetric 85%-height cone with settled dots sprinkled across its surface (no build-up, matching the live pile's granular texture rather than a smooth triangle), the helix drawn at a fixed unmoving offset, and no particles in flight — the most structured, most legible single frame of the mechanic — and no rAF loop is ever started once painted. Cleanup on unmount cancels the pending rAF, disconnects the MutationObserver/ResizeObserver/IntersectionObserver, and clears all pending timers. Zero dependencies, canvas + CSS only, no WebGL context to drop. Differs from loader-thread-spool's spinner-with-trail mechanic: nothing here spins in place or converts into a gauge — the tube's rotation is a fixed, minor background cue, and the spoil pile's cumulative silhouette is the entire point."
-      }
-    },
-    {
       "name": "autoclave-cycle-gauge",
       "type": "registry:ui",
       "title": "Autoclave Cycle Gauge",
@@ -5433,45 +5394,6 @@
       }
     },
     {
-      "name": "flag-hoist-run",
-      "type": "registry:ui",
-      "title": "Flag Hoist Run",
-      "description": "An ambient in-flight/queue-depth status card modelled on a mechanical flag hoist: small flags climb a halyard, break out into a flying position at the yard, then are struck down fast to clear the line for the next hoist.",
-      "files": [
-        {
-          "path": "registry/core/flag-hoist-run/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/flag-hoist-run.tsx"
-        }
-      ],
-      "dependencies": [],
-      "cssVars": {
-        "theme": {
-          "color-surface": "var(--surface)"
-        },
-        "light": {
-          "surface": "#fafafa"
-        },
-        "dark": {
-          "surface": "#171717"
-        }
-      },
-      "meta": {
-        "collection": "core",
-        "tags": [
-          "queue",
-          "ambient",
-          "status",
-          "dom",
-          "svg",
-          "loader",
-          "industrial",
-          "signalling"
-        ],
-        "instruction": "Build <FlagHoistRun className?> as a self-contained, non-interactive DOM/SVG-free (plain divs) ambient status widget inside a bordered card (rounded-md border border-border bg-surface, fixed 4:3 aspect-ratio, overflow-hidden). It renders a single vertical halyard line running from y=92% of card height (the deck) to y=8% (the yard), plus a short horizontal yard tick at y=8%, both var(--foreground) at a fixed 0.3 opacity, 1.5px thick — never var(--border), which falls to ~1.1:1 contrast in light theme and would read as invisible rather than a taut line. A fixed pool of 4 flag-chip divs (never more are mounted; MAX_CHIPS=4 comfortably covers ceil(4200ms cycle / 1300ms stagger)) are mutated directly every animation frame via refs (style.left/top/width/height/transform only — no React state per frame, so the ~14 hoists/minute this produces at typical concurrency never re-render React). Each chip is a solid var(--foreground) rectangle, width = 0.24x and height = 0.11x the container's SMALLER measured dimension (so it rescales correctly at card scale), left edge pinned to the halyard's x (50% of width) with transform-origin left center so all motion pivots off that attachment point. CYCLE (per chip, driven by performance.now() minus that chip's own spawn timestamp, not modulo'd against a shared clock): a 2400ms climb at constant velocity from y=92% to y=8% while rotated -90deg around the left-edge pivot (the folded state — an edge-on rectangle reads as a narrow vertical sliver flush against the halyard, exactly as a furled flag hugs the line on its way up, no separate width/scale hack needed since the rotation alone does it); a 300ms break-out easing (easeOutCubic) rotation from -90deg to 0deg at a fixed y=8% (the yard) — the one moment that has to read as a distinct 'arrival', a full rectangle swinging out to horizontal, not a continuation of the climb; an 1100ms fly holding rotation at 0deg, full silhouette, at the yard; then a 400ms strike (easeInCubic, deliberately faster than the 2400ms climb so it reads as a quick, separate mechanical action) translating y from 8% down to 118% — past the card's overflow-hidden bottom edge, so the chip genuinely 'drops out of view' via clipping rather than a fade. Full individual cycle: 2400+300+1100+400=4200ms. A new chip begins climbing from the deck every 1300ms (a fixed 4-slot round-robin, each slot idling ~1000ms between its own 4200ms hoists), so 1-2 chips are typically climbing at once while at most one flies at the yard at a time — queue depth reads directly as how many chips are currently on the line. TOKENS: colors are CSS custom properties referenced directly as `var(--foreground)` in inline styles (pure DOM, no canvas, so no getComputedStyle/MutationObserver token-read dance is needed — the cascade repaints for free on a theme class flip). No --ns-accent anywhere; this is a resting, non-interactive ambient surface, not a control. REDUCED MOTION: freezes on the single most structured static frame available in the cycle — one chip parked mid-climb at exactly 50% up the mast (rotation -90deg) and a second chip simultaneously parked flying at the yard (rotation 0deg, y=8%), both states visible at once, remaining two pool slots hidden, no rAF loop ever started. A ResizeObserver re-measures the container (and re-renders the reduced-motion frame, or arms the rAF loop, accordingly) on layout change; an IntersectionObserver pauses the rAF loop when the card scrolls off-screen and re-arms it on re-entry. Cleanup on unmount cancels any pending rAF and disconnects both observers. No pointer interaction of any kind — ambient only."
-      }
-    },
-    {
       "name": "flamegraph-ascii-frames",
       "type": "registry:ui",
       "title": "Flamegraph ASCII Frames",
@@ -9882,50 +9804,6 @@
       }
     },
     {
-      "name": "pipe-stand-trip",
-      "type": "registry:ui",
-      "title": "Pipe Stand Trip",
-      "description": "A rig-floor progress indicator that racks pipe stands the way a drilling crew actually trips them — elevator down empty, hoist a stand clear, swing it to the fingerboard, rack it, return — the fingerboard filling one slot at a time as the depth counter falls, then unracking in reverse and looping forever.",
-      "files": [
-        {
-          "path": "registry/core/pipe-stand-trip/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/pipe-stand-trip.tsx"
-        }
-      ],
-      "dependencies": [],
-      "cssVars": {
-        "theme": {
-          "color-ns-muted": "var(--ns-muted)",
-          "color-surface": "var(--surface)"
-        },
-        "light": {
-          "ns-muted": "#4d4d4d",
-          "surface": "#fafafa"
-        },
-        "dark": {
-          "ns-muted": "#8f8f8f",
-          "surface": "#171717"
-        }
-      },
-      "meta": {
-        "collection": "core",
-        "tags": [
-          "progress",
-          "stepper",
-          "drilling",
-          "rig",
-          "elevator",
-          "fingerboard",
-          "ambient",
-          "counter",
-          "svg",
-          "mechanical"
-        ],
-        "instruction": "A card-scale rig-floor progress indicator built entirely from a single fixed SVG viewBox (0 0 120 150) and preserveAspectRatio=\"xMidYMid meet\", which does the 'derive geometry from the container's smaller dimension' work for free — a narrow card scales the whole derrick down uniformly, never crops it, with no ResizeObserver or JS geometry recompute needed. The derrick is two vertical legs with four horizontal braces and diagonal cross-bracing between them (all --border, strokeOpacity ~0.85, static), a fingerboard bar along the top edge holding 12 evenly-spaced slot rects, a floor line at the bottom (rotary table), and a thin center rail down which a single elevator group (a small rect, --foreground) travels. Motion is five chained CSS transitions on that one <g> ref — style.transform + style.transition set imperatively, no React state and no rAF on the animation hot path — run back-to-back via a recursive setTimeout chain: down-stroke (700ms, ease-in cubic-bezier(0.55,0,1,0.45), empty, rail-top to rotary-table — 'gravity-assisted lowering') -> hoist-up (500ms, ease-out cubic-bezier(0,0.55,0.45,1), rotary-table back to rail-top, a stand rect fades in above the elevator block over 120ms as it attaches — 'block brake sets') -> swing-to-rack (200ms, lateral only, rail-top to the target slot's x) -> rack-seat (300ms, cubic-bezier(0.34,1.56,0.64,1) — a spring/back-out curve that overshoots into the slot and settles, expressing the spec's '~15px overshoot' as viewBox units so it scales with the card; the carried-stand rect fades out the instant this phase ends, the same instant the racked count increments) -> return-down (700ms, ease-in-out, slot back to rail-top, empty). That is exactly 2400ms per stand. Tripping in reverses the same five waypoints in reverse order with custody flipped — swing-in (700ms) -> unseat (300ms, spring, the racked count decrements and the stand-rect fades in at the START of this phase, i.e. the instant of grabbing) -> swing-out (200ms) -> lower-stand (500ms, ease-in, stand-rect fades out at the end — stabbed into the string) -> rise-empty (700ms) — unracking the MOST recently racked slot first (LIFO), which is mechanically correct for running pipe back in. `racked` (0..12) is the one piece of React state that actually matters: it drives BOTH the fingerboard fill (slot i is filled, --ns-muted, iff i < racked) AND the depth counter (displayed as `${12 - racked} STANDS`, or 'OUT' at racked === 12) from the same integer, mutated only at the exact instant custody changes hands, so the two visuals can never desync the way a pair of independently-advanced counters could. Reaching racked === 12 while tripping out holds the elevator at rail-top, empty, label 'OUT', for 1800ms, then flips direction and begins tripping in immediately from racked = 12 (no discontinuous reset). A full loop is 12 stands out (28.8s) + the 1.8s hold + 12 stands in (28.8s) ≈ 59.4s, matching the spec's ~60s figure. On mount the component starts already mid-cycle rather than from an empty derrick — 5 of 12 slots racked, the elevator mid-hoist-up carrying a stand, counter reading '7 STANDS' — per the spec's own worked t0 example, so the very first frame already reads as alive. The one thing to follow: the elevator's current phase (its position along the rail vs. over a slot) together with the fingerboard fill count, at a cadence of one full stand cycle every 2.4s (five sub-phase transitions of 200-700ms each) — comfortably clear of the 'roughly a second between followable events' floor. `prefers-reduced-motion` skips the timer chain entirely and renders one static frame: 5 slots racked, elevator seated at the 5th slot (rack-seat's end position), stand released — 'stand fully racked, elevator still adjacent, mid-settle', the frame that shows the hoist/stand/fingerboard relationship most clearly, chosen over any ambiguous empty-elevator travel frame. Pauses (no timer advanced, no mid-flight element left dangling — an in-flight phase is fast-forwarded to its end state) on IntersectionObserver non-intersection and on `visibilitychange` hidden, resuming from the next phase when visible again. Pure DOM + SVG + CSS, zero canvas, zero dependencies, every color a literal `var(--token)` SVG attribute (--border for static rig structure and empty-slot outlines, --ns-muted for a racked stand, --foreground for the elevator and whatever it is currently carrying) — nothing is read via getComputedStyle because nothing is computed in JS, so there is no first-paint color race to guard against."
-      }
-    },
-    {
       "name": "pneumatic-carrier-dispatch",
       "type": "registry:ui",
       "title": "Pneumatic Carrier Dispatch",
@@ -12172,77 +12050,6 @@
           "micro-interaction"
         ],
         "instruction": "Build a single-select (DOM trigger button + listbox panel) whose surfaces are real frosted glass: each surface stacks a canvas 2D layer, then a translucent bg-surface span with backdrop-blur + saturate that frosts the canvas beneath it, then the content. The canvases draw caustics as 6 (trigger) / 8 (panel) radial-gradient blobs summed with globalCompositeOperation 'lighter' at 0.06-0.10 alpha, colors mixed between --ns-accent and --foreground, with EXPLICIT canvas style.width/height plus a DPR-2-clamped backing store, and a full clear + redraw every frame (no destination-in accumulation). Idle simmer: each blob drifts on independent sin/cos phase offsets at a 6-10 px/s peak (amplitude 10-16px with frequency = speed/amplitude), running only while the panel is open, onscreen (IntersectionObserver), and the tab is visible; the closed trigger shows one static frame and the rAF is fully asleep. Open: panel with transform-origin at the trigger top scales 0.96 to 1 over 180ms on cubic-bezier(0.16,1,0.3,1) via WAAPI while blob anchors start clustered at the origin and spring (k=60 s^-2, zeta=0.9, ~450ms settle) to positions redistributed evenly down the list height. Active-row lens: a radial displacement field of radius 56px pulls blob centers up to 6px toward the active row center plus a tight accent pool under the row; the lens position follows cursor-hover or keyboard-active targets (one unified target) on a spring k=140 s^-2, zeta=0.8, with a forced-settle deadline snapping it 1.0s after the last input; lens coordinates are panel-local offsets from getBoundingClientRect deltas, never absolute page coords. Keyboard: full listbox pattern — trigger aria-haspopup=listbox aria-expanded, Enter/Space/ArrowDown/ArrowUp open, focus moves to the listbox which tracks aria-activedescendant, Up/Down skip disabled options, Home/End, 500ms typeahead buffer with startsWith matching, Enter (or Space with an empty buffer) commits, Esc and outside pointerdown close and restore focus to the trigger, hover and keyboard drive the same lens. Ink is getComputedStyle-derived from --ns-accent/--foreground at mount and re-derived live by a MutationObserver on documentElement class so both themes render correctly. prefers-reduced-motion: static frost texture at anchor targets, no drift or lens, instant open/close. Guard zero-size hosts before sizing canvases (the panel is display:none while closed), and tear down every rAF, WAAPI animation, observer, listener, and typeahead timer on unmount. Demo: a deployment-settings card with a labeled project input, a Region select over believable region/code option data, a Failover select, and a footer status line."
-      }
-    },
-    {
-      "name": "semaphore-arm-cast",
-      "type": "registry:ui",
-      "title": "Semaphore Arm Cast",
-      "description": "An ambient status indicator drawn as a Chappe optical telegraph mast: two pivoting arms swing to a new 45-degree angle pair every ~2.15s, each held pose reading as a distinct relayed symbol.",
-      "files": [
-        {
-          "path": "registry/core/semaphore-arm-cast/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/semaphore-arm-cast.tsx"
-        }
-      ],
-      "dependencies": [],
-      "meta": {
-        "collection": "core",
-        "tags": [
-          "status",
-          "indicator",
-          "ambient",
-          "svg",
-          "motion",
-          "telegraph",
-          "semaphore",
-          "loader"
-        ],
-        "instruction": "An ambient card-scale SVG status indicator modeled on the Chappe optical telegraph (France, 1794): a vertical mast carries a horizontal regulator bar near its top, and a pivoting indicator arm is mounted at each end of the bar. Geometry is derived entirely from the container's smaller dimension, measured via getBoundingClientRect on mount and re-measured on every ResizeObserver callback: mastHeight = min(width,height) * 0.8, armLength = min(width,height) * 0.28, the regulator bar sits at 14% down from the mast's top and spans armLength * 1.8 centered on the mast, and both arms pivot from the bar's two endpoints. Each arm is an SVG <line> nested in a <g> whose transform is `rotate(angle pivotX pivotY)`, angle measured from straight-up (0deg) clockwise in 45deg increments (0/45/90/135/180/225/270/315deg) — 8 discrete positions per arm. A fixed 9-entry symbol table pairs one angle per arm per symbol; the component free-runs through it as an unbounded loop, one symbol at a time, index 3 fixed at (135deg, 270deg) as the widest asymmetric spread in the set. A single requestAnimationFrame loop accumulating real delta-time drives a two-phase clock per symbol: SWING phase is 700ms total — arm 1 begins an eased (cubic ease-in-out) 550ms rotation from its old angle to the new one immediately at phase start, arm 2 begins its own 550ms eased rotation 150ms later so the two arms visibly depart and arrive independently rather than in lockstep, matching a two-man relay — followed by a DWELL phase of 1.6s where both arms sit fully settled at the held pair before the next symbol's swing begins; full beat is 2.3s (550ms swing + 150ms stagger overlap + 1.6s dwell), 9-symbol loop is a ~20.7s full cycle. Both arm angles are recomputed directly from phase-elapsed time every frame (never a CSS transition triggered by a setTimeout), so an IntersectionObserver and the document visibilitychange listener can pause the rAF loop outright when off-screen or the tab is hidden and resume later mid-swing with zero re-trigger or jump. Mast, bar and both arms are stroke-only from var(--foreground) directly in inline SVG attributes (no JS color read needed since var() resolves and repaints on the theme class flip for free); arm stroke width is set to 1.8x the mast/bar stroke width specifically so the two moving arms never optically merge into the static mast at small card sizes or in light theme's flatter default contrast, and a small filled circle marks each pivot for the same reason. `prefers-reduced-motion` freezes on symbol index 3 (135deg / 270deg, both arms fully settled, no swing) permanently rather than the loop's t0 symbol, chosen because it is the most structured pose in the set — several other symbols place both arms close to vertical, which reads as at-rest rather than as an active signal. Pure SVG + rAF, zero dependencies, no canvas, no interaction (ambient only) — root is `role=img` with a static `aria-label` describing the mechanism rather than a live region, since the angle pairs carry no meaning to announce per-symbol."
-      }
-    },
-    {
-      "name": "semaphore-arm-tension",
-      "type": "registry:ui",
-      "title": "Semaphore Arm Tension",
-      "description": "A status control drawn as a UK lower-quadrant mechanical semaphore: gravity holds the arm at Danger, and it only reaches Clear when the signal wire is under tension — position is the only state carrier, no coloured aspect glass. The arm and counterweight breathe on a slow wire-tension bob and the lamp flickers like a real flame, both independent of whichever state it's holding.",
-      "files": [
-        {
-          "path": "registry/core/semaphore-arm-tension/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/semaphore-arm-tension.tsx"
-        }
-      ],
-      "dependencies": [],
-      "cssVars": {
-        "theme": {
-          "color-ns-muted": "var(--ns-muted)",
-          "color-ns-accent": "var(--ns-accent)"
-        },
-        "light": {
-          "ns-muted": "#4d4d4d",
-          "ns-accent": "#006bff"
-        },
-        "dark": {
-          "ns-muted": "#8f8f8f"
-        }
-      },
-      "meta": {
-        "collection": "core",
-        "tags": [
-          "status",
-          "indicator",
-          "switch",
-          "svg",
-          "signal",
-          "railway",
-          "semaphore",
-          "ambient",
-          "deploy",
-          "gate"
-        ],
-        "instruction": "A status control rendered as a UK lower-quadrant mechanical semaphore signal: a post with a pivoting arm at its top, a counterweight hanging below on a short link, and a fixed-luminance lamp housing behind the pivot. `cleared` (boolean, controlled) / `defaultCleared` (uncontrolled, default false) drives the arm's resting rotation — 0deg (horizontal) for Danger, 55deg (rotated toward the track) for Clear — and that angle is the ONLY carrier of state; the lamp is never tinted red or green, it only ever changes luminance. Two independent continuous motions run on a single requestAnimationFrame loop that writes directly to SVG element attributes via refs (no React re-render per frame, no CSS transition on the rotate attribute since the same attribute is already being written every frame): a 9-second sinusoidal 'wire tension' bob nudges the arm's rotation ±2.2deg around its current resting angle and rocks the counterweight ±4px vertically in the opposite phase, standing in for a real signal wire's continuous give under thermal length change; and a lamp glow opacity sampled at 12Hz from a seeded PRNG (mulberry32) and linearly interpolated between samples, ranging 0.82-1.0, standing in for a real oil flame's slow candle-like flicker rather than a strobe. A discrete click, Enter, or Space toggles `cleared` and animates the resting angle itself from its previous value to the new target with a hand-computed back-ease overshoot (the same cubic-bezier(0.34,1.56,0.64,1) family used elsewhere in the registry, computed per-frame here because it has to compose with the same rotate attribute the ambient bob is writing) over 650ms. Under `prefers-reduced-motion`, the whole rAF loop stops — no bob, no flicker, no overshoot, a toggle becomes an instant angle change — but this NEVER overrides which state the arm is actually displaying; a live Danger status stays visibly Danger under reduced motion, the demo's own default state (`defaultCleared`) is what determines the resting frame reduced-motion users see. `interactive` (default true) renders a `role=switch` button with `aria-checked` reflecting `cleared`, an `aria-labelledby`/`aria-describedby` pair naming the current Danger/Clear state in a screen-reader description, and a `focus-visible` ring in `--ns-accent` (the only place accent chrome appears — never on the arm, lamp, or counterweight); passing `interactive={false}` renders a read-only `role=status` display for a pure indicator use. Every ink is a Tailwind token class (`text-foreground`/`text-ns-muted`/`text-border`/`text-background`) painted via `fill-current`/`stroke-current`, so both themes repaint for free with zero JS colour reads. Geometry is a fixed 200x240 SVG viewBox rendered at `w-full h-[240px]`, so it scales uniformly to the card. Props: `cleared`, `defaultCleared`, `onClearedChange`, `label` (default 'Signal'), `interactive`, `aria-label` override, `className`. Zero dependencies, DOM+SVG+CSS only, no canvas."
       }
     },
     {
@@ -18351,45 +18158,6 @@
       }
     },
     {
-      "name": "fresnel-flash-group",
-      "type": "registry:ui",
-      "title": "Fresnel Flash Group",
-      "description": "A full-bleed hero/section background modelled on a rotating first-order Fresnel lens drum: eight glass panels ring a fixed lamp and turn at a steady 8-second lap, each panel's own glint sweeping past a fixed marker once a second, while the brighter primary panel's pass produces the station's identifying group flash once per lap.",
-      "files": [
-        {
-          "path": "registry/loud/fresnel-flash-group/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/fresnel-flash-group.tsx"
-        }
-      ],
-      "dependencies": [],
-      "cssVars": {
-        "theme": {
-          "color-ns-muted": "var(--ns-muted)"
-        },
-        "light": {
-          "ns-muted": "#4d4d4d"
-        },
-        "dark": {
-          "ns-muted": "#8f8f8f"
-        }
-      },
-      "meta": {
-        "collection": "loud",
-        "tags": [
-          "hero",
-          "background",
-          "canvas",
-          "lighthouse",
-          "beacon",
-          "rotation",
-          "ambient",
-          "signal"
-        ],
-        "instruction": "Build <FresnelFlashGroup children? className?> as a full-bleed Canvas 2D hero/section background modelling a rotating first-order Fresnel lens drum. GEOMETRY: computeGeo(W, H) derives drumRadius = minDim * 0.42, facetRadius = minDim * 0.052, lampRadius = minDim * 0.02, all centered at (W/2, H/2), plus a scale factor clamp(minDim / 640, 0.6, 1.6) applied to stroke widths and halo blur so the same numbers read from a card up to a 100vw hero. ROTATION: rotationAngleAt(elapsedMs) = (elapsedMs * 360/8000) % 360 is a pure function of elapsed time (never per-frame incremented state) — one full lap every 8.0s, which is also the station's published characteristic (Fl 8s). FACETS: 8 facets are placed at baseAngle = i * 45deg around the drum (0deg = 12 o'clock/up, clockwise), each facet's current angle = (baseAngle + rotation) % 360. A fixed camera-bearing marker sits at 0deg (12 o'clock); every facet's glint intensity is gaussian(angleDiff(facetAngle, 0), sigmaDeg) where angleDiff wraps to [-180,180] — non-primary facets use sigma=10deg and peak alpha 0.5 (so a glint crosses the marker every 1.0s, 8.0s/8 facets), while facet index 0 (the primary bullseye) uses a tighter sigma=6deg, peak alpha 1.0, a 1.2x wider dot, and a canvas shadowBlur halo (10px * scale * intensity) in --foreground — this is the station's identifying flash, firing once per 8.0s lap. Each facet's resting (non-glinting) alpha is 0.14 (0.22 for the primary) so the ring reads as structured even when nothing is aligned to the marker. BEAM LOBE: while the primary facet's intensity exceeds 0.01, a soft quadrilateral lobe is filled from two points just above the drum edge widening to the top of the canvas, using a vertical linear gradient from --foreground to --ns-muted, at globalAlpha = primaryIntensity * 0.5 — this ramps in and out over roughly a second on either side of the flash peak (never a single-frame blink) because it is driven directly by the same gaussian intensity value as the facet dot. HAZE: an independent slow drift keeps the dark interval between flashes visibly alive — a radial gradient (--foreground center to --ns-muted edge) at a constant 0.06 alpha, its center offset by sin/cos of a 21-second period at 0.16 * minDim amplitude, drawn every frame before the drum. LAMP: a small fixed dot at the exact center, --foreground at 0.55 alpha, constant, unrelated to rotation — represents the fixed lamp the drum rotates around. Colour is read once via getComputedStyle(document.documentElement) for --foreground and --ns-muted with zero literal fallback; if either is empty the mount loop retries on the next rAF and paints nothing until both resolve. A MutationObserver on document.documentElement's class attribute re-reads tokens on every theme flip; a ResizeObserver on the root recomputes geometry and resizes the canvas backing store (devicePixelRatio capped at 2) without resetting the elapsed-time clock; an IntersectionObserver stops driving new frames while off-screen and, on returning to view, re-reads tokens (picking up any theme flip that happened while hidden) and resumes the same continuous clock — no paint happens on any of these paths before a token read succeeds. Under prefers-reduced-motion the component runs zero rAF loops, zero timers: it calls the exact same drawScene(elapsedMs) function used by the live loop with elapsedMs pinned to STATIC_TIME_MS = 3400 (153deg into the 8.0s lap) — three facets partially lit at different values, none fully saturated (as the primary flash peak would be) and none in a fully-dark gap, the single most structured frame in the cycle — and never redraws. Cleanup on unmount cancels both the animation and token-wait rAF handles and disconnects all three observers. Optional children render over the field in a centered max-w-5xl column (eyebrow, headline, CTA), with pointer-events left to the canvas's aria-hidden sibling so nothing intercepts clicks meant for real content — there is no pointer tracking or hover state anywhere in this component, the rotation-and-flash cadence is the entire spectacle. Zero dependencies, DOM+canvas only, no colour literal anywhere including fallbacks."
-      }
-    },
-    {
       "name": "gallery-gantry-track",
       "type": "registry:ui",
       "title": "Gallery Gantry Track",
@@ -19509,47 +19277,6 @@
           "spec-sheet"
         ],
         "instruction": "Build <JominyQuench bars? title? className?> where bars: JominyBar[] ({id, name, hardness: number[]}) each hold Rockwell-C hardness readings at nine standard Jominy distances from the quenched face (1/16\" to 2\", DISTANCE_LABELS). This is the real ASTM A255 / ISO 642 end-quench hardenability test: a bar is austenitised, then a water jet is sprayed against ONE end only; that face cools fastest and hardens most, and hardness falls off with distance along a curve that is the alloy's signature — comparing several bars means comparing several fall-off curves, which is the mechanic, not a metaphor. Default bars (1045, 5160, 8640, 4140) are shaped to the well-documented qualitative behavior — more alloy content flattens the fall-off — rather than lifted from one mill certificate, and are labelled as illustrative in the demo copy. LUMINANCE ADAPTATION (read this before touching the palette): the real test is intensely hue-coded, quenched steel running white -> yellow -> orange -> red -> black as it cools, but this registry has five value-only tokens and no orange. Temperature is deliberately mapped to LUMINANCE instead: the hottest point on a bar is always blended toward --foreground (maximum contrast against --background) and the coldest, just-quenched point always fades toward --background — a mapping that self-inverts correctly between light and dark theme because 'closest to --foreground' already means the salient value in either polarity, never a literal hue swap. ONE canvas runs all rows: a fixed 7.2s cycle per row (reheat 10%, quench-front creep 58%, hold 32%), phase-staggered by 16% per row so the cascade of bars never settles into one static pose — visibly different at t0, 2.5s and 5s with no input. Each row draws, left to right: a horizontal bar whose fill is a per-frame linear gradient sampled from the heat-at-x function (cold/quenched reads background-leaning, hot/unquenched reads foreground-leaning, with a soft residual gradient toward the far end, never a hard cliff); a vertical front-line marker at the current quench-front x, visible only mid-creep; and, above the bar, that alloy's hardness fall-off curve, revealed left-to-right in lockstep with the front position so the curve visibly draws itself as the quench proceeds, with a small lead dot at the point currently being traced. At the quenched face a continuous water-jet stroke plus four looping steam-plume puffs run on real elapsed time, independent of the quench-cycle phase — the jet never stops hitting the face, at rest or mid-cycle. Row geometry (bar thickness, curve band height, plume size) derives from rowH = clamp(48, 84, containerWidth * 0.15) so the mechanic stays legible at small preview-card widths rather than reading as a thin illegible sliver. Colour is read via getComputedStyle(document.documentElement) at mount and re-read on a MutationObserver watching documentElement's class (duplicated per-component per house convention, no shared lib/ helper); --ns-accent appears ONLY as the hover/focus highlight stroke on a compared bar's row (triggered by pointerenter/focus on that row's real <button> grade label) — never mixed into the resting heat ramp. Direct-DOM rAF, DPR-capped backing store (min(2, devicePixelRatio)), pauses on IntersectionObserver (root offscreen) and document visibilitychange. ACCESSIBILITY: the canvas is aria-hidden and purely decorative; every value the comparison depends on is real DOM text in a <table> beneath it — one row per bar with a <th scope=row> button (the same element that drives the hover highlight) and one <td> per distance holding the literal HRC number plus a sr-only ' HRC' unit, so a screen-reader user gets the full comparison independent of the canvas. prefers-reduced-motion freezes on a deliberately composed frame — front parked at 55% up the bar (so the directional-cooling mechanic is still visible) with the fall-off curve forced to FULLY drawn regardless of front position (bypassing the normal front-tied reveal specifically so the frozen frame shows both the mechanic and the complete signature curve at once) and the water jet/plume drawn once at a fixed pose, never animated. Props: bars (JominyBar[], default four illustrative grades), title (accessible caption for the table), className."
-      }
-    },
-    {
-      "name": "jumbo-drill-boom-pattern",
-      "type": "registry:ui",
-      "title": "Jumbo Drill Boom Pattern",
-      "description": "A full-bleed ambient background modeling a tunnel drill jumbo drilling a full blast pattern: one boom's drill steel swings to each of 35 numbered collar points across a rock face and plunges in with a hammering jitter, leaving a growing hole, before withdrawing and repositioning to the next collar in a burn-cut sequence.",
-      "files": [
-        {
-          "path": "registry/loud/jumbo-drill-boom-pattern/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/jumbo-drill-boom-pattern.tsx"
-        }
-      ],
-      "dependencies": [],
-      "cssVars": {
-        "theme": {
-          "color-ns-muted": "var(--ns-muted)",
-          "color-ns-accent": "var(--ns-accent)"
-        },
-        "light": {
-          "ns-muted": "#4d4d4d",
-          "ns-accent": "#006bff"
-        },
-        "dark": {
-          "ns-muted": "#8f8f8f"
-        }
-      },
-      "meta": {
-        "collection": "loud",
-        "tags": [
-          "background",
-          "hero",
-          "canvas",
-          "mining",
-          "tunneling",
-          "drill",
-          "industrial",
-          "ambient"
-        ],
-        "instruction": "Build <JumboDrillBoomPattern paused? children? className? style?> as a full-bleed Canvas 2D background modeling a REAL TUNNEL DRILL JUMBO drilling a full blast pattern — perimeter, lookout, stoping and lifter holes drilled by a boom-mounted percussive rock drill (drifter) before the round is charged and fired. GEOMETRY: 35 collar points (a 5x7 grid) are laid out from the container's smaller dimension with a power-1.6 warp on each axis so spacing compresses near the pattern center and widens toward the perimeter, matching a real burn-cut layout's tighter relief-hole spacing; the 35 grid cells are then sorted once (mulberry32-seeded) by distance-from-center plus a jitter term, giving a fixed DRILLING ORDER that grows as an uneven cluster outward from center rather than a clean scanned row. TIMELINE IS A PURE FUNCTION OF ELAPSED TIME, not an incrementally-stepped simulation: each hole gets a fixed 2.4s cycle (1.8s drill-in eased with easeOutCubic, 0.3s withdraw, 0.3s reposition swing to the next collar), so 35 holes take exactly 84s to drill the full pattern; that is followed by a 3s pause with the complete pattern visible and the boom parked off to the side, then a 4s dissolve where every drilled hole's depth fades back to zero together (standing in for the round being fired and a fresh face exposed), for a 91s total loop period — every value (hole depth, steel extension, boom position) is derived directly from `elapsedMs mod 91000`, so resuming after a tab hide or an IntersectionObserver reactivation is a matter of re-basing the animation clock (`performance.now() - lastSimTime`), never restarting from t0. ROCK FACE: a low-frequency value-noise field on a small fixed 9x6 control-point grid (mulberry32-seeded once at mount, bilinear+smoothstep resampled) is baked into a small offscreen canvas once at mount and rebuilt only on resize or a token change (never per frame), then drawImage-scaled onto the visible canvas every frame; it ramps between --background and --ns-muted. DRILLED HOLES: each collar's current depth (0..1, growing while its hole is actively drilling, held at 1 through withdraw/reposition and while parked, uniformly scaled by (1-dissolveT) during the reset dissolve) draws three layers at that depth's alpha — a --ns-muted spoil-ring, a soft blurred --foreground shadow (shadowColor/shadowBlur, alpha-only, no color decomposition) to keep the puncture legible against a low-contrast light-theme face, and a crisp --foreground fill on top; undrilled collars show a faint --ns-muted ring as the plan reference and disappear once their hole starts drilling. BOOM + STEEL: simple procedural line/rect geometry — a fixed off-canvas base point, a mast line from base to ~86% of the way to the current target collar (interpolated during the 0.3s reposition swing), and a steel segment that plunges past the collar by up to ~2.1x the hole radius as `steelExtend` ramps 0->1 during drill-in and 1->0 during withdraw, retracted to 0 while traveling; during the drill-in phase only, a 12Hz-equivalent two-term sine jitter (2-3px amplitude, PERPENDICULAR to the boom's own direction) shakes the steel — a real drifter hammers at 30-60Hz, deliberately decoupled from that rate per the round's aliasing rule since it is well above what a 60fps canvas can render believably. RESTING LOOP: mount always lands at simTime = 28000ms into the 91000ms loop (~a third of the pattern already drilled, one boom mid-plunge with visible jitter) — real elapsed time then carries it forward from there, so +2.5s shows one more hole complete and the boom mid-swing, +5s shows a visibly larger, still-uneven drilled cluster. prefers-reduced-motion freezes at the fixed simTime 51300ms (~61% through the 84s drill phase, the 22nd hole mid-plunge at exactly half depth) chosen because it is the one frame showing fully drilled holes, one in-progress hole and untouched undrilled collars all at once — the paused prop freezes at whatever simTime the animation last reached rather than snapping back to t0. TOKENS: --foreground (rock structure line-work, boom/steel, hole fill), --ns-muted (ambient noise field, spoil rings, undrilled collar marks) and --background (canvas clear) are read via getComputedStyle(document.documentElement) only after document.fonts.ready resolves and before the first paint, gated behind a `ready` flag on every path that could otherwise draw first (ResizeObserver, IntersectionObserver, the reduced-motion/paused branch), and re-read (with the rock buffer rebuilt) on a MutationObserver watching documentElement's class. No --ns-accent anywhere — no interaction moment, this is a resting ambient surface; there is no pointer/press/scroll driving movement so autoplay.mode is 'none'. HOST: DPR-capped backing store (max 2), IntersectionObserver (threshold 0) and document visibilitychange both stop the single rAF loop, a debounced ResizeObserver rebuilds the collar layout, holeR/jitter scale and rock buffer on layout change. The canvas is aria-hidden and pointer-events-none; children render as real DOM above it in normal focus order and are never intercepted by the canvas. Zero dependencies."
       }
     },
     {
@@ -21622,47 +21349,6 @@
           "decorative"
         ],
         "instruction": "Build <TriconeBitTeeth paused? children? className? style?> as a full-bleed 2D-canvas hero built on a rotary tricone rock bit: three cone cutters orbit the bit's centre together (bitAngle = t / LAP_SECONDS * 2*PI, LAP_SECONDS=7.5, an 8-RPM-equivalent sweep deliberately decoupled from the real 60-120 RPM rate per the round 9 aliasing rule) while a CPU-side depth buffer records where their teeth have struck. REAL NUMBERS: 3 cones, 120 degrees apart, orbit radius = 0.32 * min(fieldW, fieldH); TEETH_PER_CONE=11 teeth per cone, spread across a short arc of the cone's own track (not a single point) so one strike cluster reads as a row; a simultaneous 3-cone STRIKE_INTERVAL=0.68s cluster (33 real tooth-strikes/lap collapsed into one legible 3-cone event, per the round 9 'roughly a second between discrete events' rule); each tooth stamps a soft radial-falloff crater (exp(-d^2*2.2) within radius ref*0.028) at amplitude 0.75-1.0 into a Float32Array depth buffer sized FIELD_CELLS=96 cells across the container's SMALLER dimension (aspect-scaled on the other axis); every real frame the WHOLE buffer decays via depth *= exp(-HEAL_RATE*dt), HEAL_RATE=0.9/s (~90% refill in ~1.1s) — birth and decay are both constant and independent, so the ring is a resident population in equilibrium, never a monotonic fill (same steady-state discipline as registry/loud/edm-crater-field, but here births are STRUCTURED — always at the three cones' current orbit position — never uniform-random, which is what keeps this from reading as edm-crater-field's diffuse plate). RENDERING: the depth buffer is painted into an offscreen low-res canvas each frame (raised rock at depth<=0 mixed toward a struck-deep stop as depth approaches 1, both derived from --background/--foreground) and blitted scaled-up with imageSmoothingEnabled=true onto the display canvas — a soft, non-pixel-hard crater read appropriate to rock rather than a machined plate. The three cone BODIES are drawn as small triangular wedges directly on the display canvas each frame, orbiting at bitAngle with an additional decorative own-axis spin (t*6 rad/s, cosmetic only, not tied to any real number) — this vector overlay is what makes 'three cones rotating' legible on its own, independent of the crater ring, and is the deliberate differentiator from edm-crater-field's shader-only height field with no visible tool. A faint mud-jet sweep ring (0.08 peak luminance, radiating from bit centre at JET_SPEED=140px/s, resetting every JET_PERIOD=0.9s) stands in for nozzle discharge and must stay under the crater ring in read priority — a wash, not a highlight. MUST NOT: tint the crater ring, cone bodies or jet sweep with --ns-accent — there is no interactive control on this component (a pointer, if ever added, may only brighten the ring in luminance near the cursor), matching the showpiece recipe's standing 'accent-tinted pointer highlight' defect (edge-yield, granule-churn, shear-billow). RESTING LOOP: t0 shows an already-mid-cycle ring (seeded by two immediate strikeCluster() calls in resize(), at bit angles 0 and one-third of a lap, so mount never shows a blank flat frame); by 2.5s roughly 3-4 more clusters have landed and one or two early clusters have healed back toward flat; by 5s the ring shows continuous turnover — fresh strikes at the leading edge, healed craters fading at the trailing edge — which is the 'alive at rest' proof, not a filling-in or emptying-out pattern. TOKENS: three luminance stops (raised rock, struck-deep, muted) derived from --background, --foreground, --ns-muted via getComputedStyle(document.documentElement) at mount, re-read on a MutationObserver watching documentElement's class — NO PAINT BEFORE THE FIRST READ, readColors() runs before the first resize()/draw(). Light theme (checked first): the dark anchor for struck-deep is mixed from --foreground rather than pure black, since light theme has far less headroom below --background than dark theme does above it — verify the raised/struck-deep/muted three-step ramp stays legible there specifically. `ResizeObserver` reallocates the depth buffer and reseeds two clusters; `IntersectionObserver` (threshold 0) and `visibilitychange` both pause the single rAF loop; `prefers-reduced-motion`/`paused` freeze on STATIC_STRIKE_PHASE — the instant right after the most recent strike lands, at maximum unhealed depth, the single most structured frame in the loop. Canvas is `aria-hidden` decoration with `w-full h-full`; children render over the field in a `relative z-[1]` layer and need a token scrim, since the crater ring can pass under any line of overlaid type."
-      }
-    },
-    {
-      "name": "wasp-nest-envelope",
-      "type": "registry:ui",
-      "title": "Wasp Nest Envelope",
-      "description": "A full-bleed paper/fibre backdrop modelled on paper-wasp nest construction: pulp is laid down in short fan-shaped mandible strokes that shingle into concentric layers around a hidden comb, each layer's tone a subtly different pulp batch, with a fixed cutaway wedge permanently exposing the banded interior and periodic wasp-visit stroke batches landing right at the growth front inside it.",
-      "files": [
-        {
-          "path": "registry/loud/wasp-nest-envelope/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/wasp-nest-envelope.tsx"
-        }
-      ],
-      "dependencies": [],
-      "cssVars": {
-        "theme": {
-          "color-ns-muted": "var(--ns-muted)",
-          "color-ns-accent": "var(--ns-accent)"
-        },
-        "light": {
-          "ns-muted": "#4d4d4d",
-          "ns-accent": "#006bff"
-        },
-        "dark": {
-          "ns-muted": "#8f8f8f"
-        }
-      },
-      "meta": {
-        "collection": "loud",
-        "tags": [
-          "background",
-          "hero",
-          "canvas",
-          "simulation",
-          "monochrome",
-          "decorative",
-          "paper",
-          "organic"
-        ],
-        "instruction": "Build <WaspNestEnvelope density? speed? paused? children? className? style?> as a full-bleed 2D-canvas paper/fibre pane growing wasp-nest envelope shells — layered pulp shingles, not a filled blob or a shader trick. REAL MECHANIC: paper wasps (Polistes, Vespula) scrape wood fibre, chew it into pulp, and lay it down in short fan-shaped mandible sweeps, each stroke slightly overlapping the last, building up in concentric shingled layers (like roof shingles or stucco passes) around the comb, with each layer's stroke direction and pulp-batch shade subtly different because different wasps forage different wood sources at different times (documented in Vespidae nest-architecture studies, e.g. Jeanne 1975 'The adaptiveness of social wasp nest architecture'). NUCLEATION: `round(min(w,h)/340)` independent points, minimum 1 (overridable via `density`), each growing its own shell from a fixed random (cx,cy). STROKE PRIMITIVE: a filled rect standing in for a short fan-shaped arc, length 14-22px (random per stroke), width 5-7px, positioned at angle = (strokeIndex * 11) / radius radians around the ring (STROKE_SPACING=11px along the circumference) and rotated tangent-to-ring plus a fan offset that cycles ((strokeIndex*14) % 42) - 21 degrees, giving the shingled fan-sweep look. STROKE RATE: 3.4 strokes/s per nest, landing one at a time (STROKE_INTERVAL_MS = 1000/3.4 ≈ 294ms) — this is the followable cadence. LAYER: a layer at radius r needs `ceil(2*PI*r/11)` strokes to complete; once filled, the shell radius steps +9px (LAYER_STEP) and a new layer starts, sampling a fixed toneOffset (-1..1) once. Growth stops adding new layers once the next radius would reach `1.15 * min(w,h)/2` (CAP) — at these rates that's ~40-70s for a typical hero, a slow background event, NOT the primary resting-loop signal. TONE: each stroke's fill is `mix(--ns-muted, --border, ageFraction)` (ageFraction = layer index / (layerCount-1), 0 = oldest/interior, 1 = newest/outermost) with the layer's fixed toneOffset applied as an RGB luminance multiplier `rgb * (1 + toneOffset * range)`, range = 0.08 in dark theme, 0.12 in light theme (`!documentElement.classList.contains('dark')`) where the token range compresses — NEVER a hue shift, NEVER touching --foreground or --ns-accent. RENDER SPLIT FOR PERFORMANCE AND LEGIBILITY: interior layers (all but the outermost 3) are drawn as a single solid stroked ring (`ctx.arc` + lineWidth = LAYER_STEP+1) in that layer's tone — this is what makes the concentric banding read clearly at card/hero distance without redrawing hundreds of stale strokes every frame. The outermost 3 layers (2 most-recently-completed plus the currently-active one) are drawn as INDIVIDUAL discrete strokes computed at that layer's angle formula, which is where the shingle-stroke texture is actually visible. CUTAWAY: each nest has a fixed 60-90deg wedge (`cutawayStart`, `cutawayWidth`, sampled once) permanently skipped when rendering strokes in the outermost-3 group ONLY — interior layers beneath render as full solid rings straight through that angular range, so the wedge exposes genuine banded cross-section, not a blank cut. Two thin `--border` radial lines are stroked at the wedge's two edges, from the radius where the outer group starts down to the current shell edge, reading as the cutaway's cut walls. WASP VISITS: every 5-8s (randomized per nest, re-rolled after each visit) a batch of 6-10 fresh strokes is generated at random angles INSIDE the cutaway's angular window, at the active layer's current radius, each with a 250ms alpha fade-in — since the cutaway is otherwise empty at the outer-group radii, these visit strokes are the only thing visible landing there, giving a fast, local, always-visible event riding on top of the much slower whole-shell growth. Visit strokes are pruned once shell growth buries them (`activeRadius - strokeRadius >= 22px`) or once a nest's list exceeds 60 entries (oldest dropped first) — this keeps memory bounded through the unbounded loop, including after a nest hits CAP and stops growing new layers (visits keep landing there forever, just recycling the same band). RESTING LOOP: t0 pre-seeds every nest 800-2200ms into its life (advanceNest run synchronously at mount) so a small stroke cluster and an already-thin exposed cutaway are visible immediately, never a blank canvas; by 2.5s several layers are stacked with visible banding and a visit batch may be mid-fade-in; by 5s the shell is visibly larger, more layers are banded, and the cutaway's exposed front has advanced — genuinely different geometry at each mark, driven by the always-running per-nest stroke accumulation even though full-shell closure (CAP) is a much longer background event. HOST: DPR-aware canvas (capped 2) sized off the host's own ResizeObserver-measured bounding box, never window size; nucleation points are re-seeded on resize only when the derived count itself changes, otherwise geometry persists. A single rAF loop (dt capped 48ms, scaled by `speed`) is stopped by an IntersectionObserver (threshold 0) when offscreen and by `visibilitychange` when the tab is hidden, restarted cleanly on return. `paused` freezes the clock without unmounting. REDUCED MOTION (SHELL_MIDGROWTH): matchMedia composes each nest directly (via the same `advanceNest` step function run synchronously, not the live rAF loop) to ~55% of its target radius — 5-6 banded layers, active layer's front fully laid so it reads mid-sweep, cutaway exposing clear internal banding — chosen because it is the one frame that legibly shows both the shingle-stroke texture and the layered banding at once (earlier shows no banding yet, later hides the cutaway's interior behind its own advancing front); a MutationObserver still repaints this frozen frame on a theme change. TOKENS: colours read only via `getComputedStyle(document.documentElement)` for `--background`, `--ns-muted`, `--border`, re-read on a MutationObserver watching documentElement's class, with no paint before that first read (checked on the rAF start, the ResizeObserver resume path, and the IntersectionObserver resume path). `--foreground` and `--ns-accent` never appear anywhere in the render — this stays a pure backdrop, never competing with overlaid headline copy. The canvas is aria-hidden/role=presentation; children render in an absolutely-positioned overlay above it and need a token scrim (bg-background/70 + backdrop-blur) since the layer bands span a wide value range in both themes."
       }
     },
     {

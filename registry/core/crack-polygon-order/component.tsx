@@ -19,14 +19,19 @@ import { useEffect, useRef, useState } from "react";
 //
 // This is a real-time simulation, not a pre-computed path being revealed:
 // a 2px-cell occupancy grid records where ink already exists, a random-walk
-// tip advances against that grid (segment length 3-5px, turning noise
-// +-12deg, checked at 90px/s), and completed generations are turned into
-// regions by a flood fill of the still-empty cells so the next generation
-// can nucleate inside the biggest 60% of them. Path geometry updates happen
-// via direct SVG DOM writes on refs (not React state) so ~14 rAF-driven
-// tips can grow every frame without a React re-render; React state only
-// changes on the rare event that new <path> elements need to mount (once
-// per generation, three times a cycle) or the panel resizes.
+// tip advances against that grid at a literal 90px/s (segment length
+// 6-10px, turning noise +-12deg per segment), and completed generations are
+// turned into regions by a flood fill of the still-empty cells so the next
+// generation can nucleate inside the biggest 60% of them. Growth is driven
+// by real elapsed ms every rAF frame, not snapped to the 6-10px segment
+// boundary — a tip's in-progress segment interpolates continuously
+// (progressPx / segLen) so the stroke visibly glides at 60fps and only the
+// completed, collision-tested segment endpoints are ever committed. Path
+// geometry updates happen via direct SVG DOM writes on refs (not React
+// state) so ~14 rAF-driven tips can grow every frame without a React
+// re-render; React state only changes on the rare event that new <path>
+// elements need to mount (once per generation, three times a cycle) or the
+// panel resizes.
 //
 // t0 is deliberately not a fresh, empty panel: on mount the whole tick
 // function is run synchronously against a fast, fixed 16ms clock for a
@@ -45,8 +50,8 @@ export interface CrackPolygonOrderProps {
 
 const CELL = 2; // occupancy-grid cell size, px — matches the ~2px T-junction test
 const SPEED_PX_S = 90; // crack tip advance rate
-const SEG_MIN = 3;
-const SEG_MAX = 5;
+const SEG_MIN = 6;
+const SEG_MAX = 10;
 const TURN_NOISE = (12 * Math.PI) / 180; // +-12deg per segment
 const GEN_PAUSE_MS = 900;
 const HOLD_MS = 4000;
@@ -71,15 +76,24 @@ type Phase =
   | "rewet"
   | "cooldown";
 
+type Pt = { x: number; y: number };
+
 type Tip = {
-  points: { x: number; y: number }[];
+  // finalized segment endpoints — collision-tested, never move again
+  committed: Pt[];
+  // current heading + target length of the segment still in progress
   heading: number;
+  segLen: number;
+  // px already covered into that in-progress segment, advanced every frame
+  // by real elapsed time (not snapped to the segment boundary) so the SVG
+  // path visibly glides rather than jumping in 6-10px steps
+  progressPx: number;
   done: boolean;
   recentCells: number[];
 };
 
 type CrackData = { id: number; gen: 1 | 2 | 3; a: Tip; b: Tip };
-type CrackMeta = { id: number; gen: 1 | 2 | 3; initialD: string };
+type CrackMeta = { id: number; gen: 1 | 2 | 3; initialDA: string; initialDB: string };
 
 /** mulberry32 — small, fast, deterministic given a seed */
 function mulberry32(seed: number) {
@@ -94,14 +108,33 @@ function mulberry32(seed: number) {
 
 const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
-function pointsToPath(pts: { x: number; y: number }[]): string {
+function pointsToPath(pts: Pt[]): string {
   if (pts.length === 0) return "";
   if (pts.length === 1) return `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
   return `M ${pts.map((p) => `${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(" L ")}`;
 }
 
-function makeTip(x: number, y: number, heading: number): Tip {
-  return { points: [{ x, y }], heading, done: false, recentCells: [] };
+/** committed points plus the current in-progress segment's live, interpolated tip — this is what gets drawn every frame */
+function renderPoints(tip: Tip): Pt[] {
+  if (tip.done) return tip.committed;
+  const from = tip.committed[tip.committed.length - 1];
+  const t = tip.segLen > 0 ? tip.progressPx / tip.segLen : 0;
+  const live: Pt = {
+    x: from.x + Math.cos(tip.heading) * tip.segLen * t,
+    y: from.y + Math.sin(tip.heading) * tip.segLen * t,
+  };
+  return [...tip.committed, live];
+}
+
+function makeTip(x: number, y: number, heading: number, rng: () => number): Tip {
+  return {
+    committed: [{ x, y }],
+    heading,
+    segLen: SEG_MIN + rng() * (SEG_MAX - SEG_MIN),
+    progressPx: 0,
+    done: false,
+    recentCells: [],
+  };
 }
 
 /** Occupancy grid: one Uint8Array cell per CELLxCELL px, 0 = empty. */
@@ -210,33 +243,53 @@ function pickSeedCell(region: Region, grid: Grid, rng: () => number): { x: numbe
   return { x: cx * CELL + CELL / 2, y: cy * CELL + CELL / 2 };
 }
 
-/** advances one tip by dtMs worth of simulated growth against the shared grid */
+/**
+ * advances one tip by dtMs of simulated growth against the shared grid.
+ * The in-progress segment's `progressPx` moves by real elapsed distance
+ * every call (never snapped straight to a segment boundary), so a caller
+ * repainting every rAF frame sees the path glide continuously at
+ * SPEED_PX_S rather than jump in SEG_MIN..SEG_MAX chunks every ~70-110ms.
+ * A segment is only collision/edge-tested — and only then can it terminate
+ * the tip at a T-junction — the instant progressPx reaches segLen.
+ */
 function growTip(tip: Tip, dtMs: number, grid: Grid, w: number, h: number) {
   if (tip.done) return;
-  let remainingMs = dtMs;
+  let dt = dtMs;
   let guard = 0;
-  while (remainingMs > 0 && !tip.done && guard < 30) {
+  while (dt > 0 && !tip.done && guard < 40) {
     guard++;
-    const segLen = SEG_MIN + rngFor(tip) * (SEG_MAX - SEG_MIN);
-    const segMs = (segLen / SPEED_PX_S) * 1000;
-    if (segMs > remainingMs) break;
-    remainingMs -= segMs;
+    const remainingSegPx = tip.segLen - tip.progressPx;
+    const availablePx = (SPEED_PX_S / 1000) * dt;
 
-    tip.heading += (rngFor(tip) - 0.5) * 2 * TURN_NOISE;
-    const from = tip.points[tip.points.length - 1];
-    const to = { x: from.x + Math.cos(tip.heading) * segLen, y: from.y + Math.sin(tip.heading) * segLen };
+    if (availablePx < remainingSegPx) {
+      tip.progressPx += availablePx;
+      dt = 0;
+      break;
+    }
+
+    // enough distance this tick to finish the in-progress segment — spend
+    // only the ms it actually needed and carry the rest into the next one
+    const neededMs = (remainingSegPx / SPEED_PX_S) * 1000;
+    dt -= neededMs;
+
+    const from = tip.committed[tip.committed.length - 1];
+    const to = {
+      x: from.x + Math.cos(tip.heading) * tip.segLen,
+      y: from.y + Math.sin(tip.heading) * tip.segLen,
+    };
 
     if (to.x < 0 || to.x > w || to.y < 0 || to.y > h) {
       const cx = Math.min(w, Math.max(0, to.x));
       const cy = Math.min(h, Math.max(0, to.y));
-      tip.points.push({ x: cx, y: cy });
+      tip.committed.push({ x: cx, y: cy });
       grid.mark(cx, cy, tip);
       tip.done = true;
       break;
     }
 
-    // sample a few points along the new segment: earliest collision wins, and
-    // every clean sample gets marked so the raster has no gap another crack could slip through
+    // sample a few points along the finished segment: earliest collision
+    // wins, and every clean sample gets marked so the raster has no gap
+    // another crack could slip through
     let hit = false;
     const samples = 3;
     for (let s = 1; s <= samples; s++) {
@@ -244,7 +297,7 @@ function growTip(tip: Tip, dtMs: number, grid: Grid, w: number, h: number) {
       const px = from.x + (to.x - from.x) * t;
       const py = from.y + (to.y - from.y) * t;
       if (grid.collides(px, py, tip)) {
-        tip.points.push({ x: px, y: py });
+        tip.committed.push({ x: px, y: py });
         grid.mark(px, py, tip);
         tip.done = true;
         hit = true;
@@ -253,22 +306,26 @@ function growTip(tip: Tip, dtMs: number, grid: Grid, w: number, h: number) {
       grid.mark(px, py, tip);
     }
     if (hit) break;
-    tip.points.push(to);
+
+    tip.committed.push(to);
+    tip.heading += (rngFor() - 0.5) * 2 * TURN_NOISE;
+    tip.segLen = SEG_MIN + rngFor() * (SEG_MAX - SEG_MIN);
+    tip.progressPx = 0;
   }
 }
 
-// a tiny per-tip pseudo-random stream derived from a shared counter avoids
-// threading the shared RNG through every tip while still staying seeded —
-// each tip's own float sequence is a function of a module-level draw counter
+// a tiny module-level RNG stream (reseeded whenever the component's own
+// seeded rng is (re)created) avoids threading the seeded generator through
+// every tip while still keeping the whole pattern reproducible from `seed`
 let sharedRng: () => number = mulberry32(1);
-function rngFor(_tip: Tip) {
+function rngFor() {
   return sharedRng();
 }
 
 function spawnCrack(id: number, gen: 1 | 2 | 3, x: number, y: number, rng: () => number): CrackData {
   const heading = rng() * Math.PI * 2;
-  const a = makeTip(x, y, heading);
-  const b = makeTip(x, y, heading + Math.PI + (rng() - 0.5) * 0.6);
+  const a = makeTip(x, y, heading, rng);
+  const b = makeTip(x, y, heading + Math.PI + (rng() - 0.5) * 0.6, rng);
   return { id, gen, a, b };
 }
 
@@ -340,7 +397,8 @@ export function CrackPolygonOrder({ seed, className = "" }: CrackPolygonOrderPro
     const meta: CrackMeta[] = Array.from(cracksMapRef.current.values()).map((c) => ({
       id: c.id,
       gen: c.gen,
-      initialD: pointsToPath(c.a.points),
+      initialDA: pointsToPath(renderPoints(c.a)),
+      initialDB: pointsToPath(renderPoints(c.b)),
     }));
     setCracks(meta);
   };
@@ -467,8 +525,8 @@ export function CrackPolygonOrder({ seed, className = "" }: CrackPolygonOrderPro
     for (const c of cracksMapRef.current.values()) {
       const refs = pathRefs.current.get(c.id);
       if (!refs) continue;
-      if (refs.a) refs.a.setAttribute("d", pointsToPath(c.a.points));
-      if (refs.b) refs.b.setAttribute("d", pointsToPath(c.b.points));
+      if (refs.a) refs.a.setAttribute("d", pointsToPath(renderPoints(c.a)));
+      if (refs.b) refs.b.setAttribute("d", pointsToPath(renderPoints(c.b)));
     }
   };
 
@@ -563,7 +621,7 @@ export function CrackPolygonOrder({ seed, className = "" }: CrackPolygonOrderPro
                   entry.a = el;
                   pathRefs.current.set(c.id, entry);
                 }}
-                d={c.initialD}
+                d={c.initialDA}
                 fill="none"
                 stroke="var(--foreground)"
                 strokeWidth={STROKE_W}
@@ -577,7 +635,7 @@ export function CrackPolygonOrder({ seed, className = "" }: CrackPolygonOrderPro
                   entry.b = el;
                   pathRefs.current.set(c.id, entry);
                 }}
-                d={c.initialD}
+                d={c.initialDB}
                 fill="none"
                 stroke="var(--foreground)"
                 strokeWidth={STROKE_W}
