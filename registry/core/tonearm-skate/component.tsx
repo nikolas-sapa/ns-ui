@@ -430,17 +430,18 @@ export function TonearmSkate({ className = "" }: TonearmSkateProps) {
             strokeDasharray="2 2"
             opacity={0.45}
           />
-          {/* pivot mount, also fixed, never lifts */}
-          <circle
-            cx={PV.x}
-            cy={PV.y}
-            r={6}
-            fill="none"
-            className="stroke-current text-border"
-            strokeWidth={1.25}
-          />
-
           <g ref={armGroupRef}>
+            {/* pivot mount — rigidly attached to the tube, so it lives in
+                the lifted group with everything else that shares the pivot
+                point; only the thread and its post (above) stay fixed */}
+            <circle
+              cx={PV.x}
+              cy={PV.y}
+              r={6}
+              fill="none"
+              className="stroke-current text-border"
+              strokeWidth={1.25}
+            />
             {/* counterweight */}
             <circle
               ref={cwRef}
@@ -479,7 +480,7 @@ export function TonearmSkate({ className = "" }: TonearmSkateProps) {
             <rect
               ref={headshellRef}
               x={-4}
-              y={-7}
+              y={-3}
               width={22}
               height={6}
               rx={1.25}
