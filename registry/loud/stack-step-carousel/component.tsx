@@ -10,33 +10,33 @@ import { useEffect, useRef } from "react";
 // reflectance up a notch.
 //
 // GEOMETRY: 8 substrate discs (N_DISCS) sit on station points evenly spaced
-// around a single "sun ring" of radius 0.32*min(w,h), disc radius
-// 0.09*min(w,h). The whole ring is the carrier: its rotation, period
-// ORBIT_PERIOD = 14s, is what actually carries each station through the
-// fixed 30deg source arc at the top of the frame — this orbital position is
-// what the spec's "sun ring (carrier) period 14s" governs. Layered on top,
-// independent of orbital position, every disc also spins on its own local
-// axis (a real, separate feature of planetary coating rigs — substrates are
-// spun on their own mount for uniform deposition) at SPIN_PERIOD = 3.5s, the
-// literal 4:1 gear ratio the spec names; it is rendered as a faint radial
-// tick sweeping the disc face, decoupled from the crossing/step event per
-// the round-9 decoupling rule (the two numbers are two really-separate
-// mechanisms in the source process, not one number driving the other).
+// (45deg apart) around a single "sun ring" of radius 0.32*min(w,h), disc
+// radius 0.09*min(w,h). PLANET_PERIOD_S = 3.5s is each disc's own orbital
+// period around the center — the spec's "planet (substrate) spin" — this IS
+// what actually carries every station through the fixed 30deg source arc at
+// the top of the frame, so a single disc's own crossing cadence is exactly
+// once per 3.5s, matching the spec's legibility line literally rather than
+// by inference. CARRIER_PERIOD_S = 14s (the spec's "sun ring" period) gets
+// its own, separate, purely structural screen presence: a slow-rotating
+// armature of small index ticks around the guide ring, decoupled from the
+// discs' own fast motion — the classic epicyclic-gearing relationship (a
+// slower carrier arm, faster individual planet motion) rendered as two
+// visually distinct rotations rather than one number driving the other.
 //
 // CROSSING / LAYERS: each disc's total completed orbits by time t is
-// totalLaps_i(t) = floor(t/ORBIT_PERIOD + stationAngle_i/2*PI) — a step
-// function that ticks up by exactly 1, once per 14s, offset per disc by its
-// station angle, so across the 8 evenly-spaced discs a new crossing lands
-// roughly every 14/8 = 1.75s somewhere on the ring even though any single
-// disc only completes its own orbit once every 14s. Layer count is
-// (seedOffset_i + totalLaps_i(t)) mod 13 — a 13-state cycle (0 = fresh bare
-// blank through 12 = full stack) so the crossing that WOULD push a disc past
-// 12 instead wraps it back to a fresh blank, i.e. the staggered swap the
-// spec calls for; seedOffset_i (a fixed, non-random per-disc integer 0..12)
-// staggers the 8 discs' initial phase in the cycle so they are never all at
-// 0 or all at 12 together, and because every disc's own cycle rate is
-// identical (one crossing per 14s) that stagger persists forever — the
-// batch structurally cannot resync into a single synchronized reload.
+// totalLaps_i(t) = floor(t/PLANET_PERIOD_S + stationAngle_i/2*PI) — a step
+// function that ticks up by exactly 1 once per disc's own 3.5s orbit, offset
+// per disc by its station angle, so with 8 evenly-spaced discs a new
+// crossing lands somewhere on the ring roughly every 3.5/8 ~= 0.44s even
+// though any single disc's own personal cadence stays exactly 3.5s. Layer
+// count is (seedOffset_i + totalLaps_i(t)) mod 13 — a 13-state cycle (0 =
+// fresh bare blank through 12 = full stack) so the crossing that WOULD push
+// a disc past 12 instead wraps it back to a fresh blank, i.e. the staggered
+// swap the spec calls for; seedOffset_i (a fixed, non-random per-disc
+// integer 0..12 from a seeded PRNG) staggers the 8 discs' initial phase in
+// the cycle, and because every disc's own cycle rate is identical that
+// stagger persists forever — the batch structurally cannot resync into a
+// single synchronized reload.
 //
 // REFLECTANCE: luminance is not a linear layer count, it is the real
 // quarter-wave-stack reflectance recursion — Y(N) = n_sub*(n_L/n_H)^N,
@@ -52,16 +52,22 @@ import { useEffect, useRef } from "react";
 // weld-pool convention's intent (never literally inverted to a different
 // hue relationship) is satisfied structurally rather than by a tuned pair.
 //
-// SOURCE-CROSSING GLOW: for each disc, crossingPhaseSec_i(t) is time since
-// its last top-crossing (0..14s, wrapping). While that is under 800ms a
-// soft halo (plain --foreground, alpha-only, never --ns-accent) rises to a
-// peak at 150ms and fades back out by 800ms — arrives, brightens, departs.
+// SOURCE-CROSSING GLOW: the envelope is referenced to the disc's ARC-ENTRY
+// angle (-15deg), not the arc center, so it starts ramping as the disc
+// actually enters the 30deg window, peaks almost exactly as the disc passes
+// the arc's center (peak time = the real entry-to-center transit time, ~half
+// the arc's own transit duration), then keeps fading a while after physical
+// exit for legibility — arrives, brightens, departs, never a blink. The
+// fixed source arc is drawn from --ns-muted (not --border — a full-bleed
+// background's fixed reference the whole mechanic points at cannot be the
+// ~1.1:1 separator token) and brightens toward --foreground while any disc
+// is under it.
 //
 // POINTER: canvas-local pointermove finds the nearest disc within 1.3x its
 // radius and eases a hover ring toward full over ~150ms — a plain
 // --foreground outline whose alpha reflects that disc's OWN current
 // reflectance fraction (a legible "here's how far along this one is"), no
-// tint, no orbit/spin rate change.
+// tint, no orbit/carrier rate change.
 //
 // The clock is real elapsed wall time from mount (t = (now-startMs)/1000)
 // with no loop reset at all: the process genuinely never finishes, matching
@@ -73,13 +79,15 @@ import { useEffect, useRef } from "react";
 // ---------------------------------------------------------------------------
 
 const N_DISCS = 8;
-const ORBIT_PERIOD_S = 14; // sun ring (carrier) period
-const SPIN_PERIOD_S = 3.5; // planet (substrate) axial spin period — 4:1 ratio
+const PLANET_PERIOD_S = 3.5; // each disc's own orbit — the crossing cadence
+const CARRIER_PERIOD_S = 14; // slow armature-tick rotation, decorative
 const SOURCE_ARC_RAD = (30 * Math.PI) / 180; // 30deg source arc at top of frame
+const ARC_HALF_FRAC = SOURCE_ARC_RAD / 2 / (Math.PI * 2); // entry offset as a fraction of one orbit
+const GLOW_PEAK_MS = ARC_HALF_FRAC * PLANET_PERIOD_S * 1000; // entry -> center transit time
 const GLOW_MS = 800; // arrives-brightens-departs envelope per crossing
-const GLOW_PEAK_MS = 150;
 const LAYER_CAP = 12; // 0..12, 13-state reload cycle
 const HOVER_EASE_MS = 150;
+const N_ARMATURE_TICKS = 16;
 
 // quarter-wave stack indices — TiO2/SiO2-like alternating pair on glass
 const N_AIR = 1.0;
@@ -115,33 +123,39 @@ function mulberry32(seed: number) {
 
 interface Station {
   angle: number; // radians, 0 = top, increasing clockwise
+  angleFrac: number; // angle / 2*PI, cached
   seedOffset: number; // 0..12, staggers the reload cycle
-  spinPhase: number; // radians, staggers the axial spin marker
 }
 
 function buildStations(): Station[] {
   const rand = mulberry32(0x5ea70c1e);
   const stations: Station[] = [];
   for (let i = 0; i < N_DISCS; i++) {
+    const angle = (i / N_DISCS) * Math.PI * 2;
     stations.push({
-      angle: (i / N_DISCS) * Math.PI * 2,
+      angle,
+      angleFrac: i / N_DISCS,
       seedOffset: Math.floor(rand() * (LAYER_CAP + 1)),
-      spinPhase: rand() * Math.PI * 2,
     });
   }
   return stations;
 }
 
+/** orbit phase referenced to the disc sitting exactly at the arc's center (top) */
+function centerPhase(station: Station, tSec: number): number {
+  return tSec / PLANET_PERIOD_S + station.angleFrac;
+}
+
 function layerAt(station: Station, tSec: number): number {
-  const laps = Math.floor(tSec / ORBIT_PERIOD_S + station.angle / (Math.PI * 2));
+  const laps = Math.floor(centerPhase(station, tSec));
   return (((station.seedOffset + laps) % (LAYER_CAP + 1)) + (LAYER_CAP + 1)) % (LAYER_CAP + 1);
 }
 
-/** seconds since this disc's most recent top-crossing (0..ORBIT_PERIOD_S) */
-function crossingAge(station: Station, tSec: number): number {
-  const phase = tSec / ORBIT_PERIOD_S + station.angle / (Math.PI * 2);
-  const frac = phase - Math.floor(phase);
-  return frac * ORBIT_PERIOD_S;
+/** seconds since this disc last entered the source arc's leading (-15deg) edge */
+function glowAge(station: Station, tSec: number): number {
+  const shifted = centerPhase(station, tSec) + ARC_HALF_FRAC;
+  const frac = shifted - Math.floor(shifted);
+  return frac * PLANET_PERIOD_S;
 }
 
 function glowAlpha(ageSec: number): number {
@@ -149,6 +163,12 @@ function glowAlpha(ageSec: number): number {
   if (ageMs >= GLOW_MS) return 0;
   if (ageMs <= GLOW_PEAK_MS) return ageMs / GLOW_PEAK_MS;
   return 1 - (ageMs - GLOW_PEAK_MS) / (GLOW_MS - GLOW_PEAK_MS);
+}
+
+/** deterministically solves for a t where `station` sits at its glow peak with `laps` completed orbits */
+function solveGlowPeakTime(station: Station, laps: number): number {
+  const targetPhase = laps - ARC_HALF_FRAC + GLOW_PEAK_MS / 1000 / PLANET_PERIOD_S;
+  return (targetPhase - station.angleFrac) * PLANET_PERIOD_S;
 }
 
 interface Tokens {
@@ -264,11 +284,31 @@ export function StackStepCarousel({
       ctx.arc(cx, cy, sunRingRadius, 0, Math.PI * 2);
       ctx.stroke();
 
-      // fixed source arc at the top of the frame
-      const maxGlow = stations.reduce((m, s) => Math.max(m, glowAlpha(crossingAge(s, tSec))), 0);
-      ctx.strokeStyle = tokens.border;
-      ctx.globalAlpha = 0.6 + maxGlow * 0.4;
-      ctx.lineWidth = 2;
+      // carrier armature: a slow-rotating (14s) ring of index ticks — the
+      // sun ring's own structural motion, fully decoupled from the discs'
+      // 3.5s orbit
+      const carrierAngle = (tSec / CARRIER_PERIOD_S) * Math.PI * 2;
+      ctx.globalAlpha = 0.35;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let k = 0; k < N_ARMATURE_TICKS; k++) {
+        const a = (k / N_ARMATURE_TICKS) * Math.PI * 2 + carrierAngle;
+        const inner = sunRingRadius * 0.94;
+        const outer = sunRingRadius * 1.06;
+        ctx.moveTo(cx + inner * Math.sin(a), cy - inner * Math.cos(a));
+        ctx.lineTo(cx + outer * Math.sin(a), cy - outer * Math.cos(a));
+      }
+      ctx.stroke();
+      ctx.restore();
+
+      // fixed source arc at the top of the frame — must stay legible in
+      // light theme, so it is --ns-muted brightening toward --foreground,
+      // never the near-invisible --border
+      const maxGlow = stations.reduce((m, s) => Math.max(m, glowAlpha(glowAge(s, tSec))), 0);
+      ctx.save();
+      ctx.strokeStyle = mixRGB(tokens.muted, tokens.fg, 0.35 + maxGlow * 0.65);
+      ctx.globalAlpha = 0.75 + maxGlow * 0.25;
+      ctx.lineWidth = 3;
       ctx.beginPath();
       ctx.arc(cx, cy, sunRingRadius, -SOURCE_ARC_RAD / 2 - Math.PI / 2, SOURCE_ARC_RAD / 2 - Math.PI / 2);
       ctx.stroke();
@@ -280,8 +320,7 @@ export function StackStepCarousel({
         const layer = layerAt(st, tSec);
         const frac = reflectanceFrac(layer);
         const fill = mixRGB(tokens.muted, tokens.fg, frac);
-        const age = crossingAge(st, tSec);
-        const glow = glowAlpha(age);
+        const glow = glowAlpha(glowAge(st, tSec));
 
         if (glow > 0) {
           ctx.save();
@@ -300,22 +339,10 @@ export function StackStepCarousel({
         ctx.fill();
         ctx.restore();
 
-        // planet spin marker — decorative axial rotation, decoupled from crossings
-        const spinAngle = (tSec / SPIN_PERIOD_S) * Math.PI * 2 + st.spinPhase;
-        ctx.save();
-        ctx.strokeStyle = tokens.border;
-        ctx.globalAlpha = 0.55;
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.lineTo(x + Math.cos(spinAngle) * discRadius * 0.85, y + Math.sin(spinAngle) * discRadius * 0.85);
-        ctx.stroke();
-        ctx.restore();
-
         if (i === hoverIndex && hoverAlpha > 0.01) {
           ctx.save();
           ctx.globalAlpha = hoverAlpha * (0.3 + frac * 0.4);
-          ctx.strokeStyle = tokens.fg;
+          ctx.strokeStyle = mixRGB(tokens.muted, tokens.fg, 1);
           ctx.lineWidth = 2;
           ctx.beginPath();
           ctx.arc(x, y, discRadius * 1.2, 0, Math.PI * 2);
@@ -347,11 +374,12 @@ export function StackStepCarousel({
 
     const loop = (nowRaf: number) => {
       if (disposed) return;
-      if (!visible || pausedRef.current) {
+      if (!visible) {
         raf = 0; // IntersectionObserver re-arms this on re-entering view
         return;
       }
       raf = requestAnimationFrame(loop);
+      if (pausedRef.current) return; // stay armed; resumes the instant paused clears
       if (!sized || !tokens) return;
       if (startMs === 0) startMs = nowRaf;
       const tSec = ((nowRaf - startMs) / 1000) * speedRef.current;
@@ -364,9 +392,10 @@ export function StackStepCarousel({
       if (started || disposed || !tokens || !sized) return;
       started = true;
       if (reduced) {
-        // one disc mid-crossing at its glow peak, the rest at their natural
-        // staggered stations and layer counts — deterministic, no rAF
-        elapsedFrozenSec = GLOW_PEAK_MS / 1000;
+        // "carrier-crossing": station 3 pinned at its glow peak with 2 laps
+        // already completed, the other 7 stations at their own staggered
+        // positions and pre-crossing layer counts — deterministic, no rAF
+        elapsedFrozenSec = solveGlowPeakTime(stations[3]!, 2);
         draw(elapsedFrozenSec);
         return; // no rAF loop, no timers, no observers driving motion
       }

@@ -69,7 +69,7 @@ const BW = 120; // barrel width, constant
 const BX = (VBW - BW) / 2;
 const H_OPEN = 36;
 const H_SEATED = 22; // 62% of 36, per spec
-const DIE_W = 34;
+const DIE_W = 80; // wide enough to cover both witness-dimple x-offsets (30%/70% of BW)
 const DIE_H = 9;
 const DIMPLE_HW = 3; // 6px-wide dimple
 const DIMPLE_DEPTH = 4;
@@ -246,6 +246,14 @@ export function CrimpBarrelSet({
   const triggerPressRef = useRef<() => void>(() => {});
   const [announce, setAnnounce] = useState("");
 
+  // kept current every render so the mount-only effect below never needs
+  // onConnect/doneLabel in its dep array — an inline onConnect passed by
+  // the consumer must never tear down and restart the ambient rAF loop.
+  const onConnectRef = useRef(onConnect);
+  onConnectRef.current = onConnect;
+  const doneLabelRef = useRef(doneLabel);
+  doneLabelRef.current = doneLabel;
+
   useEffect(() => {
     const barrel = barrelRef.current;
     const topDie = topDieRef.current;
@@ -279,7 +287,6 @@ export function CrimpBarrelSet({
       barrel.setAttribute("d", buildBarrelPath(h, dimpleAmt));
       barrel.style.fill = rgbStr(fgRgb.current, 0.94);
 
-      const r = h / 2;
       const top = CY - h / 2;
       const bottom = CY + h / 2;
       const depth = DIMPLE_DEPTH * dimpleAmt;
@@ -308,11 +315,15 @@ export function CrimpBarrelSet({
       topDie.style.fill = rgbStr(fgRgb.current, 0.94);
       bottomDie.style.fill = rgbStr(fgRgb.current, 0.94);
 
-      const mouthL = BX + r;
-      const mouthR = BX + BW - r;
+      // anchored at the barrel's fixed end-caps (BX / BX+BW), not its
+      // rounded edge — the barrel's own width never changes, only its
+      // height, so this stays exposed past the barrel silhouette at every
+      // closeAmt instead of getting drawn under it.
+      const mouthL = BX;
+      const mouthR = BX + BW;
       for (let side = 0; side < 2; side++) {
         const mouthX = side === 0 ? mouthL : mouthR;
-        const outward = side === 0 ? -14 : 14;
+        const outward = side === 0 ? -16 : 16;
         for (let i = 0; i < 3; i++) {
           const idx = side * 3 + i;
           const line = strandRefs.current[idx];
@@ -335,8 +346,8 @@ export function CrimpBarrelSet({
       // a press just fires the callback directly, no motion to play.
       paint(crimpFrameAt(CLOSE_MS));
       triggerPressRef.current = () => {
-        onConnect?.();
-        setAnnounce(doneLabel);
+        onConnectRef.current?.();
+        setAnnounce(doneLabelRef.current);
       };
       const mo = new MutationObserver(() => {
         readTokens();
@@ -370,8 +381,8 @@ export function CrimpBarrelSet({
           paint(frame);
           if (frame.dimpleAmt >= 1 && !seatedFired) {
             seatedFired = true;
-            onConnect?.();
-            setAnnounce(doneLabel);
+            onConnectRef.current?.();
+            setAnnounce(doneLabelRef.current);
           }
         }
       } else {
@@ -414,7 +425,7 @@ export function CrimpBarrelSet({
       mo.disconnect();
       io.disconnect();
     };
-  }, [doneLabel, onConnect]);
+  }, []);
 
   return (
     <span className={`inline-flex flex-col items-center gap-2 ${className}`}>
@@ -446,18 +457,20 @@ export function CrimpBarrelSet({
           focusable="false"
           className="block overflow-visible"
         >
-          {/* static insulation stubs */}
+          {/* static insulation stubs — stop short of where the strand
+              flare lines begin (BX-16 / BX+BW+16) so flaring strands are
+              never redrawn over */}
           <line
             x1={BX - 40}
             y1={CY}
-            x2={BX + H_OPEN / 2 - 14}
+            x2={BX - 16}
             y2={CY}
             className="stroke-ns-muted"
             strokeWidth={5}
             strokeLinecap="round"
           />
           <line
-            x1={BX + BW - H_OPEN / 2 + 14}
+            x1={BX + BW + 16}
             y1={CY}
             x2={BX + BW + 40}
             y2={CY}
@@ -465,7 +478,14 @@ export function CrimpBarrelSet({
             strokeWidth={5}
             strokeLinecap="round"
           />
-          {/* strand flare lines, left then right, 3 each */}
+          {/* barrel */}
+          <path ref={barrelRef} />
+          {/* witness dimple marks */}
+          <path ref={witness1Ref} strokeWidth={1.4} fill="none" />
+          <path ref={witness2Ref} strokeWidth={1.4} fill="none" />
+          {/* strand flare lines, left then right, 3 each — anchored at the
+              barrel's fixed end-caps, drawn AFTER the barrel/dimples so the
+              exposed flare is never occluded by either */}
           {Array.from({ length: 6 }, (_, i) => (
             <line
               key={i}
@@ -476,12 +496,9 @@ export function CrimpBarrelSet({
               strokeLinecap="round"
             />
           ))}
-          {/* barrel */}
-          <path ref={barrelRef} />
-          {/* witness dimple marks */}
-          <path ref={witness1Ref} strokeWidth={1.4} fill="none" />
-          <path ref={witness2Ref} strokeWidth={1.4} fill="none" />
-          {/* dies */}
+          {/* dies — fill is set explicitly here (not just in paint()) so
+              nothing paints black on the very first frame before the
+              effect's token read runs */}
           <rect
             ref={topDieRef}
             x={BX + BW / 2 - DIE_W / 2}
@@ -489,6 +506,7 @@ export function CrimpBarrelSet({
             width={DIE_W}
             height={DIE_H}
             rx={1.5}
+            fill="var(--foreground)"
           />
           <rect
             ref={bottomDieRef}
@@ -497,6 +515,7 @@ export function CrimpBarrelSet({
             width={DIE_W}
             height={DIE_H}
             rx={1.5}
+            fill="var(--foreground)"
           />
         </svg>
       </button>
