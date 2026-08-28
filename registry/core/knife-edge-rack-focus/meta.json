@@ -1,0 +1,26 @@
+{
+  "name": "knife-edge-rack-focus",
+  "title": "Knife Edge Rack Focus",
+  "description": "A card-scale loader substitute built on the Foucault knife-edge test: a knife edge racks through a mirror's focus, sweeping the aperture's shadow pattern from one side to a flat null and back, with four baked zonal errors crossing that null at their own moment.",
+  "collection": "core",
+  "tags": [
+    "canvas",
+    "loader",
+    "activity-indicator",
+    "optics",
+    "foucault-test",
+    "shadow-pattern",
+    "generative",
+    "physics"
+  ],
+  "useWhen": "a card-scale loading/activity indicator whose motion has a real diagnostic-instrument mechanic (a sweep through a null, structured by baked local variation) instead of an arbitrary rotation, and the pause-at-the-interesting-moment beat reads better than a continuous unstructured loop; pick grinding-chatter-lobes instead when a growth/saturation/reset narrative fits better than a sweep-and-null one, loader-iris when a small fixed-footprint indeterminate glyph is enough with no diagnostic narrative, or profilometer-trace when the mechanic should read as a literal surface-height measurement rather than a shadow test.",
+  "autoplay": {
+    "mode": "none"
+  },
+  "instruction": "Build <KnifeEdgeRackFocus label? className?> as a self-contained Canvas 2D loader, DPR-clamped to 2, direct-DOM rAF as the sole writer, zero dependencies. Disc radius = 0.42 * min(container width, height). The shadow pattern collapses to ONE function of radius, L(r, t) = clamp(0.5 + 1.8 * (t - offset(r)), 0, 1), because every point at a given radius shares the same optical path in a real Foucault test — no 2D raster needed. offset(r) is a piecewise-linear interpolation between 4 anchor offsets [-0.18, -0.06, 0.06, 0.18] (spaced 0.12 apart) at radii [0.25, 0.5, 0.7, 0.9] of the disc radius, flat-clamped beyond the anchors. Painted every frame as ONE radial CanvasGradient sampled at 48 stops from r=0 to 1.05*radius (the extra 5% for a soft edge) — the smoothness of a real shadow front comes from gradient interpolation, not per-pixel work, so cost stays flat regardless of how far the disc grows. t is driven by a triangle wave over a 16s period (8s rising -1->1, 8s falling 1->-1) accumulated from an internal driveTime that only advances while not paused/dwelling (never derived from absolute elapsed time). Exactly at a null (|t| < 0.05) the drive PAUSES for 0.6s before continuing — that dwell, not the sweep itself, is the clearest single followable event, mirroring how a real tester holds position there. The 4 zone offsets crossing t=0 at different points in the sweep is what makes concentric rings visibly rise or sink relative to their neighbours rather than the whole disc changing uniformly — the real diagnostic signal. Pointer interaction: pointerdown snaps the drive to the nearest null (by driveTime modulo the 16s period, comparing against the two null phases at ph=0.25 and ph=0.75) and holds it there via a separate userPaused flag (driveTime itself frozen, never advanced) until pointerup/pointercancel/pointerleave, which resumes the sweep exactly where it paused; a paused-state affordance is a 1.5px stroke around the disc rim at foreground/40% alpha (never --ns-accent, never --border as a stroke). Colours: the fill is a direct two-point mix between --foreground (L=0) and --background (L=1) via a canvas fillStyle probe reading getComputedStyle(document.documentElement) before first paint and re-derived on a documentElement class MutationObserver — this ramp never inverts between themes because it is a literal light/shadow phenomenon, not a decorative palette. A ResizeObserver rebuilds geometry on layout change; an IntersectionObserver pauses/resumes the rAF loop off-screen. Under prefers-reduced-motion the component renders one static frame at t = 0.3, named FREEZE_LABEL = 'half-sweep-zoned' (clear rise/fall banding across all 4 zones, deliberately not the null itself, which is nearly featureless and would under-inform a static viewer) — the loop, pointer listeners and IntersectionObserver are never attached, though the ResizeObserver and MutationObserver stay live. Accessibility: the root carries role=\"status\" with a visually-hidden label (default 'Testing'); the canvas is aria-hidden. Props: label (status text, default 'Testing'), className (merged onto the root).",
+  "dependencies": [],
+  "card": {
+    "focus": "[role='status']",
+    "padding": 0.12
+  }
+}
