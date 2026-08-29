@@ -1,4 +1,9 @@
-import registry from "@/registry.json";
+// Client-safe projection of registry.json (build-registry.ts generates it) —
+// this module is imported by site-shell.tsx, a Client Component, so a bare
+// `registry.json` import here would ship every component's full record
+// (instruction prose, files, dependencies, cssVars) into the browser for a
+// sidebar tree that only reads name/title/tags/collection/rank.
+import registry from "@/lib/registry-lite.generated.json";
 import order from "@/lib/component-order.json";
 import { CATEGORIES, categorize } from "@/lib/search-categories";
 import { kindOf } from "@/lib/kind";
@@ -45,11 +50,11 @@ const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").repla
  * `kindOf` can't label — renders flat under the category, same depth as today.
  */
 export function navGroups(): NavGroup[] {
-  const items = registry.items.map((i) => ({
+  const items = registry.map((i) => ({
     name: i.name,
     title: i.title,
-    tags: i.meta?.tags ?? [],
-    loud: (i.meta?.collection ?? "core") === "loud",
+    tags: i.tags ?? [],
+    loud: (i.collection ?? "core") === "loud",
   }));
 
   const memberships = categorize(items);
@@ -59,7 +64,7 @@ export function navGroups(): NavGroup[] {
   // defers straight to the existing recency order. See app/page.tsx's
   // `componentRank` for the identical rule on the catalog side; the two
   // must not diverge.
-  const tasteRank = new Map(registry.items.map((i) => [i.name, i.meta?.rank]));
+  const tasteRank = new Map(registry.map((i) => [i.name, i.rank]));
   const byTaste = (name: string) => tasteRank.get(name) ?? Number.MAX_SAFE_INTEGER;
   const buckets = new Map<string, (NavItem & { kind: string | null })[]>();
 
