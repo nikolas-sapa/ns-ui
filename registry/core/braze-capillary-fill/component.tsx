@@ -126,14 +126,17 @@ export function BrazeCapillaryFill({
       const endX = w * (1 - INSET_FRAC);
       const span = endX - startX;
 
-      // sheet edges either side of the joint — separator lines, --border only
+      // sheet edges either side of the joint — separator lines, --border only.
+      // Left edge sits flush at startX (the joint mouth, where the front must
+      // visibly begin) — only the exit side overhangs, giving the fillet
+      // meniscus room to bulge past endX.
       ctx.strokeStyle = border;
       ctx.lineWidth = 1;
       ctx.globalAlpha = 1;
       ctx.beginPath();
-      ctx.moveTo(startX - h * 0.3, cy - gapHalf);
+      ctx.moveTo(startX, cy - gapHalf);
       ctx.lineTo(endX + h * 0.3, cy - gapHalf);
-      ctx.moveTo(startX - h * 0.3, cy + gapHalf);
+      ctx.moveTo(startX, cy + gapHalf);
       ctx.lineTo(endX + h * 0.3, cy + gapHalf);
       ctx.stroke();
 

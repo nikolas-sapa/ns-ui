@@ -214,48 +214,6 @@
       }
     },
     {
-      "name": "autoclave-cycle-gauge",
-      "type": "registry:ui",
-      "title": "Autoclave Cycle Gauge",
-      "description": "A card-scale status widget modelled on a steam sterilizer's combined pressure/temperature gauge: a needle sweeps a slow come-up ramp, sits through a timed hold with regulator chatter, then drops fast through an exhaust vent, while a temperature trace scrolls beneath it — three phases told apart by needle speed alone, never a printed number.",
-      "files": [
-        {
-          "path": "registry/core/autoclave-cycle-gauge/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/autoclave-cycle-gauge.tsx"
-        }
-      ],
-      "dependencies": [],
-      "cssVars": {
-        "theme": {
-          "color-ns-muted": "var(--ns-muted)",
-          "color-surface": "var(--surface)"
-        },
-        "light": {
-          "ns-muted": "#4d4d4d",
-          "surface": "#fafafa"
-        },
-        "dark": {
-          "ns-muted": "#8f8f8f",
-          "surface": "#171717"
-        }
-      },
-      "meta": {
-        "collection": "core",
-        "tags": [
-          "gauge",
-          "canvas",
-          "status",
-          "progress",
-          "needle",
-          "cycle",
-          "ambient",
-          "industrial"
-        ],
-        "instruction": "Build <AutoclaveCycleGauge label? className?> as a self-contained 2D canvas widget inside a bordered card (rounded-md border border-border bg-surface, fixed 4:3 canvas aspect-ratio, geometry derived entirely from the container's smaller dimension so it rescales cleanly at card size). Default label is a product-domain string (\"In progress\"), not the mechanic's name — callers slot in their own copy (\"Rendering export\", \"Backing up\", etc.) so the widget reads as a status moment on a real product surface, never as the sterilizer it's modelled on. It renders a circular dial occupying the card's upper ~68% and a horizontal scrolling temperature-trace strip in the lower band. CYCLE: a fixed unbounded 32s loop with three phases driven purely by elapsed real time (performance.now()-based, modulo 32s) — a 12s come-up ramp (0 to 15psi), a 15s hold sustained at 15psi with continuous +/-0.5deg needle tremor at 1.7Hz (regulator chatter, not synced to any phase boundary, floored to a minimum ~1.6px of needle-tip travel so it stays perceptible on small cards rather than going sub-pixel), then a 5s vent dropping 15psi back to 0, deliberately faster than the ramp so the three phases read apart from needle SPEED alone within the first 5 seconds, with no numeral or label ever printed. The needle sweeps a fixed 270deg arc (-135deg to +135deg from straight up) over a 0-20psi scale — the real 15psi setpoint never pins the needle at full deflection, so the same arc geometry always has visible headroom. DIAL RENDERING: a faint outer rim arc at 0.12 alpha and five minor tick marks at 0.28 alpha (0/25/50/75/100% of the scale) — no numerals, no bezel, no printed units, deliberately minimal so the widget reads as an ambient product-surface status moment rather than an instrument-panel readout. The needle itself is full-alpha var(--foreground) with a 1.5px stroke-width floor (so it survives against a light-theme dial face) and a small filled center hub. TEMPERATURE TRACE: a baseline stroke at 0.15 alpha plus a scrolling ridge built from a rolling sample history (one sample pushed per animation frame, oldest samples dropped once scrolled fully past the strip's left edge at 8px/s), rendered as a translucent (0.14 alpha) var(--foreground) fill under a 0.65 alpha stroke line — newest sample pinned to the strip's right edge, so the ridge visibly lengthens over the come-up phase (a viewer sees a longer ridge at t=5s than at t=2.5s even before the needle's ramp completes). TOKENS: every stroke/fill reads var(--foreground) or var(--background) exclusively, resolved once via getComputedStyle(document.documentElement) with no literal fallback of any kind; the mount routine retries on the next rAF until both --foreground and --background resolve and paints nothing before that; re-reads on every documentElement class-attribute mutation via a MutationObserver, and a ResizeObserver keeps canvas pixel dimensions and DPR in sync. No --ns-accent anywhere — this is a resting, non-interactive status surface, not a control. REDUCED MOTION: freezes at the hold-phase midpoint (cycle t=18s) — needle parked at exactly 15psi with tremor forced to zero (not merely evaluated at a near-neutral point in the tremor cycle), trace strip showing the full come-up ramp plus a partial flat hold segment, the single frame that shows all three phase shapes in outline (ramp slope, flat hold, and the strip stops before any vent segment exists) without ever starting an rAF loop. An IntersectionObserver pauses the rAF loop when the card scrolls off-screen and re-arms it (re-checking tokens for a theme flip that happened while hidden) on re-entry. Cleanup on unmount cancels every pending rAF and disconnects all three observers. No pointer interaction, no hover readout — the spec explicitly keeps this to needle motion alone as the one followable thing."
-      }
-    },
-    {
       "name": "autosave-ratchet",
       "type": "registry:ui",
       "title": "Autosave Ratchet",
@@ -1809,45 +1767,6 @@
       }
     },
     {
-      "name": "centrifuge-rotor-band",
-      "type": "registry:ui",
-      "title": "Centrifuge Rotor Band",
-      "description": "An ambient 'working' indicator rendered as a benchtop microcentrifuge spin-up/hold/brake cycle combined with density-gradient ultracentrifugation banding: a rotor accelerates to speed, holds, then brakes back to rest, while four pre-loaded density bands in a sample tube drift outward under centrifugal force during each hold phase, then reload for the next run.",
-      "files": [
-        {
-          "path": "registry/core/centrifuge-rotor-band/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/centrifuge-rotor-band.tsx"
-        }
-      ],
-      "dependencies": [],
-      "cssVars": {
-        "theme": {
-          "color-ns-muted": "var(--ns-muted)"
-        },
-        "light": {
-          "ns-muted": "#4d4d4d"
-        },
-        "dark": {
-          "ns-muted": "#8f8f8f"
-        }
-      },
-      "meta": {
-        "collection": "core",
-        "tags": [
-          "loader",
-          "progress",
-          "ambient",
-          "centrifuge",
-          "sedimentation",
-          "canvas",
-          "monochrome",
-          "cyclic"
-        ],
-        "instruction": "Build <CentrifugeRotorBand label? height? className?> as a card-scale <canvas> panel, an ambient 'working' indicator rendered as a benchtop microcentrifuge spin-up/hold/brake cycle combined with density-gradient ultracentrifugation banding (Svedberg sedimentation). SOURCE: a rotor accelerates to operating speed, holds, then brakes back to rest, while a sample tube's pre-loaded density bands drift outward under the applied centrifugal force during the hold phase — real bench mechanics, not an invented category. REAL NUMBERS: spin-up ramps 0 -> 14,000rpm linearly over 4.5s (RAMP_S, ~3,100rpm/s), hold sustains 14,000rpm for 8s (HOLD_S), brake decelerates 14,000 -> 0rpm linearly over 6s (BRAKE_S, slower than the accel ramp — a regenerative brake, not a hard stop). Full cycle is 18.5s (CYCLE_S), unbounded repeat via `t % CYCLE_S`. DECOUPLING: the literal 14,000rpm figure is documented in code comments and here only — rendering it 1:1 would alias against a ~60Hz paint rate into a strobe (the exact round-9 legibility failure this registry has already shipped once via meter-matrix-scan's 240Hz row-scan). The rendered spin instead uses a decoupled rpm-fraction (0..1, current rpm / 14,000) multiplied by a hard visual cap of 3 rev/s (VISUAL_REV_CAP); rotor angle is integrated every frame as `angle += 2*PI*visualRevPerSec*dtSeconds` using real elapsed time, not derived from the cycle clock directly. RENDER MODE CROSSFADE: spokes and the blurred ring crossfade continuously over rpm-fraction 0.45-0.55 (BLUR_MID +- BLUR_HALF_WIDTH) — never a hard cut, so the transition shows departure and arrival rather than a blink. Spokes (SPOKE_COUNT=3, 120° apart, from 15% to 95% of rotor radius, foreground stroke 1.5px, plus a 3px filled hub) fade out at `spokeWeight = 1 - blurWeight`; the blurred ring fades in at `blurWeight`, and its own alpha/width/radius keep varying continuously with rpm-fraction across the whole 0.5-1.0 range — outer-band alpha `(0.18 + 0.22*rpmFraction) * blurWeight`, band width `rotorRadius * (0.22 + 0.14*rpmFraction)`, band radius fraction `0.68 + 0.14*rpmFraction`, plus a thinner higher-alpha `(0.3 + 0.3*rpmFraction) * blurWeight` outer-edge stroke — so a mid-ramp frame (rpm-fraction ~0.56) and a full-hold frame (rpm-fraction 1.0) render as visibly different ring states, not the same shape twice; the paint never aliases into a strobe at the visual cap. GEOMETRY: rotor radius = min(containerWidth, containerHeight) * 0.32 (ROTOR_RADIUS_FRACTION), so the whole rig holds its shape at card scale regardless of aspect ratio; tube length, tube width and band radius are all fractions of rotor radius / tube length rather than fixed px (see BANDS below), so nothing goes imperceptible at a taller or shorter card. WOBBLE: a damped rotor-imbalance wobble (±0.4px ceiling, WOBBLE_MAX_PX) offsets the rotor's own center via `wobbleAmp * sin(t*23.1)` / `cos(t*17.3)` on independent axes, gated by `max(0, (rpmFraction-0.4)/0.6)` clamped to 1 — present only above 40% of the current rpm-fraction (WOBBLE_ONSET_FRACTION), silent below it, and forced to zero for the reduced-motion freeze frame so that frame is genuinely static. TUBE: a fixed-orientation sample tube slot (0°, straight up from the rotor's center, NOT rotating with the rotor's own spin phase — a deliberate legibility choice so the bands stay trackable rather than blurring into the rotor's motion) is drawn as a rounded capsule, length = rotor radius * 0.9 (TUBE_LENGTH_FRACTION), width = rotor radius * 0.075 (TUBE_WIDTH_FRACTION), filled with `--background` and stroked with `--ns-muted`. BANDS: four density bands at starting radii 22% / 38% / 55% / 71% of the tube's length (BAND_START_FRACTIONS), each a filled `--foreground` dot of radius = rotor radius * 0.05 (BAND_RADIUS_FRACTION — deliberately a touch wider than half the tube's own width, so a band visibly protrudes past the tube edge rather than disappearing inside it). Offset applied to every band's start radius is one continuous function of cycle time, never a discrete step within a phase: during ramp it eases linearly from 0 to `-compression` (BAND_COMPRESSION_FRACTION=0.05 of tube length — a very slight inward drift from inertial lag as speed climbs); during hold it sweeps linearly from `-compression` to `+migration` (BAND_MIGRATION_FRACTION=0.14 of tube length — the steady continuous outward drift across the 8s hold, exaggerated from the real sub-pixel Svedberg rate for legibility, and the ONE thing a viewer should follow); during brake it holds at the full `+migration` value (bands do not reset until the cycle itself rolls over — a real prep is reloaded between runs, so that snap back to 0 at the top of the next cycle is mechanically honest, not a cheat; it is the only sanctioned discontinuity in the whole offset curve). Migration/compression are expressed as fractions of the tube's own length (itself derived from the container's smaller dimension) rather than fixed px, specifically so the drift stays perceptible whether the card is short or tall. RESTING LOOP: t0 — rotor at rest (rpm-fraction 0, three static spokes visible, hub only), four bands at their unmigrated start radii, tube fully visible; 2.5s — rotor mid-ramp (rpm-fraction ~0.56, already past the blur crossfade midpoint so the blurred ring dominates over the fading spokes), bands compressed slightly toward center; 5s — 0.5s into the hold, rpm-fraction pinned at 1.0 so the ring sits at its full-speed alpha/width/radius — visibly more solid and wider than the 2.5s ramp-state ring, which is the primary tell that time has passed at that checkpoint — while the bands have just begun their outward sweep off the ramp's compressed floor. Unbounded, zero input, alive at rest. TOKENS: fg/muted/bg are read once via `getComputedStyle(document.documentElement)` against `--foreground` / `--ns-muted` / `--background` before the first paint (no paint before the first read), re-derived on a documentElement class MutationObserver so a theme flip repaints live. `--ns-muted` is the housing ring's own stroke and the tube's outline (a 2-stop foreground/ns-muted luminance ramp, never a fill on the climactic band motion); `--foreground` is the spokes/blurred-ring/hub/bands; `--background` is the tube's own fill, so bands must read as visibly darker dots against a lighter tube slot in light theme specifically — verify that contrast at every migration step, since light theme is where value-only readability breaks first. No `--border` usage (nothing here is a separator) and `--ns-accent` never appears — there is no interactive affordance in this build; a future hover state may only brighten band luminance, never mix accent into it. REDUCED MOTION: freezes at cycle t=8.7s (FREEZE_T) — the hold-phase midpoint — rendering the rotor as a static translucent ring at full speed (no motion-blur trail, no strobing, no wobble, since the freeze is a single deterministic draw call with wobble amplitude forced to zero) with bands at mid-migration (52.5% of the way from the ramp-end compressed position to the hold-end fully-migrated position, `(8.7-4.5)/8 = 0.525` of the hold's own sweep). This is the single most structured frame: both the spin state and the band drift are legible without motion. Checked via `matchMedia('(prefers-reduced-motion: reduce)')` at mount, no live-change listener needed since the component has no other motion state to reconcile. LIFECYCLE: canvas sized via `getBoundingClientRect` with `devicePixelRatio` (capped at 2) applied through `ctx.setTransform`, resize handled by a debounced ResizeObserver (150ms), the rAF loop paused by an IntersectionObserver when off-screen and by `document.hidden` via a visibilitychange listener (both resume with a fresh last-timestamp, no giant delta-time jump), and every rAF/observer/listener is torn down on unmount. A11Y: the canvas itself is `aria-hidden` (decorative raster); it is wrapped in a `role=img` element carrying an `aria-label` summarizing the reading in prose ('a centrifuge rotor spinning up, holding, and braking, while four sample density bands drift outward each hold cycle') since a continuously-cycling phased process has no single scalar `aria-valuenow` to expose the way an ordinary progress bar would. Below the label row, a static Geist Mono caption row reads the two REAL NUMBERS that never change — '14,000 RPM' / '18.5s CYCLE' — so those constants are legible from a single still frame independent of motion. No canvas colour literal, no dependency: 2D canvas, DOM+canvas+CSS only. Props: label (accessible name and visible caption, default 'Rotor speed'), height (canvas panel height px, default 220), className."
-      }
-    },
-    {
       "name": "chain-scale",
       "type": "registry:ui",
       "title": "Chain Scale",
@@ -2600,44 +2519,6 @@
           "ambient"
         ],
         "instruction": "An empty-state ambient built on real CMM (coordinate-measuring machine) touch-trigger probing, standard contact metrology, rendered on a single 2D canvas sized off the container's own `getBoundingClientRect` (DPR-capped at 2). The part is a single fixed closed contour built once from an explicit vertex walk in local unit space (half-extents HX=0.82, HY=0.5): a rounded-rectangle-ish silhouette with a rectangular notch cut into the top edge (half-width 0.15, depth 0.16) and a semicircular boss (radius 0.15) bulging outward from the right edge, corners rounded at radius 0.12 with 14-segment arcs. That vertex list is wrapped in an `ArcPath` helper that walks it into cumulative arc length and exposes `at(sFraction)` (binary-searched linear interpolation along the closed loop) and `normalAt(sFraction)` (central-difference tangent at sFraction +/- 0.004, rotated 90 degrees, sign-checked against the contour's centroid so it always points outward) — this same lookup drives both the drawn contour stroke and every station position, so there is exactly one source of geometric truth. STATIONS = 18 stations sit at even arc-length fractions k/18.\n\nAnimation is driven by one monotonic virtual clock (`elapsed`, ms, advanced by real rAF delta so speed never depends on frame rate), pre-seeded at mount to one full lap (21600ms) plus 0.42 of a lap, so every station already has a valid touch history at t0 — a rolling trail with partial composition visible immediately, never a blank contour. Per-station cycle is a fixed 1200ms state machine read off `elapsed mod 1200`: 0-420ms approach (ease-out-cubic from a point offset `APPROACH_DIST=0.24` local units outward along the station's normal, down to the contact point — fast then decelerating into contact, matching a real probe's slow final approach), 420-600ms dwell-at-contact (the trigger fires — a luminance-only flash: the probe tip's fill radius and a soft outer ring pulse via `Math.sin` peaking at the dwell midpoint, drawn twice at increasing alpha/radius in `--foreground`, never a colour change or `--ns-accent`), 600-900ms retract (ease-in-cubic back out along the same normal to the approach point, mirroring the approach's deceleration with an acceleration away from the part), 900-1200ms travel (ease-in-out-cubic straight-line interpolation from the current station's approach point to the next station's approach point, so both departure and arrival are visibly eased, never a blink-swap). A full lap is 18 x 1200ms = 21600ms and the station index simply increments mod 18 forever — there is no terminal state, no lap-complete pause.\n\nTouched-point age is computed analytically, with no history array: station k's most recent contact time within a lap is `k*1200 + 420`ms, so `age = ((elapsed mod 21600) - thatTime + 21600) mod 21600` is always exactly 'time since k was last touched', correct whether that touch happened earlier in the current lap or the previous one. Every station is drawn every frame in two passes, exactly mirroring the alpha-ramp convention used elsewhere in this registry: a base pass at full alpha in `--ns-muted` under all 18 stations, then an overlay pass in `--foreground` at alpha = `clamp01(1 - age/21600)` — near-opaque for a just-touched station, fully transparent (letting the muted base show through) for one about to roll off the trail's one-lap window. The probe tip itself is a small filled circle in `--foreground` with a thin trailing stylus-shaft stroke (60% alpha) drawn outward along the active station's current normal, so it reads as a stylus tip rather than a bare dot. The contour itself is stroked once per frame in `--border` (a separator token, never a fill) at roughly 0.6% of the geometry scale.\n\nGeometry scale is derived from the container's smaller dimension (`scale = min(width,height) * 0.42`), centred in the canvas, recomputed on every debounced ResizeObserver callback (which also repositions the 18 accessible overlay buttons). `--foreground`, `--ns-muted` and `--border` are read via `getComputedStyle(document.documentElement)` on mount and re-read on a `MutationObserver` watching `documentElement`'s class, with a synchronous re-render on change — no paint happens before that first read. The rAF loop is paused via `IntersectionObserver` (canvas out of view) and `document.hidden`, and resumed cleanly on either becoming true again, with `last` reset to 0 so the next frame's delta doesn't include the paused interval.\n\nInteraction: 18 zero-visual, `aria-label`-carrying `<button>` elements are absolutely positioned over each station (repositioned imperatively on resize, not on every animation frame, since station positions themselves never move) with a `focus-visible:ring-2 ring-ns-accent` focus ring — the one permitted accent use, interaction chrome only. Hover or focus shows a small `role=\"tooltip\"` div in `--ns-muted` text reading a synthetic per-station deviation value (a deterministic sine-hash of the station index, formatted to three decimal mm, stable across renders and identical under reduced motion). This overlay is pure DOM state (`activeStation`/`tooltipPos` via `useState`) layered on top of the canvas loop; it never reads from or writes to the virtual clock, so dwelling a pointer over a station cannot stall, speed up, or otherwise perturb the global 1200ms/station indexing cadence, the same isolation rule `peen-coverage`'s hover dwell follows for its own global pass clock.\n\nUnder `prefers-reduced-motion: reduce`, the rAF loop never starts; the virtual clock is set once, synchronously, to `21600 + 9*1200 + 420 + 90` (station index 9 — roughly opposite the lap's start — at the midpoint of its 180ms contact-dwell window, the single most legible frame: tip visibly touching, trigger flash mid-pulse, full one-lap trail history already resolved) and rendered once. That constant is exposed as `FREEZE_PHASE = \"contact-dwell-station9\"` and surfaced on the root element via `data-reduced-motion-freeze`. Cleanup on unmount cancels the rAF, disconnects the ResizeObserver, IntersectionObserver and MutationObserver, and clears the debounce timer. Zero dependencies, canvas + DOM overlay + CSS only, every colour a token (`--background` `--foreground` `--ns-muted` `--border` `--ns-accent`)."
-      }
-    },
-    {
-      "name": "column-wheel-heart-reset",
-      "type": "registry:ui",
-      "title": "Column Wheel Heart Reset",
-      "description": "A self-cycling confirm/save chip built as a chronograph's column wheel plus heart-cam reset — a needle runs, then a hammer snaps it back to exactly zero on contact regardless of where it stopped, holds, and runs again.",
-      "files": [
-        {
-          "path": "registry/core/column-wheel-heart-reset/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/column-wheel-heart-reset.tsx"
-        }
-      ],
-      "dependencies": [],
-      "cssVars": {
-        "theme": {
-          "color-ns-muted": "var(--ns-muted)",
-          "color-ns-accent": "var(--ns-accent)"
-        },
-        "light": {
-          "ns-muted": "#4d4d4d",
-          "ns-accent": "#006bff"
-        },
-        "dark": {
-          "ns-muted": "#8f8f8f"
-        }
-      },
-      "meta": {
-        "collection": "core",
-        "tags": [
-          "feedback",
-          "confirm",
-          "status",
-          "svg",
-          "mechanism"
-        ],
-        "instruction": "Build <ColumnWheelHeartReset label? size? trigger? paused? className?> as a small self-cycling SVG feedback chip modeled on a chronograph's column wheel and heart-cam reset. A column wheel is a small toothed wheel with radial pillars; each pusher press indexes it one notch (6 columns here, 60deg/index) via a jumper spring dropping into the valley between pillars. Reset engages a heart-shaped cam fixed to the seconds pinion: a hammer snaps against the heart's point and forces the pinion to rotate to EXACTLY zero regardless of where it stopped — a genuinely self-correcting mechanical return, not an eased tween to a known value. ONE PURE CLOCK, computeFrame(msIntoCycle), drives every moving part; the rAF loop only ever writes the resulting angles straight to SVG <g> ref.style.transform (no React state on the hot path — matches the project's established hot-path rule). Idle cycle: CYCLE_MS=4500, STEP_MS=750 (6 column-wheel steps). Steps 0-3 are RUN: the wheel index advances every 750ms (wheelAngle eases via smoothstep over WHEEL_SNAP_MS=200ms then holds) while a thin needle geared to the same shaft as the heart cam beneath it sweeps CONTINUOUSLY at RUN_STEP_DEG=128deg/step — 128 is deliberately not a divisor of 360, so after 4 run steps needle+cam sit at 512deg mod 360 = 152deg, nowhere near zero, making the reset's snap-to-0 a real visible correction rather than a coincidence. The hammer's rest pose during RUN sits at its ordinary disengaged clearance (HAMMER_REST_DEG=26deg off contact), easing there from full contact (HAMMER_ENGAGE_DEG=0) over the first REARM_MS=150ms of each RUN phase. Step 4 is RESET: over LIFT_MS=250ms (ease-out-cubic) the hammer eases further from REST(26deg) to WINDUP(34deg) — a real, visible departure; over the following STRIKE_MS=200ms (ease-in-cubic, accelerating into contact) it swings from WINDUP(34deg) down through REST and on into ENGAGE(0deg contact) while the needle+cam group's angle eases from 152deg to 0deg on the exact SAME clock, so the two complete together at hammer contact, never before it — this simultaneity is the load-bearing detail. A 200ms opacity pulse (FLASH_MS, driven by a computed 0..1 'flash' value applied straight to a small circle's opacity, max 0.55, never CSS keyframes tied to wall-clock) lights the cam's tip right after contact. Step 5 is HOLD: hammer stays engaged at contact, needle stays at zero, a beat of stillness before the wheel indexes into the next RUN phase. GEOMETRY: single 0..200 viewBox, scaled by the SVG's own preserveAspectRatio (no ResizeObserver needed for pure vector content). Column wheel hexagon at (58,148); heart cam + needle share one rotated group at (112,66) (cam drawn as a two-lobe bezier path with its point at local (0,-30)); hammer pivots at (140,22) with its UNROTATED line already pointing at the cam's tip (112,36) — hammerAngle is authored as an offset FROM that contact pose, so 0 means touching and every positive value swings the tip away along an arc, which is what lets one signed number drive lift, windup and contact without a second variable. TOKENS: column wheel and the running needle+cam — the quieter, structural, ambient 'it's alive' motion — render in var(--ns-muted); the hammer and the contact-moment flash — the fast, climactic motion — render in var(--foreground), referenced directly as CSS custom properties in the SVG markup (no getComputedStyle/MutationObserver plumbing — that machinery is for canvas/WebGL reading tokens into raw pixel values once; plain var(--token) in DOM/SVG repaints for free on a theme class switch). var(--border) is never used as a stroke; var(--ns-accent) never appears anywhere, since there is no pointer-driven highlight to reserve it for — the component takes no pointer input. prefers-reduced-motion (and paused) freeze at STATIC_MS = RESET_START_MS + LIFT_MS = 3250ms — hammer at full windup, needle/cam just starting its snap toward zero, wheel mid-step: the single most information-dense frame, never t0. An IntersectionObserver (threshold 0) and visibilitychange both stop the single rAF loop when offscreen/hidden; a 100ms poll picks up paused and an external `trigger` prop change without tearing down the effect — changing `trigger` jumps straight to RESET_START_MS instead of waiting on the idle cycle, then the ordinary loop resumes from there. role=status aria-live=polite wraps the chip; an sr-only live span announces `label` (default 'Saved') once per completed reset, not once per frame of it."
       }
     },
     {
@@ -4088,35 +3969,6 @@
       }
     },
     {
-      "name": "differential-analyser-trace",
-      "type": "registry:ui",
-      "title": "Differential Analyser Trace",
-      "description": "A live/streaming line-chart background modelled on the wheel-and-disc integrator unit of a 1930s Bush-type mechanical differential analyser — a friction wheel rides a steadily spinning disc at a wandering radius, and the adjacent scrolling panel plots the wheel's cumulative rotation as the output curve.",
-      "files": [
-        {
-          "path": "registry/core/differential-analyser-trace/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/differential-analyser-trace.tsx"
-        }
-      ],
-      "dependencies": [],
-      "meta": {
-        "collection": "core",
-        "tags": [
-          "canvas",
-          "chart",
-          "sparkline",
-          "integrator",
-          "mechanical",
-          "ambient",
-          "generative",
-          "streaming",
-          "metric-card"
-        ],
-        "instruction": "A card-scale Canvas 2D ambient background modelled on the integrator unit of a Bush-type mechanical differential analyser. The canvas is split into two regions sized from the container's smaller dimension (minDim): a square disc bay minDim wide holding a circle of diameter 0.8*minDim centered in it, and a trace panel filling the remaining width (containerWidth - minDim). The disc is filled with var(--background) so it reads as a porthole through whatever surface it sits on, ringed by a var(--foreground) rim; four spokes fixed to the disc's rotating frame render at 12% var(--foreground) opacity and rotate at the disc's real constant rate of 0.5 rev/s (720deg/s, never stops) — this is the single fast, continuous, real-rate rotation cue, deliberately never discretised so it cannot alias into a strobe. A fixed horizontal carriage arm (15% var(--foreground)) spans the disc's diameter and does not rotate: the wheel — a small circle of radius 0.09x the disc radius, filled at 70% var(--foreground) with a 100% rim and a var(--background) spin-tick line inside it — rides along that arm at x = radiusFraction * discRadius from center. radiusFraction(t) = clamp(0.5 + 0.35*sin(t/4.7) + 0.15*sin(t/1.3), 0.05, 0.95), recomputed every frame from t = performance.now()/1000 (seconds since page navigation origin) — the sum of two incommensurate sine periods means the radius drifts in and out on a roughly 10-15s cycle and the loop never exactly repeats. The wheel's own spin rate follows the real friction-contact physics (equal rim speed at the contact point): wheelRevPerSec = 0.5 * radiusFraction * (discRadius / wheelRadius), visually capped at 3 rev/s so an extreme radius excursion never blurs into a strobe — the disc stays legible because it is the fast element rendered as one smooth continuous rotation, never a discrete flicker. The output shaft's cumulative rotation is integrated on a fixed 20Hz tick independent of both rotation rates (cum += radiusFraction(t) * 0.5 * 0.05 every 50ms, accumulated forever, never reset) and sampled into a ring buffer trimmed to just over 12s of history. Because radiusFraction never goes negative the raw cumulative value only ever climbs, so the trace panel — matching a real strip-chart recorder's AC-coupled zero return — plots each visible sample's deviation from the currently-visible 12s window's own mean, autoscaled every frame to 80% of the panel height: this turns the wheel's wandering integration *rate* (rising while it sits out toward the rim, falling while it drifts toward the hub) into a curve with genuine rising and falling segments rather than a line that only ever climbs off the top. The trace panel has a 1px var(--border) divider from the disc bay (the only use of --border, never a fill or stroke elsewhere), a 4%-opacity var(--foreground) wash so the panel doesn't read as a literal chart 'fill', and the curve itself strokes at 85% var(--foreground) opacity scrolling left at a real 24px/s (matching the 20Hz sample rate: 1.2px per sample). Optional: hovering the trace panel draws a thin luminance-only guideline (30% var(--foreground), no accent tint, no tooltip, no value readout) at the pointer's x — deliberately excluded from ever gaining draggable controls, axis labels or numeric readouts, which would tip this into dashboard territory. All colour is read once via getComputedStyle(document.documentElement) at mount (--foreground, --background, --border) and re-derived through a MutationObserver on documentElement's class attribute; a ResizeObserver drives canvas sizing (JS-set style width/height, DPR-clamped to 2) and an IntersectionObserver suspends the rAF loop off-screen and resumes it cleanly. prefers-reduced-motion freezes at t = STATIC_PHASE = 3.14 (named 'seconds since a fixed epoch') by synchronously simulating the 12.5s of integrator history that would have preceded it — the same radiusFraction/integrate functions run for negative-relative t, since they are well-defined for any real input — and drawing exactly that one frame with no rAF and no live clock at all; that frame lands with the wheel visibly off-center (well clear of both the rim and the hub) and the trace panel showing both a rising and a falling segment in view, the single most structured frame the loop produces. Root element is aria-hidden with no interactive semantics beyond the optional hover guideline. Zero dependencies, canvas + zero DOM chrome, cleans up rAF/observers on unmount."
-      }
-    },
-    {
       "name": "divider-mosaic-split",
       "type": "registry:ui",
       "title": "Divider Mosaic Split",
@@ -4580,34 +4432,6 @@
           "monochrome"
         ],
         "instruction": "Build <EinkWaveformGhost title? description? ctaLabel? ctaHref? className? style?>, a self-contained empty-state block (bezel panel + heading + description + optional CTA link) whose panel is rendered as an idle e-ink display, sourced from real electrophoretic display driving rather than an invented pixel texture. On mount, measure the panel's own inner screen area via getBoundingClientRect and derive a coarse cell grid from its SMALLER dimension: cellPx = clamp(minDim/20, 6px floor), cols = round(w/cellPx) clamped to a 6-cell floor, rows = round(h/cellPx) clamped to a 4-cell floor (roughly 20x14 at the default 4:3 panel). Each cell is assigned a fixed target grey in [0,1] once, at grid-build time, from a small baked landscape glyph (a mid-grey sun disc, two overlapping mountain-ridge triangles at different tones, a dark ground band, open sky) evaluated at that cell's normalised position — this glyph is the settled image and it never changes; only the DISPLAY of it moves.\n\nEvery cell independently replays its own drive waveform on a randomized schedule: draw the next replay interval per cell as -1.9 * Math.log(Math.random()) seconds (Poisson-like, mean 1.9s), so a scattered handful of cells are always mid-replay at any sampled instant even though the underlying image is static — this stand-in for e-ink residual-charge drift and partial self-refresh is what carries 'alive at rest', independent of the full-refresh event below. Each replay is exactly four fixed 60ms steps (240ms total), switched discretely frame to frame with NO easing between steps (a real waveform steps, it does not tween): step 1 holds the cell's pre-replay value, steps 2 and 3 both jump to whichever pole — full 0 (--background) or full 1 (--foreground) — sits FARTHER from that pre-replay value (the shoot-through overshoot: `overshoot = value >= 0.5 ? 0 : 1`), and step 4 lands on the cell's true baked target grey. Cell colour at any instant is `rgb = lerp(backgroundRGB, foregroundRGB, value)`, backgroundRGB/foregroundRGB read from `--background`/`--foreground` via getComputedStyle(document.documentElement) at mount and re-derived on a MutationObserver watching documentElement's class (no colour literal anywhere except a pre-first-read JS fallback triple, matching the sibling card-dot-gain-screen's pattern).\n\nLayered ON TOP of that continuous per-cell layer, not instead of it: every T_refresh = 14s +/- 3s (jittered per mount via `Math.random()` so multiple instances on one page desync rather than pulsing together), the whole panel runs a synchronized full-refresh — 3 alternating full-panel flashes (value 1, 0, 1) at 90ms each, 270ms total, drawn as one solid fillRect ignoring per-cell state — then every cell's value snaps to its target grey simultaneously and every cell's per-cell schedule is reset from that instant, before the next refresh interval is redrawn. Grid geometry recomputes and per-cell schedules rebuild from scratch on every ResizeObserver-fired resize (so a resized panel gets a freshly re-gridded glyph, not a stretched old one), and colours re-derive on the class MutationObserver.\n\nprefers-reduced-motion freezes on the state where zero cells are mid-waveform — every cell simply painted at its own settled target grey, drawn once with no rAF loop ever started (the described `STATIC_TIME`-equivalent moment: the clearest possible read of the resting page, deliberately not t0-mid-transition). The rAF loop is also gated by an IntersectionObserver (paused off-screen, resumed on re-intersection with a fresh token read before the first frame) — no paint happens before the first getComputedStyle call on mount or on any resume path. Optional interaction: a pointerdown on the canvas maps to the cell under the pointer and, if that cell is currently idle, restarts its local waveform in place (like marking the panel with a stylus) — its overshoot pole and eventual settle target are computed exactly as the ambient schedule does, so the interaction never introduces `--ns-accent` or any hue, only luminance already inside the --background/--foreground range; ignored entirely during a full-refresh flash and unbound under reduced motion. `--ns-accent` appears nowhere in the canvas, only on the optional CTA link outside it. Explicitly theme-agnostic by construction: because cell values interpolate directly between --background and --foreground, the paper/ink relationship (pale paper, dark ink) is the literal read in light theme and automatically inverts in dark theme (pale cells against a dark base) — that inversion is intentional and must not be 'fixed' with a hardcoded white paper base; the waveform-stepping and shoot-through mechanic itself is identical in both themes. Canvas is `w-full h-full` with a DPR-capped (max 2) backing store recomputed on every resize. On unmount: cancel the rAF, disconnect the ResizeObserver/MutationObserver/IntersectionObserver, remove the pointerdown listener, remove the reduced-motion media query listener. No dependencies."
-      }
-    },
-    {
-      "name": "elevator-leg-dump",
-      "type": "registry:ui",
-      "title": "Elevator Leg Dump",
-      "description": "An ambient loader modelled on a bucket elevator: a closed loop of 8 buckets climbs one straight, tips and empties into a chute as it crests the head pulley, then rides back down empty on the other side to be refilled at the boot — continuous circulation, never a percentage or a completion state.",
-      "files": [
-        {
-          "path": "registry/core/elevator-leg-dump/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/elevator-leg-dump.tsx"
-        }
-      ],
-      "dependencies": [],
-      "meta": {
-        "collection": "core",
-        "tags": [
-          "loader",
-          "spinner",
-          "ambient",
-          "svg",
-          "stadium",
-          "industrial",
-          "conveyor",
-          "status"
-        ],
-        "instruction": "An ambient status loader shaped like a bucket elevator (a 'leg'): a stadium-shaped track (two vertical straights joined by two semicircular pulley caps) built from a single closed SVG `<path>` (stroke var(--border), the ~1.1:1 whisper-contrast separator token — structure, never the subject) plus two small hub circles at the head (top) and boot (bottom) pulley centers, also var(--border). Track geometry is derived every ResizeObserver tick from the container's smaller dimension: track height = 0.9 * min(w,h), track width = 0.35 * min(w,h), so it reads correctly at card scale. Eight bucket `<g>` elements share one continuous arc-length parametrisation of the stadium perimeter (a hand-written stadiumPoint(s) function returning position + direction-of-travel heading per straight/arc segment, not CSS offset-path, to keep the tip and fill events as simple pure functions of the same `s`); one full revolution takes a fixed real-time 8800ms, with the 8 buckets evenly spaced at perimeter/8 apart, so a bucket crests the head and dumps roughly every 1100ms. This is a deliberate decoupling from the real mechanic's rate (real chain speed 1.5-2.5 m/s, real bucket spacing 200-300mm, meaning a real fixed point sees 6-10 buckets/second) — animating that literally would alias against paint rate, so the documented real rate is only in this description, never rendered 1:1. Each bucket's own transform is `translate(x,y) rotate(heading + 90 + tipAngle)` recomputed every animation frame directly via setAttribute (no React state in the render loop; React state exists nowhere in the hot path). tipAngle is 0 everywhere except a ~520ms dump window centered on the head apex: it ramps from 0 to -100deg over the first 220ms (the bucket tipping as centrifugal force rounds the head pulley) then eases back to 0 over the following 300ms as the bucket starts down the descending leg, both computed as pure functions of the bucket's own arc-length position, not a timer or state machine. A `currentColor` streak line (color var(--foreground), never var(--ns-accent) — the dump moment is explicitly excluded from accent per the binding rules) fades in for the tip-down phase and fades out over a further 260ms, marking the dump. Each bucket also carries exactly one piece of persistent state: its current fill level, one of a fixed period-5 sequence (60%, 85%, 40%, 100%, 70%) that advances by one step the instant that specific bucket's own boot-crossing edge is detected (previous frame's time-since-boot negative, current frame's non-negative) — so the amount dumped visibly varies dump to dump, proving the loop is a real cycle and not decorative geometry. A bucket's visible content (an inner `<rect>` anchored to the cup floor, fill var(--foreground) for a real luminance step against both var(--background) and var(--border), never blended with var(--ns-muted) or var(--ns-accent)) is full while ascending, drains to 0 across the same 220ms tip-down window, stays empty across the entire descending leg, then rises back to its newly-assigned level over a 200ms fill window as the bucket starts back up from the boot — all as pure functions of arc-length position, so the whole system is stateless except the one fill-level value per bucket. At rest (t0/2.5s/5s, zero input): t0 shows all 8 buckets distributed around the track at their fixed 1100ms phase offsets, at least one mid-ascent and one mid-descent, all holding period-5 fill levels; by 2.5s roughly two dump events have occurred and every bucket has advanced ~28% around the loop; by 5s roughly 4-5 dumps have elapsed. `prefers-reduced-motion` computes geometry once, analytically derives the phase at which bucket 0 sits 180ms into its own dump window (named HEAD_CREST — one bucket mid-tip with its streak visible, the adjacent already-passed bucket upright and empty on the descending leg, and a bucket that has not yet reached the head fully upright and full on the ascending leg, so fill, transit and dump all read in one still frame), paints exactly that one frame via the same pure position functions, and never starts the rAF loop. An IntersectionObserver stops/resumes the rAF loop on visibility and a ResizeObserver (debounced 80ms) recomputes geometry and repaints on layout change; both, plus the rAF handle, are torn down on unmount. Every stroke/fill is a CSS custom property referenced directly in an SVG presentation attribute (var(--border), var(--foreground)) — there is no canvas, no GLSL and no JS colour computation anywhere, so there is nothing to read via getComputedStyle and nothing that could paint an unresolved colour before a token exists; the browser resolves the custom property natively on the very first paint. No pointer/press/scroll interaction of any kind (autoplay.mode is 'none'): this is a pure ambient status indicator, `role=\"status\"` with a plain `aria-label` (default 'Working'), no `aria-valuenow`/`aria-valuemax` and never a percentage anywhere in the DOM, matching the spec's explicit warning against adding a completion readout. Zero dependencies, DOM+SVG+CSS only."
       }
     },
     {
@@ -7467,91 +7291,6 @@
       }
     },
     {
-      "name": "lamination-fold-shear",
-      "type": "registry:ui",
-      "title": "Lamination Fold Shear",
-      "description": "A multi-stage pipeline/onboarding stepper rendered as a croissant-dough cross-section: a butter block enclosed in dough passes through three letter-folds, each fold tripling the visible layer count (1 -> 3 -> 9 -> 27) as every existing butter hairline splits into three during a whole-stack shear pass, then a geometric wipe merges the stack back to one layer and the cycle folds again.",
-      "files": [
-        {
-          "path": "registry/core/lamination-fold-shear/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/lamination-fold-shear.tsx"
-        }
-      ],
-      "dependencies": [],
-      "cssVars": {
-        "theme": {
-          "color-ns-muted": "var(--ns-muted)",
-          "color-ns-accent": "var(--ns-accent)",
-          "color-surface": "var(--surface)"
-        },
-        "light": {
-          "ns-muted": "#4d4d4d",
-          "ns-accent": "#006bff",
-          "surface": "#fafafa"
-        },
-        "dark": {
-          "ns-muted": "#8f8f8f",
-          "surface": "#171717"
-        }
-      },
-      "meta": {
-        "collection": "core",
-        "tags": [
-          "stepper",
-          "pipeline",
-          "canvas",
-          "progress",
-          "lamination",
-          "ambient",
-          "industrial",
-          "onboarding"
-        ],
-        "instruction": "Build <LaminationFoldShear steps? activeStep? label? className?> as a self-contained 2D canvas widget inside a bordered card (rounded-md border border-border bg-surface, 16:10 canvas aspect-ratio, geometry derived from the container's smaller dimension: bandUnit = minDim / 64, and the laminate stack's height = clamp(32 * bandUnit, 81px floor, 80% of card height) so the pitch between hairlines never falls below ~3 CSS px even at 27 layers — the number that must stay legible is pitch, not band-fill height). The stack is drawn side-view: a dough FILL (lerp of --background toward --ns-muted at t=0.12, near-background luminance) with N butter hairlines drawn as STROKES (never fills) at evenly spaced y-fractions, stroke width = max(0.6px floor, 4px / N) so widths run 4 -> 1.33 -> 0.44 -> floored-to-0.6 across the three folds. CYCLE (unbounded, 9200ms, performance.now()-based modulo): fold 1 [0,2300) = a 1400ms shear pass splitting N=1 into N=3 followed by a 900ms rest; fold 2 [2300,4600) splits 3 into 9; fold 3 [4600,6900) splits 9 into 27; a 1500ms hold at 27 layers [6900,8400); an 800ms geometric wipe [8400,9200) that merges 27 back to 1 via a vertical sweep line — canvas regions left of the sweep are clipped and re-rendered at N=1, regions right of it still render at N=27, a real spatial merge rather than an opacity cascade (opacity cascades read as carbon-ply-fade's propagating strike, which this must not resemble). FOLD SPLIT ANIMATION: each of the prevN hairlines occupies a 1/prevN-tall cell; during the 1400ms shear (eased with an easeInOutCubic on progress p), that one line becomes three — the centre child stays at the parent's exact y-position while its stroke width interpolates from the prior fold's width to the next fold's width, and the two outer children grow outward from that same starting position to their final resting points at the cell's 1/6 and 5/6 fractions, fading in via alpha = p as they travel, so the transition shows departure and arrival rather than a blink between two static line counts. Simultaneously, the WHOLE STACK undergoes a shear transform for the same 1400ms: skewX and a slight vertical-compress/horizontal-widen bump (both driven by sin(p * PI), so they peak mid-pass and relax back to identity exactly as the pass ends), applied via ctx.transform pivoted on the stack's own centre — this is decorative shear-pass flavour layered on top of, not instead of, the literal count-tripling animation. SEPARATORS: exactly two --border hairlines mark the fold-1 thirds (drawn always, at 1/3 and 2/3 of the stack height, plus a --border outer frame rect) — a fixed count regardless of layer depth, so structure reads at 3 and at 27 without ever multiplying into per-band barcode noise (kill criterion: never render finer than 27 layers, hard cap). REDUCED MOTION freezes at cycle t=6400ms (fold 3's rest phase: 27 layers fully settled, not mid-shear) by calling the same pure cycleState(t) function once at mount and painting it with no rAF loop ever started; the ResizeObserver and MutationObserver-driven token re-reads both repaint that same frozen state rather than silently going blank. TOKENS: --background, --ns-muted, --foreground, --border are each resolved once via getComputedStyle(document.documentElement) using the house parseColor/lerpColor/rgbStr idiom (hex or rgb() strings, no literal fallback colour), re-read on every documentElement class-attribute mutation via a MutationObserver, with no paint before the first successful read (the mount routine retries on the next rAF until tokens resolve) and a ResizeObserver keeping canvas pixel size/DPR in sync; an IntersectionObserver pauses the rAF loop off-screen and re-arms it (re-checking tokens for a theme flip that happened while hidden) on re-entry. INTERACTION (optional, off by default): an optional `steps` prop (up to 3 labels) renders a row of bordered button chips below the canvas, mirroring a real stepper's own focus chrome (border, focus-visible:outline-ns-accent) — accent is used only for that chip's own focus ring, never mixed into the lamination bands. Hovering or focusing a chip highlights that fold-1 third's hairlines by lifting them 45% toward --foreground in luminance only (never accent); an externally controlled `activeStep` prop does the same for a caller wiring this into a real deploy/onboarding pipeline. When `steps` is omitted the card is purely ambient with no interactive affordance. Cleanup on unmount cancels every pending rAF and disconnects all three observers."
-      }
-    },
-    {
-      "name": "lap-stroke-trace",
-      "type": "registry:ui",
-      "title": "Lap Stroke Trace",
-      "description": "A card whose backing texture is a genuine pitch-lap mirror-polishing stroke — a single continuously-extended polyline built from two superimposed rotations at an irrational (golden-ratio) frequency ratio so the path never closes or visibly repeats, its most recent 5s glowing brightest and the trailing 3s fading to nothing.",
-      "files": [
-        {
-          "path": "registry/core/lap-stroke-trace/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/lap-stroke-trace.tsx"
-        }
-      ],
-      "dependencies": [],
-      "cssVars": {
-        "theme": {
-          "color-ns-muted": "var(--ns-muted)",
-          "color-ns-accent": "var(--ns-accent)"
-        },
-        "light": {
-          "ns-muted": "#4d4d4d",
-          "ns-accent": "#006bff"
-        },
-        "dark": {
-          "ns-muted": "#8f8f8f"
-        }
-      },
-      "meta": {
-        "collection": "core",
-        "tags": [
-          "card",
-          "ambient",
-          "canvas",
-          "polishing",
-          "optics",
-          "process",
-          "monochrome",
-          "hover"
-        ],
-        "instruction": "Build a card whose entire backing surface is a canvas-rendered pitch-lap optical-mirror polishing simulation, sourced from real optical-shop / amateur-telescope-making mirror grinding-and-polishing practice (Texereau, 'How to Make a Telescope'; Ceravolo stroke patterns), not a decorative rotating pattern. Root is a `rounded-[14px] border border-border bg-background` card holding an absolutely positioned, pointer-active, `aria-hidden` canvas filling the card behind a `pointer-events-none` content stack (heading, mono body copy, optional underlined link that re-enables `pointer-events-auto` and carries a `focus-visible` ring in `--ns-accent`).\n\nGeometry is derived from the card's own smaller dimension via ResizeObserver: disc centre is the card centre, `discRadius = 0.42 * min(w,h)`, `strokeWidth = min(w,h) / 180`. The traced contact point is the sum of two rotating vectors, not a particle field and not a persisting grid: `point(t) = centre + A*(cos,sin)(2*pi*f_w*t + phaseW0) + B*(cos,sin)(2*pi*f_l*t + phaseL0)`, where `f_w = 0.05` Hz (workpiece rotation, slowed from real ~0.3-1 rev/s shop rates for card-scale legibility) and `f_l = f_w * phi^-1` (`phi^-1 = (sqrt(5)-1)/2 ~= 0.618`, the golden-ratio conjugate) — this irrational ratio is exactly what a real W-stroke/Prescott stroke achieves by combining workpiece spin with lap-arm throw, and it is what guarantees the path never closes or visibly repeats within any observation window. `A = 0.55 * throw`, `B = 0.45 * throw`, `throw = 0.78 * discRadius`. `phaseW0`/`phaseL0` are randomised once per mount (`mulberry32` seeded off `Date.now()`) so different page loads trace different arcs; this randomisation is explicitly NOT used for the reduced-motion path (see below), which must stay reproducible.\n\nOne point is appended to a trail array every animation frame — sampled at display rate, never at a coarser deposit threshold — tagged with `{x, y, t: simTime, angle: atan2(y-cy, x-cx)}`, where `simTime` is a locally-accumulated virtual clock that advances only while the rAF loop actually runs (paused/hidden cards don't age their trail). Every frame, points older than `TRAIL_HISTORY_S = 8` (by `simTime - point.t`) are dropped from the front of the array. Per-point brightness is age-based and NOT a flat fade: for `age <= 5` (`TRAIL_FADE_START_S`), brightness linearly decays from `1.0` (head) to `0.4` (`MID_BRIGHTNESS`, the 'peak trail luminance decays to 40% of head brightness by the fade point' spec value); for `5 < age < 8`, brightness linearly decays from `0.4` to `0`, then the point is dropped. Colour for a given brightness is a three-stop ramp, never a two-colour mix: `brightness >= 0.4` interpolates `midColor -> headColor`, `brightness < 0.4` interpolates `baseColor -> midColor`. Segments are drawn individually (`beginPath/moveTo/lineTo/stroke` per adjacent point pair) so each can carry its own alpha-equivalent colour; this is cheap at the ~480-point resident population 8s of 60fps sampling produces.\n\nColour tokens are read via `getComputedStyle(document.documentElement)` for `--background`, `--ns-muted`, `--foreground` at mount and re-derived on a `MutationObserver` watching `documentElement`'s class — never a literal, and no paint happens before the first read. `baseColor` is always `--background`. Dark theme: `headColor = --foreground`, `midColor = --ns-muted` directly. Light theme (checked first, the harder case): `headColor = mix(muted, foreground, 0.85)`, `midColor = mix(muted, foreground, 0.4)` — bias/contrast retuned per the weld-pool convention (never inverted direction), so the disc stays a coherent value field in both themes. The disc's blank surface itself is filled with a faint radial gradient between `mix(base, mid, 0.05)` at centre and `mix(base, mid, 0.14)` at the rim (glass read, no hue), clipped to the disc circle. Chuck framing — an edge ring and a small centre dot, both derived from `mix(base, mid, 0.6)`, never `--border` used as a canvas stroke/fill (per the binding token rule, `--border` stays a DOM separator only) — is drawn after the clip is restored, so the ring sits crisp at the true disc edge regardless of trail content.\n\nInteraction: pointermove over the canvas tracks `hoverAngle = atan2(y-cy, x-cx)` and drives a smoothed `hoverEnvelope` (exponential approach toward 1 while hovering, toward 0 once pointerleave/pointercancel fires, tau chosen so it settles within the spec's ~500ms decay). For each drawn segment, if `hoverEnvelope > 0` and the segment's stored angle is within `+/-15deg` of `hoverAngle`, its brightness is pulled toward `1.0` (head brightness) by `hoverEnvelope * falloff` (`falloff` a raised-cosine over the 15deg half-window) — this only ever raises brightness on the SAME base->mid->head colour ramp everything else uses, never mixes in `--ns-accent`, never changes `f_w`/`f_l` (which would read as the path skipping/glitching, an explicit reject), and never pauses `simTime`'s accumulation.\n\nDPR-capped (max 2) backing store sized off the card's own `getBoundingClientRect`, rebuilt on `ResizeObserver` (which also recomputes `discRadius`/`strokeWidth`/`A`/`B` and re-triggers the static build if reduced-motion is active). The render loop pauses via `IntersectionObserver` (not scrolled into view) and `visibilitychange` (tab hidden), resuming via a `wake()` that only schedules a new rAF if one isn't already pending. Under `prefers-reduced-motion: reduce`, the trail is built once via a synchronous, deterministic zero-phase run (`phaseW0 = phaseL0 = 0`, ignoring the mount-random phases used by the live path) sampled at a fixed `dt = 1/60` from `t = 0` to `STATIC_T_S = 6.0`, pruned to the same 8s window, rendered once, named `FREEZE_PHASE = \"half-lap\"` and exposed as `data-reduced-motion-freeze` on the root; the loop never starts in this mode. No dependencies."
-      }
-    },
-    {
       "name": "lcd-response-smear",
       "type": "registry:ui",
       "title": "LCD Response Smear",
@@ -9804,48 +9543,6 @@
       }
     },
     {
-      "name": "pneumatic-carrier-dispatch",
-      "type": "registry:ui",
-      "title": "Pneumatic Carrier Dispatch",
-      "description": "A background job/export queue tray drawn as a pneumatic tube transport: a loaded carrier launches on blower pressure, cruises near top speed, then brakes against a trapped air cushion and thunks softly into a shared catch tray, three lanes running staggered on their own clocks.",
-      "files": [
-        {
-          "path": "registry/core/pneumatic-carrier-dispatch/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/pneumatic-carrier-dispatch.tsx"
-        }
-      ],
-      "dependencies": [],
-      "cssVars": {
-        "theme": {
-          "color-ns-muted": "var(--ns-muted)",
-          "color-surface": "var(--surface)"
-        },
-        "light": {
-          "ns-muted": "#4d4d4d",
-          "surface": "#fafafa"
-        },
-        "dark": {
-          "ns-muted": "#8f8f8f",
-          "surface": "#171717"
-        }
-      },
-      "meta": {
-        "collection": "core",
-        "tags": [
-          "queue",
-          "progress",
-          "svg",
-          "pneumatic-tube",
-          "ambient",
-          "mechanical",
-          "loading",
-          "dispatch"
-        ],
-        "instruction": "`<PneumaticCarrierDispatch label? showReadout? className? />` — a card-scale SVG side view of a pneumatic tube dispatch line, ambient and self-driving (autoplay: none — it animates on its own internal clock, nothing for a synthetic-input driver to trigger). Three horizontal lanes are stacked evenly across the container's measured height (laneMargin = 0.14*H top/bottom), each running from a station box near the left edge (stationX = max(14, 0.1*W)) to a shared catch tray at the right (trayX = 0.78*W). Carrier size derives from the container's smaller dimension: carrierH = clamp(0.05*S, 4, 9)px, carrierW = 2.1*carrierH. Each lane runs its own independent cycle clock with a jittered period averaging DISPATCH_INTERVAL = 2600ms (+/-15%, re-rolled every cycle via Math.random on the live path / a seeded mulberry32 on the reduced-motion path) and a stagger offset of cycleLen/3 between lanes at start so all three are never in flight together. Within a cycle, elapsed ms since launch (0 at cycle start) drives one shared `lenFraction(elapsed)` function reused for every lane: 0-180ms eases in (quadratic) covering 0-18% of the tube length (launch, blower spool-up); 180-790ms advances linearly from 18% to 88% at constant velocity (cruise); 790-1050ms eases the remaining 88%->100% via a normalised exponential decay with a 70ms time constant (the trapped air-cushion braking against the carrier, a real dashpot curve, not a generic ease-out); past 1050ms the carrier is fully arrived, and for the following 90ms (to 1140ms) a small decaying `BOUNCE_PX=3` vertical oscillation (`3*exp(-4.5u)*cos(2*pi*1.6u)`) reads as the thunk settle. From 1140ms until the cycle wraps at its jittered period, the lane's carrier sits back at the station at 0.55 opacity (loaded, waiting for its next dispatch) rather than disappearing, so the diagram never shows an empty lane. The instant a lane's clock crosses 1050ms (arrival), a global deliveredCount increments and one of 6 tray-pip `<rect>` elements (round-robin by `(deliveredCount-1) % 6`, laid out 3 columns x 2 rows inside the tray outline) is marked filled and given a 220ms arrival flash: opacity eases from 1.0 down to its resting 0.55 via `1 - smoothstep(t/220)` added on top of the resting value — a pip that has never been filled stays at opacity 0 (present in the DOM, invisible), so early in a session the tray visibly builds up rather than starting full. On mount (and after every debounced 120ms ResizeObserver-triggered rebuild) a synchronous 21-second pre-roll runs the identical `advance()` step function in 16ms increments before the first paint, so the tray is never empty and at least one lane is never mid-launch at t0. Resting-loop check: t0 has some in-flight lane and some tray fill level; 2.5s later at least one full lane cycle's worth of arrival/relaunch has shifted both the flying carrier's position and the tray's fill/flash state (2.6s average cycle isn't commensurate with the 2.5s sample); 5s in, roughly two cycles have elapsed, both visibly different again — unforced, unbounded. REDUCED MOTION: `matchMedia('(prefers-reduced-motion: reduce)')` runs the same `advance()` step synchronously in 8ms increments with a seeded RNG until `deliveredCount` reaches 4 (roughly 3.5s of simulated time), then renders once with no rAF ever scheduled — freezing with the tray at a legible 4-of-6 mid-fill, one lane's carrier having just settled into place, and the other lanes independently mid-cruise or waiting at their stations, the single frame that shows tube, an in-flight carrier, a waiting carrier, and tray fill state all at once. Colors: tube channel is `var(--ns-muted)` at 0.4 opacity (a structural fill, not a separator, so it stays legible in light theme where `--border` alone would vanish); station and tray outlines are `var(--border)`, correctly used only as separators around otherwise-empty regions; carriers and tray pips are solid `var(--foreground)`, opacity-only in both themes, never accent-tinted. An optional hover-triggered readout (`showReadout`, default true) shows real derived state, \"N in transit / M delivered\" in `var(--ns-muted)`/`var(--foreground)` plain text — `inTransit` counts lanes with elapsed <= 1140ms (still visually animating), `delivered` is the running `deliveredCount`. `--ns-accent` is not used anywhere; there is no interaction chrome to color, and no focusable control (matches capstan-slip's precedent — a passive ambient status widget needs no Tab target). ResizeObserver rebuilds geometry and restarts the simulation (debounced 120ms) on any size change; IntersectionObserver pauses the rAF loop when off-screen and resumes it (fresh `last=0` so dt doesn't spike) when visible again; unmount cancels the rAF, disconnects both observers, and clears pending resize timers. DOM + SVG + CSS only, no canvas, zero dependencies."
-      }
-    },
-    {
       "name": "pole-shy",
       "type": "registry:ui",
       "title": "Pole Shy",
@@ -10539,46 +10236,6 @@
       }
     },
     {
-      "name": "rack-snail-strike",
-      "type": "registry:ui",
-      "title": "Rack Snail Strike",
-      "description": "A live-count stat tile built on the rack-and-snail striking clock: a stepped spiral cam sets how far a toothed rack drops, then the rack climbs back one tooth per strike, firing a hammer and incrementing the number on every contact — the fall depth IS the count, read out as a sequence of discrete strikes rather than a printed digit.",
-      "files": [
-        {
-          "path": "registry/core/rack-snail-strike/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/rack-snail-strike.tsx"
-        }
-      ],
-      "dependencies": [],
-      "cssVars": {
-        "theme": {
-          "color-ns-muted": "var(--ns-muted)",
-          "color-surface": "var(--surface)"
-        },
-        "light": {
-          "ns-muted": "#4d4d4d",
-          "surface": "#fafafa"
-        },
-        "dark": {
-          "ns-muted": "#8f8f8f",
-          "surface": "#171717"
-        }
-      },
-      "meta": {
-        "collection": "core",
-        "tags": [
-          "stat",
-          "kpi",
-          "counter",
-          "svg",
-          "mechanism",
-          "accessibility"
-        ],
-        "instruction": "Renders a stat figure driven by the rack-and-snail striking mechanism from English/French striking clocks. A stepped-spiral cam (SVG path, 12 constant radii, one per step 1-12, built once from a closed-form generator — no per-frame trig) rotates under a fixed follower pin over CAM_ROTATE_MS=300ms to select a step; the selected step's radius sets how deep a toothed rack (a DOM row of clipped tooth-shaped spans, its own translateY encoding depth) falls over FALL_MS=400ms with an ease-in transition, depth proportional to the step value (more strikes = falls farther, matching the fixed one-tooth-per-strike gather count — implemented this way rather than the brief's literal (13-stepValue) formula, which contradicted its own 'gathered stepValue times' rule; flagged for spec review). Gathering then runs stepValue times at STRIKE_INTERVAL_MS=850ms per strike: an SVG hammer (a line+circle group pivoting near a bell dome) rotates -34deg away from the bell over LIFT_MS=550ms with an ease-out curve (cocking back), then swings back to 0deg over STRIKE_FALL_MS=150ms on a cubic-bezier(0.3,1.6,0.4,1) curve whose overshoot past 0 IS the strike's bounce (no separate offset needed) — the stat figure increments and gets a 150ms brightness(1.7) luminance flash on --foreground exactly at hammer contact (end of the fall leg), never on lift. Each strike leaves a STRIKE_PAUSE_MS=~150ms gap before the next; after the final strike a rest gap (600-1400ms, longer for low-count steps) precedes the next cam rotation. The idle demo (no `count` prop) loops a fixed non-monotonic sequence [3,7,1,12,5,9] forever via cleared setTimeout chains (no rAF, no continuous painting) so it reads differently at t0/2.5s/5s. Passing a `count` prop disables the idle sequence entirely; the mechanism reacts only to an explicit prop change (one fall-and-gather run per change, clamped 1-12) and never polls a wall clock or infers the real hour. Colour is pure CSS custom-property reference (var(--ns-muted) on cam + rack teeth as structural chrome, var(--foreground) on hammer + bell as the climactic moment, --ns-accent never touched) — no getComputedStyle/MutationObserver needed since SVG/DOM attributes referencing var() repaint for free on a theme class flip. prefers-reduced-motion renders one static frame: the '7' step, 3 of 7 teeth already gathered (rack at a middle fallen depth), hammer resting against the bell having just struck — cam step, rack depth, and hammer-at-bell all legible in one frame, no timers or observers started. Accessible value exposed via a visually-hidden role=status aria-live=polite span. Zero dependencies, DOM+SVG only, no canvas."
-      }
-    },
-    {
       "name": "radio-ballot-drop",
       "type": "registry:ui",
       "title": "Radio Ballot Drop",
@@ -11209,49 +10866,6 @@
           "monochrome"
         ],
         "instruction": "Build a loader / background ambient texture, canvas-rendered, reproducing a risograph duplication run sourced from real riso GR/MZ drum duplication (a perforated cylindrical drum wrapped in a stencil master, ink forced through the stencil's micro-perforations onto paper as the drum makes one full rotation per printed sheet; multi-colour riso work is always run as sequential separate drum passes, one physical drum per colour). Root is a `relative h-full w-full overflow-hidden bg-background` element holding an absolutely positioned, `aria-hidden` canvas filling the host — no card copy, no text-protection carve-out, this is a pure ambient surface a page places behind or beside content, not a card.\n\nStencil grid pitch is derived from the host's own smaller dimension via `ResizeObserver`: `clamp(minDim/40, 5, 10)` px, dot diameter `0.8 * pitch` (radius `0.4 * pitch`). Run three sequential passes per cycle, each pass occupying a 2000ms slot budgeted as a 1400ms live top-to-bottom sweep (one drum rotation) followed by a 600ms pause standing in for the physical drum swap — three slots back to back total exactly 6000ms (`SWEEP_MS=1400, PAUSE_MS=600, PASS_SLOT_MS=2000, CYCLE_MS=6000`), then the cycle restarts immediately with a freshly cut stencil, no invented rest period. Track cycle time as `performance.now() - cycleBase`, incrementing a `cycleIndex` and rebasing `cycleBase` every time the cycle wraps, so every lap reseeds the stencil field (`seed = cycleIndex*997.13`) rather than replaying an identical loop.\n\nCritical to the mechanic actually being visible: all three passes read from ONE SHARED value-noise stencil field per cycle (`hash01(i*0.37+seed, j*0.41+seed)` sampled once per grid cell, reused by all three passes), not three independently-seeded fields — an uncorrelated random field shifted by a couple of pixels shows no perceptible change, while a SHARED field shifted a couple of pixels visibly doubles up and drifts. Each pass nudges the shared field's open/closed cutoff by a small per-pass delta (`threshold = 0.5 + (passIndex-1)*0.04`) standing in for that colour's own stencil-cutting tolerance. A pass only draws a row once its sweep front (`progress * rows`, progress = `clamp((cycleTime - passStart(k)) / SWEEP_MS, 0, 1)`, `passStart(k) = k * PASS_SLOT_MS`) has reached or passed that row — this is what makes the pass visibly sweep top-to-bottom rather than pop in fully formed. Each pass's dot centre is offset from the shared grid by a CUMULATIVE registration drift of `(passIndex * 1.3px, passIndex * 0.7px)` — the same sheet drifting further through each successive nip, not three independent misalignments — which is the core visible mechanic: pass 2's dots land 1.3/0.7px off pass 1's shared dots, pass 3's land 2.6/1.4px off pass 1's.\n\nDrum pressure banding: multiply each dot's base alpha (0.55) by `1 + 0.08 * sin(2*PI*(row/(rows-1)) + passIndex*2*PI/3)`, using the ROW's position as a proxy for rotation angle around the drum and phase-shifting a third of a turn per pass so the three passes' bands beat against each other instead of stacking into one static gradient. This value is computed once, at the moment that row's sweep front passes it, and never re-modulates afterward (a real drum's pressure at a given rotation angle was fixed the instant that row printed). Cap the combined alpha where multiple passes land on the same shared dot at 0.82 via a running Porter-Duff union per cell per frame: `alpha_k = min(bandedAlpha, (0.82 - prior) / (1 - prior))`, `prior = prior + alpha_k * (1 - prior)` — in practice this only visibly thins a genuine triple-overlap dot's third layer, letting the first two passes render at their full nominal alpha so the registration drift stays legible as separate ink layers rather than flattening into one solid tone.\n\nAlso draw a faint, luminance-only sweep-front 'nip line' (a soft foreground-tinted linear gradient band, peak alpha ~0.05, spanning roughly 4 pitches tall) at whichever pass is currently mid-sweep, giving the drum's current contact line a visible presence without ever using `--ns-accent`.\n\nInk colour is `--foreground` read via `getComputedStyle(document.documentElement)` at mount and re-derived on a `MutationObserver` watching `documentElement`'s class — never a literal — so ink polarity is automatically correct in both themes; verify at card scale in light theme that the 0.82 alpha cap still reads as layered ink rather than a flat dark block. `--ns-accent` is never touched anywhere in this component. DPR-capped (max 2) backing store sized off the host's own `getBoundingClientRect`. The animation loop is a plain `requestAnimationFrame`, paused via `visibilitychange` when the tab is hidden and via `IntersectionObserver` when scrolled offscreen, and driven purely by elapsed time (never frame count) so a slow machine still completes each sweep in real seconds. `prefers-reduced-motion: reduce` stops the loop entirely and freezes at the spec's explicit `STATIC_TIME_MS = 4200` — passes 1 and 2 fully complete (their sweeps end at 3400ms), pass 3 already sweeping (its sweep starts at 4000ms) — the most structurally dense, most legibly drifted static frame short of the whole cycle finishing. No dependencies."
-      }
-    },
-    {
-      "name": "rivet-buck-set",
-      "type": "registry:ui",
-      "title": "Rivet Buck Set",
-      "description": "A pin/lock control built from hot-driven riveting: a shop head forms under five discrete hammer strikes, then keeps drawing the two sheets together for a moment after its shape stops changing, as the shank cools and shrinks — legible as the joint visibly tightening after the forming flurry ends.",
-      "files": [
-        {
-          "path": "registry/core/rivet-buck-set/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/rivet-buck-set.tsx"
-        }
-      ],
-      "dependencies": [],
-      "cssVars": {
-        "theme": {
-          "color-ns-muted": "var(--ns-muted)",
-          "color-ns-accent": "var(--ns-accent)"
-        },
-        "light": {
-          "ns-muted": "#4d4d4d",
-          "ns-accent": "#006bff"
-        },
-        "dark": {
-          "ns-muted": "#8f8f8f"
-        }
-      },
-      "meta": {
-        "collection": "core",
-        "tags": [
-          "pin",
-          "lock",
-          "toggle",
-          "row",
-          "card",
-          "svg",
-          "rivet",
-          "mechanical",
-          "press",
-          "monochrome"
-        ],
-        "instruction": "A row/card control (flex row: heading + mono description on the left, a square fastener button on the right) whose button renders a hot-driven rivet joint sourced from aircraft-structures solid riveting practice, not a generic pin icon. The button is `aspect-square`, its own size measured via ResizeObserver on itself (not the outer card) so geometry derives from the button's own smaller dimension per the binding rule, and all reference numbers below are authored at a REF=112px panel size then multiplied by `scale = measuredSize/112` so they hold proportionally at other sizes.\n\nThe shop head is an SVG path rebuilt every frame from four control radii at fixed heights (base/lower-mid/upper-mid/apex, height fractions [0, 0.35, 0.7, 1] of a 30px*scale head region) mirrored left/right and run through a midpoint-quadratic smoothing pass (for each consecutive pair of silhouette points, `L` to the first midpoint then `Q` through the point to the next midpoint) so the dome reads as forged metal, not a polygon. Baseline (unformed) radius is 5px*scale at every level, a plain proud cylinder. Five discrete hammer strikes land 90ms apart (450ms total forming) with decaying per-strike control-radius increments 3.4/2.1/1.3/0.8/0.5px*scale (~0.62 geometric decay, matching work-hardening reducing each blow's effect); each level's share of a strike's increment is scaled by a per-level weight [1, 0.85, 0.55, 0.15] (base to apex) so growth concentrates toward the base and produces a mushroom/dome silhouette rather than a uniform balloon. Each strike also runs a 40ms shock: for the first 35% of that window the radius overshoots to 1.3x the settling increment (easeOutCubic), then eases back down to exactly 1x by 40ms (easeInOutCubic) — this uses a `computeGrowth(t)` that walks every strike whose start time has passed and sums `weight * delta * (t within that strike's 40ms window ? overshootMultiplier(u) : 1)`, so calling it with any t past 450ms naturally yields the fully-settled sum with no separate branch needed. The five strikes must stay visually discrete (per-strike overshoot-then-settle), never a smooth ramp — collapsing them into one continuous deformation is a reject per the spec's own kill criterion.\n\nTwo plain `<div>` sheet panels sandwich the head's base at `headBaseY = 52%` of the button's size: an upper sheet fixed at that line with a fixed thickness, and a lower sheet whose `top` is set every frame to `headBaseY + sheetThickness + currentGap` with its `height` filling to the button's bottom edge — so the lower sheet's top edge is the only thing that visibly moves, reading directly as the sheets drawing together with no change to the head geometry. `currentGap` starts at 6px*scale (bare shank, sheets at rest) and is unaffected during the 450ms forming window (the shape finishing does not by itself move the sheets). From 450ms to 2250ms (the 1800ms post-forming shrink/clamp window, well after visible forming stops), `currentGap` eases (easeOutCubic) down by 2px*scale and the BASE control radius (index 0 only) additionally tightens by up to 1px*scale over the same window — this is the one thing a viewer should be able to follow: the head's silhouette is already finished and static by 450ms, and the joint keeps visibly tightening for another 1.8s after that, which is what separates a hot-driven rivet from a generic squash-and-stop animation. 2250-3850ms holds at full clamp. 3850-4250ms eases (easeInOutCubic) the whole formed state — growth multiplier, gap, base tightening — back to the bare unformed shank and starting gap, then the 4250ms period loops continuously with zero input required. If the post-forming gap narrowing is imperceptible, reject — that is the spec's other explicit kill criterion.\n\nColour: the head fill is `var(--foreground)` with a `var(--border)` outline and the two sheet panels use `bg-foreground/[0.08]` — pure CSS custom properties, no JS colour math needed since there's no canvas/WebGL here, and a theme flip repaints for free. The one exception is a second, invisible-until-flashed `<path>` sharing the exact same `d` as the head, stroked in `var(--foreground)` with `stroke-opacity` driven straight off each strike's shock envelope (0 baseline, animated up during each 40ms shock window, back to 0 by its end) — a luminance-only 'catching the light' glint at the rim on each strike, never a colour change and never `--ns-accent`. Its peak opacity is capped at 0.85 in dark theme and 0.4 in light theme (checked directly against a light background, where less headroom is available before a flash reads as blown-out); the dark/light branch comes from one cheap `getComputedStyle(document.documentElement)` read of `--background`'s relative luminance at mount, re-derived on a `MutationObserver` watching `documentElement`'s class flip, never per-frame.\n\nInteraction: `pointerdown` on the button, or `Enter`/`Space` via a `keydown` listener (native `<button>` handles focus/keyboard reachability), resets the cycle-start timestamp to `performance.now()` — since the ambient loop already runs on its own unconditional clock, a press simply replays the same 4.25s sequence from t=0 rather than a separate state machine, so `autoplay.mode` stays `\"none\"` (the motion never depends on the synthetic-input driver to begin with). The 90ms strike cadence and 40ms shock stay identical whether the cycle was started by the ambient loop or a press — collapsing the interaction-triggered version into a single smooth deformation would lose the mechanic the same way a passive ambient loop would.\n\n`prefers-reduced-motion: reduce` freezes on `STATIC_T = 2650ms` (450ms forming + 1800ms clamp + 400ms into the 1600ms hold), named `STATIC_PHASE = \"clamped\"` and exposed as `data-reduced-motion-freeze` on the root — shop head fully formed, sheets fully drawn together at minimum gap, the only frame showing the completed joint (the bare-shank frame shows nothing formed yet). Standard cleanup: ResizeObserver on the button, IntersectionObserver (threshold default) pausing the rAF loop off-screen, `visibilitychange` pausing when the tab is hidden, MutationObserver for theme, all disconnected and the rAF cancelled on unmount. Zero dependencies, DOM+SVG only, no canvas."
       }
     },
     {
@@ -12709,49 +12323,6 @@
           "monochrome"
         ],
         "instruction": "Build <SorterPocketRoute label? paused? className? style?> as a pure DOM + CSS ambient loader (no canvas) modeling a Hollerith card-sorter CHUTE — the routing/pocket mechanism, deliberately NOT a card reader or needle bank (round 9's jacquard-card-chain already owns that surface; this component never renders a 'read' event, a needle bank, or punched pips — the only visible subject is the gate swinging to a heading and a card curving into a pocket). LAYOUT: root is a relatively-positioned box (default h-[220px] w-full, ResizeObserver-driven) with a single-column drop track centered horizontally at the top, a gate line at height*0.32, and a row of 5 pocket bins occupying the bottom ~58% of the height. GEOMETRY (recomputed on every ResizeObserver tick): pocketWidth = containerWidth / 5.5; cardHeight = pocketWidth * 0.4; cardWidth = pocketWidth * 0.72; the 5 pockets are laid out flush-left-to-flush-right with equal gutters (gutter = (containerWidth - 5*pocketWidth) / 4), matching flex space-between spacing, computed analytically rather than measured. ROUTING SEQUENCE: a FIXED period-17 array (never Math.random per-card) cycled by an incrementing counter — ROUTE_PATTERN = [2,0,3,2,4,1,2,0,3,2,1,4,2,0,3,1,2] — indices are pocket numbers 0-4; pocket 2 (center) appears 6 times in the 17, each outer pocket 2-3 times, giving the required 'roughly 2x' center weighting while staying long enough not to visibly repeat within a short viewing window (17 cards * 1.1s feed ~= 18.7s per cycle). TIMING: setInterval feeds one new card every 1100ms (plus one immediate spawn on mount so the loader is never empty at t0). Each card is tracked in React state through two phases with setTimeout, not rAF (this is a discrete-event mechanism, not a continuous simulation): 'drop' for 300ms — CSS transition on transform: translateY, linear easing, from the track top to the gate y — then 'route' for 380ms — CSS transition on transform: translate(dx,dy) rotate(-6deg), cubic-bezier(0.4,0,0.2,1) (ease-in-out), from the gate position to the assigned pocket's center x and its current stack's landing y (bin bottom - cardHeight/2 - currentStackLength * rise). 680ms total per card journey, safely inside the 1100ms feed interval so exactly one card is ever mid-flight — this is the binding legibility constraint, do not shrink the feed interval or grow the journey past it. GATE FLAP: a single 2px --foreground line, transform-origin left, pivoting at the gate y-position; when a card enters its route phase the flap eases (same 380ms/ease-in-out transition) to GATE_ANGLES[pocket] (-60,-30,0,30,60 degrees for pockets 0-4); between cards (gatePocket === null) it eases back to 0deg — this is what sells 'mechanism deciding', not just the card animating on its own. POCKET STACKS: each pocket holds a rolling array of landed cards (id, removing flag), capped at 14 visible. On the card that would be the 15th, the bottom (index 0, oldest) card is flagged removing=true immediately (its opacity CSS-transitions to 0 over 260ms) and is spliced out of state via a matching 260ms setTimeout, while the new card is already visible on top of it — a continuous rolling window, never a hard reset/clear. Stack rise per card = min(3px, (binHeight * 0.7) / 14) so the tallest possible full pocket never exceeds 70% of the bin's height regardless of container size; each landed card is positioned bottom: index * rise within its pocket bin, index 0 = oldest/bottom. TOKENS (all via var()/color-mix(), nothing read through getComputedStyle since nothing here needs a resolved numeric value): flying/landed card fill is --background with a color-mix(in srgb, var(--foreground) 60%, transparent) border; pocket bin borders are var(--border) only, never a fill; stacked cards inside a pocket use color-mix(in srgb, var(--foreground) X%, var(--background)) with X interpolated 25 to 55 across the visible stack (oldest=25%, newest=55%) so pocket depth reads as a value gradient. --ns-accent never appears; the gate's heading is conveyed by angle and the card's curved path only. REDUCED MOTION / paused: skip the feed interval entirely and render a hand-authored STATIC_PHASE instead — five pockets at a fixed, distinctly uneven card-count array (STATIC_POCKET_COUNTS = [4,9,3,11,6], none equal, none zero) and one frozen card whose transform is the SAME translate/rotate interpolation used at runtime, evaluated at t=0.6 between the gate position and pocket 4's landing position (STATIC_FROZEN_POCKET = 4), with the gate flap frozen at the matching 0.6-interpolated angle — the single frame reading 'mechanism mid-motion, system in an uneven working state', never an all-empty or all-equal t0. HOST: role=\"status\" aria-live=\"polite\" on the root with a sr-only label (default 'Sorting'); the entire visual tree is a sibling aria-hidden div — nothing here needs individual card semantics since no card content is ever rendered, only the mechanism. Clean up: clearInterval and every pending setTimeout on unmount and whenever paused/reduced-motion flips."
-      }
-    },
-    {
-      "name": "soxhlet-siphon-cycle",
-      "type": "registry:ui",
-      "title": "Soxhlet Siphon Cycle",
-      "description": "A card-scale status widget modelled on a Soxhlet extractor's siphon cycle: an extraction chamber fills drop by drop over 19.8s until the liquid crosses the siphon arm's overflow height, then self-primes and drains almost instantly back into the boiling flask below in 0.6s, before the fill begins again — a loading indicator whose whole identity is the slow-fill/fast-dump asymmetry.",
-      "files": [
-        {
-          "path": "registry/core/soxhlet-siphon-cycle/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/soxhlet-siphon-cycle.tsx"
-        }
-      ],
-      "dependencies": [],
-      "cssVars": {
-        "theme": {
-          "color-ns-muted": "var(--ns-muted)",
-          "color-surface": "var(--surface)"
-        },
-        "light": {
-          "ns-muted": "#4d4d4d",
-          "surface": "#fafafa"
-        },
-        "dark": {
-          "ns-muted": "#8f8f8f",
-          "surface": "#171717"
-        }
-      },
-      "meta": {
-        "collection": "core",
-        "tags": [
-          "gauge",
-          "canvas",
-          "status",
-          "progress",
-          "siphon",
-          "cycle",
-          "ambient",
-          "industrial",
-          "chemistry"
-        ],
-        "instruction": "Build <SoxhletSiphonCycle label? className?> as a self-contained 2D canvas widget inside a bordered card (rounded-md border border-border bg-surface, fixed 4:5 canvas aspect-ratio, geometry derived entirely from the container's smaller dimension via min(width, height) so the apparatus rescales cleanly at card size). It renders, top to bottom, a condenser drip line, an extraction chamber (rect outline, height = 0.4 * min-dimension), a siphon-threshold tick mark near the chamber's top-right, a 4-point siphon tube polyline running from the chamber's mouth down into a round flask below. CYCLE: three phases driven by elapsed real time via a fixed-step rAF loop — a fill phase where one condensate drop falls from the drip line every 900ms, each drop raising the chamber liquid level by 100/22 percent (22 drops = 19.8s, 0% to 100%, matching the spec's headline 19.8s/22-drop anchor exactly; the spec's separately-stated 2.5%-per-drop figure only sums to 55% over 22 drops and cannot itself reach the stated 100% trigger, so it is treated as the spec's own rounding slip and the 22-drops/100%/19.8s statement is taken as authoritative), a dump phase once level reaches 100% where the chamber self-primes and drains over a fast 600ms, and a 400ms settle pause at empty before the next drop begins. The dump is rendered as a value-only bottom-to-top wipe: an opacity boundary rises from the chamber floor to the pre-dump liquid surface over the 600ms, clearing what has already drained and leaving what has not yet, with a soft leading edge at the wipe boundary so it reads as a sweep rather than a blink — never a level-height jump and never a colour-based cue. A synced flow highlight travels the siphon tube polyline from chamber mouth to flask over the same 600ms. The instant the drain completes, the flask's own liquid line (rendered inside a clipped circle, density rising with accumulated volume rather than hue) ticks up a fixed 4% of its cap; the accumulation is capped and reset every 5 completed cycles (~100s) so the loop stays unbounded. A falling drop between the drip line and the current liquid surface is drawn with a quadratic ease-in during the first 480ms of each 900ms drop interval. TOKENS: every stroke/fill reads var(--foreground) or var(--border) exclusively, resolved once via getComputedStyle(document.documentElement) with zero literal fallback of any kind; the mount routine retries on the next rAF until both tokens resolve and paints nothing before that; re-reads on every documentElement class-attribute mutation via a MutationObserver, and a ResizeObserver keeps canvas pixel dimensions and DPR in sync. --border is used strictly as a non-load-bearing glass-rim outline (chamber, tube, flask, drip line, threshold tick) and is never a fill; chamber and flask liquid fills are var(--foreground) at moderate, level-dependent alpha. No --ns-accent anywhere — this is a resting, non-interactive status surface, not a control. REDUCED MOTION: freezes at the 85%-full frame — liquid level near the siphon arm's mouth, clearly about to cross the threshold, the single most structured, tension-loaded frame — rendered once, synchronously, with no rAF loop, no timers, and no observers driving motion. An IntersectionObserver pauses the rAF loop when the card scrolls off-screen and re-arms it (re-checking tokens for a theme flip that happened while hidden) on re-entry. Cleanup on unmount cancels every pending rAF and disconnects all three observers. No pointer interaction — the one followable thing is the liquid level in the chamber, rising steadily for ~20s and then vanishing in under a second; nothing else needs separate animation to make the mechanic read."
       }
     },
     {
@@ -16040,50 +15611,6 @@
       }
     },
     {
-      "name": "vacuum-filtration-cake-build",
-      "type": "registry:ui",
-      "title": "Vacuum Filtration Cake Build",
-      "description": "A card-scale processing/progress indicator modelled on Büchner-funnel vacuum filtration: liquid drips through a filter paper as a solids cake builds on its surface, the drip cadence visibly stretching from 0.6s to 2.4s per drop as the thickening cake adds resistance, per Darcy's law.",
-      "files": [
-        {
-          "path": "registry/core/vacuum-filtration-cake-build/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/vacuum-filtration-cake-build.tsx"
-        }
-      ],
-      "dependencies": [],
-      "cssVars": {
-        "theme": {
-          "color-ns-muted": "var(--ns-muted)",
-          "color-surface": "var(--surface)"
-        },
-        "light": {
-          "ns-muted": "#4d4d4d",
-          "surface": "#fafafa"
-        },
-        "dark": {
-          "ns-muted": "#8f8f8f",
-          "surface": "#171717"
-        }
-      },
-      "meta": {
-        "collection": "core",
-        "tags": [
-          "card",
-          "canvas",
-          "progress",
-          "processing",
-          "loader",
-          "filtration",
-          "physics",
-          "ambient",
-          "status",
-          "instrument"
-        ],
-        "instruction": "A card-scale single-canvas component modelling Büchner-funnel vacuum filtration: liquid drips through filter paper into a receiving flask while a solids cake builds on the paper's surface, and under constant applied pressure the filtration rate decays as the cake thickens (Darcy's law: flow rate is inversely proportional to total resistance, which grows with cake height). All geometry derives from the chart wrapper's getBoundingClientRect via computeGeo(W, H): a funnel (wide top rim tapering to a paper line at paperY, paper radius = minDim * 0.22), a narrow stem dripping down to a visible tip, and a flask (neck, tapered shoulder, flat-bottomed body) built as a single closed polygon path (flaskPath) reused for both its stroke and, via ctx.clip(), the liquid fill region — so the liquid is always exact against the tapered silhouette with no separate area math. Cake height follows the constant-pressure Darcy relation h(t) = sqrt(2*K*t) (K tuned so h(14) = HMAX = 0.38 of the paper radius) over a 14s fill phase; drip interval is sampled continuously as interval(t) = 0.6s * (H0 + h(t)) / H0 where H0 = HMAX/3 stands in for the paper's own baseline resistance (so the formula never divides by zero at t=0) — this produces the spec's exact 0.6s-to-2.4s, 4x slowdown, not a fixed schedule. Drops are spawned on a deterministic schedule (stepSim walks nextDropAtMs forward by dripInterval(t) each spawn) and each animates a real ~260ms gravity-eased (p^2) departure-from-stem-to-splash arc — always far shorter than the shortest 0.6s interval, so the slowing cadence reads from the GAP between arcs, never from the arc itself; on landing, the flask's liquidLevelPx rises by dropStepPx = 5px scaled by (minDim / 260) (the spec's reference px number at reference card size), and a brief 180ms fading ripple marks the splash point. At the 14s mark the cake and drip cadence freeze at their final state, a 6-particle bubble-burst animates for 400ms at the cake surface (vacuum release), then a shared contentAlpha ramps 1 to 0 over 1500ms fading ONLY the cake, liquid and burst — the funnel/flask glass silhouette, drawn every frame from --border at a fixed 0.7 alpha (0.85 for the load-bearing paper line), never fades, since it is fixed apparatus, not process state. Full loop is 14000 + 400 + 1500 = 15900ms, after which the simulation resets to empty and restarts — unbounded. The cake itself is a filled top-half ellipse (ctx.ellipse from angle PI to 2*PI, a true semicircular profile when height equals radius) with a radial gradient from --foreground at its apex to --ns-muted at its rim, densest at center; the liquid is --foreground at 55% alpha filled through the flask clip. Colour is read once via getComputedStyle(document.documentElement).getPropertyValue for --foreground, --border and --ns-muted with no literal fallback of any kind; if any is empty (stylesheet not yet applied) the mount loop retries on the next rAF and paints nothing until all three resolve. A MutationObserver on document.documentElement's class attribute re-reads tokens on every theme flip and forces a resize + (if reduced motion) a redraw of the static frame; a ResizeObserver on the chart wrapper recomputes geometry and resizes the canvas backing store (capped devicePixelRatio 2); an IntersectionObserver stops driving new frames while off-screen and, on re-entering view, re-reads tokens and restarts the simulation from empty (never resumes a stale mid-cycle state) — no paint happens on any of these three paths before a token read succeeds. Under prefers-reduced-motion the component runs zero rAF loops and zero timers: it deterministically simulates (same stepSim function, called in a tight synchronous walk rather than per-frame) the fill phase up to t = 14 * 0.6 = 8.4s (60% through the cycle — cake at h(8.4)/HMAX ≈ 77% of its max, i.e. ~29% of the paper radius, several drops already landed and the flask level risen), then pins exactly one drop mid-fall (started 130ms before the freeze instant) so the frozen frame shows a departure-to-splash arc in flight alongside the built-up cake and risen flask level, not just static endpoints — the same frame on every load. Cleanup on unmount cancels both the animation and token-wait rAF handles and disconnects all three observers. Zero dependencies, DOM+canvas only, no color literal anywhere including fallbacks."
-      }
-    },
-    {
       "name": "validation-error-summary",
       "type": "registry:ui",
       "title": "Validation Error Summary",
@@ -16405,50 +15932,6 @@
           "accessibility"
         ],
         "instruction": "<WaveformAsciiScrub value? defaultValue? duration? onValueChange? label? className?> draws a fixed-width canvas waveform from a locally synthesised (no audio API, no network) layered-sine amplitude function sampled peak-in-bucket across 64 base glyph columns, each rendered as a Geist Mono density character from ' .:-=+*#%@' stacked into a symmetric bar mirrored above and below the centerline. At rest every column is exactly that one coarse sample. Dragging the accent playhead (a role=slider div overlaying the canvas, pointer and keyboard driven), hovering anywhere over the strip, or holding it in keyboard focus subdivides the ~6 base columns nearest that position into 3 finer sub-columns apiece, each independently re-sampling its own narrower time span — genuinely finer detail, not an interpolated blur — while columns outside that radius stay at base resolution; the radius eases in and out over roughly 250ms rather than snapping, and collapses back to zero (fully coarse) the instant nothing is hovered, dragged or focused. Keyboard: ArrowLeft/Right step 1%, PageUp/PageDown step 5%, Home/End jump to the ends; aria-valuenow/aria-valuetext (an M:SS derived from the duration prop) update on every commit. Colors read live from --foreground/--border/--ns-accent via getComputedStyle, resynced on a documentElement class MutationObserver — no hardcoded hex. Under prefers-reduced-motion the resolution radius snaps instantly with no eased rAF loop. Zero dependencies."
-      }
-    },
-    {
-      "name": "weld-nugget-grow",
-      "type": "registry:ui",
-      "title": "Weld Nugget Grow",
-      "description": "A press-and-hold confirm control staged as resistance spot welding — two electrode tips clamp a seam between two sheets and a molten nugget grows outward from their centre under sustained pressure, solidifying into a fused spot the instant current cuts, or occasionally spitting a small burst of expelled material first. Runs its own squeeze/growth/hold/solidify/retract cycle continuously at rest; a press drives the same sequence directly off hold duration as an accent on top.",
-      "files": [
-        {
-          "path": "registry/core/weld-nugget-grow/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/weld-nugget-grow.tsx"
-        }
-      ],
-      "dependencies": [],
-      "cssVars": {
-        "theme": {
-          "color-ns-muted": "var(--ns-muted)",
-          "color-ns-accent": "var(--ns-accent)",
-          "color-surface": "var(--surface)"
-        },
-        "light": {
-          "ns-muted": "#4d4d4d",
-          "ns-accent": "#006bff",
-          "surface": "#fafafa"
-        },
-        "dark": {
-          "ns-muted": "#8f8f8f",
-          "surface": "#171717"
-        }
-      },
-      "meta": {
-        "collection": "core",
-        "tags": [
-          "button",
-          "confirm",
-          "hold",
-          "canvas",
-          "joining",
-          "welding",
-          "ambient",
-          "monochrome"
-        ],
-        "instruction": "Renders a press-and-hold confirm control as resistance spot welding (RWMA/AWS D8.9). Two horizontal sheet plates (plain DOM divs, background: color-mix(in srgb, var(--foreground), var(--background) 78%) — no JS token read needed since it's CSS, not canvas) sit with a seam gap between them; a canvas covering just that gap renders the nugget. Two electrode-tip DOM elements (clip-path trapezoids, flat var(--foreground) fill, no sheen/reflection so the material read never drifts toward weld-pool's lit chrome) sit above and below the seam and physically translateY toward it as clampT goes 0 (open) -> 1 (clamped) — geometry, not a pulsing dot, is what makes the clamp legible. The ambient cycle: 180ms squeeze (electrodes travel to clamped, easeOutCubic), 640ms growth (nugget radius 0 -> full via easeOutCubic, molten brightness rising with it), 900ms hold (full radius, peak molten brightness), 500ms solidify (molten brightness eases 1 -> 0, radius and presence held, 'the nugget locks'), 1530ms retract/idle (electrodes ease back open over the first 40% of the window, then the solidified mark itself fades over the remaining 65% so the next cycle starts from bare seam) — a 3750ms period, run continuously on requestAnimationFrame, unforced, zero input. The retract dwell is 1530ms rather than the sourced ~900ms specifically so the three graded rest-frames at t=0/2.5s/5.0s (with a 400ms phase offset baked into the ambient clock) land on cycle positions 400/1650/2900 — mid-growth, deep hold, and mid-retract-fade respectively — three visibly distinct, evenly-spaced states, instead of two of the three colliding within 0.62s of each other at the sourced 3120ms period. On 1-in-4 cycles (rolled once when a new cycle index is detected, not per-frame) a brief 90ms burst of 4 short radial streaks fires from the nugget edge in the last 90ms of growth, before the same solidify sequence plays. A press on the wrapping <button> (pointer and Space/Enter both wired) takes the identical squeeze/growth machinery over directly off hold duration: release before the 820ms growth threshold plays a 260ms abort (electrodes and whatever partial nugget existed both ease back to nothing, no weld ever forms); release at/after 820ms locks the weld immediately (skips waiting out the ambient hold window, plays solidify then retract right away, fires onConfirm and swaps the label to confirmedLabel) rather than requiring the full hold+solidify+retract dwell before release is honoured. Colour: --foreground and --background are read via getComputedStyle(document.documentElement) before the first draw (also re-run on every IntersectionObserver resume) and re-read on a MutationObserver watching documentElement's class; the faying sheets are rendered as their own mid-tone plate (foreground mixed 78% toward background) rather than bare --background, which is what gives 'molten is brighter than its surround' real headroom in both themes instead of capping the hottest pixel at the page colour itself. Molten core colour is --foreground lerped toward a computed near-white/near-plate-max target as brightness rises; solidified is flat --foreground. The heat-affected-zone falloff is a radial-gradient value step from the core colour to the plate colour — never --border, which stays a separator token only, used nowhere as a canvas fill or stroke. --ns-accent appears solely as the button's own focus-visible ring, never on the nugget, which is the component's climactic moment. Canvas geometry (nugget radius, HAZ ring, electrode travel/width) all derive from min(stage width, stage height) via a ResizeObserver on the stage element, scaled against a 96px reference so it holds up at true card scale in whatever size the consumer gives it. Paused (rAF cancelled) via IntersectionObserver (threshold 0) when scrolled offscreen; resumed with a fresh token read and resize. Under prefers-reduced-motion no rAF ever starts; the canvas paints one static frame at cycle position squeeze+growth+half-hold ('held' — electrodes clamped, nugget at full molten radius, mid-hold, the single most-developed frame the mechanic reaches) and repaints only on theme/resize changes, so reduced-motion output is byte-stable across time. Props: children (label before the weld locks, default 'Hold to merge'), confirmedLabel (label after, default 'Merged'), onConfirm (fires once per completed press-driven weld), className. Zero dependencies, DOM + one small 2D canvas inside a real <button> (real focus ring, real Tab-reachability, real accessible label text), no WebGL."
       }
     },
     {
@@ -19555,47 +19038,6 @@
       }
     },
     {
-      "name": "microtome-ribbon-feed",
-      "type": "registry:ui",
-      "title": "Microtome Ribbon Feed",
-      "description": "A full-bleed hero built on a rotary-microtome sectioning mechanic: a block reciprocates onto a fixed blade every stroke, each cut section clings to the last, and an unbroken ribbon of sections grows off the blade tip and drapes under its own weight.",
-      "files": [
-        {
-          "path": "registry/loud/microtome-ribbon-feed/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/microtome-ribbon-feed.tsx"
-        }
-      ],
-      "dependencies": [],
-      "cssVars": {
-        "theme": {
-          "color-ns-muted": "var(--ns-muted)"
-        },
-        "light": {
-          "ns-muted": "#4d4d4d"
-        },
-        "dark": {
-          "ns-muted": "#8f8f8f"
-        }
-      },
-      "meta": {
-        "collection": "loud",
-        "tags": [
-          "hero",
-          "canvas",
-          "physics",
-          "verlet",
-          "microtome",
-          "lab-instrument",
-          "ribbon",
-          "mono",
-          "ambient",
-          "generative"
-        ],
-        "instruction": "Build <MicrotomeRibbonFeed children? className?> as a full-bleed 2D-canvas hero rendering a rotary microtome's sectioning mechanic. THE CHAIN: the ribbon is a verlet point chain pinned at index 0 to a fixed anchor (the blade tip, at 0.3w/0.24h). Every STROKE_INTERVAL_S=1.4s, at DWELL_PHASE=0.5 of the stroke clock, splice a new point into index 1 (immediately after the anchor) rather than appending to the end — this is the freshly cut section, physically nearest the blade, and it pushes every previously-cut point one slot further from the anchor exactly as a real ribbon's older sections get shouldered away by whatever is cut after them. Each frame: integrate all points but the anchor with verlet (velocity = (pos - prevPos) * DAMPING=0.985, plus GRAVITY_PX_S2=900 scaled by containerMinDim/1080 and dt^2), then run CONSTRAINT_ITERS=4 passes of a distance constraint holding consecutive points at SEG_LEN_REF=6px (scaled the same way) apart, re-pinning index 0 to the anchor after every pass. No easing curve is scripted for the drape — the catenary sag is the constraint solve settling under gravity, which is why fresh segments near the blade stay taut and only the older, farther segments visibly sag. STROKE + CUT SHARE ONE CLOCK: strokeClock = (strokeClock + dt/STROKE_INTERVAL_S) % 1 is the only timer; the block's reciprocating bob (BLOCK_TRAVEL_REF=46px scaled, eased sin(t*pi/2) down 0..DWELL_PHASE, eased return DWELL_PHASE..1) and the segment-splice both read this same value, so the cut always visibly lands at the moment the block reaches the blade — never two independent timers that happen to roughly agree. CAP AND RESET: once segment count (points.length-1) reaches MAX_SEGMENTS=60, start a FADE_S=2s alpha fade on the whole ribbon draw pass, then reset points back to a single anchor point and resume growth — an unbounded loop, never a process that finishes and stops. POINTER: pointer position (canvas-local, tracked via pointermove/pointerleave) applies a small outward nudge (POINTER_FORCE=5.5, scaled) to any chain point within POINTER_RADIUS_REF=90px (scaled), falloff-squared by distance, added directly into stepChain before the constraint solve — a physical sway, not a decorative overlay — and independently brightens nearby seam-tick alpha from 0.35 up to 0.85 as a luminance-only glint (never touches --ns-accent or mixes any hue). Pointer input must never change strokeClock or segment cadence. SEAMS: at every interior point, draw a short perpendicular tick (segLen*0.4 long) in --ns-muted so consecutive sections read as discrete joins, not one smooth blurred line — this is what keeps the ribbon legible as sectioning rather than a generic wavy stroke. TOKENS: --foreground for the block, blade and ribbon stroke, --ns-muted for seam ticks, read via getComputedStyle(document.documentElement) at mount before any paint, re-read on a MutationObserver watching documentElement's class/data-theme plus a prefers-color-scheme change listener. No color literals, no hue math anywhere — brightening is alpha only. HOST: ResizeObserver on the root element (not window.resize) recomputes w/h/dpr (capped 2) and the anchor position, and re-pins the existing chain's anchor point to the new location rather than leaving it stale; an IntersectionObserver (threshold 0) and visibilitychange both pause the single rAF loop; unmount cancels the frame and disconnects every observer/listener. prefers-reduced-motion (checked via matchMedia, live via a change listener) replaces the rAF loop with a deterministic replay: tick() is stepped at a fixed SUBSTEP=1/90 from a freshly reset chain up to STATIC_TIME_S = 22*1.4 + 1.4*0.5 + 0.2 (~31.5s) and drawn once — since growth has no randomness at all, this reproduces the exact same ~22-segment frame (fresh sections taut near the blade, a 23rd about to be cut, older segments in full catenary drape, block at the blade) every time it is called, including on resize and theme flips in the reduced-motion path. children render as ordinary DOM (eyebrow/headline/CTA) positioned over the canvas, unlike a rasterized-into-canvas headline, since nothing here needs the ribbon to occlude or emboss the type."
-      }
-    },
-    {
       "name": "murmur-shear",
       "type": "registry:ui",
       "title": "Murmur Shear",
@@ -21147,44 +20589,6 @@
           "physics"
         ],
         "instruction": "A toast stack, capped at `maxVisible` (default 4), choreographed as a Newton's cradle rather than a generic slide/scale stack. RENDERING: plain DOM cards in a vertical flex column (severity icon, truncated title, optional mono message, dismiss button), newest on top; every transform is written directly via the Web Animations API on refs, not React state, so no canvas and no per-frame re-render. MOTION: a pushed toast enters at the top on an accelerating ease-in curve (cubic-bezier(.55,.06,.68,.19), 200ms, translateY -26px to 0 plus a 0.97-to-1 scale) reading as a released cradle ball picking up speed as it swings in and 'strikes' the queue. The instant it lands, every OTHER currently-visible toast (every toast except the new arrival) plays a 60ms shunt: translateY 0 to 3px and back, staggered 35ms deeper per row via the animation's own delay — a fast domino of tiny nudges that visibly propagates from the impact point to the far end, letting a glance at the stagger read the stack's depth without counting cards. Under capacity that impulse simply dissipates: the deepest toast shunts and returns exactly like every other row. At capacity, the same event instead ejects the oldest (bottommost) toast: it is pulled out of the visible list into a brief inert overlay and, at the exact stagger slot it would have shunted at, plays a 340ms departure on the ease-out curve cubic-bezier(0.16,1,0.3,1) — translateY 0 to 10px (the 'arc') with a 2deg rotation at the 35% mark, continuing to translateY 46px, rotate 9deg, opacity 0 — matching the inherited momentum with a decelerating exit rather than an abrupt cut. Manual dismiss and auto-expiry both play a plain 150ms opacity fade (no shunt, no eject arc) before the toast leaves the array, since those departures were never caused by an incoming impulse. AUTO-DISMISS: duration prop, default 5000ms per toast (0 disables); a hover OR a keyboard focus on the card pauses its own timer, and the timer only resumes once both are clear, so a screen-reader user tabbed onto a toast is never raced by the clock. ACCESSIBILITY: a single shared aria-live announcer (visually hidden) is the only thing that speaks — remounted (via a React key on an internal sequence number) each time so a screen reader re-registers its live-ness, aria-live='assertive' for error toasts and 'polite' for info, announcing each toast's title and message exactly once on arrival; the physics-only reflow of existing toasts (shunt, eject, reposition) never touches the announcer, so nothing already announced gets re-announced. Each toast card itself is role=alert (error) or role=status (info), keyboard-focusable, with an aria-label naming its severity and title; Escape while a toast has focus dismisses that toast. A global F6 keydown sends focus straight into the region — to the newest toast if one is visible, otherwise the region landmark itself — a pane-jump convention for reaching the stack without tabbing through the whole page. Every evicted, expired, or manually dismissed toast is appended to a capped (12-entry) history list surfaced behind a 'History (n)' disclosure button (aria-expanded/aria-controls) below the stack, so an ejected toast — the whole point of the eviction policy — stays reachable and readable, tagged with why it left ('evicted' / 'expired' / 'dismissed'). REDUCED MOTION: every custom animation call above is swapped for a plain 150-200ms opacity fade in the same Web Animations calls (checked once via a matchMedia('(prefers-reduced-motion: reduce)') listener) — no shunt, no eject arc, no translateY at all — while the queue, capacity, eviction, timer, and history logic all run identically, so the cap and the eviction reason are still fully legible, just without the choreography. Colors are exclusively --background/--foreground/--ns-muted/--border/--ns-accent (--ns-accent only as the focus ring); severity is distinguished by icon shape and title weight, never by hue. Imperative handle exposes push/dismiss/clear; props: maxVisible, duration, initial (toasts seeded at mount), className, aria-label. Every timer, animation, and the window keydown listener is torn down on unmount."
-      }
-    },
-    {
-      "name": "tourbillon-cage",
-      "type": "registry:ui",
-      "title": "Tourbillon Cage",
-      "description": "A full-bleed loading/route-transition curtain built as Breguet's tourbillon — a balance wheel ticking fast inside a carriage that itself turns slow, two rotations nested on one axis and never synchronized.",
-      "files": [
-        {
-          "path": "registry/loud/tourbillon-cage/component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/tourbillon-cage.tsx"
-        }
-      ],
-      "dependencies": [],
-      "cssVars": {
-        "theme": {
-          "color-ns-muted": "var(--ns-muted)",
-          "color-ns-accent": "var(--ns-accent)"
-        },
-        "light": {
-          "ns-muted": "#4d4d4d",
-          "ns-accent": "#006bff"
-        },
-        "dark": {
-          "ns-muted": "#8f8f8f"
-        }
-      },
-      "meta": {
-        "collection": "loud",
-        "tags": [
-          "loader",
-          "route-curtain",
-          "canvas",
-          "escapement",
-          "mechanism"
-        ],
-        "instruction": "Build <TourbillonCage paused? children? className?> as a full-bleed canvas-2D loading/route-transition curtain modeled on Breguet's tourbillon (1795), the real watchmaking mechanism that mounts an entire escapement — balance wheel, hairspring, pallet fork, escape wheel — on a carriage that itself slowly rotates, so gravity's drag on the balance averages out over one carriage revolution instead of biasing it in a fixed orientation. COMPRESSED, NOT LITERAL, on both axes, stated as a departure not a fidelity claim: a real one-minute tourbillon carriage does one revolution per 60s, rendered here at CAGE_PERIOD_S=9s/rev; a real balance runs 21,600-28,800 vph (3-4Hz / 6-8 beats/sec), rendered at BALANCE_HZ=2.5 (5 beats/sec) — still well under the 60Hz paint rate so the tick reads as a distinct kick-and-reverse rather than aliasing into a strobe the way a literal 1:1 simulation would. ONE ROTATED CANVAS FRAME (ctx.translate to center, ctx.rotate(cageAngle)) holds the entire escapement subassembly — hairspring, balance rim+3 spokes, pallet fork, escape wheel — plus the carriage's own two asymmetric arms (a bare ns-muted counterpoise at 200deg, a foreground 'bridge' arm at 15deg carrying the escapement); rotating that ONE frame is what makes the carriage's slow turn legible, since the arm asymmetry is what actually sells the rotation frame to frame (a plain circle would look identical at every angle). The balance's own oscillation angle, balanceAngleRad(t) = BALANCE_AMPLITUDE_DEG(102deg) * sin(2*PI*BALANCE_HZ*t + BALANCE_PHASE), is applied as a SECOND, nested ctx.rotate() on top of the already-rotated carriage frame, composing the two rotations without either driving the other. THE PALLET FORK is the one high-frequency, high-contrast element: idx = floor(t / BALANCE_HALF_PERIOD) (BALANCE_HALF_PERIOD = 1/(2*BALANCE_HZ) = 0.2s) and frac = the remainder locate the current half-swing; a smoothstep eases 0->1 across the first 12% of that half-period (SNAP_FRAC) then holds, driving BOTH the fork's +-9deg rock (FORK_KICK_DEG, sign flips with idx%2) and the escape wheel's one-tooth advance (ESCAPE_TEETH=15, TOOTH_DEG=360/15) from the SAME clock, so fork and wheel release in lockstep the way the real parts are physically forced to — a genuine locking/impulse alternation, not a continuous spin: the wheel visibly steps one tooth and stops, steps and stops. The hairspring is a 6-turn Archimedean spiral (HAIRSPRING_TURNS) whose outer radius breathes +-6% (HAIRSPRING_BREATH) in phase with abs(sin(balance phase)) — stretching as the balance swings out. MONOCHROME: cage ring track (0.55 alpha) and escape-wheel rim/teeth and hairspring, all the quieter structural/supporting motion, stroke in --ns-muted; the bridge arm, balance rim+spokes and pallet fork, the fast climactic motion, stroke in --foreground, read via getComputedStyle(document.documentElement) at mount and re-read on a MutationObserver watching its class, with NO hex fallback (readTokens runs synchronously before the first draw so nothing is ever read unassigned). --border is never used as a stroke. --ns-accent never appears anywhere — there is no pointer-driven highlight to reserve it for; the component takes no input at all. prefers-reduced-motion (and paused) freeze on STATIC_TIME = CAGE_PERIOD_S/8 = 1.125s (carriage at 45deg, a spread legible angle, never the unrotated t0 orientation), with BALANCE_PHASE chosen so the balance lands away from both a zero-crossing and a swing extreme at that instant, and the fork/escape wheel mid-hold between releases. Host follows the established canvas-2D full-bleed pattern (see curtain-leader-countdown): ResizeObserver resizes the DPR-capped (2) backing store, IntersectionObserver (threshold 0) and visibilitychange both stop the single rAF loop when offscreen/hidden, a 140ms poll picks up the paused prop without tearing down the effect. An aria-live=polite role=status sr-only div announces 'Loading' once for assistive tech; children render over the cage for an optional caption, scrimmed with bg-background/70 + backdrop-blur since the cage spans the full value range in both themes."
       }
     },
     {

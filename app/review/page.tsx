@@ -167,8 +167,11 @@ export default function ReviewPage() {
   // Opens on the newest round only — older rounds have already been judged,
   // and their state lives in .review-state.json. Toggle them back on in the
   // filter bar to re-review anything earlier.
+  // Every round on by default, paired with the status filter below showing
+  // only flagged/untouched rows — so the page opens on exactly what still
+  // needs judging, whichever round it belongs to.
   const [roundsOn, setRoundsOn] = useState<Record<string, boolean>>(
-    () => Object.fromEntries(ROUNDS.map((r) => [r, r === ROUNDS[ROUNDS.length - 1]])),
+    () => Object.fromEntries(ROUNDS.map((r) => [r, true])),
   );
   const [lanesOn, setLanesOn] = useState<Record<Lane, boolean>>({
     identity: true,
