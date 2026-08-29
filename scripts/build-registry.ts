@@ -111,6 +111,30 @@ writeFileSync(
 );
 console.log(`registry.json: ${items.length} item(s) from meta sidecars`);
 
+// Client-safe projection of registry.json, for the two places a client
+// component reads the registry directly (command-palette.tsx's search,
+// nav-data.ts's sidebar tree via site-shell.tsx). `registry.json` carries
+// `meta.instruction` — a multi-hundred-word prose field per component, the
+// bulk of every component's record — plus `files`/`dependencies`/`cssVars`,
+// all install-time-only data no client UI reads. Importing `registry.json`
+// itself from a client component ships all of it into the browser bundle;
+// this file ships only what those two call sites actually use.
+writeFileSync(
+  join(ROOT, "lib", "registry-lite.generated.json"),
+  JSON.stringify(
+    items.map((item) => ({
+      name: item.name,
+      title: item.title,
+      tags: item.meta?.tags,
+      collection: item.meta?.collection,
+      rank: item.meta?.rank,
+    })),
+    null,
+    2
+  ) + "\n"
+);
+console.log(`lib/registry-lite.generated.json: ${items.length} item(s)`);
+
 // Loud guard: every component must have a recency rank in
 // lib/component-order.json, or it sorts LAST in the catalog's "Newest" view
 // instead of first — so a freshly built component is the hardest one to find,
