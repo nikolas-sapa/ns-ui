@@ -3,6 +3,16 @@
 Single source of truth for the /changelog page. Each entry is a `## vX.Y.Z - YYYY-MM-DD`
 heading, a `###` title, then one paragraph of body. Newest first.
 
+## v0.27.0 - 2026-08-29
+
+### Rounds 9 through 12: 118 components built, 51 cut on review, 67 shipped
+
+Four rounds took the registry from 439 to 534, sourced across twenty-four axes and built by parallel agent teams, with every component judged by hand afterwards. The axes were textile and fibre process, machining and metrology, analog recording mechanism, reprographics, recording instruments that draw on moving media, untaken scan and raster technique, laboratory instrumentation, grain and milling, glassworking and kiln, mechanical cipher and computing, optics manufacture, joining and fastening, horology and escapements, ice and cryo, pneumatics and fluid power, gas discharge, mail and material handling, fermentation and colloids, drilling and rock handling, built animal structures, railway permanent way and signalling, leather and cordage craft, optical telegraphy and beacons, and soil and granular flow. Round 9 shipped all twenty-eight; rounds 10, 11 and 12 lost nine, six and eight to owner review respectively, all quarantined rather than deleted.
+
+Round 8b's two rejections became binding rules in the round brief and earned their place immediately: a real clock rendered one-to-one against the paint rate aliases into a strobe rather than reading as mechanism, and a discrete event a viewer cannot follow is a defect regardless of how faithful the cadence is. Several builders recognised that trap in their own specs and decoupled before writing a line. Sourcing killed roughly seventy concepts before any code existed, most of them for being restyles of components already shipped — scouts caught those by reading the sibling's header comment rather than diffing slug names, which is how feed-escapement was found to already own the anchor escapement and sieve-throw the plansifter.
+
+The automated gate caught an SSR hydration mismatch caused by unrounded trigonometry in SVG coordinate attributes, a canvas fill built from color-mix() that would have failed silently in some browsers, and a venturi whose marked tracer decelerated through the throat, which is the opposite of what a venturi does. Owner review then caught what four gates could not: crack-polygon-order read as "small lines popping" because its growth loop recomputed the frame budget from each frame's delta and never carried the shortfall forward, so at sixty frames a second a segment's time requirement was never met and the simulation sat permanently in its first phase. The fragments that did appear were jank frames slipping through. That is the argument for the eyeball pass surviving as a gate of its own.
+
 ## v0.26.0 - 2026-08-27
 
 ### Round 8b: 16 components across four sourcing axes, and two the owner sent back
