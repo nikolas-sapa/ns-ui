@@ -1,0 +1,23 @@
+{
+  "name": "slump-mould-drape",
+  "title": "Slump Mould Drape",
+  "description": "A content-reveal/settle moment built on kiln-slumping in warm glass work: a flat profile sags into a mould's contour under gravity, the centre drooping first and the drape spreading outward toward the edges over several seconds before holding, exactly conformed to the mould.",
+  "collection": "core",
+  "tags": [
+    "canvas",
+    "reveal",
+    "settle",
+    "glass",
+    "kiln",
+    "lab-instrument",
+    "mono",
+    "ambient",
+    "generative"
+  ],
+  "instruction": "Build <SlumpMouldDrape loop? className?> as a card-scale 2D-canvas content-reveal mechanic modelled on kiln-slumping: a flat glass profile sags under gravity into a mould's contour, centre first, edges last. THE PROFILE IS A PURE FUNCTION OF TIME: N_POINTS=32 samples span the container width; each sample's y-offset is y_i(t) = mould(x_i) * (1 - exp(-(t - delay_i)/TAU_S)) for t in the DRAPE_S=4.5s drape phase, where mould(x) = depth * (1 - cos(2*pi*x)) / 2 (a shallow bowl, 0 at both rims, depth=MAX_DROOP_FRAC=0.3 * containerMinDim at centre), delay_i = DELAY_EDGE_S=1.8s * (|x_i - 0.5| / 0.5) (0 at centre, 1.8s at the rim), and TAU_S=1.0. Nothing here carries state frame-to-frame — the whole animation is draw(phaseT) called with whatever phaseT the clock produces, which is exactly why the reduced-motion freeze frame is a single function call at STATIC_TIME_S=2.5 rather than a replay loop. PHASES: 0..DRAPE_S is the staggered drape above; DRAPE_S..DRAPE_S+HOLD_S=1.5s snaps every sample to mould(x_i) EXACTLY (full conformity, motionless — the asymptotic exp() value never quite reaches 1, so this snap is what makes the hold read as \"matches the mould\" rather than \"almost there\"); DRAPE_S+HOLD_S..CYCLE_S=6.4s (only when loop=true) lifts every sample back toward 0 over RESET_S=0.4s with a smoothstep ease (frac*frac*(3-2*frac)) — fast relative to the drape, since a real reset is a discrete offstage event (swapping blanks), not a slow process. loop=true (default) repeats the cycle indefinitely for the ambient/idle use; loop=false clamps phaseT at DRAPE_S+HOLD_S forever once reached, for a one-shot reveal (e.g. content finishing loading) whose settled state must persist rather than looping into a reset. RENDER: both the mould reference contour (drawn first, fixed, never animated) and the glass profile are stroked as a smoothed polyline — quadraticCurveTo through each pair of sample points' midpoint — never raw per-point dots, so the sheet reads as one continuous surface. TOKENS: profile line is --foreground; mould contour is --border only, and specifically NEVER the \"arrived\" signal (that reads from the profile's geometric conformity to the mould line, not colour) and never --ns-accent. Because --border is ~1.1:1 contrast in light theme, the mould's stroke WEIGHT (not a different token) is multiplied by 1.6x when documentElement lacks the dark class, so the target line the profile drapes toward stays legible in the harder theme. HOST: ResizeObserver on the root recomputes width/height/dpr(capped 2)/depth/baseline/stroke-weights (and the dark/light read they depend on) — never window.resize; IntersectionObserver(threshold 0) and visibilitychange both pause the single rAF loop; unmount cancels the frame and disconnects every observer/listener. Tokens are read via getComputedStyle(document.documentElement) plus documentElement.classList.contains('dark') at mount, before any paint, and re-read on a MutationObserver watching class/data-theme plus a prefers-color-scheme change listener. prefers-reduced-motion (matchMedia, live via a change listener) replaces the rAF loop with one draw(STATIC_TIME_S) call — centre points ~92% conformed, outer points ~50% conformed, the frame that shows the mechanic's signature centre-first/edges-last asymmetry that neither the flat start nor the fully-settled hold can show alone.",
+  "dependencies": [],
+  "useWhen": "Pick slump-mould-drape when a card, panel, or empty state should settle into its final shape with a visible, staggered centre-first lag rather than a uniform ease — the differentiator from a generic reveal is that the centre and edges are visibly out of sync as they conform. Pick skeleton-develop instead for a plain content-loading placeholder with no target-contour mechanic; reveal-ripple-tiles when the reveal should read as a discrete tile grid uncovering rather than a single continuous sagging surface.",
+  "autoplay": {
+    "mode": "none"
+  }
+}

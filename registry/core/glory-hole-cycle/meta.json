@@ -1,0 +1,22 @@
+{
+  "name": "glory-hole-cycle",
+  "title": "Glory Hole Cycle",
+  "description": "A 'still actively processing' status chip whose small canvas glow rises fast and cools slow on a fixed 4.0s beat, modeled on a glassblower's furnace reheat cycle instead of a generic pulsing dot.",
+  "collection": "core",
+  "tags": [
+    "status",
+    "indicator",
+    "badge",
+    "processing",
+    "syncing",
+    "canvas",
+    "motion",
+    "aria-live"
+  ],
+  "useWhen": "a process is still actively running right now and needs one continuous ambient chip beside a filename, job row, or sync target — a single glow rising sharply then cooling slowly on a steady beat reads as 'still working' without a spinner or a swapped icon; pick status-glyph-cadence instead when the surface has several distinct TASK states (working/searching/blocked/done) that each need their own motion cadence rather than one continuous 'still active' read, or status-sphere-dots when the indicator also has to hold up at showpiece scale (up to ~200px) rather than only as a small inline chip.",
+  "instruction": "A passive 'still actively processing' status chip — the pulsing-dot pattern's replacement — built on glassblowing's glory-hole reheat cycle: hot glass cools the instant it leaves the furnace mouth, so a gaffer plunges the piece back into the glory hole on a steady beat to bring it back to working heat, then withdraws it to work while hot, repeating for as long as the piece is still being formed. The chip is a rounded pill (rounded-full, border-border 1px ring, bg-surface fill) containing a fixed 36x36 CSS-px circular <canvas> (DPR-scaled on mount and window resize) plus a text label. The canvas draws one soft radial gradient disc, no grid, radius fixed at 60% of the canvas's smaller (36px) dimension, three gradient stops (opaque center, 55% alpha at 70%, 0% alpha at the edge). Colour is never a literal: on mount, and on every class-attribute mutation of document.documentElement (a MutationObserver, for live theme toggles), the component reads var(--ns-muted) and var(--foreground) via getComputedStyle and parses them to RGB; every frame's disc colour is a straight RGB lerp between those two parsed values driven by a scalar luminance L, never a hue shift and never var(--ns-accent) (interaction chrome only, never the climactic moment). The animation is a fixed, non-negotiable 4.0s cycle with two phases: a 0.7s reheat ramp (cubic ease-out) carrying L from 0.18 (near --ns-muted) up to 0.92 (near --foreground), then a 3.3s cool decay, an exponential L(t) = Lmin + (Lmax-Lmin) * exp(-t/tau) with tau = 1.1s, so it visibly dims fast then trails slowly like real radiative cooling rather than a linear fade. A subtle 1px inner ring (a plain DOM span, border colour set to the live --foreground RGB) pulses opacity across the identical 0.15-0.4 range on the identical rise/decay curve, so ring and disc read as one discrete 'reinsertion' pulse each beat rather than a continuous shimmer. The whole thing is one requestAnimationFrame loop computing phase from (now - startTime) % 4000ms; it is paused via an IntersectionObserver while the chip is scrolled off-screen and resumed on a fresh cycle boundary rather than a stale phase, and cancelled along with both observers on unmount. Nothing here restarts or accelerates on hover/focus — the cycle represents real elapsed process time, not UI feedback, so if a dismiss affordance is ever added beside it, it must leave the glow's phase untouched. prefers-reduced-motion skips the rAF loop entirely and paints exactly one frozen frame at t=0.7s into the cycle (L=Lmax, ring opacity 0.4) — the peak 'hot' frame, deliberately not an ambiguous mid-decay grey. Light theme is the harder case: because --ns-muted sits noticeably lighter than raw black there, the decay tail's low end is checked against --surface first so the last ~1.5s of every cycle still reads as 'dim, not gone' rather than disappearing into the chip background. Props: label (status text rendered beside the glow and announced via the chip's own role=status aria-live=polite region, default 'Processing'), className. Zero dependencies, no WebGL.",
+  "dependencies": [],
+  "autoplay": {
+    "mode": "none"
+  }
+}
