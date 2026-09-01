@@ -76,6 +76,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${REGISTRY_ORIGIN}/privacy`,
       lastModified: new Date(),
     },
+    {
+      url: `${REGISTRY_ORIGIN}/feedback`,
+      lastModified: new Date(),
+    },
+    {
+      url: `${REGISTRY_ORIGIN}/suggest`,
+      lastModified: new Date(),
+    },
     ...categoryPages().map((c) => ({
       url: `${REGISTRY_ORIGIN}/categories/${c.id}`,
       lastModified: new Date(),
