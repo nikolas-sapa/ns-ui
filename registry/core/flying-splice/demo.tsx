@@ -1,0 +1,20 @@
+"use client";
+
+import { FlyingSplice } from "./component";
+
+export default function FlyingSpliceDemo() {
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 py-16">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">ns-ui / flying-splice</p>
+
+      <div className="h-[220px] w-full max-w-2xl rounded-[12px] border border-border">
+        <FlyingSplice />
+      </div>
+
+      <p className="max-w-md text-center text-xs text-ns-muted">
+        The running roll shrinks and spins up as it empties; every 22s the standby roll splices
+        in mid-flight and a fresh roll rises into the vacated stand.
+      </p>
+    </div>
+  );
+}
