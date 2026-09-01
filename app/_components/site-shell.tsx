@@ -68,6 +68,8 @@ const BOTTOM_BAR_GROUPS: { href: string; label: string }[][] = [
     { href: "/connect", label: "Connect" },
     { href: "/guidelines", label: "Guidelines" },
     { href: "/submit", label: "Submit" },
+    { href: "/feedback", label: "Feedback" },
+    { href: "/suggest", label: "Suggest" },
     { href: "/status", label: "Status" },
   ],
 ];
