@@ -14,7 +14,7 @@
     "mono",
     "accessibility"
   ],
-  "useWhen": "the version-history-and-restore panel for a shared doc, where the ring chart's own geometry has to carry three facts at once — chronological order (radius, strictly monotonic, never re-sorted by author), each save's change size (ring width, clamped 2-14px) and exactly where authorship handed off (a dark latewood line) — and restoring an older version previews precisely what gets cut before it's cut. Pick core-sample-scroll instead when the strata metaphor is for scroll position or content depth rather than a restorable version history, and sediment-stack for accumulated content depth with no restore action at all.",
+  "useWhen": "the version-history-and-restore panel for a shared doc, where the ring chart's own geometry has to carry three facts at once — chronological order (radius, strictly monotonic, never re-sorted by author), each save's change size (ring width, clamped 2-14px) and exactly where authorship handed off (a dark latewood line) — and restoring an older version previews precisely what gets cut before it's cut. Pick scroll-story-strata instead when the strata metaphor is for scroll position or content depth rather than a restorable version history, and toast-gravity-stack for accumulated content depth with no restore action at all.",
   "autoplay": {
     "mode": "press",
     "target": "[data-growth-version=\"v10\"]",

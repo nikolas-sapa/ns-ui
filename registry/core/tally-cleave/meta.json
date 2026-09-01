@@ -13,7 +13,7 @@
     "accessibility",
     "spring"
   ],
-  "useWhen": "a Settings > Invites list where the visual needs to argue that acceptance is a two-party match, not a one-sided stamp — the seam geometry is hashed from the invite token, the pending row shows only a ghost outline of the missing half, and TTL elapsing visibly erodes the seam rather than just changing a badge color. Pick signet-drop instead when the point is a single party stamping a one-sided mark as proof of origin (no second half, no rejoining) — that is the opposite claim this component makes.",
+  "useWhen": "a Settings > Invites list where the visual needs to argue that acceptance is a two-party match, not a one-sided stamp — the seam geometry is hashed from the invite token, the pending row shows only a ghost outline of the missing half, and TTL elapsing visibly erodes the seam rather than just changing a badge color. Pick confirm-hold-wax instead when the point is a single party stamping a one-sided mark as proof of origin (no second half, no rejoining) — that is the opposite claim this component makes.",
   "autoplay": {
     "mode": "press",
     "target": "[data-action=\"accept\"]",

@@ -13,7 +13,7 @@
     "aria-live",
     "accessibility"
   ],
-  "useWhen": "a Settings > Sign-in methods list where each passkey needs a recognizable, non-random visual fingerprint derived from its own credential id — enroll plays a one-shot key-cutting pass, remove arms then files the profile flat before the row leaves. Pick pin-tumbler instead when the point is animating the ACT of unlocking rather than fingerprinting a stored credential, and card-number-emboss when the physical-object metaphor is a payment card, not a key.",
+  "useWhen": "a Settings > Sign-in methods list where each passkey needs a recognizable, non-random visual fingerprint derived from its own credential id — enroll plays a one-shot key-cutting pass, remove arms then files the profile flat before the row leaves. Pick radio-group-pin instead when the point is animating the ACT of unlocking rather than fingerprinting a stored credential, and card-number-emboss when the physical-object metaphor is a payment card, not a key.",
   "autoplay": {
     "mode": "press",
     "target": "[aria-label=\"Add passkey\"]",

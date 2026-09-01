@@ -15,7 +15,7 @@
     "accessibility",
     "collaboration"
   ],
-  "useWhen": "the morning 'what happened while I was away' panel on a shared project, where every entry is a time-punched row grouped on its author's own card so one person's rhythm stays intact — pick this over a single interleaved activity feed ('3 people made 12 edits'), which forces per-line avatar decoding this rack is built to avoid. Differs from memory-ledger-decay (patina-ledger): that one ages a record's ink color the longer it sits unreferenced; this one never recolors anything — unread is a physical position (proud vs. flush) against a datum line, cleared by a button, not a decay curve read off elapsed time.",
+  "useWhen": "the morning 'what happened while I was away' panel on a shared project, where every entry is a time-punched row grouped on its author's own card so one person's rhythm stays intact — pick this over a single interleaved activity feed ('3 people made 12 edits'), which forces per-line avatar decoding this rack is built to avoid. Differs from memory-ledger-decay: that one ages a record's ink color the longer it sits unreferenced; this one never recolors anything — unread is a physical position (proud vs. flush) against a datum line, cleared by a button, not a decay curve read off elapsed time.",
   "autoplay": {
     "mode": "press",
     "target": ".ns-clockcard-caughtup:not(:disabled)",

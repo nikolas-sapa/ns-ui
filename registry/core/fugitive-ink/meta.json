@@ -13,7 +13,7 @@
     "aria-live",
     "accessibility"
   ],
-  "useWhen": "a one-time secret reveal (new API key, recovery codes) that must leave a permanent identifying record behind after it fades — prefix and last four characters stay legible forever, the middle decays granularly on one shared clock armed by copy-or-blur, and copy-of-the-stub keeps working after the full value expires; not for an entrance effect on already-visible text (vapor-countdown) or a countdown that ends at nothing (decrypt-text).",
+  "useWhen": "a one-time secret reveal (new API key, recovery codes) that must leave a permanent identifying record behind after it fades — prefix and last four characters stay legible forever, the middle decays granularly on one shared clock armed by copy-or-blur, and copy-of-the-stub keeps working after the full value expires; not for an entrance effect on already-visible text (countdown-vapor-digits) or a countdown that ends at nothing (text-decrypt).",
   "autoplay": {
     "mode": "press",
     "target": "button.ns-fi-copy-btn",
