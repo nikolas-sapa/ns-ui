@@ -25,7 +25,8 @@ const CODE_BLOCK =
   "flex items-start gap-2 rounded-md border border-border bg-surface py-2 pl-3.5 pr-1.5";
 
 const INSTALL_ONE = `npx shadcn add ${REGISTRY_ORIGIN}/r/<name>.json`;
-const INIT_NEW = "npx shadcn init -d";
+const INIT_NEW = "npx shadcn init -d -n my-app";
+const INIT_CD = "cd my-app";
 const INSTALL_AFTER_INIT = `npx shadcn add ${REGISTRY_ORIGIN}/r/gallery-coverflow-caustic.json`;
 
 export default function InstallPage() {
@@ -100,13 +101,20 @@ export default function InstallPage() {
       <section className="mt-10 max-w-2xl">
         <h2 className={SECTION_LABEL}>Starting a new project</h2>
         <p className="mt-2 text-sm leading-6 text-ns-muted">
-          Initialize shadcn first, then install as above:
+          From an empty directory, scaffold and initialize first, then install
+          as above:
         </p>
         <div className={`mt-3 ${CODE_BLOCK}`}>
           <code className="min-w-0 flex-1 break-words font-mono text-xs leading-6 text-foreground">
             {INIT_NEW}
           </code>
           <CopyButton variant="inline" value={INIT_NEW} label="Copy init command" />
+        </div>
+        <div className={`mt-2 ${CODE_BLOCK}`}>
+          <code className="min-w-0 flex-1 break-words font-mono text-xs leading-6 text-foreground">
+            {INIT_CD}
+          </code>
+          <CopyButton variant="inline" value={INIT_CD} label="Copy cd command" />
         </div>
         <div className={`mt-2 ${CODE_BLOCK}`}>
           <code className="min-w-0 flex-1 break-words font-mono text-xs leading-6 text-foreground">
@@ -118,6 +126,22 @@ export default function InstallPage() {
             label="Copy example install command"
           />
         </div>
+        <p className="mt-3 text-sm leading-6 text-ns-muted">
+          The{" "}
+          <code className="rounded-sm bg-surface px-1 py-0.5 font-mono text-[13px] text-foreground">
+            -n
+          </code>{" "}
+          flag is what keeps this non-interactive. Without it,{" "}
+          <code className="rounded-sm bg-surface px-1 py-0.5 font-mono text-[13px] text-foreground">
+            shadcn init
+          </code>{" "}
+          has no project to configure and stops on a &ldquo;What is your project
+          named?&rdquo; prompt. It scaffolds a Next.js app into{" "}
+          <code className="rounded-sm bg-surface px-1 py-0.5 font-mono text-[13px] text-foreground">
+            my-app/
+          </code>
+          , which is why the install runs from inside it.
+        </p>
       </section>
 
       <section className="mt-10 max-w-2xl border-t border-border pt-8">

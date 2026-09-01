@@ -37,12 +37,18 @@ That drops the source at `components/ui/<name>.tsx` and installs the
 component's npm dependencies. There is no `ns-ui` package and nothing to keep
 in sync. The code is yours to edit.
 
-New project:
+New project, from an empty directory:
 
 ```bash
-npx shadcn init -d
+npx shadcn init -d -n my-app
+cd my-app
 npx shadcn add https://design.helpmarq.com/r/gallery-coverflow-caustic.json
 ```
+
+`-n` is what makes this non-interactive. Without it, `shadcn init` has no
+project to configure and stops on a "What is your project named?" prompt. The
+flag scaffolds a Next.js app into `my-app/`, so the `add` runs from inside it.
+Already in a configured project? Skip straight to `npx shadcn add`.
 
 ## For agents
 
