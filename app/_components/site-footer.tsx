@@ -63,6 +63,8 @@ const COLUMNS: { heading: string; links: FooterLink[] }[] = [
       // what is stored. Filed here rather than in a fifth column: the grid is
       // sm:grid-cols-4 and a fifth would rewrap it.
       { href: "/about", label: "About" },
+      { href: "/feedback", label: "Feedback" },
+      { href: "/suggest", label: "Suggest a feature" },
       { href: "/privacy", label: "Privacy" },
       { href: "https://github.com/nikolas-sapa/ns-ui", label: "GitHub", external: true },
       {

@@ -86,6 +86,16 @@ const STATIC_PAGES: Record<string, { title: string; summary: string }> = {
     title: "Submit a component",
     summary: "Propose a component for the registry.",
   },
+  "/feedback": {
+    title: "Feedback",
+    summary:
+      "Where to report a bug in a component or on the site, and how to reach the maintainer privately.",
+  },
+  "/suggest": {
+    title: "Suggest a feature",
+    summary:
+      "Where to propose a component idea or a feature for the CLI, MCP server, or site, and what each is judged on.",
+  },
 };
 
 /** Routes that exist but are not prose — asking for markdown here is a 406. */
