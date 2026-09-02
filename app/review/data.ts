@@ -1826,14 +1826,6 @@ export const REVIEW_ITEMS: ReviewItem[] = [
       "Watch the spent foil web index between strikes — that is the resting loop. The die must strike the headline's terminal word as well as the button, and no bed of type may appear (that is quoin-lockup's territory). Its builder found the spec's phase table summed to 4510ms against a stated 4.60s and trusted the total.",
   },
   {
-    slug: "peel-flow",
-    group: "r13",
-    round: "r13",
-    note: "Closing CTA band, the second of two. Powder-coat orange peel levelling as a lambda^4 low-pass filter: short texture gone in about a second, 1mm texture surviving minutes, in the same patch.",
-    eyeball:
-      "The band sweeping across is fine; the region it has ALREADY passed must keep changing too (cure-shrinkage telegraphing), not just slide. Its builder ran that crop test offline and it passed. The CTA button is the one place accent is allowed here.",
-  },
-  {
     slug: "joint-iron",
     group: "r13",
     round: "r13",

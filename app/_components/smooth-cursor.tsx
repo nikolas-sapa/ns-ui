@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 
 // ponytail: lerp, not a real spring. Swap in a damped spring if the ease reads too linear.
 const EASE = 0.18; // higher = tighter follow
@@ -24,8 +25,16 @@ const CLICKABLE =
 export function SmoothCursor() {
   const ref = useRef<HTMLDivElement>(null);
   const arrowRef = useRef<HTMLSpanElement>(null);
+  const pathname = usePathname();
+  // A /preview route is a component on a bare page, and it is what the
+  // verification gate, the poster pipeline and every review screenshot load
+  // DIRECTLY rather than in a frame. The iframe guard below therefore does not
+  // fire there, and the replacement cursor was being baked into captured
+  // images across the registry, including the weld-pool reference shots.
+  const onPreview = pathname?.startsWith("/preview") ?? false;
 
   useEffect(() => {
+    if (onPreview) return;
     // See the module comment — this component only owns the cursor on the
     // top-level document, never inside an embedded component's iframe.
     if (window.self !== window.top) return;
@@ -148,7 +157,9 @@ export function SmoothCursor() {
       removeEventListener("pointerenter", onEnter);
       document.body.classList.remove("smooth-cursor-active");
     };
-  }, []);
+  }, [onPreview]);
+
+  if (onPreview) return null;
 
   return (
     <div ref={ref} className="smooth-cursor" aria-hidden="true">
