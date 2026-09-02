@@ -2,7 +2,7 @@
   "name": "copy-field-crimp",
   "rank": 283,
   "title": "Copy Field Crimp",
-  "description": "A copyable value field whose confirmation is typographic — letter-spacing crimps shut in a wave from the clicked character, then a check scales into the icon slot and holds. No toast, no green flash.",
+  "description": "A copyable value field whose confirmation is typographic: letter-spacing crimps shut in a wave from the clicked character, then a check scales into the icon slot and holds. No toast, no green flash.",
   "collection": "core",
   "tags": [
     "copy",

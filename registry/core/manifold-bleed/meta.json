@@ -1,7 +1,7 @@
 {
   "name": "manifold-bleed",
   "title": "Manifold Bleed",
-  "description": "A connected app's standing grants drawn as a valve manifold — each scope is a gate valve on a supply line from your account to the app, and revoking it drains the line backward toward you only after the server confirms, leaving a hairline ghost of what was once granted.",
+  "description": "A connected app's standing grants drawn as a valve manifold: each scope is a gate valve on a supply line from your account to the app, and revoking it drains the line backward toward you only after the server confirms, leaving a hairline ghost of what was once granted.",
   "collection": "core",
   "tags": [
     "connected-apps",

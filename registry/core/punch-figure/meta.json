@@ -1,7 +1,7 @@
 {
   "name": "punch-figure",
   "title": "Punch Figure",
-  "description": "An issued amount punched through the sheet as a dot matrix by a single left-to-right head pass — subtractive, permanent, and correctable only by a second pass punching VOID diagonally across it.",
+  "description": "An issued amount punched through the sheet as a dot matrix by a single left-to-right head pass: subtractive, permanent, and correctable only by a second pass punching VOID diagonally across it.",
   "collection": "core",
   "tags": [
     "invoice",

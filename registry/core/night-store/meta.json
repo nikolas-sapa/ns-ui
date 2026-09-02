@@ -1,7 +1,7 @@
 {
   "name": "night-store",
   "title": "Night Store",
-  "description": "A cache diagnostics rack where every key-group is a storage-heater brick holding heat: a hit charges it toward full glyph-density stipple, idle time cools it on a decay matched to its own TTL, and a real eviction contracts the rack by exactly one slot. Keys hit over and over flicker cold-hot instead of settling — the visual signature of a thrashing cache.",
+  "description": "A cache diagnostics rack where every key-group is a storage-heater brick holding heat: a hit charges it toward full glyph-density stipple, idle time cools it on a decay matched to its own TTL, and a real eviction contracts the rack by exactly one slot. Keys hit over and over flicker cold-hot instead of settling: the visual signature of a thrashing cache.",
   "collection": "core",
   "tags": [
     "cache",

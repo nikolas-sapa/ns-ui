@@ -1,7 +1,7 @@
 {
   "name": "retrieval-chunk-sieve",
   "title": "Retrieval Chunk Sieve",
-  "description": "RAG retrieval as a literal sieve — one hard rule across the frame with the chunks that cleared the similarity cutoff resting solid above it and the rejects falling as faint stubs below, and a connector rail that separates what was merely retrieved from what the answer actually used.",
+  "description": "RAG retrieval as a literal sieve: one hard rule across the frame with the chunks that cleared the similarity cutoff resting solid above it and the rejects falling as faint stubs below, and a connector rail that separates what was merely retrieved from what the answer actually used.",
   "collection": "core",
   "tags": [
     "agent",

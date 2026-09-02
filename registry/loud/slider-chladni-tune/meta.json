@@ -1,7 +1,7 @@
 {
   "name": "slider-chladni-tune",
   "title": "Slider Chladni Tune",
-  "description": "Precision-tuning slider whose readout is a plate of a few thousand sand grains: off target they churn in a formless haze, on target they lock into a crisp symmetric Chladni figure and hold still — distance-to-correct read as pattern coherence, not a number.",
+  "description": "Precision-tuning slider whose readout is a plate of a few thousand sand grains: off target they churn in a formless haze, on target they lock into a crisp symmetric Chladni figure and hold still. Distance-to-correct read as pattern coherence, not a number.",
   "collection": "loud",
   "tags": [
     "slider",

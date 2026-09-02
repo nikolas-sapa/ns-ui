@@ -1,7 +1,7 @@
 {
   "name": "listbox-sticky-groups",
   "title": "Listbox Sticky Groups",
-  "description": "A grouped listbox for long lists (timezones, countries, currencies) where every passed group header sticks in place, stacking into overlapping 20px slivers you can still read and click — a live table of contents made from the headers themselves.",
+  "description": "A grouped listbox for long lists (timezones, countries, currencies) where every passed group header sticks in place, stacking into overlapping 20px slivers you can still read and click. A live table of contents made from the headers themselves.",
   "collection": "core",
   "tags": ["select", "listbox", "form", "sticky", "scroll", "navigation", "keyboard", "grouped-list"],
   "useWhen": "a long grouped listbox (timezones, countries, currencies — hundreds of rows) where the user needs to keep orientation across every group already scrolled past, not just the current one; the passed group headers themselves stack into a persistent, clickable trail. Pick select-caustic or dropdown-drape instead for a short flat option list where the interesting behavior is opening and closing the panel, not navigating inside it.",

@@ -1,7 +1,7 @@
 {
   "name": "feed-escapement",
   "title": "Feed Escapement",
-  "description": "Live feed where a small SVG anchor fork gates arrivals one at a time — a burst becomes a metered tick-tick-tick instead of a dogpile, held open only by each item's own spring-settle, not a schedule.",
+  "description": "Live feed where a small SVG anchor fork gates arrivals one at a time: a burst becomes a metered tick-tick-tick instead of a dogpile, held open only by each item's own spring-settle, not a schedule.",
   "collection": "core",
   "tags": ["feed", "notification", "queue", "physics", "aria-live", "log", "activity"],
   "useWhen": "a live feed that receives bursts, where arrivals should be metered in one at a time by each item's own settle rather than by a scheduler, so a dogpile becomes a legible tick-tick-tick; pick toast-gravity-stack instead when the arrivals are transient toasts rather than permanent feed rows, or timeline-agent-lanes when the stream is concurrent agent turns rather than a flat list.",

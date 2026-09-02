@@ -1,7 +1,7 @@
 {
   "name": "chart-bar-halftone",
   "title": "Chart Bar Halftone",
-  "description": "Bar chart whose fills are an ordered-dither halftone instead of a flat color — ink density tracks value as a second, redundant channel to height.",
+  "description": "Bar chart whose fills are an ordered-dither halftone instead of a flat color: ink density tracks value as a second, redundant channel to height.",
   "collection": "core",
   "tags": ["chart", "bar", "data-viz", "dither", "halftone", "svg", "ink"],
   "useWhen": "comparing values across nominal categories (products, teams, regions) where ink density should carry the value redundantly with bar height, so the chart survives a monochrome print or a colorblind read; pick chart-donut-halftone instead when the data is part-to-whole over an ordinal scale rather than a comparison across categories, or histogram-live-grain when the bars would be bins of a live sample rather than fixed categories.",

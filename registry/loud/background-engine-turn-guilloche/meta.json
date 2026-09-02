@@ -1,7 +1,7 @@
 {
   "name": "background-engine-turn-guilloche",
   "title": "Background Engine Turn Guilloche",
-  "description": "A full-bleed ambient background reproducing engine-turning (guilloché), the rose-engine lathe technique used to engrave the dense woven rosette patterns on banknotes and security documents — three superimposed hypotrochoid passes at close, unequal lathe ratios beat against each other while the ratios drift and each pass spins independently, so the weave never locks into a static pattern.",
+  "description": "A full-bleed ambient background reproducing engine-turning (guilloché), the rose-engine lathe technique used to engrave the dense woven rosette patterns on banknotes and security documents: three superimposed hypotrochoid passes at close, unequal lathe ratios beat against each other while the ratios drift and each pass spins independently, so the weave never locks into a static pattern.",
   "collection": "loud",
   "tags": ["background", "canvas", "guilloche", "engraving", "moire", "hypotrochoid", "security-printing", "ambient"],
   "useWhen": "a full-bleed decorative field of many overlapping engine-turned passes forming a woven interference texture at rest, distinct from loader-spirograph-trace, which traces exactly ONE epicycloid curve as a small determinate/indeterminate loading glyph — pick this when the surface is a hero/section background behind headline content, and loader-spirograph-trace when the surface is a progress indicator.",

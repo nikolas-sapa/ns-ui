@@ -76,7 +76,7 @@ export function DemoFrame({
       inert={embedded && !interactiveEmbed}
       data-autoplay-root={spec ? "" : undefined}
     >
-      <DemoLazy name={name} />
+      <DemoLazy name={name} interactive={!(embedded && !interactiveEmbed)} />
       {spec ? <AutoplayDriver spec={spec} /> : null}
     </div>
   );

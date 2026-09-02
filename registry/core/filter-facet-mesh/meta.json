@@ -1,7 +1,7 @@
 {
   "name": "filter-facet-mesh",
   "title": "Filter Facet Mesh",
-  "description": "Faceted filter chips as a sieve — active facets read as taut, bright threads in a hairline mesh fanned from a hub above the chip row, hovering a chip visibly tightens its own thread, and deselecting one opens a gap that shakes a few result particles through as the count sifts to its new value.",
+  "description": "Faceted filter chips as a sieve: active facets read as taut, bright threads in a hairline mesh fanned from a hub above the chip row, hovering a chip visibly tightens its own thread, and deselecting one opens a gap that shakes a few result particles through as the count sifts to its new value.",
   "collection": "core",
   "card": {
     "focus": ".max-w-md",

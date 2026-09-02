@@ -1,7 +1,7 @@
 {
   "name": "confirm-hold-ink",
   "title": "Confirm Hold Ink",
-  "description": "Press-and-hold destructive action — monochrome ink pours up from the press point, release early and it recoils.",
+  "description": "Press-and-hold destructive action: monochrome ink pours up from the press point, release early and it recoils.",
   "collection": "core",
   "tags": [
     "button",

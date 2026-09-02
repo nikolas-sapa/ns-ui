@@ -1,7 +1,7 @@
 {
   "name": "background-ascii-flow",
   "title": "Background ASCII Flow",
-  "description": "An ambient ASCII flow-field background — a fixed set of tracer particles ride a time-evolving 2D curl-noise velocity field, each glyph's direction ('-', '|', '/', '\\\\') and trail alpha encoding its heading and speed, with the pointer stirring a local swirl instead of painting or repelling.",
+  "description": "An ambient ASCII flow-field background: a fixed set of tracer particles ride a time-evolving 2D curl-noise velocity field, each glyph's direction ('-', '|', '/', '\\\\') and trail alpha encoding its heading and speed, with the pointer stirring a local swirl instead of painting or repelling.",
   "collection": "core",
   "tags": ["background", "ascii", "canvas", "cursor", "noise", "particles", "flow"],
   "useWhen": "Pick background-ascii-flow when the field should read as genuine fluid motion — particles with continuous position and velocity, glyph direction encoding heading — rather than a per-cell sampled scalar (background-ascii-plasma) or a persistent cursor-trail grid (background-ascii-wake).",

@@ -1,7 +1,7 @@
 {
   "name": "empty-state-mezzotint",
   "title": "Empty State Mezzotint",
-  "description": "A small ambient icon for empty states built on real mezzotint printmaking: the plate is rocked to a dense burr that would print solid black, then worked SUBTRACTIVELY as light is scraped and burnished in — the registry's only subtractive glyph mechanic, where every other component builds density up from empty.",
+  "description": "A small ambient icon for empty states built on real mezzotint printmaking: the plate is rocked to a dense burr that would print solid black, then worked SUBTRACTIVELY as light is scraped and burnished in. The registry's only subtractive glyph mechanic, where every other component builds density up from empty.",
   "collection": "core",
   "tags": ["empty-state", "icon", "ascii", "mono", "ambient", "subtractive"],
   "useWhen": "an empty-state icon whose whole point is subtraction — starting from maximum ink and scraping light in — rather than the registry's usual additive build-up-from-empty glyph fields. Pick empty-state-braille-orbit instead when a single continuous traced curve (a trajectory) is the better fit than a worked tonal plate.",

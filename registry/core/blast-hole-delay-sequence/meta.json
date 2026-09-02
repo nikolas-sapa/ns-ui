@@ -1,7 +1,7 @@
 {
   "name": "blast-hole-delay-sequence",
   "title": "Blast Hole Delay Sequence",
-  "description": "A bench-blast shot pattern rendered as a grid of charged holes that fires row by row on a delay wave — each row flashing to peak brightness and settling to a spent, darkened crater before the wave reaches the next row — rather than firing all at once.",
+  "description": "A bench-blast shot pattern rendered as a grid of charged holes that fires row by row on a delay wave rather than all at once, each row flashing to peak brightness and settling to a spent, darkened crater before the wave reaches the next row.",
   "collection": "core",
   "tags": ["loader", "status", "grid", "sequence", "delay", "mining", "generative", "ambient"],
   "useWhen": "a status/loader-family surface where many small units progress toward one event IN A FIXED ORDER and the order itself is the thing worth watching — a shot pattern's delay wave sweeping row by row across a grid, settling each row to a spent state before the next fires. Pick loader-braille instead when the loader needs a compact inline glyph with a genuine indeterminate/determinate progress value rather than a fixed decorative firing order, or status-glyph-cadence when a single inline status needs to communicate discrete named states (working/blocked/done) rather than a many-cell sequential sweep.",

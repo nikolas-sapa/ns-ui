@@ -137,8 +137,8 @@ export function AskAI({
         key={platform.id}
         type="button"
         onClick={() => copyAndOpen(platform.id, platform.homeHref)}
-        aria-label={copied ? `Prompt copied — paste it into ${platform.label}` : label}
-        title={copied ? `Copied — paste into ${platform.label}` : label}
+        aria-label={copied ? `Prompt copied. Paste it into ${platform.label}` : label}
+        title={copied ? `Copied. Paste into ${platform.label}` : label}
         className={BUTTON}
       >
         <Icon />
@@ -204,7 +204,7 @@ export function AskAI({
         <span className="inline-flex translate-y-[3px] items-center justify-center">
           <CopyIcon />
         </span>{" "}
-        copies it to your clipboard first — paste it in once the chat opens.
+        copies it to your clipboard first. Paste it in once the chat opens.
       </p>
     </div>
   );

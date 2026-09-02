@@ -1,7 +1,7 @@
 {
   "name": "confirm-dial-align",
   "title": "Confirm Dial Align",
-  "description": "Destructive-action confirm gated on precision, not patience: rotate an SVG dial's notch to within 3deg of a fixed index, hold it there 400ms, and the dial snaps home and arms the confirm button — overshoot and it springs back like a slipping safe tumbler.",
+  "description": "Destructive-action confirm gated on precision, not patience: rotate an SVG dial's notch to within 3deg of a fixed index, hold it there 400ms, and the dial snaps home and arms the confirm button. Overshoot and it springs back like a slipping safe tumbler.",
   "collection": "core",
   "tags": [
     "dial",

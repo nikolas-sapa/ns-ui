@@ -1,7 +1,7 @@
 {
   "name": "passing-loop",
   "title": "Passing Loop",
-  "description": "A progressive-rollout controller built as a funicular: two cars share one cable over a summit pulley, so the new version's share and the old version's share are geometric complements that can never disagree — a canary hold pins the midpoint until confirmed, and rollback releases the winch to fall back under damped physics.",
+  "description": "A progressive-rollout controller built as a funicular: two cars share one cable over a summit pulley, so the new version's share and the old version's share are geometric complements that can never disagree. A canary hold pins the midpoint until confirmed, and rollback releases the winch to fall back under damped physics.",
   "collection": "core",
   "tags": [
     "deploy",

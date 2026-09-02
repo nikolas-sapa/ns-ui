@@ -1,7 +1,7 @@
 {
   "name": "crimp-barrel-set",
   "title": "Crimp Barrel Set",
-  "description": "A 'connect/link/attach' confirm control modeled on open-barrel wire crimping — two dies flatten a barrel into a witness-marked, strand-flared profile on a repeating 3.6s demonstration cycle, alive at rest, with a press firing one crimp on demand.",
+  "description": "A 'connect/link/attach' confirm control modeled on open-barrel wire crimping: two dies flatten a barrel into a witness-marked, strand-flared profile on a repeating 3.6s demonstration cycle, alive at rest, with a press firing one crimp on demand.",
   "collection": "core",
   "tags": [
     "confirm",

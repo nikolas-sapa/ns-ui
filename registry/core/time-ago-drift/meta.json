@@ -1,7 +1,7 @@
 {
   "name": "time-ago-drift",
   "title": "Time Ago Drift",
-  "description": "A relative timestamp whose type visibly ages — variable-font weight, letter-spacing and ink drift from --foreground toward --ns-muted as the moment recedes; hover or focus crossfades to the exact ISO instant.",
+  "description": "A relative timestamp whose type visibly ages: variable-font weight, letter-spacing and ink drift from --foreground toward --ns-muted as the moment recedes; hover or focus crossfades to the exact ISO instant.",
   "collection": "core",
   "tags": [
     "time",

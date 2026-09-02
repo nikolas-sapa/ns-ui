@@ -1,7 +1,7 @@
 {
   "name": "seatmap-ascii-pick",
   "title": "Seatmap ASCII Pick",
-  "description": "An ASCII venue floor plan where dragging a marquee selects a contiguous block of seats — taken seats and the centre aisle break the run, and the selection visibly snaps to the longest unbroken block inside the drag, with a live seat count.",
+  "description": "An ASCII venue floor plan where dragging a marquee selects a contiguous block of seats: taken seats and the centre aisle break the run, and the selection visibly snaps to the longest unbroken block inside the drag, with a live seat count.",
   "collection": "core",
   "tags": ["seatmap", "selection", "grid", "ascii", "mono", "drag", "keyboard-navigation", "booking"],
   "useWhen": "picking a contiguous block of seats (or any grid of discrete slots that must stay together) where taken slots need to visibly break a run rather than being silently skipped — pick this over grid-magnetic-lattice (ambient cursor field, nothing is actually selected) or filter-facet-mesh (toggling a set of independent facet chips, not a contiguous run of grid cells). Not a fit for a click-one-seat-at-a-time picker; the mechanic here is specifically the marquee-to-block snap.",

@@ -1,7 +1,7 @@
 {
   "name": "shortcuts-cheat-sheet",
   "title": "Shortcuts Cheat Sheet",
-  "description": "A keyboard-shortcut cheat sheet whose keycaps press themselves — matching keydowns depress the cap and are swallowed before the app behind it can react.",
+  "description": "A keyboard-shortcut cheat sheet whose keycaps press themselves: matching keydowns depress the cap and are swallowed before the app behind it can react.",
   "collection": "core",
   "tags": [
     "shortcuts",

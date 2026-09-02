@@ -1,7 +1,7 @@
 {
   "name": "footer-ascii-rule",
   "title": "Footer ASCII Rule",
-  "description": "A sitemap footer whose back-to-top control is a real instrument: an aria-hidden vertical rail beside it continuously reads actual scroll position, and the button drives a real spring back to the top rather than a jump — grabbing the wheel mid-flight yields it immediately.",
+  "description": "A sitemap footer whose back-to-top control is a real instrument: an aria-hidden vertical rail beside it continuously reads actual scroll position, and the button drives a real spring back to the top rather than a jump. Grabbing the wheel mid-flight yields it immediately.",
   "collection": "core",
   "tags": ["footer", "sitemap", "back-to-top", "scroll", "spring", "ascii", "mono"],
   "autoplay": {

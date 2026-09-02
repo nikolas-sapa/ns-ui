@@ -2,7 +2,7 @@
   "name": "progress-wick",
   "rank": 285,
   "title": "Progress Wick",
-  "description": "A determinate progress bar that advances by capillary action — quick pull, slowing soak, brief dwell, next pull — with a faint wet-front runner previewing the track a few pixels ahead of the true fill, so bursty real-world progress (chunked uploads) reads as natural rather than janky.",
+  "description": "A determinate progress bar that advances by capillary action (quick pull, slowing soak, brief dwell, next pull), with a faint wet-front runner previewing the track a few pixels ahead of the true fill, so bursty real-world progress (chunked uploads) reads as natural rather than janky.",
   "collection": "core",
   "tags": [
     "progress",

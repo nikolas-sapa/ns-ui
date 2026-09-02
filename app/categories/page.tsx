@@ -12,8 +12,8 @@ const COMPONENT_COUNT = registry.items.length;
 
 export const metadata: Metadata = {
   alternates: { canonical: "/categories" },
-  title: "Categories — ns-ui",
-  description: `Browse ns-ui's ${COMPONENT_COUNT} React components by category — heroes, navigation, forms, charts, feedback and more.`,
+  title: "Categories · ns-ui",
+  description: `Browse ns-ui's ${COMPONENT_COUNT} React components by category: heroes, navigation, forms, charts, feedback and more.`,
 };
 
 /**
@@ -70,7 +70,7 @@ export default function CategoriesIndexPage() {
         </h1>
         <p className="mt-4 max-w-xl text-sm leading-relaxed text-ns-muted">
           {COMPONENT_COUNT} components grouped by the role a developer already has a word
-          for — pick one to see everything in it.
+          for. Pick one to see everything in it.
         </p>
       </header>
 

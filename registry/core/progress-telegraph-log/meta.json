@@ -2,7 +2,7 @@
   "name": "progress-telegraph-log",
   "rank": 286,
   "title": "Progress Telegraph Log",
-  "description": "Live telegraph feed for multi-stage operations of unknowable total duration: each real sub-step arrives as its own line with a ticking elapsed timer, then collapses into a dense done-ledger with its true cost frozen — stalls are self-evident because the active timer keeps counting while nothing new arrives.",
+  "description": "Live telegraph feed for multi-stage operations of unknowable total duration: each real sub-step arrives as its own line with a ticking elapsed timer, then collapses into a dense done-ledger with its true cost frozen. Stalls are self-evident because the active timer keeps counting while nothing new arrives.",
   "collection": "core",
   "tags": [
     "progress",

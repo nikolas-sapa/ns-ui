@@ -1,7 +1,7 @@
 {
   "name": "container-box-drawing",
   "title": "Container Box Drawing",
-  "description": "A container with real box-drawing chrome — an inline title breaking the top rule, upgrading to a double-line border character by character on hover or focus.",
+  "description": "A container with real box-drawing chrome: an inline title breaking the top rule, upgrading to a double-line border character by character on hover or focus.",
   "collection": "core",
   "tags": [
     "container",

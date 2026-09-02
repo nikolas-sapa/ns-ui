@@ -1,7 +1,7 @@
 {
   "name": "edm-crater-field",
   "title": "EDM Crater Field",
-  "description": "A full-bleed metal plate eroded by electrical discharge machining — sparks continuously pit the surface with small raised-rim craters that fade back to base as later discharges erode the recast layer, holding the plate at a steady simmer of pockmarks rather than ever saturating.",
+  "description": "A full-bleed metal plate eroded by electrical discharge machining: sparks continuously pit the surface with small raised-rim craters that fade back to base as later discharges erode the recast layer, holding the plate at a steady simmer of pockmarks rather than ever saturating.",
   "collection": "loud",
   "tags": ["background", "hero", "canvas", "webgl", "shader", "metal", "erosion", "cursor", "decorative"],
   "useWhen": "Pick edm-crater-field when the backdrop should read as a machined metal plate under continuous, low-grade erosion — a steady field of raised-rim pits that never accumulates toward a finished/saturated look. Pick weld-pool instead when the headline itself should be embedded IN a molten reflective surface (a mirror-bright pool, not a pitted plate) and the type needs to be lit and dented by the same field it sits in; weld-pool's environment needs five light sources to read as chrome, this one needs far fewer because a pocked surface only has to cross one or two reflection bands per crater to read as machined metal.",

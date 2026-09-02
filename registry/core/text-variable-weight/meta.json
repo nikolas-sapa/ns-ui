@@ -1,7 +1,7 @@
 {
   "name": "text-variable-weight",
   "title": "Text Variable Weight",
-  "description": "Letters morph variable-font weight by cursor proximity — pure typography interaction.",
+  "description": "Letters morph variable-font weight by cursor proximity. Pure typography interaction.",
   "collection": "core",
   "tags": [
     "text",

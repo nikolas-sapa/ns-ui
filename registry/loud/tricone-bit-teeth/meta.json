@@ -1,7 +1,7 @@
 {
   "name": "tricone-bit-teeth",
   "title": "Tricone Bit Teeth",
-  "description": "A full-bleed rock face worked by a rotary tricone bit — three cone cutters orbit the bit centre in a fixed 120-degree pattern, each tooth row stamping a crater cluster into the face that heals back to flat before the next pass, so the surface reads as a ring being continuously worked rather than a diffuse pockmarked plate.",
+  "description": "A full-bleed rock face worked by a rotary tricone bit: three cone cutters orbit the bit centre in a fixed 120-degree pattern, each tooth row stamping a crater cluster into the face that heals back to flat before the next pass, so the surface reads as a ring being continuously worked rather than a diffuse pockmarked plate.",
   "collection": "loud",
   "tags": ["background", "hero", "canvas", "rock", "drilling", "erosion", "decorative"],
   "useWhen": "Pick tricone-bit-teeth when the backdrop should read as a rock face being actively worked by a rotating cutting tool — three orbiting cone bodies visibly drive a textured ring of crater strikes, and the ring's fixed 120-degree structure is the legible feature. Pick edm-crater-field instead when the surface should read as a flat metal plate under diffuse, uniform-random erosion with no visible tool or directional structure at all — that component's craters land anywhere with equal probability and never trace a ring, which is the opposite read from this one's rotating-bit mechanic.",

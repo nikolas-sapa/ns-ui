@@ -1,7 +1,7 @@
 {
   "name": "command-palette-orbit",
   "title": "Command Palette Orbit",
-  "description": "Cmd-K palette where fuzzy-match results orbit the input as label pills — orbital radius is inverse match score, so the gravity sim is the ranking: an empty query leaves every command in calm staggered orbits, typing pulls strong matches into tight fast orbits while weak ones destabilize, fling off and despawn, and Enter consumes the winner into the horizon glow.",
+  "description": "Cmd-K palette where fuzzy-match results orbit the input as label pills. Orbital radius is inverse match score, so the gravity sim is the ranking: an empty query leaves every command in calm staggered orbits, typing pulls strong matches into tight fast orbits while weak ones destabilize, fling off and despawn, and Enter consumes the winner into the horizon glow.",
   "collection": "loud",
   "tags": ["command-palette", "cmd-k", "orbit", "physics", "fuzzy-search", "canvas", "keyboard"],
   "useWhen": "an open-ended Cmd-K palette over a large unbounded command set where the ranking itself should be visible, orbital radius standing in for match score while weak matches destabilize and fling off; pick command-palette-rotary instead when the destinations are a small bounded set deserving permanent memorizable positions, or search-winnow when the search filters a list on the page rather than a modal palette.",

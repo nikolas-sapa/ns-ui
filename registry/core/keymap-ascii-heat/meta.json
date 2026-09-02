@@ -1,7 +1,7 @@
 {
   "name": "keymap-ascii-heat",
   "title": "Keymap ASCII Heat",
-  "description": "An ASCII keyboard layout that accumulates real ink density per key as you type into it — each keystroke inks the key, heat decays on an exponential half-life, and the legend rescales to whichever key is currently hottest.",
+  "description": "An ASCII keyboard layout that accumulates real ink density per key as you type into it: each keystroke inks the key, heat decays on an exponential half-life, and the legend rescales to whichever key is currently hottest.",
   "collection": "core",
   "tags": ["keyboard", "heatmap", "ascii", "mono", "typing", "data-visualization", "live"],
   "useWhen": "showing which keys are actually getting hammered in a live typing session, driven entirely by real keystrokes rather than a canned dataset — pick shortcuts-cheat-sheet instead for a reference overlay whose keycaps depress themselves for a listed shortcut COMBINATION and swallow the keydown, which has no accumulation, decay or legend at all; pick heatmap-year-stipple instead for a calendar of past activity rather than a live session.",

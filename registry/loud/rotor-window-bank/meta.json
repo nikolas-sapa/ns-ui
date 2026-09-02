@@ -1,7 +1,7 @@
 {
   "name": "rotor-window-bank",
   "title": "Rotor Window Bank",
-  "description": "Full-bleed hero backdrop modeled on a rotor cipher machine's stepping mechanism: three letter-wheel windows where the right wheel ticks steadily, kicks the middle wheel once per revolution, and the middle wheel occasionally double-steps — moving twice in one beat and dragging the left wheel with it, the real Enigma-family stepping anomaly compressed to a 9-position ring so it recurs roughly every minute instead of every eleven.",
+  "description": "Full-bleed hero backdrop modeled on a rotor cipher machine's stepping mechanism: three letter-wheel windows where the right wheel ticks steadily, kicks the middle wheel once per revolution, and the middle wheel occasionally double-steps, moving twice in one beat and dragging the left wheel with it, the real Enigma-family stepping anomaly compressed to a 9-position ring so it recurs roughly every minute instead of every eleven.",
   "collection": "loud",
   "tags": ["hero", "background", "rotor", "cipher-machine", "dom", "ambient", "mechanical"],
   "useWhen": "a full-bleed ambient hero/background whose motion comes from a real electromechanical stepping mechanism rather than an authored keyframe loop, where the occasional double-step is the payoff worth watching for; pick curtain-leader-countdown instead when the full-bleed moment needs to resolve to a completion/cut rather than run as an unbounded ambient backdrop, or text-decrypt instead when the point is a specific string resolving left-to-right rather than an abstract mechanism ticking forever.",

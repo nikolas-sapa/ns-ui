@@ -1,7 +1,7 @@
 {
   "name": "profilometer-trace",
   "title": "Profilometer Trace",
-  "description": "A section divider rendered as a live contact profilometer readout — a fixed stylus near the right edge while the measured surface's roughness-plus-waviness trace scrolls continuously beneath it, right to left, at a constant real-time rate, peaks and valleys passing under the tip forever.",
+  "description": "A section divider rendered as a live contact profilometer readout: a fixed stylus near the right edge while the measured surface's roughness-plus-waviness trace scrolls continuously beneath it, right to left, at a constant real-time rate, peaks and valleys passing under the tip forever.",
   "collection": "core",
   "tags": [
     "divider",

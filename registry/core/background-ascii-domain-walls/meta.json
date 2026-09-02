@@ -1,7 +1,7 @@
 {
   "name": "background-ascii-domain-walls",
   "title": "Background ASCII Domain Walls",
-  "description": "An ambient ASCII background running a real Ising model just below its critical temperature and inking only the DOMAIN WALLS — the boundaries between up and down spin regions — so a slowly reorganising network of rough hairlines sits on empty ground, with the pointer applying a local magnetic field that clears walls out of its own neighbourhood.",
+  "description": "An ambient ASCII background running a real Ising model just below its critical temperature and inking only the DOMAIN WALLS (the boundaries between up and down spin regions), so a slowly reorganising network of rough hairlines sits on empty ground, with the pointer applying a local magnetic field that clears walls out of its own neighbourhood.",
   "collection": "core",
   "tags": [
     "background",

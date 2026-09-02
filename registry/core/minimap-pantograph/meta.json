@@ -1,7 +1,7 @@
 {
   "name": "minimap-pantograph",
   "title": "Minimap Pantograph",
-  "description": "A minimap whose viewport rectangle is physically wired to the real viewport by a live SVG pantograph — two elbow arms solved by two-bar IK every frame — so dragging the small handle visibly swings and extends the linkage as the document pans, making the scale ratio legible instead of implied.",
+  "description": "A minimap whose viewport rectangle is physically wired to the real viewport by a live SVG pantograph (two elbow arms solved by two-bar IK every frame), so dragging the small handle visibly swings and extends the linkage as the document pans, making the scale ratio legible instead of implied.",
   "collection": "core",
   "tags": ["minimap", "pantograph", "svg", "drag", "scroll", "navigation", "linkage", "slider"],
   "useWhen": "a minimap that shows its own scale ratio as a physical pantograph linkage between the small viewport rect and the real viewport, rather than leaving the amplification implied — reach for this when the point is watching a small drag mechanically drive a large pan (long documents, wide canvases, node graphs). Different from toc-minimap-mercury, which is a scroll-position TOC indicator (a liquid column climbing section ticks, no drag, no scale-transfer mechanism) and from slider-loupe, which is a single-value magnifier for reading a value precisely, not a 2D pan/navigation control.",

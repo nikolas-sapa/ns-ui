@@ -1,7 +1,7 @@
 {
   "name": "split-flap-board",
   "title": "Split Flap Board",
-  "description": "A split-flap departure-board display for short status strings — each character cell hinges its top half down over the bottom on a hard-creased 3D flip, cycling through a short burst of glyphs with per-cell stagger so a text change ripples left-to-right like clattering airport signage.",
+  "description": "A split-flap departure-board display for short status strings: each character cell hinges its top half down over the bottom on a hard-creased 3D flip, cycling through a short burst of glyphs with per-cell stagger so a text change ripples left-to-right like clattering airport signage.",
   "collection": "core",
   "tags": [
     "split-flap",

@@ -1,7 +1,7 @@
 {
   "name": "grid-bento-ascii",
   "title": "Grid Bento ASCII",
-  "description": "A 2x2 bento layout primitive built on its own content/seam track grid — a real vertical rule, horizontal rule and ┼ junction between the four tiles — where activating a tile re-spans it across every track, seam included, so the junction has nowhere left to be drawn.",
+  "description": "A 2x2 bento layout primitive built on its own content/seam track grid (a real vertical rule, horizontal rule and ┼ junction between the four tiles), where activating a tile re-spans it across every track, seam included, so the junction has nowhere left to be drawn.",
   "collection": "core",
   "tags": ["grid", "bento", "layout", "ascii", "mono", "box-drawing"],
   "useWhen": "a 2x2 bento layout primitive whose seam structure is real (a track grid with its own rule/junction elements) rather than painted borders, and where activating a tile is a genuine re-span of the grid topology rather than an overlay. Pick container-box-drawing instead for a single panel whose own perimeter upgrades to a double-line border on hover/focus — that component has no second cell and nothing to re-span.",

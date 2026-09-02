@@ -1,7 +1,7 @@
 {
   "name": "gallery-gantry-track",
   "title": "Gallery Gantry Track",
-  "description": "A scroll-scrubbed, infinitely-looping 3D card gallery — cards hang off a receding gantry track using real CSS perspective/preserve-3d, the whole tray tilts toward the pointer like a specimen table, and whichever card sits nearest the camera (by depth, not mouse distance) gets a procedural focus highlight and its title pushed to a live readout.",
+  "description": "A scroll-scrubbed, infinitely-looping 3D card gallery: cards hang off a receding gantry track using real CSS perspective/preserve-3d, the whole tray tilts toward the pointer like a specimen table, and whichever card sits nearest the camera (by depth, not mouse distance) gets a procedural focus highlight and its title pushed to a live readout.",
   "collection": "loud",
   "tags": ["scroll", "3d", "gallery", "gantry", "perspective", "parallax", "cursor"],
   "useWhen": "a scroll-driven receding 3D card gallery that loops seamlessly and highlights whichever card is nearest the virtual camera; reach for scroll-particle-tunnel instead for a scroll flythrough of unlabeled particles with fixed-depth text callouts, not a catalog of discrete labeled items.",

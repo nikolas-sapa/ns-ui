@@ -1,7 +1,7 @@
 {
   "name": "welt-channel-close",
   "title": "Welt Channel Close",
-  "description": "A full-width section divider modeled on Goodyear-welted shoe construction — a needle locks one welt stitch at a time at a single working point while, a few stitches behind it, the channel flap that exposed the last batch of stitches folds shut on a real CSS 3D hinge and hides them for good. The lockstitch is never drawn; only a plain flush seam is ever visible once a flap closes.",
+  "description": "A full-width section divider modeled on Goodyear-welted shoe construction: a needle locks one welt stitch at a time at a single working point while, a few stitches behind it, the channel flap that exposed the last batch of stitches folds shut on a real CSS 3D hinge and hides them for good. The lockstitch is never drawn; only a plain flush seam is ever visible once a flap closes.",
   "collection": "core",
   "tags": ["divider", "separator", "hr", "welt", "stitch", "leather", "fold", "3d", "monochrome"],
   "useWhen": "Pick welt-channel-close when the divider's mechanic is fold-and-conceal — a discrete working point advancing stitch by stitch while a trailing flap physically hinges shut to permanently hide what was just done, rendered as real DOM elements with a CSS 3D rotateX transform. Pick bobbin-lace-pricking instead when the divider should keep every crossing visible and the mechanic is pin-pull — a temporary pin fixture removed once its (still-visible) thread crossing has secured, rendered on canvas; that component never conceals anything, it only removes the pin. Pick divider-telephone-cord-delam instead when the mechanic is a compressive failure front wandering and re-forking through an already-formed film, with no discrete per-stitch events at all.",

@@ -1,7 +1,7 @@
 {
   "name": "confirm-slide-shatter",
   "title": "Confirm Slide Shatter",
-  "description": "Frosted-glass confirm slider where drag distance drives Voronoi crack density — release early and the cracks heal on a spring; complete the travel and the pane explodes into tumbling glass shards revealing the confirmed state.",
+  "description": "Frosted-glass confirm slider where drag distance drives Voronoi crack density. Release early and the cracks heal on a spring; complete the travel and the pane explodes into tumbling glass shards revealing the confirmed state.",
   "collection": "core",
   "tags": ["slider", "confirm", "destructive", "glass", "canvas", "voronoi", "shatter", "physics"],
   "useWhen": "a frosted-glass CONFIRM slider — drag distance grows Voronoi cracks that heal if you stop early, and shatter into glass shards on full travel; use for a destructive confirm action, not a plain value-reading input; pick confirm-hold-ink instead when the gate should be time held rather than distance dragged, confirm-dial-align when it should be rotational accuracy, or slider-loupe when the drag is setting a value rather than gating an action.",

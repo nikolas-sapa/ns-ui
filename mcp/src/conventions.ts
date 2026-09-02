@@ -29,6 +29,22 @@ literal. A component that violates this breaks the light theme silently,
 because dark is usually whichever theme the author's terminal defaulted to.
 Both themes must render correctly and are not byte-identical.
 
+Three of those tokens have a job narrower than their name suggests. Getting
+these wrong produces code that type-checks, renders, and is still wrong:
+
+- --border is a separator, not a fill. In light theme it is 1.19:1 against
+  --background. As a fill, a stroke, or canvas ink it is invisible in light
+  while looking fine in dark (1.46:1). For a faint but legible mark, use
+  --foreground at low alpha instead.
+- --ns-accent is interaction chrome only: buttons, links, focus rings, active
+  states. Not ambient highlights, not pointer trails, not a component's
+  climactic moment. Pointer highlights vary luminance, never hue.
+- --ns-muted is a second ink at full strength, for secondary text and
+  captions. Do not fade it to an arbitrary alpha. Its contrast ceiling is
+  theme-dependent, 8.45:1 light against 6.12:1 dark, so a mid-strength wash
+  passes in both themes now and fails in dark first the moment anyone
+  strengthens it. Use it as-is, or use --foreground at an explicit alpha.
+
 ## Stack assumptions
 
 - React 19+.

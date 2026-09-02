@@ -2,7 +2,7 @@
   "name": "team-grid-timezone-rail",
   "rank": 295,
   "title": "Team Grid Timezone Rail",
-  "description": "A team grid that answers the question a team grid is actually asked — who is reachable right now — by running a 24-hour UTC rail above the cards with the team's shared working-hours overlap inked into it, while each card shows that person's live local time and dims when they're outside their own hours.",
+  "description": "A team grid that answers the question a team grid is actually asked (who is reachable right now) by running a 24-hour UTC rail above the cards with the team's shared working-hours overlap inked into it, while each card shows that person's live local time and dims when they're outside their own hours.",
   "collection": "core",
   "tags": [
     "team",

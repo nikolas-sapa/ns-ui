@@ -1,7 +1,7 @@
 {
   "name": "meter-matrix-scan",
   "title": "Meter Matrix Scan",
-  "description": "A level meter rendered as a genuinely row-multiplexed LED dot-matrix panel — five rows addressed round-robin off a real 240Hz-per-row clock, and each LED's brightness is a literal 8-step PWM duty-cycle quantization rather than a smooth analog fill. The row-address concept shows as a calm, low-amplitude brightness gradient a couple of rows wide, drifting slowly down the panel and back — legible on a second look, never a strobe.",
+  "description": "A level meter rendered as a genuinely row-multiplexed LED dot-matrix panel: five rows addressed round-robin off a real 240Hz-per-row clock, and each LED's brightness is a literal 8-step PWM duty-cycle quantization rather than a smooth analog fill. The row-address concept shows as a calm, low-amplitude brightness gradient a couple of rows wide, drifting slowly down the panel and back: legible on a second look, never a strobe.",
   "collection": "core",
   "tags": [
     "meter",

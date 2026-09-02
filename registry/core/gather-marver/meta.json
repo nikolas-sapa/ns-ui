@@ -1,7 +1,7 @@
 {
   "name": "gather-marver",
   "title": "Gather Marver",
-  "description": "A file-upload / processing indicator sourced from the real hot-glass gather-and-marver sequence: an off-centre blob rolls back and forth on a flat baseline, losing its lumps a little more with every roll pass while it spins continuously underneath — the correction visibly progressing rather than a generic spinner or indeterminate ring.",
+  "description": "A file-upload / processing indicator sourced from the real hot-glass gather-and-marver sequence: an off-centre blob rolls back and forth on a flat baseline, losing its lumps a little more with every roll pass while it spins continuously underneath, the correction visibly progressing rather than a generic spinner or indeterminate ring.",
   "collection": "core",
   "tags": ["loader", "progress", "upload", "canvas", "glass", "processing", "feedback"],
   "useWhen": "a file-upload or processing indicator whose progress reads as a physical correction — a lopsided blob visibly centring and rounding out over successive roll passes while it spins, sourced from real glassblowing gather/marver technique. Pick progress-nlq-overstrike instead for a determinate 0-100 meter with a literal fill boundary (dot-matrix double-strike ink, no shape correction involved); pick loader-ascii-diffuse-fill instead for a fully indeterminate loader with no correction narrative, when a text-console grain aesthetic fits better than a canvas blob.",

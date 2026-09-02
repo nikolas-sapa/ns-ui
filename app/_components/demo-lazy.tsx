@@ -2,6 +2,7 @@
 
 import { Suspense } from "react";
 import { demos } from "@/registry/index";
+import { DemoErrorBoundary } from "@/app/_components/demo-error-boundary";
 
 /**
  * Resolves `demos[name]` on the client rather than in the server-rendered
@@ -26,12 +27,25 @@ import { demos } from "@/registry/index";
  * HTML is unchanged: real markup, not a loading placeholder, which is what
  * `scripts/verify.ts`'s blank-render and Tab-reachability checks require.
  */
-export function DemoLazy({ name }: { name: string }) {
+export function DemoLazy({
+  name,
+  interactive = false,
+}: {
+  name: string;
+  /** Passed through to the boundary's fallback: false inside an `inert`
+   *  embed, where a retry button could not be clicked. */
+  interactive?: boolean;
+}) {
   const Demo = demos[name];
   if (!Demo) return null;
+  // Boundary outside `Suspense`, not inside it: this way it also catches a
+  // failed chunk load for the lazy import itself, not only a throw from the
+  // component's own render once that chunk has arrived.
   return (
-    <Suspense fallback={null}>
-      <Demo />
-    </Suspense>
+    <DemoErrorBoundary name={name} interactive={interactive}>
+      <Suspense fallback={null}>
+        <Demo />
+      </Suspense>
+    </DemoErrorBoundary>
   );
 }

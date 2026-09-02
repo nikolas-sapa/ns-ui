@@ -1,7 +1,7 @@
 {
   "name": "waveform-ascii-scrub",
   "title": "Waveform ASCII Scrub",
-  "description": "An audio-style waveform rendered as columns of ASCII density glyphs with a draggable playhead — dragging (or hovering, or holding keyboard focus) subdivides the glyph columns nearest the cursor into finer sub-columns that re-ink the region at higher resolution, while the rest of the strip stays coarse.",
+  "description": "An audio-style waveform rendered as columns of ASCII density glyphs with a draggable playhead: dragging (or hovering, or holding keyboard focus) subdivides the glyph columns nearest the cursor into finer sub-columns that re-ink the region at higher resolution, while the rest of the strip stays coarse.",
   "collection": "core",
   "tags": ["waveform", "ascii", "audio", "canvas", "scrub", "slider", "drag", "accessibility"],
   "useWhen": "a scrub position control over a waveform where the region under the pointer should visibly resolve to finer detail while the rest stays a coarse print — a spatial resolution effect, not a hover brighten; pick voice-recorder-meter instead for a real Web Audio capture meter with no scrub/drag at all, or scrubber-film-strip for a playback scrubber whose mechanic is discrete frame-snap vs. continuous glide rather than local resolution.",

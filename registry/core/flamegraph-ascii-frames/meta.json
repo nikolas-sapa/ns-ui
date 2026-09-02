@@ -1,7 +1,7 @@
 {
   "name": "flamegraph-ascii-frames",
   "title": "Flamegraph ASCII Frames",
-  "description": "A CPU-profile flame graph laid out in monospace cells — one row per stack depth, frame width proportional to sample count, self-vs-total time encoded as ink weight — where clicking a frame rezooms the whole graph to that subtree.",
+  "description": "A CPU-profile flame graph laid out in monospace cells (one row per stack depth, frame width proportional to sample count, self-vs-total time encoded as ink weight), where clicking a frame rezooms the whole graph to that subtree.",
   "collection": "core",
   "tags": [
     "flamegraph",

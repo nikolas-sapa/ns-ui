@@ -1,7 +1,7 @@
 {
   "name": "peen-coverage",
   "title": "Peen Coverage",
-  "description": "A card whose backing texture is a genuine shot-peening coverage process — a stream of uniform-random impacts stamping soft circular dimples into a coverage bitmap, saturating toward and past nominal 100% before fading back to a fresh unpeened pass and starting over.",
+  "description": "A card whose backing texture is a genuine shot-peening coverage process: a stream of uniform-random impacts stamping soft circular dimples into a coverage bitmap, saturating toward and past nominal 100% before fading back to a fresh unpeened pass and starting over.",
   "collection": "core",
   "tags": [
     "card",

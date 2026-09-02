@@ -461,7 +461,7 @@ export function Showcase({
             A personal registry of {items.length} React components.
           </h1>
           <p className="mt-4 max-w-xl text-sm leading-relaxed text-ns-muted">
-            Canvas, motion and glass — themed by your own CSS tokens, light and dark.
+            Canvas, motion and glass. Themed by your own CSS tokens, light and dark.
             Every card below is the real component running live. Click one to
             open it full size.
           </p>
@@ -504,7 +504,7 @@ export function Showcase({
             >
               Developer docs
             </a>
-            {" — registry API, OpenAPI spec and the MCP server."}
+            {": registry API, OpenAPI spec and the MCP server."}
           </p>
 
           {/* Same moment as the install box above: deciding whether the
@@ -647,7 +647,7 @@ export function Showcase({
       {loose ? (
         <p className="mt-10 text-xs text-ns-muted">
           Nothing matches every word of{" "}
-          <span className="font-mono text-foreground">{query}</span> — showing
+          <span className="font-mono text-foreground">{query}</span>. Showing
           the closest matches
           {/* "best first" only describes the relevance ranking loose search
               produces — Newest/Oldest deliberately override it below. */}

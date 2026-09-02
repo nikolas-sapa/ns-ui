@@ -1,7 +1,7 @@
 {
   "name": "winnow-chaff-drift",
   "title": "Winnow Chaff Drift",
-  "description": "A full-bleed hero built on a real grain-cleaning mechanic: winnowing. A mixed charge of grain and chaff falls through a steady crosswind — heavy grain's momentum wins over drag and it drops in a tight, near-vertical column, while light chaff loses to the wind and fans out laterally before it lands. The separation reads entirely from trajectory and softness, never colour.",
+  "description": "A full-bleed hero built on a real grain-cleaning mechanic: winnowing. A mixed charge of grain and chaff falls through a steady crosswind: heavy grain's momentum wins over drag and it drops in a tight, near-vertical column, while light chaff loses to the wind and fans out laterally before it lands. The separation reads entirely from trajectory and softness, never colour.",
   "collection": "loud",
   "tags": [
     "background",

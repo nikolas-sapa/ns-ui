@@ -2,7 +2,7 @@
   "name": "hero-ascii-tunnel",
   "rank": 3,
   "title": "Hero ASCII Tunnel",
-  "description": "A full-bleed ASCII perspective-corridor hero — sixteen squircle rings advance toward the viewer on a continuous loop, shaded through a density ramp so depth reads from character weight alone, with the pointer steering the shared vanishing point and the whole corridor tilting to follow it.",
+  "description": "A full-bleed ASCII perspective-corridor hero: sixteen squircle rings advance toward the viewer on a continuous loop, shaded through a density ramp so depth reads from character weight alone, with the pointer steering the shared vanishing point and the whole corridor tilting to follow it.",
   "collection": "loud",
   "tags": [
     "ascii",

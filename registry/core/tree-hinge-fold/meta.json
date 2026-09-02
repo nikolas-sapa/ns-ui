@@ -1,7 +1,7 @@
 {
   "name": "tree-hinge-fold",
   "title": "Tree Hinge Fold",
-  "description": "Tree view whose branches unfold like a carpenter's folding rule — each child group is a hinged segment that swings open around a visible pivot, rows unfolding in sequence, and snaps shut faster than it opens.",
+  "description": "Tree view whose branches unfold like a carpenter's folding rule: each child group is a hinged segment that swings open around a visible pivot, rows unfolding in sequence, and snaps shut faster than it opens.",
   "collection": "core",
   "tags": ["tree", "navigation", "hierarchy", "fold", "hinge", "keyboard"],
   "useWhen": "expanding a branch should read as a physical unfolding, the child group swinging open around a visible pivot with rows unfolding in sequence and snapping shut faster than they open; pick tree-root-trace instead when the indent guides should be the animated element and the tree needs a continuous drawn connector, or tree-box-drawing when monospace connector glyphs are the medium itself.",

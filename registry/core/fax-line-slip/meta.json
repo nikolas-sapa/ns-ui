@@ -1,7 +1,7 @@
 {
   "name": "fax-line-slip",
   "title": "Fax Line Slip",
-  "description": "A document-preview / attachment-thumbnail loading state reproducing a Group 3 fax handshake and page transmission — two waveform-rendered handshake tones, then the page builds in as horizontal scan lines top to bottom, with one deliberate paper-slip shear partway down the frame before the lines resume true.",
+  "description": "A document-preview / attachment-thumbnail loading state reproducing a Group 3 fax handshake and page transmission: two waveform-rendered handshake tones, then the page builds in as horizontal scan lines top to bottom, with one deliberate paper-slip shear partway down the frame before the lines resume true.",
   "collection": "core",
   "tags": ["loading", "canvas", "fax", "print", "document", "scan", "ambient", "monochrome"],
   "useWhen": "a document preview, attachment thumbnail, or file-resolving panel needs a connecting/loading state sourced from a real fax transmission mechanic — audible-register handshake tones rendered as a waveform, then content arriving as a top-to-bottom scan-line build with a genuine mechanical paper-slip fault baked into one band. Pick eink-waveform-ghost instead when the idle motion should read as a settled display continuously self-refreshing (per-cell electrophoretic waveform replays with shoot-through overshoot) rather than a one-shot connect-then-arrive sequence with a start and a hold. Pick skeleton-develop instead when the panel is a generic loading placeholder for arbitrary declared content blocks with no print/scan sourcing and no mechanical-fault detail.",

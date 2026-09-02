@@ -1,7 +1,7 @@
 {
   "name": "switch-eclipse",
   "title": "Switch Eclipse",
-  "description": "A binary switch drawn as an eclipse — a dark occluding disc slides across a bright sun disc inside a 56x28 track, forming a computed crescent at the midpoint and a thin corona ring once fully on, while the track's ambient tint darkens smoothly with occlusion.",
+  "description": "A binary switch drawn as an eclipse: a dark occluding disc slides across a bright sun disc inside a 56x28 track, forming a computed crescent at the midpoint and a thin corona ring once fully on, while the track's ambient tint darkens smoothly with occlusion.",
   "collection": "core",
   "tags": [
     "switch",

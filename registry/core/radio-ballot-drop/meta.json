@@ -2,7 +2,7 @@
   "name": "radio-ballot-drop",
   "rank": 287,
   "title": "Radio Ballot Drop",
-  "description": "A single-choice input as a paper ballot — the chosen option folds into a slip and drops through the ballot box's slot with two-phase paper physics (flutter, then settle), and switching your vote pulls the old slip back out first.",
+  "description": "A single-choice input as a paper ballot: the chosen option folds into a slip and drops through the ballot box's slot with two-phase paper physics (flutter, then settle), and switching your vote pulls the old slip back out first.",
   "collection": "core",
   "tags": [
     "radio",

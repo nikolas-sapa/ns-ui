@@ -1,7 +1,7 @@
 {
   "name": "creep-span",
   "title": "Creep Span",
-  "description": "An SLO error-budget meter drawn as a taut wire spanning the card, which sags by irreversible plastic creep — sustained burn above 1x permanently sets the wire, so a bad day three weeks ago stays a visible kink it never recovers from, and the dashed forward extrapolation's floor intersection is the projected exhaustion date.",
+  "description": "An SLO error-budget meter drawn as a taut wire spanning the card, which sags by irreversible plastic creep: sustained burn above 1x permanently sets the wire, so a bad day three weeks ago stays a visible kink it never recovers from, and the dashed forward extrapolation's floor intersection is the projected exhaustion date.",
   "collection": "core",
   "tags": [
     "meter",

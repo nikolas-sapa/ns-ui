@@ -1,7 +1,7 @@
 {
   "name": "grazing-light",
   "title": "Grazing Light",
-  "description": "A feature-grid card whose icon and heading are blind-embossed into the surface — invisible relief that a low-angle light reveals as it rakes slowly across at idle, and that snaps to track the pointer's bearing across the whole grid at once.",
+  "description": "A feature-grid card whose icon and heading are blind-embossed into the surface: invisible relief that a low-angle light reveals as it rakes slowly across at idle, and that snaps to track the pointer's bearing across the whole grid at once.",
   "collection": "core",
   "tags": ["card", "feature-grid", "emboss", "link", "cursor", "grid", "svg-filter", "micro-interaction"],
   "useWhen": "the feature-grid card on a product page, where the icon and heading should read as carved relief that a moving light reveals rather than printed ink, alive at rest with zero layout motion and coherent across the whole grid when the pointer moves; pick card-number-emboss instead for a payment form field embossing typed digits, not a link card, or a plain static emboss-plate treatment when the relief should hold one fixed angle rather than a light that moves.",

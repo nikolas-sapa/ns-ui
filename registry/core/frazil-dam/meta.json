@@ -1,7 +1,7 @@
 {
   "name": "frazil-dam",
   "title": "Frazil Dam",
-  "description": "A card-scale processing/progress indicator modelled on frazil ice: fine crystals nucleate in turbulent water, drift across a channel via a 2-octave curl-noise flow field, and pile against a rack — the crest rising over 15-20s to a threshold, then calving a coherent chunk downstream and resuming from a smaller residual base, unbounded.",
+  "description": "A card-scale processing/progress indicator modelled on frazil ice: fine crystals nucleate in turbulent water, drift across a channel via a 2-octave curl-noise flow field, and pile against a rack, the crest rising over 15-20s to a threshold, then calving a coherent chunk downstream and resuming from a smaller residual base, unbounded.",
   "collection": "core",
   "tags": ["card", "canvas", "progress", "processing", "loader", "ice", "curl-noise", "physics", "ambient", "status"],
   "useWhen": "a processing/upload/sync indicator wants a continuous, never-terminating 'work accumulates and periodically releases in chunks' identity — turbulent transport visible throughout, a crest that rises and calves and rises again — instead of a bounded single-pass fill. Pick vacuum-filtration-cake-build instead when the point is a monotonic, non-releasing Darcy-decay fill that completes once and stops (drip cadence stretching under a still liquid, no ongoing flow, no repeat cycle); pick background-ascii-flow instead when you want a full-bleed ambient curl-noise field with no accumulation, no threshold and no release event at all, just continuous drift.",

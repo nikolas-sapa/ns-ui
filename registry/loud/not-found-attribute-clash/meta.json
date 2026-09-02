@@ -1,7 +1,7 @@
 {
   "name": "not-found-attribute-clash",
   "title": "Not Found Attribute Clash",
-  "description": "A 404 built from the ZX Spectrum's real colour-cell attribute clash: each 8x8 hardware cell could carry only one ink/paper colour pair, so image detail finer than the cell budget visibly bled and blocked. This translates that as a monochrome glyph+weight budget — one glyph and one font-weight per cell — so the numerals' own curved edges snap and bleed at the seams, with a rolling scanline that re-decides a handful of rows per frame like attribute RAM racing the beam.",
+  "description": "A 404 built from the ZX Spectrum's real colour-cell attribute clash: each 8x8 hardware cell could carry only one ink/paper colour pair, so image detail finer than the cell budget visibly bled and blocked. This translates that as a monochrome glyph+weight budget (one glyph and one font-weight per cell), so the numerals' own curved edges snap and bleed at the seams, with a rolling scanline that re-decides a handful of rows per frame like attribute RAM racing the beam.",
   "collection": "loud",
   "tags": ["404", "ascii", "canvas", "hardware", "retro", "page"],
   "useWhen": "a 404 whose graphic literalizes a real hardware detail-budget limit — cells forced to pick one glyph+weight pair snapping and bleeding at the numerals' own edges — as opposed to not-found-knockout's carved-void impact gag or not-found-postmark's multi-hop routing narrative; pick this one when the joke should read as a rendering constraint fighting the content, not a metaphor illustrated on top of it.",

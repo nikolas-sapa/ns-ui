@@ -1,7 +1,7 @@
 {
   "name": "hero-chart-recorder",
   "title": "Hero Chart Recorder",
-  "description": "A chart-recorder hero: ruled paper feeds left at fixed px/s while a mechanical pen chases the live value through a deliberately underdamped spring, so a spike overshoots, quivers, and settles — and that tremor is stamped permanently into the trace.",
+  "description": "A chart-recorder hero: ruled paper feeds left at fixed px/s while a mechanical pen chases the live value through a deliberately underdamped spring, so a spike overshoots, quivers, and settles. That tremor is stamped permanently into the trace.",
   "collection": "loud",
   "tags": [
     "canvas",

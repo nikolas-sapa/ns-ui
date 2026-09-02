@@ -1,7 +1,7 @@
 {
   "name": "wind-regulator-bellows",
   "title": "Wind Regulator Bellows",
-  "description": "A streaming media buffer-ahead strip modelled on a pipe organ's wind supply: a feeder bellows pumps discrete strokes into a reservoir whose weighted lid smooths that into a steady reading, and a spring-loaded spill valve bleeds off the excess whenever the lid threatens to overshoot — replacing the flat grey \"buffered\" overlay most players use.",
+  "description": "A streaming media buffer-ahead strip modelled on a pipe organ's wind supply: a feeder bellows pumps discrete strokes into a reservoir whose weighted lid smooths that into a steady reading, and a spring-loaded spill valve bleeds off the excess whenever the lid threatens to overshoot, replacing the flat grey \"buffered\" overlay most players use.",
   "collection": "core",
   "tags": ["meter", "buffer", "media", "scrub-bar", "svg", "bellows", "status", "ambient", "industrial"],
   "useWhen": "a scrub bar's buffered-ahead read where the value is genuinely built from discrete, periodic supply events (network-fetched segments) smoothed against continuous consumption, and an overflow-relief moment is worth showing on its own. Pick meter-quota-meniscus instead for a static level/quota reading against a soft and hard limit with no periodic injection-vs-drain dynamic and no discrete stroke events; pick progress-wick instead for a single monotonic completion fraction with no smoothing, no drain, and no overflow relief to show.",

@@ -1,7 +1,7 @@
 {
   "name": "ripple-migrate-slip",
   "title": "Ripple Migrate Slip",
-  "description": "A full-bleed dune-ripple field built on real aeolian bedform migration: each ripple's gentle windward face keeps piling higher until it crosses the angle of repose, its steep lee face avalanches, and the crest kicks one step downwind — many ripples doing this on independent, staggered clocks so the whole train visibly creeps at rest with no two slips in sync.",
+  "description": "A full-bleed dune-ripple field built on real aeolian bedform migration: each ripple's gentle windward face keeps piling higher until it crosses the angle of repose, its steep lee face avalanches, and the crest kicks one step downwind. Many ripples do this on independent, staggered clocks, so the whole train visibly creeps at rest with no two slips in sync.",
   "collection": "loud",
   "tags": ["background", "hero", "canvas", "sand", "dune", "physics", "granular", "mono", "ambient"],
   "useWhen": "a full-bleed hero or background that should feel like a slow-migrating physical bedform, ridges creeping steadily in one direction with periodic small collapses, rather than a convective surface or a falling-particle field. Pick granule-churn instead for a convective plume field with lanes and cells born/dying rather than a directional migrating ridge line; winnow-chaff-drift instead for falling particles separating by mass in a crosswind rather than a standing bedform; sand-lock instead when the sand should collapse onto a resonant standing-wave pattern rather than migrate directionally.",

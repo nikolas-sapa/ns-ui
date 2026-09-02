@@ -1,7 +1,7 @@
 {
   "name": "barograph-drum-week",
   "title": "Barograph Drum Week",
-  "description": "A card-scale status widget modelled on the aneroid barograph: a pen arm inches rightward across pre-ruled seven-day chart paper, its ink trail lengthening continuously while faint day/hour gridlines — printed on the paper, never drawn by the pen — pass beneath it, reading as \"this has been running, unattended, for a long time.\"",
+  "description": "A card-scale status widget modelled on the aneroid barograph: a pen arm inches rightward across pre-ruled seven-day chart paper, its ink trail lengthening continuously while faint day/hour gridlines (printed on the paper, never drawn by the pen) pass beneath it, reading as \"this has been running, unattended, for a long time.\"",
   "collection": "core",
   "tags": ["card", "chart", "canvas", "dom", "barograph", "trace", "status", "ambient", "uptime", "instrument", "weekly", "dashboard"],
   "useWhen": "a dashboard/status card wants a slower, more institutional \"unattended recording instrument\" feel than a live sparkline — the pen-arm-on-pre-ruled-paper identity, where the grid is a fixed printed template and the pen only ever adds ink, is the whole point. Pick text-ekg-baseline instead when the motif should be a live per-event heartbeat pulse tied to real system events (deploys, messages) rather than a slow ambient weekly trace; pick stat-row-baseline-spark instead when the point is an honest KPI figure — a value plus a stated, pointed-to delta baseline — rather than an ambient always-running recording.",

@@ -1,7 +1,7 @@
 {
   "name": "gallery-coverflow-caustic",
   "title": "Gallery Coverflow Caustic",
-  "description": "3D coverflow gallery whose frosted-glass cards run a live caustic-light simulation — drifting light pools refract across each pane, and drag velocity fringes the focused card's edges with chromatic aberration that settles to zero at rest.",
+  "description": "3D coverflow gallery whose frosted-glass cards run a live caustic-light simulation: drifting light pools refract across each pane, and drag velocity fringes the focused card's edges with chromatic aberration that settles to zero at rest.",
   "collection": "core",
   "tags": [
     "gallery",

@@ -58,7 +58,7 @@ export function ChangelogEntryList({ entries }: { entries: ChangelogEntry[] }) {
               <div className="flex shrink-0 items-center gap-1">
                 <CopyButton
                   variant="icon"
-                  value={`${entry.version} — ${entry.title}\n\n${entry.body}`}
+                  value={`${entry.version}: ${entry.title}\n\n${entry.body}`}
                   label={`Copy ${entry.version} release notes`}
                   className="mr-1"
                 />

@@ -1,7 +1,7 @@
 {
   "name": "steam-trap-batch-flush",
   "title": "Steam Trap Batch Flush",
-  "description": "An inline sync-status glyph modelled on a float-and-thermostatic steam trap — condensate (pending events) fills a small chamber, a float trips a discharge valve at 88% height, the chamber blows down fast on an eased-out curve, and refill starts immediately, forever.",
+  "description": "An inline sync-status glyph modelled on a float-and-thermostatic steam trap: condensate (pending events) fills a small chamber, a float trips a discharge valve at 88% height, the chamber blows down fast on an eased-out curve, and refill starts immediately, forever.",
   "collection": "core",
   "tags": ["status", "indicator", "sync", "svg", "motion", "steam-trap", "loading", "icon", "buffer"],
   "useWhen": "a document/editor's sync state or a telemetry/event buffer needs an ambient inline glyph that replaces a generic spinner or cloud-sync icon with a mechanism that actually resembles batching-then-flushing — a chamber visibly fills, trips, blows down fast, and refills continuously with no discrete states to announce; pick status-glyph-cadence instead when the indicator needs multiple distinct task states (working/searching/blocked/awaiting-input/done) rather than a single continuous fill-and-flush loop, or status-sphere-dots when it needs to hold up as a centerpiece at 200px rather than only inline at 24-64px.",

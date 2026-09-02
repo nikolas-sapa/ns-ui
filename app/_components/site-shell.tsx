@@ -121,6 +121,10 @@ export function SiteShell({
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [cmdkOpen, setCmdkOpen] = useState(false);
+  // Text the palette should open pre-filled with. Empty for every opener
+  // except the sidebar's own no-match state, which hands its query over so
+  // the search continues rather than restarting.
+  const [cmdkSeed, setCmdkSeed] = useState("");
 
   // Desktop-only sidebar collapse (separate from `open`, which is the
   // mobile drawer above). `sidebarHidden` only gates the two toggle
@@ -359,6 +363,9 @@ export function SiteShell({
     const onKey = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() !== "k" || !(e.metaKey || e.ctrlKey)) return;
       e.preventDefault();
+      // Cleared here too: the seed is per-opener, and ⌘K after a
+      // "Search everything" would otherwise reopen on that stale query.
+      setCmdkSeed("");
       setCmdkOpen((v) => !v);
     };
     window.addEventListener("keydown", onKey);
@@ -625,7 +632,10 @@ export function SiteShell({
               box): 322x44 at the sidebar's 17rem width. */}
           <button
             type="button"
-            onClick={() => setCmdkOpen(true)}
+            onClick={() => {
+              setCmdkSeed("");
+              setCmdkOpen(true);
+            }}
             aria-label="Search components and pages"
             className="search-trace-field group/cmdk relative flex w-full items-center gap-2 rounded-md border border-border bg-surface px-3 py-2.5 text-left text-sm text-ns-muted outline-none transition-colors hover:border-ns-accent/40 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
           >
@@ -706,7 +716,32 @@ export function SiteShell({
           data-lenis-prevent
         >
           {isFiltering && shown === 0 ? (
-            <p className="px-2 py-3 text-sm text-ns-muted">No match.</p>
+            // The message alone was a dead end: the tree is empty, the field
+            // still holds the query, and the two things that can rescue it
+            // (drop the filter, or hand the same words to the catalog search
+            // that also reads descriptions and tags) were both off-screen.
+            <div className="px-2 py-3">
+              <p className="text-sm text-ns-muted">No match.</p>
+              <div className="mt-2 flex flex-col items-start gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setQuery("")}
+                  className="rounded-sm text-xs text-ns-muted underline underline-offset-2 outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
+                >
+                  Clear filter
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCmdkSeed(query);
+                    setCmdkOpen(true);
+                  }}
+                  className="rounded-sm text-xs text-ns-muted underline underline-offset-2 outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
+                >
+                  Search everything
+                </button>
+              </div>
+            </div>
           ) : null}
           {filtered.map((g) => (
             <NavCategory
@@ -751,7 +786,7 @@ export function SiteShell({
           gate and every card's iframe) already returned above this point. */}
       {pathname !== "/connect" ? <McpPopup /> : null}
 
-      <CommandPalette open={cmdkOpen} onClose={() => setCmdkOpen(false)} />
+      <CommandPalette open={cmdkOpen} onClose={() => setCmdkOpen(false)} initialQuery={cmdkSeed} />
     </div>
   );
 }

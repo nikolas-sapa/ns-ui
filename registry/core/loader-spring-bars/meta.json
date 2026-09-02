@@ -1,7 +1,7 @@
 {
   "name": "loader-spring-bars",
   "title": "Loader Spring Bars",
-  "description": "An ambient loading glyph shaped as a row of leaf springs on a rail — one displacement keyframe, staggered per bar by negative animation-delay, reads as a single pulse of energy travelling down the rack rather than bars animating in isolation.",
+  "description": "An ambient loading glyph shaped as a row of leaf springs on a rail: one displacement keyframe, staggered per bar by negative animation-delay, reads as a single pulse of energy travelling down the rack rather than bars animating in isolation.",
   "collection": "core",
   "tags": ["loader", "loading", "spinner", "indicator", "css-animation", "physics", "aria-live", "icon"],
   "useWhen": "an indeterminate wait in a horizontal slot wider than it is tall (a caption row, a toolbar, the strip under a search field) where a square glyph would waste the space, since 3 to 9 bars share one keyframe phased by negative delay so a single pulse travels the rack; pick loader-iris or loader-die-tumble instead when the slot is square and inline, or loader-pendulum-sync when the row can be much wider and the wait runs into minutes.",

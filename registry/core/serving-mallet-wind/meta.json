@@ -1,7 +1,7 @@
 {
   "name": "serving-mallet-wind",
   "title": "Serving Mallet Wind",
-  "description": "A thin ambient loader modelled on marlinspike seamanship's serving pass — a serving zone travels along a rope, tightly winding twine turn after turn so covered rope trails behind it and bare rope always waits ahead, told through a fixed served/bare boundary, a fast scrolling wrap texture, and one slow turn-lock highlight that snaps into place every 0.9s.",
+  "description": "A thin ambient loader modelled on marlinspike seamanship's serving pass: a serving zone travels along a rope, tightly winding twine turn after turn so covered rope trails behind it and bare rope always waits ahead, told through a fixed served/bare boundary, a fast scrolling wrap texture, and one slow turn-lock highlight that snaps into place every 0.9s.",
   "collection": "core",
   "tags": ["loader", "canvas", "ambient", "rope", "marlinspike", "texture", "industrial", "progress"],
   "useWhen": "an indeterminate/ambient process indicator where a thin bar's generic fill sweep would say nothing about the work's character — serving-mallet-wind reads as a literal chafe-protection process consuming bare material at a steady rate, useful when you want the loader itself to feel like ongoing, physical work rather than an abstract percentage. Pick progress-wick instead when the process has a real, reportable 0-100 completion fraction (its capillary draw-dwell chase is built for genuine determinate/indeterminate progress with accessible value semantics); pick progress-hatch instead for a plainer determinate/indeterminate bar. This is ambient-only — it has no `value` prop and never resolves to a finished state.",

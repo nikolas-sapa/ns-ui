@@ -1,7 +1,7 @@
 {
   "name": "airlift-slug-flow",
   "title": "Airlift Slug Flow",
-  "description": "A background file-sync/upload activity rail: a slim vertical conduit where discrete air slugs, injected at the foot every 1.8s, rise at a constant 140px/s and drag a liquid plug immediately ahead of them, depositing into an accumulator basin on arrival — a real airlift-pump slug-flow regime standing in for a generic spinner or looping percentage.",
+  "description": "A background file-sync/upload activity rail: a slim vertical conduit where discrete air slugs, injected at the foot every 1.8s, rise at a constant 140px/s and drag a liquid plug immediately ahead of them, depositing into an accumulator basin on arrival. A real airlift-pump slug-flow regime standing in for a generic spinner or looping percentage.",
   "collection": "core",
   "tags": ["sync", "upload", "progress", "rail", "svg", "dom", "ambient", "fluid", "pump", "activity"],
   "useWhen": "a slim ambient rail sitting beside a file list or sync panel that needs to read as ongoing background activity without a numeric percentage; pick a determinate progress bar instead when the exact completion fraction of one known-size job must be communicated, since this component's basin only tracks arrival count against an arbitrary 14-step macro-cycle and never represents a real percentage.",

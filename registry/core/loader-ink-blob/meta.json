@@ -1,7 +1,7 @@
 {
   "name": "loader-ink-blob",
   "title": "Loader Ink Blob",
-  "description": "A small canvas-2D assistant-state indicator: a soft ink blob traced through 72 points around a circle, each perturbed by one of six distinct motion signatures — idle, thinking, listening, speaking, success, error — with a checkmark or X that strokes itself in for the two settled states.",
+  "description": "A small canvas-2D assistant-state indicator: a soft ink blob traced through 72 points around a circle, each perturbed by one of six distinct motion signatures (idle, thinking, listening, speaking, success, error), with a checkmark or X that strokes itself in for the two settled states.",
   "collection": "core",
   "tags": ["loader", "status", "canvas", "ai", "chat", "indicator", "spinner"],
   "useWhen": "a conversational assistant whose indicator must cover the whole turn including its ends: idle, thinking, listening, speaking, and the settled success or error states that stroke in a check or X, so one element carries a voice or chat turn from start to resolution; pick status-glyph-cadence instead when the states are agent task states (working, searching, blocked, done) sitting beside a text label and canvas is unwanted, or status-sphere-dots when the same indicator must also work as a large showpiece.",

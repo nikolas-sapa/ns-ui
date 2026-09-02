@@ -123,7 +123,7 @@ export function TimelineScrub({
         ref={trackRef}
         tabIndex={0}
         role="group"
-        aria-label="Release timeline, scrollable — use the arrow keys or the buttons above to scrub"
+        aria-label="Release timeline, scrollable. Use the arrow keys or the buttons above to scrub"
         className="-mx-1 mt-1 overflow-x-auto px-1 outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
       >
         <div style={{ minWidth: `${minWidth}px` }}>{children}</div>

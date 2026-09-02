@@ -1,7 +1,7 @@
 {
   "name": "bombe-drum-halt",
   "title": "Bombe Drum Halt",
-  "description": "An ambient search/lookup loading indicator built as the electromechanical Bombe's drum-and-stop search cycle — four drum columns scan continuously until, every 4-6s, all of them lock still at once while a sensing bar brightens for a check, then release and resume.",
+  "description": "An ambient search/lookup loading indicator built as the electromechanical Bombe's drum-and-stop search cycle: four drum columns scan continuously until, every 4-6s, all of them lock still at once while a sensing bar brightens for a check, then release and resume.",
   "collection": "core",
   "tags": ["loader", "search", "lookup", "ambient", "drum", "cryptography", "dom", "raf", "indeterminate"],
   "useWhen": "an ambient indicator for a search/lookup with no known endpoint or percentage (checking many candidates against a test) where the story is scan-then-halt-then-resume rather than steady linear progress; pick loader-braille instead for a compact inline spinner with no discrete halt beat, or loader-pendulum-sync for a long unattended wait whose watchable arc is a slow drift-into-sync rather than a frequent discrete stop-and-check.",

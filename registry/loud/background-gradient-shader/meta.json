@@ -2,7 +2,7 @@
   "name": "background-gradient-shader",
   "rank": 1,
   "title": "Background Gradient Shader",
-  "description": "Full-bleed animated gradient background — a WebGL shader drifts three theme-derived colors through a domain-warped noise flow field into a simple 3-stop ramp, reading as a calm moving current of color rather than a shader demo.",
+  "description": "Full-bleed animated gradient background: a WebGL shader drifts three theme-derived colors through a domain-warped noise flow field into a simple 3-stop ramp, reading as a calm moving current of color rather than a shader demo.",
   "collection": "loud",
   "tags": [
     "webgl",

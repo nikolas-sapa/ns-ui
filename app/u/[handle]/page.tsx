@@ -54,7 +54,7 @@ export async function generateMetadata({
   const { handle } = await params;
   const profile = await loadProfile(handle);
   if (!profile) return {};
-  const title = `${profile.displayName ?? profile.handle} (@${profile.handle}) — ns-ui`;
+  const title = `${profile.displayName ?? profile.handle} (@${profile.handle}) · ns-ui`;
   const description = profile.bio ?? `@${profile.handle} on ns-ui.`;
   return {
     title,

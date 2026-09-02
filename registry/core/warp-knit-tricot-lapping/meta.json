@@ -1,7 +1,7 @@
 {
   "name": "warp-knit-tricot-lapping",
   "title": "Warp Knit Tricot Lapping",
-  "description": "An ambient divider/background texture whose guide bar shogs a short lateral distance every course, lapping each needle's thread diagonally across its neighbours to build a continuously-scrolling zigzag chevron field — the diagonal wale structure of warp knitting, distinct from a weft shuttle's full-width crossing.",
+  "description": "An ambient divider/background texture whose guide bar shogs a short lateral distance every course, lapping each needle's thread diagonally across its neighbours to build a continuously-scrolling zigzag chevron field. The diagonal wale structure of warp knitting, distinct from a weft shuttle's full-width crossing.",
   "collection": "core",
   "tags": [
     "background",

@@ -1,7 +1,7 @@
 {
   "name": "toast-undo-fuse",
   "title": "Toast Undo Fuse",
-  "description": "Undo toast whose remaining lifetime is a literal fuse — a hairline along the bottom edge burns right-to-left with an ember at the front, answering \"when does this go away\" without a numeric countdown.",
+  "description": "Undo toast whose remaining lifetime is a literal fuse: a hairline along the bottom edge burns right-to-left with an ember at the front, answering \"when does this go away\" without a numeric countdown.",
   "collection": "core",
   "tags": [
     "toast",

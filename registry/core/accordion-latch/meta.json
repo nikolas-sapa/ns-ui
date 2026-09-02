@@ -1,7 +1,7 @@
 {
   "name": "accordion-latch",
   "title": "Accordion Latch",
-  "description": "An accordion whose sections latch shut with a small SVG hasp-and-staple on each closed header — opening swings the hasp off its staple, lifts the lid 2px, then unfolds the content; closing reverses and the hasp settles back down with a bounce.",
+  "description": "An accordion whose sections latch shut with a small SVG hasp-and-staple on each closed header: opening swings the hasp off its staple, lifts the lid 2px, then unfolds the content. Closing reverses and the hasp settles back down with a bounce.",
   "collection": "core",
   "tags": [
     "accordion",

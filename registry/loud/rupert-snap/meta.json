@@ -1,7 +1,7 @@
 {
   "name": "rupert-snap",
   "title": "Rupert Snap",
-  "description": "A hash-chained audit log drawn as a chain of Prince Rupert's drops, one per entry, each drop's tail fused into the next drop's head. Tampering with an entry re-derives every hash from that row down, and a single wavefront detonates the drops strictly tailward from the break — later entries shatter because they depend on the edited one, and nothing above it moves.",
+  "description": "A hash-chained audit log drawn as a chain of Prince Rupert's drops, one per entry, each drop's tail fused into the next drop's head. Tampering with an entry re-derives every hash from that row down, and a single wavefront detonates the drops strictly tailward from the break: later entries shatter because they depend on the edited one, and nothing above it moves.",
   "collection": "loud",
   "tags": [
     "table",

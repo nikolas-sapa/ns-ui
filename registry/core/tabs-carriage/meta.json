@@ -1,7 +1,7 @@
 {
   "name": "tabs-carriage",
   "title": "Tabs Carriage",
-  "description": "Tabs whose underline is a typewriter carriage on a rail — forward moves glide on a spring and stretch with speed, backward moves snap home faster with a ding-bounce, and the panel line-feeds in from the travel direction.",
+  "description": "Tabs whose underline is a typewriter carriage on a rail: forward moves glide on a spring and stretch with speed, backward moves snap home faster with a ding-bounce, and the panel line-feeds in from the travel direction.",
   "collection": "core",
   "tags": ["tabs", "navigation", "spring", "physics", "indicator", "keyboard"],
   "useWhen": "the switch itself should feel mechanical and directional, the underline springing, stretching with its own velocity, and returning faster on a backward move than a forward one while the panel line-feeds in from the travel direction; pick tabs-notch-tenon instead when the active tab must be identifiable in a still frame with no motion at all, or tabs-rail-points when the indicator should retain where the selection came from after it arrives.",

@@ -1,7 +1,7 @@
 {
   "name": "checkbox-ink-stroke",
   "title": "Checkbox Ink Stroke",
-  "description": "A checkbox and its tri-state select-all cousin whose mark is inked on by a variable-width calligraphic pen stroke — thin entry, thick corner flick, a hair of overshoot at the tip — so checked, unchecked and indeterminate read as three distinct pen gestures.",
+  "description": "A checkbox and its tri-state select-all cousin whose mark is inked on by a variable-width calligraphic pen stroke (thin entry, thick corner flick, a hair of overshoot at the tip), so checked, unchecked and indeterminate read as three distinct pen gestures.",
   "collection": "core",
   "tags": [
     "checkbox",

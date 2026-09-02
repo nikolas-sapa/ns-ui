@@ -1,7 +1,7 @@
 {
   "name": "plasma-filament-wander",
   "title": "Plasma Filament Wander",
-  "description": "A full-bleed hero background modelled on a plasma globe: filaments reach from a center point to a faint outer ring, each retracting and regrowing toward a new point on its own staggered 1.2-2.6s cadence, with pointer proximity biasing where — never when — a filament next reroutes.",
+  "description": "A full-bleed hero background modelled on a plasma globe: filaments reach from a center point to a faint outer ring, each retracting and regrowing toward a new point on its own staggered 1.2-2.6s cadence, with pointer proximity biasing where a filament next reroutes, never when.",
   "collection": "loud",
   "tags": ["hero", "canvas", "plasma", "cursor", "filament", "ambient", "wander", "background"],
   "useWhen": "a full-bleed hero background wants a chaotic-but-legible, many-independent-threads identity where the eye can still follow one thread's own departure-and-arrival at a time — the mechanism is per-filament independent retract/regrow cycling on staggered clocks, pointer proximity only ever biasing a filament's own next reroute target, never its motion. Pick hero-ascii-lichtenberg instead when the hero should read as a single discrete branching-tree event that grows once, holds, and is replaced by the next strike, or border-electric-arc when the crackle belongs on a CTA's border rather than as a full-bleed backdrop.",

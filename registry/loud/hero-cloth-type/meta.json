@@ -1,7 +1,7 @@
 {
   "name": "hero-cloth-type",
   "title": "Hero Cloth Type",
-  "description": "Cloth-like kinetic type — a headline rasterized once to an offscreen canvas is re-drawn every frame through a warped mesh of spring-loaded nodes, so the cursor drags the type like fabric and release springs it back with damping.",
+  "description": "Cloth-like kinetic type: a headline rasterized once to an offscreen canvas is re-drawn every frame through a warped mesh of spring-loaded nodes, so the cursor drags the type like fabric and release springs it back with damping.",
   "collection": "loud",
   "tags": ["text", "hero", "cursor", "canvas", "physics", "mesh", "kinetic-type", "drag"],
   "useWhen": "a hero or standalone headline that should feel physically draggable — cloth-like kinetic type the cursor deforms locally and releases with a springy snap-back; use when the headline alone is the whole scene, not alongside dense surrounding copy; pick hero-gravity-well instead when the headline should scatter into particles and spring back rather than deform in place, hero-dipole-field when a crisp DOM headline should sit over a reactive field rather than be the field, or text-ligature-melt when only the glyphs near the cursor should react rather than the whole headline.",

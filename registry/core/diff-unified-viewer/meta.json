@@ -1,7 +1,7 @@
 {
   "name": "diff-unified-viewer",
   "title": "Diff Unified Viewer",
-  "description": "A line-addressable unified-diff viewer, split or unified, that swaps red/green blocks for a thin left-rail marker and a muted gutter glyph — colorblind-safe by construction — plus a widget slot for attaching an AI annotation or review comment to any line address.",
+  "description": "A line-addressable unified-diff viewer, split or unified, that swaps red/green blocks for a thin left-rail marker and a muted gutter glyph (colorblind-safe by construction), plus a widget slot for attaching an AI annotation or review comment to any line address.",
   "collection": "core",
   "tags": ["diff", "code-review", "developer-tools", "typography", "accessibility", "split-view", "unified-diff"],
   "useWhen": "A line-addressable viewer for a unified-diff *string* (git diff / diff -u output) — split or unified panes, colorblind-safe left-rail markers instead of red/green, and a widgets map for attaching arbitrary React (an AI note, a review comment, a suggested edit) to any old/new line number. Reach for compare-crack-seam for a before/after *image* slider, or a plain drag-divider for freeform layout comparison — neither is text, and neither addresses individual lines.",

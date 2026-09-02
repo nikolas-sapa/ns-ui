@@ -1,7 +1,7 @@
 {
   "name": "lenticule-swing",
   "title": "Lenticule Swing",
-  "description": "A hero H1 lockup printed twice behind vertical lenticular slats — the problem statement and the product promise coexisting at once — that shimmers between both at rest and snaps cleanly to the promise as it scrolls out of view.",
+  "description": "A hero H1 lockup printed twice behind vertical lenticular slats (the problem statement and the product promise coexisting at once) that shimmers between both at rest and snaps cleanly to the promise as it scrolls out of view.",
   "collection": "core",
   "tags": ["hero", "headline", "text", "scroll", "lenticular", "spring", "typography"],
   "useWhen": "an above-the-fold H1 that needs to hold two complete messages (a problem statement and a product promise) at once, with the ambiguous overlap itself being the interesting resting frame and a scroll-driven resolve to the second message; pick text-slot-rotate instead for a single message that mechanically cycles through several words, or text-prism-split when the effect should read as one text refracting rather than two messages coexisting.",

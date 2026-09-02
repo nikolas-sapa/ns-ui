@@ -1,7 +1,7 @@
 {
   "name": "jacquard-card-chain",
   "title": "Jacquard Card Chain",
-  "description": "An ambient status strip modelled on a Jacquard loom's control mechanism — a chain of punched cards feeds past a fixed needle bank, one card read every beat, the bank rippling to the new pattern and holding before the next card slides in, looping forever.",
+  "description": "An ambient status strip modelled on a Jacquard loom's control mechanism: a chain of punched cards feeds past a fixed needle bank, one card read every beat, the bank rippling to the new pattern and holding before the next card slides in, looping forever.",
   "collection": "core",
   "tags": [
     "card",

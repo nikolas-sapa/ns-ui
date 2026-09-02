@@ -1,7 +1,7 @@
 {
   "name": "background-lloyd-relax",
   "title": "Background Lloyd Relax",
-  "description": "A blue-noise dot field that never stops settling — points run one weighted Lloyd relaxation iteration per frame against a drifting density function with genuine zero regions, so ink continually migrates into the dense lobes and leaves the rest of the frame bare paper; the pointer opens a density well the dots crowd into and drain out of.",
+  "description": "A blue-noise dot field that never stops settling: points run one weighted Lloyd relaxation iteration per frame against a drifting density function with genuine zero regions, so ink continually migrates into the dense lobes and leaves the rest of the frame bare paper; the pointer opens a density well the dots crowd into and drain out of.",
   "collection": "core",
   "tags": [
     "background",

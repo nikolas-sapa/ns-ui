@@ -87,7 +87,7 @@ export default async function Image() {
             }}
           >
             How developers and designers use ns-ui, in their own words. Share
-            your own experience — every submission is reviewed before it
+            your own experience. Every submission is reviewed before it
             appears.
           </div>
         </div>

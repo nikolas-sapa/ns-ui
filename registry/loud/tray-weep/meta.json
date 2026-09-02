@@ -1,7 +1,7 @@
 {
   "name": "tray-weep",
   "title": "Tray Weep",
-  "description": "A full-bleed section-divider band built on a bubble-cap distillation column tray — a stack of trays froths continuously as vapor bubbles up through submerged caps, liquid creeps toward a weir and spills to the tray below, and any cap running short on vapor visibly weeps liquid back down through itself instead of bubbling.",
+  "description": "A full-bleed section-divider band built on a bubble-cap distillation column tray: a stack of trays froths continuously as vapor bubbles up through submerged caps, liquid creeps toward a weir and spills to the tray below, and any cap running short on vapor visibly weeps liquid back down through itself instead of bubbling.",
   "collection": "loud",
   "tags": [
     "webgl",

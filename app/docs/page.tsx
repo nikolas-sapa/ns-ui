@@ -12,7 +12,7 @@ import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
 // surface with its literal URL — no prose an agent has to interpret, and
 // nothing here that isn't reachable.
 
-const title = "ns-ui developer docs — API, registry JSON, MCP server, CLI";
+const title = "ns-ui developer docs: API, registry JSON, MCP server, CLI";
 const description =
   "Every machine-readable ns-ui endpoint at its literal URL: the shadcn registry index, per-component JSON, the OpenAPI spec, the MCP server handshake, llms.txt, and markdown content negotiation.";
 
@@ -35,12 +35,12 @@ type Entry = { url: string; what: string; note?: string };
 const REGISTRY_API: Entry[] = [
   {
     url: "/v1/registry.json",
-    what: "Versioned base URL. Every path below also answers under /v1 — same handler, so the two can never disagree.",
+    what: "Versioned base URL. Every path below also answers under /v1: same handler, so the two can never disagree.",
     note: "The unversioned paths stay supported; /v1 is the one to integrate against.",
   },
   {
     url: "/registry.json",
-    what: `The shadcn registry index — all ${registry.items.length} items with names, titles, descriptions and tags.`,
+    what: `The shadcn registry index: all ${registry.items.length} items with names, titles, descriptions and tags.`,
     note: "Also served at /r/registry.json; both are the same file.",
   },
   {
@@ -66,7 +66,7 @@ const AGENT_SURFACE: Entry[] = [
   },
   {
     url: "/llms-full.txt",
-    what: "The long form — a full paragraph of behavioral detail per component.",
+    what: "The long form: a full paragraph of behavioral detail per component.",
   },
   {
     url: "Accept: text/markdown",
@@ -122,8 +122,8 @@ export default function DocsPage() {
         Every endpoint below is public, needs no key and no account, and is
         relative to{" "}
         <code className="font-mono text-foreground">{REGISTRY_ORIGIN}</code>. If
-        you want the walkthrough version — per-client MCP config, CLI examples —
-        that is on{" "}
+        you want the walkthrough version (per-client MCP config, CLI examples), that
+        is on{" "}
         <Link href="/connect" className={LINK}>
           /connect
         </Link>
@@ -145,7 +145,7 @@ export default function DocsPage() {
           </a>{" "}
           problem document, served as{" "}
           <code className="font-mono text-foreground">application/problem+json</code>
-          . Never an HTML page — a client that asked for JSON gets JSON, including
+          . Never an HTML page: a client that asked for JSON gets JSON, including
           on a 404.
         </p>
         <pre className="mt-3 overflow-x-auto rounded-md border border-border bg-surface p-3 font-mono text-xs leading-6 text-foreground">
@@ -162,7 +162,7 @@ export default function DocsPage() {
         </pre>
         <p className={P}>
           <code className="font-mono text-foreground">code</code> is the field to
-          branch on — it is stable, unlike the prose in{" "}
+          branch on. It is stable, unlike the prose in{" "}
           <code className="font-mono text-foreground">title</code> and{" "}
           <code className="font-mono text-foreground">detail</code>. Current codes:{" "}
           <code className="font-mono text-foreground">not_found</code>,{" "}
@@ -191,7 +191,7 @@ export default function DocsPage() {
         </p>
         <p className={P}>
           The window is 120 requests per minute per client, counted per serving
-          instance — deliberately generous. It exists so agents can self-throttle,
+          instance, deliberately generous. It exists so agents can self-throttle,
           not to meter usage; the registry files themselves are static and
           CDN-cached.
         </p>
@@ -224,7 +224,7 @@ export default function DocsPage() {
         <p className={P}>
           There is none. Every endpoint above is public, anonymous and read-only;
           nothing here accepts a write. Account features (saving components,
-          collections) exist on the site but have no public API — see{" "}
+          collections) exist on the site but have no public API. See{" "}
           <Link href="/privacy" className={LINK}>
             /privacy
           </Link>{" "}
@@ -235,7 +235,7 @@ export default function DocsPage() {
       <section className="mt-10 max-w-2xl">
         <h2 className={H2}>Licensing</h2>
         <p className={P}>
-          MIT, components included. Install them, edit them, ship them — the
+          MIT, components included. Install them, edit them, ship them: the
           source lands in your repository and there is no runtime package to
           depend on. More about the project on{" "}
           <Link href="/about" className={LINK}>

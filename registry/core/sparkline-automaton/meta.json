@@ -1,7 +1,7 @@
 {
   "name": "sparkline-automaton",
   "title": "Sparkline Automaton",
-  "description": "Inline KPI sparkline grown over an elementary cellular-automaton texture — the Wolfram rule is picked by the series' volatility, one generation column per data point.",
+  "description": "Inline KPI sparkline grown over an elementary cellular-automaton texture: the Wolfram rule is picked by the series' volatility, one generation column per data point.",
   "collection": "core",
   "tags": ["canvas", "data-viz", "sparkline", "cellular-automaton", "generative", "scrub", "kpi"],
   "useWhen": "a compact inline KPI tile whose backdrop should read the series rather than decorate it, with the cellular-automaton rule chosen by the data's own volatility; pick sparkline-ascii instead when the sparkline must be characters (monospace layout, copyable, keyboard-walkable), hero-chart-recorder when the live stream itself is the product at hero scale, or meter-quota-rule when the reading is a single fraction rather than a series.",

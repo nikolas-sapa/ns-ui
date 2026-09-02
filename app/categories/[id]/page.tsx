@@ -25,7 +25,7 @@ export async function generateMetadata({
   const copy = CATEGORY_COPY[id];
   if (!category || !copy) return {};
 
-  const title = `${copy.h1} — ns-ui`;
+  const title = `${copy.h1} · ns-ui`;
   const description = copy.intro;
   return {
     title,

@@ -1,7 +1,7 @@
 {
   "name": "mesh-lash",
   "title": "Mesh Lash",
-  "description": "A currency amount field where two meshed gears are the FX quote itself: tooth ratio draws the exchange rate, and mechanical backlash — the dead angle a reversed gear turns through before the other flank engages — is the provider's spread, printed as a currency figure straight off the gear math.",
+  "description": "A currency amount field where two meshed gears are the FX quote itself: tooth ratio draws the exchange rate, and mechanical backlash (the dead angle a reversed gear turns through before the other flank engages) is the provider's spread, printed as a currency figure straight off the gear math.",
   "collection": "core",
   "tags": [
     "input",

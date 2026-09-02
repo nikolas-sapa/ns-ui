@@ -4,8 +4,16 @@
 // No interactive elements here, so no focus-visible ring is needed.
 export function AccountSkeleton() {
   return (
-    <main className="mx-auto flex max-w-6xl flex-col px-6 py-16 sm:px-10">
-      <div className="h-7 w-24 motion-safe:animate-pulse rounded-sm bg-ns-muted/30" />
+    <main
+      // The pulse bars are the sighted "this is loading, nothing is broken".
+      // `aria-busy` plus the announced line below are the same statement for
+      // a screen reader, which otherwise met an unlabelled page of empty
+      // boxes with no indication that anything was still coming.
+      aria-busy="true"
+      className="mx-auto flex max-w-6xl flex-col px-6 py-16 sm:px-10"
+    >
+      <p className="sr-only">Loading your account…</p>
+      <div aria-hidden className="h-7 w-24 motion-safe:animate-pulse rounded-sm bg-ns-muted/30" />
 
       <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,320px)_1fr] lg:gap-14">
         <div className="flex flex-col gap-8">

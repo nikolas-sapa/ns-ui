@@ -1,7 +1,7 @@
 {
   "name": "card-dot-gain-screen",
   "title": "Card Dot Gain Screen",
-  "description": "A card backed by a contact-screen halftone that reproduces real dot gain — a nonlinear per-dot growth curve where the deepest tones grow past the point of staying separate circles and physically bridge into plugged solid ink.",
+  "description": "A card backed by a contact-screen halftone that reproduces real dot gain: a nonlinear per-dot growth curve where the deepest tones grow past the point of staying separate circles and physically bridge into plugged solid ink.",
   "collection": "core",
   "tags": [
     "card",

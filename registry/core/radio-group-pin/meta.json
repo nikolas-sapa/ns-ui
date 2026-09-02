@@ -1,7 +1,7 @@
 {
   "name": "radio-group-pin",
   "title": "Radio Group Pin",
-  "description": "Vertical radio group whose single choice is embodied by exactly one indicator: a dot resting on the checked option's notch that, on re-selection, elongates into a thin traveling line along a hairline rail (ticking each notch it passes) and contracts back down into a dot once it arrives — no spring, no overshoot, and never a line at rest.",
+  "description": "Vertical radio group whose single choice is embodied by exactly one indicator: a dot resting on the checked option's notch that, on re-selection, elongates into a thin traveling line along a hairline rail (ticking each notch it passes) and contracts back down into a dot once it arrives. No spring, no overshoot, and never a line at rest.",
   "collection": "core",
   "tags": ["radio-group", "form", "list", "picker", "physics", "micro-interaction"],
   "useWhen": "an exclusive choice among ordered options where the distance between them is part of the information (plan tiers, shipping speeds, environments), so exactly one indicator travels the rail and ticks each notch it passes rather than one dot blinking out and another blinking on; pick segmented-control-fling instead when the options are few, horizontal and the control should be draggable, or rating-stamp when the choice is a level on a scale rather than a labelled alternative.",

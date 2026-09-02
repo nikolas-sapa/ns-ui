@@ -1,7 +1,7 @@
 {
   "name": "slider-vernier",
   "title": "Slider Vernier",
-  "description": "Numeric input built as a true vernier caliper: a fixed coarse tick row over a sliding fine row at 0.9x pitch, where the accent-lit fine tick physically lines up with a main tick to spell the last digit — drag the body for fast absolute moves, drag the vernier scale itself for one-step-per-tick precision.",
+  "description": "Numeric input built as a true vernier caliper: a fixed coarse tick row over a sliding fine row at 0.9x pitch, where the accent-lit fine tick physically lines up with a main tick to spell the last digit. Drag the body for fast absolute moves, drag the vernier scale itself for one-step-per-tick precision.",
   "collection": "core",
   "tags": [
     "slider",

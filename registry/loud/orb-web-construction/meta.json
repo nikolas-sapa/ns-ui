@@ -1,7 +1,7 @@
 {
   "name": "orb-web-construction",
   "title": "Orb Web Construction",
-  "description": "A full-bleed hero background where a web builds in the real orb-weaver sequence — bridge, frame, radii laid hub-outward, a dashed scaffold spiral hub-outward, then a solid capture spiral laid outside-back-to-hub that visibly replaces the scaffold turn by turn — then rests, tears a random sector, and rebuilds only that sector before resting again.",
+  "description": "A full-bleed hero background where a web builds in the real orb-weaver sequence: bridge, frame, radii laid hub-outward, a dashed scaffold spiral hub-outward, then a solid capture spiral laid outside-back-to-hub that visibly replaces the scaffold turn by turn. It then rests, tears a random sector, and rebuilds only that sector before resting again.",
   "collection": "loud",
   "tags": [
     "hero",

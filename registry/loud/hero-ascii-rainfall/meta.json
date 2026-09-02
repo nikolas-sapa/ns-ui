@@ -2,7 +2,7 @@
   "name": "hero-ascii-rainfall",
   "rank": 11,
   "title": "Hero ASCII Rainfall",
-  "description": "A full-bleed ASCII precipitation hero — every column runs its own independent falling drop with a fixed rows/sec speed and trail length, and the pointer bends nearby streams sideways like wind gusting through rain instead of painting or warping cells directly.",
+  "description": "A full-bleed ASCII precipitation hero: every column runs its own independent falling drop with a fixed rows/sec speed and trail length, and the pointer bends nearby streams sideways like wind gusting through rain instead of painting or warping cells directly.",
   "collection": "loud",
   "tags": [
     "ascii",

@@ -28,7 +28,7 @@ export default async function Image() {
     readFile(join(FONT_DIR, "geist-mono/GeistMono-Regular.ttf")),
   ]);
 
-  const description = `Browse ns-ui's ${registry.items.length} React components by category — heroes, navigation, forms, charts, feedback and more.`;
+  const description = `Browse ns-ui's ${registry.items.length} React components by category: heroes, navigation, forms, charts, feedback and more.`;
 
   return new ImageResponse(
     (

@@ -1,7 +1,7 @@
 {
   "name": "guardrail-interlock-keys",
   "title": "Guardrail Interlock Keys",
-  "description": "Output guardrails built as a trapped-key interlock — every policy gate holds one key, the release bolt only retracts when all of them are seated, and a tripped gate is a visibly empty, barred keyway rather than a red badge.",
+  "description": "Output guardrails built as a trapped-key interlock: every policy gate holds one key, the release bolt only retracts when all of them are seated, and a tripped gate is a visibly empty, barred keyway rather than a red badge.",
   "collection": "core",
   "tags": [
     "agent",

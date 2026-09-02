@@ -1,7 +1,7 @@
 {
   "name": "drawer-counterweight",
   "title": "Drawer Counterweight",
-  "description": "Side drawer hung on a counterweight like a sash window: a thin track on the drawer's leading edge carries a weight pill that travels opposite the drag at -0.6x, and wherever it sits at release — before or past the tick — decides whether a spring pulls the drawer shut or bottoms the weight out and holds it open.",
+  "description": "Side drawer hung on a counterweight like a sash window: a thin track on the drawer's leading edge carries a weight pill that travels opposite the drag at -0.6x, and wherever it sits at release (before or past the tick) decides whether a spring pulls the drawer shut or bottoms the weight out and holds it open.",
   "collection": "core",
   "tags": [
     "drawer",

@@ -1,7 +1,7 @@
 {
   "name": "button-retry-backoff",
   "title": "Button Retry Backoff",
-  "description": "A retry button that visibly winds a torsion spring through its backoff — disabled and charging while a --foreground arc grows on real timing, notching every failure, pressable only once fully wound.",
+  "description": "A retry button that visibly winds a torsion spring through its backoff: disabled and charging while a --foreground arc grows on real timing, notching every failure, pressable only once fully wound.",
   "collection": "core",
   "tags": [
     "button",

@@ -1,7 +1,7 @@
 {
   "name": "seep-lattice",
   "title": "Seep Lattice",
-  "description": "A feature-flag rollout picker where blast radius is computed as literal site percolation: user segments are cells in a declared-adjacency lattice, the rollout percentage wets a fixed-order prefix of cells, and union-find continuously finds the largest connected wet cluster — its traced perimeter and percentage are the honest readout a plain rollout number hides, with a cliff at the lattice's own measured containment threshold rather than a smooth curve.",
+  "description": "A feature-flag rollout picker where blast radius is computed as literal site percolation: user segments are cells in a declared-adjacency lattice, the rollout percentage wets a fixed-order prefix of cells, and union-find continuously finds the largest connected wet cluster. Its traced perimeter and percentage are the honest readout a plain rollout number hides, with a cliff at the lattice's own measured containment threshold rather than a smooth curve.",
   "collection": "core",
   "tags": [
     "slider",

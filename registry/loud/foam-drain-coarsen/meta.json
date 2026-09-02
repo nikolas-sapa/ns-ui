@@ -1,7 +1,7 @@
 {
   "name": "foam-drain-coarsen",
   "title": "Foam Drain Coarsen",
-  "description": "A full-bleed weighted-Voronoi (Laguerre) foam mesh that coarsens under von Neumann's law — cells with more than six sides grow, fewer shrink and vanish — while its Plateau-border stroke width drains from hairline at the top to thick at the base, slowly re-wetting from below on a repeating 40s cycle.",
+  "description": "A full-bleed weighted-Voronoi (Laguerre) foam mesh that coarsens under von Neumann's law (cells with more than six sides grow, fewer shrink and vanish) while its Plateau-border stroke width drains from hairline at the top to thick at the base, slowly re-wetting from below on a repeating 40s cycle.",
   "collection": "loud",
   "tags": ["hero", "background", "canvas", "foam", "voronoi", "power-diagram", "von-neumann", "physics", "ambient", "generative"],
   "useWhen": "a full-bleed ambient hero/section background whose cell mesh should read as physically coarsening and draining rather than as a decorative tonal screen — pick background-lloyd-relax instead when the identity should be an evenly-toned engraved stipple screen that relaxes toward a centroidal Voronoi tessellation (no growth law, no height gradient, no vanish events), or background-ascii-voronoi-walls when the surface should be a flat ASCII wall-only rendering at fixed cell resolution rather than a continuously growing/shrinking weighted diagram with a real wetness gradient.",

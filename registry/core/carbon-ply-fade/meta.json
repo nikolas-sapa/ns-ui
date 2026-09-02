@@ -1,7 +1,7 @@
 {
   "name": "carbon-ply-fade",
   "title": "Carbon Ply Fade",
-  "description": "Activity feed rendered as a carbon-paper multi-part form — one strike lands on the top ply at full density and echoes down through 4-5 contiguous, fully-visible ply rows, each registering 90ms after the one above at 0.68x the density, matching real pressure-copy force dissipation through a stack.",
+  "description": "Activity feed rendered as a carbon-paper multi-part form: one strike lands on the top ply at full density and echoes down through 4-5 contiguous, fully-visible ply rows, each registering 90ms after the one above at 0.68x the density, matching real pressure-copy force dissipation through a stack.",
   "collection": "core",
   "tags": ["feed", "notification", "fanout", "physics", "carbon-paper", "aria-live", "activity"],
   "useWhen": "an activity feed or fanout notice (\"this event was also copied to N recipients\") where the visual should read as one strike propagating through a stack rather than N separate items, and the ranking/recency itself carries the meaning (top = current, lower = staler copies); pick feed-escapement instead when arrivals are a genuine FIFO queue that should be metered one row at a time rather than shown all at once as a density stack, or toast-gravity-stack when the arrivals are transient dismissible toasts rather than a permanent multi-ply record.",

@@ -1,7 +1,7 @@
 {
   "name": "pin-register",
   "title": "Pin Register",
-  "description": "A map layer panel drawn as registered acetate separations — each layer a translucent sheet in a shallow isometric stack that fans on hover, and turning one off parks it visibly off the pins instead of hiding it.",
+  "description": "A map layer panel drawn as registered acetate separations: each layer a translucent sheet in a shallow isometric stack that fans on hover, and turning one off parks it visibly off the pins instead of hiding it.",
   "collection": "core",
   "tags": ["layers", "map", "gis", "toggle", "drag-reorder", "keyboard", "spring", "listbox"],
   "useWhen": "a map/GIS layer panel (base, labels, traffic, boundaries, heat) where layer ORDER is part of the job, not just visibility — z-order is a draggable physical fact, and a disabled layer parks visibly (24px off the registration pins, dimmed) rather than vanishing, so the panel never loses the read on what's currently hidden from the map. Pick light-table instead for comparing the visual content of stacked film with no z-order or on/off semantics at all — that component is about looking, not compositing.",

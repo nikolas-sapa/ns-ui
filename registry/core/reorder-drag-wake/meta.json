@@ -1,7 +1,7 @@
 {
   "name": "reorder-drag-wake",
   "title": "Reorder Drag Wake",
-  "description": "Drag-to-reorder where the dragged row pushes a continuous falloff field through its neighbors — they shoulder sideways and the gap ahead widens before the card ever arrives, instead of a hard placeholder line.",
+  "description": "Drag-to-reorder where the dragged row pushes a continuous falloff field through its neighbors: they shoulder sideways and the gap ahead widens before the card ever arrives, instead of a hard placeholder line.",
   "collection": "core",
   "tags": ["drag-reorder", "list", "kanban", "spring", "physics", "keyboard", "reorder", "micro-interaction"],
   "useWhen": "a vertical list whose order the user changes by dragging, where neighbours should shoulder aside through a continuous falloff field and the gap open before the card arrives rather than a hard placeholder line snapping into place; pick swipe-row-detent instead when the gesture is lateral and reveals actions rather than moving the row, or dock-shelf-lean when the row is a dock and hover emphasis matters more than reordering.",

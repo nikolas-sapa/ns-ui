@@ -2,7 +2,7 @@
   "name": "hero-ascii-terrain",
   "rank": 7,
   "title": "Hero ASCII Terrain",
-  "description": "A full-bleed ASCII landscape hero — five ridgelines of deterministic value noise recede toward a horizon, each layer stepping up in frequency, height and ink density the nearer it sits, with the pointer driving parallax so the terrain slides past like a window on a moving vehicle.",
+  "description": "A full-bleed ASCII landscape hero: five ridgelines of deterministic value noise recede toward a horizon, each layer stepping up in frequency, height and ink density the nearer it sits, with the pointer driving parallax so the terrain slides past like a window on a moving vehicle.",
   "collection": "loud",
   "tags": [
     "ascii",

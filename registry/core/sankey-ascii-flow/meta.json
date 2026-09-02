@@ -1,7 +1,7 @@
 {
   "name": "sankey-ascii-flow",
   "title": "Sankey ASCII Flow",
-  "description": "A weighted, branching multi-stage flow diagram rendered as ASCII density bands instead of colour ribbons. Clicking a node isolates every ancestor and descendant on its path — the surviving nodes and bands re-stack from scratch using only the isolated subset's values, so they genuinely grow to fill the space rather than the rest just dimming.",
+  "description": "A weighted, branching multi-stage flow diagram rendered as ASCII density bands instead of colour ribbons. Clicking a node isolates every ancestor and descendant on its path: the surviving nodes and bands re-stack from scratch using only the isolated subset's values, so they genuinely grow to fill the space rather than the rest just dimming.",
   "collection": "core",
   "tags": ["sankey", "flow", "chart", "data-viz", "ascii", "graph", "isolate"],
   "useWhen": "a multi-stage weighted flow with real branching (traffic source -> channel -> outcome, funnel stages that fan back out) where isolating one path's full up/downstream is the point — pick chart-funnel-stage-drop instead for a single monotonic taper with no branching, or context-compaction-river for a single decorative channel with no weighted multi-node structure.",

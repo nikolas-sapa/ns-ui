@@ -1,7 +1,7 @@
 {
   "name": "lcd-response-smear",
   "title": "LCD Response Smear",
-  "description": "An ambient panel-diagnostics status card whose canvas strip simulates LCD pixel response time compensation: a sweeping fill boundary crosses a row of simulated cells, each newly-lit cell overshooting its target luminance before settling and each newly-darkened cell undershooting (lagging) before catching up — the asymmetric rise/fall overdrive behavior real display reviews call the \"inverse ghost\".",
+  "description": "An ambient panel-diagnostics status card whose canvas strip simulates LCD pixel response time compensation: a sweeping fill boundary crosses a row of simulated cells, each newly-lit cell overshooting its target luminance before settling and each newly-darkened cell undershooting (lagging) before catching up, the asymmetric rise/fall overdrive behavior real display reviews call the \"inverse ghost\".",
   "collection": "core",
   "tags": ["card", "status", "display", "canvas", "physics", "monochrome", "diagnostics"],
   "useWhen": "a real ambient status/diagnostics card whose sweeping edge should read as a discrete, asymmetric per-cell overshoot-then-settle spike (an LCD overdrive response curve); pick kelvin-wake instead if what you actually want is a continuous gradient trailing blur behind a moving point source (a nav active-indicator wake) — that component's ink is a smooth dispersive-wave envelope with no discrete keyframed spike, the opposite of this one's identifying feature.",

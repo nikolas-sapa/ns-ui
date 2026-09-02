@@ -1,7 +1,7 @@
 {
   "name": "schedule-ascii-freebusy",
   "title": "Schedule ASCII Free/Busy",
-  "description": "A meeting-time finder: one row of block glyphs per attendee and an underlined accent window marking the earliest slot where everyone required is free — toggling a person optional recomputes the answer instantly.",
+  "description": "A meeting-time finder: one row of block glyphs per attendee and an underlined accent window marking the earliest slot where everyone required is free. Toggling a person optional recomputes the answer instantly.",
   "collection": "core",
   "tags": [
     "scheduling",

@@ -1,7 +1,7 @@
 {
   "name": "eink-waveform-ghost",
   "title": "E-ink Waveform Ghost",
-  "description": "An empty-state panel rendered as an idle e-ink display — a coarse grid of cells continuously replays real electrophoretic drive waveforms on a scattered, ever-changing subset of itself, each replay briefly shooting through to full black or full white before settling, while the whole panel periodically runs a synchronized full-refresh flash to clear ghosting.",
+  "description": "An empty-state panel rendered as an idle e-ink display: a coarse grid of cells continuously replays real electrophoretic drive waveforms on a scattered, ever-changing subset of itself, each replay briefly shooting through to full black or full white before settling, while the whole panel periodically runs a synchronized full-refresh flash to clear ghosting.",
   "collection": "core",
   "tags": ["empty-state", "canvas", "e-ink", "waveform", "print", "display", "ambient", "monochrome"],
   "useWhen": "an empty-state panel whose idle motion is sourced from real e-ink/electrophoretic display driving — per-cell waveform replays with shoot-through overshoot, plus a periodic synchronized full-refresh flash — rather than a spatial dither or halftone field. Pick card-dot-gain-screen instead when the mechanic should be a spatially-resolved, slow-drifting print halftone (nonlinear dot gain and plugging) with no discrete step timing and no full-panel refresh event; pick empty-state-mezzotint instead when a small icon-scale subtractive glyph is wanted rather than a full display panel with its own settle-timing mechanic.",

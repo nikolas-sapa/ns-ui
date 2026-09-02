@@ -1,7 +1,7 @@
 {
   "name": "spark-test-id",
   "title": "Spark Test ID",
-  "description": "A file dropzone that identifies a specimen the way a machinist reads unknown steel: an idle grinding-wheel spark shower runs continuously, and the detected file type sets a characteristic spark signature — burst count, fork depth, carrier length.",
+  "description": "A file dropzone that identifies a specimen the way a machinist reads unknown steel: an idle grinding-wheel spark shower runs continuously, and the detected file type sets a characteristic spark signature of burst count, fork depth, and carrier length.",
   "collection": "loud",
   "tags": ["dropzone", "file-upload", "form", "canvas", "particles", "physics", "input"],
   "useWhen": "an upload/detection surface where the identification moment itself is the spectacle — a continuously running spark shower whose burst/fork pattern changes to match the detected file type; pick file-upload-thermal instead for a drag-accept/reject moment carried by rising wisps and buoyant chips, or file-upload-seal for a per-file progress read carried by a spring-driven outline.",

@@ -1,7 +1,7 @@
 {
   "name": "delta-frame-macroblock",
   "title": "Delta Frame Macroblock",
-  "description": "A quiet full-width band that visualizes a video codec's own P-frame change-detection decision — a grid of macroblocks sits mostly static, and every 220ms tick a small, capped subset is flagged changed with a brief outline flash and a slightly shifted tone while every other block is explicitly left untouched, exactly the sparse per-block change map a real codec decodes.",
+  "description": "A quiet full-width band that visualizes a video codec's own P-frame change-detection decision: a grid of macroblocks sits mostly static, and every 220ms tick a small, capped subset is flagged changed with a brief outline flash and a slightly shifted tone while every other block is explicitly left untouched, exactly the sparse per-block change map a real codec decodes.",
   "collection": "core",
   "tags": ["background", "divider", "canvas", "codec", "grid", "generative", "ambient", "monochrome"],
   "useWhen": "Pick delta-frame-macroblock for a quiet band/divider whose subject IS a change-detection decision — a mostly static block grid where a small, individually-countable subset of blocks flashes as 'changed' each tick and everything else is provably left alone, sourced from real MPEG/H.26x P-frame skip-flag encoding. background-ascii-dither is the better pick when the field should read as a continuous glyph-mapped luminance surface driven by an image or flowing noise rather than discrete per-cell change events; background-truchet-weave when the surface should read as one continuous interlaced line weave rather than a static cell grid with sparse redraws.",

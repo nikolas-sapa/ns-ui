@@ -1,7 +1,7 @@
 {
   "name": "seal-roll",
   "title": "Seal Roll",
-  "description": "A single-quote testimonial rotator built as a Mesopotamian cylinder seal — a small barrel rolls across the card and the quote presses into the surface word by word in its wake, then the impression re-clays as the barrel's return trip rolls in the next testimonial.",
+  "description": "A single-quote testimonial rotator built as a Mesopotamian cylinder seal: a small barrel rolls across the card and the quote presses into the surface word by word in its wake, then the impression re-clays as the barrel's return trip rolls in the next testimonial.",
   "collection": "core",
   "tags": ["testimonial", "carousel", "rotator", "quote", "svg", "impression", "auto-advance"],
   "useWhen": "a single-quote testimonial section where the carousel transition itself is a physical, continuous roll rather than a fade or slide — a small barrel visibly travels the card, pressing each word into view in its wake, and its return trip doubles as the swap to the next quote. Pick confirm-hold-wax or rating-stamp instead for a single percussive impression with no travel and no carousel behavior, and contact-form-teletype instead for character-scale typing of a validation log rather than a word-scale rolling quote.",

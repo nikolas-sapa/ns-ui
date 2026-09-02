@@ -1,7 +1,7 @@
 {
   "name": "background-ascii-voronoi-walls",
   "title": "Background ASCII Voronoi Walls",
-  "description": "An ambient ASCII background of Voronoi cell WALLS only — ink appears exactly where the first and second nearest sites are equidistant, so a sparse, slowly drifting network of hairlines and clean three-way junctions sits on an otherwise empty field, and the pointer is a weighted site whose territory visibly swells.",
+  "description": "An ambient ASCII background of Voronoi cell WALLS only: ink appears exactly where the first and second nearest sites are equidistant, so a sparse, slowly drifting network of hairlines and clean three-way junctions sits on an otherwise empty field, and the pointer is a weighted site whose territory visibly swells.",
   "collection": "core",
   "tags": [
     "background",

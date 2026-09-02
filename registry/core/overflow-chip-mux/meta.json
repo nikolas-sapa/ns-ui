@@ -1,7 +1,7 @@
 {
   "name": "overflow-chip-mux",
   "title": "Overflow Chip Mux",
-  "description": "The list/tag overflow indicator, replaced with real NES PPU sprite multiplexing — instead of collapsing extra items into a static \"+N\" pill, only 8 chip slots (the hardware's real 8-sprites-per-scanline limit) are ever visible at once, round-robining which contending item occupies each slot on a throttled cadence, exactly how 8-bit console flicker actually worked.",
+  "description": "The list/tag overflow indicator, replaced with real NES PPU sprite multiplexing: instead of collapsing extra items into a static \"+N\" pill, only 8 chip slots (the hardware's real 8-sprites-per-scanline limit) are ever visible at once, round-robining which contending item occupies each slot on a throttled cadence, exactly how 8-bit console flicker actually worked.",
   "collection": "core",
   "tags": ["overflow", "tags", "chips", "nes", "sprite-multiplexing", "retro", "ambient", "accessibility"],
   "useWhen": "a tag/chip/filter row that has more items than fit and should replace the generic static \"+N more\" pill with a genuine, sourced hardware artifact — a fixed 8-slot budget that round-robins which contending items are visible on a throttled cadence, always backed by a full sr-only enumeration and a visible total count. Pick avatar-stack-flock instead when the overflow group is people/avatars and the resting motion should read as an ambient flocking mill rather than a slotted rotation; pick breadcrumb-overflow-menu instead when overflow items should be reachable via an explicit disclosure menu rather than any ambient/automatic rotation at all.",

@@ -1,7 +1,7 @@
 {
   "name": "knot-capsize-cycle",
   "title": "Knot Capsize Cycle",
-  "description": "An ambient capacity/status gauge that expresses load as knot topology instead of a fill bar or needle — a granny-knot's two standing ends and two crossing loops breathe through a rigging load cycle (ramp, hold, release) and visibly slide-and-reseat into a capsized arrangement near peak load before re-dressing on release.",
+  "description": "An ambient capacity/status gauge that expresses load as knot topology instead of a fill bar or needle: a granny-knot's two standing ends and two crossing loops breathe through a rigging load cycle (ramp, hold, release) and visibly slide-and-reseat into a capsized arrangement near peak load before re-dressing on release.",
   "collection": "core",
   "tags": ["gauge", "status", "svg", "bezier", "knot", "rigging", "load-cycle", "ambient", "monochrome"],
   "useWhen": "a capacity/load/status gauge that should read as a real, named physical failure mode rather than an abstract fill or needle — pick meter-threshold-trip instead when the surface needs a literal threshold-crossing trip event (a value crossing a fixed line), or gauge-capacity-waterline instead when the surface is a literal fill-level reading (a liquid capacity metaphor); pick knot-capsize-cycle specifically when the status is cyclic tension/load (not a level or a one-shot trip) and a rope-topology metaphor — a knot slipping into a weaker arrangement under peak load, then re-dressing on release — is the right register for what's being monitored.",

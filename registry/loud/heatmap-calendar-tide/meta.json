@@ -1,7 +1,7 @@
 {
   "name": "heatmap-calendar-tide",
   "title": "Heatmap Calendar Tide",
-  "description": "Calendar heatmap read as a tide table — one column per week, depth carried by a single-hue ramp mixed from the accent token, with arrow-key navigation.",
+  "description": "Calendar heatmap read as a tide table: one column per week, depth carried by a single-hue ramp mixed from the accent token, with arrow-key navigation.",
   "collection": "loud",
   "tags": [
     "heatmap",

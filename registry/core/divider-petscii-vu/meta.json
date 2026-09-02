@@ -1,7 +1,7 @@
 {
   "name": "divider-petscii-vu",
   "title": "Divider PETSCII VU",
-  "description": "A full-width section divider printed as a PETSCII / C64 reverse-video VU meter band — every cell has exactly two states, paper or ink, never a density ramp, driven by a real 300ms-integrated amplitude envelope with a fast-attack/slow-decay peak-hold column and an AGC ceiling that keeps the meter legible at any input level.",
+  "description": "A full-width section divider printed as a PETSCII / C64 reverse-video VU meter band: every cell has exactly two states, paper or ink, never a density ramp, driven by a real 300ms-integrated amplitude envelope with a fast-attack/slow-decay peak-hold column and an AGC ceiling that keeps the meter legible at any input level.",
   "collection": "core",
   "tags": [
     "divider",

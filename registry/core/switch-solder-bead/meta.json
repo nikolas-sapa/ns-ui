@@ -2,7 +2,7 @@
   "name": "switch-solder-bead",
   "rank": 297,
   "title": "Switch Solder Bead",
-  "description": "A boolean switch rendered as two liquid solder beads on a hairline rail, trading mass through a gooey neck that bulges, stretches and pinches off on toggle — with a ratio prop for rendering any partial allocation, not just on/off.",
+  "description": "A boolean switch rendered as two liquid solder beads on a hairline rail, trading mass through a gooey neck that bulges, stretches and pinches off on toggle, with a ratio prop for rendering any partial allocation, not just on/off.",
   "collection": "core",
   "tags": [
     "switch",

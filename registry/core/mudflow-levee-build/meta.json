@@ -1,7 +1,7 @@
 {
   "name": "mudflow-levee-build",
   "title": "Mudflow Levee Build",
-  "description": "Ambient activity track whose channel is self-built by the flow's own coarse fraction shearing out to the margins — surges deposit growth at the edges as they pass, the two levees narrow the channel over many surges, and once one bank critically narrows the flow breaches it and avulses sideways, leaving the old levee pair behind as a static scar.",
+  "description": "Ambient activity track whose channel is self-built by the flow's own coarse fraction shearing out to the margins: surges deposit growth at the edges as they pass, the two levees narrow the channel over many surges, and once one bank critically narrows the flow breaches it and avulses sideways, leaving the old levee pair behind as a static scar.",
   "collection": "core",
   "tags": ["progress", "activity", "canvas", "levee", "debris-flow", "geomorphology", "generative", "ambient", "avulsion"],
   "useWhen": "an ambient activity/throughput indicator whose track is not pre-existing but is visibly self-constructed by the traffic passing through it — coarse material self-sorting to the margins into two growing levees that confine and narrow the channel, culminating in a rare, discrete breach-and-avulsion event that jumps the active path sideways and leaves a static scar behind; pick progress-wick instead when the surface needs a determinate 0-100% value chasing a real target with accessible aria-valuenow semantics — mudflow-levee-build has no notion of a target value or completion, it is a pure ambient loop with no forced end.",

@@ -19,7 +19,7 @@ export const dynamic = "force-dynamic";
 
 const title = "Community";
 const description =
-  "How developers and designers use ns-ui, in their own words. Share your own experience — every submission is reviewed before it appears.";
+  "How developers and designers use ns-ui, in their own words. Share your own experience. Every submission is reviewed before it appears.";
 
 export const metadata = {
   alternates: { canonical: "/community" },
@@ -70,7 +70,7 @@ export default async function CommunityPage() {
         </p>
         <p className="mt-3 text-sm leading-6 text-ns-muted">
           Contributing means opening a pull request, the same as any open
-          source project — there is no submission form that runs your code on
+          source project. There is no submission form that runs your code on
           this site. What you submit is read by a person against a real bar
           (see{" "}
           <Link

@@ -23,7 +23,7 @@ export async function generateMetadata({
   const post = loadWritingPost(slug);
   if (!post) return {};
 
-  const title = `${post.title} — ns-ui`;
+  const title = `${post.title} · ns-ui`;
   return {
     title,
     description: post.description,

@@ -1,7 +1,7 @@
 {
   "name": "fusee-cone",
   "title": "Fusee Cone",
-  "description": "A burn-rate alert policy editor built as a clock fusee: error budget is the mainspring barrel, a chain rides down a tapering cone as budget depletes, and alert sensitivity at any budget level is the cone's local radius — authored by dragging exactly 4 monotone control points, with a real multi-window rule table derived from the shape.",
+  "description": "A burn-rate alert policy editor built as a clock fusee: error budget is the mainspring barrel, a chain rides down a tapering cone as budget depletes, and alert sensitivity at any budget level is the cone's local radius, authored by dragging exactly 4 monotone control points, with a real multi-window rule table derived from the shape.",
   "collection": "core",
   "tags": [
     "slo",

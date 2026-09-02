@@ -1,7 +1,7 @@
 {
   "name": "tour-spotlight",
   "title": "Tour Spotlight",
-  "description": "An onboarding tour rendered as a lighthouse — the current target gets a light ring and halo while the rest of the page drops to penumbra behind a single SVG-masked scrim, and advancing sweeps a feathered beam along the path from the old target to the new one as the hole morphs to match.",
+  "description": "An onboarding tour rendered as a lighthouse: the current target gets a light ring and halo while the rest of the page drops to penumbra behind a single SVG-masked scrim, and advancing sweeps a feathered beam along the path from the old target to the new one as the hole morphs to match.",
   "collection": "core",
   "tags": [
     "onboarding",

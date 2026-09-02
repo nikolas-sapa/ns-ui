@@ -1,7 +1,7 @@
 {
   "name": "ascii-torus-donut",
   "title": "ASCII Torus Donut",
-  "description": "The donut.c homage done properly — a rotating 3D torus with real per-character depth buffering and Lambertian shading, spinning on two axes, drag-rotated with inertia, framed by a box-drawing HUD printing a live rotation readout.",
+  "description": "The donut.c homage done properly: a rotating 3D torus with real per-character depth buffering and Lambertian shading, spinning on two axes, drag-rotated with inertia, framed by a box-drawing HUD printing a live rotation readout.",
   "collection": "loud",
   "tags": ["ascii", "3d", "canvas", "cursor", "torus", "physics"],
   "useWhen": "the donut.c homage specifically, a rotating torus with real per-character depth buffering and Lambertian shading plus drag-rotate inertia and a live rotation readout; pick ascii-globe-spin instead when the sphere has to read as a planet with geography and a lat/lon readout, or hero-ascii-wordmark when the ASCII should spell something rather than render a solid.",

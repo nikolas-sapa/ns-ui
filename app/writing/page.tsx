@@ -4,7 +4,7 @@ import { loadWritingPosts } from "@/lib/writing";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/writing" },
-  title: "Writing — ns-ui",
+  title: "Writing · ns-ui",
   description: "Notes on building ns-ui, its registry, and the tools around it.",
 };
 

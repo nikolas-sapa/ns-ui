@@ -1,7 +1,7 @@
 {
   "name": "crossfoot-gap",
   "title": "Crossfoot Gap",
-  "description": "An editable invoice grid that validates itself the way a bookkeeper crossfoots a ledger: row totals right of a vertical rule, column totals under a horizontal one, and a corner gap whose width — not a warning icon — carries the size of the mismatch.",
+  "description": "An editable invoice grid that validates itself the way a bookkeeper crossfoots a ledger: row totals right of a vertical rule, column totals under a horizontal one, and a corner gap whose width (not a warning icon) carries the size of the mismatch.",
   "collection": "core",
   "tags": ["table", "form", "invoice", "ledger", "reconciliation", "svg", "aria-live", "accessibility", "mono", "budget"],
   "useWhen": "a line-item grid (invoice coding, expense receipts, budget allocation) where 'does this add up' should be answered by the geometry of a closing corner at rest, with the gap's width itself proportional to the size of the mismatch — not by validation-error-summary, which annotates individual fields with messages after a submit and carries no notion of a numeric-magnitude error at all.",

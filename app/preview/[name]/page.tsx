@@ -47,7 +47,7 @@ export async function generateMetadata({
 
   const canonical = `${REGISTRY_ORIGIN}/components/${name}`;
   return {
-    title: `${item.title} — ns-ui`,
+    title: `${item.title} · ns-ui`,
     description: item.description,
     robots: { index: false, follow: false },
     alternates: { canonical },

@@ -1,7 +1,7 @@
 {
   "name": "nav-condense-rail",
   "title": "Nav Condense Rail",
-  "description": "A full-width site nav that condenses in place as the page scrolls — roomy padding, full-size wordmark and links at the top, tightening to a dense pinned rail — over a distance measured from the bar's own rendered height at each extreme, not a guessed scroll-pixel constant.",
+  "description": "A full-width site nav that condenses in place as the page scrolls (roomy padding, full-size wordmark and links at the top, tightening to a dense pinned rail) over a distance measured from the bar's own rendered height at each extreme, not a guessed scroll-pixel constant.",
   "collection": "core",
   "tags": [
     "header",

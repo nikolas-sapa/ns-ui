@@ -1,7 +1,7 @@
 {
   "name": "ropewalk-lay-twist",
   "title": "Ropewalk Lay Twist",
-  "description": "Ambient card background modeling rope laying in a traditional ropewalk — three strands spiral together at a fixed convergence point into one rope, continuously hauled off and wound onto a take-up drum whose layer count keeps climbing, never stopping and never resetting.",
+  "description": "Ambient card background modeling rope laying in a traditional ropewalk: three strands spiral together at a fixed convergence point into one rope, continuously hauled off and wound onto a take-up drum whose layer count keeps climbing, never stopping and never resetting.",
   "collection": "core",
   "tags": ["background", "canvas", "rope", "cordage", "ropewalk", "ambient", "monochrome", "generative"],
   "useWhen": "an ambient card-background strip behind a status/queue/job card where the real-world question is 'is work still being produced right now' — the twist-and-wind mechanic reads as continuous manufacture rather than a generic pulsing loader. Pick float-ribbon-draw instead for a horizontal multi-stage pipeline bar with fixed stage territory and an optional stage-tick overlay (this component has no stage/progress concept, only continuous production). Pick loader-thread-spool instead for a single spool paying a thread OUT for a wait/loading state, the mechanical opposite of winding rope ON as it is produced.",

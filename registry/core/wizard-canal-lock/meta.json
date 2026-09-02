@@ -1,7 +1,7 @@
 {
   "name": "wizard-canal-lock",
   "title": "Wizard Canal Lock",
-  "description": "A wizard stepper built as a flight of canal locks: the next chamber's water level climbs to meet the current one, and only once they equalize does the shared gate split open for the active highlight to glide through — an invalid step's level visibly stalls short of the gate line instead of popping a toast.",
+  "description": "A wizard stepper built as a flight of canal locks: the next chamber's water level climbs to meet the current one, and only once they equalize does the shared gate split open for the active highlight to glide through. An invalid step's level visibly stalls short of the gate line instead of popping a toast.",
   "collection": "core",
   "tags": [
     "stepper",

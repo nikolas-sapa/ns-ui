@@ -1,7 +1,7 @@
 {
   "name": "citation-grounding-gap",
   "title": "Citation Grounding Gap",
-  "description": "A single SVG baseline under a RAG answer's prose — a solid 1px plank under every sourced sentence, a fading 3-dash gap wherever a claim has none — so grounding coverage reads at a glance instead of hover-hunting citation pills.",
+  "description": "A single SVG baseline under a RAG answer's prose: a solid 1px plank under every sourced sentence, a fading 3-dash gap wherever a claim has none. Grounding coverage reads at a glance instead of hover-hunting citation pills.",
   "collection": "core",
   "tags": [
     "rag",

@@ -1,7 +1,7 @@
 {
   "name": "roller-occlusion",
   "title": "Roller Occlusion",
-  "description": "A determinate-feel loader ambient drawn as a real peristaltic pump: a three-roller rotor spins above a horizontal tube, each roller pinching the lumen fully flat as it passes and driving a visible fluid slug ahead of it while the tube wall rebounds viscoelastically in its wake — quasi-continuous flow, never a percentage bar.",
+  "description": "A determinate-feel loader ambient drawn as a real peristaltic pump: a three-roller rotor spins above a horizontal tube, each roller pinching the lumen fully flat as it passes and driving a visible fluid slug ahead of it while the tube wall rebounds viscoelastically in its wake. Quasi-continuous flow, never a percentage bar.",
   "collection": "core",
   "tags": [
     "loader",

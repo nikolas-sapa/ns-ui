@@ -1,7 +1,7 @@
 {
   "name": "bitplane-cascade",
   "title": "Bitplane Cascade",
-  "description": "A full-bleed hero/background that composites a real Amiga-class planar framebuffer image one bitplane at a time — a coarse 2-tone silhouette lands first, then three more binary-weighted planes each add a finer layer of tonal detail on top of it, before the full 16-level image holds and the stack clears to rebuild from plane 0 again.",
+  "description": "A full-bleed hero/background that composites a real Amiga-class planar framebuffer image one bitplane at a time: a coarse 2-tone silhouette lands first, then three more binary-weighted planes each add a finer layer of tonal detail on top of it, before the full 16-level image holds and the stack clears to rebuild from plane 0 again.",
   "collection": "loud",
   "tags": ["background", "canvas", "bitplane", "framebuffer", "print", "ambient", "monochrome"],
   "useWhen": "a full-bleed backdrop where the point is a countable, steppy 'one more layer just landed' compositing beat with a held clean frame — pick background-halftone-rosette instead when the identity should be continuous same-ink dot-angle drift with no discrete steps, or background-capillary-wick when the mechanic should read as an organic front propagating and evaporating along a fixed lattice rather than a fixed-cadence hardware compositor.",

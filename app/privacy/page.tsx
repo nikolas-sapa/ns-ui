@@ -55,7 +55,7 @@ export default function PrivacyPage() {
         <p className={P}>
           No sign-in, no session cookie, no personal data. The site records
           anonymous, aggregate page analytics through Vercel Web Analytics and
-          Vercel Speed Insights — page views and Core Web Vitals timings, no
+          Vercel Speed Insights: page views and Core Web Vitals timings, no
           cross-site tracking cookie and no advertising profile. Those two
           scripts do not load inside component preview iframes.
         </p>
@@ -81,7 +81,7 @@ export default function PrivacyPage() {
         <p className={P}>
           Everything you create is private until you publish it. A profile, a
           save or a collection is invisible to everyone but you from the moment
-          it is created — that default is enforced in the database, not just in
+          it is created. That default is enforced in the database, not just in
           the interface.
         </p>
       </section>
@@ -110,23 +110,23 @@ export default function PrivacyPage() {
         <h2 className={H2}>Third parties that process data</h2>
         <ul className="mt-2 list-disc space-y-1 pl-5">
           <li className={LI}>
-            <strong className="font-medium text-foreground">Vercel</strong> —
+            <strong className="font-medium text-foreground">Vercel</strong>:
             hosting; serves every request, and provides the anonymous analytics
             and performance timings described above.
           </li>
           <li className={LI}>
-            <strong className="font-medium text-foreground">Convex</strong> —
+            <strong className="font-medium text-foreground">Convex</strong>:
             the database and authentication backend that stores accounts,
             profiles, saves, collections, submissions and testimonials.
           </li>
           <li className={LI}>
-            <strong className="font-medium text-foreground">GitHub and Google</strong>{" "}
-            — only if you choose one of them to sign in, or connect GitHub to
+            <strong className="font-medium text-foreground">GitHub and Google</strong>:{" "}
+            only if you choose one of them to sign in, or connect GitHub to
             open a submission pull request on your behalf.
           </li>
           <li className={LI}>
-            <strong className="font-medium text-foreground">EmailOctopus</strong>{" "}
-            — only if you submit the email form; your address is stored on that
+            <strong className="font-medium text-foreground">EmailOctopus</strong>:{" "}
+            only if you submit the email form; your address is stored on that
             list until you unsubscribe, using the link in any email it sends.
           </li>
         </ul>
@@ -150,8 +150,8 @@ export default function PrivacyPage() {
           <a href={`mailto:${CONTACT_EMAIL}`} className={LINK}>
             {CONTACT_EMAIL}
           </a>{" "}
-          from the address on the account and every record tied to it —
-          profile, saves, collections, submissions and testimonials — will be
+          from the address on the account and every record tied to it
+          (profile, saves, collections, submissions and testimonials) will be
           deleted manually. The same address handles any question about what is
           held about you, and any request for a copy of it.
         </p>

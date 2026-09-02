@@ -165,6 +165,10 @@ Options:
   -h, --help       Show this help (also works as \`ns-ui <command> --help\`)
   -v, --version    Show version
 
+Environment:
+  NS_UI_REGISTRY         Registry origin to read from (default: https://design.helpmarq.com)
+  NS_UI_CACHE_TTL_MS     Catalog cache lifetime in ms (default: 43200000, 12h)
+
 Examples:
   npx @nikolas.sapa/ns-ui search "reactive hero"
   npx @nikolas.sapa/ns-ui list --category forms

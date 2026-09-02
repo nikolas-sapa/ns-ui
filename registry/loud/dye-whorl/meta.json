@@ -1,7 +1,7 @@
 {
   "name": "dye-whorl",
   "title": "Dye Whorl",
-  "description": "A full-bleed tank of ink diffusing in water — a real GPU fluid solver whose coarse velocity field transports a fine dye field, so plumes billow with dense cores, sheets thin as they stretch, tendrils shear off the shoulders and everything dissipates into haze. Drifting injectors, falling drops and interface buoyancy keep it blooming with nobody touching it; the pointer stirs the fluid and presses drop a fresh bead.",
+  "description": "A full-bleed tank of ink diffusing in water: a real GPU fluid solver whose coarse velocity field transports a fine dye field, so plumes billow with dense cores, sheets thin as they stretch, tendrils shear off the shoulders and everything dissipates into haze. Drifting injectors, falling drops and interface buoyancy keep it blooming with nobody touching it; the pointer stirs the fluid and presses drop a fresh bead.",
   "collection": "loud",
   "tags": [
     "background",

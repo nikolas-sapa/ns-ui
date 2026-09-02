@@ -1,7 +1,7 @@
 {
   "name": "craze-rule",
   "title": "Craze Rule",
-  "description": "A section divider that arrives as a propagating, branching fracture instead of a static <hr> — a seeded random-walk SVG path with 3-5 near-perpendicular T-junction branches draws in once via IntersectionObserver on an ease-out-expo stroke-dashoffset, then keeps a faint 6s idle creep at rest.",
+  "description": "A section divider that arrives as a propagating, branching fracture instead of a static <hr>: a seeded random-walk SVG path with 3-5 near-perpendicular T-junction branches draws in once via IntersectionObserver on an ease-out-expo stroke-dashoffset, then keeps a faint 6s idle creep at rest.",
   "collection": "core",
   "tags": ["divider", "separator", "section-divider", "hr", "svg", "crack", "fracture", "scroll-reveal"],
   "autoplay": { "mode": "none" },

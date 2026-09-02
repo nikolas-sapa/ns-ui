@@ -1,7 +1,7 @@
 {
   "name": "divider-telephone-cord-delam",
   "title": "Divider Telephone Cord Delam",
-  "description": "A full-width section divider modeled on thin-film delamination buckling — a compressive-stress film debonding from its substrate and popping upward into the real 'telephone cord' morphology: a roughly constant-width ridge that telescopes side to side as its failure front advances and periodically re-forks, never a straight blister.",
+  "description": "A full-width section divider modeled on thin-film delamination buckling, a compressive-stress film debonding from its substrate and popping upward into the real 'telephone cord' morphology: a roughly constant-width ridge that telescopes side to side as its failure front advances and periodically re-forks, never a straight blister.",
   "collection": "core",
   "tags": ["divider", "separator", "hr", "buckling", "delamination", "thin-film", "canvas", "monochrome"],
   "useWhen": "Pick divider-telephone-cord-delam when the divider's mechanic is a compressive failure front continuously propagating and re-forking through an already-formed film — it never finishes. Pick craze-rule instead when the divider's mechanic is a one-shot fracture that draws in once via scroll and then holds; pick growth-ring/cambium-lay/lamina-dome instead when the mechanic is layered material being deposited outward over time, not an existing film failing.",

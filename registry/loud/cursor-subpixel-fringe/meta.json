@@ -1,7 +1,7 @@
 {
   "name": "cursor-subpixel-fringe",
   "title": "Cursor Subpixel Fringe",
-  "description": "A full-bleed field where every grid cell carries three thin vertical luminance slivers standing in for an LCD's physical red/green/blue subpixel stripes. Near the cursor, or the idle sweep target when nothing is pointing, the three slivers of a cell splay apart and diverge in value, as if a renderer were locally re-hinting glyphs to the pixel grid — and the whole field shimmers at rest, not only under the pointer.",
+  "description": "A full-bleed field where every grid cell carries three thin vertical luminance slivers standing in for an LCD's physical red/green/blue subpixel stripes. Near the cursor, or the idle sweep target when nothing is pointing, the three slivers of a cell splay apart and diverge in value, as if a renderer were locally re-hinting glyphs to the pixel grid. The whole field shimmers at rest, not only under the pointer.",
   "collection": "loud",
   "tags": ["cursor", "background", "canvas", "noise", "grid"],
   "useWhen": "a full-bleed background whose payoff is LCD subpixel stripe geometry — a 1x3 vertical sliver triad per cell that splays and value-fringes near the cursor — rather than hero-404-quadrant-occlusion's 2x2 quadrant block or empty-state-braille-orbit / loader-braille's 2x4 dot grid, both of which address a cell as discrete points, not parallel stripes.",

@@ -1,7 +1,7 @@
 {
   "name": "text-card-flick",
   "title": "Text Card Flick",
-  "description": "A hover or click flourish where every letter is an index card on a spindle — the face flicks back over its top edge and out of view while a duplicate flicks up from underneath into its place, staggered across the word from a configurable origin on a numerically integrated spring.",
+  "description": "A hover or click flourish where every letter is an index card on a spindle: the face flicks back over its top edge and out of view while a duplicate flicks up from underneath into its place, staggered across the word from a configurable origin on a numerically integrated spring.",
   "collection": "core",
   "tags": ["text", "hover", "spring", "micro-interaction", "typography"],
   "useWhen": "a headline or button label that flicks its letters over on hover or click, each one a physically-integrated spring rather than an eased crossfade; reach for text-decrypt instead for a one-shot scramble-to-decode reveal with no ongoing hover affordance.",

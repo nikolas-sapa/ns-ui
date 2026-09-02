@@ -1,7 +1,7 @@
 {
   "name": "equation-kidney-cam",
   "title": "Equation Kidney Cam",
-  "description": "A section divider whose midpoint tick rides a lookup table built from the real equation-of-time curve — an equation-marchante watch's kidney cam compressed to an 11s loop — sliding, slowing, and reversing direction with four unevenly-spaced zero-crossing brighten-pulses per cycle, never a symmetric back-and-forth.",
+  "description": "A section divider whose midpoint tick rides a lookup table built from the real equation-of-time curve (an equation-marchante watch's kidney cam compressed to an 11s loop), sliding, slowing, and reversing direction with four unevenly-spaced zero-crossing brighten-pulses per cycle, never a symmetric back-and-forth.",
   "collection": "core",
   "tags": ["divider", "separator", "section-divider", "hr", "svg", "cam", "horology", "lookup-table"],
   "autoplay": { "mode": "none" },

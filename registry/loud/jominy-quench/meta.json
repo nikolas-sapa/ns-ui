@@ -1,7 +1,7 @@
 {
   "name": "jominy-quench",
   "title": "Jominy Quench",
-  "description": "A hardenability comparison card built on the real ASTM A255 / ISO 642 Jominy end-quench test — a water jet sprays one end of a heated steel bar continuously, a directional quench front creeps up the bar, and hardness falls off with distance from that face along a curve that is each alloy's signature, drawn beside a real numeric table so the comparison never lives only in the picture.",
+  "description": "A hardenability comparison card built on the real ASTM A255 / ISO 642 Jominy end-quench test: a water jet sprays one end of a heated steel bar continuously, a directional quench front creeps up the bar, and hardness falls off with distance from that face along a curve that is each alloy's signature, drawn beside a real numeric table so the comparison never lives only in the picture.",
   "collection": "loud",
   "tags": ["comparison", "chart", "benchmark", "canvas", "metallurgy", "table", "spec-sheet"],
   "useWhen": "Pick jominy-quench when comparing several graded variants (alloys, formulations, product tiers with a measurable falloff) along one continuous physical axis and the shape of the falloff curve, not a checkmark grid, is the comparison. compare-table-reach-rule is the better pick for a feature-by-feature plan matrix; jominy-quench is for a small number of items each carrying one signature curve.",

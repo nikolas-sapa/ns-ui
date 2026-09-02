@@ -1,7 +1,7 @@
 {
   "name": "divider-teletext-mosaic",
   "title": "Divider Teletext Mosaic",
-  "description": "A full-width section divider rendered as a real teletext / videotex ALPHAMOSAIC graphics band — each character cell is a 6-bit code across a 2-wide x 3-tall sub-cell 'sextant' grid, the actual broadcast alphamosaic addressing (distinct from this registry's 2x2 quadrant block dividers and 2x4 braille-dot components), painted row by row on a fixed cadence the way a real teletext page arrives off the broadcast signal.",
+  "description": "A full-width section divider rendered as a real teletext / videotex ALPHAMOSAIC graphics band: each character cell is a 6-bit code across a 2-wide x 3-tall sub-cell 'sextant' grid, the actual broadcast alphamosaic addressing (distinct from this registry's 2x2 quadrant block dividers and 2x4 braille-dot components), painted row by row on a fixed cadence the way a real teletext page arrives off the broadcast signal.",
   "collection": "core",
   "tags": [
     "divider",

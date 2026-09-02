@@ -1,7 +1,7 @@
 {
   "name": "turbidite-graded-bed",
   "title": "Turbidite Graded Bed",
-  "description": "A card-scale ambient timeline where each irregular flow-pulse event deposits one new sedimentary bed at the top of a growing stratigraphic column — coarse grains settling first at a sharp, erosively-scoured base and fining continuously upward to a fine cap, stacking pulse by pulse forever with the oldest beds slowly compacting and scrolling off the bottom.",
+  "description": "A card-scale ambient timeline where each irregular flow-pulse event deposits one new sedimentary bed at the top of a growing stratigraphic column: coarse grains settling first at a sharp, erosively-scoured base and fining continuously upward to a fine cap, stacking pulse by pulse forever with the oldest beds slowly compacting and scrolling off the bottom.",
   "collection": "core",
   "tags": ["timeline", "canvas", "ambient", "generative", "activity-log", "grain", "stratigraphy", "raf"],
   "useWhen": "Pick turbidite-graded-bed for an ambient 'history is accumulating' strip where the record's identity is each event's own internal graded structure (coarse-to-fine fining-upward texture, sharp erosive base) rather than the stacking itself, driven by an irregular internal pulse clock. Pick growth-ring instead when the record should be driven by real user-save/edit-history events (not an internal clock) and read as a dendrochronological ring cross-section with an explicit restore action, or helicorder-line-wrap when the ambient trace should be a continuous seismograph-style line record with occasional spike events rather than discrete stacked graded layers.",

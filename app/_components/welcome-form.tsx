@@ -12,13 +12,13 @@ const HANDLE_ERROR_MESSAGES: Record<string, string> = {
   invalid_type: "Enter a handle.",
   invalid_length: "Handles are 2-30 characters.",
   invalid_format:
-    "Lowercase letters, numbers and single hyphens only — no leading, trailing or double hyphens.",
+    "Lowercase letters, numbers and single hyphens only: no leading, trailing or double hyphens.",
   reserved: "That handle is reserved.",
   name_not_allowed: "That handle is not allowed.",
   owner_name_reserved: "That name is reserved for the site owner.",
   handle_taken: "That handle is already taken.",
   handle_change_used:
-    "You've already used your one free handle change — contact support for another.",
+    "You've already used your one free handle change. Contact support for another.",
 };
 
 export function WelcomeForm({ candidateHandle }: { candidateHandle: string }) {

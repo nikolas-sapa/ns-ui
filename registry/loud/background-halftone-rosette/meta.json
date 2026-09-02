@@ -1,7 +1,7 @@
 {
   "name": "background-halftone-rosette",
   "title": "Background Halftone Rosette",
-  "description": "A full-bleed ambient background of two same-ink halftone dot screens drifting at independent, non-commensurate angles — a real duotone/double-hit moiré rosette, with a coverage gradient keeping the frame edges readable and the visual center where the interference peaks.",
+  "description": "A full-bleed ambient background of two same-ink halftone dot screens drifting at independent, non-commensurate angles: a real duotone/double-hit moiré rosette, with a coverage gradient keeping the frame edges readable and the visual center where the interference peaks.",
   "collection": "loud",
   "tags": ["background", "halftone", "moire", "css", "print", "ambient", "duotone"],
   "useWhen": "a full-bleed backdrop where the texture itself is the point — genuine same-ink dot-overlap moiré drifting forever at rest, pure CSS with zero rAF cost; pick background-gradient-shader instead for a calm moving current of color behind other content, or background-ascii-plasma when the field should read as a procedural ASCII surface rather than a print-process pattern.",

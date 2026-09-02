@@ -1,7 +1,7 @@
 {
   "name": "ring-stain",
   "title": "Ring Stain",
-  "description": "A loader built on the coffee-ring effect: 90 particles drift outward on a capillary-flow velocity profile and pin at the rim, so waiting visibly deposits a denser and denser ring — determinate progress reads as coverage angle, indeterminate progress reads as density, and completion contracts the residue onto a checkmark.",
+  "description": "A loader built on the coffee-ring effect: 90 particles drift outward on a capillary-flow velocity profile and pin at the rim, so waiting visibly deposits a denser and denser ring. Determinate progress reads as coverage angle, indeterminate progress reads as density, and completion contracts the residue onto a checkmark.",
   "collection": "core",
   "tags": [
     "loader",
