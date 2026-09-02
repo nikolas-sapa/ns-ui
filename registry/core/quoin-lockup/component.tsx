@@ -50,11 +50,16 @@ export interface QuoinLockupProps {
 }
 
 const DEFAULT_TILES: QuoinLockupTile[] = [
-  { id: "hero", title: "Imposing stone", body: "Every form is locked before it goes to press.", href: "#" },
-  { id: "tall", title: "Furniture", body: "Quantised in pica units, never continuous.", href: "#" },
-  { id: "wide", title: "Re-key cycle", body: "Quoin by quoin, in a fixed order.", href: "#" },
-  { id: "a", title: "Pressure", body: "Falls, is caught, falls again.", href: "#" },
-  { id: "b", title: "Plane down", body: "Tapped flush with a mallet.", href: "#" },
+  {
+    id: "hero",
+    title: "One workspace, everything in it",
+    body: "Docs, tasks and reviews read from the same record, so nothing drifts out of sync between them.",
+    href: "#",
+  },
+  { id: "tall", title: "Fast on a cold start", body: "Pages stream in as you open them, with no build step to wait on.", href: "#" },
+  { id: "wide", title: "Version history", body: "Roll any document back to an earlier state without leaving the page.", href: "#" },
+  { id: "a", title: "Scoped access", body: "Invite a team and choose exactly what each role can see.", href: "#" },
+  { id: "b", title: "Works offline", body: "Edits queue on the device and merge cleanly the moment you reconnect.", href: "#" },
 ];
 
 // -- real numbers (spec section 5) ------------------------------------------
@@ -95,7 +100,7 @@ const FULL_TILE_GUTTERS: GutterKey[][] = [
   ["gx2", "gy2"], // tall: 1x2, col 3 rows 1-2
   ["gy2", "gy3"], // wide: 2x1, cols 1-2 row 3
   ["gx2", "gy2", "gy3"], // a: 1x1, col 3 row 3
-  ["gy3", "gx1"], // b: 1x1, col 1 row 4
+  ["gy3"], // b: full-width foot course, row 4
 ];
 const COMPACT_TILE_GUTTERS: GutterKey[][] = [
   ["gy1"], // wide: 2x1, cols 1-2 row 1
@@ -207,7 +212,7 @@ function sinkFracFor(p: number, index: number): number {
 
 // tile x-position, as a fraction of the chase width, used only to decide when
 // the planer bar has swept past a given tile (left column vs right column)
-const FULL_TILE_X: number[] = [0.28, 0.83, 0.28, 0.83, 0.17];
+const FULL_TILE_X: number[] = [0.28, 0.83, 0.28, 0.83, 0.5];
 const COMPACT_TILE_X: number[] = [0.5, 0.25, 0.75];
 
 export function QuoinLockup({ tiles = DEFAULT_TILES, planerEvery = 3, className = "" }: QuoinLockupProps) {
@@ -527,25 +532,9 @@ export function QuoinLockup({ tiles = DEFAULT_TILES, planerEvery = 3, className 
           />
         ))}
 
-        {!compact && (
-          // the one cell the tile budget doesn't reach (col 2-3, row 4) —
-          // real furniture fills it, exactly as the real process does: every
-          // empty area in the chase is packed, never left inert
-          <div
-            aria-hidden
-            className="[--fill-a:40%]"
-            style={{
-              gridColumn: "3 / 6",
-              gridRow: "7 / 8",
-              backgroundColor: "color-mix(in srgb, var(--background), var(--foreground) var(--fill-a))",
-            }}
-          />
-        )}
-
         {rows.map((tile, i) => {
           const isHero = !compact && i === 0;
           const commonProps = {
-            key: tile.id,
             ref: (el: HTMLAnchorElement | HTMLButtonElement | null) => {
               if (el) tileRefs.current.set(tile.id, el);
               else tileRefs.current.delete(tile.id);
@@ -556,7 +545,7 @@ export function QuoinLockup({ tiles = DEFAULT_TILES, planerEvery = 3, className 
             onMouseLeave: () => setHoveredId((cur) => (cur === tile.id ? null : cur)),
             onKeyDown: (e: KeyboardEvent<HTMLElement>) => onKeyDown(e, i),
             className:
-              "quoin-lockup-tile group relative isolate flex flex-col justify-between overflow-hidden rounded-sm border p-3 text-left transition-colors duration-150 " +
+              "quoin-lockup-tile group relative isolate flex flex-col justify-start gap-1 overflow-hidden rounded-sm border p-3 text-left transition-colors duration-150 " +
               "[--face-mix:10%] dark:[--face-mix:16%] " +
               "border-transparent hover:[--face-mix:12%] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent",
             style: {
@@ -574,16 +563,22 @@ export function QuoinLockup({ tiles = DEFAULT_TILES, planerEvery = 3, className 
           };
           const content = (
             <>
-              <h3 className={`font-medium text-foreground ${isHero ? "text-base" : "text-sm"}`}>{tile.title}</h3>
-              {tile.body && <p className="mt-1 text-xs text-ns-muted">{tile.body}</p>}
+              <h3 className={`font-medium leading-snug text-foreground ${isHero ? "text-base" : "text-sm"}`}>
+                {tile.title}
+              </h3>
+              {tile.body && (
+                <p className={`text-ns-muted ${isHero ? "max-w-[34ch] text-sm leading-snug" : "text-xs leading-snug"}`}>
+                  {tile.body}
+                </p>
+              )}
             </>
           );
           return tile.href ? (
-            <a {...commonProps} href={tile.href}>
+            <a key={tile.id} {...commonProps} href={tile.href}>
               {content}
             </a>
           ) : (
-            <button {...commonProps} type="button">
+            <button key={tile.id} {...commonProps} type="button">
               {content}
             </button>
           );
@@ -617,7 +612,7 @@ function gridAreaFor(key: string, compact: boolean, axis: "col" | "row"): string
   }
   const colOf = (c1: number, c2 = c1) => `${2 * c1 - 1} / ${2 * c2}`;
   const rowOf = (r1: number, r2 = r1) => `${2 * r1 - 1} / ${2 * r2}`;
-  if (key === "gx1") return axis === "col" ? "2 / 3" : "1 / 8";
+  if (key === "gx1") return axis === "col" ? "2 / 3" : "1 / 7";
   if (key === "gx2") return axis === "col" ? "4 / 5" : "1 / 6";
   if (key === "gy1") return axis === "row" ? "2 / 3" : "1 / 6";
   if (key === "gy2") return axis === "row" ? "4 / 5" : "1 / 6";
@@ -631,8 +626,9 @@ function gridAreaFor(key: string, compact: boolean, axis: "col" | "row"): string
       return axis === "col" ? colOf(1, 2) : rowOf(3);
     case "tile-3": // a: col 3, row 3
       return axis === "col" ? colOf(3) : rowOf(3);
-    case "tile-4": // b: col 1, row 4
-      return axis === "col" ? colOf(1) : rowOf(4);
+    case "tile-4": // b: cols 1-3, row 4 — the foot course runs the full width,
+      // so the chase is packed edge to edge and no cell is left inert
+      return axis === "col" ? colOf(1, 3) : rowOf(4);
     default:
       return rawLine(1);
   }

@@ -577,7 +577,7 @@ export function DamaskFloatCard({ heading, body, iconPath, href, className = "" 
       ref={hostRef}
       onPointerEnter={onPointerEnter}
       onPointerLeave={onPointerLeave}
-      className={`ns-df-card relative flex min-h-[220px] flex-col overflow-hidden rounded-lg border border-border ${className}`}
+      className={`ns-df-card relative flex min-h-[150px] flex-col overflow-hidden rounded-lg border border-border ${className}`}
     >
       <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" aria-hidden="true" />
       {href ? (
@@ -594,10 +594,10 @@ export function DamaskFloatCard({ heading, body, iconPath, href, className = "" 
       <div
         ref={patchElRef}
         id={patchId}
-        className="relative z-10 mt-auto flex flex-col gap-1.5 rounded-md bg-background/70 p-4 backdrop-blur-sm"
+        className="relative z-10 mt-auto flex flex-col gap-1 rounded-md bg-background/70 p-3.5 backdrop-blur-sm"
       >
-        <h3 className="text-base font-semibold tracking-tight text-foreground">{heading}</h3>
-        <p className="text-sm leading-relaxed text-ns-muted">{body}</p>
+        <h3 className="text-[0.9375rem] font-semibold leading-snug tracking-tight text-foreground">{heading}</h3>
+        <p className="text-[0.8125rem] leading-snug text-ns-muted">{body}</p>
       </div>
     </div>
   );

@@ -58,7 +58,7 @@ export interface SlateTestimonial {
 export interface SlateGaugeProps {
   /** Testimonials, filled row-major (course 1 left-to-right, then course 2, ...). */
   items?: SlateTestimonial[];
-  /** Slates per course. @default 2 */
+  /** Slates per course. @default 3 */
   columns?: number;
   /** Heading rendered above the wall. */
   heading?: string;
@@ -67,16 +67,43 @@ export interface SlateGaugeProps {
 
 // ---- geometry: exactly the spec's course table ---------------------------
 // gauge = (h - LAP - HEAD) / 2, diminishing ~0.915x per course.
-const LAP = 44;
+const LAP = 20;
 const HEAD = 8;
 const COURSE_H = [132, 120, 110, 101, 94];
-const COURSES = COURSE_H.map((h) => ({ h, gauge: (h - LAP - HEAD) / 2 }));
+
+// Type metrics, in the same unscaled design units as the course table — the
+// quote is rendered at FONT_PX * scale with LINE_RATIO leading and PAD_Y *
+// scale of padding, so a course's exposure can be expressed here once and
+// then simply multiplied by the fit scale like every other box dimension.
+const FONT_PX = 10;
+const LINE_RATIO = 1.36;
+const LINE_PX = FONT_PX * LINE_RATIO;
+const PAD_Y = 6;
+
+// A course's EXPOSURE is its computed gauge quantised down to a whole number
+// of text lines. The gauge is what the slater derives; the quantisation is
+// what stops the lap from falling through the middle of a line of type, which
+// is the difference between reading as a slate lapping its neighbour and
+// reading as a sentence that got cut off.
+function exposureFor(gauge: number): number {
+  // Only the HEAD padding is inside the exposure. Counting the foot padding
+  // too left exactly one padding's worth of the next line showing through the
+  // bottom of the strip — a sliced half-line of attribution, which is the one
+  // thing that reads as broken rather than as lapped.
+  const lines = Math.max(2, Math.floor((gauge - PAD_Y) / LINE_PX));
+  return PAD_Y + lines * LINE_PX;
+}
+
+const COURSES = COURSE_H.map((h) => {
+  const gauge = (h - LAP - HEAD) / 2;
+  return { h, gauge, exposure: exposureFor(gauge) };
+});
 const SLATE_W = 168;
 const COL_OFFSET = SLATE_W / 2; // half a slate — breaks the side lap
 const NAIL_Y = 18; // rotation origin, below the head
 const MIN_HIT = 44; // WCAG minimum, padded upward into transparent space only
-const SCALE_MIN = MIN_HIT / Math.min(...COURSE_H); // floor: smallest course never drops under 44px
-const SCALE_MAX = 1.4;
+const SCALE_MIN = MIN_HIT / Math.min(...COURSES.map((c) => c.h)); // floor: smallest course never drops under 44px
+const SCALE_MAX = 1.6;
 
 const GUST_PERIOD = 4.8; // s — spec's 260px/s at the 1200px reference wall
 const GUST_WIDTH = 190; // px
@@ -208,6 +235,8 @@ interface Tokens {
   face: string;
   margin: string;
   shadow: string;
+  edge: string;
+  backing: string;
   riven: string;
   ink: string;
   inkMuted: string;
@@ -217,27 +246,63 @@ function readTokens(): Tokens {
   const cs = getComputedStyle(document.documentElement);
   const bg = cs.getPropertyValue("--background").trim() || "#ffffff";
   const fg = cs.getPropertyValue("--foreground").trim() || "#171717";
-  const muted = cs.getPropertyValue("--ns-muted").trim() || "#4d4d4d";
   const dark = lightnessOf(bg) < 0.5;
 
-  // slate is a dark stone in both themes; the page is not — section 6.
-  const face = withLightness(fg, dark ? 0.52 : 0.34);
-  const margin = shiftLightness(face, dark ? 0.05 : 0.06);
-  const shadow = shiftLightness(margin, dark ? -0.1 : -0.12);
+  // Section 6, retuned for card scale. The wall is a mid-value stone that
+  // sits BELOW the page in dark and ABOVE the page in light — a dark stone
+  // on a white page read as one undifferentiated slab, because every
+  // internal step (margin, lap shadow, arris) had to fit under the face's
+  // own lightness. Each theme therefore gets its own absolute lightness
+  // ladder rather than a shared set of deltas.
+  const L = dark
+    ? { face: 0.44, margin: 0.53, shadow: 0.19, edge: 0.72, backing: 0.2, ink: 0.08, inkMuted: 0.22 }
+    : { face: 0.66, margin: 0.76, shadow: 0.5, edge: 0.9, backing: 0.46, ink: 0.14, inkMuted: 0.32 };
+
+  const face = withLightness(fg, L.face);
+  const margin = withLightness(fg, L.margin);
+  // the lap shadow carries the whole image in a monochrome wall: measured at
+  // -0.10L it was invisible at card scale and the courses read as one slab
+  const shadow = withLightness(fg, L.shadow);
+  const edge = withLightness(fg, L.edge);
+  // the batten behind the wall: the half-slate stagger leaves a gap at the
+  // start of every other course, and against the page background those gaps
+  // read as missing tiles rather than as the wall carrying on behind
+  const backing = withLightness(fg, L.backing);
   const riven = shiftLightness(face, 0.03);
-  // ink is darker than slate in both themes, no glow inversion
-  const ink = dark ? bg : fg;
-  const inkMuted = muted;
-  return { face, margin, shadow, riven, ink, inkMuted };
+  const ink = withLightness(fg, L.ink);
+  const inkMuted = withLightness(fg, L.inkMuted);
+  return { face, margin, shadow, edge, backing, riven, ink, inkMuted };
 }
 
 // ---- default placeholder content ------------------------------------------
 
-const DEFAULT_ITEMS: SlateTestimonial[] = Array.from({ length: 10 }, (_, i) => ({
+// Illustrative placeholder quotes: deliberately generic, attributed to a role
+// rather than to any person or company, so nothing here reads as a real
+// customer claim. Swap `items` for your own.
+const DEFAULT_QUOTES: { quote: string; name: string; role: string }[] = [
+  { quote: "We moved the whole team across in one afternoon.", name: "Engineering lead", role: "platform" },
+  { quote: "It replaced four tools we were stitching together.", name: "Product manager", role: "growth" },
+  { quote: "The defaults are sensible enough to ship on.", name: "Founder", role: "two-person studio" },
+  { quote: "Onboarding takes a morning, not a fortnight.", name: "Head of design", role: "in-house team" },
+  { quote: "Nobody argues about which copy is current now.", name: "Operations lead", role: "support" },
+  { quote: "Tickets about the old export flow stopped.", name: "Customer success", role: "EMEA" },
+  { quote: "It fits how we already work, not the reverse.", name: "Staff engineer", role: "infrastructure" },
+  { quote: "The audit trail answered a question we dreaded.", name: "Security lead", role: "compliance" },
+  { quote: "Rolling a mistake back is a single click.", name: "Tech lead", role: "web" },
+  { quote: "Design and engineering read the same source.", name: "Design engineer", role: "design systems" },
+  { quote: "We stopped keeping a spreadsheet nobody trusted.", name: "Analytics lead", role: "data" },
+  { quote: "Quiet, fast, and it has never lost our work.", name: "Principal engineer", role: "core services" },
+  { quote: "The migration was the boring part of the quarter.", name: "Delivery manager", role: "programmes" },
+  { quote: "It is the first internal tool people ask for.", name: "Chief of staff", role: "operations" },
+  { quote: "Two years in, we have not outgrown it.", name: "Director of engineering", role: "product" },
+  { quote: "Handover notes write themselves now.", name: "Programme lead", role: "delivery" },
+  { quote: "Nothing about it has surprised us badly.", name: "Platform architect", role: "reliability" },
+  { quote: "The people who resisted it use it most.", name: "Team lead", role: "customer platform" },
+];
+
+const DEFAULT_ITEMS: SlateTestimonial[] = DEFAULT_QUOTES.map((q, i) => ({
   id: `slate-${i + 1}`,
-  quote: "Placeholder testimonial sentence one. Placeholder testimonial sentence two.",
-  name: `Name Placeholder ${i + 1}`,
-  role: "Role Placeholder, Company Placeholder",
+  ...q,
 }));
 
 interface Slate {
@@ -248,6 +313,7 @@ interface Slate {
   top: number; // design px, unscaled — top of this course's exposed gauge
   h: number;
   gauge: number;
+  exposure: number;
   centreNailed: boolean;
 }
 
@@ -255,7 +321,7 @@ function layout(items: SlateTestimonial[], columns: number): { slates: Slate[]; 
   const cols = Math.max(1, columns);
   const rows = Math.ceil(items.length / cols);
   const courseTop: number[] = [0];
-  for (let r = 0; r < rows; r++) courseTop.push(courseTop[r] + COURSES[r % COURSES.length].gauge);
+  for (let r = 0; r < rows; r++) courseTop.push(courseTop[r] + COURSES[r % COURSES.length].exposure);
 
   const slates: Slate[] = items.map((_, i) => {
     const row = Math.floor(i / cols);
@@ -270,19 +336,20 @@ function layout(items: SlateTestimonial[], columns: number): { slates: Slate[]; 
       top: courseTop[row],
       h: course.h,
       gauge: course.gauge,
+      exposure: course.exposure,
       centreNailed: isCentreNailed(i),
     };
   });
 
   const naturalW = cols * SLATE_W + COL_OFFSET;
-  const naturalH = courseTop[rows]; // sum of every course's own gauge — the last course's excess is trimmed
+  const naturalH = courseTop[rows]; // sum of every course's exposure — the last course's excess is trimmed
   return { slates, naturalW, naturalH };
 }
 
 export function SlateGauge({
   items = DEFAULT_ITEMS,
-  columns = 2,
-  heading = "Section heading placeholder",
+  columns = 3,
+  heading = "What teams say",
   className = "",
 }: SlateGaugeProps) {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -337,6 +404,8 @@ export function SlateGauge({
       wall.style.setProperty("--slate-face", tokens.face);
       wall.style.setProperty("--slate-margin", tokens.margin);
       wall.style.setProperty("--slate-shadow-color", tokens.shadow);
+      wall.style.setProperty("--slate-edge", tokens.edge);
+      wall.style.setProperty("--slate-backing", tokens.backing);
       wall.style.setProperty("--slate-riven", tokens.riven);
       wall.style.setProperty("--slate-ink", tokens.ink);
       wall.style.setProperty("--slate-ink-muted", tokens.inkMuted);
@@ -504,11 +573,36 @@ export function SlateGauge({
       <div
         ref={wallRef}
         className="relative shrink-0"
-        style={{ width: naturalW * scale, height: naturalH * scale }}
+        // the eaves rail occupies its own band below the last course rather
+        // than overlaying it — laid on top it clipped the foot course's last
+        // line, which is the exact fault it exists to prevent
+        style={{ width: naturalW * scale, height: naturalH * scale + Math.max(4, 6 * scale) }}
       >
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-0 rounded-[1px]"
+          style={{ backgroundColor: "var(--slate-backing)" }}
+        />
+        {/* The eaves. Every interior course is cut off by the slate lapping
+            over it, which is what reads as overlap; the bottom course has
+            nothing above it, so without a rail its cut edge reads as
+            truncated text instead of as the foot of the wall. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 z-[1001]"
+          style={{
+            bottom: 0,
+            height: Math.max(4, 6 * scale),
+            backgroundColor: "var(--slate-shadow-color)",
+            boxShadow: [
+              `inset 0 ${Math.max(1, scale)}px 0 0 var(--slate-edge)`,
+              `0 ${-3 * scale}px ${8 * scale}px ${-2 * scale}px var(--slate-shadow-color)`,
+            ].join(", "),
+          }}
+        />
         {slates.map((s) => {
           const isLifted = liftedIndex === s.index;
-          const padAbove = Math.max(0, MIN_HIT - s.gauge * scale);
+          const padAbove = Math.max(0, MIN_HIT - s.exposure * scale);
           return (
             <button
               key={items[s.index].id}
@@ -532,7 +626,7 @@ export function SlateGauge({
                 left: s.x * scale,
                 top: s.top * scale - padAbove,
                 width: SLATE_W * scale,
-                height: s.gauge * scale + padAbove,
+                height: s.exposure * scale + padAbove,
                 // resting bands never overlap (each course occupies exactly
                 // its own gauge, edge to edge), so z only has to win once a
                 // slate is lifted and needs to paint over the course below it
@@ -552,14 +646,24 @@ export function SlateGauge({
                   // at rest the face IS its gauge — only the exposed margin
                   // is ever painted; lifting grows it to the slate's real
                   // height, which is what reveals the rest of the quote
-                  height: (isLifted ? s.h : s.gauge) * scale,
+                  height: (isLifted ? s.h : s.exposure) * scale,
                   transformOrigin: `50% ${NAIL_Y * scale}px`,
                   // no colour fallback here on purpose: before the token read
                   // commits (useLayoutEffect, pre-paint) --slate-shadow-color
                   // is unset, which makes the whole box-shadow invalid and
                   // therefore simply not painted, rather than painted with a
                   // literal placeholder colour
-                  boxShadow: `inset calc(var(--wall-azimuth, 0) * 0.4px) 3px 5px -1px var(--slate-shadow-color)`,
+                  // one cast shadow onto the course below (this is what makes
+                  // the lap read as a slate sitting OVER its neighbour rather
+                  // than as text truncated at a hard edge), one inset seam,
+                  // and a sky-lit top arris. All three swing with the single
+                  // root-level azimuth property.
+                  boxShadow: [
+                    `0 ${-1 * Math.max(1, scale)}px 0 0 var(--slate-shadow-color)`,
+                    `0 ${-3 * scale}px ${7 * scale}px ${-1 * scale}px var(--slate-shadow-color)`,
+                    `inset calc(var(--wall-azimuth, 0) * 0.4px) ${3 * scale}px ${5 * scale}px ${-1 * scale}px var(--slate-shadow-color)`,
+                    `inset 0 ${Math.max(1, scale)}px 0 0 var(--slate-edge)`,
+                  ].join(", "),
                   translate: `0 calc(var(--gust-lift, 0) * -1px)`,
                 }}
               >
@@ -584,14 +688,28 @@ export function SlateGauge({
                 <div
                   aria-hidden="true"
                   className="absolute inset-x-0 top-0 bg-[var(--slate-margin)] opacity-40"
-                  style={{ height: s.gauge * scale }}
+                  style={{ height: s.exposure * scale }}
                 />
-                <div className="relative flex h-full flex-col gap-1 p-1.5" style={{ color: "var(--slate-ink)" }}>
+                <div
+                  className="relative flex h-full flex-col"
+                  style={{
+                    color: "var(--slate-ink)",
+                    padding: `${PAD_Y * scale}px ${8 * scale}px`,
+                    // type is scaled with the wall, not left at a fixed pixel
+                    // size — a fixed 10px against a gauge that grows with the
+                    // fit scale is what left a half line at every lap
+                    fontSize: `${FONT_PX * scale}px`,
+                    lineHeight: LINE_RATIO,
+                  }}
+                >
                   {/* always full text in the DOM, never display:none — the
                       gauge-height article above is what occludes it visually */}
-                  <blockquote className="m-0 text-[10px] leading-[13px]">{items[s.index].quote}</blockquote>
-                  <footer className="m-0 mt-auto text-[9px]" style={{ color: "var(--slate-ink-muted)" }}>
-                    {items[s.index].name} — {items[s.index].role}
+                  <blockquote className="m-0">&ldquo;{items[s.index].quote}&rdquo;</blockquote>
+                  <footer
+                    className="m-0 font-medium"
+                    style={{ color: "var(--slate-ink-muted)", fontSize: `${FONT_PX * scale}px` }}
+                  >
+                    {items[s.index].name} &middot; {items[s.index].role}
                   </footer>
                 </div>
               </article>
