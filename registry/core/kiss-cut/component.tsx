@@ -86,7 +86,15 @@ interface RGB {
 }
 
 function hexToRgb(hex: string): RGB | null {
-  const clean = hex.trim().replace("#", "");
+  // Tokens are authored in both notations: this project's light --background is
+  // "#fff" while every other stop is six digits. A six-digit-only parser
+  // returned null for light theme, readTokens() bailed, and the component never
+  // sized or painted its canvas at all — alive in dark, a dead 300x150 default
+  // canvas in light.
+  let clean = hex.trim().replace("#", "");
+  if (clean.length === 3) {
+    clean = clean[0] + clean[0] + clean[1] + clean[1] + clean[2] + clean[2];
+  }
   if (clean.length !== 6) return null;
   const r = parseInt(clean.slice(0, 2), 16);
   const g = parseInt(clean.slice(2, 4), 16);

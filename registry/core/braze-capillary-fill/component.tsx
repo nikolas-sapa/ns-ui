@@ -317,7 +317,13 @@ function easeOutBack(x: number): number {
 /** #rrggbb -> rgba(...) string at the given alpha. Arithmetic on the token's
  * own channels only — never a new literal hue. */
 function hexWithAlpha(hex: string, alpha: number): string {
-  const clean = hex.replace("#", "");
+  // Expand 3-digit shorthand first: this project's light --background is "#fff",
+  // and returning it unchanged silently dropped the alpha, turning every fade
+  // opaque in light theme while dark theme (6-digit tokens) looked correct.
+  let clean = hex.trim().replace("#", "");
+  if (clean.length === 3) {
+    clean = clean[0] + clean[0] + clean[1] + clean[1] + clean[2] + clean[2];
+  }
   if (clean.length !== 6) return hex;
   const r = parseInt(clean.slice(0, 2), 16);
   const g = parseInt(clean.slice(2, 4), 16);

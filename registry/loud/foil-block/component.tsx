@@ -863,10 +863,11 @@ export function FoilBlock({
     const onActivate = () => {
       if (!staticMode) strikeNow();
     };
+    // Both branches of the CTA are natively activatable: a <button> fires click
+    // on Enter AND Space, an <a href> fires it on Enter. A keydown listener that
+    // also called onActivate struck the die twice per key press, and on the
+    // anchor it swallowed Space, which should scroll the page.
     buttonEl.addEventListener("click", onActivate);
-    buttonEl.addEventListener("keydown", (e: KeyboardEvent) => {
-      if (e.key === "Enter" || e.key === " ") onActivate();
-    });
 
     let poll = 0;
     let lastHeadline = headlineRef.current;
