@@ -4,10 +4,10 @@ import { FlyingSplice } from "./component";
 
 export default function FlyingSpliceDemo() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 py-16">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-32 px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-ns-muted">ns-ui / flying-splice</p>
 
-      <div className="h-[220px] w-full max-w-2xl rounded-[12px] border border-border">
+      <div className="ns-fs-card h-[220px] w-full max-w-2xl rounded-[12px] border border-border">
         <FlyingSplice />
       </div>
 

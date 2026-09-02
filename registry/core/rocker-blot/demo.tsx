@@ -9,7 +9,7 @@ import { RockerBlot } from "./component";
 export default function RockerBlotDemo() {
   return (
     <main className="flex h-screen w-full items-center justify-center bg-background p-6">
-      <RockerBlot onReferral={() => {}} />
+      <RockerBlot className="ns-rb-card" onReferral={() => {}} />
     </main>
   );
 }
