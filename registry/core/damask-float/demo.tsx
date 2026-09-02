@@ -16,54 +16,51 @@ const PLUS_PATH = "M9 2h6v7h7v6h-7v7H9v-7H2V9h7z";
 
 const FEATURES = [
   {
-    heading: "Reciprocal structure",
-    body: "Ground and figure are the same thread in the same colour, only the float direction reverses.",
+    heading: "One source of truth",
+    body: "Every surface reads the same record, so a change lands everywhere at once.",
     iconPath: CIRCLE_PATH,
   },
   {
-    heading: "Anisotropic read",
-    body: "Reflectance is carried by thread azimuth, not by pigment, so the surface has no hue to remove.",
+    heading: "Typed end to end",
+    body: "Your schema generates the client, so a wrong field fails at build time.",
     iconPath: DIAMOND_PATH,
   },
   {
-    heading: "Binding points",
-    body: "Every fifth end breaks the float on a counter-step of two, which is what keeps a face from going flat.",
+    heading: "Permissions per field",
+    body: "Scope what a role can read or write without forking the data model.",
     iconPath: TRIANGLE_PATH,
   },
   {
-    heading: "Loom sway",
-    body: "The grain's azimuth wanders on two incommensurate periods, so the shimmer never repeats a beat.",
+    heading: "Live collaboration",
+    body: "Cursors, comments and edits arrive in order, with no refresh.",
     iconPath: BOLT_PATH,
   },
   {
-    heading: "Take-up",
-    body: "The cloth advances under tension and wraps continuously, entering the frame new every pass.",
+    heading: "Complete audit trail",
+    body: "Every write records who changed what and when, and stays queryable.",
     iconPath: HEXAGON_PATH,
   },
   {
-    heading: "Front reversal",
-    body: "Hover flips figure and ground from the pointer outward, no fade, no translate, no crossfade.",
+    heading: "Bring your own data",
+    body: "Import existing tables as they are and map the columns later.",
     iconPath: PLUS_PATH,
   },
 ];
 
 export default function DamaskFloatDemo() {
   return (
-    <main className="flex min-h-screen flex-col bg-background text-foreground">
-      <section className="mx-auto flex w-full max-w-5xl flex-1 flex-col justify-center gap-10 px-6 py-20">
-        <header className="max-w-xl">
-          <p className="font-mono text-xs uppercase tracking-widest text-ns-muted">ns-ui / damask-float</p>
-          <h1 className="mt-4 text-3xl font-semibold tracking-tight">One cloth, six cells</h1>
-          <p className="mt-3 text-sm leading-relaxed text-ns-muted">
-            Every card below is a piece of the same woven surface — the take-up and the loom&apos;s sway run
-            across the whole grid unforced. Hover a card and its satin reverses: figure becomes ground with
-            no fade and no translate, exactly as a real damask flips when you turn it.
-          </p>
+    <main className="flex h-screen w-full flex-col overflow-hidden bg-background text-foreground">
+      {/* the whole section is height-bounded so all six cells compose inside
+          the card frame instead of running off its bottom edge */}
+      <section className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-5 px-6 py-6">
+        <header className="shrink-0">
+          <p className="font-mono text-[11px] uppercase tracking-widest text-ns-muted">ns-ui / damask-float</p>
+          <h1 className="mt-2 text-xl font-semibold tracking-tight">Built on one surface</h1>
         </header>
 
         <DamaskFloatGrid
           aria-label="Feature grid woven as one reversible damask cloth"
-          className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          className="grid min-h-0 flex-1 grid-cols-1 gap-3 sm:grid-cols-2 sm:grid-rows-3 md:grid-cols-3 md:grid-rows-2"
         >
           {FEATURES.map((f) => (
             <DamaskFloatCard key={f.heading} heading={f.heading} body={f.body} iconPath={f.iconPath} />

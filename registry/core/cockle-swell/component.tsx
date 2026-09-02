@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { Fragment, useEffect, useRef } from "react";
 
 // ---------------------------------------------------------------------------
 // CockleSwell — a pull-quote block printed on a sheet of paper that is
@@ -114,9 +114,9 @@ const CONTRAST_FLOOR = 7.0;
 const TEXT_DILATE_PX = 14;
 
 const DEFAULT_QUOTE =
-  "Placeholder pull-quote copy — swap this for a real testimonial. The block wraps to three or four lines about this length and stays readable while the sheet keeps moving underneath it.";
-const DEFAULT_AUTHOR = "Placeholder Name";
-const DEFAULT_ROLE = "Placeholder Title, Placeholder Company";
+  "We moved the whole team over in an afternoon and never went back to the old tooling.";
+const DEFAULT_AUTHOR = "Engineering lead";
+const DEFAULT_ROLE = "internal platform team";
 
 export interface CockleSwellProps {
   quote?: string;
@@ -744,16 +744,17 @@ export function CockleSwell({
           <blockquote className="m-0 text-balance text-[1.05rem] font-medium leading-relaxed text-foreground sm:text-xl">
             <span aria-hidden="true">“</span>
             {chunks.map((chunk, i) => (
-              <span
-                key={i}
-                ref={(el) => {
-                  spanRefs.current[i] = el;
-                }}
-                className="inline-block will-change-transform"
-              >
-                {chunk}
-                {i < chunks.length - 1 ? " " : ""}
-              </span>
+              <Fragment key={i}>
+                <span
+                  ref={(el) => {
+                    spanRefs.current[i] = el;
+                  }}
+                  className="inline-block will-change-transform"
+                >
+                  {chunk}
+                </span>
+                {i < chunks.length - 1 ? " " : null}
+              </Fragment>
             ))}
             <span aria-hidden="true">”</span>
           </blockquote>
