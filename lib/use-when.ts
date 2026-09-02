@@ -9,7 +9,20 @@ import path from "node:path";
  * reads CHANGELOG.md. It feeds the search haystack: it is the only place the
  * registry says things like "reacts to the cursor" in plain language.
  */
+let cached: Record<string, string> | null = null;
+
+/**
+ * Memoized: `/components/[name]` calls this once per page, and
+ * `generateStaticParams` prerenders one page per registry item — so an
+ * unmemoized scan is 534 readdir/readFileSync/JSON.parse passes over every
+ * `meta.json` in the tree PER PAGE (measured: 1.7s for one pass, 534 file
+ * reads, to return the single string that page needs). The sidecars cannot
+ * change inside a single build or a single dev request, so the scan is done
+ * once per process. Dev picks up an edited `meta.json` on the module reload
+ * that a `registry/` change already triggers.
+ */
 export function loadUseWhen(): Record<string, string> {
+  if (cached) return cached;
   const root = path.join(process.cwd(), "registry");
   const out: Record<string, string> = {};
   for (const collection of ["core", "loud"]) {
@@ -25,5 +38,6 @@ export function loadUseWhen(): Record<string, string> {
       }
     }
   }
+  cached = out;
   return out;
 }

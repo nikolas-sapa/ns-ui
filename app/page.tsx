@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import registry from "@/registry.json";
-import { loadUseWhen } from "@/lib/use-when";
 import { kindOf } from "@/lib/kind";
+import { categorize } from "@/lib/search-categories";
 import order from "@/lib/component-order.json";
 import { FEATURED } from "@/lib/featured";
 import { getStarCount } from "@/lib/github-stars";
@@ -42,18 +42,25 @@ const featuredRank = (name: string) =>
 const rankByName = new Map(registry.items.map((i) => [i.name, i.meta?.rank]));
 const componentRank = (name: string) => rankByName.get(name) ?? Number.MAX_SAFE_INTEGER;
 
-/** The lead sentence carries the component's job; the rest is build detail. */
-const firstSentence = (text: string) => text.split(/(?<=\.)\s/, 1)[0] ?? "";
-
-/**
- * `useWhen` is written as "use for X, not Y" — and the Y half made searching
- * lie: button-glass says "not a destructive action needing deliberate
- * confirmation", so it surfaced for "confirm". The negative clause is guidance
- * for a reader, never a match target, so it is dropped here.
- */
-const dropNegatives = (text: string) => text.replace(/,\s*not\b[^.;]*/g, "");
-
-const useWhen = loadUseWhen();
+// Category membership, resolved here rather than on the client. It used to be
+// derived there by handing every component's `meta.tags` across the boundary
+// and running `categorize()` over them — 41.8 KB of tags in the document to
+// produce, per component, one to three short category ids. The client needs
+// the ids (chip counts on first paint, the category filter, the "other"
+// catch-all), never the tags, and `categorize()` is the same pure function
+// the sidebar and /categories call, so nothing can disagree by being computed
+// on a different side of the wire.
+//
+// The rest of the search haystack — tags, useWhen, the instruction's lead
+// sentence — is not here at all any more: it is served from
+// /search-index.json (lib/search-corpus.ts) and fetched on the first sign of
+// a search.
+const memberships = categorize(
+  registry.items.map((item) => ({
+    name: item.name,
+    tags: item.meta?.tags ?? [],
+  })),
+);
 
 const items: ShowcaseEntry[] = registry.items
   .map((item) => ({
@@ -63,13 +70,7 @@ const items: ShowcaseEntry[] = registry.items
     collection: item.meta?.collection ?? "core",
     // Plain-language label beside the metaphorical name — see lib/kind.ts.
     kind: kindOf(item.meta?.tags),
-    // Search matches tags too, so the projection carries them to the client.
-    tags: item.meta?.tags ?? [],
-    // …and the two plainest-spoken fields the registry has, so a descriptive
-    // query ("reacts to the cursor") finds something.
-    prose: dropNegatives(
-      `${useWhen[item.name] ?? ""} ${firstSentence(item.meta?.instruction ?? "")}`,
-    ).trim(),
+    cats: memberships.get(item.name) ?? [],
     order: recency(item.name),
     isNew: recency(item.name) < NEW_COUNT,
   }))
@@ -86,6 +87,18 @@ const featured = [...featuredOrder.keys()];
 // Count comes from `registry.items.length` at build time, not a hardcoded
 // number — this codebase has a history of stale counts (218, 222, 223) baked
 // in as literals that drifted the moment a component was added or removed.
+//
+// `numberOfItems` still reports the whole registry; `itemListElement`
+// enumerates only the featured rail. Measured, the full enumeration was
+// 69.3 KB of the homepage document — the single largest thing on it that no
+// visitor ever sees. It bought nothing: `app/sitemap.ts` already lists every
+// `/components/<name>` URL, which is where crawlers look for enumeration,
+// and `/categories/<id>` server-renders the members of each category as real
+// links. A partial `ItemList` under a correct `numberOfItems` is the shape
+// schema.org documents for a paged/curated listing, so this is not a lie
+// about the collection's size — it is the excerpt this page actually shows.
+const listed = FEATURED.filter((name) => registryNames.has(name));
+const titleByName = new Map(registry.items.map((i) => [i.name, i.title]));
 const collectionPageJsonLd = {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
@@ -96,11 +109,11 @@ const collectionPageJsonLd = {
   mainEntity: {
     "@type": "ItemList",
     numberOfItems: registry.items.length,
-    itemListElement: registry.items.map((item, i) => ({
+    itemListElement: listed.map((name, i) => ({
       "@type": "ListItem",
       position: i + 1,
-      url: `${REGISTRY_ORIGIN}/components/${item.name}`,
-      name: item.title,
+      url: `${REGISTRY_ORIGIN}/components/${name}`,
+      name: titleByName.get(name) ?? name,
     })),
   },
 };
@@ -117,11 +130,14 @@ export default async function Home() {
   return (
     <>
       <Showcase items={items} featured={featured} stars={stars} />
-      {/* The catalog listing goes LAST: it serializes ~55KB of ItemList for
-          the full registry, and while it sat ahead of the markup it pushed
-          this page's <h1> to byte 63,882 — past where agents that truncate a
-          fetch stop reading, which is why an audit reported "no H1" on a page
-          that has always server-rendered one.
+      {/* The catalog listing goes LAST: it used to serialize an ItemList for
+          the full registry (~69KB measured), and while it sat ahead of the
+          markup it pushed this page's <h1> to byte 63,882 — past where agents
+          that truncate a fetch stop reading, which is why an audit reported
+          "no H1" on a page that has always server-rendered one. It is small
+          now that it enumerates only the featured rail, but it stays here:
+          nothing needs it early, and last is the position that cannot
+          regress the <h1> if the list ever grows again.
 
           The identity graph (SoftwareApplication + Organization) does NOT
           live here for the mirror-image reason: moved down with this block,

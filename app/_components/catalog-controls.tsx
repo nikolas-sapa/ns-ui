@@ -51,6 +51,7 @@ export function CatalogControls({
   totalCount,
   filtered,
   onClearAll,
+  onSearchIntent,
 }: {
   filter: Filter;
   onFilter: (f: Filter) => void;
@@ -70,6 +71,12 @@ export function CatalogControls({
   totalCount: number;
   filtered: boolean;
   onClearAll: () => void;
+  /** Fires the moment someone reaches for search — focus, or the "/"
+   *  shortcut. The catalog's search corpus is fetched rather than shipped
+   *  (see lib/search-corpus.ts), and this is the earliest honest signal that
+   *  it is about to be needed, a keystroke or two before the first one
+   *  lands. */
+  onSearchIntent?: () => void;
 }) {
   const searchRef = useRef<HTMLInputElement | null>(null);
   const barRef = useRef<HTMLDivElement | null>(null);
@@ -203,6 +210,7 @@ export function CatalogControls({
               id="component-search"
               type="search"
               value={query}
+              onFocus={() => onSearchIntent?.()}
               onChange={(e) => onQuery(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Escape" && query) {

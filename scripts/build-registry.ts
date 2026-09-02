@@ -165,4 +165,13 @@ try {
   // No order file yet (fresh clone before the first order:build) — not worth
   // failing a build over.
 }
-execFileSync("npx", ["shadcn", "build"], { cwd: ROOT, stdio: "inherit" });
+// The locally installed binary, not `npx`. `npx shadcn` re-resolves the
+// package on every call and reaches the npm registry to do it: measured back
+// to back on the same machine, `npx shadcn build` took 34.1s wall against
+// 8.8s for `node_modules/.bin/shadcn build`, and a bare `npx shadcn
+// --version` alone took 20.0s. That ~25s is paid by `npm run build`,
+// `predev`, `pretypecheck` and `preverify` — i.e. every single dev-loop
+// entry point — for nothing, since the version that runs is the pinned
+// devDependency either way.
+const shadcnBin = join(ROOT, "node_modules", ".bin", "shadcn");
+execFileSync(shadcnBin, ["build"], { cwd: ROOT, stdio: "inherit" });
