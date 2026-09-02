@@ -72,14 +72,18 @@ const DIE_EDGE_LOSS_C = 9;
 const DIE_EDGE_BAND_PX = 6;
 const TEMP_THRESHOLD_C = 96;
 const PRESSURE_MEAN_MPA = 0.42;
-const PRESSURE_AMP_MPA = 0.11;
-const PRESSURE_THRESHOLD_MPA = 0.34;
-const PRESSURE_DRIFT_HZ = 0.014;
+const PRESSURE_AMP_MPA = 0.09;
+// 0.26 against a 0.42 mean: the press is set up to make ready, so the normal
+// outcome is a mostly-solid strike with ragged local voids where a lobe digs
+// under the floor — never the all-or-nothing whole-word miss a 0.34 floor
+// produced, which left the headline unstruck for tens of seconds at a time.
+const PRESSURE_THRESHOLD_MPA = 0.26;
+const PRESSURE_DRIFT_HZ = 0.07;
 
-const GHOST_COUNT = 9;
+const GHOST_COUNT = 5;
 const GHOST_STEP_PX = 71;
 const GHOST_ALPHA_NEW = 1.0;
-const GHOST_ALPHA_OLD = 0.18;
+const GHOST_ALPHA_OLD = 0.5;
 // web speed is 71px / 1.55s = 46px/s, derived rather than stored separately
 
 const SPECULAR_HZ = 0.19;
@@ -193,17 +197,22 @@ class DieRegion {
 
   // Sample the drifting 3-lobe pressure field at (u,v) in 0..1 local coords.
   private pressureAt(u: number, v: number, tAbs: number): number {
-    const lobes: Array<[number, number, number]> = [
-      [0.22 + this.seedX * 0.1, 0.5, 0],
-      [0.5, 0.28 + this.seedY * 0.1, 2.1],
-      [0.78 - this.seedX * 0.06, 0.62, 4.4],
+    // Each lobe drifts at its OWN rate (1 : 0.63 : 1.41). Sharing one
+    // frequency let all three go negative together, which produced whole
+    // strikes that transferred nothing at all — a legitimate outcome for the
+    // press, a dead frame for the component. Incommensurate rates keep the
+    // failures local: some part of the die always clears the floor.
+    const lobes: Array<[number, number, number, number]> = [
+      [0.22 + this.seedX * 0.1, 0.5, 0, 1],
+      [0.5, 0.28 + this.seedY * 0.1, 2.1, 0.63],
+      [0.78 - this.seedX * 0.06, 0.62, 4.4, 1.41],
     ];
     let p = PRESSURE_MEAN_MPA;
-    for (const [cx, cy, phase] of lobes) {
+    for (const [cx, cy, phase, rate] of lobes) {
       const dx = u - cx;
       const dy = v - cy;
       const g = Math.exp(-(dx * dx + dy * dy) / (2 * 0.16 * 0.16));
-      p += PRESSURE_AMP_MPA * g * Math.sin(2 * Math.PI * PRESSURE_DRIFT_HZ * tAbs + phase);
+      p += PRESSURE_AMP_MPA * g * Math.sin(2 * Math.PI * PRESSURE_DRIFT_HZ * rate * tAbs + phase);
     }
     return p;
   }
@@ -249,11 +258,11 @@ export interface FoilBlockProps {
 }
 
 export function FoilBlock({
-  eyebrow = "SECTION EYEBROW",
-  headline = "Headline placeholder goes here",
-  primaryLabel = "Primary action",
+  eyebrow = "GET STARTED",
+  headline = "Every release lands finished",
+  primaryLabel = "Start building",
   primaryHref,
-  secondaryLabel = "Secondary action",
+  secondaryLabel = "Read the docs",
   secondaryHref = "#",
   className = "",
 }: FoilBlockProps) {
@@ -359,9 +368,10 @@ export function FoilBlock({
       word.setOutline(w, h, alpha, dpr);
       word.clear();
       word.lastMaskAt = -Infinity;
-      // once a live raster exists, the DOM word can go transparent — the
-      // canvas now owns its pixels, but the DOM string never changes
-      wordEl.style.color = "transparent";
+      // The DOM word stays visible and stays the base state: unstruck type.
+      // The canvas paints ONLY the pixels foil actually transferred to, in
+      // register on top of it, so a failed transfer reads as plain type
+      // showing through the metal rather than as a hole in the headline.
     };
 
     const rasterizeFrame = () => {
@@ -419,7 +429,14 @@ export function FoilBlock({
     // of thousands on a headline-sized region.
     const regionBuf = new Map<DieRegion, Uint8ClampedArray>();
     let stripBuf: Uint8ClampedArray | null = null;
-    const blitRegion = (region: DieRegion, localLeft: number, localTop: number, alphaMul: number, specularT: number) => {
+    const blitRegion = (
+      region: DieRegion,
+      localLeft: number,
+      localTop: number,
+      alphaMul: number,
+      specularT: number,
+      showVoid: boolean,
+    ) => {
       if (region.w < 1 || region.h < 1) return;
       let rgba = regionBuf.get(region);
       if (!rgba || rgba.length !== region.w * region.h * 4) {
@@ -438,6 +455,11 @@ export function FoilBlock({
             continue;
           }
           const foiled = region.mask[i] > 4;
+          if (!foiled && !showVoid) {
+            // untransferred: the DOM type under the canvas is the void
+            rgba[j + 3] = 0;
+            continue;
+          }
           let col: RGB;
           if (foiled) {
             col = cLive;
@@ -462,25 +484,44 @@ export function FoilBlock({
       ctx.putImageData(img, Math.round(localLeft * dpr), Math.round(localTop * dpr));
     };
 
-    // -- ghost web strip: last 9 strikes of the word, indexing left --------
-    const GHOST_STRIP_H = 30;
-    const drawGhostStrip = (indexProgressPx: number) => {
-      const stripTop = cssH - GHOST_STRIP_H - 6;
-      if (stripTop < 0) return;
-      // Composed once into a single device-pixel buffer and blitted with one
-      // putImageData — the strip spans the full width every frame the web is
-      // indexing, so a per-source-pixel fillRect loop here is the difference
-      // between one call and tens of thousands.
+    // -- the spent web: a metallised ribbon crossing the top of the band,
+    // carrying the NEGATIVE of the last nine strikes. Foil that transferred
+    // is foil the web no longer has, so each past strike is a word-shaped
+    // HOLE punched through the ribbon, indexing left as the web feeds. A
+    // repeated positive of the word read as broken text; a holed ribbon
+    // reads as the material the metal came from.
+    const RIBBON_H = 34;
+    const RIBBON_TOP = 14;
+    const drawWebRibbon = (indexProgressPx: number, specularT: number) => {
+      if (cssH < RIBBON_TOP + RIBBON_H + 40) return;
       const stripWDev = Math.max(1, Math.round(cssW * dpr));
-      const stripHDev = Math.max(1, Math.round(GHOST_STRIP_H * dpr));
+      const stripHDev = Math.max(1, Math.round(RIBBON_H * dpr));
       if (!stripBuf || stripBuf.length !== stripWDev * stripHDev * 4) {
         stripBuf = new Uint8ClampedArray(stripWDev * stripHDev * 4);
       }
       const buf = stripBuf;
-      buf.fill(0);
-      // hairline rule marking the web's edge — a real --border separator, ~1.1:1
-      const ruleRows = Math.max(1, Math.round(dpr));
-      for (let y = 0; y < ruleRows; y++) {
+      // 1 — the carrier itself: dim metal, with a slow specular sweep along
+      // it so the ribbon reads as a reflective web rather than a grey bar
+      const base = mixRGB(cLive, cDim, dark ? 0.72 : 0.45);
+      for (let y = 0; y < stripHDev; y++) {
+        const v = y / stripHDev;
+        // PET carrier is slightly domed across its width — brighter mid-band
+        const dome = 1 - Math.abs(v - 0.5) * 0.9;
+        for (let x = 0; x < stripWDev; x++) {
+          const phase = (x / stripWDev) * 2.4 - specularT;
+          const dist = Math.abs((((phase % 1) + 1) % 1) - 0.5) * 2;
+          const band = Math.max(0, 1 - dist * 3.2) * SPECULAR_L_DELTA;
+          const col = mixRGB(base, dark ? cBright : cVoid, band * dome + 0.06 * dome);
+          const j = (y * stripWDev + x) * 4;
+          buf[j] = col[0] * 255;
+          buf[j + 1] = col[1] * 255;
+          buf[j + 2] = col[2] * 255;
+          buf[j + 3] = 255;
+        }
+      }
+      // 2 — carrier edges: two hairlines, so the ribbon has a top and a
+      // bottom instead of bleeding into the band
+      for (const y of [0, stripHDev - 1]) {
         for (let x = 0; x < stripWDev; x++) {
           const j = (y * stripWDev + x) * 4;
           buf[j] = cBorder[0] * 255;
@@ -489,42 +530,47 @@ export function FoilBlock({
           buf[j + 3] = 255;
         }
       }
+      // 3 — punch the holes, newest at the right, indexing left
+      const insetDev = Math.round(8 * dpr);
       for (let gi = 0; gi < ghosts.length; gi++) {
         const ghost = ghosts[gi];
         const ageIndex = indexCount - ghost.indexN;
         if (ageIndex < 0 || ageIndex >= GHOST_COUNT || ghost.w < 1) continue;
+        // a hole never heals: age only softens its edge as the web stretches
         const alpha =
           GHOST_ALPHA_NEW - (ageIndex / (GHOST_COUNT - 1)) * (GHOST_ALPHA_NEW - GHOST_ALPHA_OLD);
-        const xCss = cssW - 40 - ageIndex * GHOST_STEP_PX - indexProgressPx;
-        const scale = GHOST_STRIP_H / Math.max(1, ghost.h / dpr);
-        const drawWCss = (ghost.w / dpr) * scale;
-        if (xCss + drawWCss < 0 || xCss > cssW) continue;
-        const xDevStart = Math.round(xCss * dpr);
-        const drawWDev = Math.max(1, Math.round(drawWCss * dpr));
-        const col = mixRGB(cLive, cDim, 0.3);
-        for (let dy = ruleRows; dy < stripHDev; dy++) {
-          const sy = Math.min(ghost.h - 1, Math.floor((dy / stripHDev) * ghost.h));
+        const targetHDev = stripHDev - insetDev * 2;
+        const scale = targetHDev / Math.max(1, ghost.h);
+        const drawWDev = Math.max(1, Math.round(ghost.w * scale));
+        // pitch is derived from the hole's own width: the web advances by one
+        // label plus a fixed gap, so two strikes can never overprint
+        const pitchDev = drawWDev + Math.round(52 * dpr);
+        const progressFrac = indexProgressPx / GHOST_STEP_PX;
+        const xDevStart =
+          Math.round((cssW - 60) * dpr) - drawWDev - ageIndex * pitchDev - Math.round(progressFrac * pitchDev);
+        if (xDevStart + drawWDev < 0 || xDevStart > stripWDev) continue;
+        for (let dy = insetDev; dy < stripHDev - insetDev; dy++) {
+          const sy = Math.min(ghost.h - 1, Math.floor(((dy - insetDev) / targetHDev) * ghost.h));
           for (let dx = 0; dx < drawWDev; dx++) {
             const destX = xDevStart + dx;
             if (destX < 0 || destX >= stripWDev) continue;
-            const sx = Math.min(ghost.w - 1, Math.floor((dx / drawWDev) * ghost.w));
-            const si = sy * ghost.w + sx;
-            const sharpA = ghost.sharp[si];
-            if (sharpA < 8) continue;
-            const foiled = ghost.mask[si] > 4;
-            const c = foiled ? col : cDim;
+            const si = sy * ghost.w + Math.min(ghost.w - 1, Math.floor((dx / drawWDev) * ghost.w));
+            if (ghost.mask[si] <= 4) continue; // only transferred pixels left a hole
             const j = (dy * stripWDev + destX) * 4;
-            const a = alpha * (sharpA / 255) * 0.9;
-            if (a <= buf[j + 3] / 255) continue; // cheap over-composite for rare overlaps
-            buf[j] = c[0] * 255;
-            buf[j + 1] = c[1] * 255;
-            buf[j + 2] = c[2] * 255;
-            buf[j + 3] = a * 255;
+            const a = alpha * (ghost.mask[si] / 255);
+            const col = mixRGB(
+              [buf[j] / 255, buf[j + 1] / 255, buf[j + 2] / 255],
+              cVoid,
+              Math.min(1, a),
+            );
+            buf[j] = col[0] * 255;
+            buf[j + 1] = col[1] * 255;
+            buf[j + 2] = col[2] * 255;
           }
         }
       }
       const img = new ImageData(buf as Uint8ClampedArray<ArrayBuffer>, stripWDev, stripHDev);
-      ctx.putImageData(img, 0, Math.round(stripTop * dpr));
+      ctx.putImageData(img, 0, Math.round(RIBBON_TOP * dpr));
     };
 
     // -- tail filaments: hairline strands parting off the trailing edge ----
@@ -639,7 +685,12 @@ export function FoilBlock({
             wordAlphaMul = 0.6;
             frameAlphaMul = 0.6;
           } else {
-            const strikeAt = cycleAnchor + DWELL_END_MS / 1000;
+            // one strike time PER CYCLE, not one for all time: anchoring on
+            // cycleAnchor alone meant lastMaskAt matched forever after the
+            // first strike, so the mask was cleared on every approach and
+            // never re-evaluated — the band ran unfoiled from cycle two on.
+            const cyclesElapsed = Math.floor(((tAbsSeconds - cycleAnchor) * 1000) / CYCLE_MS);
+            const strikeAt = cycleAnchor + (cyclesElapsed * CYCLE_MS + DWELL_END_MS) / 1000;
             if (word.lastMaskAt !== strikeAt) word.strike(strikeAt);
             if (frame.lastMaskAt !== strikeAt) frame.strike(strikeAt);
             wordAlphaMul = 1;
@@ -686,14 +737,14 @@ export function FoilBlock({
       }
 
       if (wordGeom.ww > 0) {
-        blitRegion(word, wordGeom.localLeft, wordGeom.localTop, wordAlphaMul, specularPhase);
+        blitRegion(word, wordGeom.localLeft, wordGeom.localTop, wordAlphaMul, specularPhase, false);
         drawTailFilaments(tailProgress, tAbsSeconds * 7.13);
         drawDieBracket(dieOffsetPx);
       }
       if (frameGeom.fw > 0) {
-        blitRegion(frame, frameGeom.localLeft, frameGeom.localTop, frameAlphaMul, specularPhase);
+        blitRegion(frame, frameGeom.localLeft, frameGeom.localTop, frameAlphaMul, specularPhase, false);
       }
-      drawGhostStrip(indexProgressPx);
+      drawWebRibbon(indexProgressPx, specularPhase);
     };
 
     // -- sizing --------------------------------------------------------------
@@ -906,13 +957,19 @@ export function FoilBlock({
       data-foil-block={uid}
       className={`relative isolate w-full overflow-hidden bg-background ${className}`}
     >
-      <canvas ref={canvasRef} aria-hidden="true" className="pointer-events-none absolute inset-0 block h-full w-full" />
+      {/* z-20: the foil lands ON the type, not behind it. A canvas under the
+          content was painting the struck word behind the headline's own
+          backdrop panel, which is why the terminal word simply vanished. */}
+      <canvas ref={canvasRef} aria-hidden="true" className="pointer-events-none absolute inset-0 z-20 block h-full w-full" />
       <div className="relative z-10 mx-auto flex w-full max-w-3xl flex-col items-center px-6 py-24 text-center sm:py-32">
         {eyebrow ? <p className="mb-5 font-mono text-[11px] tracking-widest text-ns-muted">{eyebrow}</p> : null}
-        <div className="rounded-md bg-background/78 px-4 py-2 backdrop-blur">
+        <div className="px-4 py-2">
           <h2 className="text-balance text-3xl font-semibold text-foreground sm:text-4xl">
             {lead ? `${lead} ` : ""}
-            <span ref={wordRef} className="inline-block text-foreground">
+            {/* the terminal word rests at muted value — the foil that lands
+                on it is the bright event, and near-equal values would make
+                the transfer invisible */}
+            <span ref={wordRef} className="inline-block text-ns-muted">
               {last}
             </span>
           </h2>

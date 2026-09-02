@@ -70,13 +70,20 @@ const STATION_COUNT_FULL = 3;
 const STATION_COUNT_SHORT = 2;
 const MIN_HB_FOR_GRAIN_AND_3RD = 88; // px; below this, drop to 2 stations, drop grain
 
-const GROOVE_CENTER_FRAC = 0.14; // groove's resting line, fraction of Hb below top edge
-const GROOVE_CENTER_MAX_PX = 56; // clamp so the DOM scrim (below it) can never bury the groove
-const G_MAX_FRAC = 0.055; // g_max as a fraction of M = min(bandW, bandH)
+const GROOVE_CENTER_FRAC = 0.3; // groove's resting line, fraction of Hb below top edge
+const GROOVE_CENTER_MAX_PX = 132; // clamp so the DOM sitemap (below it) can never bury the groove
+const G_MAX_FRAC = 0.075; // g_max as a fraction of M = min(bandW, bandH)
+// The groove is ONE continuous channel across the band, not three isolated
+// dimples: each station owns a raised-cosine window whose depth is its own
+// phase, and the channel takes the deepest contribution at every x. Adjacent
+// windows overlap (HW > slotW/2), so the depth profile is continuous and the
+// three phases read as one hinge being worked along its length.
+const STATION_WINDOW_MULT = 0.62; // window half-width, fraction of a slot
+const GROOVE_SAMPLES = 132; // polyline samples across the band
 const FACET_WIDTH_MULT = 1.44; // facet half-width = 1.44 * current depth
 const FACET_BRIGHT_L = 0.15; // spine-side facet peak contrast, spec's real number
 const FACET_DARK_L = 0.17; // board-side facet peak contrast, spec's real number
-const FACET_BRIGHT_ALPHA = 0.34; // canvas overlay alpha budgeted for the bright peak
+const FACET_BRIGHT_ALPHA = 0.72; // lit far wall — the groove's primary value carrier
 // dark alpha derived from the bright budget scaled by the spec's own L ratio,
 // so the 0.15 / 0.17 asymmetry (and the 14%-release drop of both) survives
 // the translation into canvas alpha rather than being re-guessed.
@@ -85,8 +92,8 @@ const FACET_DARK_ALPHA = FACET_BRIGHT_ALPHA * (FACET_DARK_L / FACET_BRIGHT_L);
 const THERMOSTAT_CYCLE = 2.1;
 const THERMOSTAT_AMP_ALPHA = 0.05; // iron fill-alpha ripple standing in for +/-0.04L hunting
 
-const CASE_ALPHA_LIGHT = 0.16;
-const CASE_ALPHA_DARK = 0.22;
+const CASE_ALPHA_LIGHT = 0.1;
+const CASE_ALPHA_DARK = 0.16;
 const IRON_BASE_ALPHA = 0.86; // headroom below solid fg so the shimmer has somewhere to go
 
 const GRAIN_AMP_ALPHA = 0.05; // canvas overlay alpha standing in for +/-0.02L board grain
@@ -299,11 +306,11 @@ export function JointIron({
 
     // -- static seeded board-grain, baked to an offscreen tile at resize ---
     let grain: HTMLCanvasElement | null = null;
-    const bakeGrain = (caseTop: number, m: number) => {
+    const bakeGrain = (m: number) => {
       const feature = Math.max(1, m * GRAIN_FEATURE_FRAC);
       const tile = document.createElement("canvas");
       tile.width = Math.max(1, Math.round(w));
-      tile.height = Math.max(1, Math.round(h - caseTop));
+      tile.height = Math.max(1, Math.round(h));
       const tctx = tile.getContext("2d");
       if (!tctx || !tokens) {
         grain = tile;
@@ -360,122 +367,211 @@ export function JointIron({
       fitCanvas();
       columnStep = 1;
       slowSince = null;
-      const { grooveCenterY, showGrain } = layout();
-      if (showGrain) bakeGrain(grooveCenterY, Math.min(w, h));
+      const { showGrain } = layout();
+      if (showGrain) bakeGrain(Math.min(w, h));
       else grain = null;
       sized = true;
     };
 
     // -- drawing ----------------------------------------------------------
-    const drawStation = (
-      station: { cx: number; slotX0: number; slotX1: number },
-      frame: StationFrame,
-      grooveCenterY: number,
+    // Depth of the channel at x: the deepest station window covering it.
+    // Each station's window is a raised cosine centred on its (possibly
+    // index-shifted) centre, so a station mid-dwell cuts a deep bowl while
+    // its neighbour mid-descent is still a shallow scoop, and the two meet
+    // in a continuous wall rather than a seam.
+    const depthAt = (
+      x: number,
+      stations: Array<{ cx: number; slotX0: number; slotX1: number }>,
+      frames: StationFrame[],
       gMax: number,
+      slotW: number,
+    ) => {
+      const hw = slotW * STATION_WINDOW_MULT;
+      let d = 0;
+      let c = 0;
+      for (let i = 0; i < stations.length; i++) {
+        const f = frames[i]!;
+        const depth = (f.phase === "index" ? HOLD_FRAC : f.depthFrac) * gMax;
+        if (depth < 0.2) continue;
+        // during index the previous station's finished groove travels out of
+        // the slot, so its window centre travels with it
+        const cx = stations[i]!.cx - (f.phase === "index" ? slotW * f.indexProgress : 0);
+        const dx = Math.abs(x - cx);
+        if (dx >= hw) continue;
+        // flattened raised cosine: a pressed groove has a floor, not a
+        // vertex, so the window plateaus in the middle and steepens at the
+        // walls instead of reading as a shallow V
+        const win = Math.pow(0.5 * (1 + Math.cos((Math.PI * dx) / hw)), 0.42);
+        const contribution = depth * win;
+        if (contribution > d) {
+          d = contribution;
+          c = (f.phase === "index" ? HOLD_FRAC : f.contrastMult) * win;
+        }
+      }
+      return { d, c };
+    };
+
+    const drawGroove = (
+      cy: number,
+      gMax: number,
+      stations: Array<{ cx: number; slotX0: number; slotX1: number }>,
+      frames: StationFrame[],
+      slotW: number,
       brightToken: string,
       darkToken: string,
-      t: number,
     ) => {
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(station.slotX0, 0, station.slotX1 - station.slotX0, h);
-      ctx.clip();
-
-      // the groove is carried entirely by the two facets' Lambert-style
-      // shade, never by swapping in raw --background — a pressed groove is
-      // still case material, just recessed and lit, not a hole cut through
-      // it. AMBIENT sinks the whole notch a little below the flat case (so
-      // the floor, where wallFactor -> 0, still reads as a shadowed recess
-      // rather than vanishing back to the flat case tone) and each column's
-      // shaded rect extends from the resting line down by `bump`, so depth
-      // is legible as the shaded region's own height as well as its width
-      // (hw = 1.44*depth) and its contrast (contrastMult) — all three
-      // collapse together on the 14% release.
-      const AMBIENT = -0.35;
-      const drawNotch = (cx: number, depthFrac: number, contrastMult: number) => {
-        const depth = depthFrac * gMax;
-        if (depth < 0.3) return;
-        const hw = FACET_WIDTH_MULT * depth;
-        const x0 = Math.max(station.slotX0, Math.round(cx - hw));
-        const x1 = Math.min(station.slotX1, Math.round(cx + hw));
-        for (let x = x0; x <= x1; x += columnStep) {
-          const d = x - cx;
-          const bump = depth * 0.5 * (1 + Math.cos((Math.PI * d) / hw));
-          if (bump <= 0.15) continue;
-          const wallFactor = -Math.sin((Math.PI * d) / hw);
-          const shade = Math.max(-1, Math.min(1, AMBIENT + wallFactor));
-          const wallH = Math.max(2, bump);
-          if (shade >= 0) {
-            ctx.globalAlpha = FACET_BRIGHT_ALPHA * shade * contrastMult;
-            ctx.fillStyle = brightToken;
-          } else {
-            ctx.globalAlpha = FACET_DARK_ALPHA * -shade * contrastMult;
-            ctx.fillStyle = darkToken;
-          }
-          ctx.fillRect(x, grooveCenterY, columnStep, wallH);
-        }
-        ctx.globalAlpha = 1;
-      };
-
-      if (frame.phase === "index") {
-        // the previous, fully-formed groove slides out of this slot while
-        // this station stays otherwise unformed (depth 0 draws nothing) —
-        // clipped to the slot, so nothing bleeds into the neighbour.
-        const offset = (station.slotX1 - station.slotX0) * frame.indexProgress;
-        drawNotch(station.cx - offset, HOLD_FRAC, HOLD_FRAC);
-      } else {
-        drawNotch(station.cx, frame.depthFrac, frame.contrastMult);
+      const n = GROOVE_SAMPLES;
+      const xs = new Float64Array(n + 1);
+      const top = new Float64Array(n + 1);
+      const bot = new Float64Array(n + 1);
+      const con = new Float64Array(n + 1);
+      for (let i = 0; i <= n; i++) {
+        const x = (w * i) / n;
+        const { d, c } = depthAt(x, stations, frames, gMax, slotW);
+        xs[i] = x;
+        // the channel's own height is the first of the three depth cues: it
+        // opens downward from a nearly fixed lip, so the lip stays a
+        // straight hinge line and the floor is what moves
+        top[i] = cy - d * 0.06;
+        bot[i] = cy + d * 0.9;
+        con[i] = c;
       }
 
-      // -- iron + platen -----------------------------------------------
-      const ironUpY = grooveCenterY - gMax * 3.2;
-      const ironDownY = grooveCenterY - gMax * 0.35;
-      const ironY = ironUpY + (ironDownY - ironUpY) * frame.ironFrac;
-      const ironW = FACET_WIDTH_MULT * gMax * 2;
-      const ironH = Math.max(4, gMax * 0.9);
-      // thermostat hunting is a pure function of t (not wall-clock), so the
-      // reduced-motion frame stays byte-stable across re-renders.
-      const thermostat = 1 + THERMOSTAT_AMP_ALPHA * Math.sin((t / THERMOSTAT_CYCLE) * Math.PI * 2);
-      ctx.globalAlpha = clamp01(IRON_BASE_ALPHA * thermostat);
-      ctx.fillStyle = tokens!.fg;
-      ctx.fillRect(station.cx - ironW / 2, ironY, ironW, ironH);
+      // 1 — the recess itself: one filled band, darkest token, so the channel
+      // reads as a shadowed cut through the case at a glance
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(xs[0]!, top[0]!);
+      for (let i = 1; i <= n; i++) ctx.lineTo(xs[i]!, top[i]!);
+      for (let i = n; i >= 0; i--) ctx.lineTo(xs[i]!, bot[i]!);
+      ctx.closePath();
+      ctx.globalAlpha = isDark ? 0.5 : 0.36;
+      ctx.fillStyle = darkToken;
+      ctx.fill();
+      ctx.restore();
+
+      // 1b — the near wall directly under the lip takes the least light, so
+      // a second, shallower pass over the top 45% of the cut gives the
+      // channel a curved wall instead of a flat ribbon of tone
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(xs[0]!, top[0]!);
+      for (let i = 1; i <= n; i++) ctx.lineTo(xs[i]!, top[i]!);
+      for (let i = n; i >= 0; i--) ctx.lineTo(xs[i]!, top[i]! + (bot[i]! - top[i]!) * 0.45);
+      ctx.closePath();
+      ctx.globalAlpha = isDark ? 0.45 : 0.3;
+      ctx.fillStyle = darkToken;
+      ctx.fill();
+      ctx.restore();
+
+      // 2 — the lit far wall along the bottom of the cut: the single
+      // brightest mark in the footer, and the one that collapses visibly on
+      // the 14% spring-back (it rises AND dims together)
+      ctx.save();
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      for (let i = 0; i < n; i++) {
+        const cAvg = (con[i]! + con[i + 1]!) / 2;
+        if (cAvg <= 0.02) continue;
+        ctx.globalAlpha = Math.min(1, FACET_BRIGHT_ALPHA * cAvg + 0.06);
+        ctx.strokeStyle = brightToken;
+        ctx.lineWidth = 1.2 + 2.2 * cAvg;
+        ctx.beginPath();
+        ctx.moveTo(xs[i]!, bot[i]!);
+        ctx.lineTo(xs[i + 1]!, bot[i + 1]!);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // 3 — the hinge lip: a continuous hairline the whole width, so the
+      // joint exists as a line even where depth is zero (station indexing)
+      ctx.save();
+      ctx.globalAlpha = isDark ? 0.5 : 0.34;
+      ctx.strokeStyle = brightToken;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(xs[0]!, top[0]! - 0.5);
+      for (let i = 1; i <= n; i++) ctx.lineTo(xs[i]!, top[i]! - 0.5);
+      ctx.stroke();
+      ctx.restore();
       ctx.globalAlpha = 1;
+    };
+
+    // The iron: a brass block on a ram that never leaves the band. It is a
+    // solid --foreground silhouette (value only, no hue), with a hot
+    // underside line that shimmers for 700ms after it lifts.
+    const drawIron = (
+      station: { cx: number; slotX0: number; slotX1: number },
+      frame: StationFrame,
+      cy: number,
+      gMax: number,
+      slotW: number,
+      t: number,
+    ) => {
+      const ironW = Math.min(slotW * 0.22, gMax * 2.1);
+      const ironH = Math.max(8, gMax * 0.62);
+      const noseH = Math.max(4, gMax * 0.34);
+      const ironUpY = Math.max(4, cy - gMax * 3.2);
+      // full stroke seats the nose in the floor of its own groove, never
+      // below it — the iron forms the channel, it does not punch through
+      const ironDownY = cy - ironH - noseH * 0.15;
+      const y = ironUpY + (ironDownY - ironUpY) * frame.ironFrac;
+      const x0 = station.cx - ironW / 2;
+
+      const thermostat = 1 + THERMOSTAT_AMP_ALPHA * Math.sin((t / THERMOSTAT_CYCLE) * Math.PI * 2);
+
+      ctx.save();
+      // ram: the block is machine-driven, so it stays attached to the head
+      // rail at the top of the band instead of floating
+      ctx.globalAlpha = clamp01(0.5 * thermostat);
+      ctx.fillStyle = tokens!.fg;
+      ctx.fillRect(station.cx - Math.max(1.5, ironW * 0.07), 0, Math.max(3, ironW * 0.14), y + 2);
+
+      ctx.globalAlpha = clamp01(IRON_BASE_ALPHA * thermostat);
+      ctx.beginPath();
+      ctx.moveTo(x0, y);
+      ctx.lineTo(x0 + ironW, y);
+      ctx.lineTo(x0 + ironW, y + ironH);
+      // the working face is a wedge — it is the shape that cuts the groove,
+      // so its profile has to match the channel it leaves behind
+      ctx.lineTo(x0 + ironW * 0.72, y + ironH + noseH);
+      ctx.lineTo(x0 + ironW * 0.28, y + ironH + noseH);
+      ctx.lineTo(x0, y + ironH);
+      ctx.closePath();
+      ctx.fill();
 
       if (frame.shimmerT != null) {
         const shimmerEase = 1 - frame.shimmerT / SHIMMER_S;
-        ctx.save();
         ctx.shadowColor = tokens!.fg;
-        ctx.shadowBlur = shimmerEase * gMax * 1.4;
-        ctx.fillStyle = tokens!.fg;
-        ctx.globalAlpha = 0.9 * shimmerEase;
-        ctx.fillRect(station.cx - ironW / 2, ironY + ironH - 1.5, ironW, 1.5);
-        ctx.restore();
+        ctx.shadowBlur = shimmerEase * gMax * 2.2;
+        ctx.globalAlpha = 0.95 * shimmerEase;
+        ctx.fillRect(x0 + ironW * 0.28, y + ironH + noseH - 2, ironW * 0.44, 2);
       }
-
       ctx.restore();
+      ctx.globalAlpha = 1;
     };
 
     const draw = (t: number) => {
       if (!tokens || !sized) return;
-      const { grooveCenterY, gMax, stations, showGrain } = layout();
+      const { grooveCenterY, gMax, stations, slotW, showGrain } = layout();
       const caseAlpha = isDark ? CASE_ALPHA_DARK : CASE_ALPHA_LIGHT;
       const brightToken = isDark ? tokens.fg : tokens.bg;
       const darkToken = isDark ? tokens.bg : tokens.fg;
 
-      // page bg, then the case as an fg-over-bg wash held clearly off the
-      // page in both themes
+      // the case is the WHOLE footer surface, edge to edge — the band and
+      // the sitemap are the same material, which is the point
       ctx.fillStyle = tokens.bg;
       ctx.fillRect(0, 0, w, h);
       ctx.globalAlpha = caseAlpha;
       ctx.fillStyle = tokens.fg;
-      ctx.fillRect(0, grooveCenterY, w, h - grooveCenterY);
+      ctx.fillRect(0, 0, w, h);
       ctx.globalAlpha = 1;
 
       if (showGrain && grain) {
-        ctx.drawImage(grain, 0, grooveCenterY);
+        ctx.drawImage(grain, 0, 0);
       }
 
-      // hairline between the band and the page above
+      // hairline between the footer and the page above
       ctx.globalAlpha = 0.9;
       ctx.strokeStyle = tokens.border;
       ctx.lineWidth = 1;
@@ -485,10 +581,10 @@ export function JointIron({
       ctx.stroke();
       ctx.globalAlpha = 1;
 
+      const frames = stations.map((_, i) => stationFrame(mod(t + i * STATION_OFFSET, CYCLE)));
+      drawGroove(grooveCenterY, gMax, stations, frames, slotW, brightToken, darkToken);
       for (let i = 0; i < stations.length; i++) {
-        const localT = mod(t + i * STATION_OFFSET, CYCLE);
-        const frame = stationFrame(localT);
-        drawStation(stations[i]!, frame, grooveCenterY, gMax, brightToken, darkToken, t);
+        drawIron(stations[i]!, frames[i]!, grooveCenterY, gMax, slotW, t);
       }
     };
 
@@ -517,8 +613,8 @@ export function JointIron({
     };
 
     const rebakeGrainIfNeeded = () => {
-      const { grooveCenterY, showGrain, m } = layout();
-      if (showGrain) bakeGrain(grooveCenterY, m);
+      const { showGrain, m } = layout();
+      if (showGrain) bakeGrain(m);
       else grain = null;
     };
 
@@ -612,12 +708,15 @@ export function JointIron({
     <footer
       data-joint-iron
       ref={wrapRef}
-      className={`relative w-full min-h-[320px] overflow-hidden ${className}`}
+      className={`relative w-full min-h-[380px] overflow-hidden ${className}`}
     >
       <canvas ref={canvasRef} aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full" />
 
-      <div className="relative z-10 mx-auto max-w-5xl px-4 pt-20 pb-10 sm:px-6 sm:pt-24">
-        <div className="rounded-md bg-background/70 px-5 py-6 backdrop-blur-sm sm:px-8 sm:py-8">
+      {/* content clears the forming zone (groove centre is capped at 132px)
+          and sits directly on the case — no scrim panel, or the footer reads
+          as a card floating on an unexplained grey band */}
+      <div className="relative z-10 mx-auto max-w-5xl px-4 pt-40 pb-10 sm:px-6 sm:pt-44">
+        <div>
           <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
             <div className="max-w-xs">
               <p className="font-mono text-sm font-semibold tracking-tight text-foreground">{brand}</p>
