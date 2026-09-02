@@ -49,6 +49,7 @@ const GROUP_LABEL: Record<ReviewItem["group"], string> = {
   r10: "Round 10 — 30 new components",
   r11: "Round 11 — 30 new components",
   r12: "Round 12 — 30 new components",
+  r13: "Round 13 — 12 landing-page components",
 };
 
 const FIXED_COUNT = REVIEW_ITEMS.filter((i) => i.group === "fixed").length;
@@ -60,6 +61,7 @@ const R9_COUNT = REVIEW_ITEMS.filter((i) => i.group === "r9").length;
 const R10_COUNT = REVIEW_ITEMS.filter((i) => i.group === "r10").length;
 const R11_COUNT = REVIEW_ITEMS.filter((i) => i.group === "r11").length;
 const R12_COUNT = REVIEW_ITEMS.filter((i) => i.group === "r12").length;
+const R13_COUNT = REVIEW_ITEMS.filter((i) => i.group === "r13").length;
 
 /** Every round value present in the data, in first-seen order — deriving
  *  this from REVIEW_ITEMS itself (rather than hardcoding a list) is what
@@ -67,6 +69,7 @@ const R12_COUNT = REVIEW_ITEMS.filter((i) => i.group === "r12").length;
  *  in data.ts, never a page edit here. Replaces the old COPY_ROUND_LABEL
  *  manual date string, which could silently go stale. */
 const ROUNDS: string[] = Array.from(new Set(REVIEW_ITEMS.map((i) => i.round ?? "r7")));
+const NEWEST_ROUND: string = ROUNDS[ROUNDS.length - 1] ?? "r7";
 const ROUND_COUNTS: Record<string, number> = ROUNDS.reduce(
   (acc, r) => ({ ...acc, [r]: REVIEW_ITEMS.filter((i) => (i.round ?? "r7") === r).length }),
   {} as Record<string, number>,
@@ -82,6 +85,7 @@ const GROUPS: ReviewItem["group"][] = [
   "r10",
   "r11",
   "r12",
+  "r13",
 ];
 const LANES: Lane[] = ["identity", "money", "living", "multiplayer", "reliability", "wayfinding"];
 const UNTESTED_LANES: Lane[] = ["identity", "money", "living"];
@@ -153,25 +157,27 @@ function markLegacyMigrated() {
 
 export default function ReviewPage() {
   const [query, setQuery] = useState("");
+  // Opens on the NEWEST round only. Every earlier round has already been
+  // judged and its verdicts live in .review-state.json, so showing all 237
+  // untouched rows buries the dozen that actually need a verdict today.
+  // Toggle any earlier group back on in the filter bar to re-review it.
   const [groupsOn, setGroupsOn] = useState<Record<ReviewItem["group"], boolean>>({
-    fixed: true,
-    untested: true,
-    expansion: true,
-    r8a: true,
-    r8b: true,
-    r9: true,
-    r10: true,
-    r11: true,
-    r12: true,
+    fixed: false,
+    untested: false,
+    expansion: false,
+    r8a: false,
+    r8b: false,
+    r9: false,
+    r10: false,
+    r11: false,
+    r12: false,
+    r13: true,
   });
-  // Opens on the newest round only — older rounds have already been judged,
-  // and their state lives in .review-state.json. Toggle them back on in the
-  // filter bar to re-review anything earlier.
-  // Every round on by default, paired with the status filter below showing
-  // only flagged/untouched rows — so the page opens on exactly what still
-  // needs judging, whichever round it belongs to.
+  // Same rule for the round axis: newest only. NEWEST_ROUND is the last entry
+  // in ROUNDS, which is derived from the data file's own order, so next round
+  // this keeps working without an edit here.
   const [roundsOn, setRoundsOn] = useState<Record<string, boolean>>(
-    () => Object.fromEntries(ROUNDS.map((r) => [r, true])),
+    () => Object.fromEntries(ROUNDS.map((r) => [r, r === NEWEST_ROUND])),
   );
   const [lanesOn, setLanesOn] = useState<Record<Lane, boolean>>({
     identity: true,
@@ -353,6 +359,7 @@ export default function ReviewPage() {
   const r10Items = filtered.filter((i) => i.group === "r10");
   const r11Items = filtered.filter((i) => i.group === "r11");
   const r12Items = filtered.filter((i) => i.group === "r12");
+  const r13Items = filtered.filter((i) => i.group === "r13");
 
   const remaining = (group: ReviewItem["group"]) => {
     const items = REVIEW_ITEMS.filter((i) => i.group === group);
@@ -368,6 +375,7 @@ export default function ReviewPage() {
   const r10Remaining = remaining("r10");
   const r11Remaining = remaining("r11");
   const r12Remaining = remaining("r12");
+  const r13Remaining = remaining("r13");
   const groupRemaining: Record<ReviewItem["group"], { untested: number; total: number }> = {
     fixed: fixedRemaining,
     untested: untestedRemaining,
@@ -378,6 +386,7 @@ export default function ReviewPage() {
     r10: r10Remaining,
     r11: r11Remaining,
     r12: r12Remaining,
+    r13: r13Remaining,
   };
 
   // Jump index over the currently-filtered set, in list order — lets the
@@ -392,11 +401,31 @@ export default function ReviewPage() {
   // over the whole list (not `filtered`), same as the group counts above,
   // so the numbers on unpressed filter buttons still mean "how many total",
   // not "how many currently visible".
+  // Counted over the rows the group/round/lane/search filters admit, NOT over
+  // the whole file: with the page opening on the newest round only, a global
+  // total reported 237 untouched while twelve rows were on screen. The status
+  // filter itself is deliberately excluded from this scope, since a count that
+  // shrank when you hid a status could never be used to find the hidden ones.
+  const scopedItems = useMemo(() => {
+    if (!hydrated) return [];
+    return REVIEW_ITEMS.filter((item) => {
+      if (!groupsOn[item.group]) return false;
+      if (!roundsOn[item.round ?? "r7"]) return false;
+      if (item.lane && !lanesOn[item.lane]) return false;
+      if (!q) return true;
+      const haystack = [item.slug, item.change, item.watch, item.note, item.eyeball, state[item.slug]?.note]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(q);
+    });
+  }, [hydrated, q, groupsOn, roundsOn, lanesOn, state]);
+
   const statusCounts = useMemo(() => {
     const counts = { working: 0, flagged: 0, untouched: 0 };
-    for (const item of REVIEW_ITEMS) counts[effectiveStatus(state[item.slug])]++;
+    for (const item of scopedItems) counts[effectiveStatus(state[item.slug])]++;
     return counts;
-  }, [state]);
+  }, [scopedItems, state]);
 
   // True only when the empty list is caused by working rows being hidden,
   // not by a search term or a group/lane/status filter narrowing things out
@@ -426,6 +455,7 @@ export default function ReviewPage() {
       r10: [],
       r11: [],
       r12: [],
+      r13: [],
     };
     for (const item of flagged) byGroup[item.group].push(item);
 
@@ -478,7 +508,7 @@ export default function ReviewPage() {
         </p>
         <p className="mt-3 font-mono text-xs text-ns-muted">
           {hydrated
-            ? `${statusCounts.working} working, ${statusCounts.flagged} flagged, ${statusCounts.untouched} untouched of ${REVIEW_ITEMS.length}.`
+            ? `${statusCounts.working} working, ${statusCounts.flagged} flagged, ${statusCounts.untouched} untouched of ${scopedItems.length} shown.`
             : "Loading saved verdicts…"}
         </p>
         <p className="mt-1 font-mono text-xs text-ns-muted">
@@ -779,6 +809,22 @@ export default function ReviewPage() {
         title={GROUP_LABEL.r12}
         remaining={r12Remaining}
         items={r12Items}
+        state={state}
+        hydrated={hydrated}
+        onSetVerdict={setVerdict}
+        onNoteChange={setNote}
+        onNoteCommit={commitNote}
+        saveStatus={saveStatus}
+        registerRef={registerRef}
+        isActive={isActive}
+        isOnScreen={isOnScreen}
+      />
+
+      {/* Group J — round 13, flat (no lane) */}
+      <Section
+        title={GROUP_LABEL.r13}
+        remaining={r13Remaining}
+        items={r13Items}
         state={state}
         hydrated={hydrated}
         onSetVerdict={setVerdict}

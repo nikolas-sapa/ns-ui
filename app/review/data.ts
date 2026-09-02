@@ -56,7 +56,7 @@ export type Lane = "identity" | "money" | "living" | "multiplayer" | "reliabilit
 
 export type ReviewItem = {
   slug: string;
-  group: "fixed" | "untested" | "expansion" | "r8a" | "r8b" | "r9" | "r10" | "r11" | "r12";
+  group: "fixed" | "untested" | "expansion" | "r8a" | "r8b" | "r9" | "r10" | "r11" | "r12" | "r13";
   lane?: Lane;
   /** Group A only: one line of what changed. */
   change?: string;
@@ -1814,5 +1814,103 @@ export const REVIEW_ITEMS: ReviewItem[] = [
     note: "Replaces: divider (a full-width section-rule).",
     eyeball:
       "Watch a flap that's a few stitches behind the working needle — it should fold flush over 260ms as a continuous lift→flush hinge transform, never a hard cut/pop. At normal card-width scale (no zooming), confirm you can tell which flaps are still open and which have already folded closed.",
+  },
+
+  // Group J — round 13, 12 landing-page components (flat, no lane).
+  {
+    slug: "foil-block",
+    group: "r13",
+    round: "r13",
+    note: "Closing CTA band (this surface had ZERO components in 546). Hot foil blocking: a mark transfers only where temperature AND pressure both clear their floor in the same pixel, so every strike fails differently.",
+    eyeball:
+      "Watch the spent foil web index between strikes — that is the resting loop. The die must strike the headline's terminal word as well as the button, and no bed of type may appear (that is quoin-lockup's territory). Its builder found the spec's phase table summed to 4510ms against a stated 4.60s and trusted the total.",
+  },
+  {
+    slug: "peel-flow",
+    group: "r13",
+    round: "r13",
+    note: "Closing CTA band, the second of two. Powder-coat orange peel levelling as a lambda^4 low-pass filter: short texture gone in about a second, 1mm texture surviving minutes, in the same patch.",
+    eyeball:
+      "The band sweeping across is fine; the region it has ALREADY passed must keep changing too (cure-shrinkage telegraphing), not just slide. Its builder ran that crop test offline and it passed. The CTA button is the one place accent is allowed here.",
+  },
+  {
+    slug: "joint-iron",
+    group: "r13",
+    round: "r13",
+    note: "Footer. The footer bucket had ONE member in 546 and that one is a scroll instrument. A French groove formed under a heated iron with 14 percent spring-back on release.",
+    eyeball:
+      "The question that matters: delete the canvas and does this stop being a footer, or just lose an ornament? Its first pass rendered the notch as a background erase plus a lit lip, which is an animated top border, which is exactly why footing-course was removed from this repo. It was caught and reworked to a lit recess. No scroll response by design.",
+  },
+  {
+    slug: "spreader-bar",
+    group: "r13",
+    round: "r13",
+    note: "Logo wall. The only concept in the round that handles unequal optical weight by physics: each mark's measured ink coverage solves the fulcrum balance, so a heavy mark hangs closer in.",
+    eyeball:
+      "Seven torsional pendulums at incommensurate periods plus a draught torque, so it has no rest state and no cycle length. Rotation caps at 34 degrees so no mark drops below 0.83 of frontal width. If the positions look authored rather than solved, the mechanic has not landed.",
+  },
+  {
+    slug: "flying-splice",
+    group: "r13",
+    round: "r13",
+    note: "Logo ribbon. The subject is moved off the strip and onto the rolls: radius falls 64.6 to 27.5px while RPM more than doubles.",
+    eyeball:
+      "A marquee whose subject is the strip is the crowded shape; this one is about the roll running out. Its builder found the spec's own worked example violated its 30 percent kill criterion and added a width floor.",
+  },
+  {
+    slug: "slate-gauge",
+    group: "r13",
+    round: "r13",
+    note: "Testimonial wall. Double-lap slating: every quote is occluded to its computed gauge margin, the wall geometry never changes, one slate lifts on its nail.",
+    eyeball:
+      "Aliveness is one lifted slate, not the wall shuffling. Full quote text is in the DOM and reachable by screen reader even when visually lapped, so check keyboard traversal reads whole quotes.",
+  },
+  {
+    slug: "cockle-swell",
+    group: "r13",
+    round: "r13",
+    note: "Pull-quote. Paper cockling with 5:1 CD/MD hygroexpansivity, so the ridges are directional and you can tell which way the grain runs.",
+    eyeball:
+      "This is the round's test of type on a moving surface. Its builder measured worst-frame composited contrast at 5.65:1 (under floor) and added a direction-aware clamp converging to about 7.0. Read the quote at the worst frame, not the average one.",
+  },
+  {
+    slug: "quoin-lockup",
+    group: "r13",
+    round: "r13",
+    note: "Bento grid whose variable is PRESSURE, not cell assignment: quoins relax, a tile pies out of plane, a planer block snaps it flush.",
+    eyeball:
+      "Every other bento rearranges cells; this one never does. Its builder found five tiles at 4+2+2+1+1 need ten cells and a 3x3 has nine, so the base grid is 3x4 with the leftover packed with furniture. The planer fires every 24.6s, outside a 5s glance.",
+  },
+  {
+    slug: "damask-float",
+    group: "r13",
+    round: "r13",
+    note: "Feature grid where one cloth spans the whole grid and hover reverses figure and ground as a front, with no fade and no translate.",
+    eyeball:
+      "The reversal must be a real change in the shading model, not a crossfade, and the grid must already be alive before you touch it. Its builder pinned base tone to the spec's luminance table after its own BRDF measured 1.3:1 against a required 1.6-2.2:1.",
+  },
+  {
+    slug: "rocker-blot",
+    group: "r13",
+    round: "r13",
+    note: "Waitlist capture. A rocker blotter whose accumulated mirrored residue IS the social proof; the form does not clear on success.",
+    eyeball:
+      "Its builder caught that this went visually dead at 5.4s while passing every gate screenshot at 0/2.5/5s, and added an unforced ambient blotting every 6s. Check the queue position reads as located, and that the lifted entry stroke stays visible as evidence.",
+  },
+  {
+    slug: "indicator-rack",
+    group: "r13",
+    round: "r13",
+    note: "Plan selector. Cash-register indicator tablets, where changing plan is a SORT and not a mutation: two plates cross on every change and the population is conserved.",
+    eyeball:
+      "A number that tweens between values is the common answer and is not this. Renamed from flag-rack to avoid reading as a signal-flag component. Arrow keys, Home/End and an aria-live price announcement all work.",
+  },
+  {
+    slug: "kiss-cut",
+    group: "r13",
+    round: "r13",
+    note: "Marquee. Content is what REMAINS after a subtraction: the die cuts the face stock and not the liner, the label stays down and the waste matrix peels away.",
+    eyeball:
+      "NEEDS YOUR EYE SPECIFICALLY: the rewind spool is positioned by deriving from the fixed 38 degree strip angle rather than placed by hand, and its builder asked whether it still reads as a corner rather than upper-middle at your aspect ratios. Also confirm the cut reads as through the face only, not all the way through.",
   },
 ];
