@@ -403,3 +403,55 @@ builder pays to discover it independently.
 
 Where a spec already carries both, the FORMULA wins and the builder documents the
 discrepancy — that is what all five did, and all five were right to.
+
+## D30 — the gate is blind to two whole defect classes
+Two independent measurements this round showed `scripts/verify.ts` cannot see
+things everyone assumed it checked.
+
+1. IT DOES NOT TEST ALIVENESS. A component hard-coded to `paused = true`, with no
+   animation whatsoever, returns `GATE: PASS`. Every green gate in this project's
+   history attests to rendering and console cleanliness, not to the component
+   moving. `scripts/alive-check.mjs` (added this round) is the missing check:
+   frames at t=0/2.5s/5s at deviceScaleFactor 1 and 2 in both themes, plus
+   reduced-motion frames byte-compared 3s apart.
+
+2. IT RUNS A BROWSER WITH NO BACKGROUND THROTTLING. `scripts/verify.ts:417` calls
+   `chromium.launch()` with defaults, and Playwright's defaults include
+   `--disable-renderer-backgrounding`, `--disable-background-timer-throttling`
+   and `--disable-backgrounding-occluded-windows`. Measured on a probe page
+   behind another tab for 21s: rAF at 59.8/s, `setInterval` unthrottled at 20/s,
+   `visibilityState` never leaving "visible". So a missing `visibilitychange`
+   handler cannot fail the gate even in principle.
+
+Any future detector for the second class must assert
+`document.visibilityState === "hidden"` and must NOT be built on
+default-flagged Playwright. A synthetic `visibilitychange` dispatch cannot change
+that read-only getter and yields a confident false pass.
+
+## D31 — a registry exports its defects
+173 of 359 sustained rAF loops ship with no `visibilitychange` handler, 113 with
+no pause path at all. On our own gallery this costs nothing: every card renders
+through `/preview/<name>/embed`, whose `animation-gate.ts` patches rAF and pauses
+on visibility and on a parent postMessage.
+
+That is exactly why it matters. The registry ships code as the product, so a
+missing handler is inherited by every consumer who installs that component, in
+their app, forever. Rank these by what a CONSUMER inherits, never by our runtime
+cost — and note that none of these fixes can be verified by screenshotting our
+gallery, because the iframe gate already masks them.
+
+## D32 — WebGL context ceiling is open, not settled
+`useMountManager` builds `new Set(onScreenNames)` uncapped and applies `mountCap`
+only to the off-screen backfill; its docblock states a card touching the viewport
+is never evicted. So the observed caps (showcase 12, saved-library 9, review 8)
+are FLOORS, not ceilings. Simultaneous WebGL contexts are bounded by on-screen
+card count, which is a layout question, against a browser cap of roughly 16.
+
+Open check: gallery filtered to WebGL components, narrowest supported viewport
+plus zoom-out, count intersecting cards, watch for `webglcontextlost` on the
+oldest iframes.
+
+Fixed this round: `loud/sand-lock` handled `webglcontextlost` but had no
+`webglcontextrestored`, so a lost context left it permanently blank. Still open:
+`core/hero-particles-webgl` (no pause, no lost, no restored) and
+`loud/scroll-defrost` (calls `WEBGL_lose_context` with no restore path).

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 // ---------------------------------------------------------------------------
 // SandLock — a full-bleed Chladni plate. Tens of thousands of grains of sand
@@ -362,6 +362,12 @@ export function SandLock({
   const uid = useId();
   const pausedRef = useRef(paused);
   pausedRef.current = paused;
+  // Bumped on webglcontextrestored so the effect below tears down and rebuilds
+  // every GL object. Without it the component handled loss by stopping the loop
+  // and never came back: a lost context left the plate permanently blank, and
+  // browsers drop the oldest context once enough live ones exist, which a
+  // gallery of WebGL cards reaches on its own.
+  const [glEpoch, setGlEpoch] = useState(0);
 
   useEffect(() => {
     const wrap = wrapRef.current;
@@ -1249,11 +1255,17 @@ export function SandLock({
       attributeFilter: ["class"],
     });
 
+    // preventDefault is what makes the context restorable at all; without it
+    // the browser never fires webglcontextrestored.
     const onLost = (e: Event) => {
       e.preventDefault();
       sleep();
     };
+    const onRestored = () => {
+      if (!disposed) setGlEpoch((n) => n + 1);
+    };
     canvas.addEventListener("webglcontextlost", onLost);
+    canvas.addEventListener("webglcontextrestored", onRestored);
 
     return () => {
       disposed = true;
@@ -1264,6 +1276,7 @@ export function SandLock({
       mq.removeEventListener("change", onMq);
       document.removeEventListener("visibilitychange", onVis);
       canvas.removeEventListener("webglcontextlost", onLost);
+      canvas.removeEventListener("webglcontextrestored", onRestored);
       wrap.removeEventListener("pointerenter", onEnter);
       wrap.removeEventListener("pointermove", onMove);
       wrap.removeEventListener("pointerleave", onLeave);
@@ -1285,7 +1298,7 @@ export function SandLock({
       gl.deleteProgram(grainProg);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [grains, speed, plateScale]);
+  }, [grains, speed, plateScale, glEpoch]);
 
   return (
     <div
