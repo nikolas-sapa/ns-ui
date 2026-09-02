@@ -109,7 +109,12 @@ const REF_ASPECT = 0.278;
 // specced to reproduce, because the table already encodes the visible
 // behaviour the biharmonic stencil should match, and an internal-units k is
 // what makes the discrete operator hit it.
-const K_BASE = 0.0213; // texel^4/s at eta=100 (melt centre)
+// Raised 7x from the calibrated 0.0213: at that rate the 4-texel deposition
+// cells survived the whole melt zone, so all three zones read identically
+// rough and the lambda^4 selectivity — the entire point — was invisible. The
+// explicit biharmonic is still far inside its stability bound at this value
+// (k*dt*64 ~ 0.08 at the substep this runs).
+const K_BASE = 0.15; // texel^4/s at eta=100 (melt centre)
 
 // STATIC_TIME chosen (per spec) so the bell sits at ~0.30 of its stroke
 // (off both ends, a legible ellipse) and all three zones are populated with
@@ -214,8 +219,16 @@ void main() {
     float fan = exp(-pow((uv.y - u_bellY) / 0.11, 2.0));
     float faraday = 1.0 / (1.0 + 2.4 * clamp(gradMag * 9.0, 0.0, 4.0));
     float depositRate = 0.6 * fan * faraday;
-    float n = hash21(uv * vec2(192.0, 108.0) + u_scrollStep * 0.0173 + 11.7) - 0.5;
-    newH = h + depositRate * u_dt + n * 0.11 * u_dt * 26.0;
+    // Orange peel is a millimetre-scale waviness, not per-texel grain: the
+    // noise is sampled on a 3-texel cell so levelling has a wavelength it can
+    // visibly act on, and its amplitude sits just above the deposit rate
+    // instead of 5x over it (which buried every other signal in hash).
+    // two wavelengths, which is the whole point of the piece: a ~4-texel
+    // cell that levelling kills within the melt zone, and a ~10-texel cell
+    // that rides all the way through to the frozen third.
+    float n = hash21(floor(uv * vec2(48.0, 27.0)) + u_scrollStep * 0.0173 + 11.7) - 0.5;
+    float n2 = hash21(floor(uv * vec2(20.0, 11.0)) * 1.7 + u_scrollStep * 0.0111 + 3.1) - 0.5;
+    newH = h + depositRate * u_dt + (n * 1.0 + n2 * 0.35) * 0.11 * u_dt * 11.0;
     newAge = 0.0;
   } else if (screenX < ${MELT_END.toFixed(2)}) {
     // melt/levelling: viscosity ramps cold -> melt -> gel across the zone on
@@ -234,7 +247,7 @@ void main() {
     newAge = age + u_dt;
     float growth = 1.0 - exp(-newAge / ${CURE_TAU_S.toFixed(2)});
     float localMean = (hR + hL + hU + hD) * 0.25;
-    newH = h + (h - localMean) * growth * 0.10 * u_dt;
+    newH = h + (h - localMean) * growth * 0.045 * u_dt;
   }
 
   // Numerical leak, not a physical process: bounds the ring-buffered field
@@ -269,9 +282,29 @@ uniform vec3 u_c4;
 uniform vec3 u_border;
 uniform float u_bias;
 uniform float u_contrast;
+uniform vec3 u_knock;
 
 float sampleH(vec2 uv) {
   return texture2D(u_field, uv).r;
+}
+
+// Bilinear reconstruction done in the shader, so it works identically on the
+// float path and on the RGBA8 packed fallback (each tap is decoded before it
+// is blended — interpolating packed bytes in hardware would decode to noise).
+float sampleHL(vec2 uv) {
+  vec2 f = uv / u_texel - 0.5;
+  vec2 i0 = floor(f);
+  vec2 t = f - i0;
+  vec2 b = (i0 + 0.5) * u_texel;
+  float y0 = clamp(b.y, 0.0, 1.0);
+  float y1 = clamp(b.y + u_texel.y, 0.0, 1.0);
+  float x0 = fract(b.x);
+  float x1 = fract(b.x + u_texel.x);
+  float h00 = sampleH(vec2(x0, y0));
+  float h10 = sampleH(vec2(x1, y0));
+  float h01 = sampleH(vec2(x0, y1));
+  float h11 = sampleH(vec2(x1, y1));
+  return mix(mix(h00, h10, t.x), mix(h01, h11, t.x), t.y);
 }
 
 float strip(float el, float at, float width) {
@@ -303,16 +336,25 @@ vec3 ramp(float x) {
 
 void main() {
   vec2 uv = vec2(fract(v_uv.x - u_scrollFrac), v_uv.y);
-  float h0 = sampleH(uv);
+  float h0 = sampleHL(uv);
+  // one-texel central difference over the INTERPOLATED field: the surface a
+  // viewer sees is continuous, not the 192x108 storage grid, and sampling
+  // the grid directly is what published every texel as a hard square.
   float eps = u_texel.x;
-  float hx = sampleH(vec2(fract(uv.x + eps), uv.y));
-  float hy = sampleH(vec2(uv.x, clamp(uv.y + u_texel.y, 0.0, 1.0)));
-  float hxm = sampleH(vec2(fract(uv.x - eps), uv.y));
-  float hym = sampleH(vec2(uv.x, clamp(uv.y - u_texel.y, 0.0, 1.0)));
+  float hx = sampleHL(vec2(fract(uv.x + eps), uv.y));
+  float hxm = sampleHL(vec2(fract(uv.x - eps), uv.y));
+  float hy = sampleHL(vec2(uv.x, clamp(uv.y + u_texel.y, 0.0, 1.0)));
+  float hym = sampleHL(vec2(uv.x, clamp(uv.y - u_texel.y, 0.0, 1.0)));
   float lap = hx + hxm + hy + hym - 4.0 * h0;
 
-  float k = 3.4;
-  vec3 n = normalize(vec3(-(hx - hxm) * k, (hy - hym) * k, 1.0));
+  // The surface tilt is clamped, not just scaled. Unclamped, a wavy film
+  // sweeps the reflection vector across the whole studio in a couple of
+  // texels, and the ramp saturates into black-and-white camouflage — the
+  // gloss reads as pattern instead of as a finish.
+  float k = 2.0;
+  float gx = clamp((hx - hxm) * k, -0.2, 0.2);
+  float gy = clamp((hy - hym) * k, -0.2, 0.2);
+  vec3 n = normalize(vec3(-gx, gy, 1.0));
 
   vec2 vp = (v_uv - 0.5);
   vec3 v = normalize(vec3(vp.x * 0.5, -vp.y * 0.5, 1.0));
@@ -326,19 +368,34 @@ void main() {
   float spec1 = pow(max(dot(r, l1), 0.0), mix(220.0, 40.0, rough));
   float spec2 = pow(max(dot(r, l2), 0.0), mix(140.0, 24.0, rough));
 
-  float mask = texture2D(u_text, v_uv).r;
+  // the mask canvas is authored y-down (2D canvas) while v_uv runs y-up from
+  // the fullscreen triangle, so it has to be flipped on both axes — it was
+  // being sampled straight through, which rendered the headline rotated 180
+  // degrees. Nobody caught it because the knockout was invisible anyway.
+  float mask = texture2D(u_text, vec2(v_uv.x, 1.0 - v_uv.y)).r;
   // suppress the specular lobe inside the knockout -- flatter, lower-variance
   float specSuppress = 1.0 - 0.7 * mask;
-  L += (spec1 * 0.55 + spec2 * 0.32) * specSuppress;
+  L += (spec1 * 0.2 + spec2 * 0.11) * specSuppress;
 
-  float Lc = clamp((L - 0.5) * u_contrast + 0.5 + u_bias, 0.0, 1.0);
+  // 0.62: the film is a coating catching a studio, not a chrome mirror. At
+  // full contrast every wavelet drove the ramp end to end and both themes
+  // resolved to the same black-and-white camouflage.
+  float Lc = clamp((L - 0.5) * u_contrast * 0.62 + 0.5 + u_bias, 0.0, 1.0);
   vec3 col = ramp(Lc);
 
-  // contrast-guaranteed knockout: force the region toward the matte-deposit
-  // stop (c1) regardless of the field's instantaneous shading, so legibility
-  // never depends on where the band happens to be.
-  vec3 knockoutCol = mix(u_c1, col, 0.22);
-  col = mix(col, knockoutCol, mask);
+  // Contrast-guaranteed knockout: the headline is held at the far end of the
+  // ramp from the film, keeping only a fifth of the surface's own shading as
+  // a gloss modulation. Mixed at 0.22 toward the matte stop, as it was, the
+  // type was inside the field's own value range and simply disappeared.
+  vec3 knockoutCol = mix(u_knock, col, 0.2);
+  float mk = clamp(mask * 1.15, 0.0, 1.0);
+  col = mix(col, knockoutCol, mk);
+  // a cut edge around the knockout in the opposite extreme, so the headline
+  // separates from whatever the film happens to be doing behind it — the
+  // film's own range is wide enough to swallow either extreme on its own
+  float rim = smoothstep(0.28, 0.5, mask) * (1.0 - smoothstep(0.62, 0.86, mask));
+  vec3 rimCol = mix(u_c4, u_c0, step(0.5, dot(u_knock, vec3(0.2126, 0.7152, 0.0722))));
+  col = mix(col, rimCol, rim * 0.55);
 
   // --border's one legitimate use here: a ~1px hairline top and bottom edge
   // rule for the band, never a fill or a highlight
@@ -509,6 +566,17 @@ export function PeelFlow({
       gl!.bindTexture(gl!.TEXTURE_2D, tex);
       gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_WRAP_S, gl!.CLAMP_TO_EDGE);
       gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_WRAP_T, gl!.CLAMP_TO_EDGE);
+      // LINEAR, not NEAREST: the field is 192x108 stretched over a full-bleed
+      // band, so nearest sampling published every texel as a hard 5px square
+      // and the whole component read as television static. Every simulation
+      // tap lands on an exact texel centre, so interpolation cannot alter the
+      // sim; it only stops the shading pass from quantising the surface.
+      // NEAREST, on both paths, and non-negotiable: RGBA32F is not
+      // guaranteed linearly filterable (OES_texture_float_linear), and an
+      // incomplete texture samples as opaque black — the field went dead
+      // flat when this was set to LINEAR. The shading pass interpolates in
+      // the shader instead (sampleHL), which also decodes the RGBA8
+      // fallback's packed pair correctly, one tap at a time.
       gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_MIN_FILTER, gl!.NEAREST);
       gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_MAG_FILTER, gl!.NEAREST);
       gl!.texImage2D(gl!.TEXTURE_2D, 0, internalFormat, SIM_W, SIM_H, 0, gl!.RGBA, type, null);
@@ -564,7 +632,7 @@ export function PeelFlow({
       const img = ctx.getImageData(0, 0, tw, th).data;
       const sharp = new Uint8Array(tw * th);
       for (let i = 0, j = 3; i < sharp.length; i++, j += 4) sharp[i] = img[j];
-      const softened = boxBlur(sharp, tw, th, Math.max(1, tw * 0.0018));
+      const softened = boxBlur(sharp, tw, th, Math.max(1, tw * 0.0008));
       const rgba = new Uint8Array(tw * th * 4);
       for (let i = 0, j = 0; i < softened.length; i++, j += 4) {
         rgba[j] = softened[i];
@@ -594,6 +662,7 @@ export function PeelFlow({
     let border: RGB = [0.5, 0.5, 0.5];
     let bias = 0;
     let contrast = 1.1;
+    let knock: RGB = [0.99, 0.99, 0.99];
 
     const readColors = () => {
       const cs = getComputedStyle(document.documentElement);
@@ -636,6 +705,8 @@ export function PeelFlow({
         }
       }
       [c0, c1, c2, c3, c4] = stops;
+      // the headline takes the far end of the ramp from the film's own range
+      knock = luminance(bg) < 0.5 ? c4 : c0;
     };
     readColors();
 
@@ -753,6 +824,8 @@ export function PeelFlow({
       gl!.uniform3f(loc(shadeProgram, shadeLocs, "u_c3"), ...c3);
       gl!.uniform3f(loc(shadeProgram, shadeLocs, "u_c4"), ...c4);
       gl!.uniform3f(loc(shadeProgram, shadeLocs, "u_border"), ...border);
+      // whichever end of the ramp the film is NOT sitting on
+      gl!.uniform3f(loc(shadeProgram, shadeLocs, "u_knock"), ...knock);
       gl!.uniform1f(loc(shadeProgram, shadeLocs, "u_bias"), bias);
       gl!.uniform1f(loc(shadeProgram, shadeLocs, "u_contrast"), contrast);
       gl!.drawArrays(gl!.TRIANGLES, 0, 6);

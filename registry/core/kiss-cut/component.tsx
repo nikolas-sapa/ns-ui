@@ -43,13 +43,16 @@ export interface KissCutProps {
 
 // -- real numbers, worked at W = 3*M, M = 340px (see spec) -------------------
 const STATIC_TIME = 2.32; // reduced-motion freeze frame, deliberately non-t0
-const LABEL_H_FRAC = 0.1; // label height as a fraction of M — not given by the
-// spec (only width is), chosen so label+margin reads as a plausible sticker.
-const LABEL_W_FRAC = 0.13;
-const GUTTER_FRAC = 0.022;
-const MARGIN_TB_FRAC = 0.028;
-const CORNER_R_FRAC = 0.018;
-const DIE_R_FRAC = 0.065; // diameter 0.13*M
+// Label geometry is sized so a card-scale (3:1) frame carries about six
+// labels across, each big enough to read as a die-cut sticker with a mark on
+// it. The earlier fractions produced 25x19px tiles — a strip of icons, not a
+// label web, and at that size no cut line can be legible at all.
+const LABEL_H_FRAC = 0.3; // label height as a fraction of M
+const LABEL_W_FRAC = 0.4;
+const GUTTER_FRAC = 0.075; // matrix between labels — has to be wide enough to see
+const MARGIN_TB_FRAC = 0.085;
+const CORNER_R_FRAC = 0.045;
+const DIE_R_FRAC = 0.11;
 const STRIP_BAR_X_FRAC = 0.62;
 const STRIP_ANGLE_DEG = 38;
 const NECK_RUN_FRAC = 0.03; // of W, the corner-neck's release run
@@ -166,14 +169,19 @@ interface Palette {
 }
 
 function buildPalette(tokens: Tokens, isDark: boolean): Palette {
-  const linerT = isDark ? 0.12 : 0.06;
-  const faceT = isDark ? 0.2 : 0.14;
+  // Three tones have to be separable at a glance, because the whole mechanic
+  // is a subtraction between them: liner (the layer the die never cuts),
+  // face stock / matrix (the layer it does), and bare liner (where the
+  // matrix has been carried away). At the old 0.12/0.20 spacing they were
+  // within 0.08 of each other — physically tidy, visually one grey.
+  const linerT = isDark ? 0.07 : 0.12;
+  const faceT = isDark ? 0.58 : 0.3;
   const liner = mix(tokens.bg, tokens.fg, linerT);
   const faceStock = mix(tokens.bg, tokens.fg, faceT);
   // siliconised bare liner reads glossier: nudged toward this theme's light
   // anchor (not a literal white — whichever of bg/fg is actually lighter).
-  const bareLiner = mix(liner, tokens.lightAnchor, 0.35);
-  const scoreGroove = mix(faceStock, tokens.darkAnchor, 0.32);
+  const bareLiner = mix(liner, tokens.lightAnchor, 0.14);
+  const scoreGroove = mix(faceStock, tokens.darkAnchor, 0.62);
   const scoreShoulder = mix(faceStock, tokens.lightAnchor, 0.32);
   const ribbonLight = mix(faceStock, tokens.lightAnchor, 0.42);
   const ribbonDark = mix(faceStock, tokens.darkAnchor, 0.42);
@@ -306,55 +314,84 @@ function breakState(tLocal: number): BreakState {
 
 // Deterministic tiny abstract mark drawn inside a label rect, purely from
 // --foreground strokes — never a real logo, wordmark or brand shape.
-function drawMark(ctx: CanvasRenderingContext2D, cx: number, cy: number, size: number, seed: number, color: string) {
-  const s = size;
+function drawMark(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  boxW: number,
+  boxH: number,
+  seed: number,
+  color: string,
+) {
+  // A printed label carries a lock-up, not a lone pictogram: a geometric
+  // glyph plus two wordmark bars standing in for a name. Deterministic and
+  // deliberately generic — never a real logo, wordmark or brand shape.
+  const s = boxH;
+  const glyphCx = cx - boxW / 2 + s * 0.5;
   ctx.save();
-  ctx.translate(cx, cy);
   ctx.strokeStyle = color;
   ctx.fillStyle = color;
-  ctx.lineWidth = Math.max(1, s * 0.09);
+  ctx.lineWidth = Math.max(1.2, s * 0.11);
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
-  ctx.globalAlpha = 0.78;
+  ctx.globalAlpha = 0.9;
+
+  ctx.save();
+  ctx.translate(glyphCx, cy);
   const kind = seed % 5;
   ctx.beginPath();
   if (kind === 0) {
-    // chevron
-    ctx.moveTo(-s * 0.32, s * 0.28);
-    ctx.lineTo(0, -s * 0.3);
-    ctx.lineTo(s * 0.32, s * 0.28);
+    // stacked chevrons
+    for (let i = 0; i < 2; i++) {
+      const o = i * s * 0.26;
+      ctx.moveTo(-s * 0.3, s * 0.1 + o);
+      ctx.lineTo(0, -s * 0.24 + o);
+      ctx.lineTo(s * 0.3, s * 0.1 + o);
+    }
     ctx.stroke();
   } else if (kind === 1) {
-    // slash + dot
-    ctx.moveTo(-s * 0.3, s * 0.3);
-    ctx.lineTo(s * 0.3, -s * 0.3);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(s * 0.32, s * 0.32, s * 0.07, 0, Math.PI * 2);
-    ctx.fill();
+    // solid square with a knocked-out bar
+    ctx.fillRect(-s * 0.32, -s * 0.32, s * 0.64, s * 0.64);
+    ctx.clearRect(-s * 0.12, -s * 0.34, s * 0.18, s * 0.68);
   } else if (kind === 2) {
-    // bracket-arrow
-    ctx.moveTo(-s * 0.12, -s * 0.32);
-    ctx.lineTo(s * 0.32, 0);
-    ctx.lineTo(-s * 0.12, s * 0.32);
+    // ring plus a solid counter
+    ctx.arc(0, 0, s * 0.3, 0, Math.PI * 2);
     ctx.stroke();
     ctx.beginPath();
-    ctx.moveTo(-s * 0.34, -s * 0.32);
-    ctx.lineTo(-s * 0.34, s * 0.32);
-    ctx.stroke();
+    ctx.arc(0, 0, s * 0.13, 0, Math.PI * 2);
+    ctx.fill();
   } else if (kind === 3) {
     // three ascending bars
     for (let i = 0; i < 3; i++) {
-      const bx = -s * 0.28 + i * s * 0.28;
-      const bh = s * (0.18 + i * 0.16);
-      ctx.moveTo(bx, s * 0.3);
-      ctx.lineTo(bx, s * 0.3 - bh);
+      const bx = -s * 0.26 + i * s * 0.26;
+      const bh = s * (0.22 + i * 0.18);
+      ctx.moveTo(bx, s * 0.32);
+      ctx.lineTo(bx, s * 0.32 - bh);
     }
     ctx.stroke();
   } else {
-    // ring with a gap
-    ctx.arc(0, 0, s * 0.28, Math.PI * 0.15, Math.PI * 1.75);
+    // triangle over a rule
+    ctx.moveTo(-s * 0.3, s * 0.12);
+    ctx.lineTo(0, -s * 0.32);
+    ctx.lineTo(s * 0.3, s * 0.12);
+    ctx.closePath();
     ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(-s * 0.3, s * 0.32);
+    ctx.lineTo(s * 0.3, s * 0.32);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // wordmark: two bars, second one shorter, at label-caption proportions
+  const barX = glyphCx + s * 0.62;
+  const barMax = cx + boxW / 2 - barX;
+  if (barMax > s * 0.3) {
+    const barH = Math.max(2, s * 0.17);
+    ctx.globalAlpha = 0.82;
+    ctx.fillRect(barX, cy - barH * 1.4, barMax * (0.5 + (seed % 3) * 0.14), barH);
+    ctx.globalAlpha = 0.5;
+    ctx.fillRect(barX, cy + barH * 0.5, barMax * (0.32 + (seed % 2) * 0.16), barH);
   }
   ctx.restore();
 }
@@ -480,6 +517,19 @@ export function KissCut({ paused: pausedProp, onPausedChange, className = "" }: 
       ctx.fillStyle = css(P.liner);
       ctx.fillRect(0, L.webTop, w, L.webBottom - L.webTop);
 
+      // The subtraction, stated in one edge: right of the strip bar the face
+      // stock is still a continuous sheet (labels are only SCORED into it,
+      // which is what a kiss cut is); left of it the matrix has been carried
+      // away and the labels stand alone on bare liner. Filling the two
+      // regions as whole sheets — instead of tinting each gutter cell —
+      // makes the boundary a single hard tonal step, which is the only way
+      // the mechanic survives at card scale.
+      const bandH = L.webBottom - L.webTop;
+      ctx.fillStyle = css(P.faceStock);
+      ctx.fillRect(L.stripBarX, L.webTop, w - L.stripBarX, bandH);
+      ctx.fillStyle = css(P.bareLiner);
+      ctx.fillRect(0, L.webTop, L.stripBarX, bandH);
+
       const bs = breakState(breakLocalT);
 
       // -- label / matrix cells --------------------------------------------
@@ -489,28 +539,29 @@ export function KissCut({ paused: pausedProp, onPausedChange, className = "" }: 
         const leftX = labelScreenX(L, k, scroll);
         const labelLeft = leftX;
         const labelRight = leftX + L.labelW;
-        const gutterLeft = labelRight;
-        const gutterRight = labelRight + L.gutter;
         if (labelRight < -4 || labelLeft > w + 4) continue;
 
-        // gutter (matrix or bare liner): bare liner once past the strip bar
-        // AND the matrix has actually been carried away this cycle.
-        const gutterPastStrip = gutterLeft < L.stripBarX;
-        if (gutterPastStrip) {
-          // liner already shows through (fillRect above); overlay the
-          // slightly glossier bare tone only in the gutter footprint.
-          ctx.fillStyle = css(P.bareLiner, 0.9);
-          ctx.fillRect(Math.max(0, gutterLeft), L.webTop, Math.min(w, gutterRight) - Math.max(0, gutterLeft), L.webBottom - L.webTop);
-        } else {
-          ctx.fillStyle = css(P.faceStock);
-          ctx.fillRect(Math.max(0, gutterLeft), L.webTop, Math.min(w, gutterRight) - Math.max(0, gutterLeft), L.webBottom - L.webTop);
-        }
-
-        // label rect (face stock)
+        // label rect (face stock). Past the strip bar it is the only face
+        // stock left on the liner; before it, it is indistinguishable from
+        // the sheet it is still part of, and only the score line marks it.
         const ry = L.webCenterY - L.labelH / 2;
         ctx.fillStyle = css(P.faceStock);
         roundRect(ctx, labelLeft, ry, L.labelW, L.labelH, L.cornerR);
         ctx.fill();
+        if (labelLeft + L.labelW < L.stripBarX) {
+          // stripped labels lie proud of the liner: a contact shadow under
+          // the lower edge plus a touch more light on the face. Without the
+          // shadow they read as flat chips printed on a bar.
+          ctx.fillStyle = css(P.scoreGroove, 0.35);
+          roundRect(ctx, labelLeft, ry + Math.max(1.5, L.labelH * 0.05), L.labelW, L.labelH, L.cornerR);
+          ctx.fill();
+          ctx.fillStyle = css(P.faceStock);
+          roundRect(ctx, labelLeft, ry, L.labelW, L.labelH, L.cornerR);
+          ctx.fill();
+          ctx.fillStyle = css(P.scoreShoulder, 0.22);
+          roundRect(ctx, labelLeft, ry, L.labelW, L.labelH, L.cornerR);
+          ctx.fill();
+        }
 
         // kiss-cut score line — a groove + a lit shoulder, never a border
         // token, never a colour flash: geometry (a two-stroke offset pair)
@@ -531,7 +582,7 @@ export function KissCut({ paused: pausedProp, onPausedChange, className = "" }: 
         // mark — printed on the face stock, independent of the cut state
         if (labelRight > 0 && labelLeft < w) {
           const markSeed = ((k % L.markCount) + L.markCount) % L.markCount;
-          drawMark(ctx, labelLeft + L.labelW / 2, L.webCenterY, Math.min(L.labelW, L.labelH) * 0.72, markSeed, css(P.mark, 0.78));
+          drawMark(ctx, labelLeft + L.labelW / 2, L.webCenterY, L.labelW * 0.76, L.labelH * 0.5, markSeed, css(P.mark, 0.85));
         }
       }
 
@@ -643,13 +694,16 @@ export function KissCut({ paused: pausedProp, onPausedChange, className = "" }: 
       ctx.strokeStyle = css(P.hardware, 0.95);
       ctx.lineWidth = Math.max(1.5, L.M * 0.012);
       ctx.beginPath();
-      ctx.arc(L.dieX, L.webCenterY, L.dieR, 0, Math.PI * 2);
+      // the die is a roller riding ON the web, so it sits tangent to the top
+      // edge — drawn through the labels it read as a circle printed on one
+      const dieCy = L.webTop - L.dieR * 0.82;
+      ctx.arc(L.dieX, dieCy, L.dieR, 0, Math.PI * 2);
       ctx.stroke();
       for (let i = 0; i < 3; i++) {
         const a = angle + (i * Math.PI * 2) / 3;
         ctx.beginPath();
-        ctx.moveTo(L.dieX + Math.cos(a) * L.dieR * 0.55, L.webCenterY + Math.sin(a) * L.dieR * 0.55);
-        ctx.lineTo(L.dieX + Math.cos(a) * L.dieR * 0.95, L.webCenterY + Math.sin(a) * L.dieR * 0.95);
+        ctx.moveTo(L.dieX + Math.cos(a) * L.dieR * 0.5, dieCy + Math.sin(a) * L.dieR * 0.5);
+        ctx.lineTo(L.dieX + Math.cos(a) * L.dieR * 0.95, dieCy + Math.sin(a) * L.dieR * 0.95);
         ctx.stroke();
       }
 
