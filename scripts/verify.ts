@@ -180,10 +180,23 @@ async function verifyComponent(page: Page, name: string, dir: string, meta: Meta
 
   for (const theme of ["dark", "light"] as const) {
     const consoleErrors: string[] = [];
-    const onConsole = (msg: { type(): string; text(): string }) => {
-      if (msg.type() === "error") consoleErrors.push(msg.text());
+    // Vercel Analytics requests /_vercel/insights/script.js, which 404s in local
+    // dev (no Vercel platform behind it) and is unrelated to the component under
+    // test. The 404 lands in the message's resource location, not its text, so
+    // check both. Drop only that noise; anything else still fails the gate.
+    const isVercelNoise = (text: string) => text.includes("/_vercel/");
+    const onConsole = (msg: { type(): string; text(): string; location(): { url: string } }) => {
+      if (
+        msg.type() === "error" &&
+        !isVercelNoise(msg.text()) &&
+        !isVercelNoise(msg.location().url)
+      ) {
+        consoleErrors.push(msg.text());
+      }
     };
-    const onPageError = (err: Error) => consoleErrors.push(String(err));
+    const onPageError = (err: Error) => {
+      if (!isVercelNoise(String(err))) consoleErrors.push(String(err));
+    };
     page.on("console", onConsole);
     page.on("pageerror", onPageError);
 
