@@ -155,7 +155,10 @@ export function FlyingSplice({ paused = false, className = "", style }: FlyingSp
     };
     readColors(); // first statement in the effect — no paint precedes this
 
-    const paperColor = () => mixRGB(bg, fg, dark ? 0.16 : 0.1);
+    // Paper has to READ as paper against the band: at 0.16 in dark theme the
+    // rolls were near-black discs on a near-black band and the whole
+    // mechanism was invisible, however correct its motion was.
+    const paperColor = () => mixRGB(bg, fg, dark ? 0.34 : 0.13);
     const markColor = () => rgbCss(fg, 0.78);
 
     // --- seeded mark generator: 3 abstract families (concentric arcs, bar
@@ -372,14 +375,16 @@ export function FlyingSplice({ paused = false, className = "", style }: FlyingSp
       c.save();
       c.globalAlpha = state.opacity;
       const base = paperColor();
-      const hi = mixRGB(base, WHITE, 0.14);
-      const lo = mixRGB(base, BLACK, 0.14);
+      const hi = mixRGB(base, WHITE, 0.10);
+      const lo = mixRGB(base, BLACK, 0.12);
       // single-lamp Lambert shade: a radial gradient whose centre is offset
       // toward the light azimuth (118deg), i.e. the classic sphere-shading
       // trick, cheap in 2D canvas and value-only (no hue).
       const az = (118 * Math.PI) / 180;
-      const gx = x + Math.cos(az) * state.radius * 0.55;
-      const gy = py + Math.sin(az) * state.radius * 0.55;
+      // a shallow offset: at 0.55 the shading read as a billiard ball rather
+      // than as the flat end of a wound coil.
+      const gx = x + Math.cos(az) * state.radius * 0.22;
+      const gy = py + Math.sin(az) * state.radius * 0.22;
       const grad = c.createRadialGradient(gx, gy, state.radius * 0.05, x, py, state.radius * 1.05);
       grad.addColorStop(0, rgbCss(hi));
       grad.addColorStop(0.55, rgbCss(base));
@@ -402,9 +407,19 @@ export function FlyingSplice({ paused = false, className = "", style }: FlyingSp
         const rr = (state.radius * i) / rings;
         c.beginPath();
         c.arc(x, py, rr, 0, Math.PI * 2);
-        c.strokeStyle = rgbCss(i % 2 === 0 ? hi : lo, 0.12);
+        c.strokeStyle = rgbCss(i % 2 === 0 ? hi : lo, 0.3);
         c.stroke();
       }
+      // core: a roll of paper has a visible hub, and the hub is what tells
+      // you the wrap edge is receding toward it as the roll runs down.
+      c.beginPath();
+      c.arc(x, py, Math.max(3, state.radius * 0.17), 0, Math.PI * 2);
+      c.fillStyle = rgbCss(bg, 0.92);
+      c.fill();
+      c.lineWidth = 1;
+      c.strokeStyle = rgbCss(fg, 0.45);
+      c.stroke();
+
       // radial index lines — what makes rotation and RPM legible.
       c.strokeStyle = rgbCss(fg, dark ? 0.55 : 0.4);
       c.lineWidth = Math.max(1, state.radius * 0.035);
@@ -439,6 +454,30 @@ export function FlyingSplice({ paused = false, className = "", style }: FlyingSp
       ctx.lineTo(cssW, cssH - 0.5);
       ctx.stroke();
 
+      // The web itself. Without a visible strip of paper leaving the running
+      // roll there is no ribbon, only marks floating on the band — which is
+      // exactly how the first cut read.
+      const stateA0 = standState(runningIsA, cycle, phase);
+      const stateB0 = standState(!runningIsA, cycle, phase);
+      const runX = runningIsA ? standAx : standBx;
+      // the web leaves the roll at its wrap edge, so it must end just inside
+      // the CURRENT radius — anchored to the stand centre it would jut out
+      // past a run-down roll as a bare rectangle.
+      const runRadius = (runningIsA ? stateA0 : stateB0).radius;
+      const webEnd = runX - runRadius * 0.35;
+      const webH = markSize() * 1.95;
+      const paper = paperColor();
+      ctx.fillStyle = rgbCss(paper);
+      ctx.fillRect(0, cy - webH / 2, webEnd, webH);
+      ctx.strokeStyle = rgbCss(mixRGB(paper, BLACK, 0.35), 0.8);
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, cy - webH / 2 + 0.5);
+      ctx.lineTo(webEnd, cy - webH / 2 + 0.5);
+      ctx.moveTo(0, cy + webH / 2 - 0.5);
+      ctx.lineTo(webEnd, cy + webH / 2 - 0.5);
+      ctx.stroke();
+
       // ribbon of marks, spawned at the nip and scrolling left at v(t).
       const spc = spacing();
       const ms = markSize();
@@ -461,7 +500,13 @@ export function FlyingSplice({ paused = false, className = "", style }: FlyingSp
         const base = paperColor();
         const tapeCol = mixRGB(base, BLACK, 0.14);
         const hairline = mixRGB(base, WHITE, 0.09);
-        const bandH = ms * 1.6;
+        // clipped to the web: splice tape is stuck ON the paper, so it can
+        // never stand above or below the strip it is taped to.
+        const bandH = webH * 1.2;
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0, cy - webH / 2, Math.max(0, webEnd), webH);
+        ctx.clip();
         for (const sign of [-1, 1]) {
           ctx.save();
           ctx.translate(tapeX, cy);
@@ -472,11 +517,47 @@ export function FlyingSplice({ paused = false, className = "", style }: FlyingSp
           ctx.fillRect(tapeW / 2 - Math.max(1, tapeW * 0.08), -bandH, Math.max(1, tapeW * 0.08), bandH * 2);
           ctx.restore();
         }
+        ctx.restore();
       }
 
-      // two roll stands.
-      const stateA = standState(runningIsA, cycle, phase);
-      const stateB = standState(!runningIsA, cycle, phase);
+      // two roll stands: the stand hardware first, then the roll on it.
+      const stateA = stateA0;
+      const stateB = stateB0;
+      const drawStand = (x: number, state: StandState) => {
+        if (!state.visible || state.opacity <= 0.01) return;
+        const footY = cy + RMAX * 1.18;
+        ctx.save();
+        ctx.globalAlpha = state.opacity;
+        ctx.strokeStyle = rgbCss(fg, 0.38);
+        ctx.lineWidth = Math.max(2, RMAX * 0.06);
+        ctx.beginPath();
+        ctx.moveTo(x, cy + state.offsetY);
+        ctx.lineTo(x, footY);
+        ctx.stroke();
+        ctx.lineWidth = Math.max(1, RMAX * 0.045);
+        ctx.beginPath();
+        ctx.moveTo(x - RMAX * 0.42, footY);
+        ctx.lineTo(x + RMAX * 0.42, footY);
+        ctx.stroke();
+        ctx.restore();
+      };
+      drawStand(standAx, stateA);
+      drawStand(standBx, stateB);
+      // The stand's capacity ring: a full roll fills it, and the gap between
+      // it and the running roll's wrap edge IS the run-down, readable in a
+      // single still instead of only across 22 seconds of motion.
+      const runState = runningIsA ? stateA : stateB;
+      if (runState.visible && runState.opacity > 0.01) {
+        ctx.save();
+        ctx.globalAlpha = runState.opacity * 0.5;
+        ctx.setLineDash([3, 5]);
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = rgbCss(fg, 0.55);
+        ctx.beginPath();
+        ctx.arc(runX, cy + runState.offsetY, RMAX, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
       drawRoll(ctx, standAx, stateA);
       drawRoll(ctx, standBx, stateB);
 

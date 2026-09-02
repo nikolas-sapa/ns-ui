@@ -51,9 +51,16 @@ const CONTACT_LEAD_PX = 9;
 const GHOST_PITCH_FACTOR = 0.055;
 const GHOST_PITCH_FLOOR = 16;
 const GHOST_JITTER_PX = 6;
+// Deposit alpha = uptake * this. A blot that the eye cannot find is not
+// social proof, and at 0.7 on a mid-grey panel the older half of the stack
+// was under the visible threshold once blurred.
+const DEPOSIT_ALPHA_FACTOR = 0.95;
 
-const CAPILLARY_BLUR_START = 1.4;
-const BLUR_ASYMPTOTE = 3.1;
+const CAPILLARY_BLUR_START = 1.1;
+// 3.1px dissolved an 18px-tall mark into the paper: an older blot has to stay
+// READABLE as a blot, since the accumulated residue is this component's whole
+// payoff. The curve shape and time-constant are unchanged.
+const BLUR_ASYMPTOTE = 2.2;
 const BLUR_TAU_S = 26;
 const ALPHA_DECAY_PER_MIN = 0.04;
 
@@ -61,7 +68,15 @@ const FIBRE_COUNT = 40;
 const FEATHER_RATE_PX_S = 1.6;
 const FEATHER_MAX_PX = 9;
 
-const SEED_AGES_S = [0.4, 3, 9, 22, 60, 140];
+// Two independent axes, which the first cut conflated: how OLD the blot is
+// (blur, feathering, the 4%/min fade) and how fresh the STROKE was when it
+// was blotted (the uptake law, which sets how much ink it gave up). Seeding
+// both from one age meant every mark older than ~3s was deposited at the
+// 0.04 uptake floor and rendered invisible — a grey slab with correct
+// physics. Eight marks, each a reasonably fresh stroke blotted at a
+// different time in the past, is what a used blotter actually looks like.
+const SEED_OWN_AGES_S = [1, 4, 9, 20, 42, 80, 150, 260];
+const SEED_STROKE_AGES_S = [0.2, 0.9, 0.35, 1.6, 0.5, 2.4, 0.7, 1.2];
 
 // A blotter over a live register keeps receiving other people's blottings —
 // this is what keeps the sheet mid-process indefinitely instead of the six
@@ -145,6 +160,24 @@ function relLuminance(css: string): number {
   return 0.2126 * r! + 0.7152 * g! + 0.0722 * b!;
 }
 
+function resolveRGB(css: string): [number, number, number] {
+  const probe = document.createElement("span");
+  probe.style.color = css;
+  probe.style.display = "none";
+  document.body.appendChild(probe);
+  const rgb = getComputedStyle(probe).color;
+  document.body.removeChild(probe);
+  const m = rgb.match(/[\d.]+/g);
+  if (!m) return [0, 0, 0];
+  return [Number(m[0]), Number(m[1]), Number(m[2])];
+}
+
+function mixCss(a: string, b: string, t: number): string {
+  const [ar, ag, ab] = resolveRGB(a);
+  const [br, bg2, bb] = resolveRGB(b);
+  return `rgb(${Math.round(ar + (br - ar) * t)}, ${Math.round(ag + (bg2 - ag) * t)}, ${Math.round(ab + (bb - ab) * t)})`;
+}
+
 function readTokens(): Tokens | null {
   if (typeof document === "undefined") return null;
   const cs = getComputedStyle(document.documentElement);
@@ -155,7 +188,11 @@ function readTokens(): Tokens | null {
   const dark = relLuminance(bg) < relLuminance(fg);
   // dark theme: the register paper reads as the lighter --ns-muted panel and
   // the ink is drawn as --background so it stays the darker of the pair.
-  return { fg, bg, muted, ink: dark ? bg : fg, paper: dark ? muted : bg };
+  // Dark theme: the panel is --ns-muted pulled halfway back toward
+  // --background. Bare --ns-muted is a near-white slab in a dark card — it
+  // read as a broken image rather than as paper, and it still clears the ink
+  // (--background) by a wide margin at this mix.
+  return { fg, bg, muted, ink: dark ? bg : fg, paper: dark ? mixCss(muted, bg, 0.26) : mixCss(bg, fg, 0.04) };
 }
 
 // A one-shot raster of a mark, built once per ghost and composited (mirrored,
@@ -347,12 +384,18 @@ export function RockerBlot({
     // one more mark lost in the palimpsest.
     const queuePitch = () => Math.max(QUEUE_PITCH_FLOOR, QUEUE_PITCH_FACTOR * minDim());
 
+    // The sheet is a sheet: inset from the canvas on all four sides with its
+    // own rounded edge, so it reads as a piece of blotting paper lying under
+    // the form rather than as a full-bleed grey fill (which read as a broken
+    // image).
     const layout = () => {
       const entryY = 16;
-      const sheetTop = 34;
-      const sheetH = Math.max(40, h - sheetTop - 4);
-      const rockerParkX = w - 30;
-      return { entryY, sheetTop, sheetH, rockerParkX };
+      const sheetTop = 30;
+      const sheetX = 12;
+      const sheetW = Math.max(40, w - 24);
+      const sheetH = Math.max(40, h - sheetTop - 12);
+      const rockerParkX = sheetX + sheetW - 34;
+      return { entryY, sheetTop, sheetX, sheetW, sheetH, rockerParkX };
     };
 
     const seedGhosts = () => {
@@ -360,15 +403,15 @@ export function RockerBlot({
       nextGhostId = 0;
       nextAmbientDueMs = mountedAtMs + AMBIENT_ADD_INTERVAL_S * 1000;
       if (!tokens) return;
-      SEED_AGES_S.forEach((age, i) => {
+      SEED_OWN_AGES_S.forEach((age, i) => {
         const rand = mulberry32(9000 + i * 17);
-        const uptake = uptakeFor(age);
+        const uptake = uptakeFor(SEED_STROKE_AGES_S[i] ?? 1);
         ghosts.push({
           id: nextGhostId++,
           persistent: false,
           ownAgeAtCreateSec: age,
           createdAtMs: mountedAtMs,
-          baseAlpha: uptake * 0.7,
+          baseAlpha: uptake * DEPOSIT_ALPHA_FACTOR,
           raster: buildSquiggleRaster(4200 + i * 31, tokens!.ink),
           rasterText: null,
           rasterSeed: 4200 + i * 31,
@@ -394,7 +437,7 @@ export function RockerBlot({
         persistent: false,
         ownAgeAtCreateSec: 0,
         createdAtMs: nowMs,
-        baseAlpha: uptakeFor(0) * 0.7,
+        baseAlpha: uptakeFor(0) * DEPOSIT_ALPHA_FACTOR,
         raster: buildSquiggleRaster(seed, tokens.ink),
         rasterText: null,
         rasterSeed: seed,
@@ -429,15 +472,15 @@ export function RockerBlot({
       // durable session artefact survives a sheet change.
       const persistentGhosts = ghosts.filter((g) => g.persistent);
       ghosts = persistentGhosts;
-      SEED_AGES_S.slice(0, 3).forEach((age, i) => {
+      SEED_OWN_AGES_S.slice(0, 3).forEach((age: number, i: number) => {
         const rand = mulberry32(7700 + i * 19);
-        const uptake = uptakeFor(age);
+        const uptake = uptakeFor(SEED_STROKE_AGES_S[i] ?? 1);
         ghosts.push({
           id: nextGhostId++,
           persistent: false,
           ownAgeAtCreateSec: age,
           createdAtMs: performance.now(),
-          baseAlpha: uptake * 0.7,
+          baseAlpha: uptake * DEPOSIT_ALPHA_FACTOR,
           raster: buildSquiggleRaster(6600 + i * 41, tokens!.ink),
           rasterText: null,
           rasterSeed: 6600 + i * 41,
@@ -493,17 +536,20 @@ export function RockerBlot({
       const { sheetTop } = layout();
       let cx: number;
       let cy: number;
+      const { sheetX, sheetW, sheetH } = layout();
       if (g.queueIndex != null) {
         // queue lattice: its own right-hand column, its own (wider) pitch —
         // deliberately separated from the ambient scatter's column so a
         // visitor's own slots read as a stack, not more residue.
         const pitch = queuePitch();
-        cx = w * 0.74 + g.jitterX;
-        cy = sheetTop + 16 + g.queueIndex * pitch + g.jitterY;
+        cx = sheetX + sheetW * 0.72 + g.jitterX;
+        cy = sheetTop + 18 + g.queueIndex * pitch + g.jitterY;
       } else {
-        const pitch = ghostPitch();
-        cx = w * 0.28 + g.jitterX;
-        cy = sheetTop + 14 + (g.id % 8) * pitch + g.jitterY;
+        // ambient scatter: its own column, spread down the whole sheet so the
+        // residue reads as an accumulation rather than a huddle in one corner.
+        const pitch = Math.max(ghostPitch(), (sheetH - 30) / 7);
+        cx = sheetX + sheetW * (0.42 + 0.1 * ((g.id % 3) - 1)) + g.jitterX;
+        cy = sheetTop + 18 + (g.id % 8) * pitch + g.jitterY;
       }
 
       ctx.save();
@@ -571,6 +617,48 @@ export function RockerBlot({
       ctx.globalAlpha = 1;
     };
 
+    /** The rocker itself: a curved blotting-paper shoe with a handle above
+     * it. Two bare arcs read as a stray scratch on the still; a body with a
+     * grip reads as the tool that made the marks. */
+    const drawRockerBody = () => {
+      const halfW = ARC_WIDTH_PX / 2;
+      ctx.beginPath();
+      ctx.moveTo(-halfW, 0);
+      ctx.quadraticCurveTo(0, -11, halfW, 0);
+      ctx.lineTo(halfW - 3, -13);
+      ctx.lineTo(-halfW + 3, -13);
+      ctx.closePath();
+      ctx.globalAlpha = 0.9;
+      ctx.fillStyle = tokens!.paper;
+      ctx.fill();
+      ctx.globalAlpha = 0.75;
+      ctx.strokeStyle = tokens!.muted;
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
+      // the contact arc: the edge that actually touches the sheet
+      ctx.globalAlpha = 0.9;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-halfW, 0);
+      ctx.quadraticCurveTo(0, -11, halfW, 0);
+      ctx.stroke();
+
+      // handle
+      ctx.globalAlpha = 0.7;
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.roundRect(-9, -22, 18, 9, 3);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(-4, -13);
+      ctx.lineTo(-4, -22);
+      ctx.moveTo(4, -13);
+      ctx.lineTo(4, -22);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    };
+
     const drawRocker = (nowMs: number) => {
       const { sheetTop, rockerParkX } = layout();
       const travel = sweepTravel();
@@ -587,38 +675,60 @@ export function RockerBlot({
         x = rockerParkX;
         angle = rockerIdleAngle(nowMs);
       }
-      const y = sheetTop - 6;
+      const y = sheetTop + 32; // parked ON the sheet, handle and all
       ctx.save();
       ctx.translate(x + (sweeping ? CONTACT_LEAD_PX : 0), y + (sweeping ? 0 : ROCKER_IDLE_TRANSLATE_PX * Math.sin((nowMs / 1000 / ROCKER_IDLE_PERIOD_S) * Math.PI * 2)));
       ctx.rotate((angle * Math.PI) / 180);
-      ctx.strokeStyle = tokens!.muted;
-      ctx.globalAlpha = 0.85;
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(-ARC_WIDTH_PX / 2, 0);
-      ctx.quadraticCurveTo(0, -10, ARC_WIDTH_PX / 2, 0);
-      ctx.stroke();
-      ctx.lineWidth = 1;
-      ctx.globalAlpha = 0.5;
-      ctx.beginPath();
-      ctx.moveTo(-ARC_WIDTH_PX / 2 + 4, 3);
-      ctx.quadraticCurveTo(0, -6, ARC_WIDTH_PX / 2 - 4, 3);
-      ctx.stroke();
+      drawRockerBody();
       ctx.restore();
       ctx.globalAlpha = 1;
     };
 
+    /** The sheet's own outline — also the clip for everything blotted onto
+     * it, so no mark can run off the paper. */
+    const sheetPath = () => {
+      const { sheetTop, sheetX, sheetW, sheetH } = layout();
+      ctx.beginPath();
+      ctx.roundRect(sheetX + 0.5, sheetTop + 0.5, sheetW - 1, sheetH - 1, 5);
+    };
+
     const drawSheetPanel = () => {
-      const { sheetTop, sheetH } = layout();
+      const { sheetTop, sheetX, sheetW, sheetH } = layout();
       ctx.save();
       // register paper: --background in light theme, an --ns-muted panel
       // (lighter than the page) in dark theme — see readTokens().
+      sheetPath();
       ctx.fillStyle = tokens!.paper;
-      ctx.fillRect(0, sheetTop, w, sheetH);
+      ctx.fill();
+
+      // Paper, not a filled rectangle: a deterministic fibre speckle plus the
+      // shading the rocker bar casts along the top edge. Both are drawn from
+      // the same seed every frame, so the reduced-motion still is stable.
+      ctx.save();
+      sheetPath();
+      ctx.clip();
+      const grain = mulberry32(77);
+      ctx.fillStyle = tokens!.ink;
+      for (let i = 0; i < 220; i++) {
+        ctx.globalAlpha = 0.015 + grain() * 0.03;
+        const gx = sheetX + grain() * sheetW;
+        const gy = sheetTop + grain() * sheetH;
+        ctx.fillRect(gx, gy, 1, 1);
+      }
+      ctx.globalAlpha = 1;
+      const shade = ctx.createLinearGradient(0, sheetTop, 0, sheetTop + 14);
+      shade.addColorStop(0, tokens!.ink);
+      shade.addColorStop(1, tokens!.paper);
+      ctx.globalAlpha = 0.09;
+      ctx.fillStyle = shade;
+      ctx.fillRect(sheetX, sheetTop, sheetW, 14);
+      ctx.restore();
+
+      ctx.globalAlpha = 0.55;
       ctx.strokeStyle = tokens!.muted;
       ctx.lineWidth = 1;
-      ctx.globalAlpha = 0.35;
-      ctx.strokeRect(0.5, sheetTop + 0.5, w - 1, sheetH - 1);
+      sheetPath();
+      ctx.stroke();
       ctx.restore();
       ctx.globalAlpha = 1;
     };
@@ -641,7 +751,11 @@ export function RockerBlot({
       ctx.save();
       ctx.translate(sheetOffset, 0);
       drawSheetPanel();
+      ctx.save();
+      sheetPath();
+      ctx.clip();
       for (const g of ghosts) drawGhost(g, nowMs);
+      ctx.restore();
       ctx.restore();
 
       // outside the sheet's translate: the ruled stroke sits under the
@@ -671,7 +785,7 @@ export function RockerBlot({
           persistent: false,
           ownAgeAtCreateSec: age,
           createdAtMs: staticNowMs, // ownAge at staticNowMs collapses to `age` exactly
-          baseAlpha: uptakeFor(age) * 0.7,
+          baseAlpha: uptakeFor(age) * DEPOSIT_ALPHA_FACTOR,
           raster: buildSquiggleRaster(4200 + i * 31, tokens!.ink),
           rasterText: null,
           rasterSeed: 4200 + i * 31,
@@ -711,7 +825,11 @@ export function RockerBlot({
     const drawStatic = () => {
       ctx.clearRect(0, 0, w, h);
       drawSheetPanel();
+      ctx.save();
+      sheetPath();
+      ctx.clip();
       for (const g of ghosts) drawGhost(g, staticNowMs);
+      ctx.restore();
       drawEntryStroke(staticNowMs);
       const { sheetTop } = layout();
       const travel = sweepTravel();
@@ -720,12 +838,7 @@ export function RockerBlot({
       ctx.translate(x + CONTACT_LEAD_PX, sheetTop - 6);
       ctx.rotate((STATIC_ROCKER_DEG * Math.PI) / 180);
       ctx.strokeStyle = tokens!.muted;
-      ctx.globalAlpha = 0.85;
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(-ARC_WIDTH_PX / 2, 0);
-      ctx.quadraticCurveTo(0, -10, ARC_WIDTH_PX / 2, 0);
-      ctx.stroke();
+      drawRockerBody();
       ctx.restore();
       ctx.globalAlpha = 1;
     };
@@ -978,7 +1091,7 @@ export function RockerBlot({
             type="submit"
             disabled={submitted}
             aria-label={submitted ? "Submitted — placeholder submitted state" : buttonLabel}
-            className="shrink-0 rounded-[6px] bg-ns-accent px-4 py-2 text-sm font-medium text-white transition-colors duration-150 hover:bg-ns-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent disabled:cursor-not-allowed disabled:bg-ns-muted disabled:opacity-60"
+            className="shrink-0 rounded-[6px] bg-ns-accent px-4 py-2 text-sm font-medium text-white transition-colors duration-150 hover:bg-ns-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ns-accent disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-ns-muted disabled:opacity-60"
           >
             {submitted ? "Placeholder submitted state" : buttonLabel}
           </button>
@@ -996,7 +1109,7 @@ export function RockerBlot({
         )}
       </form>
 
-      <div className="relative mt-3 h-56 w-full">
+      <div className="relative mt-3 h-48 w-full">
         <canvas ref={canvasRef} aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full" />
       </div>
 

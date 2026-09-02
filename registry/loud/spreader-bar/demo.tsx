@@ -7,7 +7,7 @@ import { SpreaderBar } from "./component";
 export default function SpreaderBarDemo() {
   return (
     <div className="flex w-full items-center justify-center bg-background px-4 py-10">
-      <SpreaderBar className="max-w-xl" />
+      <SpreaderBar className="max-w-3xl" />
     </div>
   );
 }

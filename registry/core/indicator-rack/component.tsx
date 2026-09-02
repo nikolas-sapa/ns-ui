@@ -97,25 +97,31 @@ const DEFAULT_PLANS: IndicatorRackPlan[] = [
   { value: "c", label: "Plan C" },
 ];
 
-// Column digits are an abstract 0-9 alphabet chosen for visual spread, not a
-// price — see meta.json / spec §8. Deliberately not 0/1/2 repeats: a rack
-// with every column landing on the same digit would read as a fake counter,
-// not a mechanism with four independent columns.
+// The rack reads out the plan's figure the way a register does — leading
+// zeros included — so the three digit columns ARE the price text beside them.
+// The three placeholder figures are chosen so every column changes on at
+// least one transition: a column that never moves reads as decoration.
+const PLAN_AMOUNTS: Record<string, number> = { a: 19, b: 42, c: 128 };
 const PLAN_DIGITS: Record<string, [number, number, number]> = {
-  a: [0, 4, 2],
-  b: [1, 9, 7],
-  c: [2, 5, 0],
+  a: [0, 1, 9],
+  b: [0, 4, 2],
+  c: [1, 2, 8],
 };
 const FALLBACK_DIGITS: [number, number, number] = [0, 0, 0];
 const TERM_DIGIT: Record<IndicatorRackTerm, number> = { monthly: 0, annual: 1 };
+// The term column carries the same ten plates as every other column, but its
+// two reachable ones are printed M and A: a bare 0/1 in a price readout reads
+// as another digit, which is exactly the wrong thing for it to say.
+const TERM_FACES = ["M", "A", "2", "3", "4", "5", "6", "7", "8", "9"] as const;
 
-const COLUMN_LABELS = ["TENS", "UNITS", "CENTS", "TERM"] as const;
+const COLUMN_LABELS = ["HUND", "TENS", "UNITS", "TERM"] as const;
 const TABLET_COUNT = 10;
 const STACK_BAND_H = 30; // px — fixed, not derived (spec §3)
 const PITCH = 3; // px — fixed pitch between down-stacked tablet edges
 const LIFT_RATIO = 0.19;
 const LIFT_MIN = 44;
 const LIFT_MAX = 96;
+const RAISED_Y = 0; // a raised tablet fills the window; rest is below it
 
 const RAISE_LATCH_MS = 40;
 const RAISE_SPRING_MS = 210;
@@ -240,6 +246,7 @@ export function IndicatorRack({
 
   // -- rack digits for the current plan + term -----------------------------
   const [tens, units, cents] = PLAN_DIGITS[activePlan?.value ?? ""] ?? FALLBACK_DIGITS;
+  const amount = PLAN_AMOUNTS[activePlan?.value ?? ""] ?? 0;
   const termDigit = TERM_DIGIT[committedTerm];
   const digits = useMemo(() => [tens, units, cents, termDigit], [tens, units, cents, termDigit]);
 
@@ -266,7 +273,7 @@ export function IndicatorRack({
       col.digit = targetDigit;
 
       if (outEl) {
-        const fromY = col.anims[outgoing] ? readTranslateY(outEl) : -lift;
+        const fromY = col.anims[outgoing] ? readTranslateY(outEl) : RAISED_Y;
         col.anims[outgoing]?.cancel();
         const toRestY = restY(outgoing, lift);
         const anim = outEl.animate(
@@ -295,11 +302,11 @@ export function IndicatorRack({
             { transform: `translateY(${fromY}px)`, offset: 0 },
             { transform: `translateY(${fromY}px)`, offset: RAISE_LATCH_MS / RAISE_TOTAL_MS },
             {
-              transform: `translateY(${-(lift + RAISE_OVERSHOOT_PX)}px)`,
+              transform: `translateY(${RAISED_Y - RAISE_OVERSHOOT_PX}px)`,
               offset: (RAISE_LATCH_MS + RAISE_SPRING_MS) / RAISE_TOTAL_MS,
               easing: "cubic-bezier(0.34,1.56,0.64,1)",
             },
-            { transform: `translateY(${-lift}px)`, offset: 1, easing: "ease-out" },
+            { transform: `translateY(${RAISED_Y}px)`, offset: 1, easing: "ease-out" },
           ],
           { duration: RAISE_TOTAL_MS, delay: RAISE_DELAY_MS, fill: "forwards", easing: "linear" }
         );
@@ -325,10 +332,12 @@ export function IndicatorRack({
     window.clearTimeout(announceTimerRef.current);
     announceTimerRef.current = window.setTimeout(() => {
       const billed = committedTerm === "annual" ? "annually" : "monthly";
-      setAnnounceText(`${activePlan?.label}, PRICE PLACEHOLDER per month, billed ${billed}.`);
+      setAnnounceText(
+        `${activePlan?.label}, ${amount} dollars per month, billed ${billed}.`
+      );
     }, ANNOUNCE_DEBOUNCE_MS);
     return () => window.clearTimeout(announceTimerRef.current);
-  }, [activePlan, committedTerm]);
+  }, [activePlan, committedTerm, amount]);
 
   // -- Home/End roving to the rails (arrows + Space are native on radios) --
   const planInputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -365,6 +374,7 @@ export function IndicatorRack({
 
       <div className="ns-ir-rack" aria-hidden="true" data-reduced={reducedMotion || undefined}>
         <div className="ns-ir-window">
+          <div className="ns-ir-cur">$</div>
           {digits.map((selectedDigit, ci) => {
             const predecessor = (selectedDigit + TABLET_COUNT - 1) % TABLET_COUNT;
             return (
@@ -374,9 +384,11 @@ export function IndicatorRack({
                     let reducedTransform: string | undefined;
                     if (reducedMotion) {
                       if (digit === selectedDigit) {
-                        reducedTransform = `translateY(${-(41 / 62) * lift}px)`;
+                        // still rising: short of seated by 21/62 of the lift
+                        reducedTransform = `translateY(${(21 / 62) * lift}px)`;
                       } else if (digit === predecessor) {
-                        reducedTransform = `translateY(${restY(digit, lift) + (22 / 62) * lift}px)`;
+                        // still falling: short of its rest by 22/62 of the lift
+                        reducedTransform = `translateY(${restY(digit, lift) - (22 / 62) * lift}px)`;
                       } else {
                         reducedTransform = `translateY(${restY(digit, lift)}px)`;
                       }
@@ -391,10 +403,10 @@ export function IndicatorRack({
                         style={{
                           transform:
                             reducedTransform ??
-                            `translateY(${digit === selectedDigit ? -lift : restY(digit, lift)}px)`,
+                            `translateY(${digit === selectedDigit ? RAISED_Y : restY(digit, lift)}px)`,
                         }}
                       >
-                        <span>{digit}</span>
+                        <span>{ci === 3 ? TERM_FACES[digit] : digit}</span>
                       </div>
                     );
                   })}
@@ -406,6 +418,7 @@ export function IndicatorRack({
         </div>
         <div className="ns-ir-flag" />
         <div className="ns-ir-labels">
+          <span className="ns-ir-labels-cur" />
           {COLUMN_LABELS.map((l) => (
             <span key={l}>{l}</span>
           ))}
@@ -459,7 +472,10 @@ export function IndicatorRack({
 
         <p className="ns-ir-price">
           <span className="ns-ir-price-plan">{activePlan?.label}</span>
-          <span className="ns-ir-price-word">PRICE</span>
+          <span className="ns-ir-price-word">
+            <span className="ns-ir-price-cur">$</span>
+            {amount}
+          </span>
           <span className="ns-ir-price-meta">per month, {billedLabel}</span>
         </p>
 
@@ -532,18 +548,37 @@ const CSS = `
   width:100%;
   height:var(--fr-lift);
   display:flex;
-  align-items:flex-start;
+  align-items:center;
   justify-content:center;
-  padding-top:4px;
   box-sizing:border-box;
-  background:var(--background);
+  /* a printed plate, not a hole in the rack: one step off the rack's own
+     background so the down-stacked edges read as a stack of plates rather
+     than as pinstriping, and the raised plate reads as a face. */
+  background:color-mix(in oklab, var(--background) 90%, var(--foreground) 10%);
   color:var(--foreground);
-  border-top:1px solid color-mix(in oklab, var(--ns-muted) 55%, transparent);
-  border-bottom:1px solid color-mix(in oklab, var(--ns-muted) 40%, transparent);
+  border-top:1px solid color-mix(in oklab, var(--ns-muted) 75%, transparent);
+  border-bottom:1px solid color-mix(in oklab, var(--background) 55%, var(--foreground) 45%);
   font-family:var(--font-geist-mono, ui-monospace, monospace);
-  font-size:calc(var(--fr-col-w) * 0.42);
+  font-size:calc(var(--fr-col-w) * 0.72);
+  font-weight:500;
+  line-height:1;
   font-variant-numeric:tabular-nums;
   will-change:transform;
+}
+.ns-ir-cur{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:calc(var(--fr-col-w) * 0.6);
+  height:var(--fr-lift);
+  flex:none;
+  font-family:var(--font-geist-mono, ui-monospace, monospace);
+  font-size:calc(var(--fr-col-w) * 0.5);
+  color:var(--ns-muted);
+}
+.ns-ir-labels-cur{
+  width:calc(var(--fr-col-w) * 0.6) !important;
+  flex:none;
 }
 .ns-ir-reflection{
   position:absolute;
@@ -558,7 +593,7 @@ const CSS = `
     transparent
   );
   mix-blend-mode:overlay;
-  opacity:0.35;
+  opacity:0.14;
   pointer-events:none;
   animation:ns-ir-reflect 6s linear infinite;
 }
@@ -566,7 +601,7 @@ const CSS = `
   background:linear-gradient(
     90deg,
     transparent,
-    color-mix(in oklab, var(--foreground) 90%, var(--background) 10%),
+    color-mix(in oklab, var(--foreground) 55%, var(--background) 45%),
     transparent
   );
 }
@@ -576,10 +611,10 @@ const CSS = `
 }
 .ns-ir-flag{
   position:absolute;
-  top:-6px;
+  top:2px;
   right:14px;
   width:2px;
-  height:16px;
+  height:7px;
   background:var(--ns-muted);
   transform-origin:top center;
   animation:ns-ir-flag 3.4s ease-in-out infinite;
@@ -599,7 +634,7 @@ const CSS = `
 .ns-ir-rack[data-reduced] .ns-ir-reflection{
   animation:none;
   transform:translateX(9px);
-  opacity:0.35;
+  opacity:0.14;
 }
 .ns-ir-rack[data-reduced] .ns-ir-flag{
   animation:none;

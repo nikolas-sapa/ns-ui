@@ -44,12 +44,14 @@ import { useEffect, useId, useRef, useState } from "react";
 
 export interface SpreaderBarLogo {
   id: string;
-  /** accessible name; also the DOM list entry's text */
+  /** accessible name; also the DOM list entry's text and the drawn wordmark */
   name: string;
   /** optional link for the DOM list entry */
   href?: string;
-  /** abstract placeholder mark — never a real wordmark or trademark */
-  shape?: MarkShape;
+  /** wordmark casing/typeface treatment — invented marks only, never a real trademark */
+  face?: MarkFace;
+  /** optional glyph set beside the wordmark */
+  shape?: MarkShape | "none";
 }
 
 type MarkShape =
@@ -62,6 +64,8 @@ type MarkShape =
   | "hex"
   | "dots";
 
+type MarkFace = "sans" | "serif" | "mono";
+
 const SHAPES: MarkShape[] = [
   "disc",
   "ring",
@@ -73,15 +77,18 @@ const SHAPES: MarkShape[] = [
   "dots",
 ];
 
+// Fictional marks. Deliberately unequal — a long serif wordmark carries far
+// more ink than a five-letter monogram lockup, and that inequality is the
+// input the whole balance solve runs on.
 const DEFAULT_LOGOS: SpreaderBarLogo[] = [
-  { id: "l1", name: "Company One", shape: "disc" },
-  { id: "l2", name: "Company Two", shape: "ring" },
-  { id: "l3", name: "Company Three", shape: "square" },
-  { id: "l4", name: "Company Four", shape: "cross" },
-  { id: "l5", name: "Company Five", shape: "triangle" },
-  { id: "l6", name: "Company Six", shape: "diamond" },
-  { id: "l7", name: "Company Seven", shape: "hex" },
-  { id: "l8", name: "Company Eight", shape: "dots" },
+  { id: "l1", name: "KELVA", face: "sans", shape: "disc" },
+  { id: "l2", name: "Palto", face: "serif", shape: "none" },
+  { id: "l3", name: "NORVA", face: "mono", shape: "ring" },
+  { id: "l4", name: "ZETRIN", face: "sans", shape: "square" },
+  { id: "l5", name: "Okalu", face: "serif", shape: "triangle" },
+  { id: "l6", name: "MARBO", face: "mono", shape: "none" },
+  { id: "l7", name: "Fennow", face: "serif", shape: "diamond" },
+  { id: "l8", name: "VYSTRA", face: "sans", shape: "cross" },
 ];
 
 // -- geometry / physics constants -------------------------------------------
@@ -296,27 +303,92 @@ function drawMarkPath(ctx: CanvasRenderingContext2D, shape: MarkShape, s: number
   }
 }
 
-// Rasterise each mark once at a fixed size, sum alpha, normalise to the set's
-// mean. This is what makes the layout earned rather than authored.
-function measureWeights(shapes: MarkShape[]): number[] {
-  const size = 48;
-  const canvas = document.createElement("canvas");
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext("2d", { willReadFrequently: true });
-  if (!ctx) return shapes.map(() => 1);
-  const raw = shapes.map((shape) => {
-    ctx.clearRect(0, 0, size, size);
+// -- the wordmark lockup -------------------------------------------------
+// A logo wall has to read as logos, so a mark here is a wordmark (its own
+// typeface treatment) optionally locked up with a small glyph. That also makes
+// the weights honest: a long serif wordmark really does carry three times the
+// ink of a five-letter monogram lockup, and the balance solve sees it.
+const FACE_STACK: Record<MarkFace, string> = {
+  sans: 'ui-sans-serif, system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif',
+  serif: 'ui-serif, Georgia, "Times New Roman", serif',
+  mono: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+};
+const FACE_WEIGHT: Record<MarkFace, number> = { sans: 700, serif: 600, mono: 500 };
+const FACE_TRACK: Record<MarkFace, number> = { sans: 0.02, serif: 0, mono: 0.11 };
+
+function markFont(face: MarkFace, px: number) {
+  return `${FACE_WEIGHT[face]} ${px}px ${FACE_STACK[face]}`;
+}
+
+type LockupMetrics = {
+  face: MarkFace;
+  textPx: number;
+  glyphSize: number;
+  glyphW: number;
+  track: number;
+  total: number;
+};
+
+function measureLockup(
+  ctx: CanvasRenderingContext2D,
+  logo: SpreaderBarLogo,
+  unit: number
+): LockupMetrics {
+  const face = logo.face ?? "sans";
+  const textPx = unit * 1.5;
+  const glyphSize = unit * 0.52;
+  const gap = unit * 0.46;
+  const track = FACE_TRACK[face] * textPx;
+  ctx.font = markFont(face, textPx);
+  let textW = 0;
+  for (const ch of logo.name) textW += ctx.measureText(ch).width + track;
+  textW = Math.max(0, textW - track);
+  const hasGlyph = !!logo.shape && logo.shape !== "none";
+  const glyphW = hasGlyph ? glyphSize * 2 + gap : 0;
+  return { face, textPx, glyphSize, glyphW, track, total: textW + glyphW };
+}
+
+function drawLockup(ctx: CanvasRenderingContext2D, logo: SpreaderBarLogo, unit: number) {
+  const m = measureLockup(ctx, logo, unit);
+  let x = -m.total / 2;
+  if (m.glyphW) {
     ctx.save();
-    ctx.translate(size / 2, size / 2);
+    ctx.translate(x + m.glyphSize, 0);
+    drawMarkPath(ctx, logo.shape as MarkShape, m.glyphSize);
+    ctx.restore();
+    x += m.glyphW;
+  }
+  ctx.font = markFont(m.face, m.textPx);
+  ctx.textBaseline = "middle";
+  ctx.textAlign = "left";
+  for (const ch of logo.name) {
+    ctx.fillText(ch, x, 0);
+    x += ctx.measureText(ch).width + m.track;
+  }
+}
+
+// Rasterise each lockup once at a fixed size, sum alpha, normalise to the
+// set's mean. This is what makes the layout earned rather than authored.
+function measureWeights(list: SpreaderBarLogo[]): number[] {
+  const W = 320;
+  const H = 64;
+  const canvas = document.createElement("canvas");
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  if (!ctx) return list.map(() => 1);
+  const raw = list.map((logo) => {
+    ctx.clearRect(0, 0, W, H);
+    ctx.save();
+    ctx.translate(W / 2, H / 2);
     ctx.fillStyle = "#000";
     ctx.strokeStyle = "#000";
-    drawMarkPath(ctx, shape, size / 2);
+    drawLockup(ctx, logo, 18);
     ctx.restore();
-    const data = ctx.getImageData(0, 0, size, size).data;
+    const data = ctx.getImageData(0, 0, W, H).data;
     let sum = 0;
     for (let i = 3; i < data.length; i += 4) sum += data[i];
-    return sum / (255 * size * size);
+    return sum / (255 * W * H);
   });
   const mean = raw.reduce((a, b) => a + b, 0) / raw.length || 1;
   return raw.map((v) => v / mean);
@@ -389,7 +461,7 @@ export interface SpreaderBarProps {
 
 export function SpreaderBar({
   logos = DEFAULT_LOGOS,
-  heading = "Section heading placeholder",
+  heading = "Customers",
   className = "",
 }: SpreaderBarProps) {
   const hostRef = useRef<HTMLDivElement | null>(null);
@@ -410,7 +482,8 @@ export function SpreaderBar({
     if (!ctx) return;
 
     const tree = buildTree();
-    let shapes: MarkShape[] = SHAPES;
+    let marks: SpreaderBarLogo[] = DEFAULT_LOGOS;
+    let markUnit = 12;
 
     let cssW = 0;
     let cssH = 0;
@@ -430,8 +503,8 @@ export function SpreaderBar({
     const applyLogos = () => {
       const list = (logosRef.current.length ? logosRef.current : DEFAULT_LOGOS).slice(0, 8);
       while (list.length < 8) list.push(DEFAULT_LOGOS[list.length]!);
-      shapes = list.map((l, i) => l.shape ?? SHAPES[i % SHAPES.length]!);
-      const weights = measureWeights(shapes);
+      marks = list.map((l, i) => ({ ...l, shape: l.shape ?? SHAPES[i % SHAPES.length]! }));
+      const weights = measureWeights(marks);
       let i = 0;
       forEachLeaf(tree, (leaf) => {
         leaf.weight = weights[i++] ?? 1;
@@ -440,12 +513,46 @@ export function SpreaderBar({
     };
     applyLogos();
 
+    // The tree is solved in a unit span first: every x offset is linear in the
+    // root span, so one pass gives both the tree's half-extent and the tightest
+    // gap between adjacent marks. The root span is then the largest one whose
+    // outermost arm tip and widest wordmark still sit inside the frame, and the
+    // mark size is capped by that tightest gap — the mobile is fitted to the
+    // box rather than clipped by it, and no two wordmarks can collide.
     const relayout = () => {
       if (cssW < 40 || cssH < 40) return;
       const ref = Math.min(cssW, cssH);
       const levelH = Math.max(LEVEL_HEIGHT_MIN, LEVEL_HEIGHT_FRAC * ref);
-      const topY = Math.max(20, cssH * 0.08);
-      const span = cssW * 0.82;
+      const pad = 6;
+
+      layout(tree, 0, 0, 1, 0);
+      let ext = 0;
+      forEachArm(tree, (n) => {
+        ext = Math.max(ext, Math.abs(n.fx - n.dLeft), Math.abs(n.fx + n.dRight));
+      });
+      const leafXs: number[] = [];
+      forEachLeaf(tree, (l) => {
+        leafXs.push(l.x);
+        ext = Math.max(ext, Math.abs(l.x));
+      });
+      leafXs.sort((a, b) => a - b);
+      let gapUnit = Infinity;
+      for (let i = 1; i < leafXs.length; i++) gapUnit = Math.min(gapUnit, leafXs[i]! - leafXs[i - 1]!);
+      if (!Number.isFinite(gapUnit) || gapUnit <= 0) gapUnit = 0.2;
+      if (ext <= 0) ext = 1;
+
+      markUnit = clamp(0.062 * ref, 10, 19);
+      let span = 40;
+      for (let iter = 0; iter < 6; iter++) {
+        let widest = 0;
+        for (const m of marks) widest = Math.max(widest, measureLockup(ctx, m, markUnit).total);
+        span = Math.max(40, (cssW / 2 - pad - widest / 2) / ext);
+        const gapPx = gapUnit * span;
+        if (widest <= gapPx * 0.94 || markUnit <= 7) break;
+        markUnit = Math.max(7, markUnit * Math.max(0.6, (gapPx * 0.94) / widest));
+      }
+
+      const topY = Math.max(16, (cssH - 3 * levelH) / 2 - markUnit * 0.4);
       layout(tree, cssW / 2, topY, span, levelH);
     };
 
@@ -476,9 +583,20 @@ export function SpreaderBar({
         ctx.lineTo(n.fx + n.dRight * cosT, n.fy);
         ctx.stroke();
 
+        // The fulcrum dot sits where the solve put it; a fainter tick marks the
+        // arm's geometric centre, so the offset between the two IS the balance,
+        // visible on the still rather than only in the code.
+        const tipL = n.fx - n.dLeft * cosT;
+        const tipR = n.fx + n.dRight * cosT;
+        ctx.strokeStyle = armCol;
+        ctx.beginPath();
+        ctx.moveTo((tipL + tipR) / 2, n.fy - 3);
+        ctx.lineTo((tipL + tipR) / 2, n.fy + 3);
+        ctx.stroke();
+
         ctx.fillStyle = pivotCol;
         ctx.beginPath();
-        ctx.arc(n.fx, n.fy, 1, 0, Math.PI * 2);
+        ctx.arc(n.fx, n.fy, 2.2, 0, Math.PI * 2);
         ctx.fill();
 
         // hangers down to each child's static anchor point
@@ -506,12 +624,11 @@ export function SpreaderBar({
             ? rgba(mixRGB(fgIsh, [255, 255, 255], shade), 0.82)
             : rgba(mixRGB(fgIsh, [0, 0, 0], -shade), 0.82);
         ctx.save();
-        ctx.translate(leaf.x, leaf.y);
+        ctx.translate(leaf.x, leaf.y + markUnit * 0.95);
         ctx.scale(Math.max(0.01, cosT), 1);
         ctx.fillStyle = markCol;
         ctx.strokeStyle = markCol;
-        const size = Math.max(14, Math.min(30, Math.min(cssW, cssH) * 0.05));
-        drawMarkPath(ctx, shapes[leaf.leafIndex]!, size);
+        drawLockup(ctx, marks[leaf.leafIndex] ?? DEFAULT_LOGOS[leaf.leafIndex]!, markUnit);
         ctx.restore();
       });
     };
