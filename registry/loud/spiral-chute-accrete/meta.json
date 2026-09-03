@@ -1,7 +1,7 @@
 {
   "name": "spiral-chute-accrete",
   "title": "Spiral Chute Accrete",
-  "description": "A full-bleed ambient background reproducing a gravity spiral chute, the helical slide used to move bulk parcels/mail sacks between floors in sorting facilities and department-store stockrooms without powered conveyance — parcels drop in at the top, descend the helix in continuous view, and pile up in a landing area at the base until the pile is periodically swept clear.",
+  "description": "A full-bleed ambient background reproducing a gravity spiral chute, the helical slide used to move bulk parcels/mail sacks between floors in sorting facilities and department-store stockrooms without powered conveyance. Parcels drop in at the top, descend the helix in continuous view, and pile up in a landing area at the base until the pile is periodically swept clear.",
   "collection": "loud",
   "tags": ["background", "canvas", "chute", "spiral", "helix", "logistics", "parcel", "ambient"],
   "useWhen": "a full-bleed decorative field where small discrete units continuously descend a helical path and accumulate into a bounded, periodically-cleared pile — pick this when the section needs an industrial-logistics mechanic with a clear cyclical event (the sweep) as its 'alive at rest' signal. Pick background-engine-turn-guilloche instead when the field should be a dense, continuously-woven interference texture rather than discrete travelling units; pick bed-fluidize instead when the surface itself needs to look like a disturbed granular bed rather than parcels riding a fixed track.",

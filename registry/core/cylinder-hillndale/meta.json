@@ -1,7 +1,7 @@
 {
   "name": "cylinder-hillndale",
   "title": "Cylinder Hill-and-Dale",
-  "description": "A full-width section divider rendered as a side elevation of an Edison-style wax cylinder phonograph: a rotating cylinder carrying a static helical hill-and-dale groove, a lead-screw rail, and a stylus carriage the lead-screw advances axially in exact lockstep with rotation — one wrap of travel per one full turn, always, at any frame rate.",
+  "description": "A full-width section divider rendered as a side elevation of an Edison-style wax cylinder phonograph: a rotating cylinder carrying a static helical hill-and-dale groove, a lead-screw rail, and a stylus carriage the lead-screw advances axially in exact lockstep with rotation, one wrap of travel per one full turn, always, at any frame rate.",
   "collection": "core",
   "tags": [
     "divider",

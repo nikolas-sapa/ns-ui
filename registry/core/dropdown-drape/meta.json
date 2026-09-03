@@ -1,7 +1,7 @@
 {
   "name": "dropdown-drape",
   "title": "Dropdown Drape",
-  "description": "Dropdown whose panel is a live verlet cloth pinned to the trigger — it falls and drapes like an awning, labels ride the weave, the cursor billows the fabric, and close yanks it back up.",
+  "description": "Dropdown whose panel is a live verlet cloth pinned to the trigger: it falls and drapes like an awning, labels ride the weave, the cursor billows the fabric, and close yanks it back up.",
   "collection": "core",
   "tags": ["menu", "dropdown", "cloth", "physics", "verlet", "cursor", "nav"],
   "useWhen": "a short flat option list hanging from a trigger where opening and closing is the whole interaction, the panel falling as verlet cloth and billowing under the cursor; pick listbox-sticky-groups instead when the list is long and grouped and navigating inside it matters more than opening it, or select-caustic when the same short list should be a form select with listbox keyboard semantics rather than a nav menu.",

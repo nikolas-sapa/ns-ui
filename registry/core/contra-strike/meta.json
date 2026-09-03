@@ -1,7 +1,7 @@
 {
   "name": "contra-strike",
   "title": "Contra Strike",
-  "description": "Order line-item ledger where a partial refund drags a struck span across the amount bar and, on commit, appends a negative contra row beneath the original — which is never edited, only ever struck through and kept legible.",
+  "description": "Order line-item ledger where a partial refund drags a struck span across the amount bar and, on commit, appends a negative contra row beneath the original, which is never edited, only ever struck through and kept legible.",
   "collection": "core",
   "tags": [
     "table",

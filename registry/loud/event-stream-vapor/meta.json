@@ -1,7 +1,7 @@
 {
   "name": "event-stream-vapor",
   "title": "Event Stream Vapor",
-  "description": "A Wilson cloud chamber for your event stream — each real event condenses into a soft vapor trail (angle by category, length/brightness by magnitude) that diffuses away over seconds, with a paired Geist Mono log so the same stream reads in words.",
+  "description": "A Wilson cloud chamber for your event stream: each real event condenses into a soft vapor trail (angle by category, length/brightness by magnitude) that diffuses away over seconds, with a paired Geist Mono log so the same stream reads in words.",
   "collection": "loud",
   "tags": [
     "monitoring",

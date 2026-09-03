@@ -1,7 +1,7 @@
 {
   "name": "bed-fluidize",
   "title": "Bed Fluidize",
-  "description": "A full-bleed ambient background modeling a gas-fluidized particle bed: voids nucleate at the distributor plate, grow with height (the Darton bubble-growth relation), coalesce when they touch, and burst at the surface with a ballistic spray of ejected particles, while the surrounding bed circulates downward in each bubble's wake — a standing boil with no saturated end state.",
+  "description": "A full-bleed ambient background modeling a gas-fluidized particle bed: voids nucleate at the distributor plate, grow with height (the Darton bubble-growth relation), coalesce when they touch, and burst at the surface with a ballistic spray of ejected particles, while the surrounding bed circulates downward in each bubble's wake. A standing boil with no saturated end state.",
   "collection": "loud",
   "tags": [
     "background",

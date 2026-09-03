@@ -77,12 +77,12 @@ const spec = {
     description: [
       "Every endpoint is public, anonymous and read-only. There is no authentication: no key, no token, no account.",
       "",
-      "**Versioning.** The API is served under `/v1`, and also without a prefix for backward compatibility — the two are aliases onto the same handlers, so they cannot answer differently. Within `/v1`, response shapes only ever gain fields; a breaking change becomes `/v2`.",
+      "**Versioning.** The API is served under `/v1`, and also without a prefix for backward compatibility: the two are aliases onto the same handlers, so they cannot answer differently. Within `/v1`, response shapes only ever gain fields; a breaking change becomes `/v2`.",
       "",
       "**Deprecation.** If an endpoint is ever retired, its responses carry `Deprecation` and `Sunset` headers (RFC 9745 / RFC 8594) for at least 180 days before removal, and the change is announced in the changelog at " +
         `${REGISTRY_ORIGIN}/changelog. No endpoint is deprecated today.`,
       "",
-      "**Rate limits.** Every response carries RFC 9331 `RateLimit-*` headers; exceeding the window returns 429 with `Retry-After`. The limit is per client per instance and generous — it exists so an agent can self-throttle, not to meter usage.",
+      "**Rate limits.** Every response carries RFC 9331 `RateLimit-*` headers; exceeding the window returns 429 with `Retry-After`. The limit is per client per instance and generous. It exists so an agent can self-throttle, not to meter usage.",
       "",
       "**Errors.** Every error is `application/problem+json` (RFC 9457) with a machine-readable `code`, a human-readable `detail`, and a `resolution` naming the next step.",
     ].join("\n"),
@@ -252,7 +252,7 @@ const spec = {
           detail: { type: "string", description: "What went wrong, in this specific case." },
           code: {
             type: "string",
-            description: "Machine-readable error code — the field to branch on.",
+            description: "Machine-readable error code: the field to branch on.",
             examples: ["not_found", "component_not_found", "rate_limited", "stream_not_supported"],
           },
           resolution: { type: "string", description: "The next step that would make this request succeed." },

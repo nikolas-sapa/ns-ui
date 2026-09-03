@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { GeistSans } from "geist/font/sans";
+import localFont from "next/font/local";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { ThemeSync } from "./_components/theme-sync";
@@ -10,10 +10,31 @@ import { SmoothCursor } from "./_components/smooth-cursor";
 import { NO_FLASH_SCRIPT } from "@/lib/theme";
 import { NO_FLASH_SIDEBAR_SCRIPT } from "@/lib/sidebar";
 import { CATALOG_GATE_SCRIPT } from "@/lib/catalog-gate";
-import { navGroups } from "@/lib/nav-data";
+import { navGroups, summarizeNav } from "@/lib/nav-data";
 import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
 import { jsonLdScript } from "@/lib/json-ld";
 import { identityJsonLd } from "@/lib/site-identity";
+
+// Same file the `geist` package's own `font/sans` export loads, redeclared here
+// for one reason: `preload: false`. `--font-sans` in globals.css leads with
+// `ui-rounded` on purpose (see the comment there, and the 2026-08-03
+// testimonials plan's Task 4, which wired the rounded sans globally), so on
+// Apple platforms SF Rounded wins the cascade and this face never renders —
+// while the package's default `preload: true` fetched its 68.0 KB on every cold
+// load regardless. Off Apple `ui-rounded` resolves to nothing, GeistSans is the
+// real face, and it now loads on cascade demand instead; `font-display: swap`
+// is unchanged, so nothing blocks render either way.
+//
+// The const MUST stay named `GeistSans`: next/font/local derives the CSS
+// `font-family` from the variable name (`@next/font/dist/local/loader.js`
+// pushes `['font-family', variableName]`), and globals.css matches on the
+// literal `"GeistSans"` / `"GeistSans Fallback"` names.
+const GeistSans = localFont({
+  src: "../node_modules/geist/dist/fonts/geist-sans/Geist-Variable.woff2",
+  variable: "--font-geist-sans",
+  weight: "100 900",
+  preload: false,
+});
 
 const title = "ns-ui";
 // Shown only in the unfurl card, not in the browser tab: `title` stays bare so
@@ -100,9 +121,11 @@ export default function RootLayout({
             scroll. See the components for the full reasoning. */}
         <SmoothScroll />
         <SmoothCursor />
-        {/* Nav data is computed on the server once per build; the shell is a
-            client component only because it needs the active pathname. */}
-        <SiteShell groups={navGroups()}>{children}</SiteShell>
+        {/* Category rows and the component count only — the 534-item tree
+            itself is fetched from /nav-tree.json. Passing `navGroups()` here
+            serialized ≥728 name/title pairs into the flight payload of every
+            one of the 562 prerendered documents, card iframes included. */}
+        <SiteShell nav={summarizeNav(navGroups())}>{children}</SiteShell>
         {/* Vercel Web Analytics and Speed Insights. Both no-op outside a
             Vercel deployment, so local dev is unaffected. Skipped inside card
             iframes — see the component. */}

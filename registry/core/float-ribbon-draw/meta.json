@@ -1,7 +1,7 @@
 {
   "name": "float-ribbon-draw",
   "title": "Float Ribbon Draw",
-  "description": "A multi-stage pipeline/job-status bar modeled on the float-glass process — a fixed molten-to-set thermal gradient marks the pipeline's stages while a faint ripple scrolls continuously through the still-molten zone at a constant draw speed, so the bar keeps reading as 'actively running' whether or not a specific stage is highlighted.",
+  "description": "A multi-stage pipeline/job-status bar modeled on the float-glass process: a fixed molten-to-set thermal gradient marks the pipeline's stages while a faint ripple scrolls continuously through the still-molten zone at a constant draw speed, so the bar keeps reading as 'actively running' whether or not a specific stage is highlighted.",
   "collection": "core",
   "tags": [
     "status",

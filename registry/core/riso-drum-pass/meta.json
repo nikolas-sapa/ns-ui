@@ -1,7 +1,7 @@
 {
   "name": "riso-drum-pass",
   "title": "Riso Drum Pass",
-  "description": "A loader / background ambient texture reproducing a risograph duplication run — three sequential drum passes reading the same shared stencil field, each a rotation sweeping the sheet top-to-bottom, cumulatively drifting a few pixels out of register against the pass before it, with per-rotation drum-pressure banding baked into each row as it prints.",
+  "description": "A loader / background ambient texture reproducing a risograph duplication run: three sequential drum passes reading the same shared stencil field, each a rotation sweeping the sheet top-to-bottom, cumulatively drifting a few pixels out of register against the pass before it, with per-rotation drum-pressure banding baked into each row as it prints.",
   "collection": "core",
   "tags": [
     "loader",

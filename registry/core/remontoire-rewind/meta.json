@@ -1,7 +1,7 @@
 {
   "name": "remontoire-rewind",
   "title": "Remontoire Rewind",
-  "description": "A sync/upload progress strip driven by a constant-force remontoire: a coiled spring glyph slowly winds tight over a 2.9s creep, then trips and dumps one fixed, calibrated 6% kick into the bar in 0.3s — the escapement's flat repeated release, not the mainspring's decay — rewinding forever, unbounded.",
+  "description": "A sync/upload progress strip driven by a constant-force remontoire: a coiled spring glyph slowly winds tight over a 2.9s creep, then trips and dumps one fixed, calibrated 6% kick into the bar in 0.3s (the escapement's flat repeated release, not the mainspring's decay), rewinding forever, unbounded.",
   "collection": "core",
   "tags": ["progress", "upload", "sync", "loader", "spring", "svg", "mechanical", "ambient"],
   "useWhen": "an idle/demo sync-transfer indicator whose own loop is the point — a spring visibly winding then tripping into one discrete kick — for a job that is genuinely constant-force or discrete in real life (background sync, cache warm, queue drain) where the mechanism's motion itself is what should read as alive at rest, not a byte-accurate value. Pick progress-wick instead when a real external value arrives in bursts and the bar's job is to track that live target faithfully via draw-dwell interpolation, rather than run its own decorative wind-trip cycle underneath; pick progress-narrated instead when the point is naming a small number of discrete phases through a typed mono caption and a docked ledger rather than a continuous bar.",

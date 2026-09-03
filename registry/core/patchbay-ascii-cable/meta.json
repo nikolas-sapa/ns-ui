@@ -1,7 +1,7 @@
 {
   "name": "patchbay-ascii-cable",
   "title": "Patchbay ASCII Cable",
-  "description": "A patchbay with real, persistent, user-authored topology: drag from one jack to another to create a patch, routed orthogonally onto the shared monospace glyph grid, and once connected a small pulse travels the cable on a loop. Grabbing a jack that already carries a patch unplugs it — the classic pull-the-plug gesture — leaving a loose end you can drop on a new jack or nowhere at all.",
+  "description": "A patchbay with real, persistent, user-authored topology: drag from one jack to another to create a patch, routed orthogonally onto the shared monospace glyph grid, and once connected a small pulse travels the cable on a loop. Grabbing a jack that already carries a patch unplugs it (the classic pull-the-plug gesture), leaving a loose end you can drop on a new jack or nowhere at all.",
   "collection": "core",
   "tags": ["patchbay", "cable", "graph", "ascii", "box-drawing", "drag", "keyboard-navigation"],
   "useWhen": "any-to-any user-created routing where the connections themselves are the data (audio patchbays, signal routing, manual pairing UIs) — pick slider-allocation-wire instead for a single fixed two-way ratio, tabs-slack-cable for a selection indicator that only ever points at one predetermined tab, or transfer-list-siphon for a one-shot transfer whose tube exists only to animate items moving, never a persistent connection the user can later unplug.",

@@ -1,7 +1,7 @@
 {
   "name": "idler-drop",
   "title": "Idler Drop",
-  "description": "Delegated admin drawn as a gear train — your authority is the drive gear, each delegate is a driven gear whose tooth count sets a discrete role ratio, and revoking swings the idler out so their gear freewheels to a stop while yours keeps turning.",
+  "description": "Delegated admin drawn as a gear train: your authority is the drive gear, each delegate is a driven gear whose tooth count sets a discrete role ratio, and revoking swings the idler out so their gear freewheels to a stop while yours keeps turning.",
   "collection": "core",
   "tags": [
     "delegation",

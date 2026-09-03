@@ -1,7 +1,7 @@
 {
   "name": "background-ascii-plasma",
   "title": "Background ASCII Plasma",
-  "description": "A full-bleed animated ASCII plasma field — three octaves of traveling value noise mapped through a density ramp to a monospace glyph grid, with the pointer warping the field outward and letting it relax back like dragging a finger through liquid.",
+  "description": "A full-bleed animated ASCII plasma field: three octaves of traveling value noise mapped through a density ramp to a monospace glyph grid, with the pointer warping the field outward and letting it relax back like dragging a finger through liquid.",
   "collection": "loud",
   "tags": ["ascii", "background", "canvas", "cursor", "noise", "plasma"],
   "useWhen": "a purely procedural full-bleed ASCII field with no source material, three noise octaves interfering into drifting bands that the pointer warps outward and lets relax back; pick background-ascii-dither instead when an actual image or media source has to drive the glyphs, or background-ascii-wake when the pointer's persistent decaying trail is the whole effect rather than a momentary warp.",

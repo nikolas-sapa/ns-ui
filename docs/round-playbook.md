@@ -62,12 +62,18 @@ bug this round:
   first read** — trace the rAF start, `ResizeObserver`, and
   `IntersectionObserver` resume paths specifically. Two agents this round
   assumed no early-paint path existed and were wrong.
-- **`--border` is a separator token**, ~1.1:1 contrast in light theme —
-  invisible if used as a fill or stroke colour.
+- **`--border` is a separator token**, 1.19:1 contrast in light theme
+  (`#ebebeb` on `#ffffff`, computed) — invisible if used as a fill or stroke
+  colour.
 - **`--ns-accent` is interaction chrome only** (buttons, focus rings).
   Do not reach for it on a component's one climactic moment — see the
   showpiece recipe's "accent-tinted pointer highlights" standing check for
   why this is the single most repeated defect on the project.
+- **`--ns-muted` is a second ink at full strength, never a variable-strength
+  wash.** Its ceiling is theme-dependent (8.45:1 light, 6.12:1 dark), so a
+  mid-strength wash looks fine in both themes and only breaks later, in dark
+  first, when someone strengthens it. Full strength, or `--foreground` at an
+  explicit alpha.
 - **Alive at rest** means visibly different at t0/2.5s/5s with no input.
 - **`prefers-reduced-motion` freezes on a deliberately chosen NON-t0**
   most-structured frame.

@@ -1,7 +1,7 @@
 {
   "name": "spindle-strike",
   "title": "Spindle Strike",
-  "description": "Payment history as a diner-receipt spindle: settled transactions pile up impaled on a shared 1px spine, and a refund doesn't remove the card — it pulls the same pierced node a few px back up the spine with its puncture elongated into a slot.",
+  "description": "Payment history as a diner-receipt spindle: settled transactions pile up impaled on a shared 1px spine, and a refund doesn't remove the card. It pulls the same pierced node a few px back up the spine with its puncture elongated into a slot.",
   "collection": "core",
   "tags": [
     "billing",

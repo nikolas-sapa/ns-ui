@@ -23,7 +23,12 @@ export function CopyButton({
   variant?: "icon" | "inline" | "prose";
   className?: string;
 }) {
-  const [copied, setCopied] = useState(false);
+  // "failed" is the third state: the write can be refused (permission denied,
+  // no transient activation, an insecure origin where navigator.clipboard is
+  // undefined). It used to `return` silently, so the click looked identical to
+  // no click at all and the visitor had no way to know the command was not on
+  // their clipboard.
+  const [state, setState] = useState<"idle" | "copied" | "failed">("idle");
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -36,22 +41,40 @@ export function CopyButton({
     async (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
+      let next: "copied" | "failed" = "copied";
       try {
         await navigator.clipboard.writeText(value);
       } catch {
-        return;
+        next = "failed";
       }
-      setCopied(true);
+      setState(next);
       if (timer.current) clearTimeout(timer.current);
-      timer.current = setTimeout(() => setCopied(false), 1600);
+      // The failure message has to be read, not glimpsed, so it holds longer
+      // than the check glyph does.
+      timer.current = setTimeout(() => setState("idle"), next === "copied" ? 1600 : 4000);
     },
     [value],
   );
 
+  const copied = state === "copied";
+  const failed = state === "failed";
+
+  // The space before `focus-visible:ring-2` is load-bearing: without it the
+  // concatenation produced `transition-colorsfocus-visible:ring-2`, so the
+  // ring *width* class never existed while `outline-none` did — every copy
+  // button on the site had no visible keyboard focus at all.
   const base =
     "relative inline-flex shrink-0 items-center justify-center rounded-sm text-ns-muted " +
-    "outline-none transition-colors motion-reduce:transition-none " +
-    "hover:bg-border/60 hover:text-foreground  transition-colors" +
+    "outline-none motion-reduce:transition-none " +
+    // `transition-colors` sits in the SAME literal as the hover colours it
+    // animates, not on the line above. The hover-transition invariant in
+    // scripts/test-source-invariants.ts reads one class-list literal at a
+    // time, so a transition parked on an adjacent line reads to it as a hover
+    // that snaps. That is also why the pre-image carried a second, duplicated
+    // `transition-colors` here: it satisfied this gate, and the missing space
+    // in front of it is what silently ate `focus-visible:ring-2`. One copy,
+    // on the right line, with its trailing space.
+    "transition-colors hover:bg-border/60 hover:text-foreground " +
     "focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 " +
     "focus-visible:ring-offset-background";
 
@@ -79,18 +102,32 @@ export function CopyButton({
         ? "after:absolute after:-inset-[12px] after:content-['']"
         : "after:absolute after:-inset-x-[4px] after:-inset-y-[6px] after:content-['']";
 
+  const status = copied
+    ? "Copied"
+    : failed
+      ? "Copy failed. Select the text and copy it manually"
+      : label;
+
   return (
-    <button
-      type="button"
-      onClick={copy}
-      aria-label={copied ? "Copied" : label}
-      title={copied ? "Copied" : label}
-      className={`${base} ${
-        variant === "icon" ? "size-7" : "size-8"
-      } ${overlay} ${className}`}
-    >
-      {copied ? <CheckIcon /> : <CopyIcon />}
-    </button>
+    <>
+      <button
+        type="button"
+        onClick={copy}
+        aria-label={status}
+        title={status}
+        className={`${base} ${
+          variant === "icon" ? "size-7" : "size-8"
+        } ${overlay} ${className}`}
+      >
+        {copied ? <CheckIcon /> : failed ? <AlertIcon /> : <CopyIcon />}
+      </button>
+      {/* Announced rather than only drawn: the glyph swap is the sighted
+          feedback, this is the same message for a screen reader. Empty at
+          rest, so nothing is announced until a click actually happens. */}
+      <span aria-live="polite" className="sr-only">
+        {copied ? "Copied" : failed ? "Copy failed. Select the text and copy it manually." : ""}
+      </span>
+    </>
   );
 }
 
@@ -111,6 +148,26 @@ export function CopyIcon() {
     >
       <rect x="5.75" y="5.75" width="8.5" height="8.5" rx="1.5" />
       <path d="M10.25 3.25v-.5a1 1 0 0 0-1-1H2.75a1 1 0 0 0-1 1v6.5a1 1 0 0 0 1 1h.5" />
+    </svg>
+  );
+}
+
+/** Shown when the clipboard write was refused — same stroke language as the
+ *  copy/check glyphs, no colour of its own (accent stays interaction-only). */
+function AlertIcon() {
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      className="size-3.5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <circle cx="8" cy="8" r="6" />
+      <path d="M8 5v3.5M8 11h.01" />
     </svg>
   );
 }

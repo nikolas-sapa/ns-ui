@@ -31,9 +31,13 @@ export function AccountSignedOut() {
           <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-ns-muted">
             Account
           </p>
-          <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">
+          {/* h1, not h2: this replaces the whole of `/account` when signed out
+              (page.tsx returns one or the other), so it is the page's only
+              top-level heading. As an h2 the route had no h1 at all and its
+              outline started a level down. Type scale is unchanged. */}
+          <h1 className="mt-4 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">
             Sign in to save.
-          </h2>
+          </h1>
           <p className="mt-3 text-sm leading-6 text-ns-muted">
             Use GitHub, Google, or an email code. Your saved components stay
             close at hand.

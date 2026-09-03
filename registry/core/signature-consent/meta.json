@@ -1,7 +1,7 @@
 {
   "name": "signature-consent",
   "title": "Signature Consent",
-  "description": "Signature capture as consent — a canvas ink strip with pen-pressure feel that retraces itself in a clean witness replay before Confirm embosses it as Authorized.",
+  "description": "Signature capture as consent: a canvas ink strip with pen-pressure feel that retraces itself in a clean witness replay before Confirm embosses it as Authorized.",
   "collection": "core",
   "tags": [
     "signature",

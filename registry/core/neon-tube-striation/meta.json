@@ -1,7 +1,7 @@
 {
   "name": "neon-tube-striation",
   "title": "Neon Tube Striation",
-  "description": "A horizontal section divider rendered as the positive column of a lit glow-discharge tube — a traveling ionization-wave striation pattern drifts along its length while faint sputtering darkening deepens at both electrode ends over time.",
+  "description": "A horizontal section divider rendered as the positive column of a lit glow-discharge tube: a traveling ionization-wave striation pattern drifts along its length while faint sputtering darkening deepens at both electrode ends over time.",
   "collection": "core",
   "tags": ["divider", "separator", "hr", "neon", "plasma", "glow-discharge", "canvas", "monochrome", "ambient"],
   "useWhen": "Pick neon-tube-striation when the surface is a section divider that should read as a genuinely lit object with a slow, continuous internal process — a drifting ionization-wave band pattern plus a capped electrode-darkening ramp, both derived from real gas-discharge tube physics. Pick divider-petscii-vu instead when the divider should read as a discrete two-state instrument responding to an amplitude signal, and craze-rule instead when the mechanic should be a one-shot propagating fracture with no ongoing internal process at rest.",

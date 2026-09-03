@@ -1,7 +1,7 @@
 {
   "name": "flyball-throttle",
   "title": "Flyball Throttle",
-  "description": "A spend-cap widget drawn as a Watt centrifugal governor: two hinged arms with ball weights fly wider as burn rate outpaces the sustainable rate, the sleeve collar they drive slides down the spindle, and the collar's own linkage swings a throttle lever closed over the purchase actions — reading the derivative of spend, not the level, so 60% spent stays calm on day 28 and flares wide on day 6.",
+  "description": "A spend-cap widget drawn as a Watt centrifugal governor: two hinged arms with ball weights fly wider as burn rate outpaces the sustainable rate, the sleeve collar they drive slides down the spindle, and the collar's own linkage swings a throttle lever closed over the purchase actions. It reads the derivative of spend, not the level, so 60% spent stays calm on day 28 and flares wide on day 6.",
   "collection": "core",
   "tags": [
     "meter",

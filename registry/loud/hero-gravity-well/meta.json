@@ -1,7 +1,7 @@
 {
   "name": "hero-gravity-well",
   "title": "Hero Gravity Well",
-  "description": "Headline as a monochrome particle cloud — the cursor is a gravity well that eats letters into an orbital accretion ring, then releases them to spring back into typeset.",
+  "description": "Headline as a monochrome particle cloud: the cursor is a gravity well that eats letters into an orbital accretion ring, then releases them to spring back into typeset.",
   "collection": "loud",
   "tags": ["hero", "text", "particles", "cursor", "canvas", "physics"],
   "useWhen": "a hero built from ONLY a headline, no surrounding CTA/copy layout — rendered as a particle cloud the cursor pulls into an orbiting accretion ring and releases to spring back into type; zero deps, use when the headline alone should be the whole scene; pick hero-cloth-type instead when the headline should stay legible and deform in place rather than scatter, hero-dipole-field when a crisp DOM headline should sit over the reactive field, or hero-letterpress-lockup when the arrival should end in one terminal lockup rather than an ongoing interaction.",

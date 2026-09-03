@@ -1,7 +1,7 @@
 {
   "name": "not-found-postmark",
   "title": "Not Found Postmark",
-  "description": "A 404 rendered as returned mail — the failed URL addressed on an envelope that slides in, its routing history stamped hop by hop (edge, origin, router) as sequential ink postmarks, the last hop knocked down with a squash-and-settle NO SUCH ADDRESS hand-stamp and a 1px shake, then a forwarding-address label (search, home, recent pages) peels on as the real recovery page.",
+  "description": "A 404 rendered as returned mail: the failed URL addressed on an envelope that slides in, its routing history stamped hop by hop (edge, origin, router) as sequential ink postmarks, the last hop knocked down with a squash-and-settle NO SUCH ADDRESS hand-stamp and a 1px shake, then a forwarding-address label (search, home, recent pages) peels on as the real recovery page.",
   "collection": "loud",
   "tags": ["404", "error-page", "svg", "postal", "sequence", "recovery", "page"],
   "useWhen": "Reach for this when the 404 should read as a multi-hop routing story with the user's own bad URL as addressee — a sequence of small postmarks landing one at a time before a hand-stamp closes the case and a peeling forwarding label hands off to recovery. Pick dead-reckoning instead when the story is a navigation trail worth charting as position fixes and a corrected course (nautical framing, no stamps); pick not-found-knockout instead when you want one instant impact gag (numerals punched out of a surface) rather than a narrative with beats.",

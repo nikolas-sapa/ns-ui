@@ -1,7 +1,7 @@
 {
   "name": "chart-waterfall-ascii-step",
   "title": "Chart Waterfall ASCII Step",
-  "description": "ASCII-ramp waterfall chart where toggling a step excludes or restores its delta and every bar after it — plus the running total — visibly recomputes and re-animates, not just a hover tooltip.",
+  "description": "ASCII-ramp waterfall chart where toggling a step excludes or restores its delta and every bar after it (plus the running total) visibly recomputes and re-animates, not just a hover tooltip.",
   "collection": "core",
   "tags": [
     "chart",

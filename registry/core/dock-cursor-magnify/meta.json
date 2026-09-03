@@ -1,7 +1,7 @@
 {
   "name": "dock-cursor-magnify",
   "title": "Dock Cursor Magnify",
-  "description": "Cursor-proximity magnification row with Gaussian falloff — macOS-dock physics for any children.",
+  "description": "Cursor-proximity magnification row with Gaussian falloff: macOS-dock physics for any children.",
   "collection": "core",
   "tags": [
     "nav",

@@ -1,7 +1,7 @@
 {
   "name": "facer-stamp-flip",
   "title": "Facer Stamp Flip",
-  "description": "An ambient batch-processing loader (no total count, only continuous throughput) built as a letter-facing and cancelling machine's orientation stage — mixed-orientation envelopes travel a single-file lane, a fixed gate reads each one's stamp corner, and any envelope not already stamp-corner-up-right rotates into that orientation as it crosses, picking up a brief tap of ink as it continues.",
+  "description": "An ambient batch-processing loader (no total count, only continuous throughput) built as a letter-facing and cancelling machine's orientation stage: mixed-orientation envelopes travel a single-file lane, a fixed gate reads each one's stamp corner, and any envelope not already stamp-corner-up-right rotates into that orientation as it crosses, picking up a brief tap of ink as it continues.",
   "collection": "core",
   "tags": ["loader", "batch", "upload", "ambient", "dom", "raf", "mail", "orientation", "indeterminate"],
   "useWhen": "an ambient batch-processing indicator for a document/upload pipeline with no known total or percentage, where the story is a continuous single-file stream getting corrected/normalized at a fixed check point rather than a discrete queue draining or a franking/cancel mark being the point of interest; pick frank-register instead when the franking-meter indicium stamp itself is the moment worth showing, or not-found-postmark when a large decorative hand-stamp mark is the whole point — this component keeps its own cancel tap deliberately small and secondary since both of those already own that territory.",

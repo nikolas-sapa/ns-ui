@@ -86,7 +86,7 @@ export default async function Image() {
               maxWidth: 860,
             }}
           >
-            What shipped in ns-ui, drawn with timeline-changelog-wave — a
+            What shipped in ns-ui, drawn with timeline-changelog-wave, a
             component from the registry itself.
           </div>
         </div>

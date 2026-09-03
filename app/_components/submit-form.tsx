@@ -52,11 +52,11 @@ const ERROR_MESSAGES: Record<string, string> = {
   dco_email_invalid_chars: "Email can't contain < or >.",
   dco_not_agreed: "You must certify the DCO to submit.",
   verify_not_attested: "Confirm you ran npm run verify locally.",
-  slug_already_exists: "That slug is already in the registry — pick a new, descriptive name.",
+  slug_already_exists: "That slug is already in the registry. Pick a new, descriptive name.",
   rate_limited: "You can only open one submission every 10 minutes. Try again shortly.",
   github_not_connected: "Connect GitHub before submitting.",
   github_not_configured: "The submission portal isn't fully configured on this deployment yet.",
-  unauthenticated: "Your session expired — sign in again.",
+  unauthenticated: "Your session expired. Sign in again.",
   origin_not_allowed: "Request blocked. Reload and try again.",
   invalid_body: "Something in the form didn't parse. Check every field and try again.",
 };
@@ -154,8 +154,7 @@ export function SubmitForm() {
           {prUrl}
         </a>
         <p className="mt-2 text-xs text-ns-muted">
-          Attach your local <code className="font-mono">npm run verify</code> screenshots to the PR
-          — CI runs there, not on this site.
+          Attach your local <code className="font-mono">npm run verify</code> screenshots to the PR. CI runs there, not on this site.
         </p>
       </div>
     );
@@ -167,7 +166,7 @@ export function SubmitForm() {
         <div className="rounded-sm border border-border bg-surface p-3">
           <p className="text-sm text-foreground">Connect GitHub to open pull requests</p>
           <p className="mt-1 text-xs text-ns-muted">
-            A separate, narrower consent from sign-in — grants only permission to fork this repo
+            A separate, narrower consent from sign-in: grants only permission to fork this repo
             and open a PR (<code className="font-mono">public_repo</code> scope), nothing broader.
           </p>
           <a
@@ -207,8 +206,8 @@ export function SubmitForm() {
             disabled={pending}
             className={INPUT}
           >
-            <option value="core">core — restrained</option>
-            <option value="loud">loud — showcase</option>
+            <option value="core">core (restrained)</option>
+            <option value="loud">loud (showcase)</option>
           </select>
         </div>
       </div>
@@ -332,7 +331,7 @@ export function SubmitForm() {
             Developer Certificate of Origin
           </a>{" "}
           sign-off. This is written into the commit as a{" "}
-          <code className="font-mono">Signed-off-by</code> trailer — the checkbox alone is a
+          <code className="font-mono">Signed-off-by</code> trailer. The checkbox alone is a
           reminder, not the enforcement (CI checks the commit itself).
         </p>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">

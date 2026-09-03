@@ -1,7 +1,7 @@
 {
   "name": "autosave-ratchet",
   "title": "Autosave Ratchet",
-  "description": "Autosave status as a mechanical ratchet — a 10-tooth gear advances one notch per saved change and tallies the session in its rotation, while a failed save kicks the wheel back half a tooth and holds that broken pose until the next save resolves it.",
+  "description": "Autosave status as a mechanical ratchet: a 10-tooth gear advances one notch per saved change and tallies the session in its rotation, while a failed save kicks the wheel back half a tooth and holds that broken pose until the next save resolves it.",
   "collection": "core",
   "tags": [
     "autosave",

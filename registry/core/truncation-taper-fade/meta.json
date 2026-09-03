@@ -2,7 +2,7 @@
   "name": "truncation-taper-fade",
   "rank": 294,
   "title": "Truncation Taper Fade",
-  "description": "Truncation without the ellipsis — an overflowing line's trailing characters crowd tighter and dissolve toward the clip edge instead of getting cut to '...'; hover or focus decompresses it to read the tail.",
+  "description": "Truncation without the ellipsis: an overflowing line's trailing characters crowd tighter and dissolve toward the clip edge instead of getting cut to '...'; hover or focus decompresses it to read the tail.",
   "collection": "core",
   "tags": [
     "text",

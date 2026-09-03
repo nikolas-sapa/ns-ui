@@ -24,7 +24,7 @@ export function DemoStage({ name, title }: { name: string; title: string }) {
       <iframe
         key={name}
         src={`/preview/${name}?embed=1&interactive=1`}
-        title={`${title} — interactive`}
+        title={`${title} (interactive)`}
         className="h-[min(76vh,620px)] min-h-[520px] w-full border-0 bg-transparent"
       />
     </div>

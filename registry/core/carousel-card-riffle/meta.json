@@ -1,7 +1,7 @@
 {
   "name": "carousel-card-riffle",
   "title": "Carousel Card Riffle",
-  "description": "A card-stack navigator that shows its actual card edges as a scrubbable stripe of thin lines — dragging it riffles cards past with quick flip-past kicks, and the same stripe doubles as the pagination readout.",
+  "description": "A card-stack navigator that shows its actual card edges as a scrubbable stripe of thin lines: dragging it riffles cards past with quick flip-past kicks, and the same stripe doubles as the pagination readout.",
   "collection": "core",
   "tags": ["stack", "cards", "carousel", "stepper", "pagination", "scrub", "slider", "onboarding", "queue"],
   "useWhen": "a deck stepped through one card at a time where the pagination readout and the scrub control should be the same element, the visible edge stripe both showing position in the deck and riffling it under drag; pick gallery-coverflow-caustic instead when several items should be visible at once as a browsable gallery, or queue-triage-ratchet when each card is a decision that removes it from the stack rather than a page to move past.",

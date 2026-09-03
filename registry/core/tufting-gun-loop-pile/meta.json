@@ -1,7 +1,7 @@
 {
   "name": "tufting-gun-loop-pile",
   "title": "Tufting Gun Loop Pile",
-  "description": "A card whose backing texture is a genuine tufting-gun loop-pile build — a carriage sweeping row by row across a backing grid, plunging a loop of pile at each cell just behind it, the finished field feeding continuously off the top edge as new rows tuft in below.",
+  "description": "A card whose backing texture is a genuine tufting-gun loop-pile build: a carriage sweeping row by row across a backing grid, plunging a loop of pile at each cell just behind it, the finished field feeding continuously off the top edge as new rows tuft in below.",
   "collection": "core",
   "tags": [
     "card",

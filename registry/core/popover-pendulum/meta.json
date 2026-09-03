@@ -1,7 +1,7 @@
 {
   "name": "popover-pendulum",
   "title": "Popover Pendulum",
-  "description": "A popover that hangs from its trigger like a plumb bob: it drops in off-vertical, sways once or twice on a damped pendulum, and settles plumb — connected by a hairline SVG string that doubles as the anchor indicator.",
+  "description": "A popover that hangs from its trigger like a plumb bob: it drops in off-vertical, sways once or twice on a damped pendulum, and settles plumb, connected by a hairline SVG string that doubles as the anchor indicator.",
   "collection": "core",
   "tags": ["popover", "hovercard", "dialog", "pendulum", "physics", "anchor", "filter"],
   "useWhen": "an anchored non-modal panel whose entrance should make the anchor relationship visible, dropping off-vertical on a hairline string and settling plumb; pick hover-card-dwell instead when the failure being solved is opening on unintended hover and the delay itself should be a visible gate, tooltip-delay-group when the content is a short label rather than a panel, or dialog-emerge when it has to be modal.",

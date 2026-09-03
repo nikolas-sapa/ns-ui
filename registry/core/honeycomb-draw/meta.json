@@ -1,7 +1,7 @@
 {
   "name": "honeycomb-draw",
   "title": "Honeycomb Draw",
-  "description": "An ambient background where wax cells start as loosely packed circles and locally relax, wall by wall, into a tight hexagonal comb — each neighbour pair's shared wall straightens on its own schedule once the circles overlap, so a cell can show straight facets and still-round ones at once, with new circles seeding in from the left edge and a periodic recap flash keeping the finished lattice alive at rest.",
+  "description": "An ambient background where wax cells start as loosely packed circles and locally relax, wall by wall, into a tight hexagonal comb: each neighbour pair's shared wall straightens on its own schedule once the circles overlap, so a cell can show straight facets and still-round ones at once, with new circles seeding in from the left edge and a periodic recap flash keeping the finished lattice alive at rest.",
   "collection": "core",
   "tags": ["background", "canvas", "hexagon", "relaxation", "generative", "ambient", "texture"],
   "useWhen": "Pick honeycomb-draw when the backdrop should read as cells being actively formed — round wax tubes visibly flattening into hexagon walls one facet at a time, never a static pattern. Pick background-truchet-weave instead for an ambient tile field whose motif is a continuous interlaced arc weave rather than a growth/relaxation process, or grid-magnetic-lattice for a lattice whose motion is field-driven point attraction rather than cell-wall straightening.",

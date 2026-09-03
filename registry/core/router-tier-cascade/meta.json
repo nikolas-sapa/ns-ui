@@ -1,7 +1,7 @@
 {
   "name": "router-tier-cascade",
   "title": "Router Tier Cascade",
-  "description": "Model routing drawn as a cascade of weirs — one hairline row per model tier, each with a spill notch at its cost ceiling, so a request that a cheap tier can't hold visibly spills down a row and every escalation and its price are readable in one still frame.",
+  "description": "Model routing drawn as a cascade of weirs: one hairline row per model tier, each with a spill notch at its cost ceiling, so a request that a cheap tier can't hold visibly spills down a row and every escalation and its price are readable in one still frame.",
   "collection": "core",
   "tags": [
     "agent",

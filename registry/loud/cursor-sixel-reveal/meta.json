@@ -1,7 +1,7 @@
 {
   "name": "cursor-sixel-reveal",
   "title": "Cursor Sixel Reveal",
-  "description": "A full-bleed ASCII plasma field rendered twice from one shared scalar field — quantized to glyphs everywhere, and as a true raw-pixel grayscale raster inside a soft circular window — literalizing the real sixel/kitty-graphics-protocol-vs-character-fallback split. The window sweeps an idle Lissajous path and eases to the pointer on hover.",
+  "description": "A full-bleed ASCII plasma field rendered twice from one shared scalar field (quantized to glyphs everywhere, and as a true raw-pixel grayscale raster inside a soft circular window), literalizing the real sixel/kitty-graphics-protocol-vs-character-fallback split. The window sweeps an idle Lissajous path and eases to the pointer on hover.",
   "collection": "loud",
   "tags": ["ascii", "background", "canvas", "cursor", "raster", "terminal"],
   "useWhen": "a full-bleed background whose payoff is literalizing the terminal graphics sixel/kitty-vs-ASCII-fallback boundary — one procedural field shown two ways at once, glyph-quantized outside a window and raw-pixel raster inside it — rather than lens-ascii-magnify's density-only zoom, which stays glyph-quantized throughout and never crosses into true raster.",

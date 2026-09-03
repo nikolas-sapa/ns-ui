@@ -1,7 +1,7 @@
 {
   "name": "timeline-agent-lanes",
   "title": "Timeline Agent Lanes",
-  "description": "Live multi-agent turn tracker — one hairline lane per agent, the lane holding the turn brightened to foreground, handoffs drawn as stepped connectors with mono duration labels.",
+  "description": "Live multi-agent turn tracker: one hairline lane per agent, the lane holding the turn brightened to foreground, handoffs drawn as stepped connectors with mono duration labels.",
   "collection": "core",
   "tags": [
     "agent",

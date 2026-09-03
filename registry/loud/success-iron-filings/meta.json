@@ -1,7 +1,7 @@
 {
   "name": "success-iron-filings",
   "title": "Success Iron Filings",
-  "description": "Success moment as magnetism — a field of drifting iron filings snaps to attention when the action confirms, migrating and aligning to draw the checkmark as revealed field lines, with a halo of off-path filings rotating to the local field direction.",
+  "description": "Success moment as magnetism: a field of drifting iron filings snaps to attention when the action confirms, migrating and aligning to draw the checkmark as revealed field lines, with a halo of off-path filings rotating to the local field direction.",
   "collection": "loud",
   "tags": ["success", "celebration", "confirmation", "canvas", "particles", "checkmark"],
   "useWhen": "a confirmation moment where the checkmark should assemble out of the field rather than be drawn, filings snapping to attention and aligning along the revealed field lines; pick success-nucleation instead when the pending-to-done release should fire from the exact point pressed, or success-plumb-bob when the moment should read as a quiet checked instrument rather than a reveal.",

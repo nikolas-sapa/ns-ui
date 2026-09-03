@@ -1,7 +1,7 @@
 {
   "name": "toast-gravity-stack",
   "title": "Toast Gravity Stack",
-  "description": "Toast stack with real gravity — notifications thud into a jostling heap, errors sink under their own mass, and the pile resettles when one is dismissed.",
+  "description": "Toast stack with real gravity: notifications thud into a jostling heap, errors sink under their own mass, and the pile resettles when one is dismissed.",
   "collection": "core",
   "tags": ["toast", "notification", "physics", "gravity", "rigid-body", "micro-interaction", "feedback"],
   "useWhen": "notifications that should pile rather than queue, thudding into a heap where severity reads as mass and the pile resettles when one is dismissed; pick toast-newton-cradle instead when the stack has a hard cap and each eviction must read as caused by the arrival that displaced it, or toast-undo-fuse when there is one notification with an undo window and the timer is the point.",

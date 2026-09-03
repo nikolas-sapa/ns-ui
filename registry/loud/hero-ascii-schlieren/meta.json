@@ -2,7 +2,7 @@
   "name": "hero-ascii-schlieren",
   "rank": 13,
   "title": "Hero ASCII Schlieren",
-  "description": "A full-bleed ASCII hero built as a real schlieren rig — a rising thermal plume's refractive-index gradient is cut by a hard knife edge, so only the steep density boundaries survive as thin bright and dark bands while the uniform bulk air stays completely blank.",
+  "description": "A full-bleed ASCII hero built as a real schlieren rig: a rising thermal plume's refractive-index gradient is cut by a hard knife edge, so only the steep density boundaries survive as thin bright and dark bands while the uniform bulk air stays completely blank.",
   "collection": "loud",
   "tags": [
     "hero",

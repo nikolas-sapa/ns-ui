@@ -1,7 +1,7 @@
 {
   "name": "timeline-reasoning-rail",
   "title": "Timeline Reasoning Rail",
-  "description": "Collapsible agent-reasoning timeline — status lives entirely in the node glyph on a 1px vertical rail, steps stream in over time, and completed steps fold to a single line so a long run stays readable.",
+  "description": "Collapsible agent-reasoning timeline: status lives entirely in the node glyph on a 1px vertical rail, steps stream in over time, and completed steps fold to a single line so a long run stays readable.",
   "collection": "core",
   "tags": [
     "timeline",

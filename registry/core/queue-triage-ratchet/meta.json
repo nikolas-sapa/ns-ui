@@ -1,7 +1,7 @@
 {
   "name": "queue-triage-ratchet",
   "title": "Queue Triage Ratchet",
-  "description": "Card-triage queue driven by a literal one-way ratchet — deciding a card clicks a toothed rail forward one notch; undo means visibly lifting the pawl before the rail eases back.",
+  "description": "Card-triage queue driven by a literal one-way ratchet: deciding a card clicks a toothed rail forward one notch; undo means visibly lifting the pawl before the rail eases back.",
   "collection": "core",
   "tags": [
     "queue",

@@ -17,7 +17,7 @@ const TOKEN = {
   accent: "#006bff",
 } as const;
 
-export const alt = "ns-ui — a personal registry of React components";
+export const alt = "ns-ui: a personal registry of React components";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -102,7 +102,7 @@ export default async function Image() {
               maxWidth: 640,
             }}
           >
-            Canvas, motion and glass — every component runs live, in light
+            Canvas, motion and glass. Every component runs live, in light
             and dark.
           </div>
         </div>

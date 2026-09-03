@@ -1,27 +1,26 @@
 // Client-safe projection of registry.json (build-registry.ts generates it) —
-// this module is imported by site-shell.tsx, a Client Component, so a bare
-// `registry.json` import here would ship every component's full record
-// (instruction prose, files, dependencies, cssVars) into the browser for a
-// sidebar tree that only reads name/title/tags/collection/rank.
+// a bare `registry.json` import here would pull every component's full record
+// (instruction prose, files, dependencies, cssVars) into anything that reaches
+// this module, for a sidebar tree that only reads name/title/tags/collection/
+// rank.
+//
+// This module is SERVER-ONLY now: `app/layout.tsx` calls `navGroups()` for the
+// category summary, `app/nav-tree.json/route.ts` prerenders the full tree, and
+// `app/components/[name]/page.tsx` walks it for prev/next. Nothing with
+// "use client" may import it — see `lib/nav-tree.ts` for why that rule is not
+// cosmetic.
 import registry from "@/lib/registry-lite.generated.json";
 import order from "@/lib/component-order.json";
 import { CATEGORIES, categorize } from "@/lib/search-categories";
 import { kindOf } from "@/lib/kind";
+import type { NavGroup, NavItem, NavKind } from "@/lib/nav-tree";
 
-export type NavItem = { name: string; title: string; loud: boolean };
-/** A `kind` sub-group inside a category — see `kindOf` for the label. */
-export type NavKind = { id: string; label: string; items: NavItem[] };
-export type NavGroup = {
-  id: string;
-  label: string;
-  /** Total components in this category, kinds + loose items combined. */
-  count: number;
-  /** Kinds with 2+ members — worth their own collapsible level. */
-  kinds: NavKind[];
-  /** Components whose kind is a singleton (or tagless) — rendered flat,
-   *  directly under the category, not wrapped in a redundant one-item group. */
-  items: NavItem[];
-};
+// The shapes and the pure walks live in `lib/nav-tree.ts`, which imports no
+// registry — `site-shell.tsx` needs them on the client, and importing them
+// from here dragged the 136.7 KB `registry-lite.generated.json` into the
+// client bundle with them. Re-exported so server callers keep one import.
+export type { NavItem, NavKind, NavGroup, NavSummary } from "@/lib/nav-tree";
+export { flatOrder, locate, packNavTree, summarizeNav } from "@/lib/nav-tree";
 
 const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
@@ -48,8 +47,29 @@ const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").repla
  * click for nothing), so only kinds with 2+ members become their own
  * collapsible group; everything else — including the ~27% of components
  * `kindOf` can't label — renders flat under the category, same depth as today.
+ *
+ * Memoized at module scope. It is a pure function of two module-level JSON
+ * imports (`registry-lite.generated.json`, `component-order.json`) with no
+ * arguments and no environment reads, and the whole thing is a rebuild from
+ * scratch each call: a map over all 534 entries, `categorize()`, two Maps, the
+ * bucket loop, then a sort per category and per kind. `app/layout.tsx` calls
+ * it via `summarizeNav` on EVERY rendered route, so an unmemoized version ran
+ * that recompute 591+ times per build — once per static page — plus once more
+ * per component page for `flatOrder`, and again for `/nav-tree.json`. Same
+ * shape of fix as `lib/use-when.ts`'s cache, for the same reason.
+ *
+ * Returning the shared instance is safe because every consumer is read-only:
+ * `summarizeNav` and `packNavTree` only map over it, `flatOrder` only walks it
+ * and pushes into an array it created itself, and `filterGroups` (site-shell)
+ * operates on the client's own fetched copy, not on this one. The in-place
+ * `sort`s below all run on arrays built inside this call, before it returns.
+ * If a future caller needs to mutate the tree, it must copy — do not add a
+ * mutation here and rely on the caller getting a fresh one.
  */
+let cached: NavGroup[] | null = null;
+
 export function navGroups(): NavGroup[] {
+  if (cached) return cached;
   const items = registry.map((i) => ({
     name: i.name,
     title: i.title,
@@ -132,48 +152,6 @@ export function navGroups(): NavGroup[] {
     const { kinds, loose } = split("other", other);
     groups.push({ id: "other", label: "Other", count: other.length, kinds, items: loose });
   }
+  cached = groups;
   return groups;
-}
-
-/**
- * The tree flattened into the single order it actually reads top-to-bottom
- * in the sidebar — same category → kind → loose-item walk `navGroups()`
- * builds and `NavCategory`/`NavKindGroup` render, deduped to first
- * occurrence. A component can be a member of several categories (the
- * multi-match rule documented above `navGroups()`), so without the dedupe a
- * component filed under two sections would neighbour itself in prev/next.
- * First occurrence wins rather than last so this agrees with whichever
- * section the sidebar auto-opens for that component (`locate()`, same
- * category-then-kind order).
- */
-export function flatOrder(groups: NavGroup[]): NavItem[] {
-  const seen = new Set<string>();
-  const flat: NavItem[] = [];
-  const push = (item: NavItem) => {
-    if (seen.has(item.name)) return;
-    seen.add(item.name);
-    flat.push(item);
-  };
-  for (const g of groups) {
-    for (const k of g.kinds) for (const i of k.items) push(i);
-    for (const i of g.items) push(i);
-  }
-  return flat;
-}
-
-/** Where a component lives in the tree, for auto-opening its section on
- *  navigation — `null` if it's not in the registry (shouldn't happen for a
- *  real slug, but a stale link degrades to "nothing auto-opens" rather than
- *  a crash). */
-export function locate(
-  groups: NavGroup[],
-  name: string,
-): { groupId: string; kindId: string | null } | null {
-  for (const g of groups) {
-    for (const k of g.kinds) {
-      if (k.items.some((i) => i.name === name)) return { groupId: g.id, kindId: k.id };
-    }
-    if (g.items.some((i) => i.name === name)) return { groupId: g.id, kindId: null };
-  }
-  return null;
 }

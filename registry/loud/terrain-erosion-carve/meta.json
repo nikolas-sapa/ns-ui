@@ -1,7 +1,7 @@
 {
   "name": "terrain-erosion-carve",
   "title": "Terrain Erosion Carve",
-  "description": "The cursor is a river — dragging across a live topographic map carves a channel into the heightfield, marching-squares isolines reflowing into canyon walls with a faint waterline; release and sediment heals the terrain back over ~6 seconds. At rest the sheet stays alive: contours drift in a slow traveling ripple and sediment specks trickle downhill continuously.",
+  "description": "The cursor is a river: dragging across a live topographic map carves a channel into the heightfield, marching-squares isolines reflowing into canyon walls with a faint waterline; release and sediment heals the terrain back over ~6 seconds. At rest the sheet stays alive: contours drift in a slow traveling ripple and sediment specks trickle downhill continuously.",
   "collection": "loud",
   "tags": ["terrain", "topographic", "cursor", "canvas", "marching-squares", "drag", "physics", "ambient"],
   "useWhen": "an ambient full-bleed sheet the cursor persistently changes, dragging carving channels into a live heightfield that sediment heals back over about six seconds, so the surface remembers where you have been; pick reveal-ripple-tiles instead when the point is revealing media beneath a grid rather than deforming a generative field, or hero-vortex-street when the trace should drift and decay rather than carve.",

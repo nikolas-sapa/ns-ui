@@ -11,7 +11,7 @@ import Link from "next/link";
 
 const title = "Suggest a feature";
 const description =
-  "Propose a feature for the CLI, MCP server, or site — or a component idea — and what each proposal is judged on.";
+  "Propose a feature for the CLI, MCP server, or site (or a component idea), and what each proposal is judged on.";
 
 export const metadata: Metadata = {
   title,
@@ -87,7 +87,7 @@ export default function SuggestPage() {
             feature request
           </a>
           . Say what you were trying to do and where the current surface stopped
-          you — that is the part that cannot be guessed later.
+          you. That is the part that cannot be guessed later.
         </p>
       </section>
 

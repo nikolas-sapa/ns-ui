@@ -1,7 +1,7 @@
 {
   "name": "screen-flood-stroke",
   "title": "Screen Flood Stroke",
-  "description": "A card-scale loader modelled on the real screen-printing flood/print stroke cycle — a squeegee alternates a light flood pass that spreads ink across the mesh and a firm print pass that forces it through, printing one fading impression per cycle.",
+  "description": "A card-scale loader modelled on the real screen-printing flood/print stroke cycle: a squeegee alternates a light flood pass that spreads ink across the mesh and a firm print pass that forces it through, printing one fading impression per cycle.",
   "collection": "core",
   "tags": ["loader", "progress", "canvas", "print", "ambient", "monochrome"],
   "useWhen": "an ambient 'something is being produced' loader whose motion is sourced from a real two-stroke print mechanic rather than a generic spinner or wipe, including an optional determinate mode where a 0-1 progress value caps how much of the mesh can hold a fresh impression while the flood/print cycle itself keeps running unforced. Pick progress-hatch instead when the surface needs to read as a precise numeric percentage meter with a printed readout and tick ruler; pick card-dot-gain-screen instead when the goal is a static card's backing texture (a halftone contact screen with per-dot gain and shadow plugging) rather than a moving loader with no card copy to protect.",

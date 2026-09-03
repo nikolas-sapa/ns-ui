@@ -1,7 +1,7 @@
 {
   "name": "transition-panel-crumble",
   "title": "Transition Panel Crumble",
-  "description": "A layout transition where the outgoing panel crumbles into a few thousand token-colored grains that fall under gravity, funnel toward the incoming panel's matching regions, and settle there while the crisp new DOM (already fully mounted and focused) shows through — conservation of matter made visible, an hourglass turn between a dashboard overview and its detail pivot.",
+  "description": "A layout transition where the outgoing panel crumbles into a few thousand token-colored grains that fall under gravity, funnel toward the incoming panel's matching regions, and settle there while the crisp new DOM (already fully mounted and focused) shows through: conservation of matter made visible, an hourglass turn between a dashboard overview and its detail pivot.",
   "collection": "loud",
   "tags": ["transition", "canvas", "particles", "physics", "dashboard", "layout", "verlet", "gravity"],
   "useWhen": "a high-moment layout swap (dashboard-to-detail pivot, onboarding step change, publish handoff) where the old screen's regions visibly become the new screen's regions via a physical pour, rather than a generic particle wipe; pick scroll-particle-tunnel instead for a scroll-scrubbed camera flythrough with no source/destination geometry, since that one has no notion of an outgoing or incoming DOM at all.",

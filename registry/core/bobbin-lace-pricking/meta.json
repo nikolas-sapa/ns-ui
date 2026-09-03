@@ -1,7 +1,7 @@
 {
   "name": "bobbin-lace-pricking",
   "title": "Bobbin Lace Pricking",
-  "description": "A decorative divider/empty-state motif: a narrow working band of pins twists thread pairs into locked crosses down a pricked grid, while a pin two rows behind the band is pulled free the moment its crossing has secured — the load-bearing, uncontested mechanic no other lattice sibling has.",
+  "description": "A decorative divider/empty-state motif: a narrow working band of pins twists thread pairs into locked crosses down a pricked grid, while a pin two rows behind the band is pulled free the moment its crossing has secured. The load-bearing, uncontested mechanic no other lattice sibling has.",
   "collection": "core",
   "tags": ["divider", "empty-state", "ambient", "canvas", "lace", "textile", "grid", "mono"],
   "useWhen": "a decorative divider or empty-state ornament that wants a quiet, structured, continuously-working ambient motif rather than a functional control — pick this over divider-mosaic-split when a slow, physical building process (not a static pattern) is the point, or over empty-state-braille-orbit when a fixed, legible grid mechanic reads better than a comet-orbit trajectory. Distinct from mesh-lash, seep-lattice, and pin-register: none of those places-then-physically-removes an element as work progresses — this one's pin is a temporary fixture, present only while its crossing is still forming.",

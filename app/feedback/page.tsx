@@ -13,7 +13,7 @@ import Link from "next/link";
 
 const title = "Feedback";
 const description =
-  "Report a bug, flag something wrong on the site, or say what is not working — where each kind of feedback goes.";
+  "Report a bug, flag something wrong on the site, or say what is not working: where each kind of feedback goes.";
 
 export const metadata: Metadata = {
   title,
@@ -60,7 +60,7 @@ export default function FeedbackPage() {
             bug report
           </a>
           . Include the registry name as used in the install command, the
-          browser, and whether it happens in light, dark, or both — the
+          browser, and whether it happens in light, dark, or both. The
           screenshot gate compares those separately, so which one it is
           narrows the cause immediately.
         </p>
@@ -86,7 +86,7 @@ export default function FeedbackPage() {
       <section className={SECTION}>
         <h2 className={H2}>An idea rather than a defect</h2>
         <p className={P}>
-          Feature ideas and component ideas have their own page —{" "}
+          Feature ideas and component ideas have their own page:{" "}
           <Link href="/suggest" className={LINK}>
             /suggest
           </Link>
@@ -110,7 +110,7 @@ export default function FeedbackPage() {
           >
             security advisories
           </a>{" "}
-          or the same address — never a public issue. What the site stores
+          or the same address, never a public issue. What the site stores
           about you is on{" "}
           <Link href="/privacy" className={LINK}>
             /privacy

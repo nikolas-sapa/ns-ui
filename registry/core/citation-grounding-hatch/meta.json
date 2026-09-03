@@ -1,7 +1,7 @@
 {
   "name": "citation-grounding-hatch",
   "title": "Citation Grounding Hatch",
-  "description": "A per-sentence grounding trace under an AI answer: solid where a source backs the claim, a bare hairline where the model is inferring alone, diagonal hatch where a source contradicts it — shape-encoded, never color, with a static legend keying each mark to its meaning and a click-to-raise source panel.",
+  "description": "A per-sentence grounding trace under an AI answer: solid where a source backs the claim, a bare hairline where the model is inferring alone, diagonal hatch where a source contradicts it. Shape-encoded, never color, with a static legend keying each mark to its meaning and a click-to-raise source panel.",
   "collection": "core",
   "tags": [
     "rag",

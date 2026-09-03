@@ -1,7 +1,7 @@
 {
   "name": "due-slip",
   "title": "Due Slip",
-  "description": "A ruled read-receipt card styled as a library date-due slip: the first time each collaborator opens a shared doc, their initials and an HH:MM timestamp stamp into the next free row, so row position alone is reading order — no hover, no collapsing '+N' pile.",
+  "description": "A ruled read-receipt card styled as a library date-due slip: the first time each collaborator opens a shared doc, their initials and an HH:MM timestamp stamp into the next free row, so row position alone is reading order. No hover, no collapsing '+N' pile.",
   "collection": "core",
   "tags": [
     "read-receipt",

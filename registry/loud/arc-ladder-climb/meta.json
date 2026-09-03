@@ -1,7 +1,7 @@
 {
   "name": "arc-ladder-climb",
   "title": "Arc Ladder Climb",
-  "description": "A full-bleed section-divider background modelled on a Jacob's ladder: two rails diverge from a narrow base gap, a bright plasma arc strikes there, climbs the widening gap as it burns, dies near the top, and a fresh arc restrikes at the base almost immediately — continuously, at a re-randomized ~1.6-2.2s cadence.",
+  "description": "A full-bleed section-divider background modelled on a Jacob's ladder: two rails diverge from a narrow base gap, a bright plasma arc strikes there, climbs the widening gap as it burns, dies near the top, and a fresh arc restrikes at the base almost immediately. This runs continuously, at a re-randomized ~1.6-2.2s cadence.",
   "collection": "loud",
   "tags": ["divider", "hero", "canvas", "electric", "arc", "plasma", "ambient", "background"],
   "useWhen": "a full-bleed break between two page sections that should stay visibly alive rather than sit as a static rule — the mechanism is a single discrete strike-climb-extinguish-restrike cycle on diverging rails, always re-striking at the same narrow base point, never a continuous glow or a cursor-driven effect. Pick plasma-filament-wander instead when the identity should be several independent filaments simultaneously reaching from a shared center toward a ring, each rerouting on its own staggered clock, or border-electric-arc when the crackle belongs on a CTA's own border as interaction chrome rather than as a full-bleed section background.",

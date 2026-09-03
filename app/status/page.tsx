@@ -213,7 +213,7 @@ function bannerState(services: StatusCheck[]): BannerState {
 const BANNER_CAPTION: Record<BannerState, string> = {
   ok: "Every live read taken for this page came back clean.",
   degraded:
-    "At least one live read came back with drift — the rows below name which, and what it costs.",
+    "At least one live read came back with drift. The rows below name which, and what it costs.",
   down: "At least one live read failed outright. The rows below name which.",
   unknown:
     "At least one live read did not come back, so its service is unproven rather than fine.",
@@ -280,7 +280,7 @@ export default async function StatusPage() {
         </h1>
         <p className="mt-5 max-w-2xl text-[15px] leading-7 text-ns-muted">
           The banner states the worst of the live reads taken for this page. The
-          strips under it are drawn only from snapshots that were recorded — a
+          strips under it are drawn only from snapshots that were recorded: a
           day with no snapshot is grey, nothing is backfilled, and an uptime
           figure appears only once there is a recorded day behind it. Because
           every failure this registry has had returned HTTP 200, the questions
@@ -336,8 +336,8 @@ export default async function StatusPage() {
         <span className="break-words font-mono text-foreground">{REGISTRY_ORIGIN}/r/registry.json</span>,
         the npm dist-tag and the published component index of{" "}
         <span className="font-mono text-foreground">{CLI_PACKAGE}</span> and of{" "}
-        <span className="font-mono text-foreground">{MCP_PACKAGE}</span> — each package
-        read from its own tarball, never from the other&rsquo;s — and one public
+        <span className="font-mono text-foreground">{MCP_PACKAGE}</span> (each package
+        read from its own tarball, never from the other&rsquo;s), and one public
         Convex query, refreshed hourly. The daily bars come from recorded
         snapshots only; days before recording began stay grey.
       </p>

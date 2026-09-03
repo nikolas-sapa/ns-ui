@@ -1,7 +1,7 @@
 {
   "name": "sheet-ascii-range",
   "title": "Sheet ASCII Range",
-  "description": "A spreadsheet-style rectangular cell range select where the border draws itself in real box-drawing glyphs (┌─┐│└┘) and a live ASCII status bar prints the aggregate — count, sum, mean, min, max — as the range grows by drag or Shift+Arrow.",
+  "description": "A spreadsheet-style rectangular cell range select where the border draws itself in real box-drawing glyphs (┌─┐│└┘) and a live ASCII status bar prints the aggregate (count, sum, mean, min, max) as the range grows by drag or Shift+Arrow.",
   "collection": "core",
   "tags": ["spreadsheet", "grid", "selection", "ascii", "mono", "box-drawing", "keyboard-navigation", "data-visualization"],
   "useWhen": "a rectangular multi-cell range selection over tabular numeric data where the aggregate of the current selection should read live, spreadsheet-style — pick this over table-heat-shimmer when the selection itself is the point, not a fixed row's status. table-heat-shimmer's rows aren't selectable at all; its mechanic is which rows shimmer, not which cells are chosen.",

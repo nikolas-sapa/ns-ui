@@ -1,7 +1,7 @@
 {
   "name": "fugitive-ink",
   "title": "Fugitive Ink",
-  "description": "A one-time secret panel that prints a new API key or recovery code fully legible, then lets it fade like security ink — armed by the user's own copy or by clicking away, never by a modal you close and lose.",
+  "description": "A one-time secret panel that prints a new API key or recovery code fully legible, then lets it fade like security ink, armed by the user's own copy or by clicking away, never by a modal you close and lose.",
   "collection": "core",
   "tags": [
     "secret",

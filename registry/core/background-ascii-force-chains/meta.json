@@ -1,7 +1,7 @@
 {
   "name": "background-ascii-force-chains",
   "title": "Background ASCII Force Chains",
-  "description": "An ambient ASCII background of a granular packing under load — a static disc packing's contact network is relaxed each frame and only the contacts carrying well above the mean force are inked, so the few percent of grains bearing the load stand out as thin branching chains while the rest of the pile stays dark.",
+  "description": "An ambient ASCII background of a granular packing under load: a static disc packing's contact network is relaxed each frame and only the contacts carrying well above the mean force are inked, so the few percent of grains bearing the load stand out as thin branching chains while the rest of the pile stays dark.",
   "collection": "core",
   "tags": ["background", "ascii", "canvas", "cursor", "granular", "force-chains", "stress"],
   "useWhen": "Pick background-ascii-force-chains when the hero should read as load finding a path through a pile of grains — a sparse branching skeleton threading downward through mostly empty field, with the pointer pressing in as an indenter that opens a downward stress cone and dims everything it steals load from. background-ascii-caustics is the pick for bright focused filaments from multiplied plane waves with the pointer as a converging lens; background-ascii-nodal-lines for curved dead-fringe hairlines from interfering emitters; background-ascii-voronoi-walls when the structure should be a static cellular partition rather than a transmitted load.",

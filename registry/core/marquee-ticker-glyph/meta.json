@@ -1,7 +1,7 @@
 {
   "name": "marquee-ticker-glyph",
   "title": "Marquee Ticker Glyph",
-  "description": "A grabbable ticker tape: drag to scrub through its content, release to fling it with momentum, and legibility itself is a function of speed — fast motion blurs characters into noise glyphs, slowing down resolves them back into real text.",
+  "description": "A grabbable ticker tape: drag to scrub through its content, release to fling it with momentum, and legibility itself is a function of speed. Fast motion blurs characters into noise glyphs, slowing down resolves them back into real text.",
   "collection": "core",
   "tags": ["marquee", "ticker", "scrub", "drag", "mono", "glyph", "instrument"],
   "useWhen": "a marquee the visitor can grab and scrub through, where speed itself is the readout — dragging fast blurs the tape into noise glyphs and slowing down resolves it back to real text; pick ticker-tape-splice instead for a live feed that only needs hover-to-pause easing, or ticker-teleprinter when the crawl should read as character-quantised typewriter arrival rather than something you can physically throw and catch.",

@@ -1,7 +1,7 @@
 {
   "name": "hachure-fall",
   "title": "Hachure Fall",
-  "description": "A route elevation profile drawn as 18th-century military engravers drew slope: strokes perpendicular to the profile line, hanging down the fall direction, whose length and density both derive from local grade — no colour ramp, no vertical-exaggeration slider.",
+  "description": "A route elevation profile drawn as 18th-century military engravers drew slope: strokes perpendicular to the profile line, hanging down the fall direction, whose length and density both derive from local grade. No colour ramp, no vertical-exaggeration slider.",
   "collection": "core",
   "tags": ["chart", "elevation", "route", "svg", "slider", "keyboard", "accessibility", "cycling", "terrain"],
   "useWhen": "the elevation panel under any route (cycling, hiking, running, delivery, EV range) where the reader needs to feel where the climb is and how hard, without decoding a y-axis — stroke length is fixed at 1 stroke-height = 5% grade so hachures stay comparable across routes with no exaggeration control to distort that. Reach for chart-ridgeline-terrain instead when the data is ambient/decorative (a live signal rendered as scenery, gravitationally dented by the cursor) rather than a working instrument someone reads a real grade off of — that component is a mood, this one is a measurement.",

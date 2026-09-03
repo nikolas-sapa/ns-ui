@@ -1,7 +1,7 @@
 {
   "name": "offset-fountain-split",
   "title": "Offset Fountain Split",
-  "description": "A full-bleed ambient background modeling a web-offset press ink train — ink splits and smears across six rollers from fountain to form, driven by 24 independently drifting fountain-key zones so the field's ribbed banding never converges flat.",
+  "description": "A full-bleed ambient background modeling a web-offset press ink train: ink splits and smears across six rollers from fountain to form, driven by 24 independently drifting fountain-key zones so the field's ribbed banding never converges flat.",
   "collection": "loud",
   "tags": ["background", "print", "ink", "canvas", "ambient", "offset", "monochrome"],
   "useWhen": "a full-bleed backdrop where the texture itself is a real print-process story — cascading ink-train splitting driven by a never-settling fountain-key drift, rendered as vertical density strips. Pick background-gradient-shader instead for a calm moving current of color with no print-process narrative; pick background-halftone-rosette instead when the read you want is same-ink dot-screen moiré rather than roller-splitting ribbing.",

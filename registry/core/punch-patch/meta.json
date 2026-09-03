@@ -1,7 +1,7 @@
 {
   "name": "punch-patch",
   "title": "Punch Patch",
-  "description": "A role x permission matrix rendered as a Jacquard card where authority is asymmetric material: granting punches a clean hole through the card stock, revoking never un-punches — it pastes a visible patch over the hole instead, so a cell that was ever revoked stays permanently distinguishable from one that was never touched.",
+  "description": "A role x permission matrix rendered as a Jacquard card where authority is asymmetric material: granting punches a clean hole through the card stock, revoking never un-punches. It pastes a visible patch over the hole instead, so a cell that was ever revoked stays permanently distinguishable from one that was never touched.",
   "collection": "core",
   "tags": [
     "matrix",

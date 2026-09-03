@@ -7,7 +7,7 @@ import { ClientSwitcher } from "./client-switcher";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/connect" },
-  title: "Connect — ns-ui",
+  title: "Connect · ns-ui",
   description:
     "Pull the ns-ui registry into an agent: an MCP server, a CLI, and the raw llms.txt feeds.",
 };

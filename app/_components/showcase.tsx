@@ -10,7 +10,7 @@ import { GitHubStarButton } from "./github-star-button";
 import { PreviewCard, type RegistryEntry } from "./preview-card";
 import { useMountManager } from "./use-mount-manager";
 import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
-import { CATEGORIES, categorize } from "@/lib/search-categories";
+import { CATEGORIES } from "@/lib/search-categories";
 import { SYNONYM_TEXT } from "@/lib/search-synonyms";
 
 const installFor = (name: string) =>
@@ -24,13 +24,25 @@ const installFor = (name: string) =>
 const EXAMPLE_NAME = "hero-particles-webgl";
 
 export type ShowcaseEntry = RegistryEntry & {
-  tags: string[];
-  /** useWhen + the instruction's lead sentence — the plainest-spoken copy. */
-  prose: string;
+  /** Category ids from `categorize()`, resolved on the server — see
+   *  app/page.tsx. The client never sees the tags they were derived from;
+   *  those are search-only and live in /search-index.json. */
+  cats: string[];
   /** Recency rank from lib/component-order.json — 0 is newest. Missing
    *  components (not yet in the committed snapshot) sort last. */
   order: number;
 };
+
+/** name -> the search-only half of its haystack. See lib/search-corpus.ts. */
+type SearchCorpus = Record<string, string>;
+
+const SEARCH_INDEX_URL = "/search-index.json";
+
+/** How long to wait before prefetching the corpus on a browser with no
+ *  `requestIdleCallback` (Safari). Long enough to be after the catalog's own
+ *  first screen of iframes, short enough that a visitor who reads for a
+ *  moment before searching still gets an instant first keystroke. */
+const CORPUS_IDLE_FALLBACK_MS = 2500;
 
 /**
  * How many demos may run at once.
@@ -152,6 +164,11 @@ export function Showcase({
   // Flips once this effect has run, so the retirement effect below can wait
   // for it — see that effect's comment for why the two can't be merged.
   const [urlSynced, setUrlSynced] = useState(false);
+  /** True when the arriving URL carried `?q=`, i.e. the very first render
+   *  after hydration is already a search result. That is the one case where
+   *  the fetched corpus has to be in hand before anything is painted — see
+   *  the gate-retirement effect. */
+  const [queryFromUrl, setQueryFromUrl] = useState(false);
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const fromUrl = params.get(SORT_PARAM);
@@ -173,8 +190,14 @@ export function Showcase({
       setCategoryState(categoryFromUrl);
     }
     if (params.get(NEW_PARAM) === "1") setNewOnlyState(true);
-    const queryFromUrl = params.get(QUERY_PARAM);
-    if (queryFromUrl) setQueryState(queryFromUrl);
+    const q = params.get(QUERY_PARAM);
+    if (q) {
+      setQueryState(q);
+      // Not on idle, not on focus: this visitor is already searching, so the
+      // corpus is on the critical path for this one arrival shape.
+      setQueryFromUrl(true);
+      setCorpusWanted(true);
+    }
     setUrlSynced(true);
   }, []);
 
@@ -242,8 +265,14 @@ export function Showcase({
     return { all: items.length, core, loud, new: fresh };
   }, [items]);
 
-  /** name -> category ids, computed once from the components' own tags. */
-  const memberships = useMemo(() => categorize(items), [items]);
+  /** name -> category ids. Resolved on the server from each component's own
+   *  tags (app/page.tsx) and carried as `cats`, so the chips have their
+   *  counts on the first paint without the tags themselves crossing the
+   *  wire. */
+  const memberships = useMemo(
+    () => new Map(items.map((i) => [i.name, i.cats])),
+    [items],
+  );
 
   const categories = useMemo(() => {
     const named = CATEGORIES.map((c) => ({
@@ -263,25 +292,84 @@ export function Showcase({
   }, [items, memberships]);
 
   /**
-   * One lowercase string per component to match against. 206 items, so this
+   * The search-only half of the haystack — tags, useWhen, the instruction's
+   * lead sentence — fetched from /search-index.json instead of arriving as
+   * props. Measured, it was 161 KB of the homepage document, serialized into
+   * the inline flight payload for a visitor who may never type a character.
+   * `null` until it lands (or, on a failed fetch, forever): search still
+   * works against name/title/description/synonyms, just less richly.
+   */
+  const [corpus, setCorpus] = useState<SearchCorpus | null>(null);
+  /** Distinct from `corpus !== null`: a failed fetch settles too. The gate
+   *  retirement below waits on *settled*, so a 404 or an offline visitor
+   *  cannot leave the grid hidden behind the stand-in. */
+  const [corpusSettled, setCorpusSettled] = useState(false);
+  const [corpusWanted, setCorpusWanted] = useState(false);
+  const wantCorpus = useCallback(() => setCorpusWanted(true), []);
+
+  // Prefetch once the browser is idle, so the common case (someone reads the
+  // page, then searches) has the corpus in hand before the first keystroke.
+  // It is off the document's critical path either way — a separate,
+  // CDN-cached request that no longer has to be parsed before the page is
+  // interactive.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const idle = window.requestIdleCallback;
+    if (idle) {
+      const id = idle(() => setCorpusWanted(true), { timeout: CORPUS_IDLE_FALLBACK_MS });
+      return () => window.cancelIdleCallback?.(id);
+    }
+    const id = window.setTimeout(() => setCorpusWanted(true), CORPUS_IDLE_FALLBACK_MS);
+    return () => window.clearTimeout(id);
+  }, []);
+
+  useEffect(() => {
+    if (!corpusWanted || corpusSettled) return;
+    let cancelled = false;
+    fetch(SEARCH_INDEX_URL)
+      .then((res) => (res.ok ? (res.json() as Promise<SearchCorpus>) : null))
+      .then((data) => {
+        if (cancelled) return;
+        if (data) setCorpus(data);
+        setCorpusSettled(true);
+      })
+      .catch(() => {
+        // Offline, or the static file is missing. Search degrades to the
+        // fields the cards already render rather than breaking.
+        if (!cancelled) setCorpusSettled(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [corpusWanted, corpusSettled]);
+
+  /**
+   * One lowercase string per component to match against. 534 items, so this
    * is a plain substring scan on every keystroke — no index, no debounce.
    *
    * The synonym words are folded in here rather than matched separately, so a
    * multi-word plain query ("file upload") still works term by term against
    * the existing every-term rule.
+   *
+   * Rebuilt when `corpus` arrives. A query typed in the gap between the first
+   * keystroke and the fetch resolving matches on the narrower text and then
+   * widens — visible only as results appearing, never as the grid showing
+   * something and then being corrected: the one case where that would have
+   * been a layout shift is a `?q=` URL on arrival, and the pre-hydration gate
+   * below is held closed until the fetch settles for exactly that reason.
    */
   const haystacks = useMemo(() => {
     const map = new Map<string, string>();
     for (const i of items) {
       map.set(
         i.name,
-        `${i.name} ${i.title} ${i.description} ${i.tags.join(" ")} ${
-          i.collection
-        } ${i.prose} ${SYNONYM_TEXT[i.name] ?? ""}`.toLowerCase(),
+        `${i.name} ${i.title} ${i.description} ${i.collection} ${
+          SYNONYM_TEXT[i.name] ?? ""
+        } ${corpus?.[i.name] ?? ""}`.toLowerCase(),
       );
     }
     return map;
-  }, [items]);
+  }, [items, corpus]);
 
   // A `useDeferredValue(query)` sat here, feeding the memo below so a
   // keystroke's own render stayed synchronous while the 265-card grid
@@ -316,10 +404,19 @@ export function Showcase({
   // prevent. As a separate effect it only runs once that corrected render has
   // already committed, which is exactly the point the grid becomes safe to
   // reveal.
+  //
+  // A `?q=` arrival additionally waits for the search corpus fetch to settle
+  // (lib/search-corpus.ts). The corpus is half the haystack, so retiring the
+  // gate before it lands would reveal a grid filtered on the narrower text
+  // and then re-filter it a moment later — the same one-render-late shape as
+  // the `useDeferredValue` experiment above, which measured 0.3330 on
+  // `/?q=toggle`. `corpusSettled` (not `corpus`) is the condition, so a
+  // failed fetch reveals the grid rather than hiding it forever.
   useEffect(() => {
     if (!urlSynced) return;
+    if (queryFromUrl && !corpusSettled) return;
     document.documentElement.classList.remove("catalog-filtered", "catalog-sorted");
-  }, [urlSynced]);
+  }, [urlSynced, queryFromUrl, corpusSettled]);
 
   const { visibleItems: filteredItems, loose } = useMemo(() => {
     const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
@@ -461,7 +558,7 @@ export function Showcase({
             A personal registry of {items.length} React components.
           </h1>
           <p className="mt-4 max-w-xl text-sm leading-relaxed text-ns-muted">
-            Canvas, motion and glass — themed by your own CSS tokens, light and dark.
+            Canvas, motion and glass. Themed by your own CSS tokens, light and dark.
             Every card below is the real component running live. Click one to
             open it full size.
           </p>
@@ -504,7 +601,7 @@ export function Showcase({
             >
               Developer docs
             </a>
-            {" — registry API, OpenAPI spec and the MCP server."}
+            {": registry API, OpenAPI spec and the MCP server."}
           </p>
 
           {/* Same moment as the install box above: deciding whether the
@@ -535,6 +632,7 @@ export function Showcase({
         totalCount={items.length}
         filtered={filtered}
         onClearAll={clearAll}
+        onSearchIntent={wantCorpus}
       />
 
       {/* Featured rail: a small, genuinely-curated set, live and directly
@@ -647,7 +745,7 @@ export function Showcase({
       {loose ? (
         <p className="mt-10 text-xs text-ns-muted">
           Nothing matches every word of{" "}
-          <span className="font-mono text-foreground">{query}</span> — showing
+          <span className="font-mono text-foreground">{query}</span>. Showing
           the closest matches
           {/* "best first" only describes the relevance ranking loose search
               produces — Newest/Oldest deliberately override it below. */}

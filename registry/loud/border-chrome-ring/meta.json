@@ -1,7 +1,7 @@
 {
   "name": "border-chrome-ring",
   "title": "Border Chrome Ring",
-  "description": "Wraps any element in a thick tube of molten chrome — a WebGL shader fakes a 3D torus cross-section across the band width (not a flat gradient), lights it with a rotating banded environment reflection so bright/dark stripes sweep around the collar, and perturbs the band's own boundary with noise so it wobbles like liquid metal instead of holding a fixed shape. Hovering biases a specular hit toward the cursor; pressing bulges the metal outward and pools it toward the pointer; releasing sends a ripple once around the ring.",
+  "description": "Wraps any element in a thick tube of molten chrome: a WebGL shader fakes a 3D torus cross-section across the band width (not a flat gradient), lights it with a rotating banded environment reflection so bright/dark stripes sweep around the collar, and perturbs the band's own boundary with noise so it wobbles like liquid metal instead of holding a fixed shape. Hovering biases a specular hit toward the cursor; pressing bulges the metal outward and pools it toward the pointer; releasing sends a ripple once around the ring.",
   "collection": "loud",
   "tags": ["webgl", "shader", "metal", "chrome", "ring", "border", "decorative", "avatar", "button"],
   "useWhen": "wrapping an element in a thick liquid-metal collar with a real modelled cross-section and a rotating environment reflection, where the ring is a material object that bulges toward the pointer under press; pick border-electric-arc instead when the border should crackle as a live wire around a CTA and discharge on press, or surface-glass when the treatment belongs to the whole container rather than its edge.",

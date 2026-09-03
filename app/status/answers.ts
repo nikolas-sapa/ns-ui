@@ -75,7 +75,7 @@ function installAnswer(
       id: "install",
       question,
       state: "unknown",
-      answer: "Not measured — the install checks did not run for this render.",
+      answer: "Not measured: the install checks did not run for this render.",
     };
   }
 
@@ -86,7 +86,7 @@ function installAnswer(
       id: "install",
       question,
       state: payloads.state,
-      answer: `No — only ${built}, so the rest resolve to nothing a package manager can write to disk.`,
+      answer: `No: only ${built}, so the rest resolve to nothing a package manager can write to disk.`,
     };
   }
 
@@ -95,7 +95,7 @@ function installAnswer(
       id: "install",
       question,
       state: "unknown",
-      answer: `Not measured — all ${build.payloadsTotal} install payloads in this build parse and carry real file contents, but the live registry index could not be read, so what production is serving right now is unknown.`,
+      answer: `Not measured: all ${build.payloadsTotal} install payloads in this build parse and carry real file contents, but the live registry index could not be read, so what production is serving right now is unknown.`,
     };
   }
 
@@ -109,8 +109,8 @@ function installAnswer(
       question,
       state: behind ? "down" : "degraded",
       answer: behind
-        ? `No — the live registry index serves ${live} components while this build measured ${build.components}, so ${build.components - live} of the components described here cannot be installed from it.`
-        : `Yes — every one of the ${build.components} components in this build installs, though the live registry index is ahead of it at ${live}, so production is describing components this page has not measured.`,
+        ? `No: the live registry index serves ${live} components while this build measured ${build.components}, so ${build.components - live} of the components described here cannot be installed from it.`
+        : `Yes: every one of the ${build.components} components in this build installs, though the live registry index is ahead of it at ${live}, so production is describing components this page has not measured.`,
     };
   }
 
@@ -118,7 +118,7 @@ function installAnswer(
     id: "install",
     question,
     state: "ok",
-    answer: `Yes — all ${build.payloadsTotal} install payloads parse and carry real file contents, and the live registry index serves the same ${build.components} components.`,
+    answer: `Yes: all ${build.payloadsTotal} install payloads parse and carry real file contents, and the live registry index serves the same ${build.components} components.`,
   };
 }
 
@@ -140,7 +140,7 @@ function agentAnswer(build: StatusBuild): Answer {
       id: "agents",
       question,
       state: "unknown",
-      answer: `Not measured — ${list(unread.map((p) => p.label))} could not be read at build time, so how much of the registry an agent actually sees is unknown.`,
+      answer: `Not measured: ${list(unread.map((p) => p.label))} could not be read at build time, so how much of the registry an agent actually sees is unknown.`,
     };
   }
 
@@ -150,7 +150,7 @@ function agentAnswer(build: StatusBuild): Answer {
       id: "agents",
       question,
       state: "degraded",
-      answer: `Partly — ${list(
+      answer: `Partly: ${list(
         short.map((p) => `${p.label} describes ${p.count} of ${build.components} components`)
       )}, so an agent reading it is working from an incomplete registry.`,
     };
@@ -160,7 +160,7 @@ function agentAnswer(build: StatusBuild): Answer {
     id: "agents",
     question,
     state: "ok",
-    answer: `Yes — llms.txt, llms-full.txt and the MCP snapshot each describe all ${build.components} components in this build.`,
+    answer: `Yes: llms.txt, llms-full.txt and the MCP snapshot each describe all ${build.components} components in this build.`,
   };
 }
 
@@ -178,7 +178,7 @@ function previewAnswer(integrity: StatusCheck[]): Answer {
       id: "previews",
       question,
       state: "unknown",
-      answer: "Not measured — the featured-card checks did not run for this render.",
+      answer: "Not measured: the featured-card checks did not run for this render.",
     };
   }
 
@@ -188,7 +188,7 @@ function previewAnswer(integrity: StatusCheck[]): Answer {
       id: "previews",
       question,
       state,
-      answer: `Yes — every featured card has both its preview videos and both its posters (${previews.value} cards, ${posters.value} poster files).`,
+      answer: `Yes: every featured card has both its preview videos and both its posters (${previews.value} cards, ${posters.value} poster files).`,
     };
   }
 
@@ -197,7 +197,7 @@ function previewAnswer(integrity: StatusCheck[]): Answer {
       id: "previews",
       question,
       state,
-      answer: `No — ${previews.value} featured cards resolve a preview video and only ${posters.value} poster files are present, so some cards render an empty frame.`,
+      answer: `No: ${previews.value} featured cards resolve a preview video and only ${posters.value} poster files are present, so some cards render an empty frame.`,
     };
   }
 
@@ -211,10 +211,10 @@ function previewAnswer(integrity: StatusCheck[]): Answer {
     question,
     state,
     answer: !Number.isFinite(broken)
-      ? `No — ${previews.detail}.`
+      ? `No: ${previews.detail}.`
       : resolved === 0
-        ? `No — not one of the ${total} featured cards has a preview video that resolves, so every one of them silently falls back to a still poster and never moves.`
-        : `No — ${broken} of the ${total} featured cards have no preview video that resolves, so they silently fall back to a still poster and never move.`,
+        ? `No: not one of the ${total} featured cards has a preview video that resolves, so every one of them silently falls back to a still poster and never moves.`
+        : `No: ${broken} of the ${total} featured cards have no preview video that resolves, so they silently fall back to a still poster and never move.`,
   };
 }
 
@@ -231,8 +231,8 @@ function accountAnswer(services: StatusCheck[]): Answer {
     question,
     state: "unknown",
     answer: reachable
-      ? "Not measured — one public, unauthenticated Convex query answers, which proves the backend can be read and nothing more; sign-in, saving and every authenticated path are unproven here."
-      : "Not measured — the public Convex query threw, and a real outage is indistinguishable from an unset connection URL; sign-in and saving are unproven either way.",
+      ? "Not measured: one public, unauthenticated Convex query answers, which proves the backend can be read and nothing more; sign-in, saving and every authenticated path are unproven here."
+      : "Not measured: the public Convex query threw, and a real outage is indistinguishable from an unset connection URL; sign-in and saving are unproven either way.",
   };
 }
 

@@ -35,7 +35,7 @@ const TOOLS = [
     title: "Search ns-ui components",
     description:
       `Search the ns-ui registry (${registry.items.length} self-contained React/Tailwind ` +
-      "components) by name, title, description and tags. Returns compact results — call " +
+      "components) by name, title, description and tags. Returns compact results. Call " +
       "get_component with a result's name for the install command and full metadata.",
     inputSchema: {
       type: "object",

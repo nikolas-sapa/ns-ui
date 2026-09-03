@@ -1,7 +1,7 @@
 {
   "name": "glaze-crawl-heal",
   "title": "Glaze Crawl Heal",
-  "description": "A live status badge drawn as a glaze surface mid-firing: gas bubbles burst through the molten glaze and the melt either flows back over the crater (heals) or, when surface tension has failed, pulls away into a ragged bare patch that never closes (crawling) — three real ceramics behaviours standing in for operational, degraded and down.",
+  "description": "A live status badge drawn as a glaze surface mid-firing: gas bubbles burst through the molten glaze and the melt either flows back over the crater (heals) or, when surface tension has failed, pulls away into a ragged bare patch that never closes (crawling). Three real ceramics behaviours standing in for operational, degraded and down.",
   "collection": "core",
   "tags": [
     "status",

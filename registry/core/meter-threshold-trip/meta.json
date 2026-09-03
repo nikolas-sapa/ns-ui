@@ -1,7 +1,7 @@
 {
   "name": "meter-threshold-trip",
   "title": "Meter Threshold Trip",
-  "description": "A data-driven threshold indicator built like a thermostat's bimetallic strip: it bows progressively as a metric climbs, snaps across a visible contact gap at the trip point and latches, then only re-straightens once the value falls below a lower re-arm mark — making hysteresis visible instead of implying it with a color change.",
+  "description": "A data-driven threshold indicator built like a thermostat's bimetallic strip: it bows progressively as a metric climbs, snaps across a visible contact gap at the trip point and latches, then only re-straightens once the value falls below a lower re-arm mark, making hysteresis visible instead of implying it with a color change.",
   "collection": "core",
   "tags": [
     "meter",

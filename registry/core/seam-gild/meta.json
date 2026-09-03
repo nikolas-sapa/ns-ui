@@ -1,7 +1,7 @@
 {
   "name": "seam-gild",
   "title": "Seam Gild",
-  "description": "A kintsugi payoff for consequential actions: confirming cracks the panel with a biased-random-walk SVG path in ~400ms, then immediately re-fills it from both ends as a bright raised seam — the scar stays for the rest of the browser session, so repeated confirmations accumulate as ornament instead of fading. Before any confirmation, a faint stress hairline draws in, holds, and dissolves on its own every few seconds, so the panel never sits as a dead frame.",
+  "description": "A kintsugi payoff for consequential actions: confirming cracks the panel with a biased-random-walk SVG path in ~400ms, then immediately re-fills it from both ends as a bright raised seam. The scar stays for the rest of the browser session, so repeated confirmations accumulate as ornament instead of fading. Before any confirmation, a faint stress hairline draws in, holds, and dissolves on its own every few seconds, so the panel never sits as a dead frame.",
   "collection": "core",
   "tags": [
     "confirm",

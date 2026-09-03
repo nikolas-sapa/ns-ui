@@ -119,7 +119,7 @@ export function TestimonialModeration() {
               </blockquote>
 
               <p className="mt-2 text-xs text-ns-muted">
-                {row.name} — {row.role} at {row.company} ·{" "}
+                {row.name}, {row.role} at {row.company} ·{" "}
                 <a
                   href={row.profileUrl}
                   target="_blank"

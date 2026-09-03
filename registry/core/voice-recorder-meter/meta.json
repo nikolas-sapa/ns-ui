@@ -1,7 +1,7 @@
 {
   "name": "voice-recorder-meter",
   "title": "Voice Recorder Meter",
-  "description": "Voice-capture chip whose amplitude strip is real Web Audio, not Math.random() bars — flat at rest, live spectrum while listening, an honest error if the mic is denied.",
+  "description": "Voice-capture chip whose amplitude strip is real Web Audio, not Math.random() bars: flat at rest, live spectrum while listening, an honest error if the mic is denied.",
   "collection": "core",
   "tags": ["voice", "audio", "recorder", "microphone", "input", "svg", "accessibility"],
   "useWhen": "capturing microphone input where the amplitude strip has to be real Web Audio rather than faked bars, sitting as a static hairline at rest, reading live frequency bins while listening, and stating an honest error when permission is denied; pick loader-ink-blob instead when the listening state belongs to an assistant's own indicator rather than to a recording control the user operates.",

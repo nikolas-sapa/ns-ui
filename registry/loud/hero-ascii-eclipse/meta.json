@@ -2,7 +2,7 @@
   "name": "hero-ascii-eclipse",
   "rank": 9,
   "title": "Hero ASCII Eclipse",
-  "description": "A full-bleed ASCII hero built around an occlusion event — a dark glyph disc transits a bright sun disc over a fixed starfield, the pointer dragging the transit, and a corona blooms at the rim only as the two centers nearly align, the way a real solar corona is only visible near totality.",
+  "description": "A full-bleed ASCII hero built around an occlusion event: a dark glyph disc transits a bright sun disc over a fixed starfield, the pointer dragging the transit, and a corona blooms at the rim only as the two centers nearly align, the way a real solar corona is only visible near totality.",
   "collection": "loud",
   "tags": [
     "ascii",

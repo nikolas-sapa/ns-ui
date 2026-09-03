@@ -1,7 +1,7 @@
 {
   "name": "sleeper-renewal-relay",
   "title": "Sleeper Renewal Relay",
-  "description": "An ambient row-level 'processing/refreshing' indicator built from mechanised sleeper-renewal trains: a crawling gantry crane lifts one old sleeper clear, swings a new one into the gap, and clips the rail down before advancing to the next tie — old-vs-new is a continuous wear gradient across the 8-row stack, not a binary flag, so it never blinks.",
+  "description": "An ambient row-level 'processing/refreshing' indicator built from mechanised sleeper-renewal trains: a crawling gantry crane lifts one old sleeper clear, swings a new one into the gap, and clips the rail down before advancing to the next tie. Old-vs-new is a continuous wear gradient across the 8-row stack, not a binary flag, so it never blinks.",
   "collection": "core",
   "tags": ["loader", "list", "row", "table", "svg", "railway", "mechanical", "ambient", "sync", "refresh", "monochrome"],
   "useWhen": "a row-level ambient 'processing / refreshing / syncing' indicator for a table or list — the row-scale equivalent of a generic sync spinner — that should read as a real mechanised swap-and-advance event rather than a spinning icon or a shimmer skeleton; the crane crawls through a fixed 8-row window on its own 1.3s-per-row clock, unbounded, wrapping to the top after a full lap. Pick loader-die-tumble instead when the surface is a single standalone loading glyph rather than a row-scoped list indicator (no per-row wear gradient, no advancing mechanism), or refresh-pull-flywheel when the surface is a pointer-driven pull-to-refresh gesture rather than an ambient always-on row sweep.",

@@ -1,7 +1,7 @@
 {
   "name": "background-ascii-caustics",
   "title": "Background ASCII Caustics",
-  "description": "Ambient water-caustics rendered in ASCII ink density — three rotated wave grids combined multiplicatively and sharpened into thin bright filaments, the way overlapping light wave-fronts trace a caustic web, with the pointer acting as a lens the pattern visibly focuses toward.",
+  "description": "Ambient water-caustics rendered in ASCII ink density: three rotated wave grids combined multiplicatively and sharpened into thin bright filaments, the way overlapping light wave-fronts trace a caustic web, with the pointer acting as a lens the pattern visibly focuses toward.",
   "collection": "core",
   "tags": ["background", "ascii", "canvas", "cursor", "caustics", "water", "light"],
   "useWhen": "Pick background-ascii-caustics for a rippling, refracted-light-through-water surface with the pointer reading as a lens the pattern converges toward. background-ascii-plasma is the additive-octave sibling with no directional focusing; background-ascii-wake is for when the pointer's own trail, not an ambient pattern, should be the subject.",

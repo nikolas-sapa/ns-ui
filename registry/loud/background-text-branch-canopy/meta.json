@@ -1,7 +1,7 @@
 {
   "name": "background-text-branch-canopy",
   "title": "Background Text Branch Canopy",
-  "description": "A full-bleed ambient background where an L-system tree grows entirely out of readable text — every limb is one run of words drawn with a single fillText, pivoting on its own foot as it angles from its parent, with the outer canopy senescing and regrowing forever so it never settles into a finished frame.",
+  "description": "A full-bleed ambient background where an L-system tree grows entirely out of readable text: every limb is one run of words drawn with a single fillText, pivoting on its own foot as it angles from its parent, with the outer canopy senescing and regrowing forever so it never settles into a finished frame.",
   "collection": "loud",
   "tags": ["background", "text", "canvas", "growth", "typography", "ambient", "botanical"],
   "useWhen": "a full-bleed backdrop where the branching structure itself is made of legible words, not glyphs standing in for a scalar field (that's background-ascii-plasma/hero-ascii-*) and not a textured stroke (that's tendril-cast, auxin-canal, tree-root-trace, cambium-lay) — pick this when the point is typography given a botanical body, with real word runs as the geometric primitive.",

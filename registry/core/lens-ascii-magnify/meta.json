@@ -1,7 +1,7 @@
 {
   "name": "lens-ascii-magnify",
   "title": "Lens ASCII Magnify",
-  "description": "A circular lens that resolves the text under it into a denser dot-matrix of ASCII glyphs — every character it passes over is redrawn as its own 5x7 grid of ramp characters, more glyphs per glyph rather than the same glyph bigger.",
+  "description": "A circular lens that resolves the text under it into a denser dot-matrix of ASCII glyphs: every character it passes over is redrawn as its own 5x7 grid of ramp characters, more glyphs per glyph rather than the same glyph bigger.",
   "collection": "core",
   "tags": ["lens", "magnifier", "ascii", "text", "mono", "canvas", "cursor"],
   "useWhen": "a magnifying lens over a body of text where the payoff is seeing each letter resolve into a denser dot-matrix of ascii characters, not an optically bigger version of the same glyph; pick slider-loupe instead for optically magnifying a numeric tick scale, or text-prism-split when the lens should tear the text into RGB channel offsets rather than resample its density.",

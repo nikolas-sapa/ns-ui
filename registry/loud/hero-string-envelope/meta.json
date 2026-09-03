@@ -2,7 +2,7 @@
   "name": "hero-string-envelope",
   "rank": 18,
   "title": "Hero String Envelope",
-  "description": "A hero whose backdrop is pure string art — a few hundred straight chords across a circle under the map i → k*i, whose envelope is an epicycloid caustic that the chords draw without any curve ever being plotted; the pointer's horizontal position continuously morphs k, so cusps split and merge under the cursor.",
+  "description": "A hero whose backdrop is pure string art: a few hundred straight chords across a circle under the map i → k*i, whose envelope is an epicycloid caustic that the chords draw without any curve ever being plotted; the pointer's horizontal position continuously morphs k, so cusps split and merge under the cursor.",
   "collection": "loud",
   "tags": [
     "hero",

@@ -1,7 +1,7 @@
 {
   "name": "turntable-stall",
   "title": "Turntable Stall",
-  "description": "Org/tenant switcher as a locomotive roundhouse turntable — the bridge slews on a real spring, and org-scoped nav stays visibly disconnected through the entire unaligned middle, reconnecting only when the bridge is exactly on the stall angle AND the server has confirmed.",
+  "description": "Org/tenant switcher as a locomotive roundhouse turntable: the bridge slews on a real spring, and org-scoped nav stays visibly disconnected through the entire unaligned middle, reconnecting only when the bridge is exactly on the stall angle AND the server has confirmed.",
   "collection": "core",
   "tags": ["switcher", "organization", "tenant", "turntable", "svg", "spring", "physics", "listbox", "multi-tenant", "navigation"],
   "useWhen": "a multi-tenant org/workspace switcher where the moment between contexts must be visibly, functionally unsafe — scoped nav actually disconnects mid-swing and only re-enables on an exact angle match plus a resolved server confirmation, never on an optimistic timer or a crossfade. Pick command-palette-rotary instead for a generic jump-to-destination switcher navigated as a 1D rotary space (no server gate, no disconnect semantics); pick dial-moire for a value/option dial where the rotation itself is the selected value, not a proxy for exclusive session authority.",

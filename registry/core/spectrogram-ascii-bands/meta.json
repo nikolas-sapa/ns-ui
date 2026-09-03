@@ -1,7 +1,7 @@
 {
   "name": "spectrogram-ascii-bands",
   "title": "Spectrogram ASCII Bands",
-  "description": "A scrolling spectrogram in monospace ink — a real 512-point FFT grouped into log-spaced bands, each with its own adaptive noise floor so quiet bands stay dark and only the actual harmonic structure prints as bright glyph runs.",
+  "description": "A scrolling spectrogram in monospace ink: a real 512-point FFT grouped into log-spaced bands, each with its own adaptive noise floor so quiet bands stay dark and only the actual harmonic structure prints as bright glyph runs.",
   "collection": "core",
   "tags": [
     "spectrogram",

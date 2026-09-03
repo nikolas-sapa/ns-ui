@@ -1,7 +1,7 @@
 {
   "name": "tabs-notch-tenon",
   "title": "Tabs Notch Tenon",
-  "description": "Tabs whose bottom rule is a single SVG path with a notch missing under the active tab, and whose panel carries a matching raised tenon that slots into that gap — the strip and panel read as one interrupted border, legible at rest with zero motion.",
+  "description": "Tabs whose bottom rule is a single SVG path with a notch missing under the active tab, and whose panel carries a matching raised tenon that slots into that gap. The strip and panel read as one interrupted border, legible at rest with zero motion.",
   "collection": "core",
   "tags": ["tabs", "navigation", "svg", "joinery", "spring", "physics", "keyboard", "accessibility"],
   "useWhen": "the active tab must be unambiguous at rest, in a screenshot, or under reduced motion, since the strip's bottom rule is drawn with a gap under the active tab and the panel's tenon fills that gap, making selection structural rather than a highlight you have to catch moving; pick tabs-carriage instead when the transition is the point and a springing indicator is wanted, or tabs-rail-points when the indicator should show the route the selection took.",

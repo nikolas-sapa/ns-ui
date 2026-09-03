@@ -1,7 +1,7 @@
 {
   "name": "empty-state-pegboard",
   "title": "Empty State Pegboard",
-  "description": "Empty state modeled on a workshop pegboard — dashed silhouettes preview the exact card/avatar/title geometry of future items, and creating one hangs it onto its shadow with a spring settle.",
+  "description": "Empty state modeled on a workshop pegboard: dashed silhouettes preview the exact card/avatar/title geometry of future items, and creating one hangs it onto its shadow with a spring settle.",
   "collection": "core",
   "tags": [
     "empty-state",

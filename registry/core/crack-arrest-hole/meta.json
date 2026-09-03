@@ -1,7 +1,7 @@
 {
   "name": "crack-arrest-hole",
   "title": "Crack Arrest Hole",
-  "description": "A press-and-hold STOP/ABORT confirm modeled on the crack-arrest (stop) hole: holding grows a fatigue crack from the edge toward a drilled hole, and reaching the hole halts it — arrest is the confirmation, not a break-through.",
+  "description": "A press-and-hold STOP/ABORT confirm modeled on the crack-arrest (stop) hole: holding grows a fatigue crack from the edge toward a drilled hole, and reaching the hole halts it. Arrest is the confirmation, not a break-through.",
   "collection": "core",
   "tags": ["button", "confirm", "stop", "abort", "cancel", "micro-interaction", "canvas"],
   "autoplay": {

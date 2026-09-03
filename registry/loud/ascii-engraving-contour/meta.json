@@ -1,7 +1,7 @@
 {
   "name": "ascii-engraving-contour",
   "title": "ASCII Engraving Contour",
-  "description": "ASCII rendered as a real engraving — glyph density traces concentric contour bands through an orbiting metaball field instead of mapping brightness straight to weight, so the plate reads as ridged hatch linework over a soft rounded subject, with a pointer-driven polish trail and a self-healing burin-slip glitch.",
+  "description": "ASCII rendered as a real engraving: glyph density traces concentric contour bands through an orbiting metaball field instead of mapping brightness straight to weight, so the plate reads as ridged hatch linework over a soft rounded subject, with a pointer-driven polish trail and a self-healing burin-slip glitch.",
   "collection": "loud",
   "tags": ["ascii", "canvas", "generative", "engraving", "cursor", "glitch", "monochrome"],
   "useWhen": "a generative full-bleed ASCII/glyph canvas where the text density traces literal contour hatching over an evolving 3D-ish form and the pointer visibly polishes a trail into it; reach for background-ascii-dither instead for a luminance-to-glyph renderer of an actual image or flowing noise field with a cursor-brightness halo, and event-stream-vapor for a particle-trail generative piece with no glyphs at all.",

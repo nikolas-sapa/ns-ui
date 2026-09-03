@@ -1,7 +1,7 @@
 {
   "name": "tool-call-board",
   "title": "Tool Call Board",
-  "description": "An agent's tools hung on a board like fishing tackle — slim capability chips at rest, each lifting and paying out a streaming-argument strip the instant its tool is called, with a recency underline that fades over 60 seconds.",
+  "description": "An agent's tools hung on a board like fishing tackle: slim capability chips at rest, each lifting and paying out a streaming-argument strip the instant its tool is called, with a recency underline that fades over 60 seconds.",
   "collection": "core",
   "tags": [
     "agent",

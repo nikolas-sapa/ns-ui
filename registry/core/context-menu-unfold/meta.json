@@ -2,7 +2,7 @@
   "name": "context-menu-unfold",
   "rank": 282,
   "title": "Context Menu Unfold",
-  "description": "A context menu that unfolds like a pocket knife — items swing out from a hinged spine as slim blades, staggered from folded to open, with a hairline edge highlight while swinging; submenus unfold as a second, smaller knife from a blade's tip.",
+  "description": "A context menu that unfolds like a pocket knife: items swing out from a hinged spine as slim blades, staggered from folded to open, with a hairline edge highlight while swinging; submenus unfold as a second, smaller knife from a blade's tip.",
   "collection": "core",
   "tags": [
     "context-menu",

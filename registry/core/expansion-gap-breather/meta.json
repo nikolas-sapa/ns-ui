@@ -1,7 +1,7 @@
 {
   "name": "expansion-gap-breather",
   "title": "Expansion Gap Breather",
-  "description": "A full-height divider between two independently-sized layout regions, sourced from continuous-welded-rail breather switches — the seam's tapered-blade teeth interlock and slide apart as a rendered rail temperature swings the gap between 4px and 22px on a 14s cycle, actually resizing the element that sits between its neighbours rather than drawing over a fixed rule.",
+  "description": "A full-height divider between two independently-sized layout regions, sourced from continuous-welded-rail breather switches: the seam's tapered-blade teeth interlock and slide apart as a rendered rail temperature swings the gap between 4px and 22px on a 14s cycle, actually resizing the element that sits between its neighbours rather than drawing over a fixed rule.",
   "collection": "core",
   "tags": ["divider", "separator", "svg", "rail", "thermal", "ambient", "interlock", "layout"],
   "useWhen": "a vertical divider between two flex/grid regions of mismatched, independently-sized content that should read as visibly absorbing that mismatch rather than sitting as a static hairline — mechanism is a CWR breather switch's tapered-blade gap tracking a rendered temperature sine, so the divider's own width breathes and pushes its neighbours; pick a plain `border-l border-border` rule instead when the seam should be an inert, near-invisible structural hairline with no motion and no width change, since --border is explicitly too low-contrast in light theme to carry this component's teeth.",

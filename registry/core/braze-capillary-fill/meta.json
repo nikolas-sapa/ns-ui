@@ -1,7 +1,7 @@
 {
   "name": "braze-capillary-fill",
   "title": "Braze Capillary Fill",
-  "description": "A progress/validation-fill indicator rendered as torch brazing — molten filler is drawn sideways along a hairline joint gap by capillary action, brightest at the leading front, settling into a solidified track behind it, and pooling into a fillet the instant it reaches the far end before cooling, fading, and starting a fresh joint.",
+  "description": "A progress/validation-fill indicator rendered as torch brazing: molten filler is drawn sideways along a hairline joint gap by capillary action, brightest at the leading front, settling into a solidified track behind it, and pooling into a fillet the instant it reaches the far end before cooling, fading, and starting a fresh joint.",
   "collection": "core",
   "tags": ["progress", "loading", "fill", "canvas", "joining", "brazing", "ambient", "monochrome"],
   "useWhen": "a fill/progress indicator whose motion should read as a directional, physical process — flow drawn along a seam toward a fixed endpoint, not a bar racing to a percentage — and where a continuous unforced idle loop (no press required) is wanted for a catalog/hero context. Runs its own ambient fill/hold/fade cycle by default; pass `progress` (0-1) to pin the front to real external state instead. Pick meter-latency-capillary instead when the reading needs to be honest about a calibrated p50/p95 wait time and must HOLD rather than fake progress past what's earned — that component never loops ambiently, it is driven entirely by real elapsed time against a distribution. Pick progress-wick instead for a generic linear fill with no directional joint/fillet semantics.",

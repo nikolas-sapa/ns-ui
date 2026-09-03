@@ -1,7 +1,7 @@
 {
   "name": "background-ascii-nodal-lines",
   "title": "Background ASCII Nodal Lines",
-  "description": "An ambient ASCII background of the destructive-interference nodal set of four point emitters — ink appears only where the summed radial waves cancel to near zero, tracing the hyperbolic dead-fringe families across an otherwise empty field, with the pointer as a fifth, phase-shifted emitter that redraws the geometry.",
+  "description": "An ambient ASCII background of the destructive-interference nodal set of four point emitters: ink appears only where the summed radial waves cancel to near zero, tracing the hyperbolic dead-fringe families across an otherwise empty field, with the pointer as a fifth, phase-shifted emitter that redraws the geometry.",
   "collection": "core",
   "tags": ["background", "ascii", "canvas", "cursor", "interference", "wave", "nodal"],
   "useWhen": "Pick background-ascii-nodal-lines when the hero should read as a ripple tank — sparse curved hairlines fanning between unmarked focal points, with the pointer acting as an extra wave source that visibly re-solves the whole pattern. background-ascii-caustics is the better pick for the inverse read (bright focused filaments from multiplied plane waves, pointer as a converging lens); background-ascii-plasma for a smooth summed-octave wash with no discrete sources; background-ascii-wake when the pointer's own trail, not a standing field, is the subject.",

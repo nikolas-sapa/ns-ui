@@ -1,7 +1,7 @@
 {
   "name": "millstone-furrow-flow",
   "title": "Millstone Furrow Flow",
-  "description": "An ambient processing-section background modelled on a dressed millstone pair — a static bedstone furrow layer under a slowly rotating runner layer, their crossing sweeping a drifting moiré band around the stone, while grain particles spiral outward from the eye, shrinking as they grind finer, and disperse into fading meal dust at the rim.",
+  "description": "An ambient processing-section background modelled on a dressed millstone pair: a static bedstone furrow layer under a slowly rotating runner layer, their crossing sweeping a drifting moiré band around the stone, while grain particles spiral outward from the eye, shrinking as they grind finer, and disperse into fading meal dust at the rim.",
   "collection": "core",
   "tags": ["background", "divider", "canvas", "moire", "particles", "radial", "ambient", "processing", "industrial"],
   "useWhen": "a processing/transform-section background or divider whose OWN resting motion is a slow two-layer furrow moiré (independent of any particle system) with a coarse-to-fine grain-spiral mechanic layered on top — pick grinding-chatter-lobes instead when the mechanic should read as tool-chatter vibration lobes on a rotating workpiece rather than a millstone dress pattern, or background-ascii-flow when the ambient field should be a generic curl-noise fluid with no radial centre-to-rim narrative.",

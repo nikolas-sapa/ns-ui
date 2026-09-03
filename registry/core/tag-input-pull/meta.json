@@ -1,7 +1,7 @@
 {
   "name": "tag-input-pull",
   "title": "Tag Input Pull",
-  "description": "A tag/token input whose chips attach like burrs — hooked, not glued. Removing one takes a deliberate pull: it stretches at the trailing edge, pops free, and the row exhales closed behind it with a staggered ripple toward the caret.",
+  "description": "A tag/token input whose chips attach like burrs: hooked, not glued. Removing one takes a deliberate pull: it stretches at the trailing edge, pops free, and the row exhales closed behind it with a staggered ripple toward the caret.",
   "collection": "core",
   "tags": [
     "tag-input",

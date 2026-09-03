@@ -31,9 +31,63 @@ See [design.helpmarq.com/connect](https://design.helpmarq.com/connect) for the c
 shapes for Cursor, VS Code, Windsurf, Zed, Cline and Codex CLI, which differ from the
 shape above.
 
-Requires Node 18+. If `npx` refuses with "No versions available", that's npm's own
-`minimum-release-age` setting on your machine rejecting a recently-published package, not
-a problem with this one — wait out the window or override the policy locally.
+Requires Node 18+ (`engines` in `package.json`).
+
+## Checking it works
+
+The server speaks JSON-RPC over stdio, newline-delimited, and prints nothing on its own.
+A silent process is the healthy state, so "it launched" tells you nothing. Drive a real
+handshake instead. In a scratch directory, not in this repo, so you do not add a
+dependency to it:
+
+```bash
+mkdir /tmp/ns-ui-mcp-check && cd /tmp/ns-ui-mcp-check
+npm init -y
+npm install @nikolas.sapa/ns-ui-mcp
+node <path-to-this-repo>/mcp/scripts/verify-stdio.mjs \
+  ./node_modules/@nikolas.sapa/ns-ui-mcp/dist/index.js
+```
+
+It runs initialize, then tools/list, then calls every tool, and asserts each returns a
+non-empty result. The last line on success is:
+
+```
+ALL CHECKS PASSED
+```
+
+In a client, working looks like five tools appearing under `ns-ui`:
+`search_components`, `get_component`, `list_categories`, `install_command`,
+`get_conventions`. Call `list_categories` first. It returns the taxonomy plus a `total`
+and a `generatedAt` timestamp, which is the quickest way to see both that the server
+answers and how old its snapshot is.
+
+## When it does not work
+
+**Check the tool count first.** No `ns-ui` tools at all means the client never launched
+the process, which is a config-path problem, not a server problem. Tools present but
+erroring is a different bug, and worth reporting.
+
+**Your client's config shape is probably not the one above.** The JSON block here is the
+Claude Code / generic stdio shape. Cursor, VS Code, Windsurf, Zed, Cline and Codex CLI
+each differ. Copy the right one from
+[design.helpmarq.com/connect](https://design.helpmarq.com/connect) rather than adapting
+this one by hand.
+
+**`command: "npx"` needs `npx` on the PATH the client sees**, which is often not your
+shell's PATH. If the client launches nothing and logs nothing, put an absolute path to
+the `npx` binary there.
+
+**The component count looks low, or a component you know exists is missing.** The
+snapshot is baked in at publish time, so an older installed version reports an older
+catalog. Measured: an installed `0.7.1` reported `"total": 423` while the live site was
+at 534.
+
+**`npx` quietly installs an older version than the newest published one.** If your npm
+has `minimum-release-age` set, a recent publish is filtered out of resolution. It does
+not always fail loudly. Measured on one machine: `npm install @nikolas.sapa/ns-ui-mcp`
+resolved `0.7.1` while `0.9.0` was published. Older npm reports this as
+"No versions available" instead. Either way it is your npm policy, not this package.
+Wait out the window or override the policy locally.
 
 ## Tools
 

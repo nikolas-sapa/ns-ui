@@ -1,7 +1,7 @@
 {
   "name": "meter-latency-capillary",
   "title": "Meter Latency Capillary",
-  "description": "Time-to-first-token rendered as calibrated capillary rise — a narrow tube climbs to a scribed p50 line, holds and trembles if it's running slow, and only surfaces retry/switch-model once it's genuinely past p95. Never fakes progress.",
+  "description": "Time-to-first-token rendered as calibrated capillary rise: a narrow tube climbs to a scribed p50 line, holds and trembles if it's running slow, and only surfaces retry/switch-model once it's genuinely past p95. Never fakes progress.",
   "collection": "core",
   "tags": [
     "loading",

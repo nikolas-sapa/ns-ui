@@ -1,7 +1,7 @@
 {
   "name": "image-crop-mat",
   "title": "Image Crop Mat",
-  "description": "Image cropping as a passe-partout — four mat boards slide over a photo to define the crop window, snap to ratio presets with a settle, and show a rule-of-thirds grid only while dragging.",
+  "description": "Image cropping as a passe-partout: four mat boards slide over a photo to define the crop window, snap to ratio presets with a settle, and show a rule-of-thirds grid only while dragging.",
   "collection": "core",
   "tags": [
     "image",

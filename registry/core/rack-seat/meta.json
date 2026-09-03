@@ -1,7 +1,7 @@
 {
   "name": "rack-seat",
   "title": "Rack Seat",
-  "description": "Step-up auth drawn as switchgear racking — a sensitive-actions group sits 12px back on a visible rail with its contacts unmade until fresh verification racks it in, then physically withdraws over the elevation window instead of expiring invisibly into a 401.",
+  "description": "Step-up auth drawn as switchgear racking: a sensitive-actions group sits 12px back on a visible rail with its contacts unmade until fresh verification racks it in, then physically withdraws over the elevation window instead of expiring invisibly into a 401.",
   "collection": "core",
   "tags": [
     "auth",

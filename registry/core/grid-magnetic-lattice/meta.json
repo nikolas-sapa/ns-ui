@@ -1,7 +1,7 @@
 {
   "name": "grid-magnetic-lattice",
   "title": "Grid Magnetic Lattice",
-  "description": "Card grid on a magnetized hairline lattice — the cursor bends the grid lines and the DOM cards sample the same displacement field, riding the bent sheet.",
+  "description": "Card grid on a magnetized hairline lattice: the cursor bends the grid lines and the DOM cards sample the same displacement field, riding the bent sheet.",
   "collection": "core",
   "tags": ["canvas", "grid", "cursor", "cards", "field", "micro-interaction"],
   "useWhen": "a fixed card grid that should feel ambiently cursor-reactive, the hairline lattice bending under the pointer while the real DOM cards sample the same displacement field and ride the bent sheet; pick grid-bento-dense instead when which tile is largest should actually change rather than the layout staying fixed, or background-gradient-shader when the ambient motion belongs to the page behind rather than to the grid itself.",

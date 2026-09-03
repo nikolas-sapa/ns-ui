@@ -1,7 +1,7 @@
 {
   "name": "knit-ladder-run",
   "title": "Knit Ladder Run",
-  "description": "An ambient status/health card background: a field of knit stitches builds downward course by course, and at random intervals a dropped stitch opens a ladder that runs a few rows before a latch-hook repair catches it and reknits the column — structurally sound, with occasional self-corrected faults, in place of a static health badge.",
+  "description": "An ambient status/health card background: a field of knit stitches builds downward course by course, and at random intervals a dropped stitch opens a ladder that runs a few rows before a latch-hook repair catches it and reknits the column. Structurally sound, with occasional self-corrected faults, in place of a static health badge.",
   "collection": "core",
   "tags": ["status", "health", "background", "ambient", "canvas", "knit", "textile", "mono"],
   "useWhen": "a card background or ambient feedback moment that needs to read as 'structurally sound, with occasional self-corrected faults' rather than a static success/health badge — the continuous knit build plus a recurring, always-repaired ladder fault communicates resilience over time instead of a single point-in-time status icon. Pick text-stitch-unpick instead for a pointer-driven, letter-by-letter, irreversible-per-letter reveal (a seam ripper on hover) — that grammar is deliberately reserved for pointer interaction and must not collide with this component's fully ambient, no-interaction ladder fault. Pick optimistic-stitch instead for a single row's pending/committed/rolled-back write lifecycle — that component never loops or repeats, this one is a continuous, unbounded, self-healing field.",

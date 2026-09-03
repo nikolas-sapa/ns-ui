@@ -3,7 +3,17 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { flatOrder, locate, type NavGroup, type NavItem, type NavKind } from "@/lib/nav-data";
+import {
+  countGroup,
+  flatOrder,
+  locate,
+  unpackNavTree,
+  type NavGroup,
+  type NavItem,
+  type NavKind,
+  type NavSummary,
+  type NavTreeWire,
+} from "@/lib/nav-tree";
 import { SIDEBAR_HIDDEN_KEY } from "@/lib/sidebar";
 import { McpPopup } from "./mcp-popup";
 import { SiteAuth } from "./site-auth";
@@ -110,17 +120,33 @@ function persistOpen(ids: Set<string>) {
   }
 }
 
+/** Where the tree comes from now. See `app/nav-tree.json/route.ts`. */
+const NAV_TREE_URL = "/nav-tree.json";
+
+/** How long to wait before prefetching the tree on a browser with no
+ *  `requestIdleCallback` (Safari). Only ever reached on routes that don't
+ *  already want the tree immediately — a component page fetches on mount,
+ *  and any reach for the tree (opening a category, focusing the filter,
+ *  ⌘K, the mobile drawer) fetches straight away. */
+const NAV_IDLE_FALLBACK_MS = 2000;
+
 export function SiteShell({
-  groups,
+  nav,
   children,
 }: {
-  groups: NavGroup[];
+  /** Category rows + the unique component count, server-rendered. The items
+   *  under each row arrive from `/nav-tree.json` — see `lib/nav-tree.ts`. */
+  nav: NavSummary;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [cmdkOpen, setCmdkOpen] = useState(false);
+  // Text the palette should open pre-filled with. Empty for every opener
+  // except the sidebar's own no-match state, which hands its query over so
+  // the search continues rather than restarting.
+  const [cmdkSeed, setCmdkSeed] = useState("");
 
   // Desktop-only sidebar collapse (separate from `open`, which is the
   // mobile drawer above). `sidebarHidden` only gates the two toggle
@@ -171,6 +197,65 @@ export function SiteShell({
   // the ~300 `NavLink`s, which used to each subscribe to the router's own
   // pathname and so all re-rendered on *any* navigation, active tree or not.
   const isOnComponentPage = pathname.startsWith("/components/");
+
+  // Every card on the catalog is an iframe onto /preview/<slug>/embed, and
+  // this component runs inside each of them — the chrome-less early return
+  // below sits after the hooks, because `usePathname()` is one. Ungated, the
+  // prefetch effect would fire in all twelve concurrent iframes and parse the
+  // tree twelve more times in twelve realms, which is precisely the cost this
+  // change exists to remove. Nothing framed ever renders a sidebar, so
+  // nothing framed ever fetches one.
+  const bare = isBarePreview(pathname);
+
+  /**
+   * The component tree, fetched rather than serialized into this document.
+   * `null` until it lands: the category rows and their counts render from
+   * `nav` on the server either way, so what is missing before then is the
+   * items inside a section the visitor has not opened yet.
+   */
+  const [tree, setTree] = useState<NavGroup[] | null>(null);
+  const [treeWanted, setTreeWanted] = useState(false);
+  const wantTree = useCallback(() => setTreeWanted(true), []);
+
+  // On a component page the tree is wanted immediately — it holds the active
+  // link to highlight and scroll to, and the prev/next arrows. Everywhere
+  // else it is a prefetch on idle, so that opening a category is instant
+  // without the fetch competing with the page's own first screen.
+  useEffect(() => {
+    if (bare || treeWanted) return;
+    if (active) {
+      setTreeWanted(true);
+      return;
+    }
+    const idle = window.requestIdleCallback;
+    if (idle) {
+      const id = idle(() => setTreeWanted(true), { timeout: NAV_IDLE_FALLBACK_MS });
+      return () => window.cancelIdleCallback?.(id);
+    }
+    const id = window.setTimeout(() => setTreeWanted(true), NAV_IDLE_FALLBACK_MS);
+    return () => window.clearTimeout(id);
+  }, [bare, treeWanted, active]);
+
+  useEffect(() => {
+    if (!treeWanted || tree) return;
+    let cancelled = false;
+    fetch(NAV_TREE_URL)
+      .then((res) => (res.ok ? (res.json() as Promise<NavTreeWire>) : null))
+      .then((wire) => {
+        // A failed fetch leaves the categories collapsed with their real
+        // counts — degraded, not broken, and every component is still one
+        // click away through the catalog, /categories or the sitemap.
+        if (!cancelled && wire) setTree(unpackNavTree(wire));
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [treeWanted, tree]);
+
+  /** Empty until the fetch lands. Every walk below already handles an empty
+   *  tree — they ran against a filtered one on every keystroke. */
+  const groups = useMemo(() => tree ?? [], [tree]);
 
   // Prev/next for the sidebar's own arrows — same order the tree reads
   // top-to-bottom (category -> kind -> loose item, deduped to first
@@ -301,7 +386,16 @@ export function SiteShell({
       container.scrollTop += delta;
     });
     return () => cancelAnimationFrame(id);
-  }, [pathname]);
+    // `tree` as well as `pathname`: on a component route the tree is fetched,
+    // so at mount there is no NavLink to centre on and `activeRef.current` is
+    // null — keyed on pathname alone this bailed once and never ran again,
+    // leaving the active link wherever the scroll box happened to be on all
+    // 534 component routes. The rAF still lands after the section-opening
+    // effect above has committed (it is declared first, so its setOpenIds is
+    // flushed and re-rendered before the frame), which is what keeps
+    // getBoundingClientRect off a closed <details> with no layout box. Not
+    // `openIds` — that would re-centre on every manual expand.
+  }, [pathname, tree]);
 
   useEffect(() => {
     if (!open) return;
@@ -359,11 +453,18 @@ export function SiteShell({
     const onKey = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() !== "k" || !(e.metaKey || e.ctrlKey)) return;
       e.preventDefault();
+      // The palette searches the same component list the tree carries, so
+      // the shortcut has to ask for it too — it can fire on a route that
+      // never went near the sidebar.
+      wantTree();
+      // Cleared here too: the seed is per-opener, and ⌘K after a
+      // "Search everything" would otherwise reopen on that stale query.
+      setCmdkSeed("");
       setCmdkOpen((v) => !v);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [wantTree]);
 
   // Move focus to the page's own heading on every route change — otherwise
   // focus silently stays wherever the link that was just clicked sat in the
@@ -413,19 +514,32 @@ export function SiteShell({
   // Unique components, not a sum of category counts — a component listed
   // under two categories (multi-match, same rule the filter chips use) is
   // still one component, and this is the number next to the wordmark that
-  // has to match the "223 shown" the catalog page opens with.
-  const total = useMemo(() => {
-    const names = new Set<string>();
-    for (const g of groups) {
-      for (const k of g.kinds) for (const i of k.items) names.add(i.name);
-      for (const i of g.items) names.add(i.name);
-    }
-    return names.size;
-  }, [groups]);
+  // has to match the "223 shown" the catalog page opens with. Counted on the
+  // server (`summarizeNav`) rather than here, because the tree it was counted
+  // from no longer arrives in this document; it must not blink to 0 and back
+  // while the fetch is in flight.
+  const total = nav.total;
   const shown = useMemo(
     () => filtered.reduce((n, g) => n + countGroup(g), 0),
     [filtered],
   );
+
+  /** The server-rendered stand-in: real category rows with their real
+   *  counts, no items under them. What the sidebar looks like for the one
+   *  paint before `/nav-tree.json` lands — and permanently, if it never
+   *  does. Every category is collapsed by default anyway, so on a cold visit
+   *  this is pixel-identical to the finished tree. */
+  const placeholders = useMemo<NavGroup[]>(
+    () => nav.groups.map((g) => ({ ...g, kinds: [], items: [] })),
+    [nav],
+  );
+  const sections = tree ? filtered : isFiltering ? [] : placeholders;
+
+  // "Expand all" can be clicked before the tree exists, and the ids to
+  // expand are in the tree. Recorded as an intent and applied by the effect
+  // below, so the click works the same whether it lands before or after the
+  // fetch.
+  const [expandAll, setExpandAll] = useState(false);
 
   const allIds = useMemo(() => {
     const ids: string[] = [];
@@ -436,7 +550,13 @@ export function SiteShell({
     return ids;
   }, [groups]);
 
-  if (isBarePreview(pathname)) return <>{children}</>;
+  useEffect(() => {
+    if (!expandAll || !tree) return;
+    setOpenIds(new Set(allIds));
+    setExpandAll(false);
+  }, [expandAll, tree, allIds]);
+
+  if (bare) return <>{children}</>;
 
   return (
     <div className="lg:flex">
@@ -454,7 +574,10 @@ export function SiteShell({
       <button
         ref={navToggleRef}
         type="button"
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => {
+          wantTree();
+          setOpen((v) => !v);
+        }}
         aria-expanded={open}
         aria-controls="site-nav"
         className="fixed left-3 top-3 z-50 inline-flex h-11 w-11 items-center justify-center rounded-md border border-border bg-background text-ns-muted outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent lg:hidden transition-colors"
@@ -591,6 +714,19 @@ export function SiteShell({
             nothing off the component pages (the landing grid, /status, …)
             where "previous/next" has no meaning — rule 6 of the brief this
             shipped against: dead arrows are worse than no arrows. */}
+        {isOnComponentPage && !tree ? (
+          // The arrows and the "N of M" counter both come out of the fetched
+          // tree, so on a component page they arrive a round trip after the
+          // rest of the sidebar. Reserving their row keeps the search field
+          // and the whole tree below it from jumping down when they do —
+          // same 28px content box, same pb-3, nothing drawn in it. The
+          // keyboard ArrowLeft/ArrowRight stepping is dormant for the same
+          // moment; the page's own Previous/Next links at the foot of
+          // /components/<name> are server-rendered and unaffected.
+          <div aria-hidden className="px-4 pb-3">
+            <div className="h-7" />
+          </div>
+        ) : null}
         {flatIndex >= 0 && prevItem && nextItem ? (
           <div className="flex items-center justify-between gap-2 px-4 pb-3">
             <Link
@@ -625,7 +761,11 @@ export function SiteShell({
               box): 322x44 at the sidebar's 17rem width. */}
           <button
             type="button"
-            onClick={() => setCmdkOpen(true)}
+            onClick={() => {
+              wantTree();
+              setCmdkSeed("");
+              setCmdkOpen(true);
+            }}
             aria-label="Search components and pages"
             className="search-trace-field group/cmdk relative flex w-full items-center gap-2 rounded-md border border-border bg-surface px-3 py-2.5 text-left text-sm text-ns-muted outline-none transition-colors hover:border-ns-accent/40 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
           >
@@ -652,6 +792,11 @@ export function SiteShell({
             <input
               type="search"
               value={query}
+              // Reaching for the filter is the earliest honest signal that
+              // the tree is about to be needed — a keystroke or two before
+              // the first one lands. Same intent hook the catalog uses for
+              // its search corpus (catalog-controls.tsx).
+              onFocus={wantTree}
               onChange={(e) => setQuery(e.target.value)}
               // Same Escape-to-clear as the catalog search, so the two
               // near-identical fields don't answer the same key differently.
@@ -677,7 +822,10 @@ export function SiteShell({
               of click (a deliberate reset) and does persist. */}
           <button
             type="button"
-            onClick={() => setOpenIds(new Set(allIds))}
+            onClick={() => {
+              wantTree();
+              setExpandAll(true);
+            }}
             className="rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
           >
             Expand all
@@ -705,15 +853,56 @@ export function SiteShell({
           className="min-h-0 flex-1 overflow-y-auto px-2 pb-6"
           data-lenis-prevent
         >
-          {isFiltering && shown === 0 ? (
-            <p className="px-2 py-3 text-sm text-ns-muted">No match.</p>
+          {/* "No match." only once there is a tree to have failed to match.
+              Filtering before the fetch lands is a real state (focusing the
+              field is one of the things that triggers it, so the window is
+              one round trip) and it is not the same answer — and neither are
+              the two recovery actions below, which would be offering an
+              escape from a search that has not run yet. */}
+          {isFiltering && !tree ? (
+            <p className="px-2 py-3 text-sm text-ns-muted">Loading components…</p>
           ) : null}
-          {filtered.map((g) => (
+          {isFiltering && tree && shown === 0 ? (
+            // The message alone was a dead end: the tree is empty, the field
+            // still holds the query, and the two things that can rescue it
+            // (drop the filter, or hand the same words to the catalog search
+            // that also reads descriptions and tags) were both off-screen.
+            <div className="px-2 py-3">
+              <p className="text-sm text-ns-muted">No match.</p>
+              <div className="mt-2 flex flex-col items-start gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setQuery("")}
+                  className="rounded-sm text-xs text-ns-muted underline underline-offset-2 outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
+                >
+                  Clear filter
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCmdkSeed(query);
+                    setCmdkOpen(true);
+                  }}
+                  className="rounded-sm text-xs text-ns-muted underline underline-offset-2 outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
+                >
+                  Search everything
+                </button>
+              </div>
+            </div>
+          ) : null}
+          {sections.map((g) => (
             <NavCategory
               key={g.id}
               group={g}
+              pending={!tree}
               open={isFiltering || openIds.has(g.id)}
-              onToggle={(v) => toggle(g.id, v)}
+              onToggle={(v) => {
+                // Opening a category is the plainest possible "I want the
+                // tree" signal, and the one case where the fetch is on the
+                // critical path of something the visitor just asked for.
+                if (v) wantTree();
+                toggle(g.id, v);
+              }}
               openIds={openIds}
               onToggleKind={toggle}
               isFiltering={isFiltering}
@@ -751,15 +940,20 @@ export function SiteShell({
           gate and every card's iframe) already returned above this point. */}
       {pathname !== "/connect" ? <McpPopup /> : null}
 
-      <CommandPalette open={cmdkOpen} onClose={() => setCmdkOpen(false)} />
+      {/* Same component list the tree holds, in the same order — the palette
+          used to import `registry-lite.generated.json` itself, which is what
+          put a 534-entry array in a chunk every one of the 562 documents
+          loads. `null` until the fetch lands; opening the palette is one of
+          the things that asks for it. */}
+      <CommandPalette
+        open={cmdkOpen}
+        onClose={() => setCmdkOpen(false)}
+        items={tree ? flat : null}
+        initialQuery={cmdkSeed}
+      />
     </div>
   );
 }
-
-/** Only counts items — kinds are just a grouping of the same items, not
- *  additional ones, so `count` fields would double a component up otherwise. */
-const countGroup = (g: NavGroup) =>
-  g.items.length + g.kinds.reduce((n, k) => n + k.items.length, 0);
 
 /**
  * Category-level `<details>`. `<summary>` is the platform's own disclosure
@@ -768,6 +962,7 @@ const countGroup = (g: NavGroup) =>
  */
 function NavCategory({
   group,
+  pending,
   open,
   onToggle,
   openIds,
@@ -778,6 +973,9 @@ function NavCategory({
   activeRef,
 }: {
   group: NavGroup;
+  /** True while the tree is still being fetched, so this row knows its empty
+   *  `items` means "not here yet" rather than "nothing to show". */
+  pending: boolean;
   open: boolean;
   onToggle: (open: boolean) => void;
   openIds: Set<string>;
@@ -813,6 +1011,13 @@ function NavCategory({
             activeRef={activeRef}
           />
         ))}
+        {pending ? (
+          // Opening a category before /nav-tree.json lands is a real state —
+          // the prefetch is on idle everywhere except component pages, so a
+          // click in the first second gets here. An open box with nothing in
+          // it reads as a broken category; this says what is happening.
+          <p className="px-2 py-1.5 text-sm text-ns-muted">Loading…</p>
+        ) : null}
         {group.items.length > 0 ? (
           <ul>
             {group.items.map((i) => (

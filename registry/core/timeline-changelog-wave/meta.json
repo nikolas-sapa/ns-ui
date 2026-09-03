@@ -1,7 +1,7 @@
 {
   "name": "timeline-changelog-wave",
   "title": "Timeline Changelog Wave",
-  "description": "Changelog timeline drawn as a beach strand: each release arrives as a foam crest sweeping an arc in from the now edge, breaks at its chronological position, pops a marker in with a spring, and recedes leaving an etched tide-ring — later waves wash past older marks so ring density reads as event history.",
+  "description": "Changelog timeline drawn as a beach strand: each release arrives as a foam crest sweeping an arc in from the now edge, breaks at its chronological position, pops a marker in with a spring, and recedes leaving an etched tide-ring. Later waves wash past older marks so ring density reads as event history.",
   "collection": "core",
   "tags": [
     "canvas",

@@ -1,7 +1,7 @@
 {
   "name": "text-ascii-cascade",
   "title": "Text ASCII Cascade",
-  "description": "A headline that ambiently collapses character by character into a scattered field of noise glyphs below it, then climbs back into place — hovering forces an immediate, amplified cascade.",
+  "description": "A headline that ambiently collapses character by character into a scattered field of noise glyphs below it, then climbs back into place. Hovering forces an immediate, amplified cascade.",
   "collection": "loud",
   "tags": ["text", "cascade", "glyph-field", "mono", "headline", "showpiece", "physics"],
   "useWhen": "a showpiece headline that periodically collapses into a scattered field of glyphs and reassembles, with hover forcing an immediate, amplified collapse; pick text-decrypt instead when characters should churn identity IN PLACE rather than move, or split-flap-board when the motion should read as mechanical hinged signage rather than a physical fall.",

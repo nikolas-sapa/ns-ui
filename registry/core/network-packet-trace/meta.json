@@ -1,7 +1,7 @@
 {
   "name": "network-packet-trace",
   "title": "Network Packet Trace",
-  "description": "A small hairline node/edge network where data pulses branch across random routes, easing along each edge with a fading tail — idle traffic, dense active traffic, or an error state where packets queue up at a congested hub node.",
+  "description": "A small hairline node/edge network where data pulses branch across random routes, easing along each edge with a fading tail: idle traffic, dense active traffic, or an error state where packets queue up at a congested hub node.",
   "collection": "core",
   "tags": [
     "network",

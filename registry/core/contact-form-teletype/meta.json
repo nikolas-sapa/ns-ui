@@ -1,7 +1,7 @@
 {
   "name": "contact-form-teletype",
   "title": "Contact Form Teletype",
-  "description": "A contact form whose validation prints as a teletype receipt below it — each field's check accretes as a new line, and correcting a field strikes through the old line and reprints rather than clearing it.",
+  "description": "A contact form whose validation prints as a teletype receipt below it: each field's check accretes as a new line, and correcting a field strikes through the old line and reprints rather than clearing it.",
   "collection": "core",
   "tags": ["form", "contact", "validation", "mono", "log", "accessibility", "teletype"],
   "useWhen": "a contact/lead form where the fill itself should read as an honest running log — every validation attempt stays visible in order, corrections struck through rather than erased — instead of a status badge that overwrites itself; pick validation-inline-wick instead for a single field whose border should diffuse a tint from the offending character with no history, or validation-error-summary for a punch list gathered at the top on failed submit that self-dismisses once every field resolves.",

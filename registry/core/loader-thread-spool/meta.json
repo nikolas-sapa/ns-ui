@@ -1,7 +1,7 @@
 {
   "name": "loader-thread-spool",
   "title": "Loader Thread Spool",
-  "description": "A loader that winds thread onto a spool while duration is unknown, then converts the same coil in place into a proportional gauge the instant total size arrives — the indeterminate-to-determinate handoff as one continuous object, never a spinner swapped for a bar.",
+  "description": "A loader that winds thread onto a spool while duration is unknown, then converts the same coil in place into a proportional gauge the instant total size arrives. The indeterminate-to-determinate handoff as one continuous object, never a spinner swapped for a bar.",
   "collection": "core",
   "tags": [
     "loader",

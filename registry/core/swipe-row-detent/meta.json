@@ -1,7 +1,7 @@
 {
   "name": "swipe-row-detent",
   "title": "Swipe Row Detent",
-  "description": "A swipeable list row that clicks through machined detent stops — archive, then flag — and strains against a hard stop before overtravel arms delete, with a 3-second undo bar before it commits.",
+  "description": "A swipeable list row that clicks through machined detent stops (archive, then flag) and strains against a hard stop before overtravel arms delete, with a 3-second undo bar before it commits.",
   "collection": "core",
   "tags": [
     "swipe",

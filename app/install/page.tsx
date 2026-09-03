@@ -28,6 +28,9 @@ const INSTALL_ONE = `npx shadcn add ${REGISTRY_ORIGIN}/r/<name>.json`;
 const INIT_NEW = "npx shadcn init -d -n my-app";
 const INIT_CD = "cd my-app";
 const INSTALL_AFTER_INIT = `npx shadcn add ${REGISTRY_ORIGIN}/r/gallery-coverflow-caustic.json`;
+/** Shown as three lines, copied as one paste — see the block below. */
+const NEW_PROJECT_STEPS = [INIT_NEW, INIT_CD, INSTALL_AFTER_INIT];
+const NEW_PROJECT_SEQUENCE = NEW_PROJECT_STEPS.join("\n");
 
 export default function InstallPage() {
   return (
@@ -74,7 +77,7 @@ export default function InstallPage() {
             components/ui/&lt;name&gt;.tsx
           </code>{" "}
           and installs that component's own npm dependencies (per-component,
-          not registry-wide — most components have none). There's no{" "}
+          not registry-wide: most components have none). There's no{" "}
           <code className="rounded-sm bg-surface px-1 py-0.5 font-mono text-[13px] text-foreground">
             ns-ui
           </code>{" "}
@@ -83,7 +86,7 @@ export default function InstallPage() {
         </p>
         <p className="mt-3 text-sm leading-6 text-ns-muted">
           The same command also writes any custom design token the component
-          needs into your project's CSS file — shadcn's CLI merges the
+          needs into your project's CSS file: shadcn's CLI merges the
           registry entry's <code className="rounded-sm bg-surface px-1 py-0.5 font-mono text-[13px] text-foreground">cssVars</code>{" "}
           block into your <code className="rounded-sm bg-surface px-1 py-0.5 font-mono text-[13px] text-foreground">:root</code>/
           <code className="rounded-sm bg-surface px-1 py-0.5 font-mono text-[13px] text-foreground">.dark</code> on install
@@ -104,26 +107,25 @@ export default function InstallPage() {
           From an empty directory, scaffold and initialize first, then install
           as above:
         </p>
+        {/* One block, one copy, three lines — it used to be three separate
+            blocks with a copy button each, so the shortest path from this
+            page to a running component was three clicks and three switches
+            back to the terminal for what is a single sequence. The copied
+            text is exactly the three lines shown, newline-separated and with
+            no trailing newline, so a paste runs the first two and leaves the
+            third on the prompt for the visitor to send. */}
         <div className={`mt-3 ${CODE_BLOCK}`}>
           <code className="min-w-0 flex-1 break-words font-mono text-xs leading-6 text-foreground">
-            {INIT_NEW}
-          </code>
-          <CopyButton variant="inline" value={INIT_NEW} label="Copy init command" />
-        </div>
-        <div className={`mt-2 ${CODE_BLOCK}`}>
-          <code className="min-w-0 flex-1 break-words font-mono text-xs leading-6 text-foreground">
-            {INIT_CD}
-          </code>
-          <CopyButton variant="inline" value={INIT_CD} label="Copy cd command" />
-        </div>
-        <div className={`mt-2 ${CODE_BLOCK}`}>
-          <code className="min-w-0 flex-1 break-words font-mono text-xs leading-6 text-foreground">
-            {INSTALL_AFTER_INIT}
+            {NEW_PROJECT_STEPS.map((line) => (
+              <span key={line} className="block">
+                {line}
+              </span>
+            ))}
           </code>
           <CopyButton
             variant="inline"
-            value={INSTALL_AFTER_INIT}
-            label="Copy example install command"
+            value={NEW_PROJECT_SEQUENCE}
+            label="Copy all three commands"
           />
         </div>
         <p className="mt-3 text-sm leading-6 text-ns-muted">
@@ -148,7 +150,7 @@ export default function InstallPage() {
         <h2 className={SECTION_LABEL}>Before you install</h2>
         <p className="mt-2 text-sm leading-6 text-ns-muted">
           Every component is built against, at minimum, five CSS custom
-          properties already in scope on the host app —{" "}
+          properties already in scope on the host app:{" "}
           <code className="rounded-sm bg-surface px-1 py-0.5 font-mono text-[13px] text-foreground">
             --background
           </code>
@@ -167,10 +169,10 @@ export default function InstallPage() {
           , and{" "}
           <code className="rounded-sm bg-surface px-1 py-0.5 font-mono text-[13px] text-foreground">
             --ns-accent
-          </code>{" "}
-          — never a hardcoded color, in markup or in canvas/SVG draw code. A
-          component that needs more than that — a card surface, an error or
-          status color — declares it in its own registry entry, and the
+          </code>, never a
+          hardcoded color, in markup or in canvas/SVG draw code. A component that
+          needs more than that (a card surface, an error or status color) declares
+          it in its own registry entry, and the
           install command above adds it for you; the full set of ten tokens
           the registry as a whole draws from is on{" "}
           <Link
@@ -189,7 +191,7 @@ export default function InstallPage() {
           </code>{" "}
           at mount and again on theme change, rather than baking in a color
           literal. If your project doesn't define these properties before
-          installing, an installed component won't necessarily error — it may
+          installing, an installed component won't necessarily error. It may
           just render with the wrong ink, or invisible ink on one theme.
           Full detail:{" "}
           <Link
@@ -207,7 +209,7 @@ export default function InstallPage() {
         <ul className="mt-3 flex flex-col gap-2.5">
           {[
             "React 19+.",
-            "Tailwind CSS v4 — every component is styled entirely with Tailwind utility classes: no shipped CSS file, no CSS-in-JS.",
+            "Tailwind CSS v4. Every component is styled entirely with Tailwind utility classes: no shipped CSS file, no CSS-in-JS.",
             "Geist Sans / Geist Mono, inherited from the host app's own font-family rather than set by the component itself.",
             `"use client" is already on every component file, and each ships with zero or minimal npm dependencies of its own.`,
           ].map((line) => (
@@ -238,8 +240,8 @@ export default function InstallPage() {
           , a visible dialog has an accessible name, and if a component
           renders any control at all, Tab reaches something. Keyboard focus
           is also required to render visibly differently from unfocused. What
-          that check does and doesn't cover — presence of a name, not its
-          wording; reachability, not per-element tab order — is on{" "}
+          that check does and doesn't cover (presence of a name, not its wording;
+          reachability, not per-element tab order) is on{" "}
           <Link
             href="/guidelines"
             className="underline underline-offset-2 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent transition-colors"
@@ -253,7 +255,7 @@ export default function InstallPage() {
       <section className="mt-10 max-w-2xl">
         <h2 className={SECTION_LABEL}>Motion and performance: convention, not gate</h2>
         <p className="mt-2 text-sm leading-6 text-ns-muted">
-          None of the following is checked by the automated gate — it has no
+          None of the following is checked by the automated gate: it has no
           <code className="rounded-sm bg-surface px-1 py-0.5 font-mono text-[13px] text-foreground">
             {" "}
             prefers-reduced-motion
@@ -296,7 +298,7 @@ export default function InstallPage() {
                 Device-pixel-ratio capping
               </strong>{" "}
               applies only to the canvas-based components (90 of 298 draw to a
-              2D context) — there is no DPR to cap on anything else. Within
+              2D context). There is no DPR to cap on anything else. Within
               that group it&apos;s close to universal but not total: 89 of 90
               cap the ratio at 2 before sizing their canvas.
             </span>
@@ -314,7 +316,7 @@ export default function InstallPage() {
               their render loop when the tab is hidden, and even scoped to
               just the canvas-based components it's a minority behavior (48
               of 90). Don't assume a given animated component stops rendering
-              in a background tab — check its source.
+              in a background tab. Check its source.
             </span>
           </li>
         </ul>

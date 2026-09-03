@@ -1,7 +1,7 @@
 {
   "name": "return-aviso",
   "title": "Return Aviso",
-  "description": "An @mention chip that behaves like registered post: a stub tears off along a dashed perforation on send and only returns — filled, timestamped — once the mentioned person actually looks.",
+  "description": "An @mention chip that behaves like registered post: a stub tears off along a dashed perforation on send and only returns (filled, timestamped) once the mentioned person actually looks.",
   "collection": "core",
   "tags": [
     "mention",

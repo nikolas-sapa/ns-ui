@@ -1,7 +1,7 @@
 {
   "name": "text-ligature-melt",
   "title": "Text Ligature Melt",
-  "description": "Headline whose glyphs liquefy near the cursor — an SVG gooey filter fuses neighbors into temporary ligatures that spring apart on leave, with a faint field drifting the melt on its own at rest.",
+  "description": "Headline whose glyphs liquefy near the cursor: an SVG gooey filter fuses neighbors into temporary ligatures that spring apart on leave, with a faint field drifting the melt on its own at rest.",
   "collection": "core",
   "tags": ["text", "cursor", "svg-filter", "goo", "micro-interaction"],
   "useWhen": "glyphs liquefy and fuse into gooey ligatures near the cursor via an SVG filter, drifting even at rest and springing apart on leave; use for a squishy, organic headline, not a legibility-first reveal; pick text-stitch-unpick instead when the cursor should unravel letters rather than fuse them, text-prism-split when the distortion should be chromatic and glitchy rather than gooey, or text-variable-weight when the response should be pure weight with no filter at all.",

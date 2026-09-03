@@ -1,7 +1,7 @@
 {
   "name": "rosensweig-crest",
   "title": "Rosensweig Crest",
-  "description": "A flat pool of ASCII glyphs that erupts into a hexagonal lattice of sharp spikes wherever the pointer's field crosses a critical threshold, tracking the cursor with a stiff-up, overdamped-down viscous lag — the Rosensweig instability rendered as a deformable surface, not particles.",
+  "description": "A flat pool of ASCII glyphs that erupts into a hexagonal lattice of sharp spikes wherever the pointer's field crosses a critical threshold, tracking the cursor with a stiff-up, overdamped-down viscous lag. The Rosensweig instability rendered as a deformable surface, not particles.",
   "collection": "loud",
   "tags": [
     "ascii",

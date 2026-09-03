@@ -137,7 +137,7 @@ export function SavedLibrary({ items, slugs, initialFolders, handle }: { items: 
                 <span aria-hidden="true" className="inline-flex h-4 w-4 items-center justify-center rounded-sm border border-ns-accent bg-ns-accent text-white">
                   <svg viewBox="0 0 12 12" aria-hidden="true" className="h-2.5 w-2.5"><path d="M2 6l3 3 5-6" stroke="currentColor" strokeWidth="1.5" fill="none" /></svg>
                 </span>
-                Published — anyone with the link can view this folder and your profile
+                Published: anyone with the link can view this folder and your profile
               </span>
               {handle ? (
                 <Link href={`/u/${handle}`} className="rounded-sm px-2 py-1 text-xs text-ns-accent outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ns-accent">
@@ -156,9 +156,10 @@ export function SavedLibrary({ items, slugs, initialFolders, handle }: { items: 
           ) : confirmingPublish === folder.id ? (
             <div className="space-y-2">
               <p className="text-xs text-foreground">
-                Publishing “{folder.name}” makes it — and your public profile page at{" "}
+                Publishing “{folder.name}” makes it visible to anyone with the link, along with your
+                public profile page at{" "}
                 <span className="font-mono">/u/{handle ?? "…"}</span> (display name, bio, url, tags,
-                avatar) — visible to anyone with the link. Nothing else you saved becomes visible.
+                avatar). Nothing else you saved becomes visible.
               </p>
               <div className="flex items-center gap-2">
                 <button
@@ -181,7 +182,7 @@ export function SavedLibrary({ items, slugs, initialFolders, handle }: { items: 
             </div>
           ) : (
             <div className="flex items-center gap-2 text-xs text-ns-muted">
-              <span>Not published — only you can see this folder</span>
+              <span>Not published: only you can see this folder</span>
               <button
                 type="button"
                 onClick={() => setConfirmingPublish(folder.id)}

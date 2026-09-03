@@ -100,6 +100,13 @@ Every command also accepts `-h`/`--help` for command-specific usage; bare
 `ns-ui` (or `-h`/`--help`) prints the command list above. `-v`/`--version`
 prints the installed CLI version.
 
+## Environment variables
+
+| Variable | Purpose |
+|---|---|
+| `NS_UI_REGISTRY` | Registry origin the CLI reads `registry.json` and `llms.txt` from, and the origin baked into the install commands it prints. Defaults to `https://design.helpmarq.com`. |
+| `NS_UI_CACHE_TTL_MS` | Lifetime of the on-disk catalog cache, in milliseconds. Defaults to `43200000` (12 hours). |
+
 ## Where the data comes from
 
 This package is fully standalone — it does not import, read, or depend on

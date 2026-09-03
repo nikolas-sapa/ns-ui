@@ -20,9 +20,9 @@ export const metadata: Metadata = {
 
 const REJECTED = [
   "A console error on either theme, at any state.",
-  "A blank render — nothing painted where the component should be.",
+  "A blank render: nothing painted where the component should be.",
   "Hover that looks byte-identical to resting, or keyboard focus that looks byte-identical to unfocused. An interaction that doesn't visibly interact isn't one.",
-  "Dark and light rendered as the same bytes — a component that ignored the theme rather than one that happens to look similar.",
+  "Dark and light rendered as the same bytes: a component that ignored the theme rather than one that happens to look similar.",
   "An interactive control with no accessible name, a role of switch/checkbox/radio with no aria-checked, or a visible dialog with no accessible name.",
   "Controls that Tab cannot reach.",
   "Hardcoded hex in markup or in canvas/SVG draw code, instead of the CSS custom properties already in scope.",
@@ -45,7 +45,7 @@ export default function GuidelinesPage() {
         >
           CONTRIBUTING.md
         </Link>{" "}
-        stays the mechanical how-to — setup, the file layout, the verify gate
+        stays the mechanical how-to: setup, the file layout, the verify gate
         commands. Read this one first; it's shorter and it's the part that
         actually decides whether something gets merged.
       </p>
@@ -56,7 +56,7 @@ export default function GuidelinesPage() {
         </h2>
         <p className="mt-2 text-sm leading-6 text-ns-muted">
           The bar for a new component is an interaction that does not already
-          exist here — not a component that merely works. A button styled
+          exist here, not a component that merely works. A button styled
           differently from an existing button is not a new interaction. A
           button that reveals a hold-to-confirm affordance, or that reacts to
           the cursor's position rather than its click, is. If two submissions
@@ -71,7 +71,7 @@ export default function GuidelinesPage() {
         <p className="mt-2 text-sm leading-6 text-ns-muted">
           Every component ships in dark and light, and both are graded, not
           just the one your terminal defaults to. A component can read
-          perfectly in dark and fall apart in light — a gradient that
+          perfectly in dark and fall apart in light: a gradient that
           inverts, ink that vanishes into the background, a shadow that
           becomes a smear. The gate only fails a component whose two themes
           render byte-identical, so a light theme that is merely wrong sails
@@ -89,7 +89,7 @@ export default function GuidelinesPage() {
           in the grid as a speck of interface adrift in empty background, or
           with the interesting part outside the frame. A submission is judged
           on what a stranger sees in that card before they ever click through
-          to the full page — if the card doesn't say what the component does,
+          to the full page. If the card doesn't say what the component does,
           the component isn't done yet.
         </p>
       </section>
@@ -99,7 +99,7 @@ export default function GuidelinesPage() {
           The token rule
         </h2>
         <p className="mt-2 text-sm leading-6 text-ns-muted">
-          Color comes from the CSS custom properties already in scope —{" "}
+          Color comes from the CSS custom properties already in scope:{" "}
           <code className="rounded-sm bg-surface px-1 py-0.5 font-mono text-[13px] text-foreground">
             --background
           </code>
@@ -118,8 +118,7 @@ export default function GuidelinesPage() {
           , and{" "}
           <code className="rounded-sm bg-surface px-1 py-0.5 font-mono text-[13px] text-foreground">
             --ns-accent
-          </code>
-          — never a hardcoded hex, in markup or in canvas/SVG draw code. This
+          </code>, never a hardcoded hex, in markup or in canvas/SVG draw code. This
           broke the light theme across the whole registry once already. A
           component that derives ink for a canvas reads it with{" "}
           <code className="rounded-sm bg-surface px-1 py-0.5 font-mono text-[13px] text-foreground">
@@ -156,7 +155,7 @@ export default function GuidelinesPage() {
         </h2>
         <p className="mt-2 text-sm leading-6 text-ns-muted">
           A merged submission is contributed under the repository's MIT
-          license — you keep authorship, the project keeps the right to
+          license: you keep authorship, the project keeps the right to
           distribute it under those terms. Every pull request certifies its
           own origin with a Developer Certificate of Origin: a checkbox and a{" "}
           <code className="rounded-sm bg-surface px-1 py-0.5 font-mono text-[13px] text-foreground">
@@ -186,7 +185,7 @@ export default function GuidelinesPage() {
         <p className="mt-3 text-sm leading-6 text-ns-muted">
           Credit for a contribution links to that contributor's profile only
           when one exists and is public. Otherwise it renders as their plain
-          GitHub login, with no link — the same degradation a deleted account
+          GitHub login, with no link, the same degradation a deleted account
           takes.
         </p>
       </section>

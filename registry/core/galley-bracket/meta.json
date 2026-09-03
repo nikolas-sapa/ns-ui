@@ -1,7 +1,7 @@
 {
   "name": "galley-bracket",
   "title": "Galley Bracket",
-  "description": "Remote collaborators' live selections drawn as proofreader's marks — thin corner brackets at each end of a range and a hairline underline, nesting outward by arrival order where ranges overlap, instead of overlapping tinted highlight fills.",
+  "description": "Remote collaborators' live selections drawn as proofreader's marks: thin corner brackets at each end of a range and a hairline underline, nesting outward by arrival order where ranges overlap, instead of overlapping tinted highlight fills.",
   "collection": "core",
   "tags": [
     "collaboration",

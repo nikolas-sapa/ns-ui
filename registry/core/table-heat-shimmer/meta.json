@@ -1,7 +1,7 @@
 {
   "name": "table-heat-shimmer",
   "title": "Table Heat Shimmer",
-  "description": "Dense ops table where rows above a heat threshold shimmer like air over asphalt — live DOM text refracts through an animated SVG displacement filter while cold rows sit dead-still behind hairline borders.",
+  "description": "Dense ops table where rows above a heat threshold shimmer like air over asphalt: live DOM text refracts through an animated SVG displacement filter while cold rows sit dead-still behind hairline borders.",
   "collection": "core",
   "tags": ["table", "data-viz", "svg-filter", "displacement", "heat-haze", "canvas", "sortable", "dashboard"],
   "useWhen": "a dense ops table where the rows needing attention should be findable by motion rather than by hue, hot rows refracting through a displacement filter while cold rows sit dead still; pick heatmap-calendar-tide instead when the magnitudes belong on a grid of time slots rather than in table rows, or meter-threshold-trip when one metric's trip and clear points are the question rather than which rows are hot.",

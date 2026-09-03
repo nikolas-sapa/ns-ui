@@ -3,7 +3,7 @@
 Thanks for looking. This is a curated registry, so the bar for a new component
 is "an interaction that does not already exist here", not "a component that
 works". This file is the mechanical how-to; [/guidelines](https://design.helpmarq.com/guidelines)
-is the taste document — what that bar actually means, why both themes are
+is the taste document: what that bar actually means, why both themes are
 non-negotiable, why the card matters as much as the preview, and what gets
 rejected. Read that one first. Everything below applies equally to humans and
 to agents; an agent editing this repo should also read
@@ -25,7 +25,7 @@ The preview site has three routes worth knowing:
 
 - `/` lists every component as a live, self-demonstrating card.
 - `/components/<name>` renders one component, fully interactive. This is the
-  canonical, indexed page — what a visitor or a search engine lands on.
+  canonical, indexed page: what a visitor or a search engine lands on.
 - `/preview/<name>` renders the identical component, chrome-less. This is the
   screenshot gate's fixture, not a page anyone is meant to link to.
 
@@ -54,8 +54,8 @@ If something in the generated output is wrong, fix `meta.json` or the component
 source and rebuild. Hand edits are silently overwritten.
 
 One exception: `README.md` is committed and hand-edited, since it's the repo's
-front page. Its component-count numbers are still generated, not hand-tracked
-— `scripts/build-readme.ts` rewrites only the text between paired
+front page. Its component-count numbers are still generated, not hand-tracked.
+`scripts/build-readme.ts` rewrites only the text between paired
 `<!-- generated:NAME start -->`/`<!-- generated:NAME end -->` markers, leaving
 everything else in the file untouched. Missing or malformed markers fail the
 build loudly rather than being skipped or auto-inserted.
@@ -67,11 +67,11 @@ fits. Then:
 
 1. Create `registry/<collection>/<name>/` containing three files.
 
-   - `component.tsx` — the component itself. `"use client"`, zero or minimal
+   - `component.tsx`: the component itself. `"use client"`, zero or minimal
      dependencies.
-   - `demo.tsx` — the preview render used by `/components/<name>` and the
+   - `demo.tsx`: the preview render used by `/components/<name>` and the
      `/preview/<name>` verifier fixture.
-   - `meta.json` — the source of truth: `name`, `title`, `description`,
+   - `meta.json`, the source of truth: `name`, `title`, `description`,
      `collection`, `tags`, `instruction` (a rich paragraph describing behavior,
      read by `scripts/build-llms.ts` into `llms-full.txt`), and `dependencies`.
      Optionally `card`, `autoplay`, `gate` and `useWhen`. The last three are
@@ -88,7 +88,7 @@ fits. Then:
    structure. There is no central index to edit.
 
    Then `npm run order:build`, and commit what it changes. `lib/component-order.json`
-   is a generated file that IS committed (like `README.md`, above) — git history
+   is a generated file that IS committed (like `README.md`, above). Git history
    is unreliable on Vercel's shallow clone, so the site ships a snapshot of
    creation dates instead of deriving them. Skip this and your component still
    ships, it just sorts **last** in the grid instead of first, which looks like
@@ -137,16 +137,16 @@ frame on:
 }
 ```
 
-- `focus` (required once `card` is present) — a CSS selector queried inside the
+- `focus` (required once `card` is present): a CSS selector queried inside the
   preview document. The first match's border box becomes the subject, and the
   card scales and translates so that box fills it. Pick a selector that matches
   exactly the element the component is about, and prefer a stable hook (a
   `role`, a `data-` attribute) over a structural selector a refactor will
   quietly break.
-- `padding` — breathing room around the subject, as a fraction of its own box
+- `padding`: breathing room around the subject, as a fraction of its own box
   on every side. `0` crops flush, `0.4` leaves 40 percent of its own size as
   context. Defaults to `0.15`.
-- `maxZoom` — ceiling on the zoom applied over the card's base scale, so a
+- `maxZoom`: ceiling on the zoom applied over the card's base scale, so a
   24px icon is not blown up to fill the card. Defaults to `4`.
 
 `registry:build` rejects a `card` with a missing or empty `focus`, or a
@@ -169,20 +169,60 @@ registry once. If a component derives ink for a `<canvas>`, read it via
 Both themes must render correctly. Verify both, not whichever your terminal
 happens to default to.
 
+### Three tokens that are routinely misused
+
+Naming a token correctly is not the same as using it for the right job. These
+three are the repeat offenders on this project. Contrast figures below are
+WCAG ratios computed from the shipped values in `app/globals.css`.
+
+**`--border` is a separator, never a fill.** Light theme, `#ebebeb` on
+`#ffffff`, is 1.19:1. That is a hairline you can just see and nothing else.
+Fill a shape with it, stroke a chart with it, or draw a canvas glyph in it and
+the component is invisible in light theme while looking fine in dark, where
+`#2e2e2e` on `#0a0a0a` reaches 1.46:1. If you need a faint but legible mark,
+derive it from `--foreground` at low alpha, do not reach for `--border`.
+
+**`--ns-accent` is interaction chrome only.** Buttons, links, focus rings,
+active states. It is not available for a component's climactic moment, an
+ambient highlight, or a pointer trail. A resting screenshot is not an
+interaction. This is the single most repeated defect here: three shipped
+components mixed accent into a pointer or beam highlight and it read as a
+stationary coloured blob in the corner, because `scripts/verify.ts` parks the
+pointer at the viewport origin. No gate tests for hue, so nothing catches it.
+Pointer highlights move in luminance only. See the "accent-tinted pointer
+highlights" standing check in [`docs/showpiece-recipe.md`](docs/showpiece-recipe.md).
+
+**`--ns-muted` is a second ink at full strength, never a variable-strength
+wash.** Using it as written, for secondary text and captions, is correct and
+encouraged. Fading it to an arbitrary alpha is not, because its ceiling is
+theme-dependent: 8.45:1 in light (`#4d4d4d` on `#ffffff`) against 6.12:1 in
+dark (`#8f8f8f` on `#0a0a0a`). A mid-strength wash therefore looks acceptable
+in both themes today and breaks only later, when someone strengthens the wash
+and dark hits its lower ceiling first. The failure arrives in a change that
+did not touch the component. Use it at full strength, or use `--foreground` at
+an explicit alpha where you control both ends.
+
 ## The quality gate
 
 ```bash
 npm run typecheck   # tsc --noEmit, must be clean
-npm run dev         # in another shell; the gate needs a running server
-npm run verify      # every component
+npm run build       # registry:build && next build; the gate needs this build
+npm run verify      # every component, against the served build
 ```
 
 Narrower runs:
 
 ```bash
-node scripts/verify.ts button-glass              # one component
-BASE_URL=http://localhost:3001 npm run verify    # non-default port
+npm run verify button-glass                      # one component
+BASE_URL=http://localhost:3400 npm run verify    # non-default port
 ```
+
+The gate needs a running server, and it must be a production server, not
+`npm run dev`. Turbopack serves corrupted chunks under the gate's parallel
+load: 15 to 50 percent false failures measured against dev, versus 0 of 12
+against a production build. A `next start` already running does not pick up a
+new route or a new component without a rebuild and a restart. See
+[`docs/review-workflow.md`](docs/review-workflow.md) for the launch recipe.
 
 `verify` drives every component through headless Chromium, screenshots each
 state (default, hover, focus, press, scroll, unfocused) against each theme into
@@ -206,6 +246,51 @@ genuinely on screen, not clipped invisible by an ancestor's `overflow: hidden`.
 
 Screenshots are committed. They are the review artifact, so a component PR
 should include them.
+
+## Troubleshooting
+
+Every entry below is a failure this repo actually hit and recorded, in
+[`docs/review-workflow.md`](docs/review-workflow.md) and
+[`docs/round-playbook.md`](docs/round-playbook.md). None is hypothetical.
+
+**`__name is not defined` from the verifier.** You ran
+`npx tsx scripts/verify.ts`. tsx's esbuild transform injects a helper into
+code Playwright serialises into the page. Run `npm run verify [name]`.
+
+**Widespread, implausible verify failures, 15 to 50 percent of components.**
+You are pointing the gate at `npm run dev`. Turbopack serves corrupted chunks
+under parallel load. The same run against a production build measured 0
+failures out of 12. Build and serve, then verify.
+
+**`ERR_CONNECTION_REFUSED` and no useful failure detail.** A server started
+with a trailing `&` in one shell call dies when that call returns. Start the
+server and run the gate inside a single invocation, or use pm2.
+
+**Your new component or route is not there.** A production `next start`
+already running does not pick up new files. Rebuild, then restart the process.
+If the component is new on disk it also has to be registered: run
+`npm run registry:build` before expecting `/preview/<name>` or `/review` to
+resolve it.
+
+**A 401 on one port but not another.** That is a stale or unrelated process
+holding the port, not the script. Check
+`lsof -nP -iTCP:<port> -sTCP:LISTEN` and confirm its cwd before blaming
+`verify.ts`.
+
+**A high pm2 restart count.** That number is cumulative, not a crash loop.
+Read `unstable restarts`, not the raw count, before concluding anything.
+
+**`gate` passes but the component is visibly still shut.** Your `expect`
+selector points at something that renders identically open and closed, a rod,
+a track, a wrapper. Three curtain components shipped this way. Point `expect`
+at an element the closed state genuinely occludes, and confirm with
+`document.elementFromPoint` before and after the trigger rather than reasoning
+from DOM or z-order.
+
+**Previews you just generated have vanished.** `scripts/build-previews.ts`
+with no argument wipes `public/previews` first. A targeted run
+(`node scripts/build-previews.ts <name>`) does not. Batching targeted runs is
+safe, a full run after them is not.
 
 ## Working in parallel
 
@@ -233,14 +318,14 @@ through [SECURITY.md](SECURITY.md), privately, not a public issue.
 By contributing you agree your work is licensed under the
 [MIT License](LICENSE), and to the
 [Code of Conduct](CODE_OF_CONDUCT.md). Contributing a component is public git
-history under the GitHub identity that opened the PR — it survives deleting
+history under the GitHub identity that opened the PR. It survives deleting
 any account you may later create on the site, because it isn't data the site
 stores about you.
 
 ## Sign-off (DCO)
 
 Every commit must carry a `Signed-off-by` trailer certifying the
-[Developer Certificate of Origin](DCO) — that you wrote the contribution, or
+[Developer Certificate of Origin](DCO): that you wrote the contribution, or
 otherwise have the right to submit it under this project's license. Add it
 with `-s`:
 
@@ -264,5 +349,5 @@ git rebase --signoff HEAD~<n>
 git push --force-with-lease
 ```
 
-The PR template's DCO checkbox is a reminder, not the enforcement — the CI
+The PR template's DCO checkbox is a reminder, not the enforcement. The CI
 check reading each commit's trailer is.

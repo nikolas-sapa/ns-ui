@@ -1,7 +1,7 @@
 {
   "name": "catenary-contact-stagger",
   "title": "Catenary Contact Stagger",
-  "description": "A live connection/sync-quality indicator built from overhead contact wire stagger — a fixed pantograph marker tracks the wire's deliberate zigzag span by span, and only arcs, briefly, on the rare span where contact genuinely breaks.",
+  "description": "A live connection/sync-quality indicator built from overhead contact wire stagger: a fixed pantograph marker tracks the wire's deliberate zigzag span by span, and only arcs, briefly, on the rare span where contact genuinely breaks.",
   "collection": "core",
   "tags": [
     "status",

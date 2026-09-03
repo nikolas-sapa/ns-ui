@@ -54,7 +54,7 @@ export default function AboutPage() {
       <section className={`${SECTION} border-t border-border pt-8`}>
         <h2 className={H2}>What it is</h2>
         <p className={P}>
-          Each component is built around a single interaction — a hold to
+          Each component is built around a single interaction: a hold to
           confirm, a row that can be un-deleted, a hero that reacts to the
           cursor rather than to a click. That constraint is the whole editorial
           rule: a button styled differently from an existing button is not a
@@ -85,7 +85,7 @@ export default function AboutPage() {
           an interactive control Tab cannot reach, or a control with no
           accessible name. It also fails any component whose hover state
           renders byte-identical to its resting state, and any component whose
-          dark and light renders are identical — an interaction that does not
+          dark and light renders are identical. An interaction that does not
           visibly interact is not an interaction, and a component that ignored
           the theme is not themed.
         </p>
@@ -132,8 +132,8 @@ export default function AboutPage() {
             GitHub
           </a>
           . Contributions are accepted under the MIT license with a DCO
-          sign-off; the mechanics — setup, file layout, the verify commands —
-          are in CONTRIBUTING.md in the repository.
+          sign-off; the mechanics (setup, file layout, the verify commands) are in
+          CONTRIBUTING.md in the repository.
         </p>
       </section>
 
@@ -146,8 +146,8 @@ export default function AboutPage() {
           </a>{" "}
           for anything, or open an issue on GitHub for anything about a
           specific component. Security reports go privately through GitHub&apos;s
-          security advisories or the same address — never a public issue; the
-          policy is in SECURITY.md. What the site stores about you, and who
+          security advisories or the same address, never a public issue. The policy
+          is in SECURITY.md. What the site stores about you, and who
           processes it, is on{" "}
           <Link href="/privacy" className={LINK}>
             /privacy

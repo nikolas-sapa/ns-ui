@@ -204,7 +204,7 @@ export function ServiceCard({
           </h3>
           <span
             className="flex items-center gap-1.5 font-mono text-[11px] text-ns-muted"
-            title={`Live, read for this render: ${LIVE_WORD[live.state]} — ${live.detail}`}
+            title={`Live, read for this render: ${LIVE_WORD[live.state]} (${live.detail})`}
           >
             <span aria-hidden className={`h-2 w-2 rounded-full ${LIVE_BAR[live.state]}`} />
             now: {LIVE_WORD[live.state]}
@@ -239,7 +239,7 @@ export function ServiceCard({
           // its name says so, the smallest honest way to tell "this happened
           // and was resolved" apart from "this is still going" without a
           // second colour or a whole incident-log UI.
-          const name = `${prettyDay(bar.day)} — ${WORD[bar.state]}${bar.recovered ? ", recovered — last sample ok" : ""}${bar.backfilled ? ", backfilled — entered after the fact" : ""}${bar.detail ? `: ${bar.detail}` : ""}`;
+          const name = `${prettyDay(bar.day)}, ${WORD[bar.state]}${bar.recovered ? ", recovered (last sample ok)" : ""}${bar.backfilled ? ", backfilled (entered after the fact)" : ""}${bar.detail ? `: ${bar.detail}` : ""}`;
           // Centered (`left-1/2 -translate-x-1/2`) is right for every bar except
           // the handful nearest either end of the strip, where a centered,
           // whitespace-nowrap tooltip spills past the card's own edge — and,
@@ -287,8 +287,8 @@ export function ServiceCard({
                   <span aria-hidden className={`h-2 w-2 rounded-[3px] ${BAR[bar.state]}`} />
                   <span>
                     {WORD[bar.state]}
-                    {bar.recovered ? ", recovered — last sample ok" : ""}
-                    {bar.backfilled ? ", backfilled — entered after the fact" : ""}
+                    {bar.recovered ? ", recovered (last sample ok)" : ""}
+                    {bar.backfilled ? ", backfilled (entered after the fact)" : ""}
                     {bar.detail ? `: ${bar.detail}` : ""}
                   </span>
                 </div>

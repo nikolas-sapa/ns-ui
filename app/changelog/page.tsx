@@ -6,9 +6,9 @@ import { TimelineScrub } from "./timeline-scrub";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/changelog" },
-  title: "Changelog — ns-ui",
+  title: "Changelog · ns-ui",
   description:
-    "What shipped in ns-ui, drawn with timeline-changelog-wave — a component from the registry itself.",
+    "What shipped in ns-ui, drawn with timeline-changelog-wave, a component from the registry itself.",
 };
 
 export default function ChangelogPage() {

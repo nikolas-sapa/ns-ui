@@ -1,7 +1,7 @@
 {
   "name": "nav-overstrike-typewriter",
   "title": "Nav Overstrike Typewriter",
-  "description": "A real site nav with a typed ruled line beneath its links, shaded by striking two or three characters into the same cell — real typewriter overstrike compositing, not this registry's usual single-glyph density ramp — with the current page reading as the deepest stack.",
+  "description": "A real site nav with a typed ruled line beneath its links, shaded by striking two or three characters into the same cell (real typewriter overstrike compositing, not this registry's usual single-glyph density ramp), with the current page reading as the deepest stack.",
   "collection": "core",
   "tags": ["nav", "typewriter", "overstrike", "mono", "canvas", "monochrome", "accessibility"],
   "autoplay": {

@@ -51,6 +51,7 @@ export function CatalogControls({
   totalCount,
   filtered,
   onClearAll,
+  onSearchIntent,
 }: {
   filter: Filter;
   onFilter: (f: Filter) => void;
@@ -70,6 +71,12 @@ export function CatalogControls({
   totalCount: number;
   filtered: boolean;
   onClearAll: () => void;
+  /** Fires the moment someone reaches for search — focus, or the "/"
+   *  shortcut. The catalog's search corpus is fetched rather than shipped
+   *  (see lib/search-corpus.ts), and this is the earliest honest signal that
+   *  it is about to be needed, a keystroke or two before the first one
+   *  lands. */
+  onSearchIntent?: () => void;
 }) {
   const searchRef = useRef<HTMLInputElement | null>(null);
   const barRef = useRef<HTMLDivElement | null>(null);
@@ -79,15 +86,29 @@ export function CatalogControls({
   // static number — the chip row wraps onto extra lines at narrower widths
   // and the Clear button appears/disappears with `filtered`, both of which
   // change this height at runtime.
+  // Zero below `sm`, where the bar is no longer sticky (see the bar's own
+  // class list): a card only has to clear a bar that is still pinned over it.
+  // Publishing 477px there — the measured height at 390px — would have
+  // scrolled a linked card more than half a phone viewport too far down.
   useLayoutEffect(() => {
     const el = barRef.current;
     if (!el) return;
+    const pinned = window.matchMedia("(min-width: 640px)");
     const set = () =>
-      document.documentElement.style.setProperty("--filter-bar-h", `${el.offsetHeight}px`);
+      document.documentElement.style.setProperty(
+        "--filter-bar-h",
+        pinned.matches ? `${el.offsetHeight}px` : "0px",
+      );
     set();
     const ro = new ResizeObserver(set);
     ro.observe(el);
-    return () => ro.disconnect();
+    // The observer covers every height change; this covers the one width
+    // change that crosses the breakpoint without changing the height.
+    pinned.addEventListener("change", set);
+    return () => {
+      ro.disconnect();
+      pinned.removeEventListener("change", set);
+    };
   }, []);
 
   // "/" focuses search — standard, cheap, and ignored while any text input
@@ -111,7 +132,15 @@ export function CatalogControls({
   return (
     <div
       ref={barRef}
-      className="sticky top-0 z-30 -mx-6 mt-14 border-b border-border bg-background/85 px-6 py-3 backdrop-blur sm:-mx-10 sm:px-10"
+      // Sticky from `sm` up only. Measured at 390x844 this bar is 477px tall
+      // — the chip row is a two-column grid there, so it runs to seven rows —
+      // which pinned 57% of a phone viewport permanently to filter chrome and
+      // left ~360px for the components the filters are meant to reveal. Above
+      // `sm` it is 197px (768) and 125px (1440) against much taller viewports,
+      // where pinning still pays for itself. On a phone it now scrolls away
+      // with the content; the floating back-to-top control (showcase.tsx) is
+      // the one tap back to it.
+      className="z-30 -mx-6 mt-14 border-b border-border bg-background/85 px-6 py-3 backdrop-blur sm:sticky sm:top-0 sm:-mx-10 sm:px-10"
     >
       {/* The extra `pl-8`/`sm:pl-4` (on top of the bar's own px-6/sm:px-10)
           clears the fixed mobile nav toggle (44px, left-3 top-3) — same
@@ -157,7 +186,12 @@ export function CatalogControls({
           })}
         </div>
 
-        <div className="flex w-full min-w-0 items-center gap-2 sm:w-auto sm:gap-3">
+        {/* Wraps below `sm` so the search field can take a full row of its
+            own: sharing one 390px row with the New toggle and the Sort select
+            left it 115px wide, narrow enough that its own placeholder read
+            "Search cat". Unchanged from `sm` up, where all three fit a single
+            row at their natural widths. */}
+        <div className="flex w-full min-w-0 flex-wrap items-center gap-2 sm:w-auto sm:flex-nowrap sm:gap-3">
           {/* Sits in row one beside the tabs, not in the category-chip row
               below: that row is a two-column grid under `sm`, and a fourth
               shrink-0 child there re-created the wrapped-chip-label
@@ -194,7 +228,7 @@ export function CatalogControls({
             <span className="ml-1.5 font-mono text-xs text-ns-muted">{newCount}</span>
           </button>
 
-          <div className="search-trace-field relative w-full min-w-0 flex-1 rounded-sm sm:w-auto sm:flex-none">
+          <div className="search-trace-field relative order-first w-full min-w-0 flex-1 basis-full rounded-sm sm:order-none sm:w-auto sm:flex-none sm:basis-auto">
             <label htmlFor="component-search" className="sr-only">
               Search catalog
             </label>
@@ -203,6 +237,7 @@ export function CatalogControls({
               id="component-search"
               type="search"
               value={query}
+              onFocus={() => onSearchIntent?.()}
               onChange={(e) => onQuery(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Escape" && query) {

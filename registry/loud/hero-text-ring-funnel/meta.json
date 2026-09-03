@@ -1,7 +1,7 @@
 {
   "name": "hero-text-ring-funnel",
   "title": "Hero Text Ring Funnel",
-  "description": "A full-bleed hero where readable running text is the geometry itself — seven concentric rings of real words, laid out once by rotating and translating the 2D context per character rather than quantizing to a fixed grid, tapering in true single-point perspective and spinning at differential speeds so the growing phase lag between rings reads as depth.",
+  "description": "A full-bleed hero where readable running text is the geometry itself: seven concentric rings of real words, laid out once by rotating and translating the 2D context per character rather than quantizing to a fixed grid, tapering in true single-point perspective and spinning at differential speeds so the growing phase lag between rings reads as depth.",
   "collection": "loud",
   "tags": ["hero", "typography", "canvas", "3d", "funnel", "text"],
   "useWhen": "Pick hero-text-ring-funnel when the mechanism itself should be legible copy — real words set on circles, not a raster stand-in for one. hero-ascii-tunnel is the pick when the surface should read as a procedural ASCII corridor (glyphs as density, not as words); hero-ascii-terrain is a sideways landscape read rather than a tunnel converging on a point.",

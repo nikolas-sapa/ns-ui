@@ -1,7 +1,7 @@
 {
   "name": "curtain-traveler-draw",
   "title": "Curtain Traveler Draw",
-  "description": "A full-bleed route curtain modeled on a real theatrical traveler/draw curtain — two overlapping SVG drape panels with sewn-in pleats shaded in value against a muted fabric body, breathing at rest and drawing open toward the wings on their own corded track, with catenary sag and a momentum overshoot on the pull.",
+  "description": "A full-bleed route curtain modeled on a real theatrical traveler/draw curtain: two overlapping SVG drape panels with sewn-in pleats shaded in value against a muted fabric body, breathing at rest and drawing open toward the wings on their own corded track, with catenary sag and a momentum overshoot on the pull.",
   "collection": "loud",
   "tags": ["preloader", "curtain", "route", "svg", "physics", "loading", "reveal"],
   "gate": {

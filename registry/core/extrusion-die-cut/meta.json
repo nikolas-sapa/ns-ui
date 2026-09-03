@@ -1,7 +1,7 @@
 {
   "name": "extrusion-die-cut",
   "title": "Extrusion Die Cut",
-  "description": "A card-scale processing/loader widget modelled on pasta die-face cutting: a textured rope continuously extrudes from a die aperture and a guillotine blade sweeps across it every ~2.2s, severing off a segment that falls and settles into a loose floor stack — the loop is unbounded and shows something always extruding and something periodically finished, without a single digit or bar ever drawn.",
+  "description": "A card-scale processing/loader widget modelled on pasta die-face cutting: a textured rope continuously extrudes from a die aperture and a guillotine blade sweeps across it every ~2.2s, severing off a segment that falls and settles into a loose floor stack. The loop is unbounded and shows something always extruding and something periodically finished, without a single digit or bar ever drawn.",
   "collection": "core",
   "tags": ["loader", "progress", "canvas", "extrusion", "food-process", "mechanical", "ambient", "generative"],
   "useWhen": "an ambient or determinate processing indicator for a long-running background job (export, batch render, ingest queue) that should read as a continuous machine rather than a percentage fill — pick progress-wick or progress-hatch instead when a single continuous fill bar (with no discrete completion beats) is the better fit; pick roller-break-reduce instead when the story is size-REDUCTION through sequential stages rather than a single continuous feed with periodic cuts.",

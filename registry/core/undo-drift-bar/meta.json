@@ -1,7 +1,7 @@
 {
   "name": "undo-drift-bar",
   "title": "Undo Drift Bar",
-  "description": "Deleted list row collapses in place to a thin labeled bar that drifts toward the trailing edge over the grace window — distance traveled is the only clock, and pressing the bar pulls it back.",
+  "description": "Deleted list row collapses in place to a thin labeled bar that drifts toward the trailing edge over the grace window. Distance traveled is the only clock, and pressing the bar pulls it back.",
   "collection": "core",
   "tags": ["list", "undo", "destructive", "delete", "accessibility", "micro-interaction"],
   "useWhen": "Inline post-delete undo where the recovery window is read spatially rather than numerically: the deleted row becomes a compact bar, staying in its original list slot, whose horizontal position is the remaining time — no digits anywhere in the default state. Reach for undo-ghost-row instead when a shrinking-height ghost (vertical collapse to zero, no horizontal travel) fits the layout better; reach for countdown-vapor-digits instead when the thing being communicated is an actual live clock, not a one-shot undo window.",

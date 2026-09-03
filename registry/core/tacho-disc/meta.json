@@ -1,7 +1,7 @@
 {
   "name": "tacho-disc",
   "title": "Tacho Disc",
-  "description": "Today's security activity as one rotating polar disc under a fixed stylus: sign-ins, permission grants and revocations scribed at their true time-of-day angle, radius by category, older days stacked behind as dimmer discs — dragging or arrowing it scrubs a real, bound event list.",
+  "description": "Today's security activity as one rotating polar disc under a fixed stylus: sign-ins, permission grants and revocations scribed at their true time-of-day angle, radius by category, older days stacked behind as dimmer discs. Dragging or arrowing it scrubs a real, bound event list.",
   "collection": "core",
   "tags": ["security", "activity-log", "svg", "slider", "feed", "aria-live", "keyboard", "accessibility", "dashboard"],
   "useWhen": "a sign-in / key-usage / permission-change log where the reader's actual question is time-of-day shaped (\"was last night normal?\") and event-level detail at true angular time must survive — a credential-stuffing run needs to visibly read as a dense arc, not get smoothed away. Reach for hero-chart-recorder instead for a decorative ambient strip chart with no real bound list and no per-event semantics; reach for heatmap-calendar-tide instead when you want time-of-day intentionally aggregated away into a coarse tide pattern across many days rather than kept at individual-event resolution for one day.",

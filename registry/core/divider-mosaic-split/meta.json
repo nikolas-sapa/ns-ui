@@ -1,7 +1,7 @@
 {
   "name": "divider-mosaic-split",
   "title": "Divider Mosaic Split",
-  "description": "A full-width section divider rendered in real NAPLPS 'separated mosaic' mode — the same 2-wide x 3-tall sextant sub-cell grid this registry's divider-teletext-mosaic already ships in contiguous mode, but every lit sub-cell block is drawn inset by a genuine luminance gap on all sides, so the band reads as a field of small floating tiles rather than a solid mosaic shape, painted by a left-to-right column-group write sweep.",
+  "description": "A full-width section divider rendered in real NAPLPS 'separated mosaic' mode: the same 2-wide x 3-tall sextant sub-cell grid this registry's divider-teletext-mosaic already ships in contiguous mode, but every lit sub-cell block is drawn inset by a genuine luminance gap on all sides, so the band reads as a field of small floating tiles rather than a solid mosaic shape, painted by a left-to-right column-group write sweep.",
   "collection": "core",
   "tags": [
     "divider",

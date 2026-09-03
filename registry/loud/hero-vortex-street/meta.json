@@ -1,7 +1,7 @@
 {
   "name": "hero-vortex-street",
   "title": "Hero Vortex Street",
-  "description": "Cursor fluid — moving the pointer through a full-bleed dark field sheds a von Karman vortex street of alternating-sign vortices that drift downstream and decay, revealed by ~600 velocity-aligned tracer streaks; clicking drops a counter-rotating vortex pair that stirs the field for exactly 3 seconds.",
+  "description": "Cursor fluid: moving the pointer through a full-bleed dark field sheds a von Karman vortex street of alternating-sign vortices that drift downstream and decay, revealed by ~600 velocity-aligned tracer streaks; clicking drops a counter-rotating vortex pair that stirs the field for exactly 3 seconds.",
   "collection": "loud",
   "tags": ["fluid", "vortex", "cursor", "canvas", "particles", "physics", "hero", "decorative"],
   "useWhen": "a full-bleed decorative fluid backdrop with no text and no controls of its own, where the cursor sheds a vortex street that drifts and decays behind whatever the caller overlays; pick hero-dipole-field or hero-gravity-well instead when the headline itself is the subject of the effect, or hero-particles-webgl when true GPU depth is worth three npm dependencies.",

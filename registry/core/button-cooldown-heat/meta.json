@@ -1,7 +1,7 @@
 {
   "name": "button-cooldown-heat",
   "title": "Button Cooldown Heat",
-  "description": "A rate-limited button that heat-soaks: each press deposits heat into a visible bottom-up fill, dilates its letter-spacing, swells its surface and brightens its border, growing a heat-haze shimmer as it nears the limit and decaying exponentially (fill draining, haze fading) when idle — hammered past its duty cycle it soaks into a distinct hazard-hatched dead state, going dead on a flat 1px dip until it visibly cools back below the re-arm mark.",
+  "description": "A rate-limited button that heat-soaks: each press deposits heat into a visible bottom-up fill, dilates its letter-spacing, swells its surface and brightens its border, growing a heat-haze shimmer as it nears the limit and decaying exponentially (fill draining, haze fading) when idle. Hammered past its duty cycle it soaks into a distinct hazard-hatched dead state, going dead on a flat 1px dip until it visibly cools back below the re-arm mark.",
   "collection": "core",
   "tags": [
     "button",

@@ -59,7 +59,7 @@ export async function generateMetadata({
   const item = registry.items.find((i) => i.name === name);
   if (!item) return {};
 
-  const title = `${item.title} — ns-ui`;
+  const title = `${item.title} · ns-ui`;
   const description = item.description;
 
   return {

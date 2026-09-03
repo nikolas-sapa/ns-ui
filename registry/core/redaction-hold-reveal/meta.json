@@ -2,7 +2,7 @@
   "name": "redaction-hold-reveal",
   "rank": 289,
   "title": "Redaction Hold Reveal",
-  "description": "Inline redaction bar sized by the real text beneath it — hold to peek and the ink flows back after release, click to latch it open; the lifted bar stays hovering as a thin overline so the redaction never disappears.",
+  "description": "Inline redaction bar sized by the real text beneath it: hold to peek and the ink flows back after release, click to latch it open; the lifted bar stays hovering as a thin overline so the redaction never disappears.",
   "collection": "core",
   "tags": [
     "redaction",

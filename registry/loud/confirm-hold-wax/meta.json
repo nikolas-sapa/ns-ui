@@ -1,7 +1,7 @@
 {
   "name": "confirm-hold-wax",
   "title": "Confirm Hold Wax",
-  "description": "Press-and-hold confirm as a molten wax seal — holding pours a wobbling gooey blob of deep crimson wax onto the document line, hold-complete drops a signet stamp that squashes it into a scalloped, monogrammed seal that cools, darkens and micro-cracks over 2s, while early release slumps the blob and drains it back.",
+  "description": "Press-and-hold confirm as a molten wax seal: holding pours a wobbling gooey blob of deep crimson wax onto the document line, hold-complete drops a signet stamp that squashes it into a scalloped, monogrammed seal that cools, darkens and micro-cracks over 2s, while early release slumps the blob and drains it back.",
   "collection": "loud",
   "tags": [
     "confirm",

@@ -1,7 +1,7 @@
 {
   "name": "card-number-emboss",
   "title": "Card Number Emboss",
-  "description": "A card-number input rendered as an embossing machine — typed digits raise as bevel-shadowed metal, a stamping-head caret dips on every keystroke, and a brand watermark fades in once enough digits exist.",
+  "description": "A card-number input rendered as an embossing machine: typed digits raise as bevel-shadowed metal, a stamping-head caret dips on every keystroke, and a brand watermark fades in once enough digits exist.",
   "collection": "core",
   "tags": [
     "payment",

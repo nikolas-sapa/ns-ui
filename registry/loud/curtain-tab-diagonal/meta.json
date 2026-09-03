@@ -1,7 +1,7 @@
 {
   "name": "curtain-tab-diagonal",
   "title": "Curtain Tab Diagonal",
-  "description": "A full-bleed route curtain modeled on a real theatrical tab (tableau/opera-drape) curtain — the rigging where a line of rings runs on the diagonal from a panel's center-meeting bottom corner up to a fixed tie-off roughly a third of the way up the wing side, so hauling it draws that corner UP AND OUT along a curved diagonal while the header stays pinned, gathering the fabric into a swag before the whole tied-back panel retracts offscreen; a different axis of motion from curtain-traveler-draw's horizontal parting on a corded track.",
+  "description": "A full-bleed route curtain modeled on a real theatrical tab (tableau/opera-drape) curtain: the rigging where a line of rings runs on the diagonal from a panel's center-meeting bottom corner up to a fixed tie-off roughly a third of the way up the wing side, so hauling it draws that corner UP AND OUT along a curved diagonal while the header stays pinned, gathering the fabric into a swag before the whole tied-back panel retracts offscreen; a different axis of motion from curtain-traveler-draw's horizontal parting on a corded track.",
   "collection": "loud",
   "tags": ["preloader", "curtain", "route", "svg", "physics", "loading", "reveal"],
   "gate": {

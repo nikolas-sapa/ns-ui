@@ -1,7 +1,7 @@
 {
   "name": "jam-kickout-loop",
   "title": "Jam Kickout Loop",
-  "description": "An ambient background-job status line built as bulk-mail sortation conveyor jam handling — most tiles ride the main line straight through, but a fixed 1-in-6 tile is diverted by a swinging arm onto a lower side loop and re-merged one cycle later for a second attempt, never stopping the line to clear it by hand.",
+  "description": "An ambient background-job status line built as bulk-mail sortation conveyor jam handling: most tiles ride the main line straight through, but a fixed 1-in-6 tile is diverted by a swinging arm onto a lower side loop and re-merged one cycle later for a second attempt, never stopping the line to clear it by hand.",
   "collection": "core",
   "tags": ["loader", "status", "ambient", "dom", "raf", "conveyor", "retry", "queue", "indeterminate"],
   "useWhen": "a system-level, always-on status line for a background job that retries some of its items on its own schedule (a sync/processing queue), where the point is a small deterministic fraction getting a second pass, not a user-triggered action; pick button-retry-backoff instead when a user presses a button and must watch an honest per-click backoff timer count down, or bombe-drum-halt for an indeterminate search/lookup with no per-item retry story, just scan-then-halt-then-resume.",

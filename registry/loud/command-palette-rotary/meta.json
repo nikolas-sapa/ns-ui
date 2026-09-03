@@ -1,7 +1,7 @@
 {
   "name": "command-palette-rotary",
   "title": "Command Palette Rotary",
-  "description": "A jump switcher navigated as a 1D rotary space instead of a ranked list — destinations sit at fixed compass bearings on an invisible ring, and you sweep past them; only the reticle item resolves fully while neighbors compress toward the edges of a periscope slit, with a Geist Mono bearing tape scrolling along the top.",
+  "description": "A jump switcher navigated as a 1D rotary space instead of a ranked list: destinations sit at fixed compass bearings on an invisible ring, and you sweep past them; only the reticle item resolves fully while neighbors compress toward the edges of a periscope slit, with a Geist Mono bearing tape scrolling along the top.",
   "collection": "loud",
   "tags": ["command-palette", "navigation", "rotary", "compass", "physics", "keyboard", "listbox", "spatial-memory"],
   "autoplay": {

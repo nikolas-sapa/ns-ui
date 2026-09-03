@@ -1,7 +1,7 @@
 {
   "name": "loader-pendulum-sync",
   "title": "Loader Pendulum Sync",
-  "description": "An indeterminate loader for long background work — a row of pendulums with slightly different periods drift from unison into apparent chaos and back into perfect sync on a knowable ~10s cycle, pure CSS with zero per-frame JS.",
+  "description": "An indeterminate loader for long background work: a row of pendulums with slightly different periods drift from unison into apparent chaos and back into perfect sync on a knowable ~10s cycle, pure CSS with zero per-frame JS.",
   "collection": "core",
   "tags": [
     "loader",

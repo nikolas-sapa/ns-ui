@@ -1,7 +1,7 @@
 {
   "name": "streaming-ink-dry",
   "title": "Streaming Ink Dry",
-  "description": "Streaming LLM text where the newest tokens arrive light and translucent, then dry to full opacity a beat behind the stream head — width-stable, so committed text never reflows.",
+  "description": "Streaming LLM text where the newest tokens arrive light and translucent, then dry to full opacity a beat behind the stream head. Width-stable, so committed text never reflows.",
   "collection": "core",
   "tags": [
     "text",

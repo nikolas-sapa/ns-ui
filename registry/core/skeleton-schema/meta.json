@@ -1,7 +1,7 @@
 {
   "name": "skeleton-schema",
   "title": "Skeleton Schema",
-  "description": "Schema-driven skeleton for streaming structured LLM output — every field, key, and array slot renders as a dashed empty mold the instant the shape is known, then sets solid field-by-field as values pour in.",
+  "description": "Schema-driven skeleton for streaming structured LLM output: every field, key, and array slot renders as a dashed empty mold the instant the shape is known, then sets solid field-by-field as values pour in.",
   "collection": "core",
   "tags": [
     "skeleton",

@@ -38,7 +38,7 @@ export function SubmitSignedOut() {
       <h1 className="text-xl font-medium text-foreground">Propose a component</h1>
       <p className="mt-2 text-sm text-ns-muted">
         Submitting opens a pull request under your own GitHub identity, so this needs a GitHub
-        sign-in — Google and email sign-in have no GitHub account to open the PR as.
+        sign-in. Google and email sign-in have no GitHub account to open the PR as.
       </p>
       <button
         type="button"
@@ -60,7 +60,7 @@ export function SubmitSignedOut() {
         >
           the guidelines
         </Link>{" "}
-        first — the taste bar this registry holds new components to.
+        first: the taste bar this registry holds new components to.
       </p>
     </main>
   );

@@ -1,7 +1,7 @@
 {
   "name": "loader-die-tumble",
   "title": "Loader Die Tumble",
-  "description": "An ambient loading glyph shaped as a die tumbling face over face on a fixed axle — each 90deg landing overshoots by 8deg and corrects on a spring, with a floor shadow compressing and flaring in sync, rather than rotating cleanly to a stop.",
+  "description": "An ambient loading glyph shaped as a die tumbling face over face on a fixed axle: each 90deg landing overshoots by 8deg and corrects on a spring, with a floor shadow compressing and flaring in sync, rather than rotating cleanly to a stop.",
   "collection": "core",
   "tags": ["loader", "loading", "spinner", "indicator", "3d", "svg", "css-animation", "physics", "aria-live", "icon"],
   "useWhen": "an indeterminate wait that should read as discrete units being processed, since the cube lands on a numbered face four times per cycle so each beat is a visible tick rather than a continuous smear, and there is opaque room beneath the glyph for its cast floor shadow; pick loader-iris instead for the same inline slot when the wait is one undifferentiated block of work and a continuous breath is more honest, or loader-pendulum-sync when the wait is long enough that a 40px glyph gives the user nothing to watch.",

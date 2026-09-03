@@ -1,7 +1,7 @@
 {
   "name": "loader-iris",
   "title": "Loader Iris",
-  "description": "An ambient loading glyph shaped as a six-blade camera-iris diaphragm breathing open and shut inside a fixed housing ring — one wedge shape repeated by rotation, its shared displacement keyframe overshooting each open and close before settling on a spring.",
+  "description": "An ambient loading glyph shaped as a six-blade camera-iris diaphragm breathing open and shut inside a fixed housing ring: one wedge shape repeated by rotation, its shared displacement keyframe overshooting each open and close before settling on a spring.",
   "collection": "core",
   "tags": ["loader", "loading", "spinner", "indicator", "svg", "css-animation", "physics", "aria-live", "icon"],
   "useWhen": "an inline indeterminate spinner in a fixed circular footprint (a button, a field, a table cell) where the wait has no known duration and the glyph must not imply beats or steps; pick loader-die-tumble instead when four discrete legible landings per cycle better convey that work is still ticking over item by item, loader-spring-bars when the slot is a wide short strip rather than a square, or loader-thread-spool when a total will arrive mid-wait and the same object should become a real gauge.",

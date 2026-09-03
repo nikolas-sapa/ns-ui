@@ -320,12 +320,12 @@ export async function POST(request: NextRequest) {
       asGithubBodyText(value.description),
       "",
       "**Checklist** (per CONTRIBUTING.md):",
-      "- [x] Submitted via /submit — DCO sign-off captured above.",
+      "- [x] Submitted via /submit: DCO sign-off captured above.",
       `- [${input.verifyAttested ? "x" : " "}] I ran \`npm run verify\` locally and it passed for this component.`,
       "- [ ] Dark and light themes both checked (maintainer/contributor to confirm before merge).",
-      "- [ ] Screenshots attached to this PR (verify's local output — not uploaded through the site; non-goal #12).",
+      "- [ ] Screenshots attached to this PR (verify's local output, not uploaded through the site; non-goal #12).",
       "",
-      `No version field was set on submission — this repo versions the registry, not the component ` +
+      `No version field was set on submission. This repo versions the registry, not the component ` +
         `(docs/decisions/2026-08-03-component-versioning.md). If this change would break an existing ` +
         `installed copy, the maintainer's call at review time is a new slug, not a bump here.`,
       "",

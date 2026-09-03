@@ -1,7 +1,7 @@
 {
   "name": "shutter-telegraph-board",
   "title": "Shutter Telegraph Board",
-  "description": "An ambient multi-stage status board of six louvred shutters, modelled on the Admiralty six-shutter telegraph — each shutter independently flips edge-on (open, near-invisible) or face-on (closed, a solid opaque square) in a staggered cascade that forms a new symbol every couple of seconds.",
+  "description": "An ambient multi-stage status board of six louvred shutters, modelled on the Admiralty six-shutter telegraph: each shutter independently flips edge-on (open, near-invisible) or face-on (closed, a solid opaque square) in a staggered cascade that forms a new symbol every couple of seconds.",
   "collection": "core",
   "tags": ["status", "loader", "grid", "dom", "telegraph", "signal", "ambient", "generative"],
   "useWhen": "an ambient loader or decorative multi-stage status indicator for a card that wants a grid-based visual identity rather than a dot ring or spinner — six independent shutters flipping between open/closed states to spell one of 8 fixed symbols in a staggered cascade; pick status-glyph-cadence instead when the indicator needs to sit inline at 20-64px beside a text label and encode a small, meaningful set of real application states (working/searching/blocked/etc.) through motion cadence, since shutter-telegraph-board's 8 symbols are a fixed decorative sequence with no state mapping and it needs real card-scale room (shutters compress unreadably below ~100px card height).",

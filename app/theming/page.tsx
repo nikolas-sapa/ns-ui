@@ -3,7 +3,7 @@ import Link from "next/link";
 import { CopyButton } from "../_components/copy-button";
 import { ThemeToggle } from "../_components/theme-toggle";
 
-const title = "Theming — ns-ui";
+const title = "Theming · ns-ui";
 const description =
   "Every --ns-* token in the registry: what it controls, its light/dark values, how to override it, and why it's namespaced instead of reusing stock shadcn tokens.";
 
@@ -36,14 +36,14 @@ const TOKENS: TokenRow[] = [
     name: "--surface",
     light: "#fafafa",
     dark: "#171717",
-    role: "Elevated surfaces — cards, code blocks, inset panels.",
+    role: "Elevated surfaces: cards, code blocks, inset panels.",
   },
   { name: "--border", light: "#ebebeb", dark: "#2e2e2e", role: "Hairlines and dividers." },
   {
     name: "--ns-muted",
     light: "#4d4d4d",
     dark: "#8f8f8f",
-    role: "Secondary text — descriptions, captions, eyebrows.",
+    role: "Secondary text: descriptions, captions, eyebrows.",
   },
   {
     name: "--ns-accent",
@@ -73,7 +73,7 @@ const TOKENS: TokenRow[] = [
     name: "--warning",
     light: "#7a5200",
     dark: "#f5a623",
-    role: "Caution state — never a brand accent.",
+    role: "Caution state. Never a brand accent.",
   },
 ];
 
@@ -128,7 +128,7 @@ export default function ThemingPage() {
         </h1>
         <p className="mt-4 max-w-xl text-sm leading-relaxed text-ns-muted">
           Every component reads color from CSS custom properties already in scope, never a
-          hardcoded hex — in markup or in canvas/SVG draw code. This is the full list, what
+          hardcoded hex, whether in markup or in canvas/SVG draw code. This is the full list, what
           each one controls, and how to change what they resolve to.
         </p>
       </header>
@@ -137,7 +137,7 @@ export default function ThemingPage() {
         <h2 className={SECTION_LABEL}>The tokens</h2>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ns-muted">
           Values as this site defines them (<code className="font-mono text-foreground">app/globals.css</code>).
-          A consuming project can set these to anything — the names and what they mean are
+          A consuming project can set these to anything: the names and what they mean are
           the contract, not the hex values below.
         </p>
         <div className="mt-5 overflow-x-auto rounded-md border border-border">
@@ -184,8 +184,42 @@ export default function ThemingPage() {
         <p className="mt-4 max-w-2xl text-xs leading-relaxed text-ns-muted">
           <code className="font-mono text-foreground">--ns-accent</code> and{" "}
           <code className="font-mono text-foreground">--ns-accent-hover</code> are the same
-          value in both themes — the brand blue is deliberately theme-invariant, everything
+          value in both themes. The brand blue is deliberately theme-invariant, everything
           else here is not.
+        </p>
+      </section>
+
+      <section className="mt-14 border-t border-border pt-10">
+        <h2 className={SECTION_LABEL}>Three tokens with a narrower job than their name</h2>
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ns-muted">
+          Reading the right variable is not the same as using it for the right job. These
+          three are the ones this registry gets wrong most often. Every ratio below is a
+          WCAG contrast figure computed from the values in the table above.
+        </p>
+        <p className="mt-4 max-w-2xl text-sm leading-relaxed text-ns-muted">
+          <code className="font-mono text-foreground">--border</code> is a separator, not a
+          fill. In light theme it measures 1.19:1 against{" "}
+          <code className="font-mono text-foreground">--background</code>, a hairline and
+          nothing more. Fill a shape with it, stroke a chart with it, or draw canvas ink in
+          it and the result is invisible in light while looking correct in dark, where it
+          reaches 1.46:1. For a faint but legible mark, use{" "}
+          <code className="font-mono text-foreground">--foreground</code> at low alpha.
+        </p>
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ns-muted">
+          <code className="font-mono text-foreground">--ns-accent</code> is interaction
+          chrome only: buttons, links, focus rings, active states. Not an ambient highlight,
+          not a pointer trail, not a component&apos;s climactic moment. A resting screenshot
+          is not an interaction. Pointer highlights vary luminance, never hue.
+        </p>
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ns-muted">
+          <code className="font-mono text-foreground">--ns-muted</code> is a second ink at
+          full strength, for secondary text and captions, and it is entirely correct used
+          that way. It is not a variable-strength wash. Its contrast ceiling is
+          theme-dependent, 8.45:1 in light against 6.12:1 in dark, so a mid-strength wash
+          looks acceptable in both themes today and fails in dark first the moment anyone
+          strengthens it, in a change that never touched the component. Use it at full
+          strength, or use <code className="font-mono text-foreground">--foreground</code>{" "}
+          at an explicit alpha where you control both ends.
         </p>
       </section>
 
@@ -193,13 +227,13 @@ export default function ThemingPage() {
         <h2 className={SECTION_LABEL}>Two layers, not one</h2>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ns-muted">
           A component's markup never writes{" "}
-          <code className="font-mono text-foreground">var(--ns-muted)</code> directly — it
+          <code className="font-mono text-foreground">var(--ns-muted)</code> directly. It
           uses a Tailwind utility, <code className="font-mono text-foreground">text-ns-muted</code>
           . That utility only exists because it's registered in a second block, separate from
           the custom property itself:
         </p>
         <p className="mt-5 font-mono text-[11px] uppercase tracking-wider text-ns-muted">
-          Layer 1 — the raw custom properties
+          Layer 1: the raw custom properties
         </p>
         <div className={`mt-2 ${CODE_BLOCK}`}>
           <pre className="min-w-0 flex-1 overflow-x-auto font-mono text-xs leading-6 text-foreground">
@@ -208,7 +242,7 @@ export default function ThemingPage() {
           <CopyButton variant="inline" value={GLOBALS_ROOT} label="Copy :root and .dark block" />
         </div>
         <p className="mt-5 font-mono text-[11px] uppercase tracking-wider text-ns-muted">
-          Layer 2 — the Tailwind utility mapping
+          Layer 2: the Tailwind utility mapping
         </p>
         <div className={`mt-2 ${CODE_BLOCK}`}>
           <pre className="min-w-0 flex-1 overflow-x-auto font-mono text-xs leading-6 text-foreground">
@@ -225,7 +259,7 @@ export default function ThemingPage() {
           build time. Copy only the <code className="font-mono text-foreground">:root</code>/
           <code className="font-mono text-foreground">.dark</code> block into a project and
           the custom properties exist, but{" "}
-          <code className="font-mono text-foreground">text-ns-muted</code> doesn&apos;t —
+          <code className="font-mono text-foreground">text-ns-muted</code> doesn&apos;t.
           Tailwind never sees a reason to generate it. The component renders with no error
           and no color: unstyled ink. Both blocks have to land together.
         </p>
@@ -235,20 +269,20 @@ export default function ThemingPage() {
         <h2 className={SECTION_LABEL}>Light and dark</h2>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ns-muted">
           Dark mode is a <code className="font-mono text-foreground">.dark</code> class on{" "}
-          <code className="font-mono text-foreground">&lt;html&gt;</code>, not a media query —
-          every token above is redeclared inside <code className="font-mono text-foreground">.dark</code>{" "}
+          <code className="font-mono text-foreground">&lt;html&gt;</code>, not a media query.
+          Every token above is redeclared inside <code className="font-mono text-foreground">.dark</code>{" "}
           and the cascade does the rest. <code className="font-mono text-foreground">color-scheme</code>{" "}
           is set alongside it (<code className="font-mono text-foreground">light</code> in{" "}
           <code className="font-mono text-foreground">:root</code>,{" "}
           <code className="font-mono text-foreground">dark</code> in{" "}
-          <code className="font-mono text-foreground">.dark</code>) so native browser chrome —
-          the scrollbar, a native <code className="font-mono text-foreground">&lt;select&gt;</code>{" "}
-          panel, autofill backgrounds — follows the same theme instead of staying light
+          <code className="font-mono text-foreground">.dark</code>) so native browser chrome (the scrollbar, a native{" "}
+          <code className="font-mono text-foreground">&lt;select&gt;</code> panel, autofill
+          backgrounds) follows the same theme instead of staying light
           against a dark page.
         </p>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ns-muted">
           Every component in the registry is verified in both themes, and the gate hard-fails
-          a component whose light and dark render as byte-identical screenshots — that only
+          a component whose light and dark render as byte-identical screenshots. That only
           catches a component that ignored theming entirely, not one that merely looks wrong
           in light. Whatever theme you ship, look at both yourself before calling it done.
         </p>
@@ -259,7 +293,7 @@ export default function ThemingPage() {
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ns-muted">
           Change what a token resolves to by redeclaring it in your own{" "}
           <code className="font-mono text-foreground">:root</code>/
-          <code className="font-mono text-foreground">.dark</code> — components read the
+          <code className="font-mono text-foreground">.dark</code>. Components read the
           variable, not a specific value, so a different{" "}
           <code className="font-mono text-foreground">--ns-accent</code> re-themes every
           installed component that uses it, with no component code to touch. This is also
@@ -270,7 +304,7 @@ export default function ThemingPage() {
             <code className="font-mono text-foreground">shadcn add</code>
           </Link>{" "}
           does automatically the first time you install a component that needs a token you
-          don&apos;t have yet — it merges that token into your CSS file rather than failing or
+          don&apos;t have yet: it merges that token into your CSS file rather than failing or
           silently doing nothing.
         </p>
       </section>
@@ -280,7 +314,7 @@ export default function ThemingPage() {
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ns-muted">
           Stock shadcn already ships tokens named <code className="font-mono text-foreground">--muted</code>{" "}
           and <code className="font-mono text-foreground">--accent</code>, but as neutral
-          surface colors — a muted background and a subtle hover background, each with its
+          surface colors: a muted background and a subtle hover background, each with its
           own <code className="font-mono text-foreground">-foreground</code> pair for text on
           top of them. This registry needed different things under similar-sounding names:{" "}
           <code className="font-mono text-foreground">--ns-muted</code> is a text color
@@ -292,9 +326,8 @@ export default function ThemingPage() {
           Reusing the stock names would mean a component's{" "}
           <code className="font-mono text-foreground">text-accent</code> resolves to whatever
           neutral hover-surface color a project's own shadcn setup already defined for{" "}
-          <code className="font-mono text-foreground">--accent</code> — silently, with no
-          error, because the property exists and just holds the wrong kind of color for the
-          job. Namespacing under <code className="font-mono text-foreground">--ns-*</code>{" "}
+          <code className="font-mono text-foreground">--accent</code>. There is no error,
+          because the property exists and just holds the wrong kind of color for the job. Namespacing under <code className="font-mono text-foreground">--ns-*</code>{" "}
           keeps the two vocabularies from ever aliasing each other: a project can define both
           shadcn&apos;s own tokens and ns-ui&apos;s side by side with no collision.
         </p>

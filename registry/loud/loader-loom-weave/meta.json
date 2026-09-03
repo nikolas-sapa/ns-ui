@@ -1,7 +1,7 @@
 {
   "name": "loader-loom-weave",
   "title": "Loader Loom Weave",
-  "description": "Loader as a loom — warp threads span the frame, a shuttle carries the weft back and forth alternating direction per row like real weaving, and progress is the woven cloth accumulating row by row, each pass beaten up against the fell with a small compression bounce.",
+  "description": "Loader as a loom: warp threads span the frame, a shuttle carries the weft back and forth alternating direction per row like real weaving, and progress is the woven cloth accumulating row by row, each pass beaten up against the fell with a small compression bounce.",
   "collection": "loud",
   "tags": ["loader", "progress", "canvas", "weaving", "shuttle", "ambient"],
   "useWhen": "a determinate progress value that should accumulate as visible material rather than sweep past, since every completed row of cloth stays on the canvas so the finished portion is a growing artifact and the bare warp is what remains; pick progress-hatch instead when the surface needs a compact ruler with a printed numeric readout, progress-narrated when each stretch of the run has a name worth saying, or loader-thread-spool when the total is not known at the start.",
