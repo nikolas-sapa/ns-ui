@@ -12,8 +12,8 @@ export default function FlyingSpliceDemo() {
       </div>
 
       <p className="max-w-md text-center text-xs text-ns-muted">
-        The running roll shrinks and spins up as it empties; every 22s the standby roll splices
-        in mid-flight and a fresh roll rises into the vacated stand.
+        The roll shrinks and spins up as it empties, then rebuilds to full and slows back down.
+        One continuous 22s oscillation, never a reset.
       </p>
     </div>
   );

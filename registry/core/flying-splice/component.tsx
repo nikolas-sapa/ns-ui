@@ -3,34 +3,32 @@
 import { useEffect, useRef } from "react";
 
 // ---------------------------------------------------------------------------
-// FlyingSplice — a logo ribbon whose subject is the flying paster (automatic
-// splicer) on a web press, not the ribbon of marks itself. Two roll stands
-// sit side by side, occupying the majority of the band's width. The running
-// roll unwinds at constant web speed, so its radius falls and its RPM climbs
-// continuously (1.06 -> 2.48 rev/s as radius falls 64.6px -> 27.5px at card
-// scale). Every 22s the standby roll — creep-driven while it waits, then
-// spun up to matched surface speed — is pasted onto the web, a knife severs
-// the spent roll, and a fresh roll rises into the vacated stand. BOTH stands
-// turn at all times they are on screen, at rates set by their own radii: the
-// full standby roll on creep is always the slowest thing in the frame and
-// the run-down roll at the splice the fastest. The ribbon of marks is the
-// OUTPUT the rolls feed; it is deliberately the plainer half of this
-// component.
+// FlyingSplice — a logo ribbon whose subject is the roll stand feeding it, not
+// the ribbon of marks itself. ONE stand, one roll, unwinding at constant web
+// speed: the roll's radius falls and its RPM climbs continuously as it empties
+// (v/r rises as r shrinks), then the radius rebuilds on the exact time-reverse
+// of the same schedule while the roll keeps turning the same way. That inverse
+// radius/RPM relationship is the whole mechanic; the ribbon of marks is the
+// OUTPUT the roll feeds and is deliberately the plainer half of this component.
+//
+// The cycle wraps by oscillating the radius, not by resetting it: 15s of
+// run-down (R_max -> R_min, omega v/R_max -> v/R_min) then 7s of rebuild
+// (R_min -> R_max) — so there is never a pop back to a full roll, and never a
+// second disc on screen. Angular velocity is omega = v/r throughout, so it is
+// continuous at BOTH turning points (both sides evaluate to v/R_min and
+// v/R_max respectively); only dr/dt changes sign, and the rebuild is simply
+// the same inverse relationship traversed backward.
 //
 // Every visual quantity is a pure, closed-form function of absolute time —
-// never a per-frame accumulator — because prefers-reduced-motion has to
-// render exactly t=22.09s byte-stably without simulating 22 seconds at
-// mount, and because the two integrals involved (radius under constant web
-// speed, and quadratic-ease angular spin-up/spin-down) both have exact
-// closed forms:
-//   r(t)     = sqrt(R_max^2 - B*t),          B = (R_max^2 - R_splice^2)/22
-//   theta(t) = 2*v*(R_max - r(t)) / B         (exact integral of omega = v/r)
-// A single 22s cycle is split into two roles per stand (running / standby)
-// that swap on cycle parity, so the roll that WAS running becomes, at the
-// instant of the splice, the "just-spent" stand playing the knife/drop/rise
-// choreography, while the roll that WAS standby continues unwinding as the
-// new running roll — no special-casing, the running-roll radius/angle
-// formulas already start correctly at R_max/0 when a fresh cycle begins.
+// never a per-frame accumulator — because prefers-reduced-motion has to render
+// exactly t = STATIC_TIME byte-stably without simulating up to it at mount,
+// and because the integrals involved have exact closed forms:
+//   down: r = sqrt(R_max^2 - B_dn*p),  theta = 2*v*(R_max - r)/B_dn
+//   up:   r = sqrt(R_min^2 + B_up*q),  theta = 2*v*(r - R_min)/B_up
+// The swept angle accumulates across cycles as `cycle*THETA_CYCLE + theta(p)`
+// rather than restarting each cycle, so the index lines do not snap at the
+// wrap — with a single persistent roll there is no role swap to hide a reset
+// behind.
 // ---------------------------------------------------------------------------
 
 export interface FlyingSpliceProps {
@@ -65,22 +63,6 @@ function rgbCss([r, g, b]: RGB, a = 1): string {
 const BLACK: RGB = [0, 0, 0];
 const WHITE: RGB = [1, 1, 1];
 
-const easeOutQuad = (t: number) => 1 - (1 - t) * (1 - t);
-const clamp01 = (t: number) => Math.max(0, Math.min(1, t));
-
-// Closed-form angle swept by omega(tau) = omega0 * (1 - (1-tau)^2), tau in [0,1]
-// — the quadratic ease-out spin-up curve, integrated exactly.
-function angleEaseOut(tau: number, omega0: number, duration: number): number {
-  const u = clamp01(tau);
-  return omega0 * duration * (u + Math.pow(1 - u, 3) / 3 - 1 / 3);
-}
-// Closed-form angle swept by omega(tau) = omega0 * (1-tau)^2, tau in [0,1]
-// — the quadratic ease-in spin-down (decel) curve, integrated exactly.
-function angleEaseIn(tau: number, omega0: number, duration: number): number {
-  const u = clamp01(tau);
-  return omega0 * duration * (1 / 3 - Math.pow(1 - u, 3) / 3);
-}
-
 // mulberry32 — deterministic seeded PRNG so the mark pattern is identical on
 // every mount/render, which prefers-reduced-motion's byte-stability needs.
 function mulberry32(seed: number) {
@@ -97,37 +79,19 @@ function mulberry32(seed: number) {
 // --- cycle timing (seconds), all named so a reviewer can check them against
 // the spec directly ------------------------------------------------------
 const CYCLE = 22.0; // unbounded, never terminating
-const SPINUP_DUR = 3.4;
-const SPINUP_START = CYCLE - SPINUP_DUR; // 18.6
-const ARM_DUR = 0.18; // arm swings 26deg, completing contact at wrap (t=22.0)
-const ARM_ANGLE_DEG = 26;
-// Knife fire is specced as "90ms after paster contact" AND the static frame
-// at STATIC_TIME=22.09 (90ms into the new cycle) is specced as "mid-sweep".
-// A 120ms sweep starting exactly at 90ms is only just beginning, not mid —
-// so the sweep window is centred on 90ms rather than started there,
-// reconciling both numbers instead of silently dropping one.
-const KNIFE_DUR = 0.12;
-const KNIFE_START = 0.09 - KNIFE_DUR / 2; // 0.03
-const ARM_HOLD_END = KNIFE_START + KNIFE_DUR + 0.05; // 0.2 — arm retracts shortly after
-const DECEL_START = KNIFE_START; // roll begins decelerating as the knife touches
-const DECEL_DUR = 1.1;
-const DROP_START = DECEL_START + DECEL_DUR; // 1.13
-const DROP_DUR = 0.4;
-const RISE_START = DROP_START + DROP_DUR + 0.9; // 2.43
-const RISE_DUR = 0.7;
-const CHOREO_END = RISE_START + RISE_DUR; // 3.13
-const CHEVRON_CROSS = 2.4; // a mark/tape crosses the band in 2.4s
-// The standby stand is NOT parked. A splicer creep-drives the fresh roll from
-// the moment it is loaded — that is how the tail tape is laid on a turning
-// core and why the paster never has to start a dead roll from rest. Without
-// it the standby stand returned a hardcoded angle of 0 for the 15.5s between
-// the end of the changeover choreography and spin-up, so one of the two roll
-// stands rendered byte-identical for 70% of every cycle. Creep is a fraction
-// of matched surface speed, which keeps the full roll the slower of the two:
-// the radius/RPM relationship this component is about is preserved, not
-// broken, by making it turn.
-const CREEP_FRAC = 0.24;
-export const STATIC_TIME = CYCLE + 0.09; // 22.09s — 90ms into the new cycle
+// The roll empties over RUNDOWN_DUR and rebuilds over the remainder. Asymmetric
+// on purpose: the run-down is the subject and gets the long, slow read; the
+// rebuild is the wrap, and a shorter rebuild keeps it from reading as a second,
+// competing event. Both legs share the same sqrt-of-time radius law, so the
+// rebuild is the run-down time-reversed rather than an arbitrary eased return.
+const RUNDOWN_DUR = 15.0;
+const REBUILD_DUR = CYCLE - RUNDOWN_DUR; // 7.0
+// Reduced-motion freeze: 65% through the run-down, where the roll is visibly
+// part-spent — a clear gap between its wrap edge and the dashed capacity ring,
+// index lines already noticeably closer-spaced than on a full roll. Freezing on
+// a full roll (the old 22.09s, chosen for a splice that no longer exists) would
+// show zero run-down at all.
+export const STATIC_TIME = RUNDOWN_DUR * 0.65; // 9.75s
 
 export function FlyingSplice({ paused = false, className = "", style }: FlyingSpliceProps) {
   const wrapRef = useRef<HTMLDivElement | null>(null);
@@ -239,11 +203,10 @@ export function FlyingSplice({ paused = false, className = "", style }: FlyingSp
     let W = 1;
     let H = 1;
     let RMAX = 1;
-    let RSPLICE = 1;
-    const RSPLICE_RATIO = 27.5 / 64.6; // preserves the spec's radius ratio
+    let RMIN = 1;
+    const RMIN_RATIO = 27.5 / 64.6; // preserves the spec's radius ratio
     let cy = 0;
-    let standAx = 0; // left stand centre x
-    let standBx = 0; // right stand centre x
+    let standX = 0; // the stand's centre x
     let nipX = 0;
     let markCount = 9;
     let indexLines = 4;
@@ -252,19 +215,19 @@ export function FlyingSplice({ paused = false, className = "", style }: FlyingSp
       M = Math.min(cssW, cssH);
       W = cssW;
       H = cssH;
-      // R_max = 0.19*M is the spec's checkable number at typical/card aspect
-      // ratios; the max() with 0.075*W is a floor that only engages on very
-      // wide bands, guaranteeing the two-stand cluster clears the spec's
-      // hard 30%-of-band-width kill criterion at any aspect ratio rather
-      // than only at the one worked example.
-      RMAX = Math.max(0.19 * M, 0.075 * W);
-      RSPLICE = RMAX * RSPLICE_RATIO;
+      // R_max = 0.19*M is the spec's checkable number at typical aspect
+      // ratios; the max() with a fraction of W is a floor that engages on wide
+      // bands (card crops especially), where 0.19*M would leave a spent roll
+      // too small to read as wound paper. The floor is 0.11*W: with ONE stand
+      // the cluster is a single 2*R_max-wide disc, so 0.11*W puts it at 22% of
+      // the band — still clear of the 30%-of-band-width kill criterion that
+      // the old 0.075*W floor was sized for when two stands shared the space.
+      RMAX = Math.max(0.19 * M, 0.11 * W);
+      RMIN = RMAX * RMIN_RATIO;
       cy = H / 2;
-      const gap = RMAX * 0.22;
-      const marginR = RMAX * 0.18;
-      standBx = W - marginR - RMAX;
-      standAx = standBx - (2 * RMAX + gap);
-      nipX = standAx - RMAX * 1.05;
+      const marginR = RMAX * 0.2;
+      standX = W - marginR - RMAX;
+      nipX = standX - RMAX * 1.05;
       markCount = M < 200 ? 6 : 9;
       indexLines = M < 200 ? 3 : 4;
     };
@@ -274,132 +237,57 @@ export function FlyingSplice({ paused = false, className = "", style }: FlyingSp
     const spacing = () => 0.155 * W;
     const markSize = () => 0.14 * M;
 
-    const A = () => RMAX * RMAX;
-    const B = () => (RMAX * RMAX - RSPLICE * RSPLICE) / CYCLE;
+    // radius law constants: r^2 is linear in time on both legs, which is what
+    // constant web speed off a wound roll actually gives you.
+    const BDN = () => (RMAX * RMAX - RMIN * RMIN) / RUNDOWN_DUR;
+    const BUP = () => (RMAX * RMAX - RMIN * RMIN) / REBUILD_DUR;
 
     const radiusAt = (phase: number) => {
-      const b = B();
-      return Math.sqrt(Math.max(A() - b * phase, RSPLICE * RSPLICE));
+      if (phase <= RUNDOWN_DUR) {
+        return Math.sqrt(Math.max(RMAX * RMAX - BDN() * phase, RMIN * RMIN));
+      }
+      const q = Math.min(phase - RUNDOWN_DUR, REBUILD_DUR);
+      return Math.sqrt(Math.min(RMIN * RMIN + BUP() * q, RMAX * RMAX));
     };
-    const runAngle = (phase: number) => {
-      const b = B();
-      if (b <= 0) return 0;
-      return (2 * v() * (RMAX - radiusAt(phase))) / b;
+    // exact integral of omega = v/r on each leg; omega itself is continuous at
+    // both turning points (v/RMIN at the bottom, v/RMAX at the wrap), so the
+    // index lines never stall, reverse or jump.
+    const angleDownTotal = () => (2 * v() * (RMAX - RMIN)) / BDN();
+    const angleUpTotal = () => (2 * v() * (RMAX - RMIN)) / BUP();
+    const angleAt = (phase: number) => {
+      if (phase <= RUNDOWN_DUR) {
+        return (2 * v() * (RMAX - radiusAt(phase))) / BDN();
+      }
+      return angleDownTotal() + (2 * v() * (radiusAt(phase) - RMIN)) / BUP();
     };
-    const spinupOmega0 = () => v() / RMAX;
-    const creepOmega = () => spinupOmega0() * CREEP_FRAC;
-    // angle a standby roll has accumulated on creep alone by `phase`; creep
-    // stops contributing once the spin-up ramp takes over at SPINUP_START
-    const creepAngle = (phase: number) =>
-      creepOmega() * Math.max(0, Math.min(SPINUP_START, phase));
-    // spin-up ramps from creep to matched surface speed rather than from rest
-    const spinupAngle = (tau: number) =>
-      creepOmega() * clamp01(tau) * SPINUP_DUR +
-      angleEaseOut(tau, spinupOmega0() - creepOmega(), SPINUP_DUR);
-    // total angle a stand carries into the splice, so the running roll picks
-    // up exactly where the standby roll left off and nothing jumps at wrap
-    const spinupTotalAngle = () => creepAngle(SPINUP_START) + spinupAngle(1);
-    const decelOmega0 = () => v() / RSPLICE;
+    const cycleAngle = () => angleDownTotal() + angleUpTotal();
 
-    interface StandState {
-      visible: boolean;
+    interface RollState {
       radius: number;
       angle: number;
-      offsetY: number;
-      opacity: number;
     }
 
-    // role: true = running this cycle, for a given absolute time t.
-    const standState = (running: boolean, cycle: number, phase: number): StandState => {
-      if (running) {
-        const angle = spinupTotalAngle() + runAngle(phase);
-        return { visible: true, radius: radiusAt(phase), angle, offsetY: 0, opacity: 1 };
-      }
-      // standby role this cycle
-      if (cycle > 0 && phase < CHOREO_END) {
-        const totalAtCut = spinupTotalAngle() + runAngle(CYCLE);
-        const omegaOld = decelOmega0();
-        if (phase < DECEL_START) {
-          return {
-            visible: true,
-            radius: RSPLICE,
-            angle: totalAtCut + omegaOld * phase,
-            offsetY: 0,
-            opacity: 1,
-          };
-        }
-        if (phase < DROP_START) {
-          const tau = (phase - DECEL_START) / DECEL_DUR;
-          return {
-            visible: true,
-            radius: RSPLICE,
-            angle: totalAtCut + omegaOld * DECEL_START + angleEaseIn(tau, omegaOld, DECEL_DUR),
-            offsetY: 0,
-            opacity: 1,
-          };
-        }
-        if (phase < DROP_START + DROP_DUR) {
-          const tau = clamp01((phase - DROP_START) / DROP_DUR);
-          return {
-            visible: true,
-            radius: RSPLICE,
-            angle: totalAtCut + omegaOld * DECEL_START + angleEaseIn(1, omegaOld, DECEL_DUR),
-            offsetY: easeOutQuad(tau) * RMAX * 1.4,
-            opacity: 1 - tau,
-          };
-        }
-        if (phase < RISE_START) {
-          return { visible: false, radius: RMAX, angle: 0, offsetY: RMAX * 1.4, opacity: 0 };
-        }
-        if (phase < CHOREO_END) {
-          const tau = clamp01((phase - RISE_START) / RISE_DUR);
-          return {
-            visible: true,
-            radius: RMAX,
-            angle: creepAngle(phase),
-            offsetY: (1 - easeOutQuad(tau)) * RMAX * 1.4,
-            opacity: tau,
-          };
-        }
-      }
-      if (phase >= SPINUP_START) {
-        const tau = (phase - SPINUP_START) / SPINUP_DUR;
-        return {
-          visible: true,
-          radius: RMAX,
-          angle: creepAngle(SPINUP_START) + spinupAngle(tau),
-          offsetY: 0,
-          opacity: 1,
-        };
-      }
-      // waiting on creep: turning, just far slower than the running roll
-      return { visible: true, radius: RMAX, angle: creepAngle(phase), offsetY: 0, opacity: 1 };
-    };
-
-    // arm swing: completes contact exactly at the wrap (t = k*CYCLE), held
-    // briefly into the new cycle, then retracted for the rest of the cycle.
-    const armProgress = (cycle: number, phase: number) => {
-      if (phase >= CYCLE - ARM_DUR) return easeOutQuad((phase - (CYCLE - ARM_DUR)) / ARM_DUR);
-      if (cycle > 0 && phase < ARM_HOLD_END) return 1;
-      return 0;
-    };
-    const knifeProgress = (cycle: number, phase: number) => {
-      if (cycle > 0 && phase >= KNIFE_START && phase < KNIFE_START + KNIFE_DUR) {
-        return (phase - KNIFE_START) / KNIFE_DUR;
-      }
-      return -1;
+    // The single roll's complete state at absolute time t. The swept angle
+    // accumulates across cycles rather than restarting, so nothing snaps at the
+    // wrap; it is reduced mod 2*PI only at draw time to keep float precision
+    // bounded over long sessions.
+    const rollState = (t: number): RollState => {
+      const cycle = Math.floor(t / CYCLE);
+      const phase = t - cycle * CYCLE;
+      return {
+        radius: radiusAt(phase),
+        angle: (cycle * cycleAngle() + angleAt(phase)) % (Math.PI * 2),
+      };
     };
 
     // ---- draw --------------------------------------------------------------
     const drawRoll = (
       c: CanvasRenderingContext2D,
       x: number,
-      state: StandState
+      state: RollState
     ) => {
-      if (!state.visible || state.opacity <= 0.01) return;
-      const py = cy + state.offsetY;
+      const py = cy;
       c.save();
-      c.globalAlpha = state.opacity;
       const base = paperColor();
       const hi = mixRGB(base, WHITE, 0.10);
       const lo = mixRGB(base, BLACK, 0.12);
@@ -462,9 +350,7 @@ export function FlyingSplice({ paused = false, className = "", style }: FlyingSp
     const draw = () => {
       if (!colorsReady || cssW <= 0 || cssH <= 0) return;
       const t = staticMode ? STATIC_TIME : simTime;
-      const cycle = Math.floor(t / CYCLE);
-      const phase = t - cycle * CYCLE;
-      const runningIsA = cycle % 2 === 0;
+      const state = rollState(t);
 
       ctx.save();
       ctx.scale(dpr, dpr);
@@ -480,17 +366,14 @@ export function FlyingSplice({ paused = false, className = "", style }: FlyingSp
       ctx.lineTo(cssW, cssH - 0.5);
       ctx.stroke();
 
-      // The web itself. Without a visible strip of paper leaving the running
-      // roll there is no ribbon, only marks floating on the band — which is
-      // exactly how the first cut read.
-      const stateA0 = standState(runningIsA, cycle, phase);
-      const stateB0 = standState(!runningIsA, cycle, phase);
-      const runX = runningIsA ? standAx : standBx;
-      // the web leaves the roll at its wrap edge, so it must end just inside
-      // the CURRENT radius — anchored to the stand centre it would jut out
-      // past a run-down roll as a bare rectangle.
-      const runRadius = (runningIsA ? stateA0 : stateB0).radius;
-      const webEnd = runX - runRadius * 0.35;
+      // The web itself. Without a visible strip of paper leaving the roll
+      // there is no ribbon, only marks floating on the band — which is
+      // exactly how the first cut read. The web leaves the roll at its wrap
+      // edge, so it must end just inside the CURRENT radius: anchored to the
+      // stand centre it would jut out past a run-down roll as a bare
+      // rectangle, and the strip visibly lengthening as the roll empties is
+      // itself part of the run-down read.
+      const webEnd = standX - state.radius * 0.35;
       const webH = markSize() * 1.95;
       const paper = paperColor();
       ctx.fillStyle = rgbCss(paper);
@@ -518,114 +401,40 @@ export function FlyingSplice({ paused = false, className = "", style }: FlyingSp
         if (step > 200) break; // pathological-width safety, never hit in practice
       }
 
-      // chevron splice tape: the component's climactic moment — never
-      // accent, a duller band with a brighter leading hairline.
-      if (cycle > 0 && phase < CHEVRON_CROSS) {
-        const tapeX = nipX - speed * phase;
-        const tapeW = 0.03 * W;
-        const base = paperColor();
-        const tapeCol = mixRGB(base, BLACK, 0.14);
-        const hairline = mixRGB(base, WHITE, 0.09);
-        // clipped to the web: splice tape is stuck ON the paper, so it can
-        // never stand above or below the strip it is taped to.
-        const bandH = webH * 1.2;
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(0, cy - webH / 2, Math.max(0, webEnd), webH);
-        ctx.clip();
-        for (const sign of [-1, 1]) {
-          ctx.save();
-          ctx.translate(tapeX, cy);
-          ctx.rotate((sign * 34 * Math.PI) / 180);
-          ctx.fillStyle = rgbCss(tapeCol, 0.9);
-          ctx.fillRect(-tapeW / 2, -bandH, tapeW, bandH * 2);
-          ctx.fillStyle = rgbCss(hairline, 0.85);
-          ctx.fillRect(tapeW / 2 - Math.max(1, tapeW * 0.08), -bandH, Math.max(1, tapeW * 0.08), bandH * 2);
-          ctx.restore();
-        }
-        ctx.restore();
-      }
+      // the stand hardware, then the roll sitting on it.
+      const footY = cy + RMAX * 1.18;
+      ctx.save();
+      ctx.strokeStyle = rgbCss(fg, 0.38);
+      ctx.lineWidth = Math.max(2, RMAX * 0.06);
+      ctx.beginPath();
+      ctx.moveTo(standX, cy);
+      ctx.lineTo(standX, footY);
+      ctx.stroke();
+      ctx.lineWidth = Math.max(1, RMAX * 0.045);
+      ctx.beginPath();
+      ctx.moveTo(standX - RMAX * 0.42, footY);
+      ctx.lineTo(standX + RMAX * 0.42, footY);
+      ctx.stroke();
+      ctx.restore();
 
-      // two roll stands: the stand hardware first, then the roll on it.
-      const stateA = stateA0;
-      const stateB = stateB0;
-      const drawStand = (x: number, state: StandState) => {
-        if (!state.visible || state.opacity <= 0.01) return;
-        const footY = cy + RMAX * 1.18;
-        ctx.save();
-        ctx.globalAlpha = state.opacity;
-        ctx.strokeStyle = rgbCss(fg, 0.38);
-        ctx.lineWidth = Math.max(2, RMAX * 0.06);
-        ctx.beginPath();
-        ctx.moveTo(x, cy + state.offsetY);
-        ctx.lineTo(x, footY);
-        ctx.stroke();
-        ctx.lineWidth = Math.max(1, RMAX * 0.045);
-        ctx.beginPath();
-        ctx.moveTo(x - RMAX * 0.42, footY);
-        ctx.lineTo(x + RMAX * 0.42, footY);
-        ctx.stroke();
-        ctx.restore();
-      };
-      drawStand(standAx, stateA);
-      drawStand(standBx, stateB);
       // The stand's capacity ring: a full roll fills it, and the gap between
-      // it and the running roll's wrap edge IS the run-down, readable in a
-      // single still instead of only across 22 seconds of motion.
-      const runState = runningIsA ? stateA : stateB;
-      if (runState.visible && runState.opacity > 0.01) {
-        ctx.save();
-        ctx.globalAlpha = runState.opacity * 0.5;
-        ctx.setLineDash([3, 5]);
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = rgbCss(fg, 0.55);
-        ctx.beginPath();
-        ctx.arc(runX, cy + runState.offsetY, RMAX, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.restore();
-      }
-      drawRoll(ctx, standAx, stateA);
-      drawRoll(ctx, standBx, stateB);
+      // it and the roll's wrap edge IS the run-down, readable in a single
+      // still instead of only across the cycle. Its alpha is tied to that gap,
+      // so it fades out entirely as the roll fills: at R_max the dashed ring
+      // sits directly on the roll's own wrap-edge stroke and the doubled
+      // outline reads as a jagged artefact — for the ~2s centred exactly on
+      // the wrap, which is the one moment that has to be unobtrusive.
+      ctx.save();
+      ctx.globalAlpha = 0.5 * ((RMAX - state.radius) / (RMAX - RMIN));
+      ctx.setLineDash([3, 5]);
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = rgbCss(fg, 0.55);
+      ctx.beginPath();
+      ctx.arc(standX, cy, RMAX, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
 
-      // paster arm + knife, shared mechanism at the nip.
-      const arm = armProgress(cycle, phase);
-      if (arm > 0.001) {
-        ctx.save();
-        ctx.translate(nipX + RMAX * 0.15, cy - RMAX * 0.9);
-        ctx.rotate(((-ARM_ANGLE_DEG * arm) * Math.PI) / 180);
-        ctx.strokeStyle = rgbCss(fg, 0.9);
-        ctx.lineWidth = Math.max(2, RMAX * 0.05);
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.lineTo(0, RMAX * 0.85);
-        ctx.stroke();
-        // a single value-only bevel highlight, never a hue.
-        ctx.strokeStyle = rgbCss(mixRGB(fg, WHITE, 0.22), 0.6);
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(1, 4);
-        ctx.lineTo(1, RMAX * 0.8);
-        ctx.stroke();
-        ctx.restore();
-      }
-      const knife = knifeProgress(cycle, phase);
-      if (knife >= 0) {
-        const ky = cy - RMAX * 0.7 + knife * RMAX * 1.4;
-        ctx.save();
-        ctx.strokeStyle = rgbCss(fg, 0.95);
-        ctx.lineWidth = Math.max(2, RMAX * 0.045);
-        ctx.beginPath();
-        ctx.moveTo(nipX - RMAX * 0.25, ky);
-        ctx.lineTo(nipX + RMAX * 0.35, ky);
-        ctx.stroke();
-        ctx.strokeStyle = rgbCss(mixRGB(fg, WHITE, 0.22), 0.7);
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(nipX - RMAX * 0.25, ky - 1);
-        ctx.lineTo(nipX + RMAX * 0.35, ky - 1);
-        ctx.stroke();
-        ctx.restore();
-      }
+      drawRoll(ctx, standX, state);
 
       ctx.restore();
     };
@@ -749,7 +558,7 @@ export function FlyingSplice({ paused = false, className = "", style }: FlyingSp
       className={`relative h-full w-full overflow-hidden bg-background ${className}`}
       style={style}
       role="img"
-      aria-label="Two paper rolls feeding a ribbon of placeholder logo marks, the running roll shrinking and spinning faster until a splice hands off to the standby roll"
+      aria-label="A single paper roll feeding a ribbon of placeholder logo marks, shrinking and spinning faster as it empties, then rebuilding to full and slowing again"
     >
       <canvas ref={canvasRef} aria-hidden="true" className="block h-full w-full" />
     </div>
