@@ -1834,14 +1834,6 @@ export const REVIEW_ITEMS: ReviewItem[] = [
       "The question that matters: delete the canvas and does this stop being a footer, or just lose an ornament? Its first pass rendered the notch as a background erase plus a lit lip, which is an animated top border, which is exactly why footing-course was removed from this repo. It was caught and reworked to a lit recess. No scroll response by design.",
   },
   {
-    slug: "spreader-bar",
-    group: "r13",
-    round: "r13",
-    note: "Logo wall. The only concept in the round that handles unequal optical weight by physics: each mark's measured ink coverage solves the fulcrum balance, so a heavy mark hangs closer in.",
-    eyeball:
-      "Seven torsional pendulums at incommensurate periods plus a draught torque, so it has no rest state and no cycle length. Rotation caps at 34 degrees so no mark drops below 0.83 of frontal width. If the positions look authored rather than solved, the mechanic has not landed.",
-  },
-  {
     slug: "flying-splice",
     group: "r13",
     round: "r13",
@@ -1882,27 +1874,11 @@ export const REVIEW_ITEMS: ReviewItem[] = [
       "The reversal must be a real change in the shading model, not a crossfade, and the grid must already be alive before you touch it. Its builder pinned base tone to the spec's luminance table after its own BRDF measured 1.3:1 against a required 1.6-2.2:1.",
   },
   {
-    slug: "rocker-blot",
-    group: "r13",
-    round: "r13",
-    note: "Waitlist capture. A rocker blotter whose accumulated mirrored residue IS the social proof; the form does not clear on success.",
-    eyeball:
-      "Its builder caught that this went visually dead at 5.4s while passing every gate screenshot at 0/2.5/5s, and added an unforced ambient blotting every 6s. Check the queue position reads as located, and that the lifted entry stroke stays visible as evidence.",
-  },
-  {
     slug: "indicator-rack",
     group: "r13",
     round: "r13",
     note: "Plan selector. Cash-register indicator tablets, where changing plan is a SORT and not a mutation: two plates cross on every change and the population is conserved.",
     eyeball:
       "A number that tweens between values is the common answer and is not this. Renamed from flag-rack to avoid reading as a signal-flag component. Arrow keys, Home/End and an aria-live price announcement all work.",
-  },
-  {
-    slug: "kiss-cut",
-    group: "r13",
-    round: "r13",
-    note: "Marquee. Content is what REMAINS after a subtraction: the die cuts the face stock and not the liner, the label stays down and the waste matrix peels away.",
-    eyeball:
-      "NEEDS YOUR EYE SPECIFICALLY: the rewind spool is positioned by deriving from the fixed 38 degree strip angle rather than placed by hand, and its builder asked whether it still reads as a corner rather than upper-middle at your aspect ratios. Also confirm the cut reads as through the face only, not all the way through.",
   },
 ];
