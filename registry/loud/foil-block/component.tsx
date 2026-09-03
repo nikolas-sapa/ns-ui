@@ -29,19 +29,31 @@ import { useEffect, useId, useRef } from "react";
 // — it does not re-evaluate every frame.
 //
 // STRIKE CYCLE, 4.60s: approach 420ms (die descends, ease-out cubic) -> dwell
-// 300ms (mask evaluated at dwell end, t=720ms) -> peel 280ms (die lifts; the
-// last 90ms the carrier still clings and the foil edge stretches as hairline
-// tail filaments) -> web index 1550ms (the spent web scrolls 71px at
-// 46px/s) -> idle 2050ms (web still, specular band still sweeping). The
-// spent web is this component's resting loop: it carries the negative record
-// of the last 9 strikes (alpha 1.0 -> 0.18 across the 639px visible run) and
-// keeps indexing with zero input, which is what makes the band alive at
-// rest. It is deliberately NOT the only thing moving — an unconditional 24px
-// (responsive, floored 16px) specular band sweeps at 0.19 cycles/s across
-// every transferred area regardless of the strike cycle, foil's directional
+// 300ms (the die closes its last 1.5px of travel under load; mask evaluated
+// at dwell end, t=720ms) -> peel 280ms (die lifts the whole 280ms; the last
+// 90ms the carrier still clings and the foil edge stretches as hairline tail
+// filaments) -> web index 3600ms, the ENTIRE remainder of the cycle. The web
+// can only be held still while the die is down, so it feeds continuously for
+// every millisecond the die is up and advances exactly one hole pitch per
+// cycle. An earlier cut indexed for 1550ms and then sat idle for 2050ms,
+// which is what read as the band stopping and starting again: 45% of every
+// cycle had no moving part at all. The spent web is this component's resting
+// loop: it carries the negative record of the last strikes (alpha 1.0 ->
+// 0.5) and keeps indexing with zero input, which is what makes the band
+// alive at rest. It is deliberately NOT the only thing moving — an
+// unconditional specular band sweeps at 0.19 cycles/s across every
+// transferred area regardless of the strike cycle, foil's directional
 // vacuum-metallised anisotropy, and the make-ready pressure field differs
 // strike to strike, so the mature (already-struck) region is never a still
 // image sliding under a moving band.
+//
+// TRANSFERRED FOIL IS PERMANENT. It is on the stock; the next impression
+// cannot take it back off. An earlier cut called clear() on the mask at
+// every approach, so the struck word dropped to bare unfoiled type for the
+// 720ms of approach + dwell and then snapped back — the visible restart.
+// What a re-strike changes is WHERE the voids fall, because the pressure
+// field has drifted, so a strike now reads as the void pattern re-rolling
+// under a descending die rather than as the word blinking out.
 //
 // ACCESSIBILITY: canvas is aria-hidden. The headline is a real, always-legible
 // heading — its terminal word is given color:transparent ONLY once a 2D
@@ -59,13 +71,15 @@ const APPROACH_MS = 420;
 const DWELL_MS = 300;
 const PEEL_MS = 280;
 const TAIL_MS = 90; // overlaps the final 90ms of peel, not additive
-const INDEX_MS = 1550;
+// the web feeds through every millisecond the die is off the stock: from the
+// end of peel to the end of the cycle, no idle tail
+const INDEX_MS = 4600 - (420 + 300 + 280); // 3600
 const DWELL_END_MS = APPROACH_MS + DWELL_MS; // 720
 const PEEL_END_MS = DWELL_END_MS + PEEL_MS; // 1000
-const INDEX_END_MS = PEEL_END_MS + INDEX_MS; // 2550
-// idle fills the remainder of the 4.60s cycle named in the spec: 2050ms
-// (CYCLE_MS - INDEX_END_MS), during which the web is still and only the
-// specular band keeps moving
+const INDEX_END_MS = PEEL_END_MS + INDEX_MS; // 4600 === CYCLE_MS
+// the last 1.5px of die travel is closed during dwell rather than at the end
+// of approach, so the die is never parked motionless while it is down
+const DWELL_BITE_PX = 1.5;
 
 const DIE_TEMP_C = 118;
 const DIE_EDGE_LOSS_C = 9;
@@ -81,10 +95,11 @@ const PRESSURE_THRESHOLD_MPA = 0.26;
 const PRESSURE_DRIFT_HZ = 0.07;
 
 const GHOST_COUNT = 5;
-const GHOST_STEP_PX = 71;
 const GHOST_ALPHA_NEW = 1.0;
 const GHOST_ALPHA_OLD = 0.5;
-// web speed is 71px / 1.55s = 46px/s, derived rather than stored separately
+// the web's position is carried as a single monotonic float in units of hole
+// pitch (one pitch per strike cycle), so hole spacing, fade and speed are all
+// one number and the ribbon can never jump a pitch at a cycle boundary
 
 const SPECULAR_HZ = 0.19;
 const SPECULAR_L_DELTA = 0.16;
@@ -312,10 +327,15 @@ export function FoilBlock({
     const frame = new DieRegion(5.3);
 
     // ghost history: each entry remembers the word mask + word raster size at
-    // the moment its strike completed and which index-cycle it entered on
-    type Ghost = { sharp: Uint8ClampedArray; mask: Uint8ClampedArray; w: number; h: number; indexN: number };
+    // the moment its strike completed and the web position (in hole pitches)
+    // it was punched at, so its age is just webAdvance - bornAt.
+    type Ghost = { sharp: Uint8ClampedArray; mask: Uint8ClampedArray; w: number; h: number; bornAt: number };
     let ghosts: Ghost[] = [];
-    let indexCount = 0;
+    // web travel measured in hole pitches. webCarry banks everything fed
+    // before the current cycleAnchor so an out-of-cadence activation strike
+    // cannot wind the web backwards; webRel is the amount fed since it.
+    let webCarry = 0;
+    let webRel = 0;
 
     let cLive: RGB = [0.06, 0.06, 0.06];
     let cDim: RGB = [0.4, 0.4, 0.4];
@@ -492,7 +512,7 @@ export function FoilBlock({
     // reads as the material the metal came from.
     const RIBBON_H = 34;
     const RIBBON_TOP = 14;
-    const drawWebRibbon = (indexProgressPx: number, specularT: number) => {
+    const drawWebRibbon = (webAdvance: number, specularT: number) => {
       if (cssH < RIBBON_TOP + RIBBON_H + 40) return;
       const stripWDev = Math.max(1, Math.round(cssW * dpr));
       const stripHDev = Math.max(1, Math.round(RIBBON_H * dpr));
@@ -534,20 +554,20 @@ export function FoilBlock({
       const insetDev = Math.round(8 * dpr);
       for (let gi = 0; gi < ghosts.length; gi++) {
         const ghost = ghosts[gi];
-        const ageIndex = indexCount - ghost.indexN;
-        if (ageIndex < 0 || ageIndex >= GHOST_COUNT || ghost.w < 1) continue;
+        // age in hole pitches — a continuous float, so a hole slides rather
+        // than stepping, and its own fade slides with it
+        const age = webAdvance - ghost.bornAt;
+        if (age < 0 || age >= GHOST_COUNT || ghost.w < 1) continue;
         // a hole never heals: age only softens its edge as the web stretches
         const alpha =
-          GHOST_ALPHA_NEW - (ageIndex / (GHOST_COUNT - 1)) * (GHOST_ALPHA_NEW - GHOST_ALPHA_OLD);
+          GHOST_ALPHA_NEW - (age / (GHOST_COUNT - 1)) * (GHOST_ALPHA_NEW - GHOST_ALPHA_OLD);
         const targetHDev = stripHDev - insetDev * 2;
         const scale = targetHDev / Math.max(1, ghost.h);
         const drawWDev = Math.max(1, Math.round(ghost.w * scale));
         // pitch is derived from the hole's own width: the web advances by one
         // label plus a fixed gap, so two strikes can never overprint
         const pitchDev = drawWDev + Math.round(52 * dpr);
-        const progressFrac = indexProgressPx / GHOST_STEP_PX;
-        const xDevStart =
-          Math.round((cssW - 60) * dpr) - drawWDev - ageIndex * pitchDev - Math.round(progressFrac * pitchDev);
+        const xDevStart = Math.round((cssW - 60) * dpr - drawWDev - age * pitchDev);
         if (xDevStart + drawWDev < 0 || xDevStart > stripWDev) continue;
         for (let dy = insetDev; dy < stripHDev - insetDev; dy++) {
           const sy = Math.min(ghost.h - 1, Math.floor(((dy - insetDev) / targetHDev) * ghost.h));
@@ -600,7 +620,7 @@ export function FoilBlock({
     // field itself changing.
     const drawDieBracket = (descentPx: number) => {
       const wr = wordGeom;
-      if (wr.ww < 2 || descentPx <= 0.05) return;
+      if (wr.ww < 2 || descentPx < 0) return;
       // descentPx is distance the die still has to travel to reach contact,
       // so the bracket sits ABOVE the word by that much and closes to zero
       const pad = 6;
@@ -644,19 +664,17 @@ export function FoilBlock({
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const dieDescentPx = Math.max(10, 0.037 * Math.min(cssW, cssH));
 
-      let indexProgressPx: number;
+      let webAdvance: number;
       let tailProgress: number;
       let dieOffsetPx = 0;
       let specularPhase: number;
-      let wordAlphaMul = 1;
-      let frameAlphaMul = 1;
 
       if (isStatic) {
         // composed freeze frame: dwell already complete, foil transferred,
         // tail filaments at maximum extension, band centred on the CTA word.
         if (word.lastMaskAt !== tAbsSeconds) word.strike(tAbsSeconds);
         if (frame.lastMaskAt !== tAbsSeconds) frame.strike(tAbsSeconds);
-        indexProgressPx = 0;
+        webAdvance = 0;
         tailProgress = 1;
         dieOffsetPx = 3; // "die is 3px off the type" at the named freeze instant
         // bandCoord is region-local (0..1), so 0.5 centres the band on every
@@ -665,47 +683,52 @@ export function FoilBlock({
         if (ghosts.length < GHOST_COUNT) {
           ghosts = [];
           for (let i = 0; i < GHOST_COUNT; i++) {
-            ghosts.push({ sharp: word.sharp, mask: word.mask, w: word.w, h: word.h, indexN: -i });
+            ghosts.push({ sharp: word.sharp, mask: word.mask, w: word.w, h: word.h, bornAt: -i });
           }
-          indexCount = 0;
         }
       } else {
-        const cycleLocal = ((tAbsSeconds - cycleAnchor) * 1000) % CYCLE_MS;
-        const local = cycleLocal < 0 ? cycleLocal + CYCLE_MS : cycleLocal;
+        const sinceAnchorMs = (tAbsSeconds - cycleAnchor) * 1000;
+        const cyclesElapsed = Math.floor(sinceAnchorMs / CYCLE_MS);
+        const local = sinceAnchorMs - cyclesElapsed * CYCLE_MS;
+
+        // The web is held only while the die is on the stock; the instant the
+        // die is clear it feeds, all the way to the end of the cycle.
+        const indexFrac = local <= PEEL_END_MS ? 0 : Math.min(1, (local - PEEL_END_MS) / INDEX_MS);
+        webRel = cyclesElapsed + indexFrac;
+        webAdvance = webCarry + webRel;
 
         if (local < APPROACH_MS) {
-          // die descending, ease-out cubic — outline visible, nothing transferred yet
-          word.clear();
-          frame.clear();
-          wordAlphaMul = 0.35;
-          frameAlphaMul = 0.35;
-          dieOffsetPx = dieDescentPx * (1 - easeOutCubic(local / APPROACH_MS));
-        } else if (local < PEEL_END_MS - TAIL_MS) {
-          if (local < DWELL_END_MS) {
-            wordAlphaMul = 0.6;
-            frameAlphaMul = 0.6;
-          } else {
-            // one strike time PER CYCLE, not one for all time: anchoring on
-            // cycleAnchor alone meant lastMaskAt matched forever after the
-            // first strike, so the mask was cleared on every approach and
-            // never re-evaluated — the band ran unfoiled from cycle two on.
-            const cyclesElapsed = Math.floor(((tAbsSeconds - cycleAnchor) * 1000) / CYCLE_MS);
-            const strikeAt = cycleAnchor + (cyclesElapsed * CYCLE_MS + DWELL_END_MS) / 1000;
-            if (word.lastMaskAt !== strikeAt) word.strike(strikeAt);
-            if (frame.lastMaskAt !== strikeAt) frame.strike(strikeAt);
-            wordAlphaMul = 1;
-            frameAlphaMul = 1;
-          }
-          dieOffsetPx = 0; // dwell: die fully down
+          // die descending, ease-out cubic. The foil already on the stock is
+          // NOT taken back off — only the die moves.
+          dieOffsetPx =
+            DWELL_BITE_PX + (dieDescentPx - DWELL_BITE_PX) * (1 - easeOutCubic(local / APPROACH_MS));
+        } else if (local < DWELL_END_MS) {
+          // dwell: the die closes its last 1.5px under load rather than
+          // sitting parked, so no part of the contact window is a still frame
+          dieOffsetPx = DWELL_BITE_PX * (1 - (local - APPROACH_MS) / DWELL_MS);
         } else if (local < PEEL_END_MS) {
-          // last 90ms of peel: die lifting, carrier still clinging
-          wordAlphaMul = 1;
-          frameAlphaMul = 1;
-          const p = (local - (PEEL_END_MS - TAIL_MS)) / TAIL_MS;
-          dieOffsetPx = dieDescentPx * p;
+          // one strike time PER CYCLE, not one for all time: anchoring on
+          // cycleAnchor alone meant lastMaskAt matched forever after the
+          // first strike, so the mask was cleared on every approach and
+          // never re-evaluated — the band ran unfoiled from cycle two on.
+          const strikeAt = cycleAnchor + (cyclesElapsed * CYCLE_MS + DWELL_END_MS) / 1000;
+          if (word.lastMaskAt !== strikeAt) {
+            word.strike(strikeAt);
+            // the strike is what punches the hole, so the web's record is
+            // committed here and then carried away by the feed that follows
+            ghosts.push({
+              sharp: Uint8ClampedArray.from(word.sharp),
+              mask: Uint8ClampedArray.from(word.mask),
+              w: word.w,
+              h: word.h,
+              bornAt: webAdvance,
+            });
+            while (ghosts.length > GHOST_COUNT + 1) ghosts.shift();
+          }
+          if (frame.lastMaskAt !== strikeAt) frame.strike(strikeAt);
+          // peel runs the full 280ms of lift, not a parked 190ms then a jump
+          dieOffsetPx = dieDescentPx * ((local - DWELL_END_MS) / PEEL_MS);
         } else {
-          wordAlphaMul = 1;
-          frameAlphaMul = 1;
           dieOffsetPx = dieDescentPx;
         }
 
@@ -715,36 +738,18 @@ export function FoilBlock({
           tailProgress = 0;
         }
 
-        if (local >= PEEL_END_MS && local < INDEX_END_MS) {
-          const t = (local - PEEL_END_MS) / INDEX_MS;
-          indexProgressPx = t * GHOST_STEP_PX;
-          if (t >= 0.999 && ghosts[ghosts.length - 1]?.indexN !== indexCount) {
-            ghosts.push({
-              sharp: Uint8ClampedArray.from(word.sharp),
-              mask: Uint8ClampedArray.from(word.mask),
-              w: word.w,
-              h: word.h,
-              indexN: indexCount,
-            });
-            indexCount++;
-            if (ghosts.length > GHOST_COUNT + 1) ghosts.shift();
-          }
-        } else {
-          indexProgressPx = local >= INDEX_END_MS ? GHOST_STEP_PX : 0;
-        }
-
         specularPhase = tAbsSeconds * SPECULAR_HZ;
       }
 
       if (wordGeom.ww > 0) {
-        blitRegion(word, wordGeom.localLeft, wordGeom.localTop, wordAlphaMul, specularPhase, false);
+        blitRegion(word, wordGeom.localLeft, wordGeom.localTop, 1, specularPhase, false);
         drawTailFilaments(tailProgress, tAbsSeconds * 7.13);
         drawDieBracket(dieOffsetPx);
       }
       if (frameGeom.fw > 0) {
-        blitRegion(frame, frameGeom.localLeft, frameGeom.localTop, frameAlphaMul, specularPhase, false);
+        blitRegion(frame, frameGeom.localLeft, frameGeom.localTop, 1, specularPhase, false);
       }
-      drawWebRibbon(indexProgressPx, specularPhase);
+      drawWebRibbon(webAdvance, specularPhase);
     };
 
     // -- sizing --------------------------------------------------------------
@@ -777,10 +782,9 @@ export function FoilBlock({
           mask: Uint8ClampedArray.from(word.mask),
           w: word.w,
           h: word.h,
-          indexN: -i,
+          bornAt: -i,
         });
       }
-      indexCount = 0;
       word.clear();
       word.lastMaskAt = -Infinity;
     };
@@ -859,6 +863,8 @@ export function FoilBlock({
         // already sitting behind it, so the band never looks freshly booted.
         simTime = 0;
         cycleAnchor = 0;
+        webCarry = 0;
+        webRel = 0;
         wake();
       }
     };
@@ -907,6 +913,10 @@ export function FoilBlock({
 
     // activation feedback: one out-of-cadence strike, restarting the cycle
     const strikeNow = () => {
+      // bank the web travel fed under the old anchor before moving it, or an
+      // activation strike would wind the ribbon back to the top of a cycle
+      webCarry += webRel;
+      webRel = 0;
       cycleAnchor = simTime;
       word.lastMaskAt = -Infinity;
       frame.lastMaskAt = -Infinity;

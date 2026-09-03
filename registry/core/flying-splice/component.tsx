@@ -8,10 +8,14 @@ import { useEffect, useRef } from "react";
 // sit side by side, occupying the majority of the band's width. The running
 // roll unwinds at constant web speed, so its radius falls and its RPM climbs
 // continuously (1.06 -> 2.48 rev/s as radius falls 64.6px -> 27.5px at card
-// scale). Every 22s the standby roll — already spun up to matched surface
-// speed — is pasted onto the web, a knife severs the spent roll, and a fresh
-// roll rises into the vacated stand. The ribbon of marks is the OUTPUT the
-// rolls feed; it is deliberately the plainer half of this component.
+// scale). Every 22s the standby roll — creep-driven while it waits, then
+// spun up to matched surface speed — is pasted onto the web, a knife severs
+// the spent roll, and a fresh roll rises into the vacated stand. BOTH stands
+// turn at all times they are on screen, at rates set by their own radii: the
+// full standby roll on creep is always the slowest thing in the frame and
+// the run-down roll at the splice the fastest. The ribbon of marks is the
+// OUTPUT the rolls feed; it is deliberately the plainer half of this
+// component.
 //
 // Every visual quantity is a pure, closed-form function of absolute time —
 // never a per-frame accumulator — because prefers-reduced-motion has to
@@ -113,6 +117,16 @@ const RISE_START = DROP_START + DROP_DUR + 0.9; // 2.43
 const RISE_DUR = 0.7;
 const CHOREO_END = RISE_START + RISE_DUR; // 3.13
 const CHEVRON_CROSS = 2.4; // a mark/tape crosses the band in 2.4s
+// The standby stand is NOT parked. A splicer creep-drives the fresh roll from
+// the moment it is loaded — that is how the tail tape is laid on a turning
+// core and why the paster never has to start a dead roll from rest. Without
+// it the standby stand returned a hardcoded angle of 0 for the 15.5s between
+// the end of the changeover choreography and spin-up, so one of the two roll
+// stands rendered byte-identical for 70% of every cycle. Creep is a fraction
+// of matched surface speed, which keeps the full roll the slower of the two:
+// the radius/RPM relationship this component is about is preserved, not
+// broken, by making it turn.
+const CREEP_FRAC = 0.24;
 export const STATIC_TIME = CYCLE + 0.09; // 22.09s — 90ms into the new cycle
 
 export function FlyingSplice({ paused = false, className = "", style }: FlyingSpliceProps) {
@@ -273,7 +287,18 @@ export function FlyingSplice({ paused = false, className = "", style }: FlyingSp
       return (2 * v() * (RMAX - radiusAt(phase))) / b;
     };
     const spinupOmega0 = () => v() / RMAX;
-    const spinupTotalAngle = () => angleEaseOut(1, spinupOmega0(), SPINUP_DUR);
+    const creepOmega = () => spinupOmega0() * CREEP_FRAC;
+    // angle a standby roll has accumulated on creep alone by `phase`; creep
+    // stops contributing once the spin-up ramp takes over at SPINUP_START
+    const creepAngle = (phase: number) =>
+      creepOmega() * Math.max(0, Math.min(SPINUP_START, phase));
+    // spin-up ramps from creep to matched surface speed rather than from rest
+    const spinupAngle = (tau: number) =>
+      creepOmega() * clamp01(tau) * SPINUP_DUR +
+      angleEaseOut(tau, spinupOmega0() - creepOmega(), SPINUP_DUR);
+    // total angle a stand carries into the splice, so the running roll picks
+    // up exactly where the standby roll left off and nothing jumps at wrap
+    const spinupTotalAngle = () => creepAngle(SPINUP_START) + spinupAngle(1);
     const decelOmega0 = () => v() / RSPLICE;
 
     interface StandState {
@@ -331,7 +356,7 @@ export function FlyingSplice({ paused = false, className = "", style }: FlyingSp
           return {
             visible: true,
             radius: RMAX,
-            angle: 0,
+            angle: creepAngle(phase),
             offsetY: (1 - easeOutQuad(tau)) * RMAX * 1.4,
             opacity: tau,
           };
@@ -342,12 +367,13 @@ export function FlyingSplice({ paused = false, className = "", style }: FlyingSp
         return {
           visible: true,
           radius: RMAX,
-          angle: angleEaseOut(tau, spinupOmega0(), SPINUP_DUR),
+          angle: creepAngle(SPINUP_START) + spinupAngle(tau),
           offsetY: 0,
           opacity: 1,
         };
       }
-      return { visible: true, radius: RMAX, angle: 0, offsetY: 0, opacity: 1 };
+      // waiting on creep: turning, just far slower than the running roll
+      return { visible: true, radius: RMAX, angle: creepAngle(phase), offsetY: 0, opacity: 1 };
     };
 
     // arm swing: completes contact exactly at the wrap (t = k*CYCLE), held
