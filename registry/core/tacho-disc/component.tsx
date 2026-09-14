@@ -115,9 +115,17 @@ function angleForMs(ms: number): number {
   return (minutesOfDay(ms) / MIN_PER_DAY) * 360;
 }
 
+// rounded to 3 decimals: Math.sin/cos can differ by a ULP between Node (SSR)
+// and the browser's engine (CSR), which surfaced as x1="29.148748315591874"
+// on the server vs 29.148748315591888 on the client — a hydration mismatch
+// despite both being "correct". Every mark's coords come through here.
+function r3(n: number): number {
+  return Math.round(n * 1000) / 1000;
+}
+
 function polar(r: number, angleDeg: number): { x: number; y: number } {
   const rad = (angleDeg * Math.PI) / 180;
-  return { x: CX + r * Math.sin(rad), y: CY - r * Math.cos(rad) };
+  return { x: r3(CX + r * Math.sin(rad)), y: r3(CY - r * Math.cos(rad)) };
 }
 
 function angDist(a: number, b: number): number {
