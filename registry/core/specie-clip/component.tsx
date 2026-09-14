@@ -185,13 +185,17 @@ function DiscFace({ label }: DiscFaceProps) {
         const rad = (deg * Math.PI) / 180;
         const cos = Math.cos(rad);
         const sin = Math.sin(rad);
+        // rounded: Math.cos/sin can differ by a ULP between Node (SSR) and the
+        // browser's engine (CSR), which surfaced as x2="62.58022883702639" on
+        // the server vs 62.5802288370264 on the client — a hydration mismatch
+        // despite both being "correct".
         return (
           <line
             key={deg}
-            x1={CX + FACE_R * cos}
-            y1={CY + FACE_R * sin}
-            x2={CX + OUTER_R * cos}
-            y2={CY + OUTER_R * sin}
+            x1={round2(CX + FACE_R * cos)}
+            y1={round2(CY + FACE_R * sin)}
+            x2={round2(CX + OUTER_R * cos)}
+            y2={round2(CY + OUTER_R * sin)}
             stroke="var(--ns-muted)"
             strokeWidth={1}
           />

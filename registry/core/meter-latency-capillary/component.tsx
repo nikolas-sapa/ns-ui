@@ -64,6 +64,14 @@ function fmtSeconds(ms: number): string {
   return (safe / 1000).toFixed(1);
 }
 
+// A fraction as a percentage string, fixed to 4 decimals. The raw value
+// serialized as "43.3333%" on the server and "43.333333333333336%" on the
+// client, and React discards the subtree over a string that long. Four
+// decimals is far below one device pixel on a tube this size.
+function pct(frac: number): string {
+  return (frac * 100).toFixed(4);
+}
+
 // which of the two timed phases (ignoring `arrivedAt`) a given elapsed-ms
 // falls in, for a p50/p95 pair
 function timedPhase(elapsedMs: number, p50Ms: number, p95Ms: number): "waiting" | "slow" | "stalled" {
@@ -147,7 +155,18 @@ export function MeniscusHold({
   // reached — it never keeps climbing toward p95, that would be fake
   // progress. p95 anchors the very top of the tube.
   const p50Frac = Math.max(0, Math.min(1, safeP50 / safeP95));
-  const elapsedAtMount = Date.now() - start;
+  // The first client render must serialize EXACTLY what the server sent, and
+  // the server cannot know how many ms elapsed before the browser hydrated —
+  // any clock read here produced transition-duration 650ms against the 649ms
+  // already committed to the DOM. So the elapsed clock is not read during
+  // render at all: both sides render the full p50 duration, and the real
+  // remaining time is installed in an effect, which runs only after hydration
+  // has matched. Behaviour is unchanged — the threshold timers above still
+  // decide when each phase begins.
+  const [elapsedAtMount, setElapsedAtMount] = useState(0);
+  useEffect(() => {
+    setElapsedAtMount(Date.now() - start);
+  }, [start]);
   const riseRemainMs = Math.max(0, safeP50 - elapsedAtMount);
 
   let fillFrac: number;
@@ -235,7 +254,7 @@ export function MeniscusHold({
                   aria-hidden
                   className="absolute inset-x-0 bottom-0"
                   style={{
-                    height: `${fillFrac * 100}%`,
+                    height: `${pct(fillFrac)}%`,
                     backgroundColor: "var(--ns-muted)",
                     opacity: 0.25,
                     transition: `height ${fillMs}ms ${fillEase}`,
@@ -252,7 +271,7 @@ export function MeniscusHold({
                   position: "absolute",
                   left: -1,
                   right: -1,
-                  bottom: `calc(${fillFrac * 100}% - 2px)`,
+                  bottom: `calc(${pct(fillFrac)}% - 2px)`,
                   height: 4,
                   transition: `bottom ${fillMs}ms ${fillEase}`,
                 }}
@@ -333,7 +352,7 @@ function Tick({
       aria-hidden
       className="absolute left-0 flex items-center gap-1"
       style={{
-        bottom: `calc(${bottomFrac * 100}% - 0.5px)`,
+        bottom: `calc(${pct(bottomFrac)}% - 0.5px)`,
         opacity,
         transition: `opacity ${transitionMs}ms linear`,
       }}
