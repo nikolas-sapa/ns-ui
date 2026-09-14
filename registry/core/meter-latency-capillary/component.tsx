@@ -155,13 +155,18 @@ export function MeniscusHold({
   // reached — it never keeps climbing toward p95, that would be fake
   // progress. p95 anchors the very top of the tube.
   const p50Frac = Math.max(0, Math.min(1, safeP50 / safeP95));
-  // Frozen at mount rather than read fresh on every render: `Date.now() - start`
-  // evaluated on the server and again on the client a millisecond later gave
-  // transition-duration 650ms vs 649ms, which React reports as a hydration
-  // mismatch. One useState initializer means both renders serialize the same
-  // number; the threshold timers in the effect above still drive real timing,
-  // so nothing about the animation's behaviour changes.
-  const [elapsedAtMount] = useState(() => Date.now() - start);
+  // The first client render must serialize EXACTLY what the server sent, and
+  // the server cannot know how many ms elapsed before the browser hydrated —
+  // any clock read here produced transition-duration 650ms against the 649ms
+  // already committed to the DOM. So the elapsed clock is not read during
+  // render at all: both sides render the full p50 duration, and the real
+  // remaining time is installed in an effect, which runs only after hydration
+  // has matched. Behaviour is unchanged — the threshold timers above still
+  // decide when each phase begins.
+  const [elapsedAtMount, setElapsedAtMount] = useState(0);
+  useEffect(() => {
+    setElapsedAtMount(Date.now() - start);
+  }, [start]);
   const riseRemainMs = Math.max(0, safeP50 - elapsedAtMount);
 
   let fillFrac: number;
