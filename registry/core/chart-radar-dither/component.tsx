@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 
 // ---------------------------------------------------------------------------
 // ChartRadarDither — the dithered-chart family's radar/spider chart, the
@@ -115,8 +115,10 @@ export function ChartRadarDither({ data = [], title = "Chart", className = "" }:
   const [activeIndex, setActiveIndex] = useState(0);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const [showTable, setShowTable] = useState(false);
-  const uidRef = useRef(`crd-${Math.random().toString(36).slice(2, 8)}`);
-  const uid = uidRef.current;
+  // useId, not Math.random(): the id is serialized into element ids on the
+  // server and must match what the client renders, or React discards the
+  // subtree as a hydration mismatch
+  const uid = `crd-${useId().replace(/:/g, "")}`;
 
   const reducedRef = useRef(false);
   useEffect(() => {
