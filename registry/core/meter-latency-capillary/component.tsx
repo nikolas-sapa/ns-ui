@@ -155,7 +155,13 @@ export function MeniscusHold({
   // reached — it never keeps climbing toward p95, that would be fake
   // progress. p95 anchors the very top of the tube.
   const p50Frac = Math.max(0, Math.min(1, safeP50 / safeP95));
-  const elapsedAtMount = Date.now() - start;
+  // Frozen at mount rather than read fresh on every render: `Date.now() - start`
+  // evaluated on the server and again on the client a millisecond later gave
+  // transition-duration 650ms vs 649ms, which React reports as a hydration
+  // mismatch. One useState initializer means both renders serialize the same
+  // number; the threshold timers in the effect above still drive real timing,
+  // so nothing about the animation's behaviour changes.
+  const [elapsedAtMount] = useState(() => Date.now() - start);
   const riseRemainMs = Math.max(0, safeP50 - elapsedAtMount);
 
   let fillFrac: number;
