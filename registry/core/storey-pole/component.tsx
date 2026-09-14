@@ -173,8 +173,15 @@ function PlanGlyph({
   level: StoreyPoleLevel;
   className?: string;
 }) {
-  const rng = useMemo(() => mulberry32(seedFromString(level.id)), [level.id]);
-  const cuts = useMemo(() => {
+  // One memo, one draw order. `cuts` and `core` used to share a single stateful
+  // `rng` across two separate useMemos: `cuts` consumes a VARIABLE number of
+  // rng() calls (random loop count, branch per iteration), so `core` read
+  // whatever position the stream happened to be at. React is free to re-run
+  // memos independently on the client, which left the server drawing core at
+  // x=22.67 and the client at x=46.82 — a hydration mismatch. Deriving both
+  // from one generator in a fixed order makes the sequence deterministic.
+  const { cuts, core } = useMemo(() => {
+    const rng = mulberry32(seedFromString(level.id));
     const n = 2 + Math.floor(rng() * 3);
     const lines: { x1: number; y1: number; x2: number; y2: number }[] = [];
     for (let i = 0; i < n; i++) {
@@ -186,17 +193,16 @@ function PlanGlyph({
         lines.push({ x1: 6, y1: y, x2: 90, y2: y });
       }
     }
-    return lines;
-  }, [rng]);
-  const core = useMemo(
-    () => ({
-      x: 10 + rng() * 58,
-      y: 10 + rng() * 42,
-      w: 10 + rng() * 12,
-      h: 8 + rng() * 10,
-    }),
-    [rng]
-  );
+    return {
+      cuts: lines,
+      core: {
+        x: 10 + rng() * 58,
+        y: 10 + rng() * 42,
+        w: 10 + rng() * 12,
+        h: 8 + rng() * 10,
+      },
+    };
+  }, [level.id]);
   return (
     <svg
       viewBox="0 0 96 72"

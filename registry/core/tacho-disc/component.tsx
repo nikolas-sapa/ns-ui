@@ -180,7 +180,13 @@ function ScribeLine({
 }
 
 export function TachoDisc({ events, historyDays = 2, now: controlledNow, label = "Security activity", className = "" }: TachoDiscProps) {
-  const [internalNow, setInternalNow] = useState(() => Date.now());
+  // Quantised to the minute: Date.now() on the server and again on the client
+  // milliseconds later gave two different rotation angles (-334.03333 vs
+  // -334.0375) and React discarded the subtree as a hydration mismatch. The
+  // dial only re-reads the clock every 60s and never renders sub-minute
+  // precision, so flooring to the minute costs nothing and makes both renders
+  // agree. The interval below still moves it in real time after mount.
+  const [internalNow, setInternalNow] = useState(() => Math.floor(Date.now() / 60_000) * 60_000);
   const nowMs = controlledNow ?? internalNow;
 
   const reducedRef = useRef(false);
