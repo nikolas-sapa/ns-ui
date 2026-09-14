@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 
 // ---------------------------------------------------------------------------
 // BoxplotAsciiWhisker — the registry's first distribution instrument.
@@ -159,8 +159,10 @@ export function BoxplotAsciiWhisker({ groups, title = "Chart", className = "" }:
   const [k, setK] = useState(1.5);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const uidRef = useRef(`baw-${Math.random().toString(36).slice(2, 8)}`);
-  const uid = uidRef.current;
+  // useId, not Math.random(): the id is serialized into element ids on the
+  // server and must match what the client renders, or React discards the
+  // subtree as a hydration mismatch
+  const uid = `baw-${useId().replace(/:/g, "")}`;
   const trackRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 

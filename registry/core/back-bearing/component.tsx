@@ -58,9 +58,16 @@ function shortestDelta(from: number, to: number) {
   return d;
 }
 
+// rounded to 3 decimals: Math.cos/sin can differ by a ULP between Node (SSR)
+// and the browser's engine (CSR), which otherwise surfaces as a hydration
+// mismatch in the serialized coordinate despite both being "correct"
+function r3(n: number): number {
+  return Math.round(n * 1000) / 1000;
+}
+
 function polar(r: number, deg: number) {
   const rad = (deg * Math.PI) / 180;
-  return { x: CX + r * Math.sin(rad), y: CY - r * Math.cos(rad) };
+  return { x: r3(CX + r * Math.sin(rad)), y: r3(CY - r * Math.cos(rad)) };
 }
 
 function pad3(n: number) {
