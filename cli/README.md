@@ -106,6 +106,7 @@ prints the installed CLI version.
 |---|---|
 | `NS_UI_REGISTRY` | Registry origin the CLI reads `registry.json` and `llms.txt` from, and the origin baked into the install commands it prints. Defaults to `https://design.helpmarq.com`. |
 | `NS_UI_CACHE_TTL_MS` | Lifetime of the on-disk catalog cache, in milliseconds. Defaults to `43200000` (12 hours). |
+| `NS_UI_FETCH_TIMEOUT_MS` | Deadline for fetching and reading the live catalog. Positive integer milliseconds, defaults to `10000`. Falls back to cached or bundled data when exceeded. |
 
 ## Where the data comes from
 
@@ -123,7 +124,8 @@ a runtime import of it) computes categories and the short "kind" label.
 tiers, in order:
 
 1. **On-disk cache** (~12h TTL, override with `NS_UI_CACHE_TTL_MS`) —
-   avoids a network round trip on every invocation once warm.
+   avoids a network round trip on every invocation once warm. Each registry
+   origin has its own cache; malformed cached catalogs are ignored.
 2. **Live fetch** of `registry.json` + `llms.txt` — this is what keeps a
    CLI installed months ago still seeing newly added components; the cache
    is refreshed and used from then on.
