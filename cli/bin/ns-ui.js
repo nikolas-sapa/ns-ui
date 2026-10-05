@@ -6,9 +6,10 @@ import { readFileSync, writeFileSync, mkdirSync, statSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { tmpdir } from "node:os";
+import { createHash } from "node:crypto";
 import { buildIndex } from "../lib/build-index.js";
 
-const REGISTRY_ORIGIN = process.env.NS_UI_REGISTRY || "https://design.helpmarq.com";
+const REGISTRY_ORIGIN = (process.env.NS_UI_REGISTRY || "https://design.helpmarq.com").replace(/\/+$/, "");
 const REGISTRY_JSON_URL = `${REGISTRY_ORIGIN}/registry.json`;
 const LLMS_TXT_URL = `${REGISTRY_ORIGIN}/llms.txt`;
 
@@ -17,8 +18,12 @@ const BUNDLED_INDEX_PATH = join(PKG_ROOT, "data", "registry-index.json");
 
 // Cache lives outside the package (it's per-machine, not per-install) so a
 // fresh `npx` re-resolve of the CLI doesn't force a re-fetch every time.
-const CACHE_PATH = join(tmpdir(), "ns-ui-cli-cache-v1.json");
+const CACHE_KEY = createHash("sha256").update(REGISTRY_ORIGIN).digest("hex");
+const CACHE_PATH = join(tmpdir(), `ns-ui-cli-cache-v2-${CACHE_KEY}.json`);
 const CACHE_TTL_MS = Number(process.env.NS_UI_CACHE_TTL_MS) || 12 * 60 * 60 * 1000; // 12h
+const configuredTimeout = Number(process.env.NS_UI_FETCH_TIMEOUT_MS);
+const FETCH_TIMEOUT_MS = Number.isSafeInteger(configuredTimeout) && configuredTimeout > 0
+  ? configuredTimeout : 10_000;
 
 // ---------------------------------------------------------------------------
 // Colour: TTY + NO_COLOR aware, computed once. Node 22's styleText does not
@@ -58,6 +63,19 @@ function c(style, text) {
 // ---------------------------------------------------------------------------
 let cachedIndex = null;
 
+function validCatalog(registry, llmsText) {
+  return typeof llmsText === "string" && registry !== null &&
+    typeof registry === "object" && typeof registry.name === "string" &&
+    Array.isArray(registry.items) && registry.items.every((item) =>
+      item !== null && typeof item === "object" &&
+      typeof item.name === "string" && typeof item.title === "string" &&
+      typeof item.description === "string" &&
+      typeof item.meta?.collection === "string" &&
+      Array.isArray(item.meta?.tags) && item.meta.tags.every((tag) => typeof tag === "string") &&
+      Array.isArray(item.dependencies) && item.dependencies.every((dep) => typeof dep === "string")
+    );
+}
+
 function readCache() {
   let stat;
   try {
@@ -68,6 +86,7 @@ function readCache() {
   if (Date.now() - stat.mtimeMs > CACHE_TTL_MS) return { stale: true, path: CACHE_PATH };
   try {
     const raw = JSON.parse(readFileSync(CACHE_PATH, "utf8"));
+    if (!validCatalog(raw?.registry, raw?.llmsText)) return null;
     return { stale: false, registry: raw.registry, llmsText: raw.llmsText };
   } catch {
     return null;
@@ -77,6 +96,7 @@ function readCache() {
 function readStaleCache() {
   try {
     const raw = JSON.parse(readFileSync(CACHE_PATH, "utf8"));
+    if (!validCatalog(raw?.registry, raw?.llmsText)) return null;
     return { registry: raw.registry, llmsText: raw.llmsText };
   } catch {
     return null;
@@ -94,13 +114,15 @@ function writeCache(registry, llmsText) {
 }
 
 async function fetchLive() {
+  const signal = AbortSignal.timeout(FETCH_TIMEOUT_MS);
   const [registryRes, llmsRes] = await Promise.all([
-    fetch(REGISTRY_JSON_URL),
-    fetch(LLMS_TXT_URL),
+    fetch(REGISTRY_JSON_URL, { signal }),
+    fetch(LLMS_TXT_URL, { signal }),
   ]);
   if (!registryRes.ok) throw new Error(`${REGISTRY_JSON_URL}: ${registryRes.status} ${registryRes.statusText}`);
   if (!llmsRes.ok) throw new Error(`${LLMS_TXT_URL}: ${llmsRes.status} ${llmsRes.statusText}`);
   const [registry, llmsText] = await Promise.all([registryRes.json(), llmsRes.text()]);
+  if (!validCatalog(registry, llmsText)) throw new Error("Registry returned a malformed catalog");
   return { registry, llmsText };
 }
 
@@ -120,8 +142,8 @@ async function getIndex() {
 
   try {
     const { registry, llmsText } = await fetchLive();
-    writeCache(registry, llmsText);
     cachedIndex = buildIndex(registry, llmsText, REGISTRY_ORIGIN);
+    writeCache(registry, llmsText);
     return cachedIndex;
   } catch (err) {
     const stale = readStaleCache();
@@ -452,16 +474,14 @@ async function cmdList(args) {
     ? index.categories.filter((cat) => cat.id === values.category)
     : index.categories;
 
-  let total = 0;
   for (const cat of categoriesToShow) {
     const inCategory = items.filter((item) => item.categories.includes(cat.id));
     if (inCategory.length === 0) continue;
     console.log(c("bold", `\n${cat.label} (${inCategory.length})`));
     printRows(inCategory);
-    total += inCategory.length;
   }
 
-  console.log(`\n${total} component${total === 1 ? "" : "s"} total`);
+  console.log(`\n${items.length} component${items.length === 1 ? "" : "s"} total`);
 }
 
 // ---------------------------------------------------------------------------
