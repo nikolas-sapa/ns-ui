@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 
 // ---------------------------------------------------------------------------
 // SignetDrop — press-and-hold confirm rendered as a molten wax seal, not a
@@ -189,9 +189,11 @@ export function SignetDrop({
   const parityRef = useRef(false);
 
   const holdMsRef = useRef(holdMs);
-  holdMsRef.current = holdMs;
   const onSealedRef = useRef(onSealed);
-  onSealedRef.current = onSealed;
+  useLayoutEffect(() => {
+    holdMsRef.current = holdMs;
+    onSealedRef.current = onSealed;
+  }, [holdMs, onSealed]);
 
   const stateRef = useRef({
     phase: "idle" as SignetDropPhase,
