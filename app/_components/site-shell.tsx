@@ -18,6 +18,7 @@ import { SIDEBAR_HIDDEN_KEY } from "@/lib/sidebar";
 import { McpPopup } from "./mcp-popup";
 import { SiteAuth } from "./site-auth";
 import { SiteFooter } from "./site-footer";
+import { CursorToggle } from "./cursor-toggle";
 import { ThemeToggle } from "./theme-toggle";
 import { CommandPalette, SearchIcon } from "./command-palette";
 
@@ -676,11 +677,14 @@ export function SiteShell({
             ns-ui
           </Link>
           <div className="flex items-center gap-2.5">
-            {/* Grown alongside the old ⌘K trigger that used to sit here
-                (size-8 -> size-9, icon size-3.5 -> size-4). Now that the
-                trigger has moved to its own full-width row below, this is
-                back to being one of two controls in the cluster rather than
-                three, which is the room it was missing. */}
+            {/* The two global display preferences, side by side. CursorToggle
+                is `display: none` unless a replacement cursor is actually
+                running (globals.css), so on touch and under reduced motion
+                this cluster is exactly what it was before. Grown alongside
+                the old ⌘K trigger that used to sit here (size-8 -> size-9,
+                icon size-3.5 -> size-4); with the trigger moved to its own
+                full-width row below, this row has the width for both. */}
+            <CursorToggle />
             <ThemeToggle />
             <span className="font-mono text-[11px] text-ns-muted">{total}</span>
             {/* Desktop-only: collapses the whole sidebar, not a section

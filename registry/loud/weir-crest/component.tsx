@@ -938,7 +938,16 @@ export function WeirCrest({
       canvas.removeEventListener("webglcontextlost", onLost);
       canvas.removeEventListener("webglcontextrestored", onRestored);
       delete (wrap as HTMLDivElement & { __weirPoke?: () => void }).__weirPoke;
+      // destroy() frees the GL objects but not the context holding them, and a
+      // detached canvas keeps its context until GC gets round to it —
+      // browsers cap live contexts per renderer process and evict the oldest
+      // first, which kills weirs still on screen. Hand it back explicitly,
+      // but only on a real unmount: this cleanup also runs when a dep changes,
+      // and a canvas returns its one lost context to every later getContext(),
+      // so releasing too eagerly would blank the rebuilt weir.
+      const lose = surface.gl?.getExtension("WEBGL_lose_context");
       surface.destroy();
+      if (!canvas.isConnected) lose?.loseContext();
     };
   }, []);
 

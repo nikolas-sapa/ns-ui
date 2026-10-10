@@ -481,6 +481,27 @@ export function FrostScrub({
       readout(p);
     };
 
+    // A context can be lost for reasons that have nothing to do with this
+    // component: browsers cap live contexts per renderer process and evict the
+    // oldest when a page mounts a lot of them. preventDefault is what makes
+    // the loss restorable at all — without it the browser never fires
+    // webglcontextrestored and the pane stays frozen for the rest of the
+    // session. `gl` is the same object either side of a loss, so setup() can
+    // rebuild the program, buffers and texture straight onto it.
+    const onLost = (e: Event) => {
+      e.preventDefault();
+      cancelAnimationFrame(raf);
+      raf = 0;
+    };
+    const onRestored = () => {
+      if (disposed) return;
+      if (!setup()) enterFallback();
+      resize?.();
+      drawFrame(reduced ? 1 : current);
+    };
+    canvas.addEventListener("webglcontextlost", onLost);
+    canvas.addEventListener("webglcontextrestored", onRestored);
+
     // reduced motion: one static frame at p = 1 — clear image, the shader's
     // uEdgeFrost vignette keeps a faint frost border. No loop, no listener.
     if (reduced) {
@@ -494,7 +515,12 @@ export function FrostScrub({
       return () => {
         disposed = true;
         ro.disconnect();
-        gl?.getExtension("WEBGL_lose_context")?.loseContext();
+        canvas.removeEventListener("webglcontextlost", onLost);
+        canvas.removeEventListener("webglcontextrestored", onRestored);
+        // only on a real unmount — this cleanup also runs when a dep changes,
+        // and a canvas returns its one lost context to every later
+        // getContext(), so an eager release would blank the rebuilt pane.
+        if (!canvas.isConnected) gl?.getExtension("WEBGL_lose_context")?.loseContext();
       };
     }
 
@@ -543,7 +569,12 @@ export function FrostScrub({
       raf = 0;
       window.removeEventListener("scroll", onScroll);
       ro.disconnect();
-      gl?.getExtension("WEBGL_lose_context")?.loseContext();
+      canvas.removeEventListener("webglcontextlost", onLost);
+      canvas.removeEventListener("webglcontextrestored", onRestored);
+      // only on a real unmount — this cleanup also runs when a dep changes,
+      // and a canvas returns its one lost context to every later getContext(),
+      // so an eager release would blank the rebuilt pane.
+      if (!canvas.isConnected) gl?.getExtension("WEBGL_lose_context")?.loseContext();
     };
     // onProgress intentionally excluded — delivered via onProgressRef so an
     // unmemoized inline callback can't tear down the GL setup every render.

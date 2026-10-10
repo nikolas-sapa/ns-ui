@@ -38,6 +38,7 @@
     "test:category-coverage": "node scripts/test-category-coverage.ts",
     "test:status-checks": "node scripts/test-status-checks.ts",
     "test:source-invariants": "node scripts/test-source-invariants.ts",
+    "test:animation-gate": "node scripts/test-animation-gate.ts",
     "test:perf-budget": "node scripts/test-perf-budget.ts",
     "test:agent-readiness": "node scripts/test-agent-readiness.ts",
     "test:convex-deployed": "node scripts/test-convex-deployed.ts",

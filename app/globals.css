@@ -2,6 +2,12 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* `html.native-cursor` — the visitor turned the replacement cursor off
+   (lib/cursor.ts). Shaped exactly like the dark variant above so the
+   CursorToggle icon swap is the same pure-CSS, already-correct-on-first-paint
+   trick ThemeToggle's sun/moon uses, rather than a client-side correction. */
+@custom-variant native-cursor (&:where(.native-cursor, .native-cursor *));
+
 :root {
   /* Tells the UA the document's theme so native chrome — page scrollbar, the
      <select> dropdown panel, range tracks, autofill backgrounds — follows it.
@@ -84,11 +90,45 @@
    in the top-level document — smooth-cursor.tsx never adds this class inside
    an iframe (see its window.self !== window.top guard), so this rule never
    fires inside an embedded component's own document, and the native cursor
-   stays visible and usable there. */
+   stays visible and usable there.
+
+   `html:not(.native-cursor)` is the visitor's off switch, and it has to live
+   on the rule that hides the cursor rather than on one that restores it: a
+   `cursor: auto` override would also outrank every `cursor-pointer` on the
+   page (same specificity problem documented in smooth-cursor.tsx's hit test),
+   leaving links with a plain arrow. Conditioning the hide instead means the
+   native cursor is never taken away in the first place — including for the
+   frames before hydration, which is the whole point of the <head> script in
+   lib/cursor.ts. */
 @media (hover: hover) and (pointer: fine) {
-  body.smooth-cursor-active,
-  body.smooth-cursor-active * {
+  html:not(.native-cursor) body.smooth-cursor-active,
+  html:not(.native-cursor) body.smooth-cursor-active * {
     cursor: none;
+  }
+}
+
+/* Belt and braces for the same first-frame guarantee: the component keeps
+   rendering its markup (it must stay mounted to watch for the preference
+   changing back), so this is what keeps it from being painted meanwhile. */
+html.native-cursor .smooth-cursor {
+  display: none;
+}
+
+/* CursorToggle appears only where there is a custom cursor to switch off —
+   this repeats smooth-cursor.tsx's own three bail-out conditions (fine
+   pointer, real hover, no reduced-motion preference) rather than offering a
+   touch or reduced-motion visitor a switch that controls nothing. CSS-only
+   for the same reason `.sidebar-restore` below is: a media query cannot be
+   read during SSR, and a JS-gated control would either flash in or need a
+   mounted flag to avoid a hydration mismatch. The button carries no `display`
+   utility of its own, so this rule owns it outright. */
+.cursor-toggle {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .cursor-toggle {
+    display: inline-flex;
   }
 }
 
@@ -111,6 +151,23 @@
 .smooth-cursor-hand {
   display: block;
   transition: opacity 120ms ease-out, scale 140ms cubic-bezier(0.2, 0.9, 0.3, 1.4);
+}
+
+/* Pin the arrow's drawn TIP to the hotspot, the same correction the hand
+   below has always had. The tip is the path's apex at viewBox (25, 11) in a
+   50x54 box rendered at 25x27 — a uniform 0.5 scale, so (12.5px, 5.5px) from
+   the element's corner, which is the point `translate3d` puts on the pointer.
+   Unoffset, the arrow was drawn down-right of where clicks actually land, and
+   swapping to the (correctly pinned) hand on a link visibly jumped the glyph
+   ~12px. `transform-origin` moves to that same apex so rotation swings the
+   body behind a tip that stays put, rather than orbiting the tip around the
+   SVG's centre — which is what makes the lerp-free position in
+   smooth-cursor.tsx read as "the cursor is exactly here". */
+.smooth-cursor-arrow {
+  position: absolute;
+  top: -5.5px;
+  left: -12.5px;
+  transform-origin: 12.5px 5.5px;
 }
 
 /* Hand replaces arrow over clickables; the arrow keeps its steering rotation,

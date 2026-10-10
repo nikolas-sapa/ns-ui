@@ -25,6 +25,11 @@ const FRAME_H = 900;
  * ratio and rounding come from `className`, mount/eviction comes from
  * `active`.
  */
+// readyState poll cadence and its floor: 25 x 120ms = 3s, matching the
+// "first few seconds" the effect below describes.
+const POLL_MS = 120;
+const POLL_TICKS = 25;
+
 export function LivePreviewFrame({
   name,
   title,
@@ -138,6 +143,13 @@ export function LivePreviewFrame({
   // covers a frame torn down mid-poll.
   useEffect(() => {
     if (!active || loaded) return;
+    // The "first few seconds" above is a real deadline, not a figure of
+    // speech: a frame that never reaches `complete` (404 embed route, a chunk
+    // that fails, an offline visitor) otherwise keeps this interval doing a
+    // cross-realm document read 8x a second for as long as the card stays
+    // mounted, times MOUNT_CAP cards. Past the floor the `onLoad` handler is
+    // the only thing that can still help, and polling adds nothing.
+    let ticks = 0;
     const id = window.setInterval(() => {
       try {
         if (frameRef.current?.contentDocument?.readyState === "complete") {
@@ -145,11 +157,13 @@ export function LivePreviewFrame({
           // paint is already cropped rather than zooming in afterwards.
           refit();
           setLoaded(true);
+          return;
         }
       } catch {
         /* frame gone */
       }
-    }, 120);
+      if (++ticks >= POLL_TICKS) window.clearInterval(id);
+    }, POLL_MS);
     return () => window.clearInterval(id);
   }, [active, loaded, refit]);
 

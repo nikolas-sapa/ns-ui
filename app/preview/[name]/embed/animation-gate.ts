@@ -55,8 +55,15 @@ export const ANIMATION_GATE_SCRIPT = `(function () {
     return visible && document.visibilityState !== "hidden";
   }
 
-  function wrap(cb, token) {
+  function wrap(cb, token, id) {
     return function (ts) {
+      // Drop the bookkeeping entry the moment the frame runs. A rAF loop
+      // re-arms every frame with a fresh id and only ever cancels the last
+      // one, so without this the Map grows by ~60 entries/second for as long
+      // as the iframe lives and is never collected — it bounded nothing and
+      // leaked everything. After this point cancelAnimationFrame(id) is a
+      // no-op miss, which is exactly right: the frame has already fired.
+      tokens.delete(id);
       if (token.cancelled) return;
       cb(ts - pausedTotal);
     };
@@ -67,9 +74,9 @@ export const ANIMATION_GATE_SCRIPT = `(function () {
     var token = { cancelled: false };
     tokens.set(id, token);
     if (effectiveVisible()) {
-      nativeRaf(wrap(cb, token));
+      nativeRaf(wrap(cb, token, id));
     } else {
-      held.push({ cb: cb, token: token });
+      held.push({ cb: cb, token: token, id: id });
     }
     return id;
   };
@@ -84,7 +91,8 @@ export const ANIMATION_GATE_SCRIPT = `(function () {
     var queued = held;
     held = [];
     for (var i = 0; i < queued.length; i++) {
-      if (!queued[i].token.cancelled) nativeRaf(wrap(queued[i].cb, queued[i].token));
+      if (!queued[i].token.cancelled)
+        nativeRaf(wrap(queued[i].cb, queued[i].token, queued[i].id));
     }
   }
 

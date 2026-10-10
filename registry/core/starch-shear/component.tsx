@@ -113,6 +113,13 @@ export function StarchShear({
   const lastTimeRef = useRef(0);
   const runningRef = useRef(false);
   const rafRef = useRef<number | null>(null);
+  // The frame loop re-arms itself for as long as there is motion to settle, so
+  // without this it outlives the component: `writeItem` would keep writing
+  // transforms to detached nodes (pinning the subtree alive through
+  // `itemRefs`) and `commit` would keep calling `onValueChange` on a dead
+  // component, 60 times a second, for the life of the page. Checked before
+  // every re-arm and set by the mount effect's cleanup.
+  const disposedRef = useRef(false);
 
   const draggingRef = useRef(false);
   const pointerIdRef = useRef<number | null>(null);
@@ -169,7 +176,7 @@ export function StarchShear({
   }, []);
 
   const wake = useCallback(() => {
-    if (runningRef.current) return;
+    if (runningRef.current || disposedRef.current) return;
     runningRef.current = true;
     lastTimeRef.current = performance.now();
     rafRef.current = requestAnimationFrame(frameRef.current);
@@ -238,7 +245,7 @@ export function StarchShear({
       // settle toward next frame — ambient motion keeps the loop alive
       // continuously, gated only by tab visibility for cost.
       const settled = reducedRef.current && maxDelta < EPS_PX && envelopeRef.current < EPS_V;
-      if (!settled && !document.hidden) {
+      if (!settled && !document.hidden && !disposedRef.current) {
         rafRef.current = requestAnimationFrame(frameRef.current);
       } else {
         runningRef.current = false;
@@ -264,6 +271,7 @@ export function StarchShear({
     const el = listboxRef.current;
     if (!el) return;
 
+    disposedRef.current = false;
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     reducedRef.current = mq.matches;
     const onMotionChange = () => {
@@ -305,6 +313,10 @@ export function StarchShear({
     document.addEventListener("visibilitychange", onVisibility);
 
     return () => {
+      disposedRef.current = true;
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+      runningRef.current = false;
       mq.removeEventListener("change", onMotionChange);
       document.removeEventListener("visibilitychange", onVisibility);
       ro.disconnect();

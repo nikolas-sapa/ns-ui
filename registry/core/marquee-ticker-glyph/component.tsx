@@ -190,18 +190,26 @@ export function GlyphScrubTicker({
     container.addEventListener("pointermove", onPointerMove);
     container.addEventListener("pointerup", endDrag);
     container.addEventListener("pointercancel", endDrag);
-    container.addEventListener("pointerenter", () => {
+    // Named, not inline: this effect re-runs on every `speed` /
+    // `resolveThreshold` / reduced-motion change, and anonymous handlers
+    // cannot be removed below — a consumer driving `speed` from state piled
+    // four more onto the same node per change.
+    const onPointerEnter = () => {
       hovering = true;
-    });
-    container.addEventListener("pointerleave", () => {
+    };
+    const onPointerLeave = () => {
       hovering = false;
-    });
-    container.addEventListener("focusin", () => {
+    };
+    const onFocusIn = () => {
       focused = true;
-    });
-    container.addEventListener("focusout", () => {
+    };
+    const onFocusOut = () => {
       focused = false;
-    });
+    };
+    container.addEventListener("pointerenter", onPointerEnter);
+    container.addEventListener("pointerleave", onPointerLeave);
+    container.addEventListener("focusin", onFocusIn);
+    container.addEventListener("focusout", onFocusOut);
 
     // Arrow keys nudge the scrub position directly (fast enough repeats
     // briefly cross the resolve threshold so keyboard users can feel the
@@ -227,6 +235,10 @@ export function GlyphScrubTicker({
       container.removeEventListener("pointerup", endDrag);
       container.removeEventListener("pointercancel", endDrag);
       container.removeEventListener("keydown", onKeyDown);
+      container.removeEventListener("pointerenter", onPointerEnter);
+      container.removeEventListener("pointerleave", onPointerLeave);
+      container.removeEventListener("focusin", onFocusIn);
+      container.removeEventListener("focusout", onFocusOut);
     };
   }, [tape, speed, resolveThreshold, reduced]);
 

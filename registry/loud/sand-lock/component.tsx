@@ -1296,6 +1296,15 @@ export function SandLock({
       gl.deleteTexture(fieldTex);
       gl.deleteProgram(plateProg);
       gl.deleteProgram(grainProg);
+      // The deletes above free the GL objects but not the context holding
+      // them, and a detached canvas keeps its context until GC gets round to
+      // it — browsers cap live contexts per renderer process and evict the
+      // oldest first, which kills plates still on screen. Hand it back
+      // explicitly, but only once the canvas is really gone: this cleanup also
+      // runs on a dep change, including the glEpoch bump onRestored uses to
+      // rebuild after a loss, and a canvas returns its one lost context to
+      // every later getContext() — releasing here would blank the rebuild.
+      if (!canvas.isConnected) gl.getExtension("WEBGL_lose_context")?.loseContext();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [grains, speed, plateScale, glEpoch]);

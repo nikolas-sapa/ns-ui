@@ -578,7 +578,16 @@ export function TrayWeep({ className = "", style }: TrayWeepProps) {
       canvas.removeEventListener("webglcontextlost", onLost);
       canvas.removeEventListener("webglcontextrestored", onRestored);
       sleep();
+      // teardown() frees the GL objects but not the context holding them, and
+      // a detached canvas keeps its context until GC gets round to it —
+      // browsers cap live contexts per renderer process and evict the oldest
+      // first, which kills trays still on screen. Hand it back explicitly,
+      // but only on a real unmount: this cleanup also runs when a dep
+      // changes, and a canvas returns its one lost context to every later
+      // getContext(), so releasing too eagerly would blank the rebuilt tray.
+      const lose = gl?.getExtension("WEBGL_lose_context");
       teardown();
+      if (!canvas.isConnected) lose?.loseContext();
     };
   }, []);
 
