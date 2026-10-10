@@ -47,6 +47,13 @@ jobs:
       - name: Source invariants
         run: npm run test:source-invariants
 
+      # Runs ANIMATION_GATE_SCRIPT in a vm with a counting Map, because the
+      # token bookkeeping it leaked was invisible to every other gate here:
+      # it is a string, not reachable code, and the symptom was a tab dying
+      # after minutes of dwell rather than anything a single page load shows.
+      - name: Animation gate
+        run: npm run test:animation-gate
+
       - name: Build site
         run: npm run build
 

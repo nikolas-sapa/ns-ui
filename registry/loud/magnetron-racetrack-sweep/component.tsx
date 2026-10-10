@@ -677,7 +677,16 @@ export function MagnetronRacetrackSweep({
       sleep();
       if (erosionTex && surface.gl) surface.gl.deleteTexture(erosionTex);
       erosionTex = null;
+      // destroy() frees the GL objects but not the context holding them, and a
+      // detached canvas keeps its context until GC gets round to it —
+      // browsers cap live contexts per renderer process and evict the oldest
+      // first, which kills tracks still on screen. Hand it back explicitly,
+      // but only on a real unmount: this cleanup also runs when a dep changes,
+      // and a canvas returns its one lost context to every later getContext(),
+      // so releasing too eagerly would blank the rebuilt track.
+      const lose = surface.gl?.getExtension("WEBGL_lose_context");
       surface.destroy();
+      if (!canvas.isConnected) lose?.loseContext();
     };
   }, []);
 

@@ -1186,7 +1186,16 @@ export function WeldPool({
       sleep();
       if (texture && surface.gl) surface.gl.deleteTexture(texture);
       texture = null;
+      // destroy() frees the GL objects but not the context holding them, and a
+      // detached canvas keeps its context until GC gets round to it —
+      // browsers cap live contexts per renderer process and evict the oldest
+      // first, which kills pools still on screen. Hand it back explicitly,
+      // but only on a real unmount: this cleanup also runs when a dep changes,
+      // and a canvas returns its one lost context to every later getContext(),
+      // so releasing too eagerly would blank the rebuilt pool.
+      const lose = surface.gl?.getExtension("WEBGL_lose_context");
       surface.destroy();
+      if (!canvas.isConnected) lose?.loseContext();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [headlineWeight, headlineFit, headlineY, relief, speed, scale]);

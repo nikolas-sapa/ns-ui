@@ -174,11 +174,25 @@ function Particles({ still, visible }: { still: boolean; visible: RefObject<bool
   );
 }
 
+// Memoised per document, and the probe context is handed straight back.
+// Browsers cap live WebGL contexts per renderer process (~16 in Chrome), and a
+// dropped canvas holds its context until GC gets round to it — so probing on
+// every mount spent budget on feature detection alone, and once the cap is hit
+// the browser kills the OLDEST contexts, i.e. the demos being looked at.
+let webglSupport: boolean | null = null;
+function detectWebGL() {
+  if (webglSupport !== null) return webglSupport;
+  const canvas = document.createElement("canvas");
+  const gl = canvas.getContext("webgl2") || canvas.getContext("webgl");
+  webglSupport = !!gl;
+  gl?.getExtension("WEBGL_lose_context")?.loseContext();
+  return webglSupport;
+}
+
 function useWebGLSupport() {
   const [supported, setSupported] = useState(true);
   useEffect(() => {
-    const canvas = document.createElement("canvas");
-    setSupported(!!(canvas.getContext("webgl2") || canvas.getContext("webgl")));
+    setSupported(detectWebGL());
   }, []);
   return supported;
 }

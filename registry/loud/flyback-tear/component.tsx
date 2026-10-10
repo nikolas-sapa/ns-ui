@@ -1235,6 +1235,14 @@ export function FlybackTear({
       glassProg?.destroy();
       signalProg = null;
       glassProg = null;
+      // The deletes above free the GL objects but not the context holding
+      // them, and a detached canvas keeps its context until GC gets round to
+      // it — browsers cap live contexts per renderer process and evict the
+      // oldest first, which kills tears still on screen. Hand it back
+      // explicitly, but only on a real unmount: this cleanup also runs when a
+      // dep changes, and a canvas returns its one lost context to every later
+      // getContext(), so releasing too eagerly would blank the rebuilt tear.
+      if (!canvas.isConnected) gl.getExtension("WEBGL_lose_context")?.loseContext();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [captionWeight, captionFit, captionY, tear, noise, persistence, curvature, speed]);
