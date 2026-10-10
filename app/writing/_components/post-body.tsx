@@ -2,10 +2,15 @@ import type { ReactNode } from "react";
 
 /**
  * A purpose-built renderer for the small markdown subset the writing posts
- * actually use: `##`/`###` headings, paragraphs, fenced code blocks, inline
- * code and links. No markdown package in this repo (checked package.json)
- * and the subset is narrow enough that pulling one in for four block types
- * would be a bigger dependency than the parser itself.
+ * actually use: `##`/`###` headings, paragraphs, fenced code blocks, bulleted
+ * and numbered lists, inline code, bold and links. No markdown package in
+ * this repo (checked package.json) and the subset is narrow enough that
+ * pulling one in would be a bigger dependency than the parser itself.
+ *
+ * Lists and bold were missing until they were found rendering literally in
+ * production: `content/writing/llms-txt-use-when-audit.md` authors both, and
+ * every item was shipping as a paragraph beginning "- " or "1. " with visible
+ * `**` around the numbers. Valid HTML, so no gate caught it.
  *
  * Blocks are separated by blank lines. Within a block, more than one line
  * means intentional separate lines (used by the sign-off block at the end of
@@ -79,11 +84,40 @@ function parseBlocks(markdown: string): ReactNode[] {
       group.push(lines[i]);
       i += 1;
     }
-    for (const paragraph of group) {
+    // A run of list items becomes one list. Anything else in the group stays
+    // one paragraph per physical line (the sign-off block relies on that).
+    let g = 0;
+    while (g < group.length) {
+      const marker = listMarker(group[g]);
+      if (!marker) {
+        blocks.push(
+          <p key={key++} className="text-[17px] leading-[1.75] text-foreground/90">
+            {renderInline(group[g])}
+          </p>,
+        );
+        g += 1;
+        continue;
+      }
+      const ordered = marker === "ordered";
+      const items: string[] = [];
+      while (g < group.length && listMarker(group[g]) === marker) {
+        items.push(stripMarker(group[g]));
+        g += 1;
+      }
+      const List = ordered ? "ol" : "ul";
       blocks.push(
-        <p key={key++} className="text-[17px] leading-[1.75] text-foreground/90">
-          {renderInline(paragraph)}
-        </p>,
+        <List
+          key={key++}
+          className={`space-y-2 pl-5 text-[17px] leading-[1.75] text-foreground/90 ${
+            ordered ? "list-decimal" : "list-disc"
+          }`}
+        >
+          {items.map((item, idx) => (
+            <li key={idx} className="pl-1 marker:text-ns-muted">
+              {renderInline(item)}
+            </li>
+          ))}
+        </List>,
       );
     }
   }
@@ -91,9 +125,27 @@ function parseBlocks(markdown: string): ReactNode[] {
   return blocks;
 }
 
-/** Inline pass: `code spans` and [text](url) links. Never runs inside a fence. */
+const UNORDERED = /^[-*]\s+\S/;
+const ORDERED = /^\d+\.\s+\S/;
+
+/** Which kind of list item a line is, if any. */
+function listMarker(line: string): "ordered" | "unordered" | null {
+  if (ORDERED.test(line)) return "ordered";
+  if (UNORDERED.test(line)) return "unordered";
+  return null;
+}
+
+function stripMarker(line: string): string {
+  return line.replace(/^(?:[-*]|\d+\.)\s+/, "");
+}
+
+/**
+ * Inline pass: `code spans`, **bold**, and [text](url) links. Never runs
+ * inside a fence. Code is matched first so a `**` inside a code span stays
+ * literal rather than turning into a <strong>.
+ */
 function renderInline(text: string): ReactNode[] {
-  const pattern = /(`[^`]+`)|(\[[^\]]+\]\([^)]+\))/g;
+  const pattern = /(`[^`]+`)|(\[[^\]]+\]\([^)]+\))|(\*\*[^*]+\*\*)/g;
   const nodes: ReactNode[] = [];
   let last = 0;
   let key = 0;
@@ -110,6 +162,12 @@ function renderInline(text: string): ReactNode[] {
         >
           {m[1].slice(1, -1)}
         </code>,
+      );
+    } else if (m[3]) {
+      nodes.push(
+        <strong key={key++} className="font-semibold text-foreground">
+          {m[3].slice(2, -2)}
+        </strong>,
       );
     } else if (m[2]) {
       const link = /^\[([^\]]+)\]\(([^)]+)\)$/.exec(m[2]);
