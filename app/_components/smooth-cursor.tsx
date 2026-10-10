@@ -1,18 +1,28 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
+import {
+  CURSOR_NATIVE_KEY,
+  CURSOR_PREF_EVENT,
+  applyNativeCursorClass,
+  prefersNativeCursor,
+} from "@/lib/cursor";
 
-// ponytail: lerp, not a real spring. Swap in a damped spring if the ease reads too linear.
-const EASE = 0.18; // higher = tighter follow
 const TURN = 0.22; // rotation smoothing
-const MIN_SPEED = 0.35; // below this, keep the last angle instead of jittering
+// Below this, keep the last angle instead of jittering. Raised from the
+// portfolio's 0.35 along with the lerp removal below: `dx/dy` used to be the
+// decaying *gap* to the pointer (already low-passed by the ease, so sub-pixel
+// values were meaningful), and is now the raw per-frame pointer delta. 0.75
+// excludes a stationary pointer and trackpad sub-pixel noise while still
+// admitting any real 1px move, whose direction is genuine.
+const MIN_SPEED = 0.75;
 
 const CLICKABLE =
   'a, button, [role="button"], [role="link"], input, textarea, select, summary, label';
 
 /**
- * Ported from the portfolio's `SmoothCursor` (same lerp/turn constants, same
+ * Ported from the portfolio's `SmoothCursor` (same turn constant, same
  * markup, same CSS hooks), with ns-ui-specific additions: bails out entirely
  * inside iframes, since every `/preview/<slug>` shape and every catalog card
  * thumbnail render this same root layout framed — a hidden native cursor
@@ -21,6 +31,10 @@ const CLICKABLE =
  * to the hand-state hit test on top of the portfolio's plain tag/role list,
  * so any non-semantic clickable (a div/span with an onClick, styled
  * cursor-pointer instead of using a real button/link) still gets the hand.
+ *
+ * The portfolio's position lerp is gone (see `frame` below) and the visitor
+ * can switch the whole thing off (lib/cursor.ts, CursorToggle) — both from the
+ * same report, that the trailing read as cursor acceleration.
  */
 export function SmoothCursor() {
   const ref = useRef<HTMLDivElement>(null);
@@ -33,8 +47,37 @@ export function SmoothCursor() {
   // images across the registry, including the weld-pool reference shots.
   const onPreview = pathname?.startsWith("/preview") ?? false;
 
+  // The visitor's off switch. Starts `false` so the server and the first
+  // client render agree (nothing in the markup below depends on it either
+  // way); the class on <html>, set pre-paint by the no-flash script, is the
+  // real first-frame answer, and globals.css already honours it on its own —
+  // this state is only what tears the listeners and the rAF loop down.
+  const [native, setNative] = useState(false);
   useEffect(() => {
-    if (onPreview) return;
+    const read = () => setNative(prefersNativeCursor());
+    read();
+    // Same document: CursorToggle flips the class and fires this, since a
+    // classList change is not otherwise observable.
+    window.addEventListener(CURSOR_PREF_EVENT, read);
+    // Every OTHER same-origin document: `storage` never fires in the one that
+    // wrote, so this is the host page's only notice that a second tab (or a
+    // framed copy of this shell, which cannot own a cursor itself) changed the
+    // preference. Same pattern as theme-sync.tsx.
+    const onStorage = (e: StorageEvent) => {
+      // A key of `null` means the whole storage area was cleared.
+      if (e.key !== CURSOR_NATIVE_KEY && e.key !== null) return;
+      applyNativeCursorClass(e.newValue === "1");
+      read();
+    };
+    window.addEventListener("storage", onStorage);
+    return () => {
+      window.removeEventListener(CURSOR_PREF_EVENT, read);
+      window.removeEventListener("storage", onStorage);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (onPreview || native) return;
     // See the module comment — this component only owns the cursor on the
     // top-level document, never inside an embedded component's iframe.
     if (window.self !== window.top) return;
@@ -127,10 +170,17 @@ export function SmoothCursor() {
     addEventListener("pointerenter", onEnter);
 
     const frame = () => {
+      // The hotspot is the pointer, full stop — no lerp. The portfolio's
+      // `x += (tx - x) * 0.18` is what the owner was reading as "cursor
+      // acceleration": at 60fps the arrow needed ~20 frames to close a gap, so
+      // it visibly trailed on every move and overshot nothing on stopping.
+      // Only the *rotation* is still smoothed, which is where the character
+      // was, and it costs no positional lag. dx/dy stay the frame's real
+      // movement, which is a better steering signal than the old decaying gap.
       const dx = tx - x;
       const dy = ty - y;
-      x += dx * EASE;
-      y += dy * EASE;
+      x = tx;
+      y = ty;
 
       const speed = Math.hypot(dx, dy);
       if (speed > MIN_SPEED) {
@@ -156,8 +206,14 @@ export function SmoothCursor() {
       removeEventListener("pointerleave", onLeave);
       removeEventListener("pointerenter", onEnter);
       document.body.classList.remove("smooth-cursor-active");
+      // Back to the pre-first-move state. This effect can now run a second
+      // time (the visitor switching the cursor back on), and the element is
+      // the same one — left visible, it would paint one frame at
+      // translate3d(0,0,0) before the next pointermove seeded a position,
+      // flashing the arrow in the top-left corner.
+      el.dataset.visible = "false";
     };
-  }, [onPreview]);
+  }, [onPreview, native]);
 
   if (onPreview) return null;
 

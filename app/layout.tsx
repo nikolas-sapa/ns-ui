@@ -9,6 +9,7 @@ import { SmoothScroll } from "./_components/smooth-scroll";
 import { SmoothCursor } from "./_components/smooth-cursor";
 import { NO_FLASH_SCRIPT } from "@/lib/theme";
 import { NO_FLASH_SIDEBAR_SCRIPT } from "@/lib/sidebar";
+import { NO_FLASH_CURSOR_SCRIPT } from "@/lib/cursor";
 import { CATALOG_GATE_SCRIPT } from "@/lib/catalog-gate";
 import { navGroups, summarizeNav } from "@/lib/nav-data";
 import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
@@ -106,6 +107,11 @@ export default function RootLayout({
         {/* Same reasoning, for a collapsed sidebar instead of a theme — see
             lib/sidebar.ts. */}
         <script dangerouslySetInnerHTML={{ __html: NO_FLASH_SIDEBAR_SCRIPT }} />
+        {/* Same reasoning again, for a visitor who switched the replacement
+            cursor off — see lib/cursor.ts. This one is what keeps their
+            native cursor from disappearing for the frames between paint and
+            the effect in <SmoothCursor /> below. */}
+        <script dangerouslySetInnerHTML={{ __html: NO_FLASH_CURSOR_SCRIPT }} />
         {/* Same reasoning again, for the homepage catalog's URL-carried
             filter/sort state — see lib/catalog-gate.ts. This is what keeps a
             shared `/?q=...` link from painting the unfiltered homepage and
