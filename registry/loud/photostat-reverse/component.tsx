@@ -620,10 +620,18 @@ export function PhotostatReverse({
       }
     };
 
-    const buildProgram = (): boolean => {
+    const buildProgram = (isRestore = false): boolean => {
       try {
         prog = new Program(gl, FRAG_SRC);
       } catch {
+        // The context survived; only the program failed. The early return on
+        // false below happens before the effect registers the cleanup that
+        // hands the context back, so the release has to happen here — the
+        // inverse of that cleanup's `!canvas.isConnected` test, since the
+        // canvas is still mounted on this path. A restore attempt is left
+        // alone: onRestored re-enters this builder, and releasing there would
+        // feed its own loss/restore/fail cycle.
+        if (!isRestore) gl.getExtension("WEBGL_lose_context")?.loseContext();
         return false;
       }
       quad = gl.createBuffer();
@@ -730,7 +738,7 @@ export function PhotostatReverse({
       mask = null;
       quad = null;
       maskReady = false;
-      if (!buildProgram()) return;
+      if (!buildProgram(true)) return;
       cssW = 0;
       cssH = 0;
       resize();

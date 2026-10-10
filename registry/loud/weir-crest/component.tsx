@@ -392,7 +392,7 @@ class GLSurface {
 
   constructor(private canvas: HTMLCanvasElement, private frag: string) {}
 
-  init(): boolean {
+  init(isRestore = false): boolean {
     const gl = this.canvas.getContext("webgl", {
       alpha: false,
       antialias: false,
@@ -406,7 +406,7 @@ class GLSurface {
       this.fs = compile(gl, gl.FRAGMENT_SHADER, this.frag);
       const program = gl.createProgram();
       if (!program) {
-        this.destroy();
+        this.abandon(isRestore);
         return false;
       }
       this.program = program;
@@ -414,11 +414,11 @@ class GLSurface {
       gl.attachShader(program, this.fs);
       gl.linkProgram(program);
       if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-        this.destroy();
+        this.abandon(isRestore);
         return false;
       }
     } catch {
-      this.destroy();
+      this.abandon(isRestore);
       return false;
     }
     gl.useProgram(this.program);
@@ -434,6 +434,20 @@ class GLSurface {
     gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
     this.locs.clear();
     return true;
+  }
+
+  // A compile/link failure above happens on a context getContext() already
+  // handed over, and the caller's `if (!surface.init()) return` never
+  // registers the effect cleanup that hands a context back — so the release
+  // belongs here, while this.gl still reaches it. The condition is the
+  // inverse of that cleanup's `!canvas.isConnected`: the canvas is still
+  // mounted on this path, and the context that must NOT be released is one
+  // the browser has just restored, since onRestored re-enters init() and a
+  // release there would feed its own loss/restore/fail cycle.
+  private abandon(isRestore: boolean) {
+    const lose = isRestore ? null : this.gl?.getExtension("WEBGL_lose_context");
+    this.destroy();
+    lose?.loseContext();
   }
 
   private loc(name: string): WebGLUniformLocation | null {
@@ -909,7 +923,7 @@ export function WeirCrest({
       stop();
     };
     const onRestored = () => {
-      if (surface.init()) {
+      if (surface.init(true)) {
         readColors();
         resize();
         start();

@@ -1072,11 +1072,19 @@ export function FlybackTear({
       havePointer = false;
     };
 
-    const buildPrograms = (): boolean => {
+    const buildPrograms = (isRestore = false): boolean => {
       try {
         signalProg = new Program(gl, FRAG_SIGNAL);
         glassProg = new Program(gl, FRAG_GLASS);
       } catch {
+        // The context survived; only the programs failed. The early return on
+        // false below happens before the effect registers the cleanup that
+        // hands the context back, so the release has to happen here — the
+        // inverse of that cleanup's `!canvas.isConnected` test, since the
+        // canvas is still mounted on this path. A restore attempt is left
+        // alone: onRestored re-enters this builder, and releasing there would
+        // feed its own loss/restore/fail cycle.
+        if (!isRestore) gl.getExtension("WEBGL_lose_context")?.loseContext();
         return false;
       }
       quad = gl.createBuffer();
@@ -1195,7 +1203,7 @@ export function FlybackTear({
       texture = null;
       quad = null;
       front = 0;
-      if (!buildPrograms()) return;
+      if (!buildPrograms(true)) return;
       cssW = 0;
       cssH = 0;
       resize();
