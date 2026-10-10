@@ -54,6 +54,13 @@ jobs:
       - name: Animation gate
         run: npm run test:animation-gate
 
+      # The writing posts are rendered by a hand-written markdown subset
+      # parser, so a feature the author uses but the parser lacks ships as
+      # literal text -- valid HTML, invisible to the console and screenshot
+      # gates. This asserts the content stays inside what the parser renders.
+      - name: Writing markdown
+        run: npm run test:writing-markdown
+
       - name: Build site
         run: npm run build
 
