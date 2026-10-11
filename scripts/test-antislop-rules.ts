@@ -382,3 +382,131 @@ test("deadSignals names every signal no file exhibits, and nothing else", () => 
     "absent everywhere is still dead — the signal measures nothing yet",
   );
 });
+
+// --- Fix 3: the verdict pools fail closed too ------------------------------
+
+// At n=20 the corpus holds 2 slop files, so slopRate is quantised to
+// {0, 0.5, 1} and a perfect-looking gap can rest on one or two files. A
+// separation computed from that cannot authorize a rule.
+test("a slop pool below the minimum is ineligible however wide the gap looks", () => {
+  const thin = new Map([
+    ...slops("gradient-blob", "present", 2),
+    ...exemplars("gradient-blob", "absent"),
+    ...controls("gradient-blob", "absent"),
+  ]);
+  const r = eligibility("gradient-blob", thin);
+  assert.equal(r.eligible, false, "a gap of 1.00 over 2 slop files is not evidence");
+  assert.equal(r.slopRate, 1, "the rate is still reported, it just cannot authorize anything");
+  assert.match(r.reason, /slop.*n=2|n=2.*slop/s);
+
+  // The boundary: the minimum itself is enough.
+  const enough = new Map([
+    ...slops("gradient-blob", "present", 3),
+    ...exemplars("gradient-blob", "absent"),
+    ...controls("gradient-blob", "absent"),
+  ]);
+  assert.equal(eligibility("gradient-blob", enough).eligible, true);
+});
+
+// The same reasoning on the other side of the gap. It cannot bind at n=20
+// (9 exemplars) but the gap is computed from both pools, so a thin exemplar
+// pool makes it just as unreliable.
+test("an exemplar pool below the minimum is ineligible", () => {
+  const thin = new Map([
+    ...slops("gradient-blob", "present"),
+    ...exemplars("gradient-blob", "absent", 2),
+    ...controls("gradient-blob", "absent"),
+  ]);
+  const r = eligibility("gradient-blob", thin);
+  assert.equal(r.eligible, false);
+  assert.match(r.reason, /exemplar.*n=2|n=2.*exemplar/s);
+});
+
+// The real corpus case: three-card-row was eligible on slop 1/1 because the
+// other slop file left the pool unsettled. Unresolved must not fill a verdict
+// pool any more than it fills the control pool.
+test("unresolved files do not count toward a verdict pool minimum", () => {
+  const corpus = new Map([
+    ...slops("three-card-row", "present", 1, "sp"),
+    ...slops("three-card-row", "unresolved", 3, "su"),
+    ...exemplars("three-card-row", "absent"),
+    ...controls("three-card-row", "absent"),
+  ]);
+  const r = eligibility("three-card-row", corpus);
+  assert.equal(r.eligible, false, "1 rated slop file plus 3 non-answers is 1 rated slop file");
+  assert.match(r.reason, /n=1/);
+});
+
+// Both pools short: the reason must name both, not stop at the first.
+test("a reason naming a thin pool names every thin pool", () => {
+  const corpus = new Map([
+    ...slops("gradient-blob", "present", 2),
+    ...exemplars("gradient-blob", "absent", 1),
+    ...controls("gradient-blob", "absent"),
+  ]);
+  const r = eligibility("gradient-blob", corpus);
+  assert.equal(r.eligible, false);
+  assert.match(r.reason, /slop/);
+  assert.match(r.reason, /exemplar/);
+});
+
+// --- Fix 4: the control gate is a slop-signal concern ----------------------
+
+// The gate's own reason gives it away: "a rule against it would convict the
+// control cohort" is an avoid-rule argument. A prefer rule on a craft signal
+// that was common in 2014 praises that cohort; there is nothing to convict.
+test("a craft signal common pre-AI is still eligible — the control gate is not its concern", () => {
+  const corpus = new Map([
+    ...exemplars("one-accent-discipline", "present"),
+    ...slops("one-accent-discipline", "absent"),
+    ...controls("one-accent-discipline", "present"),
+  ]);
+  const r = eligibility("one-accent-discipline", corpus);
+  assert.equal(r.eligible, true, "71% in 2014 is weak positive evidence for a craft signal, not a disqualification");
+  assert.equal(r.controlRate, 1, "the rate is still measured and reported, it just does not gate");
+  // A reader seeing "71% in pre-ai-2015" on an eligible signal must be able to
+  // tell the gate was skipped rather than passed.
+  assert.match(r.reason, /not gated for a craft signal/);
+});
+
+// And the pool minimum behind that gate goes with it: a craft signal needs no
+// control evidence at all, because a genuinely new technique has none.
+test("a craft signal with no control evidence is still eligible", () => {
+  const corpus = new Map([
+    ...exemplars("live-claim-control", "present"),
+    ...slops("live-claim-control", "absent"),
+  ]);
+  const r = eligibility("live-claim-control", corpus);
+  assert.equal(r.eligible, true, "live-claim-control is exactly the new technique an inverted gate would disqualify");
+  assert.equal(r.controlRate, 0);
+});
+
+// The other half: the gate must stay on for slop signals, both parts of it.
+test("a slop signal still answers to the control gate", () => {
+  const common = new Map([
+    ...slops("gradient-blob", "present"),
+    ...exemplars("gradient-blob", "absent"),
+    ...controls("gradient-blob", "present"),
+  ]);
+  const r = eligibility("gradient-blob", common);
+  assert.equal(r.eligible, false, "a slop signal common pre-AI is still a convention");
+  assert.match(r.reason, /convention/i);
+
+  const none = new Map([
+    ...slops("gradient-blob", "present"),
+    ...exemplars("gradient-blob", "absent"),
+  ]);
+  assert.equal(eligibility("gradient-blob", none).eligible, false, "and still fails closed with no control evidence");
+});
+
+// The slop-pool minimum is class-independent: a gap computed from one or two
+// slop files is unreliable whichever direction it points.
+test("a craft signal is still held to the slop-pool minimum", () => {
+  const corpus = new Map([
+    ...exemplars("editorial-grid-break", "present"),
+    ...slops("editorial-grid-break", "absent", 2),
+  ]);
+  const r = eligibility("editorial-grid-break", corpus);
+  assert.equal(r.eligible, false, "2 rated slop files cannot support a separation in either direction");
+  assert.match(r.reason, /slop.*n=2|n=2.*slop/s);
+});
