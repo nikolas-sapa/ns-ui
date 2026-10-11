@@ -8,6 +8,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import { loadSnapshot, findComponent } from "./data.ts";
+import { formatRules, rulesForContext } from "./antislop.ts";
 import { searchComponents } from "./search.ts";
 import { CONVENTIONS } from "./conventions.ts";
 
@@ -222,6 +223,26 @@ server.registerTool(
     inputSchema: {},
   },
   async () => text(CONVENTIONS)
+);
+
+server.registerTool(
+  "get_antislop_rules",
+  {
+    title: "Get ns-ui anti-slop design rules",
+    description:
+      "What to avoid and what to do instead for a given page context (hero, " +
+      "pricing, features, …), each rule backed by a count of real sites studied. " +
+      "Read this before writing marketing-page UI so the result doesn't default " +
+      "to the template every AI-built page converges on. Counts are computed from " +
+      "the evidence files, not asserted.",
+    inputSchema: {
+      context: z
+        .string()
+        .optional()
+        .describe("Page context, e.g. 'hero' or 'pricing'. Omit for every rule."),
+    },
+  },
+  async ({ context }) => text(formatRules(rulesForContext(context), context))
 );
 
 const transport = new StdioServerTransport();
