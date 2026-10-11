@@ -35,6 +35,22 @@ jobs:
       - name: Build registry
         run: npm run registry:build
 
+      # Restoring a hand-edited count locally is only half of it: a stale
+      # count committed by hand must also fail CI, or it ships. The counts in
+      # content/rules/ are generated in place between markers by
+      # scripts/build-antislop.ts (chained into registry:build above), so a
+      # rebuild that changes anything means what was committed did not match
+      # the evidence. The build itself also exits non-zero when a
+      # rule-eligible signal has no rule, so this step covers both.
+      #
+      # content/rules/ only: mcp/data/ is gitignored (like the registry
+      # snapshot) and regenerated on every build, so it has no committed
+      # state to go stale and `git diff` would silently compare nothing.
+      - name: anti-slop counts are not stale
+        run: |
+          node scripts/build-antislop.ts
+          git diff --exit-code -- content/rules/
+
       - name: Typecheck
         run: npm run typecheck
 
