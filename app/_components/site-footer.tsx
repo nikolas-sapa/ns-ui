@@ -121,6 +121,29 @@ export function SiteFooter() {
           Built by Nikolas Sapa
         </a>
         <p>Built with love for developers, with Claude Code.</p>
+        {/* Directory badge. It is the verification mechanism, not decoration:
+            LaunchNest checks for it on this origin before the listing goes
+            live, so it has to ship before the destination resolves. Plain
+            <img> rather than next/image to avoid adding a remote pattern for
+            one third-party asset, lazy because it is below every page, and
+            sized explicitly so a slow or dead third party cannot shift the
+            footer. Only a dark variant is published, so it stays dark in both
+            themes -- their artwork, not ours to recolour. */}
+        <a
+          href="https://launchnest.io/p/ns-ui-react-components-one-interaction-each"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="ml-auto rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        >
+          <img
+            src="https://launchnest.io/badge/ns-ui-react-components-one-interaction-each.svg?variant=featured"
+            alt="ns-ui: React components on LaunchNest"
+            width={220}
+            height={56}
+            loading="lazy"
+            decoding="async"
+          />
+        </a>
       </div>
     </footer>
   );
