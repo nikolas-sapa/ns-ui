@@ -18,7 +18,7 @@ signals:
   testimonial-card-row: absent
   indigo-violet-accent: absent
   gradient-fill-cta: absent
-  scroll-reveal-blank: present
+  scroll-reveal-blank: unresolved
   typewriter-headline: absent
   stock-photo-generic: absent
   centered-hero-stack: absent
@@ -74,9 +74,17 @@ pill and the download buttons. Nothing else on the page is chromatic; the colour
 all comes from the game footage. Single theme, heavy condensed grotesk wordmark,
 tight geometric sans for the headline.
 
-**Scroll walker, partial.** The walk fires the band under the hero — "Combine any
-game in your library and play with your friends" over Elden Ring and Hollow Knight
-cover art flanking the download button, where the static capture had Call of Duty and
-Super Mario — so the section is confirmed scroll-gated and `scroll-reveal-blank` is
-present. Roughly 4000px between that band and the FAQ stays black even after the full
-walk, so the gate is real but a walked capture does not recover everything behind it.
+**Scroll walker says no, and the first reading of it was wrong.** The band under the
+hero does change between captures — Elden Ring and Hollow Knight cover art where the
+static capture had Call of Duty and Super Mario — but that is the page rotating its
+cover art per load, not a section mounting. A row-level diff of the two full captures
+puts every changed row in the hero video panel plus two rows at y1220-1260 in that
+cover-art strip. Across the roughly 4000px of black between it and the FAQ, not one
+row differs. Mean ink per row goes 7.6% to 8.3%, and all of that 0.7 point is the
+video sitting at a different frame.
+
+So `scroll-reveal-blank` is `unresolved`, on the same standard applied to
+`vercel-com`: the band is real and the page is clearly not rendering something, but
+scrolling is the gate the signal names and a full-document walk does not open it.
+`openhack` under the identical walk goes 6.0% to 27.8% mean ink, 4.6x — that is what
+a confirmed gate looks like, and this is not it.
