@@ -5,29 +5,34 @@ cohort: pre-ai-2015
 context: [hero, features, testimonials, cta, footer]
 verdict: slop
 studied: 2026-10-11
+materials: [single-theme, illustration]
 signals:
-  centered-hero-stack: present
   gradient-blob: present
   three-card-row: present
   glass-card-overuse: absent
   emoji-as-icon: absent
   generic-sans-default: absent
-  purple-blue-gradient-cta: absent
   symmetric-everything: present
   badge-pill-spam: absent
+  generic-line-icon-set: present
+  testimonial-card-row: absent
+  indigo-violet-accent: present
+  gradient-fill-cta: absent
+  scroll-reveal-blank: absent
+  typewriter-headline: absent
+  stock-photo-generic: absent
+  centered-hero-stack: present
   hero-mockup-float: present
-  feature-icons-identical: present
-  testimonial-card-triplet: absent
-  dark-mode-afterthought: absent
   asymmetric-split: absent
   single-optical-anchor: absent
   type-scale-high-contrast: absent
   editorial-grid-break: absent
   custom-type-pairing: absent
-  motion-tied-to-input: unresolved
   real-product-screenshot: present
+  artifact-not-dashboard: absent
   density-variation: absent
   one-accent-discipline: present
+  live-claim-control: absent
 ---
 Capture year 2014 (Jan 2015 snapshot). The control cohort's proof that the
 slop template is not an AI invention. This page runs six of the thirteen
@@ -52,3 +57,8 @@ from one set.
 One hue does carry the page, which is the single piece of discipline here.
 Everything else is the template: centered stack, gradient field, mirrored
 panels, three stats, identical icons, logo wall, quote band, icon list.
+**v3 re-pass.** `indigo-violet-accent` is present, and this is the cohort's proof that
+the hue is not an AI invention either: the hero field samples #5b4e91 to #61519c, the
+bottom CTA is a flat #6e5baa, and the testimonial band, every stat illustration and
+every feature icon sit in the same violet. One hue, eleven years before the palette
+became a tell. `gradient-fill-cta` is absent — the CTA fill is flat.

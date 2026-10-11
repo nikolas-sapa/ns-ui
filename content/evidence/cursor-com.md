@@ -5,29 +5,34 @@ cohort: agent-tools
 context: [hero, nav, features, testimonials, cta, footer]
 verdict: mixed
 studied: 2026-10-10
+materials: [dual-theme, illustration]
 signals:
-  centered-hero-stack: absent
   gradient-blob: absent
   three-card-row: present
   glass-card-overuse: absent
   emoji-as-icon: absent
   generic-sans-default: absent
-  purple-blue-gradient-cta: absent
   symmetric-everything: absent
   badge-pill-spam: absent
+  generic-line-icon-set: absent
+  testimonial-card-row: absent
+  indigo-violet-accent: absent
+  gradient-fill-cta: absent
+  scroll-reveal-blank: absent
+  typewriter-headline: absent
+  stock-photo-generic: absent
+  centered-hero-stack: absent
   hero-mockup-float: present
-  feature-icons-identical: absent
-  testimonial-card-triplet: absent
-  dark-mode-afterthought: absent
   asymmetric-split: present
   single-optical-anchor: absent
   type-scale-high-contrast: absent
   editorial-grid-break: absent
   custom-type-pairing: present
-  motion-tied-to-input: unresolved
   real-product-screenshot: present
+  artifact-not-dashboard: absent
   density-variation: present
   one-accent-discipline: present
+  live-claim-control: absent
 ---
 Captured at 1440x900 light and dark; full page 8175px. A cookie-consent card covers
 roughly (890,755) to (1420,885) in both captures.
@@ -56,8 +61,8 @@ members flip, so the primary/secondary hierarchy survives the theme change — t
 common failure is inverting the field and leaving one button's fill fixed, which
 collapses the pair. The painted backdrop is the same painting in both themes,
 darkened and desaturated in dark rather than swapped. A dark capture differs from
-light across 99.7% of pixels; this is a designed second theme, so
-dark-mode-afterthought is absent.
+light across 99.7% of pixels; this is a designed second theme, recorded as
+`materials: dual-theme` rather than as a signal.
 
 Where it fails. The hero composites two application windows over a 19th-century
 romantic landscape oil painting: a "Cursor Desktop" window from x=180 to x=1260 with

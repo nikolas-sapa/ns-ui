@@ -5,29 +5,34 @@ cohort: yc-current
 context: [hero, nav, footer]
 verdict: mixed
 studied: 2026-10-10
+materials: [dual-theme]
 signals:
-  centered-hero-stack: absent
   gradient-blob: present
   three-card-row: unresolved
   glass-card-overuse: absent
   emoji-as-icon: absent
   generic-sans-default: absent
-  purple-blue-gradient-cta: absent
   symmetric-everything: absent
   badge-pill-spam: absent
+  generic-line-icon-set: absent
+  testimonial-card-row: unresolved
+  indigo-violet-accent: present
+  gradient-fill-cta: absent
+  scroll-reveal-blank: present
+  typewriter-headline: present
+  stock-photo-generic: absent
+  centered-hero-stack: absent
   hero-mockup-float: present
-  feature-icons-identical: absent
-  testimonial-card-triplet: unresolved
-  dark-mode-afterthought: absent
   asymmetric-split: present
   single-optical-anchor: absent
   type-scale-high-contrast: present
   editorial-grid-break: absent
   custom-type-pairing: absent
-  motion-tied-to-input: unresolved
   real-product-screenshot: unresolved
+  artifact-not-dashboard: absent
   density-variation: present
   one-accent-discipline: present
+  live-claim-control: absent
 ---
 AI-driven CRO running clinical trials, YC F26. The archetypal indigo-violet AI site,
 with one thing on it that almost nothing else in this pass has: a second theme that
@@ -42,10 +47,10 @@ agents do. A soft lilac radial wash sits behind the upper left of the hero, and 
 second lavender band gradient appears mid-page.
 
 The accent is a single flat indigo-violet, held across the CTA pill, the typewriter
-phrase, the three checklist marks and the product card's row icons. Recorded as
-purple-blue-gradient-cta absent because the pill is a solid fill, not a gradient;
-the hue is nonetheless the single most recognisable palette choice of this cohort,
-which the vocabulary has no way to record.
+phrase, the three checklist marks and the product card's row icons. Sampled down the
+CTA pill it holds flat at #8b85ff, so gradient-fill-cta is absent; the hue itself is
+the single most recognisable palette choice of this cohort and is what
+indigo-violet-accent exists to record. v1, naming only the gradient, missed it.
 
 Copy is the strongest part and argues a mechanism rather than a benefit: "thirteen
 purpose-built agents run a study end to end in lifecycle order, and every action
@@ -62,7 +67,7 @@ readouts ("Contract aging 41 d against the 77 d benchmark", "Site 12 KRI 0.74",
 product or a designed representation of it cannot be settled from a screenshot, so
 real-product-screenshot is unresolved rather than guessed.
 
-dark-mode-afterthought is recorded absent on evidence, not assumption. The nav
+`materials: dual-theme` is recorded on evidence, not assumption. The nav
 carries a theme toggle and the site answers prefers-color-scheme: the dark render
 swaps the moon glyph for a sun, re-grounds the page in deep indigo-black, re-skins
 the product card to a dark surface with lighter hairline borders, inverts text and
@@ -70,7 +75,7 @@ keeps the status chips and the indigo accent legible. Nothing is washed out and 
 surface is left at its light value.
 
 Below the hero the full-page capture is empty until the footer: the mid-page bands
-are scroll-triggered and never fired, so three-card-row, testimonial-card-triplet
-and motion-tied-to-input are unresolved. The nav names seven sections the capture
+are scroll-triggered and never fired — scroll-reveal-blank present — so three-card-row
+and testimonial-card-row stay unresolved. The nav names seven sections the capture
 cannot reach (Human checkpoint, Agents, Platform, Cancer App, AI Hospital Guide,
 Founders, Advisors).

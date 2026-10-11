@@ -5,29 +5,34 @@ cohort: agent-tools
 context: [hero, nav, features, testimonials, cta, footer]
 verdict: mixed
 studied: 2026-10-10
+materials: [single-theme, illustration]
 signals:
-  centered-hero-stack: absent
   gradient-blob: absent
   three-card-row: absent
   glass-card-overuse: absent
   emoji-as-icon: absent
   generic-sans-default: absent
-  purple-blue-gradient-cta: absent
   symmetric-everything: absent
   badge-pill-spam: absent
+  generic-line-icon-set: absent
+  testimonial-card-row: absent
+  indigo-violet-accent: present
+  gradient-fill-cta: absent
+  scroll-reveal-blank: present
+  typewriter-headline: absent
+  stock-photo-generic: absent
+  centered-hero-stack: absent
   hero-mockup-float: absent
-  feature-icons-identical: absent
-  testimonial-card-triplet: absent
-  dark-mode-afterthought: absent
   asymmetric-split: present
   single-optical-anchor: present
   type-scale-high-contrast: present
   editorial-grid-break: present
   custom-type-pairing: present
-  motion-tied-to-input: unresolved
   real-product-screenshot: present
+  artifact-not-dashboard: absent
   density-variation: present
   one-accent-discipline: absent
+  live-claim-control: absent
 ---
 Captured at 1440x900; full page 12319px.
 
@@ -62,10 +67,12 @@ Where it fails, and the failures are worth more than the successes here:
 weekend" in a left-to-right gradient fill measured at #bb79f0 violet, #8b9eec
 periwinkle, #73a9eb blue, #6ca9ca, #76b3bf teal. A violet-to-teal gradient on
 display type is among the most machine-generated devices in circulation, and it is
-here on a site the cohort copies. It is not scored under purple-blue-gradient-cta
-because the gradient is on a heading and on the hero badge's 1px border (#4a1b64 at
-its left end), not on a button — the primary CTA is an achromatic #151514 pill. See
-the proposed-signal note below; the vocabulary cannot currently name this.
+here on a site the cohort copies. v3's split is what finally names it: the hue is
+recorded under indigo-violet-accent, which fires on any fill, while gradient-fill-cta
+stays absent because the gradient is on a heading and on the hero badge's 1px border
+(#4a1b64 at its left end), never on a button — the primary CTA is an achromatic
+#151514 pill. Under v1's single purple-blue-gradient-cta the whole thing went
+unrecorded.
 
 **Accent sprawl.** Three unrelated hues carry meaning on one page: violet-to-teal on
 the heading and badge border, green on the status dot and the selected tab's
@@ -105,3 +112,13 @@ logo wall is 13 customer marks in two centered rows, monochrome.
 Single theme, dark-native. A prefers-color-scheme dark capture differs by 6.7% of
 pixels with both fields at #020202 — that delta is animated content between the two
 captures, not a theme, so there is no dark variant to be an afterthought.
+**v3 re-pass.** `scroll-reveal-blank` is present. Between the "Reach humans, not spam
+folders" heading and the Guillermo Rauch testimonial the full-page capture holds
+roughly a thousand pixels of literal #000 — sampled every hundred rows, zero non-black
+pixels across the band. That is unfired scroll-triggered content, and it is a separate
+defect from the empty "Everything in your control" tab panel described above, which
+renders its chrome.
+
+`indigo-violet-accent` is present on the gradient-text heading and the badge border;
+`gradient-fill-cta` is absent because the primary CTA is achromatic. That split is the
+whole point of v3 breaking `purple-blue-gradient-cta` in two.

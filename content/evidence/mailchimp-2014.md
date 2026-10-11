@@ -5,29 +5,34 @@ cohort: pre-ai-2015
 context: [hero, cta, footer]
 verdict: exemplar
 studied: 2026-10-11
+materials: [single-theme, commissioned-photo]
 signals:
-  centered-hero-stack: present
   gradient-blob: absent
   three-card-row: absent
   glass-card-overuse: absent
   emoji-as-icon: absent
   generic-sans-default: absent
-  purple-blue-gradient-cta: absent
   symmetric-everything: absent
   badge-pill-spam: absent
+  generic-line-icon-set: absent
+  testimonial-card-row: absent
+  indigo-violet-accent: absent
+  gradient-fill-cta: absent
+  scroll-reveal-blank: absent
+  typewriter-headline: absent
+  stock-photo-generic: absent
+  centered-hero-stack: present
   hero-mockup-float: absent
-  feature-icons-identical: absent
-  testimonial-card-triplet: absent
-  dark-mode-afterthought: absent
   asymmetric-split: absent
   single-optical-anchor: present
   type-scale-high-contrast: present
   editorial-grid-break: absent
   custom-type-pairing: present
-  motion-tied-to-input: unresolved
   real-product-screenshot: present
+  artifact-not-dashboard: absent
   density-variation: present
   one-accent-discipline: present
+  live-claim-control: absent
 ---
 Capture year 2014 (Dec 2014 snapshot). Centered, and the strongest page in
 this cohort, which is itself the useful finding: centering is not the

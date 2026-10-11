@@ -5,29 +5,34 @@ cohort: yc-current
 context: [hero, nav, features, cta, footer]
 verdict: exemplar
 studied: 2026-10-10
+materials: [single-theme, illustration]
 signals:
-  centered-hero-stack: present
   gradient-blob: absent
   three-card-row: absent
   glass-card-overuse: absent
   emoji-as-icon: absent
   generic-sans-default: absent
-  purple-blue-gradient-cta: absent
   symmetric-everything: absent
   badge-pill-spam: absent
+  generic-line-icon-set: absent
+  testimonial-card-row: absent
+  indigo-violet-accent: absent
+  gradient-fill-cta: absent
+  scroll-reveal-blank: absent
+  typewriter-headline: absent
+  stock-photo-generic: absent
+  centered-hero-stack: present
   hero-mockup-float: present
-  feature-icons-identical: absent
-  testimonial-card-triplet: absent
-  dark-mode-afterthought: absent
   asymmetric-split: present
   single-optical-anchor: present
   type-scale-high-contrast: present
   editorial-grid-break: present
   custom-type-pairing: present
-  motion-tied-to-input: unresolved
   real-product-screenshot: present
+  artifact-not-dashboard: absent
   density-variation: present
   one-accent-discipline: present
+  live-claim-control: absent
 ---
 In-house legal automation, YC F26. Filed as an exemplar despite a centred hero,
 because the centring is the only template move on the page and everything else
@@ -67,3 +72,13 @@ Single theme: light-scheme and dark-scheme captures are byte-identical, so the s
 ignores prefers-color-scheme rather than shipping a neglected dark mode. Two
 captures 3.5s apart are also byte-identical, so nothing animates on a timer and a
 static frame cannot settle whether anything answers the pointer.
+**v3 re-pass, correcting a material.** The warm plaster-and-foliage and Tuscan-doorway
+images are not photographs. At 1:1 they are painted — visible brushwork on the plaster
+and the olive leaves, no lens falloff, no grain — and they are described above as
+"painterly" for that reason. Recorded as `materials: illustration`, and
+`stock-photo-generic` is absent because there is no stock photograph to judge.
+
+The hero product card renders with its interior blurred behind a visible
+Active / Waiting / Done tab strip. That is a frosted treatment, not an unfired
+section: the rest of the 7832px page renders complete, so `scroll-reveal-blank` is
+absent.
