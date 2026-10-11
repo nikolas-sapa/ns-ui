@@ -142,6 +142,24 @@ export function SiteShell({
 }) {
   const pathname = usePathname();
   const router = useRouter();
+
+  /**
+   * Opening a sidebar category also filters the catalog to it. The row used
+   * to only unfold a list of names, which meant the two halves of "show me
+   * the heroes" lived in different controls: this tree, and the chip row
+   * above the grid. One click now does both — the names unfold here and the
+   * grid below becomes those components, live.
+   *
+   * `?category=` is the same contract the chips write and CATALOG_GATE_SCRIPT
+   * reads before paint, so a sidebar click and a chip click are
+   * indistinguishable to everything downstream, including a shared URL.
+   */
+  const pickCategory = useCallback(
+    (id: string) => {
+      router.push(`/?category=${encodeURIComponent(id)}`, { scroll: false });
+    },
+    [router],
+  );
   const [open, setOpen] = useState(false);
   const [cmdkOpen, setCmdkOpen] = useState(false);
   // Text the palette should open pre-filled with. Empty for every opener
@@ -907,6 +925,7 @@ export function SiteShell({
                 if (v) wantTree();
                 toggle(g.id, v);
               }}
+              onPickCategory={pickCategory}
               openIds={openIds}
               onToggleKind={toggle}
               isFiltering={isFiltering}
@@ -969,6 +988,7 @@ function NavCategory({
   pending,
   open,
   onToggle,
+  onPickCategory,
   openIds,
   onToggleKind,
   isFiltering,
@@ -982,6 +1002,8 @@ function NavCategory({
   pending: boolean;
   open: boolean;
   onToggle: (open: boolean) => void;
+  /** Filters the catalog to this category — see `pickCategory`. */
+  onPickCategory: (id: string) => void;
   openIds: Set<string>;
   onToggleKind: (id: string, open: boolean) => void;
   isFiltering: boolean;
@@ -995,7 +1017,19 @@ function NavCategory({
       open={open}
       onToggle={(e) => onToggle(e.currentTarget.open)}
     >
-      <summary className="flex cursor-pointer list-none items-center justify-between rounded-sm px-2 py-1.5 outline-none transition-colors [&::-webkit-details-marker]:hidden hover:bg-surface focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none">
+      <summary
+        // Only on the click that OPENS the row. Collapsing is a "hide this
+        // list" gesture, not "show me these components", and re-filtering
+        // there would fight the visitor. Read before the native toggle runs,
+        // so `open` is still the pre-click value. Deliberately not driven
+        // from onToggle: that also fires for the opens this component forces
+        // (filter matches, the active section on navigation), which would
+        // turn an ordinary page load into a redirect.
+        onClick={(e) => {
+          if (!e.currentTarget.closest("details")?.open) onPickCategory(group.id);
+        }}
+        className="flex cursor-pointer list-none items-center justify-between rounded-sm px-2 py-1.5 outline-none transition-colors [&::-webkit-details-marker]:hidden hover:bg-surface focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
+      >
         <span className="flex items-center gap-1.5 text-[12px] text-ns-muted transition-colors group-hover/cat:text-foreground motion-reduce:transition-none">
           <Chevron />
           {group.label}
