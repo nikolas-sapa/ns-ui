@@ -13,20 +13,29 @@
 import { ALL_SIGNALS, CRAFT_SIGNALS, SLOP_SIGNALS, type SignalValue } from "../../lib/antislop-vocab.ts";
 import type { Evidence } from "./evidence.ts";
 
-// Thresholds. Deliberately stated here, not buried.
+// The gates, in one place. Every one of these encodes a finding at n=20 and is
+// expected to be revisited as evidence accumulates — the spec calls this a
+// procedure to re-run, not a calibrated constant, and no public claim should
+// cite these numbers.
 //
-// What they actually reduce to at n=20 is narrower than the numbers suggest:
-// the corpus holds 2 slop files, so slopRate is quantised to {0, 0.5, 1} and
-// the separation gate becomes "both slop files show it and fewer than 7 of 9
-// exemplars do", or "one does and at most 1 of 9 exemplars does". The control
-// pool is 7 files, so one file moves controlRate by 0.143 and the gate is
-// decided by single-file coin flips. Both rates also inherit the circularity
-// the spec admits in section 6: verdicts were set by the rater who had just
-// set the signals. This is a procedure to re-run as evidence accumulates, not
-// a calibrated constant, and no public claim should cite these numbers.
-const SEPARATION_MIN = 0.3; // gap between the two verdict pools, in the direction the class claims
-const CONTROL_MAX = 0.3; // present-rate within the control cohort
-const CONTROL_MIN_N = 3; // rated control files needed before the gate means anything
+// What they reduce to on the current corpus is narrower than the values
+// suggest. There are 2 slop files, so slopRate is quantised to {0, 0.5, 1} and
+// the 0.3 gap does almost no work: the binding constraint is slopRate itself.
+// One of those 2 is heroku-2014, a control file, so the separation and control
+// gates are not independent — a 2014 convention earns separation credit from
+// the same cohort the control gate penalises it for. The control pool is 7
+// files, so one file moves controlRate by 0.143 and the gate turns on
+// single-file coin flips. Both verdict rates also inherit the circularity the
+// spec admits in section 6: verdicts were set by the rater who had just set
+// the signals. The two pool minimums below are what stop any of that from
+// authorizing a rule: thin evidence fails closed rather than passing quietly.
+const SEPARATION_MIN = 0.3; // gap between the verdict pools, in the direction the class claims
+const CONTROL_MAX = 0.3; // present-rate within the control cohort; SLOP SIGNALS ONLY
+const CONTROL_MIN_N = 3; // rated control files before the control gate means anything; slop only
+// The slop-pool minimum, applied to EITHER verdict pool rather than only the
+// slop one: the gap is computed from both, so either being thin makes it
+// unreliable, and for a craft signal the thin side is the slop pool anyway.
+const VERDICT_MIN_N = 3; // rated files in each verdict pool before a gap means anything; both classes
 
 // The cohort that answers "was this already normal before AI-built pages?".
 // Named rather than inlined because every verdict here turns on it.
@@ -91,17 +100,45 @@ export function eligibility(signal: string, corpus: Map<string, Evidence>): Elig
   const [hiName, loName] = isSlop ? ["slop", "exemplar"] : ["exemplar", "slop"];
   const gap = hi.rate - lo.rate;
 
-  // Fail closed. With too few rated control files the honest answer is "not
-  // enough evidence to tell", and a rate of 0 over an empty pool would clear
-  // the exact gate that exists to catch pre-AI conventions.
-  if (control.n < CONTROL_MIN_N) {
-    return no(
-      `only ${control.n} rated ${CONTROL_COHORT} file(s) (n=${control.n}), ${CONTROL_MIN_N} required: not enough control evidence to tell whether this is a convention that predates AI-built pages. Rate it in more ${CONTROL_COHORT} evidence before authoring a rule.`,
-    );
+  // The control gate is a slop-signal concern only. Its own argument — "a rule
+  // against it would convict the control cohort" — is an avoid-rule argument:
+  // a prefer rule built on a craft signal that was common in 2014 praises that
+  // cohort, so there is nothing to convict. It is deliberately NOT inverted for
+  // craft either. Requiring a minimum pre-AI presence would assert that real
+  // craft must be timeless, a stronger claim than the evidence supports, and it
+  // would disqualify a genuinely new technique — live-claim-control is exactly
+  // that. Being common in 2014 is weak positive evidence for a craft signal,
+  // not a requirement. controlRate is still measured and reported for every
+  // signal; it just does not gate a craft one.
+  if (isSlop) {
+    // Fail closed. With too few rated control files the honest answer is "not
+    // enough evidence to tell", and a rate of 0 over an empty pool would clear
+    // the exact gate that exists to catch pre-AI conventions.
+    if (control.n < CONTROL_MIN_N) {
+      return no(
+        `only ${control.n} rated ${CONTROL_COHORT} file(s) (n=${control.n}), ${CONTROL_MIN_N} required: not enough control evidence to tell whether this is a convention that predates AI-built pages. Rate it in more ${CONTROL_COHORT} evidence before authoring a rule.`,
+      );
+    }
+    if (control.rate > CONTROL_MAX) {
+      return no(
+        `already present in ${pct(control.rate)} of ${CONTROL_COHORT} evidence (n=${control.n}) — a convention, not an AI artifact. A rule against it would convict the control cohort.`,
+      );
+    }
   }
-  if (control.rate > CONTROL_MAX) {
+  // Fail closed on the separation side too. The gap is computed from both
+  // verdict pools, so either one being thin makes it unreliable however wide
+  // it looks: three-card-row scored a gap of 0.89 on a single rated slop file.
+  // Checked after the control gate because "this is a 2014 convention" is a
+  // decisive finding, while a thin pool is only an absence of evidence.
+  const thin = ([
+    [hiName, hi],
+    [loName, lo],
+  ] as const).filter(([, p]) => p.n < VERDICT_MIN_N);
+  if (thin.length > 0) {
     return no(
-      `already present in ${pct(control.rate)} of ${CONTROL_COHORT} evidence (n=${control.n}) — a convention, not an AI artifact. A rule against it would convict the control cohort.`,
+      `not enough rated evidence to compute a separation: ${thin
+        .map(([name, p]) => `${name} (n=${p.n})`)
+        .join(", ")}; ${VERDICT_MIN_N} rated files required in each verdict pool. A gap resting on one or two files cannot authorize a rule.`,
     );
   }
   if (gap < SEPARATION_MIN) {
@@ -116,6 +153,8 @@ export function eligibility(signal: string, corpus: Map<string, Evidence>): Elig
   return {
     eligible: true,
     ...rates,
-    reason: `separates as a ${cls} signal: ${pct(hi.rate)} of ${hiName} (n=${hi.n}) vs ${pct(lo.rate)} of ${loName} evidence (n=${lo.n}), gap ${gap.toFixed(2)}; ${pct(control.rate)} in ${CONTROL_COHORT} (n=${control.n})`,
+    reason: `separates as a ${cls} signal: ${pct(hi.rate)} of ${hiName} (n=${hi.n}) vs ${pct(lo.rate)} of ${loName} evidence (n=${lo.n}), gap ${gap.toFixed(2)}; ${pct(control.rate)} in ${CONTROL_COHORT} (n=${control.n})${
+      isSlop ? "" : ", measured but not gated for a craft signal"
+    }`,
   };
 }
