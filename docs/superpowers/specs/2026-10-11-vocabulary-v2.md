@@ -60,8 +60,7 @@ The other three zeros — `badge-pill-spam`, `glass-card-overuse`,
 | `typewriter-headline` | slop | `nxtcure-labs` (hero, caught at two strings), `decent-com` (product panel, two dollar values) |
 | `indigo-violet-accent` | slop | `nxtcure-labs`; `databuddy` background bloom |
 | `live-claim-control` | craft | `silica` ("Press and hold to apply load", drives the chart backing the page's one argument) |
-| `stock-photo-hero` | neutral? | `capveon` (five credited CC0 photographs) |
-| `yc-backer-badge` | neutral? | 7 of 8 — cohort artifact; recording it stops it contaminating `badge-pill-spam` |
+| `stock-photo-generic` | slop | stock that could belong to any company, or stock the type cannot survive on so a scrim is bolted over it. `capveon` is **absent**: its headline is sited in dark water where the photograph has no detail, so no scrim is needed, and every image is credited |
 
 **`artifact-not-dashboard` exposes a bug, not a gap.** `real-product-screenshot`
 means the opposite thing, so `decent-com` had to be marked absent on it —
@@ -74,10 +73,19 @@ agent reading the page all get nothing.
 
 ## 4. Open schema decisions for session 2
 
-1. **Does the vocabulary need a third class?** v1 has slop and craft only.
-   `stock-photo-hero` and `yc-backer-badge` are descriptive, not
-   evaluative. Third class, or plain frontmatter fields outside the signal
-   set? Awaiting the cohort agent's recommendation.
+1. ~~Does the vocabulary need a third class?~~ **Settled: no.** Every
+   signal exists to aggregate into a rule carrying `stance: avoid | prefer`.
+   A neutral signal can never carry a stance, so it would validate, count
+   and emit into `antislop.json` while being unable to do the one job a
+   signal has. The two candidates dissolve on inspection:
+   `yc-backer-badge` is not a design fact at all (it records who funded the
+   company; `cohort: yc-current` already says that) and existed only to stop
+   contaminating `badge-pill-spam` — which that signal's own scope rule
+   fixes directly. `stock-photo-hero` felt neutral because it was named at
+   the wrong altitude: it named a material, not a decision. Renamed to
+   `stock-photo-generic` it carries a stance cleanly.
+   **The general lesson: a signal that feels neutral is almost always named
+   at the wrong altitude.** Rename it before reaching for a new class.
 2. **Replace `motion-tied-to-input`.** Unresolved 17/20 — a static capture
    cannot settle it. `live-claim-control` is narrower, stronger, and
    resolvable from a still because the affordance is a visible label.
@@ -122,17 +130,53 @@ The two slop pages are `heroku-2014` (6 signals: centered stack, gradient
 field, three-card row, symmetric panels, floating mockups, one line-icon
 set) and `openhack` (5). Every exemplar sits at 2 or below.
 
-This breaks the rule model in the v1 spec, where one rule = one signal plus
-a count. A rule reading "38/40 sites do X" would convict pages that did X
-well — `neomatter` is an exemplar that centres its hero, `decent-com` an
-exemplar that floats a product panel. Session 2's schema must either mark
-some signals as compound-only or weight co-occurrence rather than summing
-independent hits.
+### The separation is partly circular — do not cite it as a finding
 
-Caveat, stated firmly: 2 slop files is almost no data. The threshold is
-suggestive, not established, and the verdicts were assigned by the same
-raters who set the signals, so this is not an independent test. It is a
-hypothesis worth designing around, not a result.
+**The verdict and the signals were set by the same rater in the same pass.**
+Each rater read the screenshots, set 22 signals, then assigned a verdict
+informed by what they had just set. So "slop-count predicts verdict" is
+partly tautological. The clean separation may be measuring rater
+consistency rather than a property of the sites.
+
+Three raters produced the three cohorts, and the pattern holds in all
+three — but that does not break the circularity, because each rater could
+be individually self-consistent. It is not independent evidence.
+
+Two cheap ways to break it, for session 2:
+- One agent sets signals, a second assigns verdicts blind to them.
+- Check whether the count predicts a verdict the rater did not produce.
+
+Until one runs, the 0-2 / 0-4 / 5-6 bands are a hypothesis to test, not a
+result — independently of the n=2 problem.
+
+### A signal must EARN a rule
+
+The v1 model (one rule = one signal + a count) does not survive for the
+*conventions*, but it is probably fine for signals that discriminate on
+their own — `emoji-as-icon` and `generic-sans-default` plausibly still do.
+Rather than abandoning it, make a signal earn its rule. It may back one
+only if:
+
+1. its present-rate separates exemplar from slop, and
+2. it is not already common in `pre-ai-2015`.
+
+`hero-mockup-float` fails both and gets no rule; it stays in the evidence
+files as a recorded fact. This is a procedure to apply as evidence
+accumulates, not a threshold to freeze at n=20, and it fits the
+numeric-criteria style of the v1 test plan.
+
+### Several slop signals are just pre-AI web conventions
+
+`hero-mockup-float` at 43% in 2014 and `generic-line-icon-set` across all
+three 2014 exemplars are the same finding twice: **part of the v1
+vocabulary measures "is this a website" rather than "is this slop".** That
+is what the density result predicts — individual conventions are neutral,
+accumulation is the defect. The two findings corroborate each other, which
+is worth more than either alone.
+
+The rule this forces: never author "icons bad". Author the count, the
+uniformity, and the informational emptiness. A rule phrased the first way
+fails against the 2014 cohort the first time anyone tests it.
 
 ## 7. `hero-mockup-float` does not discriminate
 
