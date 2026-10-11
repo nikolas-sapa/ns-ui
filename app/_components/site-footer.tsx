@@ -1,5 +1,42 @@
 import { AskAI } from "./ask-ai";
 
+/**
+ * Launch-directory badges. These are a verification mechanism, not
+ * decoration: each directory fetches the page at the URL it has on file and
+ * checks for its own badge image wrapped in a followable link back to the
+ * listing. A `nofollow`, `sponsored` or `ugc` rel cancels the backlink, and
+ * removing the badge later can get the listing delisted — so they live in the
+ * footer, which renders on the homepage (the URL directories actually list)
+ * and on every other page, rather than on a dedicated page a directory would
+ * never look at.
+ *
+ * Plain <img> rather than next/image: each would otherwise need its own
+ * remotePatterns entry. Lazy because the footer is below the fold everywhere,
+ * and explicitly sized so a slow or offline directory cannot shift the layout
+ * — which is not hypothetical, letslaunch.today was returning 504s when its
+ * badge was added. A directory that is down degrades to alt text and heals
+ * itself when it comes back.
+ *
+ * Only dark variants are published by both, so they stay dark in either
+ * theme. Their artwork, not ours to recolour.
+ */
+const DIRECTORY_BADGES = [
+  {
+    href: "https://launchnest.io/p/ns-ui-react-components-one-interaction-each",
+    src: "https://launchnest.io/badge/ns-ui-react-components-one-interaction-each.svg?variant=featured",
+    alt: "ns-ui: React components on LaunchNest",
+    width: 220,
+    height: 56,
+  },
+  {
+    href: "https://letslaunch.today/product/ns-ui",
+    src: "https://letslaunch.today/badge/ns-ui.svg",
+    alt: "NS UI on LetsLaunch",
+    width: 250,
+    height: 54,
+  },
+] as const;
+
 const COLUMN_LABEL = "font-mono text-[10px] uppercase tracking-wider text-ns-muted";
 
 // Same link idiom as the sidebar's own bottom bar (site-shell.tsx) — plain
@@ -116,34 +153,32 @@ export function SiteFooter() {
         ))}
       </div>
 
-      <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-2 border-t border-border pt-6">
+      <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-4 border-t border-border pt-6">
         <a href="https://nikolas.helpmarq.com" className={`${COLUMN_LINK} -mx-2 inline-block`}>
           Built by Nikolas Sapa
         </a>
         <p>Built with love for developers, with Claude Code.</p>
-        {/* Directory badge. It is the verification mechanism, not decoration:
-            LaunchNest checks for it on this origin before the listing goes
-            live, so it has to ship before the destination resolves. Plain
-            <img> rather than next/image to avoid adding a remote pattern for
-            one third-party asset, lazy because it is below every page, and
-            sized explicitly so a slow or dead third party cannot shift the
-            footer. Only a dark variant is published, so it stays dark in both
-            themes -- their artwork, not ours to recolour. */}
-        <a
-          href="https://launchnest.io/p/ns-ui-react-components-one-interaction-each"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="ml-auto rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-        >
-          <img
-            src="https://launchnest.io/badge/ns-ui-react-components-one-interaction-each.svg?variant=featured"
-            alt="ns-ui: React components on LaunchNest"
-            width={220}
-            height={56}
-            loading="lazy"
-            decoding="async"
-          />
-        </a>
+        <ul className="ml-auto flex flex-wrap items-center justify-end gap-3">
+          {DIRECTORY_BADGES.map((badge) => (
+            <li key={badge.href}>
+              <a
+                href={badge.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              >
+                <img
+                  src={badge.src}
+                  alt={badge.alt}
+                  width={badge.width}
+                  height={badge.height}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </a>
+            </li>
+          ))}
+        </ul>
       </div>
     </footer>
   );
