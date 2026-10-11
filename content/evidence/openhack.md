@@ -67,3 +67,11 @@ byte-identical, confirming nothing animates on a timer; the page waits for scrol
 Single theme, so there is no neglected second one. One accent, a single gold, used
 on the headline's second line and nowhere else. A cookie-preferences panel covers
 the lower right of the first viewport on load.
+
+**Scroll walker confirms the gate.** Under a full-document scroll walk the page that
+rendered as near-total black paints completely: a six-mark customer wall, four
+benefit rows, a feature grid of code and scan panels, an integrations band with Slack
+and Linear cards, a security-research carousel, a startups/enterprise two-up, a
+seven-question FAQ and the footer. `scroll-reveal-blank` is present on evidence. It
+also means the signals this file marks `unresolved` below the fold are recoverable
+from a walked capture rather than permanently unsettleable.

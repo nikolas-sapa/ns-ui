@@ -79,3 +79,16 @@ are scroll-triggered and never fired — scroll-reveal-blank present — so thre
 and testimonial-card-row stay unresolved. The nav names seven sections the capture
 cannot reach (Human checkpoint, Agents, Platform, Cancer App, AI Hospital Guide,
 Founders, Advisors).
+
+**Scroll walker confirms the gate.** A full-document scroll walk paints every band
+the static capture left blank: the YC / Harvard / MIT credit card, a five-mark
+partner wall, "Reviewed by Board of Oncologists" over a four-row review queue with
+Reject/Approve controls, "Thirteen agents, in the order a trial unfolds", a four-card
+"One orchestration layer" row, and the closing CTA. `scroll-reveal-blank` is present
+on evidence, not inference.
+
+That walk also puts three of this file's `unresolved` calls within reach of being
+settled — the pillar row is a four-up rather than a `three-card-row`, the page
+carries no quote cards at all, and the revealed panels are the same designed-card
+idiom as the hero rather than captures of a shipping UI. Left `unresolved` here
+because re-rating them is outside this migration, but they are no longer unsettleable.

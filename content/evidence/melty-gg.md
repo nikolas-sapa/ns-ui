@@ -73,3 +73,10 @@ One accent, a single electric blue, on the nav Download chip, the "In one click"
 pill and the download buttons. Nothing else on the page is chromatic; the colour
 all comes from the game footage. Single theme, heavy condensed grotesk wordmark,
 tight geometric sans for the headline.
+
+**Scroll walker, partial.** The walk fires the band under the hero — "Combine any
+game in your library and play with your friends" over Elden Ring and Hollow Knight
+cover art flanking the download button, where the static capture had Call of Duty and
+Super Mario — so the section is confirmed scroll-gated and `scroll-reveal-blank` is
+present. Roughly 4000px between that band and the FAQ stays black even after the full
+walk, so the gate is real but a walked capture does not recover everything behind it.
