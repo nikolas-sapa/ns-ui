@@ -122,3 +122,9 @@ renders its chrome.
 `indigo-violet-accent` is present on the gradient-text heading and the badge border;
 `gradient-fill-cta` is absent because the primary CTA is achromatic. That split is the
 whole point of v3 breaking `purple-blue-gradient-cta` in two.
+
+**Scroll walker, partial.** The walk lights rows inside the black band that were flat
+`#000` in the static capture — y8300 goes from zero to 41% inked — so the band is
+scroll-gated rather than genuinely empty, and `scroll-reveal-blank` stands. Most of
+it stays black after a full-document walk, which puts this file alongside `melty-gg`:
+the gate is confirmed, the content behind it is not fully recoverable headless.

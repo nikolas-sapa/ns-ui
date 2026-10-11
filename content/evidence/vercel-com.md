@@ -18,7 +18,7 @@ signals:
   testimonial-card-row: absent
   indigo-violet-accent: absent
   gradient-fill-cta: absent
-  scroll-reveal-blank: present
+  scroll-reveal-blank: unresolved
   typewriter-headline: absent
   stock-photo-generic: absent
   centered-hero-stack: absent
@@ -91,3 +91,18 @@ unresolved is settled: a dark-scheme capture is a fully built second theme — t
 field goes near-black, both hero buttons and the nav "Sign Up" pill invert together,
 the seven customer logos re-ink to white and the triangle mark gains a rendered
 halo. Recorded as `materials: dual-theme`.
+
+**v3 re-pass, and a signal the scroll walker took back.** Everything below roughly
+3300px of the 5333px capture is empty, which reads as `scroll-reveal-blank` and was
+first recorded that way. A full-document scroll walk (1440x900, 600px steps with a
+700ms settle at each, height re-measured per step) does not paint it. The document
+grows from 5333px to 5930px under the walk, so something mounts, but across the
+2630px below y=3300 not one sampled pixel differs from the `#fafafa` field — maximum
+deviation zero. Scrolling is what the signal names as the gate, and scrolling does
+not open it.
+
+So the value is `unresolved`, not `present`. A dead region is established; a
+scroll-triggered reveal as its cause is not, and hydration that never completes
+headless, an observer wanting real user activation, and a bot gate all fit the same
+evidence. `nxtcure-labs` and `openhack` under the identical walk paint their whole
+page, which is what the present case looks like.
