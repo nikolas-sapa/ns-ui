@@ -5,29 +5,34 @@ cohort: yc-current
 context: [hero, nav, pricing, features, testimonials, cta, footer]
 verdict: mixed
 studied: 2026-10-10
+materials: [single-theme, illustration]
 signals:
-  centered-hero-stack: absent
   gradient-blob: present
   three-card-row: present
   glass-card-overuse: absent
   emoji-as-icon: absent
   generic-sans-default: absent
-  purple-blue-gradient-cta: absent
   symmetric-everything: absent
   badge-pill-spam: absent
+  generic-line-icon-set: present
+  testimonial-card-row: absent
+  indigo-violet-accent: present
+  gradient-fill-cta: absent
+  scroll-reveal-blank: absent
+  typewriter-headline: absent
+  stock-photo-generic: absent
+  centered-hero-stack: absent
   hero-mockup-float: present
-  feature-icons-identical: present
-  testimonial-card-triplet: absent
-  dark-mode-afterthought: absent
   asymmetric-split: present
   single-optical-anchor: absent
   type-scale-high-contrast: present
   editorial-grid-break: absent
   custom-type-pairing: absent
-  motion-tied-to-input: unresolved
   real-product-screenshot: present
+  artifact-not-dashboard: absent
   density-variation: present
   one-accent-discipline: absent
+  live-claim-control: absent
 ---
 Product analytics tool, YC F26. Dark site, hero text left at roughly half measure,
 headline split across two weights so the second line ("without a data team.") drops
@@ -60,3 +65,9 @@ Single theme. The default (prefers-color-scheme: light) capture renders dark, so
 there is no second theme to have neglected. Two captures 3.5s apart differ, so
 something on the page animates, but nothing in a static frame shows whether any
 motion answers to the pointer.
+**v3 re-pass.** `indigo-violet-accent` is present: the top-right bloom samples at
+#5e3e79 to #4e3d77 along its right edge, so the orange-to-magenta run terminates in
+indigo-violet rather than stopping at magenta. `gradient-fill-cta` is absent — the
+bloom is a background wash and both hero buttons are flat dark pills with hairlines.
+The full page renders complete, so `scroll-reveal-blank` is absent despite the page
+being 8761px tall.

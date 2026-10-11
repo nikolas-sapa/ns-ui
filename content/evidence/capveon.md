@@ -5,29 +5,34 @@ cohort: yc-current
 context: [hero, nav, features, cta, footer]
 verdict: mixed
 studied: 2026-10-10
+materials: [single-theme, stock-photo]
 signals:
-  centered-hero-stack: absent
   gradient-blob: absent
   three-card-row: absent
   glass-card-overuse: absent
   emoji-as-icon: absent
   generic-sans-default: absent
-  purple-blue-gradient-cta: absent
   symmetric-everything: absent
   badge-pill-spam: absent
+  generic-line-icon-set: present
+  testimonial-card-row: absent
+  indigo-violet-accent: absent
+  gradient-fill-cta: absent
+  scroll-reveal-blank: absent
+  typewriter-headline: absent
+  stock-photo-generic: absent
+  centered-hero-stack: absent
   hero-mockup-float: absent
-  feature-icons-identical: present
-  testimonial-card-triplet: absent
-  dark-mode-afterthought: absent
   asymmetric-split: present
   single-optical-anchor: present
   type-scale-high-contrast: present
   editorial-grid-break: absent
   custom-type-pairing: absent
-  motion-tied-to-input: unresolved
-  real-product-screenshot: present
+  real-product-screenshot: absent
+  artifact-not-dashboard: present
   density-variation: present
   one-accent-discipline: present
+  live-claim-control: absent
 ---
 Integration layer for construction and heavy industry, YC F26, the batch's only
 Government-tagged company. Photography does all the work, and it is stock
@@ -72,3 +77,19 @@ which are uniformly warm. Recorded as one-accent-discipline present on the same
 reading applied to neomatter, that zero or one accent is the same restraint. Single
 theme. 10869px tall, the longest page in this pass, and the full-page capture
 renders complete, so nothing here is scroll-gated.
+**v3 re-pass.** `real-product-screenshot` moves from present to absent under v3's
+scope fix ("the product's UI shown as a real screenshot"): nowhere on this page is
+Capveon's own interface pictured. What the v1 rater was scoring is the "What a
+morning looks like" panel, and that is the deliverable, not the UI — a two-column
+queue of proposed writes against the evidence for each, closing on "Four approved in
+one click each. One escalated.", with a refusal ("Flag / ERP customer credit limit
+below contract value. Needs a person.") standing in the list. So
+`artifact-not-dashboard` is present and the two stay mutually exclusive by
+construction rather than by luck.
+
+`stock-photo-generic` is absent on the carve-out v3 names: the photography is
+unambiguously stock (every frame carries a CC0 credit line) but the headline is sited
+in the dark water at the left of the dam frame where the image has no detail, so no
+scrim is bolted over anything. The material fact is recorded as `materials:
+stock-photo`; the signal asks a different question and answers no. 10869px render
+complete, so `scroll-reveal-blank` is absent.

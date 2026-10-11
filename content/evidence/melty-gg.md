@@ -5,29 +5,34 @@ cohort: yc-current
 context: [hero, nav, features, cta, footer]
 verdict: exemplar
 studied: 2026-10-10
+materials: [single-theme, video-hero]
 signals:
-  centered-hero-stack: absent
   gradient-blob: absent
   three-card-row: absent
   glass-card-overuse: absent
   emoji-as-icon: absent
   generic-sans-default: absent
-  purple-blue-gradient-cta: absent
   symmetric-everything: absent
   badge-pill-spam: absent
+  generic-line-icon-set: absent
+  testimonial-card-row: absent
+  indigo-violet-accent: absent
+  gradient-fill-cta: absent
+  scroll-reveal-blank: present
+  typewriter-headline: absent
+  stock-photo-generic: absent
+  centered-hero-stack: absent
   hero-mockup-float: absent
-  feature-icons-identical: absent
-  testimonial-card-triplet: absent
-  dark-mode-afterthought: absent
   asymmetric-split: absent
   single-optical-anchor: present
   type-scale-high-contrast: present
   editorial-grid-break: absent
   custom-type-pairing: absent
-  motion-tied-to-input: absent
   real-product-screenshot: present
+  artifact-not-dashboard: absent
   density-variation: present
   one-accent-discipline: present
+  live-claim-control: absent
 ---
 Game mashups, YC F26. Consumer gaming, and the only site in this pass whose hero
 is the product running rather than a picture of the product.
@@ -44,8 +49,9 @@ pill with a play triangle. Pause and mute controls sit in the panel's top right.
 The headline is not centred and the video is not a floating mockup; it is the frame
 the page is built around, and it is the only thing in the first screen.
 
-Motion is recorded absent for motion-tied-to-input: the clip autoplays and loops on
-its own, and the pause and mute affordances stop motion rather than drive it. Across
+live-claim-control is absent: the clip autoplays and loops on
+its own, and the pause and mute affordances stop motion rather than let a visitor
+test the claim the page is making. Across
 two captures 3.5s apart the video is at different frames and the panel is otherwise
 identical.
 

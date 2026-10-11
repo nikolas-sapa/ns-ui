@@ -5,29 +5,34 @@ cohort: agent-tools
 context: [hero, nav, features, footer]
 verdict: exemplar
 studied: 2026-10-10
+materials: [single-theme]
 signals:
-  centered-hero-stack: absent
   gradient-blob: absent
   three-card-row: present
   glass-card-overuse: absent
   emoji-as-icon: absent
   generic-sans-default: absent
-  purple-blue-gradient-cta: absent
   symmetric-everything: absent
   badge-pill-spam: absent
+  generic-line-icon-set: absent
+  testimonial-card-row: absent
+  indigo-violet-accent: absent
+  gradient-fill-cta: absent
+  scroll-reveal-blank: absent
+  typewriter-headline: absent
+  stock-photo-generic: absent
+  centered-hero-stack: absent
   hero-mockup-float: absent
-  feature-icons-identical: absent
-  testimonial-card-triplet: absent
-  dark-mode-afterthought: absent
   asymmetric-split: present
   single-optical-anchor: present
   type-scale-high-contrast: present
   editorial-grid-break: present
   custom-type-pairing: present
-  motion-tied-to-input: unresolved
   real-product-screenshot: absent
+  artifact-not-dashboard: absent
   density-variation: present
   one-accent-discipline: present
+  live-claim-control: absent
 ---
 Captured at 1440x900; full page 3340px. A cookie-consent card occupies the lower
 right of the capture from roughly (960,605) to (1415,850) and hides part of the
@@ -72,7 +77,7 @@ marketing copy — DATE / CATEGORY / DETAILS as left labels in small caps with
 right-aligned values and a 1px rule under each row, so the card is a data record
 rather than a pitch. And there is no icon: the usual row puts a 24px line icon above
 each heading, and this one puts nothing there at all, which is why
-feature-icons-identical is absent even though the row is present.
+generic-line-icon-set is absent even though the row is present.
 
 The section immediately after it is the better pattern and the direct alternative: a
 left statement ("At Anthropic, we build AI to serve humanity's long-term

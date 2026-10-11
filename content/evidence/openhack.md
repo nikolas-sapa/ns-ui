@@ -5,29 +5,34 @@ cohort: yc-current
 context: [hero, nav, cta]
 verdict: slop
 studied: 2026-10-10
+materials: [single-theme]
 signals:
-  centered-hero-stack: present
   gradient-blob: present
   three-card-row: unresolved
   glass-card-overuse: absent
   emoji-as-icon: absent
   generic-sans-default: present
-  purple-blue-gradient-cta: absent
   symmetric-everything: present
   badge-pill-spam: absent
+  generic-line-icon-set: unresolved
+  testimonial-card-row: unresolved
+  indigo-violet-accent: absent
+  gradient-fill-cta: absent
+  scroll-reveal-blank: present
+  typewriter-headline: absent
+  stock-photo-generic: absent
+  centered-hero-stack: present
   hero-mockup-float: present
-  feature-icons-identical: unresolved
-  testimonial-card-triplet: unresolved
-  dark-mode-afterthought: absent
   asymmetric-split: absent
   single-optical-anchor: absent
   type-scale-high-contrast: absent
   editorial-grid-break: absent
   custom-type-pairing: absent
-  motion-tied-to-input: unresolved
   real-product-screenshot: present
+  artifact-not-dashboard: absent
   density-variation: absent
   one-accent-discipline: present
+  live-claim-control: absent
 ---
 AI security scanning, YC F26. This is the reference rendering of the current
 template, and worth filing precisely because nothing about it is distinctive.

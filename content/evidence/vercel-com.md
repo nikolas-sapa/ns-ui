@@ -5,29 +5,34 @@ cohort: agent-tools
 context: [hero, nav, features, cta, footer]
 verdict: exemplar
 studied: 2026-10-10
+materials: [dual-theme]
 signals:
-  centered-hero-stack: absent
   gradient-blob: absent
   three-card-row: absent
   glass-card-overuse: absent
   emoji-as-icon: absent
   generic-sans-default: absent
-  purple-blue-gradient-cta: absent
   symmetric-everything: absent
   badge-pill-spam: absent
+  generic-line-icon-set: absent
+  testimonial-card-row: absent
+  indigo-violet-accent: absent
+  gradient-fill-cta: absent
+  scroll-reveal-blank: present
+  typewriter-headline: absent
+  stock-photo-generic: absent
+  centered-hero-stack: absent
   hero-mockup-float: absent
-  feature-icons-identical: absent
-  testimonial-card-triplet: absent
-  dark-mode-afterthought: unresolved
   asymmetric-split: present
   single-optical-anchor: present
   type-scale-high-contrast: present
   editorial-grid-break: present
   custom-type-pairing: unresolved
-  motion-tied-to-input: unresolved
   real-product-screenshot: present
+  artifact-not-dashboard: absent
   density-variation: present
   one-accent-discipline: present
+  live-claim-control: absent
 ---
 Captured at 1440x900; full page 5333px, of which everything below roughly 3300px
 failed to render under a 3.5s wait (lazy-mounted), so the footer and any closing
@@ -81,6 +86,8 @@ show another company's interface rather than Vercel's own, which is an unusual c
 `custom-type-pairing` is marked unresolved rather than absent: the page self-hosts
 `Geist_Variable`, five `GeistPixel` display cuts (Circle, Grid, Line, Square,
 Triangle) and one unnamed hashed face, so a pairing is clearly provisioned, but no
-pixel-face type appears in the region that rendered. `dark-mode-afterthought` is
-unresolved for the same reason — six `prefers-color-scheme` rules and twenty dark
-hooks exist in source but a dark-scheme capture is not what is described above.
+pixel-face type appears in the region that rendered. The theme question v1 left
+unresolved is settled: a dark-scheme capture is a fully built second theme — the
+field goes near-black, both hero buttons and the nav "Sign Up" pill invert together,
+the seven customer logos re-ink to white and the triangle mark gains a rendered
+halo. Recorded as `materials: dual-theme`.

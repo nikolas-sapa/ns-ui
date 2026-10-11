@@ -5,29 +5,34 @@ cohort: yc-current
 context: [hero, features, footer]
 verdict: exemplar
 studied: 2026-10-10
+materials: [single-theme, illustration]
 signals:
-  centered-hero-stack: absent
   gradient-blob: absent
   three-card-row: absent
   glass-card-overuse: absent
   emoji-as-icon: absent
   generic-sans-default: absent
-  purple-blue-gradient-cta: absent
   symmetric-everything: absent
   badge-pill-spam: absent
+  generic-line-icon-set: absent
+  testimonial-card-row: absent
+  indigo-violet-accent: absent
+  gradient-fill-cta: absent
+  scroll-reveal-blank: absent
+  typewriter-headline: absent
+  stock-photo-generic: absent
+  centered-hero-stack: absent
   hero-mockup-float: absent
-  feature-icons-identical: absent
-  testimonial-card-triplet: absent
-  dark-mode-afterthought: absent
   asymmetric-split: absent
   single-optical-anchor: present
   type-scale-high-contrast: present
   editorial-grid-break: present
   custom-type-pairing: absent
-  motion-tied-to-input: present
-  real-product-screenshot: present
+  real-product-screenshot: absent
+  artifact-not-dashboard: present
   density-variation: present
   one-accent-discipline: present
+  live-claim-control: present
 ---
 Force-sensing robot joints, YC F26. The one site in this pass that spends its
 opening viewport on nothing at all.
@@ -64,3 +69,12 @@ both break out of the narrow prose measure; the prose column never moves.
 
 One grotesk throughout, one orange, one theme. The footer is a wordmark and two
 links.
+**v3 re-pass.** `live-claim-control` is present and this page is the reference case
+for it: "Press and hold to apply load" sits above the force-at-the-gripper chart as a
+labelled control, so the claim that motor-current estimates are noise and joint
+measurement is not can be falsified by the visitor on the page.
+
+`real-product-screenshot` moves to absent and `artifact-not-dashboard` to present.
+There is no software UI anywhere on this page — the product appears as a line drawing,
+as isometric renders of the arm doing each task, and as force-vs-time charts. The
+chart is the deliverable, which is the example v3 cites for the signal.

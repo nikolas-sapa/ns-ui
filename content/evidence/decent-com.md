@@ -5,29 +5,34 @@ cohort: yc-current
 context: [hero, nav, features, testimonials, cta, footer]
 verdict: exemplar
 studied: 2026-10-10
+materials: [single-theme, commissioned-photo]
 signals:
-  centered-hero-stack: absent
   gradient-blob: absent
   three-card-row: absent
   glass-card-overuse: absent
   emoji-as-icon: absent
   generic-sans-default: absent
-  purple-blue-gradient-cta: absent
   symmetric-everything: absent
   badge-pill-spam: absent
+  generic-line-icon-set: absent
+  testimonial-card-row: absent
+  indigo-violet-accent: absent
+  gradient-fill-cta: absent
+  scroll-reveal-blank: absent
+  typewriter-headline: present
+  stock-photo-generic: absent
+  centered-hero-stack: absent
   hero-mockup-float: present
-  feature-icons-identical: absent
-  testimonial-card-triplet: absent
-  dark-mode-afterthought: absent
   asymmetric-split: present
   single-optical-anchor: absent
   type-scale-high-contrast: present
   editorial-grid-break: present
   custom-type-pairing: present
-  motion-tied-to-input: absent
   real-product-screenshot: absent
+  artifact-not-dashboard: present
   density-variation: present
   one-accent-discipline: present
+  live-claim-control: absent
 ---
 AI-native health insurance brokerage for small businesses, YC F26. Three colours,
 two families, and a page that runs on tables instead of feature cards.
@@ -40,7 +45,9 @@ minutes" button. The right side holds a black panel that is not a dashboard: a
 small white card reading "Your 2027 rates / $36,678 / per month" and a line of
 white text being typed in. Across two captures the panel reads "$36,678 … went u|"
 and "$39,180 … went up 18%. Again." with a "+18%" chip, so it is a timed typewriter
-loop. Motion is therefore recorded absent for motion-tied-to-input.
+loop — a product panel cycling phrases, recorded as typewriter-headline present.
+live-claim-control is absent: nothing on the page lets a visitor test the rate
+claim; the CTA opens a quote flow elsewhere.
 
 Type is a high-contrast transitional display serif against a humanist sans for body
 and all table text. Both families appear throughout; headline to body is roughly

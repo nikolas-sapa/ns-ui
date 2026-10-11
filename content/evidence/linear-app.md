@@ -5,29 +5,34 @@ cohort: agent-tools
 context: [hero, nav, features, testimonials, cta, footer]
 verdict: exemplar
 studied: 2026-10-10
+materials: [single-theme, illustration]
 signals:
-  centered-hero-stack: absent
   gradient-blob: absent
   three-card-row: absent
   glass-card-overuse: absent
   emoji-as-icon: absent
   generic-sans-default: present
-  purple-blue-gradient-cta: absent
   symmetric-everything: absent
   badge-pill-spam: absent
+  generic-line-icon-set: absent
+  testimonial-card-row: absent
+  indigo-violet-accent: absent
+  gradient-fill-cta: absent
+  scroll-reveal-blank: absent
+  typewriter-headline: absent
+  stock-photo-generic: absent
+  centered-hero-stack: absent
   hero-mockup-float: absent
-  feature-icons-identical: absent
-  testimonial-card-triplet: absent
-  dark-mode-afterthought: absent
   asymmetric-split: present
   single-optical-anchor: present
   type-scale-high-contrast: present
   editorial-grid-break: absent
   custom-type-pairing: absent
-  motion-tied-to-input: unresolved
   real-product-screenshot: present
+  artifact-not-dashboard: absent
   density-variation: present
   one-accent-discipline: present
+  live-claim-control: absent
 ---
 Captured at 1440x900; full page 9960px.
 
@@ -93,3 +98,16 @@ it from a default is not the face but the tracking: a per-size letter-spacing to
 scale (`--title-1-letter-spacing` through `--text-micro-letter-spacing`, with values
 down to -0.004em) means the headline and the 11px label are tracked differently.
 Copying Inter gets none of that. The face is free; the tracking table is the work.
+**v3 re-pass, and the call worth arguing.** `indigo-violet-accent` is recorded absent
+even though a lavender fill is demonstrably on the page — the OpenAI testimonial card
+samples #e2e4ff to #eae3ff. Two reasons it is still absent. The tint is pale, around
+11% saturation, not the saturated indigo the signal names. And the fill is sourced
+from a third party's identity, the same reasoning that keeps the card out of
+`gradient-blob` above; Linear's own palette above the footer is near-black and one
+near-white. Scoring it present would fire the signal on an exemplar because of a
+customer's logo card, which would cost it the separation it exists to provide. The
+literal reading of "the hue, in any fill" would say present, so this is the file that
+shows the phrase needs a scope line.
+
+Nothing else new fires: no photography, a flat white "Get started" pill, and a 9960px
+full-page capture that renders complete.
