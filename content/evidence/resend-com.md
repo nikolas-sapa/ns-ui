@@ -124,7 +124,10 @@ renders its chrome.
 whole point of v3 breaking `purple-blue-gradient-cta` in two.
 
 **Scroll walker, partial.** The walk lights rows inside the black band that were flat
-`#000` in the static capture — y8300 goes from zero to 41% inked — so the band is
-scroll-gated rather than genuinely empty, and `scroll-reveal-blank` stands. Most of
-it stays black after a full-document walk, which puts this file alongside `melty-gg`:
-the gate is confirmed, the content behind it is not fully recoverable headless.
+`#000` in the static capture: 38 rows differ between the two captures, spanning
+y5720 to y10960, and y8300 alone goes from zero to 41% inked. So the band is
+scroll-gated rather than genuinely empty and `scroll-reveal-blank` stands. The gain
+is thin — mean ink per row 8.5% to 9.3% against openhack's 6.0% to 27.8% — because
+what mounts is sparse rather than because little mounts. Much of the band is still
+black after a full walk; the gate is confirmed, the content behind it is not fully
+recoverable headless.
