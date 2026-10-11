@@ -3,6 +3,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
+ * How often a scroll gesture may re-rank the mounted set. Bounded below by
+ * "fast enough that a card inside the preload band is ranked before it
+ * reaches the viewport" and above by "slow enough not to force a layout on
+ * every frame Lenis eases".
+ */
+const SCROLL_RERANK_MS = 100;
+
+/**
  * Decides which cards may run a live preview iframe.
  *
  * Rule: any card touching the real viewport is never evicted (evicting a
@@ -81,6 +89,41 @@ export function useMountManager({
     frame.current = requestAnimationFrame(recompute);
   }, [recompute]);
 
+  // `schedule` is rAF-throttled, which bounds it to once per frame — but
+  // scroll FIRES every frame, because Lenis rewrites the scroll position on
+  // every frame it is easing. So `recompute` ran every frame of every scroll,
+  // reading getBoundingClientRect off every card inside the preload band
+  // immediately after Lenis's own writes: a forced layout per frame, for the
+  // whole gesture.
+  //
+  // The observers below still schedule immediately, so a card crossing the
+  // preload boundary mounts on that same frame. This throttle only slows the
+  // *re-ranking* that scroll alone drives, and the preload margin is exactly
+  // the slack that makes that safe: a card has `preloadMargin` px of travel
+  // before it genuinely needs to be mounted, which is hundreds of ms at any
+  // real scroll speed. The other thing re-ranking feeds is the on-screen set
+  // that pauses off-screen demos, where 100ms of latency is invisible.
+  const scrollAt = useRef(0);
+  const scrollTimer = useRef<number | null>(null);
+  const scheduleFromScroll = useCallback(() => {
+    const now = performance.now();
+    const since = now - scrollAt.current;
+    if (since >= SCROLL_RERANK_MS) {
+      scrollAt.current = now;
+      schedule();
+      return;
+    }
+    // Trailing edge. A gesture can stop inside the throttle window, and the
+    // resting position has to be ranked or a card sits mis-ranked until the
+    // next scroll or intersection.
+    if (scrollTimer.current !== null) return;
+    scrollTimer.current = window.setTimeout(() => {
+      scrollTimer.current = null;
+      scrollAt.current = performance.now();
+      schedule();
+    }, SCROLL_RERANK_MS - since);
+  }, [schedule]);
+
   useEffect(() => {
     observer.current = new IntersectionObserver(
       (entries) => {
@@ -96,20 +139,23 @@ export function useMountManager({
     );
     // A card can cross the true viewport edge while staying inside the
     // preload margin, which fires no intersection callback — so re-rank on
-    // scroll too (rAF-throttled, reading only the handful of near cards).
-    window.addEventListener("scroll", schedule, { passive: true });
+    // scroll too, throttled (see scheduleFromScroll). Resize stays immediate:
+    // it is rare and it invalidates every rect at once.
+    window.addEventListener("scroll", scheduleFromScroll, { passive: true });
     window.addEventListener("resize", schedule);
     for (const el of elements.current.values()) observer.current.observe(el);
     schedule();
     return () => {
-      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("scroll", scheduleFromScroll);
       window.removeEventListener("resize", schedule);
       if (frame.current !== null) cancelAnimationFrame(frame.current);
       frame.current = null;
+      if (scrollTimer.current !== null) clearTimeout(scrollTimer.current);
+      scrollTimer.current = null;
       observer.current?.disconnect();
       observer.current = null;
     };
-  }, [schedule]);
+  }, [schedule, scheduleFromScroll]);
 
   const registerRef = useCallback(
     (name: string, el: HTMLElement | null) => {
