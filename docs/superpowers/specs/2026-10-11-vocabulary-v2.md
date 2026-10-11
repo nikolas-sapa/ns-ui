@@ -106,7 +106,92 @@ agent reading the page all get nothing.
 - **Screenshot storage, for the spec's deferred question:** full-page PNGs
   ran 0.2–5.9MB, median ~1MB, tallest 10869px. ~200–400MB at 200 sites.
 
-## 6. Standing caveat
+## 7. Slop is a density, not a signal — the rule model does not survive
+
+Tested across all 20 files. Slop-signal count against the verdict assigned
+independently when each file was written:
+
+| verdict | n | slop-signal counts |
+|---|---|---|
+| exemplar | 9 | 0, 0, 0, 1, 1, 1, 1, 1, 2 |
+| mixed | 9 | 0, 1, 1, 2, 2, 2, 2, 4, 4 |
+| slop | 2 | 5, 6 |
+
+Clean separation. **No single signal predicts a verdict; the count does.**
+The two slop pages are `heroku-2014` (6 signals: centered stack, gradient
+field, three-card row, symmetric panels, floating mockups, one line-icon
+set) and `openhack` (5). Every exemplar sits at 2 or below.
+
+This breaks the rule model in the v1 spec, where one rule = one signal plus
+a count. A rule reading "38/40 sites do X" would convict pages that did X
+well — `neomatter` is an exemplar that centres its hero, `decent-com` an
+exemplar that floats a product panel. Session 2's schema must either mark
+some signals as compound-only or weight co-occurrence rather than summing
+independent hits.
+
+Caveat, stated firmly: 2 slop files is almost no data. The threshold is
+suggestive, not established, and the verdicts were assigned by the same
+raters who set the signals, so this is not an independent test. It is a
+hypothesis worth designing around, not a result.
+
+## 8. `hero-mockup-float` does not discriminate
+
+Earlier summarized as the one slop signal genuinely rising (3/7 → 5/8). It
+does not survive the control.
+
+| cohort | fires | verdicts of the files firing |
+|---|---|---|
+| pre-ai-2015 | 3/7 | slop, mixed, mixed |
+| yc-current | 5/8 | mixed, exemplar, exemplar, mixed, slop |
+| agent-tools | 1/5 | mixed |
+
+It fires on exemplars and slop alike, and was already 43% standard in 2014.
+A convention, not a defect. Nothing in the program should claim otherwise.
+
+With this struck, **no slop signal in the vocabulary is rising over twelve
+years.** The ones that move are falling.
+
+## 9. Disposition of the four remaining zeros
+
+From the cohort agent, whose reasoning separates them by cause rather than
+lumping them as "unused":
+
+- `badge-pill-spam` — keep; add a number (3+ decorative pills in marketing
+  chrome above the fold) and a scope rule excluding embedded product UI.
+  Without the scope rule, `nxtcure-labs` and `openhack` fire on their
+  product screenshots instead of their marketing. Stays 0/20 here: the
+  badge-pill wave has passed, which is a finding, not a gap.
+- `glass-card-overuse` — keep with a threshold (3+ translucent-blur
+  surfaces). `capveon`'s single floating nav is the only glass surface in
+  20 files. Glassmorphism has passed too.
+- `emoji-as-icon` — keep unchanged. The one honest zero: unambiguous
+  definition, no threshold needed, genuinely absent. This is the baseline
+  against which the other zeros should be judged.
+- `dark-mode-afterthought` — does not survive. It conflates "ships a
+  neglected second theme" with "ships no second theme", so 7 single-theme
+  sites and the one genuinely good dual-theme site (`nxtcure-labs`) all
+  read absent for opposite reasons. Split `single-theme` out as a separate
+  fact.
+
+## 10. `centered-hero-stack` indicts good pages
+
+It pulls `neomatter`, the clearest exemplar in the YC set, into a slop hit.
+What makes `openhack` slop is centring *plus* symmetric-everything plus
+generic-sans-default plus hero-mockup-float — four signals on one axis.
+`neomatter` centres one 110px italic display serif, then breaks the grid in
+every band below. Same signal, opposite outcome. This is the clearest
+single case for the compound model in section 7.
+
+## 11. `one-accent-discipline` has no zero-accent ruling
+
+`neomatter` (cream, near-black) and `capveon` (white, near-black, warm
+photography) carry no chromatic accent at all — the photography carries
+every colour. Both were marked present on the reading that zero or one
+accent is the same restraint, and both files say so. Flipping that reading
+moves the count 7/8 to 5/8. Session 2 picks one and states it in the
+vocabulary rather than leaving it to the rater.
+
+## 12. Standing caveat
 
 n = 7, 8, 5. Directional, not conclusive. The 2014 control files are one
 rater's judgment with no second read; the YC set had two. Any public claim
