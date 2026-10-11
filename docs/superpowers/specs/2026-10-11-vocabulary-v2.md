@@ -106,7 +106,7 @@ agent reading the page all get nothing.
 - **Screenshot storage, for the spec's deferred question:** full-page PNGs
   ran 0.2–5.9MB, median ~1MB, tallest 10869px. ~200–400MB at 200 sites.
 
-## 7. Slop is a density, not a signal — the rule model does not survive
+## 6. Slop is a density, not a signal — the rule model does not survive
 
 Tested across all 20 files. Slop-signal count against the verdict assigned
 independently when each file was written:
@@ -134,7 +134,7 @@ suggestive, not established, and the verdicts were assigned by the same
 raters who set the signals, so this is not an independent test. It is a
 hypothesis worth designing around, not a result.
 
-## 8. `hero-mockup-float` does not discriminate
+## 7. `hero-mockup-float` does not discriminate
 
 Earlier summarized as the one slop signal genuinely rising (3/7 → 5/8). It
 does not survive the control.
@@ -151,7 +151,7 @@ A convention, not a defect. Nothing in the program should claim otherwise.
 With this struck, **no slop signal in the vocabulary is rising over twelve
 years.** The ones that move are falling.
 
-## 9. Disposition of the four remaining zeros
+## 8. Disposition of the four remaining zeros
 
 From the cohort agent, whose reasoning separates them by cause rather than
 lumping them as "unused":
@@ -173,16 +173,16 @@ lumping them as "unused":
   read absent for opposite reasons. Split `single-theme` out as a separate
   fact.
 
-## 10. `centered-hero-stack` indicts good pages
+## 9. `centered-hero-stack` indicts good pages
 
 It pulls `neomatter`, the clearest exemplar in the YC set, into a slop hit.
 What makes `openhack` slop is centring *plus* symmetric-everything plus
 generic-sans-default plus hero-mockup-float — four signals on one axis.
 `neomatter` centres one 110px italic display serif, then breaks the grid in
 every band below. Same signal, opposite outcome. This is the clearest
-single case for the compound model in section 7.
+single case for the compound model in section 6.
 
-## 11. `one-accent-discipline` has no zero-accent ruling
+## 10. `one-accent-discipline` has no zero-accent ruling
 
 `neomatter` (cream, near-black) and `capveon` (white, near-black, warm
 photography) carry no chromatic accent at all — the photography carries
@@ -191,7 +191,7 @@ accent is the same restraint, and both files say so. Flipping that reading
 moves the count 7/8 to 5/8. Session 2 picks one and states it in the
 vocabulary rather than leaving it to the rater.
 
-## 12. Standing caveat
+## 11. Standing caveat
 
 n = 7, 8, 5. Directional, not conclusive. The 2014 control files are one
 rater's judgment with no second read; the YC set had two. Any public claim
