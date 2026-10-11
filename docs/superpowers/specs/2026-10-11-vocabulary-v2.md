@@ -149,6 +149,50 @@ Two cheap ways to break it, for session 2:
 Until one runs, the 0-2 / 0-4 / 5-6 bands are a hypothesis to test, not a
 result — independently of the n=2 problem.
 
+### The cheap circularity check, and what it found
+
+Before spending agents on a blind re-rate, recompute the verdict
+mechanically from the signals alone and see which files disagree. It needs
+no agents and it found more than the blind test would have.
+
+Rule: `slop>=5 → slop`, `slop>=3 → mixed`, else `exemplar`.
+**It reproduces 13 of 20 hand verdicts.**
+
+Every one of the 7 disagreements runs in the same direction:
+
+| file | cohort | hand | mechanical | slop | craft |
+|---|---|---|---|---|---|
+| `resend-com` | agent-tools | mixed | exemplar | 0 | 7 |
+| `capveon` | yc-current | mixed | exemplar | 1 | 6 |
+| `github-2014` | pre-ai-2015 | mixed | exemplar | 1 | 5 |
+| `basecamp-2014` | pre-ai-2015 | mixed | exemplar | 2 | 3 |
+| `cursor-com` | agent-tools | mixed | exemplar | 2 | 5 |
+| `nxtcure-labs` | yc-current | mixed | exemplar | 2 | 4 |
+| `squarespace-2014` | pre-ai-2015 | mixed | exemplar | 2 | 4 |
+
+**Seven for seven, the rater withheld `exemplar` from a page the vocabulary
+scores as clean.** Never the reverse. Three different raters, three
+cohorts, same direction.
+
+That one-directional bias is evidence *against* pure circularity: a rater
+merely reading back their own signals would produce errors in both
+directions. Something outside all 22 signals is informing the verdict, and
+it only ever argues for less praise. `resend-com` is the sharpest case —
+zero slop signals, seven craft signals, and still not called exemplar.
+
+**These 7 are the most informative files in the set.** Whatever the raters
+saw is the vocabulary's largest blind spot, and it is a bigger prize than
+the blind re-rate. Session 2 should interview the files, not the raters:
+read the prose notes of these 7 against the 9 exemplars and name what
+separates them.
+
+A partial lead from the margins: craft count by hand verdict is
+exemplar [4,5,6,6,6,7,7,7,8], mixed [2,3,4,4,4,5,5,6,7], slop [2,2]. Craft
+separates about as well as slop does and the v1 model ignores it entirely.
+`slop − craft` sharpens it further: every exemplar sits at −3 or below, both
+slop files at +3 or above. Still overlapping in the middle, so it is a lead,
+not a rule.
+
 ### A signal must EARN a rule
 
 The v1 model (one rule = one signal + a count) does not survive for the
