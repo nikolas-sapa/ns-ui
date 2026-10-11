@@ -35,6 +35,24 @@ const DIRECTORY_BADGES = [
     width: 250,
     height: 54,
   },
+  {
+    href: "https://www.codehype.ai/product/ns-ui?utm_source=codehype_badge",
+    src: "https://www.codehype.ai/badges/ns-ui.svg?variant=find-us&v=20",
+    alt: "Featured on CodeHype",
+    width: 180,
+    height: 65,
+  },
+  {
+    // Their embed code points at badge0-white.svg, which is a white pill
+    // (#fff ground, #000 type) and disappears against the light theme. The
+    // dark variant they also publish (#131a2b) reads on both, and matches
+    // every other badge here, which is a dark pill too.
+    href: "https://twelve.tools",
+    src: "https://twelve.tools/badge0-dark.svg",
+    alt: "Featured on Twelve Tools",
+    width: 148,
+    height: 40,
+  },
 ] as const;
 
 const COLUMN_LABEL = "font-mono text-[10px] uppercase tracking-wider text-ns-muted";
