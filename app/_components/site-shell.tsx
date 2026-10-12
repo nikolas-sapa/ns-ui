@@ -16,6 +16,7 @@ import {
 } from "@/lib/nav-tree";
 import { SIDEBAR_HIDDEN_KEY } from "@/lib/sidebar";
 import { McpPopup } from "./mcp-popup";
+import { StarPrompt } from "./star-prompt";
 import { SiteAuth } from "./site-auth";
 import { SiteFooter } from "./site-footer";
 import { CursorToggle } from "./cursor-toggle";
@@ -53,7 +54,13 @@ const LINK =
  *  the honest ceiling given the row's own spacing, not a full 44px target.
  *  Measured before/after: ~46-66x16.5 -> ~58-78x22.5. */
 const BOTTOM_BAR_LINK =
-  "relative rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none after:absolute after:-inset-x-[6px] after:-inset-y-[3px] after:content-['']";
+  // Underlined, because these sat next to Sign in -- an ACTION rendered by
+  // SiteAuth with the identical "no underline, colour on hover" treatment --
+  // so a page link and a button were indistinguishable until you clicked one
+  // (owner feedback). The underline is the cheapest honest signal: links are
+  // underlined, the action is boxed. decoration-border keeps it quiet at rest
+  // so the row still reads as a row, not a wall of blue.
+  "relative rounded-sm underline decoration-border underline-offset-2 outline-none transition-colors hover:text-foreground hover:decoration-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none after:absolute after:-inset-x-[6px] after:-inset-y-[3px] after:content-['']";
 
 /** Same grouping the footer uses (site-footer.tsx's `COLUMNS`) so the two
  *  surfaces never disagree about what belongs together — Browse / Build
@@ -837,7 +844,13 @@ export function SiteShell({
 
         {/* Bulk controls — at 223 items across up to three levels, hunting
             down every chevron by hand is the wrong default interaction. */}
-        <div className="flex items-center gap-3 px-4 pb-2 font-mono text-[10px] uppercase tracking-wider text-ns-muted">
+        {/* Was font-mono text-[10px] uppercase, which is this codebase's
+            idiom for a non-interactive LABEL — so these two read as a caption
+            and the owner could not tell them from the headings above. Now
+            sentence-case 11px with a border, i.e. the same quiet-button shape
+            used elsewhere, so "clickable" is carried by the box rather than
+            by hover alone. */}
+        <div className="flex items-center gap-2 px-4 pb-2 text-[11px] text-ns-muted">
           {/* Expand all is a one-off "show me everything right now", not a
               standing preference — it doesn't persist, so the tree is back
               to normal on the next visit. Collapse all is the opposite kind
@@ -848,7 +861,7 @@ export function SiteShell({
               wantTree();
               setExpandAll(true);
             }}
-            className="rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
+            className="rounded-sm border border-border px-2 py-1 outline-none transition-colors hover:border-ns-muted hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
           >
             Expand all
           </button>
@@ -859,7 +872,7 @@ export function SiteShell({
               setOpenIds(empty);
               persistOpen(empty);
             }}
-            className="rounded-sm outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
+            className="rounded-sm border border-border px-2 py-1 outline-none transition-colors hover:border-ns-muted hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
           >
             Collapse all
           </button>
@@ -940,7 +953,7 @@ export function SiteShell({
             (SiteAuth's `basis-full` below) instead of overflowing past the
             sidebar's fixed width — it never affects Changelog/Writing/Connect
             themselves, which stay on the first line at any name length. */}
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-border px-4 py-3 font-mono text-[11px] text-ns-muted">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-border px-4 py-3 font-mono text-[12px] text-ns-muted">
           {BOTTOM_BAR_GROUPS.map((group, gi) => (
             <span key={gi} className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
               {gi > 0 ? <span aria-hidden className="text-ns-muted/40">·</span> : null}
@@ -962,6 +975,9 @@ export function SiteShell({
           Every /preview/<name> shape (bare route + /embed, the screenshot
           gate and every card's iframe) already returned above this point. */}
       {pathname !== "/connect" ? <McpPopup /> : null}
+      {/* Mounted once for the whole site: it reacts to a window event, so it
+          covers every copy surface without any of them knowing it exists. */}
+      <StarPrompt />
 
       {/* Same component list the tree holds, in the same order — the palette
           used to import `registry-lite.generated.json` itself, which is what

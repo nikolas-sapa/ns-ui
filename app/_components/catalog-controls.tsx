@@ -280,7 +280,16 @@ export function CatalogControls({
               id="sort-order"
               value={sort}
               onChange={(e) => onSort(e.target.value as Sort)}
-              className="min-h-11 shrink-0 appearance-none rounded-sm border border-border bg-surface py-1 pl-1.5 pr-5 text-xs text-ns-muted outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none hover:text-foreground sm:min-h-0"
+              // The trigger was styled but the OPTION PANEL was not, so it
+              // rendered as a light OS menu with a system-blue highlight over
+              // a dark page (owner screenshot). `color-scheme: dark` in
+              // globals.css is supposed to cover that and does for the page
+              // scrollbar, but a browser may skip it for <option> once the
+              // select carries `appearance: none` — so the colours are stated
+              // outright. Chrome and Firefox honour these; where a UA paints
+              // its own panel regardless (Safari on macOS) `color-scheme`
+              // still gets it dark, so neither path lands back on white.
+              className="min-h-11 shrink-0 appearance-none rounded-sm border border-border bg-surface py-1 pl-1.5 pr-5 text-xs text-ns-muted outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none hover:text-foreground sm:min-h-0 [&>option]:bg-surface [&>option]:text-foreground"
             >
               {SORTS.map((s) => (
                 <option key={s.key} value={s.key}>

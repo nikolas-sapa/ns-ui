@@ -68,7 +68,11 @@ export function GitHubStarButton({
     <LiquidCollar
       variant="pill"
       radius={6}
-      ringWidth={10}
+      // 10 -> 6. Owner feedback: the collar read as thick enough to be the
+      // subject, crowding the label it is supposed to frame. The glass effect
+      // survives at 6 (it is a refraction band, not a border) while giving the
+      // text back its visual priority.
+      ringWidth={6}
       className={className}
     >
       <a
