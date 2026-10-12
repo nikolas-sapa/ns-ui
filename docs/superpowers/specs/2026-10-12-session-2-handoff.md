@@ -100,9 +100,15 @@ Two distinct failure modes, both silent:
   0×0 only once in view. Park on the section ~12s and take a viewport shot.
 
 Measure by row-level diff, never by eye: a page with per-load randomized
-content (rotating cover art) reads as content mounting. Take background as
-the modal pixel — an absolute brightness threshold reads a light page as
-100% inked before and after.
+content (rotating cover art) reads as content mounting.
+
+Take background as the modal pixel. **An absolute brightness threshold is
+meaningless on a light page**: every pixel of `nxtcure-labs`'s `#f5f3ff`
+field clears it, so the page read 100% inked both before and after the
+walk. The first comparison metric used on this signal was thrown out for
+exactly that reason. Restated here because its only other record was a
+script header in `~/scratch/antislop/compare_walk2.py`, which a cleanup
+would take with it.
 
 ## Carried forward
 
