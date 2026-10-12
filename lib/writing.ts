@@ -7,6 +7,15 @@ export type WritingPost = {
   description: string;
   /** ISO date, e.g. "2026-07-29" */
   iso: string;
+  /**
+   * Optional ISO date for a substantive revision, from an `updated:` key in
+   * frontmatter. Undefined when the key is absent, which is the normal case —
+   * it drives `dateModified` in the post's JSON-LD and a visible "Updated"
+   * line, and both stay off rather than claiming a revision that never
+   * happened. A file mtime would be a checkout artifact, not an edit date,
+   * so it is deliberately NOT a fallback.
+   */
+  updated?: string;
   /** Markdown body, frontmatter stripped. */
   body: string;
 };
@@ -14,7 +23,8 @@ export type WritingPost = {
 const WRITING_DIR = path.join(process.cwd(), "content/writing");
 
 /**
- * Frontmatter is three fixed keys, one per line — no YAML library needed for
+ * Frontmatter is three required keys plus one optional `updated:`, one per
+ * line — no YAML library needed for
  * a format this small. Same "one regex wide" philosophy as
  * app/changelog/entries.ts: the grammar is deliberately narrow because there
  * is exactly one author writing these files.
@@ -31,11 +41,16 @@ function parseWriting(slug: string, raw: string): WritingPost {
     return line?.[1].trim().replace(/^"(.*)"$/, "$1") ?? "";
   };
 
+  // `field` returns "" for an absent key; collapse that to undefined so the
+  // optional date is either a real date or nothing at all.
+  const updated = field("updated") || undefined;
+
   return {
     slug,
     title: field("title"),
     description: field("description"),
     iso: field("date"),
+    ...(updated ? { updated } : {}),
     body: body.trim(),
   };
 }

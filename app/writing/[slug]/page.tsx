@@ -64,11 +64,11 @@ export default async function WritingPostPage({
   //
   // Deliberately absent, because an honest partial beats a fabricated field
   // (same reasoning as the country-only PostalAddress in lib/site-identity.ts):
-  // `dateModified` — frontmatter carries exactly one date (lib/writing.ts
-  // parses three fixed keys) and a file mtime is a checkout artifact, not an
-  // editorial revision; `keywords` and `articleSection` — no such frontmatter
-  // key exists; `wordCount` — these posts are table-heavy, so a count scraped
-  // off raw markdown would report pipes and `##` as words.
+  // `keywords` and `articleSection` — no such frontmatter key exists;
+  // `wordCount` — these posts are table-heavy, so a count scraped off raw
+  // markdown would report pipes and `##` as words. `dateModified` appears
+  // only when a post declares `updated:` (see lib/writing.ts); no post does
+  // today, so it is absent rather than guessed from a file mtime.
   const blogPostingJsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -77,6 +77,9 @@ export default async function WritingPostPage({
     description: post.description,
     url: pageUrl,
     datePublished: post.iso,
+    // Spread, not a literal: omitted entirely unless frontmatter carries a
+    // real `updated:` date. Never a file mtime.
+    ...(post.updated ? { dateModified: post.updated } : {}),
     inLanguage: "en",
     isAccessibleForFree: true,
     // The per-slug opengraph-image.tsx in this folder, at its file-convention URL.
@@ -119,8 +122,18 @@ export default async function WritingPostPage({
         >
           ns-ui / writing
         </Link>
+        {/* <time dateTime> rather than bare text: the date was already visible
+            here, but only a human could read it. The machine-readable
+            attribute is the freshness signal — crawlers and assistants weight
+            recency, and an unparseable date reads as undated. */}
         <p className="mt-6 font-mono text-[11px] uppercase tracking-wider text-ns-muted">
-          {formatDate(post.iso)}
+          <time dateTime={post.iso}>{formatDate(post.iso)}</time>
+          {post.updated ? (
+            <>
+              {" · Updated "}
+              <time dateTime={post.updated}>{formatDate(post.updated)}</time>
+            </>
+          ) : null}
         </p>
         {/* 65–75ch measure, generous leading — this page is a reading
             experience, so the title gets the same width constraint as the
