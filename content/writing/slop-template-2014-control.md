@@ -27,7 +27,7 @@ Stripe's 2014 page is close behind at six: multi-hue gradient under the whole vi
 
 Nobody prompted either page.
 
-## The counts
+## Nine signals, counted out of 7, 8 and 10
 
 Present out of the cohort:
 
@@ -55,11 +55,13 @@ Mailchimp's 2014 page is centered, and it is the strongest page in the control c
 
 Basecamp 2014 is centered too, and stranger: one 600px column holding the whole page, then six headed sections of running prose at 14px, no cards and no icons anywhere. Same signal as Heroku's hero, opposite outcome. The defect was never the centering. It is what gets stacked on top of it.
 
-## The signal that failed
+## hero-mockup-float fires on exemplars and slop alike
 
 I spent a while thinking `hero-mockup-float` was the one slop move genuinely rising, 3/7 to 5/8. It does not survive the control.
 
-In 2014 it fires on three pages: one rated slop, two rated mixed. In the YC cohort it fires on five: two exemplars, two mixed, one slop. It fires on good and bad pages alike, and was already standard in 43% of the 2014 cohort. Squarespace 2014 is the clearest case: a MacBook floating dead centre with a real customer site on its screen, where the signal does real work, because the product is websites.
+`hero-mockup-float` fires on three of the seven 2014 pages: one rated slop, two rated mixed. In the YC cohort it fires on five of eight: two exemplars, two mixed, one slop. It fires on good and bad pages alike, and was already standard in 43% of the 2014 cohort.
+
+Squarespace 2014 is the clearest case: a MacBook floating dead centre with a real customer site on its screen, where the signal does real work, because the product is websites.
 
 That is not a declining trend with one exception. It is a signal that measures "is this a website" rather than "is this slop", and it should never have been in the list.
 
@@ -69,11 +71,13 @@ The tempting story is that the strongest current builders dropped the template. 
 
 What moved is the composition around them. Mean slop signals per page runs 3.14 in 2014, 2.62 in the YC cohort, 2.40 in dev tools: barely a slope. Mean craft runs 3.71, 5.38, 5.90. Those pages did not abandon the conventional moves. They stopped running them bare.
 
-## The result that broke when I finished the corpus
+## At 25 files the slop band sits inside the mixed band
 
 At 20 files I had a clean separation: exemplars at 0 to 2 slop signals, mixed at 0 to 4, the two slop pages at 5 and 6. I wrote it up as the central finding.
 
-Finishing the corpus to 25 and completing a vocabulary re-pass broke it. Exemplars now run 0 to 3, mixed runs 1 to 7, and the two slop pages sit at 6 and 7. The slop band is now entirely inside the mixed band. Railway's homepage carries seven slop signals, the same count as Heroku 2014, and was rated mixed, because it also pins a 1px rail with a travelling illustrated train down all 12,212px outside the content column and renders its deploy count as a mechanical split-flap departure board.
+Finishing the corpus to 25 and completing a vocabulary re-pass broke it. Exemplars now run 0 to 3, mixed runs 1 to 7, and the two slop pages sit at 6 and 7. The slop band is now entirely inside the mixed band.
+
+Railway's homepage carries seven slop signals, the same count as Heroku 2014, and was rated mixed, because it also pins a 1px rail with a travelling illustrated train down all 12,212px outside the content column and renders its deploy count as a mechanical split-flap departure board.
 
 Two things moved the bands: five new files, and two signals added in a re-pass that raised Heroku from six to seven. Both, not just the files.
 
@@ -81,11 +85,15 @@ And the separation was never independent evidence anyway. The signals and the ve
 
 The honest state of what I am building from this: the pipeline that turns these evidence files into rules an agent can read currently authors **zero** rules. All 26 signals report the same reason, that the corpus holds 2 pages rated slop and the separation test requires 3. The build passes empty, which is the gate working.
 
-## Why the control was worth shooting anyway
+## What seven 2014 pages bought, and what they cannot settle
 
 Everything above is 25 pages, one viewport each, no narrow-width capture at all, so `asymmetric-split` at 10/10 may not survive at phone width. One rater produced the 2014 cohort with no second read.
 
-What the control bought, for seven pages of work, is the ability to tell two explanations apart. "AI flattened web design" predicts a 2014 cohort that looks varied. Mine has the highest mean slop count of the three, 3.14 against 2.62 and 2.40, and contains a page running seven template moves at once. Treat the ordering as weak: that is a half-signal gap across samples of 7, 8 and 10, and it would flip if one 2014 page were re-rated. The page running seven at once is the part that does not depend on the average. So the convergent template is not a model artifact. It is 2014-era marketing-site convention, learned by the models from the pages I just screenshotted, and the strongest current builders are measurably further from it than their predecessors were.
+What the control bought, for seven pages of work, is the ability to tell two explanations apart. "AI flattened web design" predicts a 2014 cohort that looks varied. Mine, at n=7, has the highest mean slop count of the three, 3.14 against 2.62 (n=8) and 2.40 (n=10).
+
+Treat the ordering as weak: that is a half-signal gap across samples of 7, 8 and 10, and it would flip if one 2014 page were re-rated. The cohort also contains a page running seven template moves at once, and that is the part that does not depend on the average.
+
+So the convergent template is not a model artifact. It is 2014-era marketing-site convention, learned by the models from the pages I just screenshotted, and the strongest current builders are measurably further from it than their predecessors were.
 
 That is a smaller claim than the accusation. It is also the one I can show you the counts for.
 

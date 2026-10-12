@@ -29,9 +29,11 @@ Railway's page returns eight emoji to a codepoint scan. All eight are U+2713, an
 
 The gradient and the glass fail in the generous direction: a source reader calls the page worse than it is, which is the failure mode I would have accepted if someone had asked me in advance to pick one.
 
-The emoji one is different in kind. `emoji-as-icon` reads `absent` on all 25 files. The vocabulary's current draft names it "the one honest zero, and the baseline for judging other zeros", because a vocabulary full of signals that never fire is usually a vocabulary with bad definitions, and this zero is the one I trust. Source-scoring would put the first non-zero there, from captured terminal output, on a page that has no emoji in it at all. It would not just be wrong about Railway. It would break the reference point every other zero is judged against.
+The emoji one is different in kind. `emoji-as-icon` reads `absent` on all 25 files. The vocabulary's current draft names it "the one honest zero, and the baseline for judging other zeros", because a vocabulary full of signals that never fire is usually a vocabulary with bad definitions, and this zero is the one I trust.
 
-## So the obvious product does not work
+Source-scoring would put the first non-zero there, from captured terminal output, on a page that has no emoji in it at all. It would not just be wrong about Railway. It would break the reference point every other zero is judged against.
+
+## Why I am not building check_design(html)
 
 On this evidence I would not build a tool that takes pasted HTML and scores it for slop. Three signals on two sites is a thin basis for an absolute, so take this as the direction the measurements point rather than a proof. The signals that are easiest to name in markup are exactly the ones where markup and paint disagree, because a gradient that got occluded, a blur stack that is one mask, and a check mark inside a screenshot are all completely ordinary things to find in a real stylesheet.
 
@@ -45,13 +47,19 @@ Two silent capture failures, both found by being wrong first.
 
 **A scroll walker fixes that, and does not fix lazily-sized canvases.** Walking the document in 600px steps with a 700ms settle at each, re-measuring height per step, makes `openhack` paint completely. `modal.com` still returned correct-dimension empty panels with only a centred mono caption. Those are WebGL canvases that size from 0x0 only once they are in view, and the walk passes too fast for them. Parking on the section for about ten seconds paints real animated diagrams. Twelve further contexts on that page sit at 0x0 until something mounts them.
 
-## Two of the mistakes were mine
+## Two errors of mine: melty.gg's cover art, and a threshold that cannot come back red
 
-**I compared two captures by eye and reported a false confirmation.** On `melty.gg`, a band under the hero changes between loads: Call of Duty and Super Mario cover art in one capture, Elden Ring and Hollow Knight in the next. I read that as a section mounting. It is the page rotating its cover art per load. A row-level diff puts every changed row in the hero video panel plus two rows in the cover-art strip, and across roughly 4000px of black between it and the FAQ, not one row differs. Mean ink per row goes 7.6% to 8.3%, and all 0.7 of that point is the video sitting at a different frame. `openhack` under the identical walk goes 6.0% to 27.8%, 4.6x. That is what a gate opening looks like, and melty is not it.
+**I compared two captures by eye and reported a false confirmation.** On `melty.gg`, a band under the hero changes between loads: Call of Duty and Super Mario cover art in one capture, Elden Ring and Hollow Knight in the next. I read that as a section mounting. It is the page rotating its cover art per load.
 
-**An absolute brightness threshold is meaningless on a light page.** The first comparison pass counted a row as inked if a sampled pixel cleared a fixed brightness. Every pixel of `nxtcure-labs`'s `#f5f3ff` field clears it, so the page read 100% inked before the walk and 100% inked after, which is a measurement that cannot come back red and therefore proves nothing. Background has to be taken as the modal pixel of the capture, with a row counting as inked when a sample deviates from that.
+A row-level diff puts every changed row in the hero video panel plus two rows in the cover-art strip, and across roughly 4000px of black between it and the FAQ, not one row differs.
 
-## The page I still cannot explain
+Mean ink per row on `melty.gg` goes 7.6% to 8.3% under the walk, and all 0.7 of that point is the video sitting at a different frame. `openhack` under the identical walk goes 6.0% to 27.8%, 4.6x. That is what a gate opening looks like, and melty is not it.
+
+**An absolute brightness threshold is meaningless on a light page.** Every pixel of `nxtcure-labs`'s `#f5f3ff` field clears a fixed brightness bar, so the page read 100% inked before the walk and 100% inked after, which is a measurement that cannot come back red and therefore proves nothing.
+
+The first comparison pass counted a row as inked if a sampled pixel cleared a fixed brightness. Background has to be taken as the modal pixel of the capture, with a row counting as inked when a sample deviates from that.
+
+## Vercel leaves 2630px unpainted, and the cause stays unresolved
 
 `vercel.com` captures at 5333px, of which everything below roughly 3300px is empty. That reads as a scroll reveal, and I first recorded it that way.
 
@@ -59,7 +67,7 @@ The walk does not paint it. The document grows from 5333px to 5930px under the w
 
 Scrolling is the gate the signal names, and scrolling does not open it. So the value is `unresolved`, not `present`. The dead region is established. Its cause is not: hydration that never completes headless, an observer waiting on real user activation, and a bot gate all fit this evidence equally well, and I have not separated them.
 
-## What this is actually worth
+## What 25 evidence files and three signals measured both ways settle
 
 Twenty-five evidence files. Three signals measured both ways, on two sites. That is a small basis for a general claim about reading design from source, and I would not want it quoted as more than it is. What it is enough for is the decision it was made to settle: I was about to build a markup scorer, and on the three cases I checked the markup scorer would have been wrong three times, once in a way that poisons the baseline. That is enough to not build it.
 
