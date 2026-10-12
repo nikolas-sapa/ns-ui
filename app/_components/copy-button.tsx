@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { COPIED_EVENT } from "./star-prompt";
 
 /**
  * Copy-to-clipboard control. Three shapes:
@@ -48,6 +49,11 @@ export function CopyButton({
         next = "failed";
       }
       setState(next);
+      // Announce a real copy so StarPrompt can ask for a star at the one
+      // moment the visitor has demonstrably taken something. Fired here
+      // rather than passed down as a prop so every copy surface on the site
+      // gets it without threading anything; nothing listening is also fine.
+      if (next === "copied") window.dispatchEvent(new Event(COPIED_EVENT));
       if (timer.current) clearTimeout(timer.current);
       // The failure message has to be read, not glimpsed, so it holds longer
       // than the check glyph does.
