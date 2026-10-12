@@ -18,7 +18,7 @@ signals:
   testimonial-card-row: absent
   indigo-violet-accent: absent
   gradient-fill-cta: absent
-  scroll-reveal-blank: absent
+  scroll-reveal-blank: present
   typewriter-headline: absent
   stock-photo-generic: absent
   centered-hero-stack: present
@@ -80,5 +80,14 @@ and the olive leaves, no lens falloff, no grain — and they are described above
 
 The hero product card renders with its interior blurred behind a visible
 Active / Waiting / Done tab strip. That is a frosted treatment, not an unfired
-section: the rest of the 7832px page renders complete, so `scroll-reveal-blank` is
-absent.
+section.
+
+**v3 re-pass, scroll walk against a time control.** `scroll-reveal-blank` is
+present, and the earlier reading of absent came from judging a static full-page
+capture. Walked at 1440x900 in 600px steps, 36 text nodes carrying 1028 characters
+cross from under 8% effective opacity to visible — every faded node on the page,
+with none left stuck — and a control dwelling the same 15 steps without scrolling
+crosses zero, so the gate is the scroll and not the clock. The band at y3140-3380
+goes from 16.3% to 30.3% ink with ten rows gained and none lost: at rest the
+"Decisions come to you ready" panel shows only its title, and the three options it
+asks the reader to choose between render solely after scrolling.
