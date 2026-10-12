@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { loadWritingPost, loadWritingPosts } from "@/lib/writing";
 import { getStarCount } from "@/lib/github-stars";
+import { jsonLdScript } from "@/lib/json-ld";
+import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
 import { PostBody } from "../_components/post-body";
 import { GitHubStarButton } from "../../_components/github-star-button";
 import { EmailCapture } from "../../_components/email-capture";
@@ -52,8 +54,64 @@ export default async function WritingPostPage({
   if (!post) notFound();
   const stars = await getStarCount();
 
+  const pageUrl = `${REGISTRY_ORIGIN}/writing/${post.slug}`;
+
+  // BlogPosting rather than bare Article: these are dated posts on a blog.
+  // `isPartOf` carries the same @id app/writing/page.tsx gives the Blog, so a
+  // post and the index read as one graph instead of two unrelated blocks —
+  // the same @id-linking lib/site-identity.ts uses for SoftwareApplication
+  // and Organization.
+  //
+  // Deliberately absent, because an honest partial beats a fabricated field
+  // (same reasoning as the country-only PostalAddress in lib/site-identity.ts):
+  // `dateModified` — frontmatter carries exactly one date (lib/writing.ts
+  // parses three fixed keys) and a file mtime is a checkout artifact, not an
+  // editorial revision; `keywords` and `articleSection` — no such frontmatter
+  // key exists; `wordCount` — these posts are table-heavy, so a count scraped
+  // off raw markdown would report pipes and `##` as words.
+  const blogPostingJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "@id": `${pageUrl}#post`,
+    headline: post.title,
+    description: post.description,
+    url: pageUrl,
+    datePublished: post.iso,
+    inLanguage: "en",
+    isAccessibleForFree: true,
+    // The per-slug opengraph-image.tsx in this folder, at its file-convention URL.
+    image: `${pageUrl}/opengraph-image`,
+    author: {
+      "@type": "Person",
+      name: "Nikolas Sapalidis",
+      url: `${REGISTRY_ORIGIN}/about`,
+    },
+    publisher: { "@id": `${REGISTRY_ORIGIN}/#organization` },
+    isPartOf: { "@id": `${REGISTRY_ORIGIN}/writing#blog` },
+    mainEntityOfPage: { "@type": "WebPage", "@id": pageUrl },
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "ns-ui", item: REGISTRY_ORIGIN },
+      { "@type": "ListItem", position: 2, name: "Writing", item: `${REGISTRY_ORIGIN}/writing` },
+      { "@type": "ListItem", position: 3, name: post.title, item: pageUrl },
+    ],
+  };
+
   return (
     <main className="mx-auto w-full max-w-2xl px-6 pb-32 sm:px-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(blogPostingJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(breadcrumbJsonLd) }}
+      />
+
       <header className="pt-20 sm:pt-28">
         <Link
           href="/writing"
