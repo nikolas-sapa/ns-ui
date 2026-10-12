@@ -51,7 +51,7 @@ clearest case in the cohort of CSS and pixels disagreeing: a source grep would
 have scored it present.
 
 The same trap sits on `glass-card-overuse`. A naive count finds sixteen
-`backdrop-filter: blur()` surfaces, five above the v3 threshold of three. They
+`backdrop-filter: blur()` surfaces against a threshold of three or more. They
 are sixteen 1440x50 `pointer-events-none` strips with blur stepping 1px, 1px,
 2px, 2px, 3px, 4px — one progressive-blur mask under the sticky nav, assembled
 from stacked bands. One effect, not sixteen glass cards. Absent.

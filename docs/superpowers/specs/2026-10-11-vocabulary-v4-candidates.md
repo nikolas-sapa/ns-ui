@@ -78,9 +78,9 @@ agent hit it independently:
 
 - **IntersectionObserver reveals** → fixed by a scroll walker.
 - **Lazily-sized WebGL canvases** → NOT fixed. They size from 0×0 only once
-  in view, and a 700px/700ms walk passes too fast. `modal.com` returned
+  in view, and a 600px/700ms walk passes too fast. `modal.com` returned
   correct-dimension empty panels with only a centred mono caption. Fixed by
-  parking on the section ~12s, after which they paint real animated
+  parking on the section ~10s, after which they paint real animated
   diagrams. `railway.com`'s closing CTA needed a targeted shot at y≈10461.
 
 Any `absent` set from a static capture — or from a walk alone — is suspect
