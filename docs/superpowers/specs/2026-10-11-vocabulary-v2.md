@@ -14,8 +14,12 @@ original guesses.
 
 `centered-hero-stack` runs 5/7 in 2014, 2/8 in YC Fall 2026, 0/5 in
 agent-tools. It is a 2014 pattern in decline, not an AI artifact.
-`feature-icons-identical` (3/7 → 2/8 → 0/5) and `three-card-row`
-(2/7 → 1/8 → 2/5) follow the same curve. `gradient-blob` is roughly flat
+`generic-line-icon-set` (3/7 → 2/8 → 2/10) follows the same curve.
+
+**`three-card-row` does not, and this was wrong as first written.** Recounted
+on the completed cohorts it reads 2/7 → 1/8 → **5/10**: it is rising, not
+declining. `centered-hero-stack` also does not reach zero — 3/10 in
+agent-tools, not the 0/5 measured before that cohort was finished. `gradient-blob` is roughly flat
 across twelve years (2/7 → 3/8).
 
 Only `hero-mockup-float` is genuinely rising: 3/7 → 5/8.
@@ -119,13 +123,31 @@ agent reading the page all get nothing.
 Tested across all 20 files. Slop-signal count against the verdict assigned
 independently when each file was written:
 
-| verdict | n | slop-signal counts |
+| verdict | n=20 (as first measured) | n=25 (recounted, v3 signals) |
 |---|---|---|
-| exemplar | 9 | 0, 0, 0, 1, 1, 1, 1, 1, 2 |
-| mixed | 9 | 0, 1, 1, 2, 2, 2, 2, 4, 4 |
-| slop | 2 | 5, 6 |
+| exemplar | 0,0,0,1,1,1,1,1,2 | 0,0,0,1,1,1,1,2,2,2,3 |
+| mixed | 0,1,1,2,2,2,2,4,4 | 1,2,2,2,2,2,3,4,5,5,6,**7** |
+| slop | 5, 6 | 6, 7 |
 
-Clean separation. **No single signal predicts a verdict; the count does.**
+**The separation did not survive. At n=25 the slop band [6,7] sits entirely
+inside the mixed band [1..7].** `railway-com` carries 7 slop signals, the
+same as `heroku-2014`, and is rated `mixed`. Two causes: five files were
+added, and two signals added in the v3 re-pass moved `heroku-2014` 6→7 and
+`openhack` 5→6.
+
+**What does separate is slop net of craft**, with no overlap at n=25:
+exemplar runs −7 to −2, mixed −5 to +4, slop +4 to +5. `railway-com` nets
++1 on 7 slop and 6 craft; `heroku-2014` nets +5 on 7 slop and 2 craft. Same
+slop count, opposite verdicts, and craft is the whole difference.
+
+The readable version: **they did not abandon the template moves, they
+stopped running them bare.** Mean slop per page barely moves across twelve
+years (3.14 → 2.62 → 2.40) while mean craft climbs hard (3.71 → 5.38 →
+5.90).
+
+This is still circular — same raters set the signals and the verdicts — and
+`stripe-2014` nets +4 while rated `mixed`, so even the net version has a
+boundary case. It is a better hypothesis, not a finding.
 The two slop pages are `heroku-2014` (6 signals: centered stack, gradient
 field, three-card row, symmetric panels, floating mockups, one line-icon
 set) and `openhack` (5). Every exemplar sits at 2 or below.

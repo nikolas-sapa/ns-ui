@@ -35,8 +35,10 @@ signals:
   live-claim-control: absent
 ---
 Capture year 2014 (Jan 2015 snapshot). The control cohort's proof that the
-slop template is not an AI invention. This page runs six of the thirteen
-slop signals simultaneously, in 2014.
+slop template is not an AI invention. This page runs seven of the sixteen
+slop signals simultaneously, in 2014. (Six when first rated against the v1
+list; indigo-violet-accent was added in the v3 re-pass and is present —
+#5b4e91 hero field, #6e5baa CTA.)
 
 Centered hero: "Focus on the app" at roughly 30px over a purple gradient
 field, one centered ghost button beneath it. The headline is barely twice
