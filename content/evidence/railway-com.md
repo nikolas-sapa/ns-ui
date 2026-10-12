@@ -17,7 +17,7 @@ signals:
   testimonial-card-row: present
   indigo-violet-accent: present
   gradient-fill-cta: present
-  scroll-reveal-blank: absent
+  scroll-reveal-blank: present
   typewriter-headline: absent
   stock-photo-generic: absent
   centered-hero-stack: present
@@ -142,9 +142,16 @@ status ticks and the footer's `All systems operational`. The six-series chart
 palette inside the Observability capture is data colour and is not counted
 against it.
 
-`scroll-reveal-blank` is absent on the stated mechanism. Excluding nav and menu
-subtrees, only 61 characters of the page's own prose render under 8% opacity at
-rest — the closing CTA headline and its subhead, one block. Worth recording
+`scroll-reveal-blank` is present, which reverses the earlier absent. That reading
+rested on a static capture and on counting only prose at rest: excluding nav and
+menu subtrees just 61 characters render under 8% opacity in the first viewport.
+Walked at 1440x900 in 600px steps, 38 text nodes carrying 564 characters cross
+from under 8% opacity to visible, and the band at y5500-6300 gains 41 rows while
+losing none, going from 17.9% to 68.7% ink across 820px. A control dwelling the
+same 22 steps without scrolling crosses zero text nodes and reproduces the static
+capture, so the gate is the scroll rather than elapsed time — which also correctly
+discounts this page's animated deploy feed, whose text mounts under the dwell too.
+Worth recording
 separately because the vocabulary does not name it: with JavaScript disabled the
 page yields 7293 characters against 15497 with it, so 53% of the text exists only
 under JS. That is a different defect from a scroll reveal and the build cannot

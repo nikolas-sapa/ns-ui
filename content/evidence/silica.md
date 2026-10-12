@@ -18,7 +18,7 @@ signals:
   testimonial-card-row: absent
   indigo-violet-accent: absent
   gradient-fill-cta: absent
-  scroll-reveal-blank: absent
+  scroll-reveal-blank: present
   typewriter-headline: absent
   stock-photo-generic: absent
   centered-hero-stack: absent
@@ -73,6 +73,15 @@ links.
 for it: "Press and hold to apply load" sits above the force-at-the-gripper chart as a
 labelled control, so the claim that motor-current estimates are noise and joint
 measurement is not can be falsified by the visitor on the page.
+
+`scroll-reveal-blank` moves to present. Walked at 1440x900 in 600px steps against a
+same-run control, the band at y4800-5100 goes from 0.0% to 53.5% ink with sixteen
+rows gained and none lost: the Q Series lineup renders as an empty grey field until
+scrolled, then paints four labelled machine renders. Four more text nodes cross from
+under 8% opacity to visible, "Pre-orders open. Production starts January 2027."
+among them. A control dwelling the same ten steps without scrolling leaves the band
+empty, so the gate is the scroll and not elapsed time; the joint-selector captions
+mount under the dwell as well and are not counted.
 
 `real-product-screenshot` moves to absent and `artifact-not-dashboard` to present.
 There is no software UI anywhere on this page — the product appears as a line drawing,

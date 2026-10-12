@@ -17,7 +17,7 @@ signals:
   testimonial-card-row: absent
   indigo-violet-accent: absent
   gradient-fill-cta: absent
-  scroll-reveal-blank: absent
+  scroll-reveal-blank: present
   typewriter-headline: absent
   stock-photo-generic: absent
   centered-hero-stack: present
@@ -133,11 +133,21 @@ including Ramp, Microsoft, and Lovable` — and four links. That copy is authore
 and specific; whether it is intended as a no-JS fallback or as an
 answer-engine block cannot be told from the outside, but either way the reader
 `scroll-reveal-blank` worries about gets a denser page here, not a thinner one.
-The signal is scored absent on its stated mechanism and the measurement
-agrees independently: only 92 characters of body prose render under 8% opacity at
-rest, and the opacity-gated count is identical before and after a full scroll
-walk (10 nodes, 10 nodes; innerText 4106 both times). Nothing on this page waits
-for a scroll. The vocabulary has no slot for an authored no-JS edition and
+The text-opacity measurement is unchanged and still agrees: only 92 characters of
+body prose render under 8% opacity at rest, and the opacity-gated count is
+identical before and after a full scroll walk (10 nodes, 10 nodes; innerText 4106
+both times).
+
+**v3 re-pass, pixel diff against a same-run control.** The signal is nonetheless
+present, because on this page nothing that waits for a scroll is text. Two bands
+gain ink and lose none — y4640-5080 from 0.6% to 61.0%, y5820-6380 from 17.6% to
+51.7%, 52 rows in all — and the first is the three-up under "Create a browser
+session / Choose your model / Execute your first task", whose captions are present
+at rest while the three illustrations above them are absent from the capture
+entirely and paint only after scrolling. A same-length dwell without scrolling
+reproduces the static capture, so the gate is the scroll. This is why the
+opacity-gated count reads clean: the reveal is on the illustrations, which have no
+text to fade, and a text instrument cannot see it. The vocabulary has no slot for an authored no-JS edition and
 probably should.
 
 `gradient-blob` and `gradient-fill-cta` are absent on zero gradient declarations
