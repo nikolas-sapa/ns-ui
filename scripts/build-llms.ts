@@ -15,6 +15,7 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { REGISTRY_ORIGIN } from "../lib/registry-origin.ts";
 import { PACKAGE_PUBLISHED } from "../lib/package-publish-status.ts";
+import { loadWritingPosts } from "../lib/writing.ts";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 // Single source of truth (lib/registry-origin.ts) — see that file for the
@@ -621,6 +622,8 @@ Developer resources, by URL (every one of these is live — no key, no account):
 - One component's install spec and real source: ${HOMEPAGE}/r/<name>.json
 - Human-readable page per component: ${HOMEPAGE}/components/<name>
 - Markdown of any page: send \`Accept: text/markdown\` to it (acceptmarkdown.com).
+- Long-form posts (build notes and measurement reports): ${HOMEPAGE}/writing
+  Full text of each is on its own page; RSS: ${HOMEPAGE}/writing/feed.xml
 - Agent-facing docs index: ${HOMEPAGE}/connect · Sitemap: ${HOMEPAGE}/sitemap.xml
 - Who maintains this and how to reach them: ${HOMEPAGE}/about · ${HOMEPAGE}/privacy
 
@@ -663,15 +666,44 @@ function renderBlock(meta: Meta, full: boolean): string {
   return lines.join("\n");
 }
 
+// Writing posts were missing from both files entirely: an agent that fetched
+// llms.txt got the whole component API and no hint that the long-form posts
+// exist. Title/date/url/description is all frontmatter carries (lib/writing.ts
+// parses three fixed keys), so that is all this emits — the post's own page
+// and the RSS feed hold the prose.
+const writingPosts = loadWritingPosts();
+const WRITING_SECTION = writingPosts.length
+  ? [
+      "",
+      "# Writing — long-form posts",
+      "",
+      "Not component docs. Build notes and measurement reports, newest first.",
+      "Each block below:",
+      "  ## <title>",
+      "  date: <ISO 8601 date>  ·  url: <canonical page>",
+      "  <one-line description>",
+      "",
+      writingPosts
+        .map((post) =>
+          [
+            `## ${post.title}`,
+            `date: ${post.iso}  ·  url: ${HOMEPAGE}/writing/${post.slug}`,
+            post.description,
+          ].join("\n")
+        )
+        .join("\n\n"),
+    ].join("\n") + "\n"
+  : "";
+
 const shortBody = components.map((m) => renderBlock(m, false)).join("\n\n");
 const fullBody = components.map((m) => renderBlock(m, true)).join("\n\n");
 
-writeFileSync(join(ROOT, "public", "llms.txt"), HEADER + "\n" + shortBody + "\n");
-writeFileSync(join(ROOT, "public", "llms-full.txt"), HEADER + "\n" + fullBody + "\n");
+writeFileSync(join(ROOT, "public", "llms.txt"), HEADER + "\n" + shortBody + "\n" + WRITING_SECTION);
+writeFileSync(join(ROOT, "public", "llms-full.txt"), HEADER + "\n" + fullBody + "\n" + WRITING_SECTION);
 
 const uniqueWarnings = [...new Set(warnings)];
 console.log(
-  `llms.txt / llms-full.txt: ${components.length} component(s)` +
+  `llms.txt / llms-full.txt: ${components.length} component(s), ${writingPosts.length} post(s)` +
     (uniqueWarnings.length
       ? ` — WARNING: prop extraction failed for: ${uniqueWarnings.join(", ")}`
       : "")
