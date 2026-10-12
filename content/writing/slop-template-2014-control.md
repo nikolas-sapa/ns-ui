@@ -15,7 +15,7 @@ So I built one. Twenty-five homepages, each captured in a single 1440x900 viewpo
 
 Seven, eight and ten. I will keep repeating those: every number below is a count out of a single digit, not a rate with an error bar.
 
-### The control cohort already runs the template
+## The control cohort already runs the template
 
 The clearest single result is Heroku's 2014 homepage, which runs **seven of the sixteen slop signals at once**.
 
@@ -27,7 +27,7 @@ Stripe's 2014 page is close behind at six: multi-hue gradient under the whole vi
 
 Nobody prompted either page.
 
-### The counts
+## The counts
 
 Present out of the cohort:
 
@@ -47,7 +47,7 @@ Not one slop signal in the vocabulary rises across twelve years. The ones that m
 
 Four of the sixteen slop signals fired zero times in 25 sites. Those four describe something I believed rather than something I found.
 
-### Centering is not the defect
+## Centering is not the defect
 
 Mailchimp's 2014 page is centered, and it is the strongest page in the control cohort.
 
@@ -55,7 +55,7 @@ Mailchimp's 2014 page is centered, and it is the strongest page in the control c
 
 Basecamp 2014 is centered too, and stranger: one 600px column holding the whole page, then six headed sections of running prose at 14px, no cards and no icons anywhere. Same signal as Heroku's hero, opposite outcome. The defect was never the centering. It is what gets stacked on top of it.
 
-### The signal that failed
+## The signal that failed
 
 I spent a while thinking `hero-mockup-float` was the one slop move genuinely rising, 3/7 to 5/8. It does not survive the control.
 
@@ -63,13 +63,13 @@ In 2014 it fires on three pages: one rated slop, two rated mixed. In the YC coho
 
 That is not a declining trend with one exception. It is a signal that measures "is this a website" rather than "is this slop", and it should never have been in the list.
 
-### What the dev-tools cohort actually shows
+## What the dev-tools cohort actually shows
 
 The tempting story is that the strongest current builders dropped the template. The counts do not say that. `three-card-row` is 5/10 in the dev-tools cohort against 2/7 in 2014, which is up, and `centered-hero-stack` is 3/10 rather than zero.
 
 What moved is the composition around them. Mean slop signals per page runs 3.14 in 2014, 2.62 in the YC cohort, 2.40 in dev tools: barely a slope. Mean craft runs 3.71, 5.38, 5.90. Those pages did not abandon the conventional moves. They stopped running them bare.
 
-### The result that broke when I finished the corpus
+## The result that broke when I finished the corpus
 
 At 20 files I had a clean separation: exemplars at 0 to 2 slop signals, mixed at 0 to 4, the two slop pages at 5 and 6. I wrote it up as the central finding.
 
@@ -81,7 +81,7 @@ And the separation was never independent evidence anyway. The signals and the ve
 
 The honest state of what I am building from this: the pipeline that turns these evidence files into rules an agent can read currently authors **zero** rules. All 26 signals report the same reason, that the corpus holds 2 pages rated slop and the separation test requires 3. The build passes empty, which is the gate working.
 
-### Why the control was worth shooting anyway
+## Why the control was worth shooting anyway
 
 Everything above is 25 pages, one viewport each, no narrow-width capture at all, so `asymmetric-split` at 10/10 may not survive at phone width. One rater produced the 2014 cohort with no second read.
 

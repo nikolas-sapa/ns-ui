@@ -7,7 +7,7 @@ Four days ago I published a post arguing that tags do not disambiguate component
 
 I then went and grepped the file I actually ship.
 
-### What does the shipped file say?
+## What does the shipped file say?
 
 The registry is 228 components now. Each one gets a block in `public/llms.txt`, and each block carries a line called `use when`. That line is the entire selection surface. It is the one place a model is told which of four similar things to reach for.
 
@@ -41,7 +41,7 @@ Those two do the job. They name the situation, then they name the specific alter
 
 Same file, same field, same generator. The distance between the two halves is the whole subject of this post.
 
-### How bad is it, exactly?
+## How bad is it, exactly?
 
 I counted rather than guessed, because the counting is trivial and the guessing was flattering.
 
@@ -53,7 +53,7 @@ I counted rather than guessed, because the counting is trivial and the guessing 
 
 So 36% of the catalog answers the question the post was about, and 64% does not.
 
-### Is the fallback the villain here?
+## Is the fallback the villain here?
 
 No, and I want to be precise about this, because "generated text is bad" is the wrong lesson.
 
@@ -63,7 +63,7 @@ The default did exactly what the default said it would do. What did not happen i
 
 This is also why the number is 122 and not 228. A real person did sit down and write 106 of these, some of them very well. The work started. It stopped at 46%.
 
-### Didn't the rename fix this?
+## Didn't the rename fix this?
 
 Partly, and the part it fixed is real.
 
@@ -73,7 +73,7 @@ But a name and a comparison are different jobs. A name tells a model what kind o
 
 So the rename solved the retrieval half. The selection half belongs to `use when`, and `use when` is two thirds unwritten. I fixed the axis I had a script for.
 
-### What does a good line actually contain?
+## What does a good line actually contain?
 
 Reading the 82 that work, they share a shape. Not a template, because the reasoning is bespoke every time, but a shape:
 
@@ -85,7 +85,7 @@ Point three is the expensive one and the only one that matters. It is also the r
 
 Which is a polite way of saying there is no clever fix available. There are 146 lines to write and they get written one at a time.
 
-### The uncomfortable version
+## The uncomfortable version
 
 I wrote a post arguing that tags are not enough to choose between similar components. It was correct. I then shipped a file where, for 122 components out of 228, the selection guidance is the tags.
 
