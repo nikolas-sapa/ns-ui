@@ -11,7 +11,7 @@ The obvious explanation is that the model is careless. I don't think that's it. 
 
 So the model is not choosing badly. It is choosing without the information a human gets for free.
 
-### What a model actually needs
+## What a model actually needs
 
 I have a registry of 206 components. Every one of them is one interaction: a switch that eclipses like the sun, a pagination control that folds like a book page, a departure board that clatters through split flaps. Visually they're distinct. In text, half of them collapse into "a button that animates."
 
@@ -21,7 +21,7 @@ What actually separates them is mechanism. One reads out a threshold by physical
 
 So every component in the registry carries a written mechanism description. Not what it's called or what family it belongs to, but what it does and how, in enough detail that you could rebuild it from the text. It reads more like a spec than a doc.
 
-### One fetch, no protocol
+## One fetch, no protocol
 
 The second decision was distribution.
 
@@ -41,7 +41,7 @@ There's a second file, `llms-full.txt`, that carries the full mechanism descript
 
 Installing is a shadcn command, which means the component lands in your project as source you own. No package, nothing to keep in sync, nothing to break when I change something. If you want to edit it, edit it. It's yours.
 
-### The part I keep thinking about
+## The part I keep thinking about
 
 Writing specs for machines made the library better for people.
 
