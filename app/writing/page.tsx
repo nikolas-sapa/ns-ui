@@ -47,6 +47,7 @@ export default function WritingIndexPage() {
       description: post.description,
       url: `${REGISTRY_ORIGIN}/writing/${post.slug}`,
       datePublished: post.iso,
+      ...(post.updated ? { dateModified: post.updated } : {}),
     })),
   };
 
@@ -89,8 +90,10 @@ export default function WritingIndexPage() {
               href={`/writing/${post.slug}`}
               className="group block rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
             >
+              {/* Machine-readable date, same as the post page — the listing is
+                  what a crawler hits first. */}
               <p className="font-mono text-[11px] uppercase tracking-wider text-ns-muted">
-                {formatDate(post.iso)}
+                <time dateTime={post.iso}>{formatDate(post.iso)}</time>
               </p>
               <h2 className="mt-2 text-lg font-medium tracking-tight text-foreground transition-colors group-hover:text-ns-accent">
                 {post.title}
