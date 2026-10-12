@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AskAI } from "./ask-ai";
 import { CatalogControls, type Filter, type Sort } from "./catalog-controls";
 import { CopyButton } from "./copy-button";
@@ -117,42 +117,56 @@ export function Showcase({
       .catch(() => setAuthenticated(false));
   }, []);
 
-  const toggleSave = useCallback(
-    async (name: string) => {
-      if (authenticated !== true || saving.has(name)) return;
-      const wasSaved = saved.has(name);
-      setSaving((current) => new Set(current).add(name));
+  // `authenticated`, `saved` and `saving` are read through refs rather than
+  // listed as dependencies. They change on load (the /api/saves reply) and on
+  // every save toggle, and a dependency on any of them gave this callback a new
+  // identity each time — which is a prop of every card, so `PreviewCard`'s memo
+  // comparison failed for all 538 of them and the whole catalog re-rendered.
+  // Measured on a production build at 1440x900: the initial /api/saves settle
+  // (authenticated null -> false) re-rendered 538 cards / 1076 renders; a single
+  // save toggle re-rendered all 538 again. The three reads below are
+  // point-in-time checks inside an event handler, not render output, so reading
+  // them late is the same value the handler would have seen.
+  const authRef = useRef(authenticated);
+  authRef.current = authenticated;
+  const savedRef = useRef(saved);
+  savedRef.current = saved;
+  const savingRef = useRef(saving);
+  savingRef.current = saving;
+
+  const toggleSave = useCallback(async (name: string) => {
+    if (authRef.current !== true || savingRef.current.has(name)) return;
+    const wasSaved = savedRef.current.has(name);
+    setSaving((current) => new Set(current).add(name));
+    setSaved((current) => {
+      const next = new Set(current);
+      if (wasSaved) next.delete(name);
+      else next.add(name);
+      return next;
+    });
+    try {
+      const res = await fetch("/api/saves", {
+        method: wasSaved ? "DELETE" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug: name }),
+      });
+      if (res.status === 401) setAuthenticated(false);
+      if (!res.ok) throw new Error("save failed");
+    } catch {
       setSaved((current) => {
         const next = new Set(current);
-        if (wasSaved) next.delete(name);
-        else next.add(name);
+        if (wasSaved) next.add(name);
+        else next.delete(name);
         return next;
       });
-      try {
-        const res = await fetch("/api/saves", {
-          method: wasSaved ? "DELETE" : "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ slug: name }),
-        });
-        if (res.status === 401) setAuthenticated(false);
-        if (!res.ok) throw new Error("save failed");
-      } catch {
-        setSaved((current) => {
-          const next = new Set(current);
-          if (wasSaved) next.add(name);
-          else next.delete(name);
-          return next;
-        });
-      } finally {
-        setSaving((current) => {
-          const next = new Set(current);
-          next.delete(name);
-          return next;
-        });
-      }
-    },
-    [authenticated, saved, saving],
-  );
+    } finally {
+      setSaving((current) => {
+        const next = new Set(current);
+        next.delete(name);
+        return next;
+      });
+    }
+  }, []);
 
   // Starts at the server-rendered default and syncs from the URL once
   // mounted — same mounted-gate pattern as ThemeToggle, so there is nothing

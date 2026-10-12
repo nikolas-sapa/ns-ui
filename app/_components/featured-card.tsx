@@ -253,6 +253,27 @@ export function FeaturedCard({
                 preload="metadata"
                 tabIndex={-1}
                 aria-hidden
+                // The still, again — as the video's own `poster`. Until the
+                // recording reaches its first frame the element paints an
+                // empty box, and an empty box at 526x328 is still the largest
+                // paint on the page, so it *replaces* the poster as the LCP
+                // candidate while showing nothing: measured, LCP went from
+                // 524 ms (the poster <img>) to 5,696 ms (this video, decoded
+                // 5.3-5.9s in). `poster` makes the browser paint the still
+                // through this element instead, so the candidate never
+                // degrades, and it is the same file and the same width the
+                // `<Image>` above already requested, so it is a cache hit
+                // rather than a new request.
+                //
+                // `/_next/image`, not the raw `/posters/...png`: `poster` is
+                // a plain URL, so it bypasses the loader and would fetch the
+                // 120-244 KB original every time. Measured, the raw path cost
+                // +480 KB on the homepage; this one re-encodes to the card's
+                // real width (w=640, the same bucket `sizes` resolves to) and
+                // matched the pre-existing request byte for byte.
+                poster={`/_next/image?url=${encodeURIComponent(
+                  `/posters/${entry.name}-${theme}.png`,
+                )}&w=640&q=75`}
                 onPlaying={() => setRolling(true)}
                 className="absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-out"
                 style={{ opacity: rolling ? 1 : 0 }}

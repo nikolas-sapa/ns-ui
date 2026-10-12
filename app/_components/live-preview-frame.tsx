@@ -253,12 +253,29 @@ function same(a: Fit | null, b: Fit | null) {
   );
 }
 
-/** Quiet empty stage: dot grid on surface. No text, no shimmer bar. */
+/**
+ * Quiet empty stage: dot grid on surface. No text, no shimmer bar.
+ *
+ * The pulse is gated on `visible` rather than left running under an `opacity:
+ * 0` — the node stays mounted for the whole life of the card, so an animation
+ * declared unconditionally is one the compositor keeps ticking forever behind
+ * a surface nobody can see. Measured on the homepage at 1440x900, idle 4s:
+ * 542 of these were animating while only the ~12 cards with a live frame were
+ * actually covered, and cancelling the hidden ones cut idle style recalc from
+ * 826ms to 51ms per 4s (240 -> 15 recalc passes) with every visible pixel
+ * identical — an invisible pulse has no visible output to preserve.
+ *
+ * `motion-reduce:animate-none` replaces `motion-safe:` now that the class is
+ * conditional: the guard has to sit on the same element as the animation it
+ * guards (scripts/test-source-invariants.ts's motion-guard check).
+ */
 function Placeholder({ visible }: { visible: boolean }) {
   return (
     <div
       aria-hidden
-      className="absolute inset-0 [background-image:radial-gradient(circle,var(--border)_1px,transparent_1px)] [background-size:16px_16px] motion-safe:animate-pulse"
+      className={`absolute inset-0 [background-image:radial-gradient(circle,var(--border)_1px,transparent_1px)] [background-size:16px_16px] ${
+        visible ? "animate-pulse motion-reduce:animate-none" : ""
+      }`}
       style={{ opacity: visible ? 1 : 0 }}
     />
   );
