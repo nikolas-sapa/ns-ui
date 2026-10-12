@@ -13,8 +13,19 @@ const REPO_API_URL = "https://api.github.com/repos/nikolas-sapa/ns-ui";
  */
 export async function getStarCount(): Promise<number | null> {
   try {
+    // GITHUB_TOKEN raises the ceiling from 60 requests/hour/IP to 5,000.
+    // Unauthenticated is not just slow, it silently corrupts the homepage:
+    // this runs at BUILD time for a prerendered page, so one rate-limited
+    // build bakes `null` into the static HTML and the count stays missing
+    // until the next deploy -- which is exactly what happened in production
+    // (the /writing page kept its count because it rendered at a different
+    // moment). Optional: unset still works, it just has the old ceiling.
+    const token = process.env.GITHUB_TOKEN?.trim();
     const res = await fetch(REPO_API_URL, {
-      headers: { "User-Agent": "ns-ui" },
+      headers: {
+        "User-Agent": "ns-ui",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
       next: { revalidate: 3600 },
     });
     if (!res.ok) return null;

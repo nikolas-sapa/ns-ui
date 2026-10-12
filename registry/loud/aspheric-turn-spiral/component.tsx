@@ -356,7 +356,18 @@ export function AsphericTurnSpiral({
       return locs.get(name) ?? null;
     };
 
-    const setup = (): boolean => {
+    // A failure past that getContext() leaves a live context nothing can hand
+    // back: the `if (!setup()) return` below returns before the effect
+    // registers the cleanup that releases it. Hence the release here — and
+    // note the condition is the inverse of that cleanup's
+    // `!canvas.isConnected`, because on this path the canvas is still mounted.
+    // A restore attempt is the one case to leave alone: onRestored re-enters
+    // setup(), so releasing there would feed its own loss/restore/fail cycle.
+    const abandon = (isRestore: boolean): false => {
+      if (!isRestore) gl?.getExtension("WEBGL_lose_context")?.loseContext();
+      return false;
+    };
+    const setup = (isRestore = false): boolean => {
       gl = canvas.getContext("webgl", {
         alpha: false,
         antialias: false,
@@ -368,14 +379,14 @@ export function AsphericTurnSpiral({
         vs = compile(gl, gl.VERTEX_SHADER, VERT_SRC);
         fs = compile(gl, gl.FRAGMENT_SHADER, FRAG_SRC);
         const p = gl.createProgram();
-        if (!p) return false;
+        if (!p) return abandon(isRestore);
         program = p;
         gl.attachShader(p, vs);
         gl.attachShader(p, fs);
         gl.linkProgram(p);
-        if (!gl.getProgramParameter(p, gl.LINK_STATUS)) return false;
+        if (!gl.getProgramParameter(p, gl.LINK_STATUS)) return abandon(isRestore);
       } catch {
-        return false;
+        return abandon(isRestore);
       }
       gl.useProgram(program);
       buffer = gl.createBuffer();
@@ -575,7 +586,7 @@ export function AsphericTurnSpiral({
       sleep();
     };
     const onRestored = () => {
-      if (setup()) {
+      if (setup(true)) {
         resize();
         applyMode();
       }

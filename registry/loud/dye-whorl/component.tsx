@@ -510,7 +510,7 @@ class Solver {
   private active: WebGLProgram | null = null;
   constructor(private canvas: HTMLCanvasElement) {}
 
-  init(): boolean {
+  init(isRestore = false): boolean {
     const gl = this.canvas.getContext("webgl2", {
       alpha: false,
       antialias: false,
@@ -529,7 +529,17 @@ class Solver {
     const ext =
       gl.getExtension("EXT_color_buffer_float") ??
       gl.getExtension("EXT_color_buffer_half_float");
-    if (!ext) return false;
+    if (!ext) {
+      // The context is live by this point, and the caller's early return on
+      // false never registers the effect cleanup that hands one back, so an
+      // unreleased context would outlive the mount. The condition is the
+      // inverse of that cleanup's `!canvas.isConnected` — the canvas is still
+      // attached on this path — and the one context to leave alone is one the
+      // browser just restored, since onRestored re-enters init() and a release
+      // there would feed its own loss/restore/fail cycle.
+      if (!isRestore) gl.getExtension("WEBGL_lose_context")?.loseContext();
+      return false;
+    }
     gl.getExtension("OES_texture_float_linear");
 
     this.buffer = gl.createBuffer();
@@ -762,7 +772,14 @@ export function DyeWhorl({
       !pAdvectVel || !pForce || !pDiv || !pJacobi || !pGrad ||
       !pDyeAdvect || !pDyeResolve || !pRender
     ) {
+      // The programs failed on a context getContext() did hand over, and this
+      // return comes before any cleanup is registered: destroy() frees the GL
+      // objects, but only an explicit release gets the context itself back.
+      // No isRestore guard is needed here — onRestored re-enters init() and
+      // nothing else, so this block cannot cycle.
+      const lose = solver.gl?.getExtension("WEBGL_lose_context");
       solver.destroy();
+      lose?.loseContext();
       return;
     }
 
@@ -1530,7 +1547,7 @@ export function DyeWhorl({
       sleep();
     };
     const onRestored = () => {
-      if (solver.init()) {
+      if (solver.init(true)) {
         resize();
         allocate();
         applyMode();

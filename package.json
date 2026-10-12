@@ -40,6 +40,7 @@
     "test:source-invariants": "node scripts/test-source-invariants.ts",
     "test:animation-gate": "node scripts/test-animation-gate.ts",
     "test:antislop": "node --test scripts/test-antislop.ts scripts/test-antislop-rules.ts scripts/test-antislop-corpus.ts scripts/test-antislop-build.ts",
+    "test:writing-markdown": "node scripts/test-writing-markdown.ts",
     "test:perf-budget": "node scripts/test-perf-budget.ts",
     "test:agent-readiness": "node scripts/test-agent-readiness.ts",
     "test:convex-deployed": "node scripts/test-convex-deployed.ts",

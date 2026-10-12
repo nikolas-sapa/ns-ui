@@ -1,8 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+
+/**
+ * GA4 measurement ID, e.g. `G-XXXXXXXXXX`. Unset — the local and
+ * preview-without-the-var case — emits nothing, so GA is opt-in per deploy
+ * target rather than something that has to be stubbed out in development.
+ *
+ * It lives here rather than in the layout specifically to inherit the
+ * top-frame guard below. Dropped into <head> instead, it would boot once per
+ * catalog card iframe, which is the exact bug the Vercel scripts above were
+ * moved here to fix: 5-12 copies per load, every pageview multiplied by the
+ * number of visible cards.
+ */
+const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim();
 
 /**
  * Analytics, minus the copies every card thumbnail was loading.
@@ -38,6 +52,23 @@ export function SiteAnalytics() {
     <>
       <Analytics />
       <SpeedInsights />
+      {GA_ID ? (
+        <>
+          {/* afterInteractive, not beforeInteractive: analytics is never on
+              the critical path, and gtag.js is ~90KB of third-party script.
+              `send_page_view` stays on — the App Router does a full document
+              request per navigation here (no client-side router cache for
+              these routes), so the default pageview is correct and a manual
+              pathname listener would double-count. */}
+          <Script
+            src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+            strategy="afterInteractive"
+          />
+          <Script id="ga-init" strategy="afterInteractive">
+            {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}');`}
+          </Script>
+        </>
+      ) : null}
     </>
   );
 }

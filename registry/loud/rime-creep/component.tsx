@@ -1364,6 +1364,13 @@ export function RimeCreep({
       depositProg?.destroy();
       decayProg?.destroy();
       screenProg?.destroy();
+      // The destroys free the programs but not the context getContext() handed
+      // over above, and this return comes before the cleanup that releases it
+      // is registered. No `!canvas.isConnected` test here — the canvas is
+      // still mounted on this path — and no restore guard either: onRestored
+      // rebuilds in its own try/catch, which deliberately leaves the context
+      // alone so a failing restore cannot cycle.
+      gl.getExtension("WEBGL_lose_context")?.loseContext();
       return;
     }
     quadBuf = gl.createBuffer();

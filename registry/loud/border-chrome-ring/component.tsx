@@ -358,27 +358,35 @@ export function LiquidCollar({
     // ring) rather than an uncaught throw, which would skip the `if
     // (!setup()) return;` early-return below and leave the effect's cleanup
     // never registered — a permanent GL leak on a bad driver.
-    const setup = (): boolean => {
+    //
+    // That clean false leaks the context by the same route, though: the
+    // early-return happens before the cleanup is registered, and teardown()
+    // nulls the only handle that still reaches it. So a failure past
+    // getContext() releases the context here, which is the inverse of the
+    // cleanup's `!canvas.isConnected` test — on this path the canvas is still
+    // mounted. The one context to leave alone is one the browser has just
+    // restored: onRestored re-enters setup(), and a release there would feed
+    // its own loss/restore/fail cycle.
+    const abandon = (isRestore: boolean): false => {
+      const lose = isRestore ? null : gl?.getExtension("WEBGL_lose_context");
+      teardown();
+      lose?.loseContext();
+      return false;
+    };
+    const setup = (isRestore = false): boolean => {
       gl = canvas.getContext("webgl", { alpha: true, premultipliedAlpha: true }) as WebGLRenderingContext | null;
       if (!gl) return false;
       try {
         vShader = compile(gl, gl.VERTEX_SHADER, VERT_SRC);
         fShader = compile(gl, gl.FRAGMENT_SHADER, FRAG_SRC);
         program = gl.createProgram();
-        if (!program) {
-          teardown();
-          return false;
-        }
+        if (!program) return abandon(isRestore);
         gl.attachShader(program, vShader);
         gl.attachShader(program, fShader);
         gl.linkProgram(program);
-        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-          teardown();
-          return false;
-        }
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return abandon(isRestore);
       } catch {
-        teardown();
-        return false;
+        return abandon(isRestore);
       }
       gl.useProgram(program);
 
@@ -594,7 +602,7 @@ export function LiquidCollar({
       sleep();
     };
     const onRestored = () => {
-      if (setup()) {
+      if (setup(true)) {
         resize();
         applyMode();
       }

@@ -171,17 +171,28 @@ export function ChromaTide({ colors, speed = 1, scale = 1, className = "", style
     };
     readColors();
 
-    const setup = (): boolean => {
+    // A failure past that getContext() leaves a live context nothing can hand
+    // back: the `if (!setup()) return` below returns before the effect
+    // registers the cleanup that releases it. Hence the release here — and
+    // note the condition is the inverse of that cleanup's
+    // `!canvas.isConnected`, because on this path the canvas is still mounted.
+    // A restore attempt is the one case to leave alone: onRestored re-enters
+    // setup(), so releasing there would feed its own loss/restore/fail cycle.
+    const abandon = (isRestore: boolean): false => {
+      if (!isRestore) gl?.getExtension("WEBGL_lose_context")?.loseContext();
+      return false;
+    };
+    const setup = (isRestore = false): boolean => {
       gl = canvas.getContext("webgl", { alpha: false, antialias: true }) as WebGLRenderingContext | null;
       if (!gl) return false;
       vShader = compile(gl, gl.VERTEX_SHADER, VERT_SRC);
       fShader = compile(gl, gl.FRAGMENT_SHADER, FRAG_SRC);
       program = gl.createProgram();
-      if (!program) return false;
+      if (!program) return abandon(isRestore);
       gl.attachShader(program, vShader);
       gl.attachShader(program, fShader);
       gl.linkProgram(program);
-      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return false;
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return abandon(isRestore);
       gl.useProgram(program);
 
       buffer = gl.createBuffer();
@@ -323,7 +334,7 @@ export function ChromaTide({ colors, speed = 1, scale = 1, className = "", style
       sleep();
     };
     const onRestored = () => {
-      if (setup()) {
+      if (setup(true)) {
         applyColorUniforms();
         resize();
         applyMode();

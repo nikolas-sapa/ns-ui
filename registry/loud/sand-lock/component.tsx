@@ -385,7 +385,17 @@ export function SandLock({
 
     const plateProg = link(gl, VERT_PLATE, FRAG_PLATE);
     const grainProg = link(gl, VERT_GRAIN, FRAG_GRAIN);
-    if (!plateProg || !grainProg) return;
+    if (!plateProg || !grainProg) {
+      // A link failure leaves the context getContext() just handed over with
+      // no owner: this return comes before the cleanup that releases it is
+      // registered. Unlike that cleanup there is no `!canvas.isConnected`
+      // test — the canvas is still mounted here — but the release is confined
+      // to the first attempt: a non-zero glEpoch means onRestored is retrying
+      // after a loss, and releasing a context the browser has just restored
+      // would feed its own loss/restore/fail cycle.
+      if (glEpoch === 0) gl.getExtension("WEBGL_lose_context")?.loseContext();
+      return;
+    }
 
     const quad = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, quad);

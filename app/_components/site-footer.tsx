@@ -1,5 +1,77 @@
 import { AskAI } from "./ask-ai";
 
+/**
+ * Launch-directory badges. These are a verification mechanism, not
+ * decoration: each directory fetches the page at the URL it has on file and
+ * checks for its own badge image wrapped in a followable link back to the
+ * listing. A `nofollow`, `sponsored` or `ugc` rel cancels the backlink, and
+ * removing the badge later can get the listing delisted — so they live in the
+ * footer, which renders on the homepage (the URL directories actually list)
+ * and on every other page, rather than on a dedicated page a directory would
+ * never look at.
+ *
+ * Plain <img> rather than next/image: each would otherwise need its own
+ * remotePatterns entry. Lazy because the footer is below the fold everywhere,
+ * and explicitly sized so a slow or offline directory cannot shift the layout
+ * — which is not hypothetical, letslaunch.today was returning 504s when its
+ * badge was added. A directory that is down degrades to alt text and heals
+ * itself when it comes back.
+ *
+ * Only dark variants are published by both, so they stay dark in either
+ * theme. Their artwork, not ours to recolour.
+ */
+const DIRECTORY_BADGES = [
+  {
+    href: "https://launchnest.io/p/ns-ui-react-components-one-interaction-each",
+    src: "https://launchnest.io/badge/ns-ui-react-components-one-interaction-each.svg?variant=featured",
+    alt: "ns-ui: React components on LaunchNest",
+    width: 220,
+    height: 56,
+  },
+  {
+    href: "https://letslaunch.today/product/ns-ui",
+    src: "https://letslaunch.today/badge/ns-ui.svg",
+    alt: "NS UI on LetsLaunch",
+    width: 250,
+    height: 54,
+  },
+  {
+    href: "https://www.codehype.ai/product/ns-ui?utm_source=codehype_badge",
+    src: "https://www.codehype.ai/badges/ns-ui.svg?variant=find-us&v=20",
+    alt: "Featured on CodeHype",
+    width: 180,
+    height: 65,
+  },
+  {
+    // Their embed code points at badge0-white.svg, which is a white pill
+    // (#fff ground, #000 type) and disappears against the light theme. The
+    // dark variant they also publish (#131a2b) reads on both, and matches
+    // every other badge here, which is a dark pill too.
+    href: "https://twelve.tools",
+    src: "https://twelve.tools/badge0-dark.svg",
+    alt: "Featured on Twelve Tools",
+    width: 148,
+    height: 40,
+  },
+  {
+    // Optional on their side -- it only moves the free listing into a
+    // priority queue. Taken anyway, and deliberately NOT recoloured. The
+    // artwork is a white pill with a #006AFF border, so the outline carries
+    // it on the dark theme unedited, and its only orange sits inside their
+    // own logo mark. Self-hosting a recoloured copy is the obvious "fix" and
+    // a bad one: their verifier fetches this page looking for THEIR asset,
+    // and a modified file on our origin is how you fail that check.
+    //
+    // Published at 300x80; drawn at 206x55 so it sits on the same optical
+    // line as its neighbours instead of towering over them.
+    href: "https://startupbase.io/products/ns-ui?utm_source=startupbase&utm_medium=badge&utm_campaign=launch-badge-light",
+    src: "https://statics.startupbase.io/site/badges/launched-on-sb.svg",
+    alt: "Launched on StartupBase",
+    width: 206,
+    height: 55,
+  },
+] as const;
+
 const COLUMN_LABEL = "font-mono text-[10px] uppercase tracking-wider text-ns-muted";
 
 // Same link idiom as the sidebar's own bottom bar (site-shell.tsx) — plain
@@ -116,11 +188,43 @@ export function SiteFooter() {
         ))}
       </div>
 
-      <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-2 border-t border-border pt-6">
+      <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-4 border-t border-border pt-6">
         <a href="https://nikolas.helpmarq.com" className={`${COLUMN_LINK} -mx-2 inline-block`}>
           Built by Nikolas Sapa
         </a>
         <p>Built with love for developers, with Claude Code.</p>
+      </div>
+
+      {/* Own row, left-aligned, with real bottom clearance.
+          Five badges is ~1050px of fixed-width artwork in a ~940px column, so
+          `ml-auto` in the credit row above wrapped them — and the wrapped line
+          sat under the fixed McpPopup and back-to-top button, hiding CodeHype
+          and StartupBase completely (caught in a screenshot, not in review).
+          pb-16 is the clearance for those two fixed controls; justify-start so
+          growth runs left-to-right into empty space instead of back under
+          them. */}
+      <div className="mt-6 pb-16">
+        <ul className="flex flex-wrap items-center gap-3">
+          {DIRECTORY_BADGES.map((badge) => (
+            <li key={badge.href}>
+              <a
+                href={badge.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              >
+                <img
+                  src={badge.src}
+                  alt={badge.alt}
+                  width={badge.width}
+                  height={badge.height}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </a>
+            </li>
+          ))}
+        </ul>
       </div>
     </footer>
   );
