@@ -53,6 +53,23 @@ const DIRECTORY_BADGES = [
     width: 148,
     height: 40,
   },
+  {
+    // Optional on their side -- it only moves the free listing into a
+    // priority queue. Taken anyway, and deliberately NOT recoloured. The
+    // artwork is a white pill with a #006AFF border, so the outline carries
+    // it on the dark theme unedited, and its only orange sits inside their
+    // own logo mark. Self-hosting a recoloured copy is the obvious "fix" and
+    // a bad one: their verifier fetches this page looking for THEIR asset,
+    // and a modified file on our origin is how you fail that check.
+    //
+    // Published at 300x80; drawn at 206x55 so it sits on the same optical
+    // line as its neighbours instead of towering over them.
+    href: "https://startupbase.io/products/ns-ui?utm_source=startupbase&utm_medium=badge&utm_campaign=launch-badge-light",
+    src: "https://statics.startupbase.io/site/badges/launched-on-sb.svg",
+    alt: "Launched on StartupBase",
+    width: 206,
+    height: 55,
+  },
 ] as const;
 
 const COLUMN_LABEL = "font-mono text-[10px] uppercase tracking-wider text-ns-muted";
@@ -176,7 +193,18 @@ export function SiteFooter() {
           Built by Nikolas Sapa
         </a>
         <p>Built with love for developers, with Claude Code.</p>
-        <ul className="ml-auto flex flex-wrap items-center justify-end gap-3">
+      </div>
+
+      {/* Own row, left-aligned, with real bottom clearance.
+          Five badges is ~1050px of fixed-width artwork in a ~940px column, so
+          `ml-auto` in the credit row above wrapped them — and the wrapped line
+          sat under the fixed McpPopup and back-to-top button, hiding CodeHype
+          and StartupBase completely (caught in a screenshot, not in review).
+          pb-16 is the clearance for those two fixed controls; justify-start so
+          growth runs left-to-right into empty space instead of back under
+          them. */}
+      <div className="mt-6 pb-16">
+        <ul className="flex flex-wrap items-center gap-3">
           {DIRECTORY_BADGES.map((badge) => (
             <li key={badge.href}>
               <a
