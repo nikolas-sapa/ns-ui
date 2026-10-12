@@ -29,6 +29,20 @@ function formatStarCount(count: number): string {
  * (fetch failed, or not threaded through) renders exactly as before: no
  * count, no divider, same height either way.
  */
+/**
+ * The hero's star CTA plus its progress toward the goal. Separate export
+ * rather than a prop on GitHubStarButton, because the quiet variant appears
+ * mid-page and in the newsletter CTA where a goal bar would be noise.
+ */
+export function GitHubStarCta({ stars = null }: { stars?: number | null }) {
+  return (
+    <div className="flex flex-col items-end">
+      <GitHubStarButton stars={stars} />
+      {stars !== null ? <StarGoal stars={stars} /> : null}
+    </div>
+  );
+}
+
 export function GitHubStarButton({
   variant = "collar",
   className = "",
@@ -103,6 +117,54 @@ function StarCount({ stars }: { stars: number | null }) {
     <span aria-hidden className="ml-0.5 flex items-center gap-2 border-l border-border pl-2 font-mono text-xs tabular-nums text-ns-muted">
       {formatStarCount(stars)}
     </span>
+  );
+}
+
+/** The number the owner is aiming at. One place, read by both the bar and
+ *  the label, so they can never disagree. */
+const STAR_GOAL = 5000;
+
+/**
+ * Progress toward STAR_GOAL, rendered under the hero's star button.
+ *
+ * Two honesty problems a naive progress bar has at this scale, both handled
+ * here rather than papered over:
+ *
+ *  - A true-width fill at 25/5,000 is 0.5% of the track, which rounds to
+ *    nothing and paints as an empty bar — indistinguishable from broken. The
+ *    fill therefore has a 2px floor whenever the count is above zero: it
+ *    overstates the bar by a hair at the very bottom of the range, and the
+ *    LABEL next to it carries the exact figures, so nothing is actually
+ *    misreported.
+ *  - The percentage is shown to one decimal below 10%, because "0%" next to a
+ *    real count of 25 reads as a bug and "1%" is wrong.
+ *
+ * `aria-hidden` on the bar with the numbers in the adjacent text, rather than
+ * a progressbar role: a screen reader gets "25 of 5,000 stars, 0.5%" as plain
+ * prose, which is the whole content. A role here would add a second
+ * announcement of the same thing.
+ */
+function StarGoal({ stars }: { stars: number }) {
+  const pct = (stars / STAR_GOAL) * 100;
+  const shown = pct < 10 ? pct.toFixed(1) : Math.round(pct).toString();
+  return (
+    <div className="mt-2 w-full max-w-[13rem]">
+      <div
+        aria-hidden
+        className="h-[3px] w-full overflow-hidden rounded-full bg-border"
+      >
+        <div
+          className="h-full rounded-full bg-ns-accent"
+          // Inline width because the value is data, not a design token — there
+          // is no Tailwind class for "0.5%".
+          style={{ width: stars > 0 ? `max(2px, ${pct}%)` : 0 }}
+        />
+      </div>
+      <p className="mt-1.5 font-mono text-[10px] tabular-nums text-ns-muted">
+        {stars.toLocaleString("en-US")} of {STAR_GOAL.toLocaleString("en-US")} stars
+        <span aria-hidden> · {shown}%</span>
+      </p>
+    </div>
   );
 }
 

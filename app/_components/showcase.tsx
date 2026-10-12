@@ -6,7 +6,7 @@ import { CatalogControls, type Filter, type Sort } from "./catalog-controls";
 import { CopyButton } from "./copy-button";
 import { EmailCapture } from "./email-capture";
 import { FeaturedCard } from "./featured-card";
-import { GitHubStarButton } from "./github-star-button";
+import { GitHubStarButton, GitHubStarCta } from "./github-star-button";
 import { PreviewCard, type RegistryEntry } from "./preview-card";
 import { useMountManager } from "./use-mount-manager";
 import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
@@ -553,11 +553,11 @@ export function Showcase({
           never climbs into that button's space at narrower widths. Theme
           toggle used to sit here too — SiteShell renders one for every page
           now, so this row no longer needs its own. */}
-      <div className="flex items-center justify-between gap-3 pt-20 sm:pt-28 lg:pt-10">
+      <div className="flex items-start justify-between gap-3 pt-20 sm:pt-28 lg:pt-10">
         <p className="font-mono text-xs uppercase tracking-[0.18em] text-ns-muted">
           ns-ui
         </p>
-        <GitHubStarButton stars={stars} />
+        <GitHubStarCta stars={stars} />
       </div>
 
       {/* Two-column split waits for xl, not lg — the persistent sidebar
