@@ -29,6 +29,11 @@ const SUPPORTED = new Set([
   "fence",
   "inline-code",
   "link",
+  // Tables: added alongside the renderer in post-body.tsx, after this gate
+  // caught slop-template-2014-control.md's evidence table shipping as
+  // literal pipes. Header row, `|---|` delimiter, body rows; no alignment
+  // colons and no inline pipes inside cells, neither of which any post uses.
+  "table",
 ]);
 
 /** Everything a post could plausibly contain, supported or not. */
