@@ -57,6 +57,57 @@ const CORPUS_IDLE_FALLBACK_MS = 2500;
  */
 const MOUNT_CAP = 12;
 
+/**
+ * The cap above is a desktop figure, and it used to be the only one — the same
+ * 12 on a 4K monitor and on a phone.
+ *
+ * Reported: "site crashes on mobile safari after zooming in." iOS Safari
+ * enforces a hard per-tab memory ceiling and kills the tab on breach, and a
+ * canvas backing store scales with the SQUARE of the zoom factor — so a pinch
+ * to 3x asks for ~9x the pixels of every live demo at once. At 12 mounted
+ * iframes, several of which hold a WebGL context, that is the whole budget.
+ *
+ * Measured at the card grid, not assumed: 12 is an upper bound the preload
+ * margin never reaches on a narrow viewport, so the real counts are
+ *
+ *   phone  390px   5 mounted -> 3,  3 visible, none blank
+ *   tablet 820px  10 mounted -> 6,  6 visible, none blank
+ *
+ * i.e. ~40% fewer live canvases on a phone, not the 4x a naive reading of the
+ * constant suggests. Costs nothing visible: the mount manager never evicts a
+ * card touching the viewport (useMountManager's own invariant), so this only
+ * bounds the off-screen PRELOAD budget — `blankVisible` stayed empty at every
+ * width before and after.
+ *
+ * ponytail: width only, not visualViewport.scale. 3 instead of 12 already cuts
+ * the phone's worst case to a quarter. If it still crashes, the next lever is
+ * dropping the cap further while `visualViewport.scale > 1` and pausing demos
+ * outside the zoomed region.
+ */
+function capForWidth(width: number): number {
+  if (width < 640) return 3;
+  if (width < 1024) return 6;
+  return MOUNT_CAP;
+}
+
+/**
+ * Starts at the phone value and widens after mount, rather than reading
+ * `window` in the initializer: this component server-renders, so a
+ * width-dependent initial value is a hydration mismatch waiting to happen
+ * (this repo has already had two sweeps of those). Over-mounting on a phone is
+ * the failure that crashes a tab; one extra re-rank on desktop is not.
+ */
+function useMountCap(): number {
+  const [cap, setCap] = useState(3);
+  useEffect(() => {
+    const read = () => setCap(capForWidth(window.innerWidth));
+    read();
+    window.addEventListener("resize", read);
+    return () => window.removeEventListener("resize", read);
+  }, []);
+  return cap;
+}
+
 /** Mount a demo this far outside the viewport so it has run a beat before seen. */
 const PRELOAD_MARGIN = 600;
 
@@ -503,7 +554,8 @@ export function Showcase({
     setQuery("");
   };
 
-  const { registerRef, isActive, isOnScreen } = useMountManager({ mountCap: MOUNT_CAP, preloadMargin: PRELOAD_MARGIN });
+  const mountCap = useMountCap();
+  const { registerRef, isActive, isOnScreen } = useMountManager({ mountCap, preloadMargin: PRELOAD_MARGIN });
 
   const byName = useMemo(() => new Map(items.map((i) => [i.name, i])), [items]);
   const featuredItems = useMemo(
