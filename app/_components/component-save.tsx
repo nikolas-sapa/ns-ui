@@ -18,7 +18,8 @@ export function ComponentSave({ name }: { name: string }) {
 
   useEffect(() => {
     let disposed = false;
-    fetch("/api/saves")
+    // See showcase.tsx: unbounded, this leaves the control disabled forever.
+    fetch("/api/saves", { signal: AbortSignal.timeout(8000) })
       .then(async (res) => {
         if (disposed) return;
         if (res.status === 401) {

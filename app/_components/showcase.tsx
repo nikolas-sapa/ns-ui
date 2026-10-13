@@ -154,7 +154,12 @@ export function Showcase({
   const [saving, setSaving] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    fetch("/api/saves")
+    // Deadline for the same reason as the corpus fetch above: `authenticated`
+    // stays null until this settles, and save-button.tsx disables on null, so
+    // a hanging Convex request left all 542 buttons disabled and labelled
+    // "Save" rather than offering sign-in. Timing out resolves to signed-out,
+    // which is the honest default.
+    fetch("/api/saves", { signal: AbortSignal.timeout(8000) })
       .then(async (res) => {
         if (res.status === 401) {
           setAuthenticated(false);
@@ -391,7 +396,16 @@ export function Showcase({
   useEffect(() => {
     if (!corpusWanted || corpusSettled) return;
     let cancelled = false;
-    fetch(SEARCH_INDEX_URL)
+    // 8s deadline. Failure was already handled; SLOWNESS was not, and it is
+    // the worse case: `corpusSettled` is set only in the handlers below, and
+    // until it is, the gate effect keeps `.catalog-filtered` on <html>, which
+    // app/globals.css hides the entire grid under. A visitor arriving on a
+    // shared `/?q=...` link therefore saw the controls claim "8 of 542" above
+    // a blank page, permanently. The abort lands in the `.catch` that already
+    // calls setCorpusSettled(true), so the grid reveals unfiltered -- the
+    // same degradation a 500 already produced. Same idiom as
+    // lib/status-checks.ts.
+    fetch(SEARCH_INDEX_URL, { signal: AbortSignal.timeout(8000) })
       .then((res) => (res.ok ? (res.json() as Promise<SearchCorpus>) : null))
       .then((data) => {
         if (cancelled) return;

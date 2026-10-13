@@ -152,7 +152,13 @@ export function LivePreviewFrame({
     let ticks = 0;
     const id = window.setInterval(() => {
       try {
-        if (frameRef.current?.contentDocument?.readyState === "complete") {
+        // The URL test is load-bearing: a fresh iframe's own `about:blank`
+        // reports readyState "complete" immediately, so this accepted it,
+        // faded the card in and faded the placeholder out before the real
+        // document existed. On a slow embed route that painted rows of blank
+        // boxes with no dot grid and no loading signal.
+        const doc = frameRef.current?.contentDocument;
+        if (doc?.readyState === "complete" && doc.URL !== "about:blank") {
           // Fit in the same batch as the fade-in, so the frame's first visible
           // paint is already cropped rather than zooming in afterwards.
           refit();
