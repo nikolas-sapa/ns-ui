@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 /**
  * A purpose-built renderer for the small markdown subset the writing posts
- * actually use: `##`/`###` headings, paragraphs, fenced code blocks, bulleted
+ * actually use: `##`/`###` headings, paragraphs, tables, fenced code blocks, bulleted
  * and numbered lists, inline code, bold and links. No markdown package in
  * this repo (checked package.json) and the subset is narrow enough that
  * pulling one in would be a bigger dependency than the parser itself.
@@ -50,6 +50,58 @@ function parseBlocks(markdown: string): ReactNode[] {
         >
           <code className="font-mono text-foreground">{codeLines.join("\n")}</code>
         </pre>,
+      );
+      continue;
+    }
+
+    // Tables. Added after scripts/test-writing-markdown.ts caught
+    // `slop-template-2014-control.md`'s evidence table shipping as literal
+    // pipes: it is the counted centrepiece of that post, and a comparison
+    // table is also the single most extractable shape for an assistant to
+    // cite, so degrading it to prose was the wrong fix.
+    //
+    // GFM subset actually authored here: a header row, a `|---|` delimiter,
+    // then body rows. Leading and trailing pipes optional. No alignment
+    // colons, no inline pipes inside cells (nothing in content/writing uses
+    // either), no caption.
+    if (line.startsWith("|") && /^\|[\s:|-]+\|?$/.test(lines[i + 1] ?? "")) {
+      const cells = (row: string) =>
+        row.replace(/^\||\|$/g, "").split("|").map((c) => c.trim());
+      const header = cells(line);
+      i += 2; // header + delimiter
+      const rows: string[][] = [];
+      while (i < lines.length && lines[i].startsWith("|")) {
+        rows.push(cells(lines[i]));
+        i += 1;
+      }
+      blocks.push(
+        <div key={key++} className="overflow-x-auto">
+          <table className="w-full border-collapse text-[13px] leading-relaxed">
+            <thead>
+              <tr>
+                {header.map((h, n) => (
+                  <th
+                    key={n}
+                    className="border-b border-border px-3 py-2 text-left font-semibold text-foreground"
+                  >
+                    {renderInline(h)}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r, n) => (
+                <tr key={n}>
+                  {r.map((c, m) => (
+                    <td key={m} className="border-b border-border px-3 py-2 align-top text-ns-muted">
+                      {renderInline(c)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>,
       );
       continue;
     }
