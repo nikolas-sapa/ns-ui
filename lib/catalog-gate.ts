@@ -9,7 +9,24 @@
 // only present in the default render — the Featured rail and the "All
 // components" heading above the catalog grid — so when they disappear on the
 // corrected render, everything below (including the grid) jumps up. That
-// jump is this repo's worst measured CLS (docs/perf-audit-2026-07.md).
+// jump is a layout shift by construction — read `filtered` and the two
+// gates at app/_components/showcase.tsx:548 and the blocks it guards — but
+// it is UNQUANTIFIED, and this comment used to claim otherwise.
+//
+// It previously read "this repo's worst measured CLS
+// (docs/perf-audit-2026-07.md)". Both halves were false. That document's
+// CLS row reads `| CLS | 0 | 0 |`, and its methodology loads a plain
+// homepage, which never visits a `?q=`/`?category=` URL — so it could not
+// have observed this shift even in principle. The worst CLS actually on
+// record is the footer selector at 0.11 across 6 samples, up to 0.13
+// per-route (docs/perf-goal.md, "### CLS"), which belongs to
+// app/_components/site-auth.tsx, not to the catalog.
+//
+// No audit here samples a filtered URL, which is likely why: one only
+// arrives when a visitor shares it, so the shift can be large per
+// occurrence while contributing nothing visible to a field P75. The gate
+// below is therefore justified on cost, not on magnitude — an inline
+// <head> script adding two classes, firing only on URLs carrying params.
 //
 // This script runs in <head>, before hydration (same idiom as
 // lib/theme.ts's NO_FLASH_SCRIPT and lib/sidebar.ts's
