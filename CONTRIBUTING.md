@@ -97,13 +97,23 @@ fits. Then:
 3. `npm run typecheck`. It must be clean, and it reruns `registry:build`, so it
    also catches a malformed `meta.json`.
 
-4. Run the gate on your component alone, with a server up:
+4. Run the gate on your component alone, against a **production** server:
 
    ```bash
-   npm run dev                                    # in another shell
-   node scripts/verify.ts <name>
-   BASE_URL=http://localhost:3001 node scripts/verify.ts <name>   # other port
+   npm run build && npm run start                 # in another shell
+   npm run verify <name>
+   BASE_URL=http://localhost:3400 npm run verify <name>   # non-default port
    ```
+
+   Not `npm run dev` — Turbopack serves corrupted chunks under the gate's
+   parallel load and produces 15 to 50 percent false failures, which read as a
+   catastrophic bug in your own component. See
+   ["The quality gate"](#the-quality-gate) below; the gate needs a rebuild and
+   a restart before it sees a new component.
+
+   Use `npm run verify`, not `node scripts/verify.ts` directly: the npm script
+   carries a `preverify` hook that rebuilds the registry first, and without it
+   the gate runs against a stale index.
 
 5. Look at it yourself, in both themes and at both sizes. The gate catches a
    lot, but not everything, and the two things it misses are the two that have
@@ -306,9 +316,12 @@ catastrophic component bug.
 Keep the diff to one component or one concern. Include the dark and light
 resting-state screenshots. Confirm `typecheck` and `verify` are clean, that you
 have looked at the component in both themes and on the homepage card, and that
-no generated file is in the diff. CI runs `registry:build`, `typecheck`,
-`build` and a DCO sign-off check on every PR; `verify` stays local because it
-needs a server.
+no generated file is in the diff. CI runs nine checks on every PR:
+`registry:build`, an anti-slop count check, `typecheck`,
+`test:source-invariants`, `test:animation-gate`, `test:writing-markdown`,
+`build`, `test:perf-budget`, and a DCO sign-off check. Every one except DCO
+runs locally with the same command, so you can be green before you push.
+`verify` is the exception that stays local: it needs a running server.
 
 ## Reporting problems
 
