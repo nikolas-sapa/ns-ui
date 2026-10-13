@@ -36,6 +36,15 @@ const CONTROL_MIN_N = 3; // rated control files before the control gate means an
 // slop one: the gap is computed from both, so either being thin makes it
 // unreliable, and for a craft signal the thin side is the slop pool anyway.
 const VERDICT_MIN_N = 3; // rated files in each verdict pool before a gap means anything; both classes
+// The signal's own positive count, across the WHOLE corpus rather than within
+// a verdict pool. Added when the gate first opened and let two signals through
+// on almost nothing: badge-pill-spam was eligible on a single `present` file
+// and stock-photo-generic on two. Both passed because the pool minimums
+// constrain how many files were RATED, and the separation gate reads a rate —
+// 1 of 3 slop files is 33%, which clears a 0.3 gap. Neither gate looks at how
+// many times the signal was actually observed. A rule reading "present in 1 of
+// 32 files studied" is not a rule, it is an anecdote with a denominator.
+const PRESENT_MIN_N = 3; // `present` observations corpus-wide before a signal may back a rule
 
 // The cohort that answers "was this already normal before AI-built pages?".
 // Named rather than inlined because every verdict here turns on it.
@@ -139,6 +148,15 @@ export function eligibility(signal: string, corpus: Map<string, Evidence>): Elig
       `not enough rated evidence to compute a separation: ${thin
         .map(([name, p]) => `${name} (n=${p.n})`)
         .join(", ")}; ${VERDICT_MIN_N} rated files required in each verdict pool. A gap resting on one or two files cannot authorize a rule.`,
+    );
+  }
+  // Fail closed on the signal's own evidence, not just the pools'. Checked
+  // last: it is the narrowest claim of the three and the least informative
+  // reason to report when a wider one applies.
+  const presentN = files.filter((e) => settled(e) === "present").length;
+  if (presentN < PRESENT_MIN_N) {
+    return no(
+      `only ${presentN} file(s) in the whole corpus rate this \`present\`, ${PRESENT_MIN_N} required: a rule would rest on an anecdote. Rate it in more evidence before authoring one.`,
     );
   }
   if (gap < SEPARATION_MIN) {

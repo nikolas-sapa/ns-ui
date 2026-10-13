@@ -278,6 +278,34 @@ test("no control evidence is ineligible, naming the pool size", () => {
   assert.match(r.reason, /n=0/);
 });
 
+// The signal's own positive count, which neither pool gate constrains. The
+// gate first opened with badge-pill-spam eligible on ONE `present` file: 1 of
+// 3 slop files is 33%, which clears the 0.3 separation gap, and both pool
+// minimums were satisfied because they count RATED files, not observations.
+test("a signal observed fewer than 3 times corpus-wide is ineligible", () => {
+  const corpus = new Map([
+    // 1 present among the slop pool, 0 elsewhere: every rate and pool size
+    // clears, and the whole corpus has exactly one observation of the signal.
+    ["s1", evc("s1", "yc-current", "slop", "badge-pill-spam", "present")],
+    ["s2", evc("s2", "yc-current", "slop", "badge-pill-spam", "absent")],
+    ["s3", evc("s3", "yc-current", "slop", "badge-pill-spam", "absent")],
+    ...exemplars("badge-pill-spam", "absent"),
+    ...controls("badge-pill-spam", "absent"),
+  ]);
+  const r = eligibility("badge-pill-spam", corpus);
+  assert.equal(r.eligible, false, "one observation cannot authorize a rule");
+  assert.match(r.reason, /only 1 file\(s\)|anecdote/i);
+});
+
+test("three observations corpus-wide clears the present-count gate", () => {
+  const corpus = new Map([
+    ...slops("gradient-blob", "present"),
+    ...exemplars("gradient-blob", "absent"),
+    ...controls("gradient-blob", "absent"),
+  ]);
+  assert.equal(eligibility("gradient-blob", corpus).eligible, true);
+});
+
 test("a control pool below the minimum is ineligible", () => {
   const base: [string, Evidence][] = [
     ...slops("gradient-blob", "present"),
