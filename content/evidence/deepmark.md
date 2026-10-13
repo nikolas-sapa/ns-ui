@@ -3,7 +3,7 @@ source: https://www.deepmark.me
 kind: site
 cohort: yc-current
 context: [hero, features, testimonials, cta, footer]
-verdict: slop
+verdict: mixed
 studied: 2026-10-13
 materials: [single-theme, illustration, stock-photo]
 signals:
@@ -27,7 +27,7 @@ signals:
   single-optical-anchor: absent
   type-scale-high-contrast: absent
   editorial-grid-break: absent
-  custom-type-pairing: absent
+  custom-type-pairing: present
   real-product-screenshot: absent
   artifact-not-dashboard: absent
   density-variation: present
@@ -77,19 +77,41 @@ single scale with no display face, nothing breaks the grid, there is no
 real product screenshot anywhere on 10760px, and the cyan competes with
 itself in enough places that no single element anchors the view.
 
-Calibration note: this nets +4 (7 slop, 3 craft) after the two carousel
-corrections. A blind second rater, working from the vocabulary and the
-existing slop files without seeing this one, independently returned `slop`
-at 6 slop / 2 craft / net +4 and ~75% confidence. Both readings land on
-+4, which is also `openhack`'s net.
+Calibration note, after two independent blind re-ratings. **This file was
+rated `slop` and is `mixed`.**
 
-The craft count is what decides it rather than the slop count:
-`railway-com` survives eight slop signals because six pieces of craft carry
-them, and this page has two or three, one of which is "holds one hue" —
-`heroku-2014`'s single piece of discipline, in that file's own words.
+Two blind raters worked it without seeing this file. Both independently
+returned the same six slop signals. They split on craft: one scored 2, the
+other 4, and the second was right on the call that decides it.
 
-The margin is thin and the second rater named where the residual doubt
-sits: `type-scale-high-contrast` has no threshold in v3, and this page
-measures 3.58:1 at the hero cap-height against 2.6:1 across the page
-rhythm. Scoring the hero instead of the rhythm would add a craft signal and
-put it at +3, in `railway-com`'s neighbourhood.
+`custom-type-pairing` was rated `absent` here and is `present`, measured:
+Space Grotesk carries every display size on the page (60, 42, 36 and 26px)
+and Geist carries all body copy (14 to 18px). Two faces, each with a job,
+assigned by role. A first rating that missed it was reading the page as
+single-voiced when it is not.
+
+That puts the page at 6 slop and 4 craft, net **+2** — identical to
+`railway-com`, which is the `mixed` anchor, and well below both slop
+anchors (`heroku-2014` +5, `openhack` +4). It also carries the lowest slop
+count in the candidate pool with double the craft of either slop file.
+
+The second rater also established `scroll-reveal-blank` as `absent` three
+ways rather than by capture diff: zero text nodes under 8% opacity at rest,
+after a 19-step walk, and after a matched dwell control, with visible
+characters identical at 8285 in all three and one transformed element
+page-wide. A capture diff alone reports 5.5% of pixels differing with 14
+images missing, and the cause is native `loading="lazy"` on 31 of 34
+images, which survives no-JS and withholds nothing from a markup reader.
+
+Where the two raters would still differ, recorded because the margin is
+thin: `symmetric-everything` is `absent` here, and the counter-case is
+real — `wave-left.svg` and `wave-right.svg` at the closing CTA are a
+pixel-exact mirror pair (mean absolute difference 0.07 against 15.84
+unmirrored) flanking a centred stack, which is `heroku-2014`'s mechanism
+exactly. It is held `absent` because 22 of 25 headings are left-aligned,
+three sections carry measured voids, and the hero field is not mirrored.
+Flipping it gives +3, still below both slop anchors.
+
+**Consequence:** the slop pool returns to 2, below the gate's minimum of 3,
+so no signal is rule-eligible and the eleven rules authored against this
+file are withdrawn.
