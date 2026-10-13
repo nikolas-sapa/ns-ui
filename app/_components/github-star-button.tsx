@@ -157,7 +157,10 @@ function StarGoal({ stars }: { stars: number }) {
           className="h-full rounded-full bg-ns-accent"
           // Inline width because the value is data, not a design token — there
           // is no Tailwind class for "0.5%".
-          style={{ width: stars > 0 ? `max(2px, ${pct}%)` : 0 }}
+          // Rounded: the raw ratio serialises into the shipped HTML as
+          // `max(2px, 0.5599999999999999%)`. Two decimals is well past
+          // sub-pixel on any track width.
+          style={{ width: stars > 0 ? `max(2px, ${pct.toFixed(2)}%)` : 0 }}
         />
       </div>
       <p className="mt-1.5 font-mono text-[10px] tabular-nums text-ns-muted">
