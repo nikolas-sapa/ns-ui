@@ -14,4 +14,4 @@ Give the first viewport exactly one thing that wins the eye, and make everything
 
 The sharpest craft separator measured here. Nearly every exemplar has one anchor and no page rated slop has any. The failure mode is not ugliness, it is a page where a saturated CTA, a coloured illustration, a logo wall and three accent hues all arrive at once, so the visitor's eye has nowhere to land and the page reads as busy without being able to say why.
 
-Present in <!-- generated:count start -->18/32<!-- generated:count end --> of the rated files studied for this rule.
+Present in <!-- generated:count start -->17/32<!-- generated:count end --> of the rated files studied for this rule.

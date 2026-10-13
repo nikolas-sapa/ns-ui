@@ -14,4 +14,4 @@ Let one element sit outside the grid the rest of the page obeys: a nav in its ow
 
 Absent from every page rated slop and absent from the entire 2014 control, which makes it the most distinctly modern craft move in the corpus. It is a deliberate-looking gesture that is hard to produce by default, which is exactly why it signals a decision.
 
-Present in <!-- generated:count start -->11/32<!-- generated:count end --> of the rated files studied for this rule.
+Present in <!-- generated:count start -->12/32<!-- generated:count end --> of the rated files studied for this rule.
