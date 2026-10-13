@@ -171,7 +171,7 @@ export function SubmitForm() {
           </p>
           <a
             href="/api/submit/github/authorize"
-            className="mt-2 inline-block rounded-sm border border-border bg-background px-3 py-1.5 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent"
+            className="mt-2 inline-block rounded-sm border border-border-control bg-background px-3 py-1.5 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             Connect GitHub
           </a>
@@ -369,7 +369,7 @@ export function SubmitForm() {
             checked={dcoAgreed}
             onChange={(e) => setDcoAgreed(e.target.checked)}
             disabled={pending}
-            className="mt-0.5 size-4 shrink-0 rounded-sm border-border text-ns-accent outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
+            className="mt-0.5 size-4 shrink-0 rounded-sm border-border-control text-ns-accent outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
           />
           <span>
             I certify the DCO for this contribution and agree it is licensed under the MIT License.
@@ -383,7 +383,7 @@ export function SubmitForm() {
           checked={verifyAttested}
           onChange={(e) => setVerifyAttested(e.target.checked)}
           disabled={pending}
-          className="mt-0.5 size-4 shrink-0 rounded-sm border-border text-ns-accent outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
+          className="mt-0.5 size-4 shrink-0 rounded-sm border-border-control text-ns-accent outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
         />
         {/* The copy has to be ONE element. The label is `flex`, so every child
             is a flex item — and this sentence used to be three of them (text,
@@ -400,7 +400,7 @@ export function SubmitForm() {
       <button
         type="submit"
         disabled={pending || githubConnected !== true}
-        className="rounded-sm border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none disabled:opacity-60"
+        className="rounded-sm border border-border-control bg-surface px-4 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none disabled:opacity-60"
       >
         {pending ? "Opening pull request…" : "Open pull request"}
       </button>

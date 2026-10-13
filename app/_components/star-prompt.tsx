@@ -162,7 +162,7 @@ export function StarPrompt() {
         target="_blank"
         rel="noopener noreferrer"
         onClick={() => close(true)}
-        className="mt-2.5 inline-flex items-center gap-1.5 rounded-sm border border-border px-2.5 py-1.5 text-xs font-medium text-foreground outline-none transition-colors hover:border-ns-muted hover:bg-border/40 focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
+        className="mt-2.5 inline-flex items-center gap-1.5 rounded-sm border border-border-control px-2.5 py-1.5 text-xs font-medium text-foreground outline-none transition-colors hover:border-ns-muted hover:bg-border/40 focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
       >
         <svg
           viewBox="0 0 16 16"

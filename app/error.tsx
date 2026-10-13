@@ -38,7 +38,7 @@ export default function Error({
           <button
             type="button"
             onClick={reset}
-            className="rounded-sm border border-border px-4 py-2 font-mono text-xs uppercase tracking-[0.18em] text-foreground outline-none transition-colors hover:text-ns-accent focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
+            className="rounded-sm border border-border-control px-4 py-2 font-mono text-xs uppercase tracking-[0.18em] text-foreground outline-none transition-colors hover:text-ns-accent focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
           >
             Try again
           </button>

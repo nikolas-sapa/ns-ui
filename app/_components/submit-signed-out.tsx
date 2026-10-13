@@ -44,7 +44,7 @@ export function SubmitSignedOut() {
         type="button"
         onClick={start}
         disabled={pending}
-        className="mt-6 inline-flex items-center gap-2 rounded-sm border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none disabled:opacity-60"
+        className="mt-6 inline-flex items-center gap-2 rounded-sm border border-border-control bg-surface px-4 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none disabled:opacity-60"
       >
         <GitHubMark />
         {pending ? "Redirecting…" : "Sign in with GitHub"}

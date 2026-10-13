@@ -18,6 +18,27 @@
   --foreground: #171717;
   --surface: #fafafa;
   --border: #ebebeb;
+  /* Boundary for anything a visitor can OPERATE — the border that is the
+     only thing saying "this is a control".
+
+     WCAG 1.4.11 wants 3.0:1 for that, and `--border` does not come close:
+     #ebebeb is 1.19:1 on the page and 1.14:1 on --surface, #2e2e2e is 1.46:1
+     and 1.32:1 in dark. Neither does the fill help — --surface against
+     --background is about 1.1:1 — so on a search input or a bordered button
+     nothing identifies the control at all.
+
+     Deliberately a SECOND token rather than a louder `--border`. 1.4.11
+     exempts purely decorative edges, and most uses here are decorative: 1px
+     rules, card outlines, the preview dot grid, and 1318 uses inside
+     registry/ components. Raising `--border` would pass the criterion by
+     restyling the entire product.
+
+     #919191 is the lowest-contrast grey clearing 3.0:1 against BOTH
+     --background and --surface in light (3.15:1 / 3.02:1); #646464 does the
+     same in dark (3.35:1 / 3.03:1). Picked as a minimum rather than a round
+     number so the visual jump from --border is as small as the criterion
+     allows. */
+  --border-control: #919191;
   /* #8f8f8f is the dark-mode muted (6.1:1 on #0a0a0a) but only ~3.2:1 on
      white — fails AA for the small text it's used on everywhere (card
      descriptions, footer, eyebrow). #4d4d4d clears 4.5:1 (8.45:1 on white). */
@@ -43,6 +64,8 @@
   --foreground: #ededed;
   --surface: #171717;
   --border: #2e2e2e;
+  /* See the :root note. 3.35:1 on --background, 3.03:1 on --surface. */
+  --border-control: #646464;
   --ns-muted: #8f8f8f;
   /* #ea001d is only 4.26:1 on #0a0a0a and 3.86:1 on --surface — under AA for
      the small error text every form renders. #ff6369 clears it (6.83:1 /
@@ -57,6 +80,7 @@
   --color-foreground: var(--foreground);
   --color-surface: var(--surface);
   --color-border: var(--border);
+  --color-border-control: var(--border-control);
   --color-ns-muted: var(--ns-muted);
   --color-ns-accent: var(--ns-accent);
   --color-ns-accent-hover: var(--ns-accent-hover);

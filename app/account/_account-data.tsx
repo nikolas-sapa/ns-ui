@@ -48,7 +48,7 @@ export async function AccountData() {
         <div className="mt-8">
           <Link
             href="/welcome"
-            className="rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent"
+            className="rounded-sm border border-border-control bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             Claim a handle
           </Link>

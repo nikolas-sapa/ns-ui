@@ -69,7 +69,7 @@ export function GitHubStarButton({
         // reaches the intended ~3-4px past the visible edge. Plenty of
         // clearance above/below in both places this renders (header row,
         // newsletter CTA), so no horizontal-gap-style cap needed.
-        className={`relative inline-flex items-center gap-2 rounded-sm border border-border px-4 py-2 text-sm text-foreground outline-none transition-colors hover:border-ns-muted hover:bg-surface focus-visible:ring-2 focus-visible:ring-ns-accent after:absolute after:-inset-x-[4px] after:-inset-y-[5px] after:content-[''] ${className}`}
+        className={`relative inline-flex items-center gap-2 rounded-sm border border-border-control px-4 py-2 text-sm text-foreground outline-none transition-colors hover:border-ns-muted hover:bg-surface focus-visible:ring-2 focus-visible:ring-ns-accent after:absolute after:-inset-x-[4px] after:-inset-y-[5px] after:content-[''] ${className}`}
       >
         <StarIcon />
         {label}

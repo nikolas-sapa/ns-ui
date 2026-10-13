@@ -73,7 +73,7 @@ export class DemoErrorBoundary extends Component<
           <button
             type="button"
             onClick={() => this.setState({ failed: false })}
-            className="rounded-sm border border-border px-3 py-1.5 font-mono text-xs uppercase tracking-[0.18em] text-ns-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:transition-none"
+            className="rounded-sm border border-border-control px-3 py-1.5 font-mono text-xs uppercase tracking-[0.18em] text-ns-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:transition-none"
           >
             Try again
           </button>

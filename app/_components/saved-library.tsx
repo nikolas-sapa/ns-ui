@@ -116,12 +116,12 @@ export function SavedLibrary({ items, slugs, initialFolders, handle }: { items: 
   return (
     <div className="mt-5">
       <div className="flex flex-wrap items-center gap-2 border-b border-border pb-4">
-        <button type="button" aria-pressed={selected === "all"} onClick={() => setSelected("all")} className={`rounded-sm px-2.5 py-1.5 text-xs outline-none focus-visible:ring-2 focus-visible:ring-ns-accent ${selected === "all" ? "bg-foreground text-background" : "border border-border text-ns-muted hover:text-foreground"} transition-colors`}>All saves <span className="font-mono">{resolvedCount(slugs)}</span></button>
-        {folders.map((entry) => <button key={entry.id} type="button" aria-pressed={selected === entry.id} onClick={() => setSelected(entry.id)} className={`rounded-sm px-2.5 py-1.5 text-xs outline-none focus-visible:ring-2 focus-visible:ring-ns-accent ${selected === entry.id ? "bg-foreground text-background" : "border border-border text-ns-muted hover:text-foreground"} transition-colors`}>{entry.name} <span className="font-mono">{resolvedCount(entry.slugs)}</span></button>)}
+        <button type="button" aria-pressed={selected === "all"} onClick={() => setSelected("all")} className={`rounded-sm px-2.5 py-1.5 text-xs outline-none focus-visible:ring-2 focus-visible:ring-ns-accent ${selected === "all" ? "bg-foreground text-background" : "border border-border-control text-ns-muted hover:text-foreground"} transition-colors`}>All saves <span className="font-mono">{resolvedCount(slugs)}</span></button>
+        {folders.map((entry) => <button key={entry.id} type="button" aria-pressed={selected === entry.id} onClick={() => setSelected(entry.id)} className={`rounded-sm px-2.5 py-1.5 text-xs outline-none focus-visible:ring-2 focus-visible:ring-ns-accent ${selected === entry.id ? "bg-foreground text-background" : "border border-border-control text-ns-muted hover:text-foreground"} transition-colors`}>{entry.name} <span className="font-mono">{resolvedCount(entry.slugs)}</span></button>)}
         <form onSubmit={createFolder} className="ml-auto flex items-center gap-1.5">
           <label htmlFor="new-folder" className="sr-only">New folder name</label>
-          <input id="new-folder" value={newFolder} onChange={(event) => setNewFolder(event.target.value)} disabled={creating} maxLength={40} placeholder="New folder" className="w-28 rounded-sm border border-border bg-background px-2.5 py-1.5 text-xs text-foreground outline-none placeholder:text-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60" />
-          <button type="submit" disabled={creating} className="rounded-sm border border-border px-2.5 py-1.5 text-xs text-foreground outline-none hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none disabled:opacity-60 transition-colors">{creating ? "Adding…" : "Add"}</button>
+          <input id="new-folder" value={newFolder} onChange={(event) => setNewFolder(event.target.value)} disabled={creating} maxLength={40} placeholder="New folder" className="w-28 rounded-sm border border-border-control bg-background px-2.5 py-1.5 text-xs text-foreground outline-none placeholder:text-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60" />
+          <button type="submit" disabled={creating} className="rounded-sm border border-border-control px-2.5 py-1.5 text-xs text-foreground outline-none hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none disabled:opacity-60 transition-colors">{creating ? "Adding…" : "Add"}</button>
         </form>
       </div>
       {error ? <p role="alert" className="mt-3 text-xs text-[var(--error)]">{error}</p> : null}
@@ -148,7 +148,7 @@ export function SavedLibrary({ items, slugs, initialFolders, handle }: { items: 
                 type="button"
                 disabled={publishPending}
                 onClick={() => void togglePublish(folder.id, false)}
-                className="rounded-sm border border-border px-2.5 py-1.5 text-xs text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none disabled:opacity-60"
+                className="rounded-sm border border-border-control px-2.5 py-1.5 text-xs text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none disabled:opacity-60"
               >
                 {publishPending ? "Unpublishing…" : "Unpublish"}
               </button>
@@ -174,7 +174,7 @@ export function SavedLibrary({ items, slugs, initialFolders, handle }: { items: 
                   type="button"
                   disabled={publishPending}
                   onClick={() => setConfirmingPublish(null)}
-                  className="rounded-sm border border-border px-3 py-1.5 text-xs text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none disabled:opacity-60"
+                  className="rounded-sm border border-border-control px-3 py-1.5 text-xs text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none disabled:opacity-60"
                 >
                   Cancel
                 </button>
@@ -186,7 +186,7 @@ export function SavedLibrary({ items, slugs, initialFolders, handle }: { items: 
               <button
                 type="button"
                 onClick={() => setConfirmingPublish(folder.id)}
-                className="rounded-sm border border-border px-2.5 py-1.5 text-xs text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent"
+                className="rounded-sm border border-border-control px-2.5 py-1.5 text-xs text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent"
               >
                 Publish…
               </button>
@@ -209,7 +209,7 @@ export function SavedLibrary({ items, slugs, initialFolders, handle }: { items: 
               >
                 <div className="flex items-center gap-2 border-t border-border px-3 py-2">
                   <label htmlFor={`folder-${item.name}`} className="text-[11px] text-ns-muted">Folder</label>
-                  <select id={`folder-${item.name}`} value={currentFolder?.id ?? ""} disabled={pending === item.name} onChange={(event) => void move(item.name, event.target.value || null)} className="min-w-0 flex-1 rounded-sm border border-border bg-background px-2 py-1 text-xs text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ns-accent">
+                  <select id={`folder-${item.name}`} value={currentFolder?.id ?? ""} disabled={pending === item.name} onChange={(event) => void move(item.name, event.target.value || null)} className="min-w-0 flex-1 rounded-sm border border-border-control bg-background px-2 py-1 text-xs text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ns-accent">
                     <option value="">Unfiled</option>
                     {folders.map((entry) => <option key={entry.id} value={entry.id}>{entry.name}</option>)}
                   </select>
@@ -271,7 +271,7 @@ function SavedCard({
           title={item.title}
           active={active}
           onScreen={onScreen}
-          className="aspect-[16/10] w-full rounded-none border-0 border-b border-border"
+          className="aspect-[16/10] w-full rounded-none border-0 border-b border-border-control"
         >
           <div
             aria-hidden

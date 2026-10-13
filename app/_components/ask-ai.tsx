@@ -31,7 +31,7 @@ const ICONS: Record<string, ComponentType> = {
 // dark-mode card in dark — same border/surface pair every code block on the
 // site already uses, not a hardcoded off-white.
 const BUTTON =
-  "relative flex size-11 shrink-0 items-center justify-center rounded-md border border-border bg-surface text-ns-muted outline-none transition-colors motion-reduce:transition-none hover:border-foreground/40 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+  "relative flex size-11 shrink-0 items-center justify-center rounded-md border border-border-control bg-surface text-ns-muted outline-none transition-colors motion-reduce:transition-none hover:border-foreground/40 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
 /**
  * "Ask AI about ns-ui" launcher. Defaults to the whole registry; pass

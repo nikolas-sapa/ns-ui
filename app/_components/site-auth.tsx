@@ -102,7 +102,7 @@ export function SiteAuth() {
         // links, and it used to carry their exact treatment, so nothing
         // distinguished "go to a page" from "start signing in". The links now
         // take the underline (see BOTTOM_BAR_LINK) and this takes the border.
-        className="rounded-sm border border-border px-2 py-0.5 outline-none transition-colors hover:border-ns-muted hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
+        className="rounded-sm border border-border-control px-2 py-0.5 outline-none transition-colors hover:border-ns-muted hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
       >
         Sign in
       </Link>

@@ -32,7 +32,7 @@ export function EmailCapture({ className = "" }: { className?: string }) {
           placeholder="you@example.com"
           autoComplete="email"
           disabled={pending}
-          className="w-full min-w-0 rounded-sm border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
+          className="w-full min-w-0 rounded-sm border border-border-control bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
         />
         {/* Honeypot: hidden from sighted and screen-reader users alike, so a
             human never has a reason to touch it. A filled value is treated as
@@ -51,7 +51,7 @@ export function EmailCapture({ className = "" }: { className?: string }) {
           // Capped at half the 8px gap to the email input beside it (+1px
           // for this button's own `border` — see github-star-button.tsx for
           // why); generous below since the caption line has slack.
-          className="relative shrink-0 rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none disabled:opacity-60 after:absolute after:-inset-x-[5px] after:-inset-y-[4px] after:content-['']"
+          className="relative shrink-0 rounded-sm border border-border-control bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none disabled:opacity-60 after:absolute after:-inset-x-[5px] after:-inset-y-[4px] after:content-['']"
         >
           {pending ? "Adding…" : "Subscribe"}
         </button>

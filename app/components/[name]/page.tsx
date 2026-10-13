@@ -351,7 +351,7 @@ export default async function ComponentPage({
                 <li key={c.id}>
                   <Link
                     href={`/categories/${c.id}`}
-                    className="block rounded-sm border border-border px-1.5 py-px font-mono text-[10px] uppercase tracking-wider text-ns-muted outline-none transition-colors hover:border-foreground hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
+                    className="block rounded-sm border border-border-control px-1.5 py-px font-mono text-[10px] uppercase tracking-wider text-ns-muted outline-none transition-colors hover:border-foreground hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
                   >
                     {c.label}
                   </Link>
@@ -366,7 +366,7 @@ export default async function ComponentPage({
                 <li key={tag}>
                   <Link
                     href={`/?q=${encodeURIComponent(tag)}`}
-                    className="block rounded-sm border border-border px-1.5 py-px font-mono text-[10px] uppercase tracking-wider text-ns-muted outline-none transition-colors hover:border-foreground hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
+                    className="block rounded-sm border border-border-control px-1.5 py-px font-mono text-[10px] uppercase tracking-wider text-ns-muted outline-none transition-colors hover:border-foreground hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
                   >
                     {tag}
                   </Link>
@@ -442,7 +442,7 @@ export default async function ComponentPage({
                       href={`https://www.npmjs.com/package/${dep}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="rounded-sm border border-border px-2 py-1 font-mono text-xs text-foreground outline-none transition-colors hover:border-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
+                      className="rounded-sm border border-border-control px-2 py-1 font-mono text-xs text-foreground outline-none transition-colors hover:border-foreground focus-visible:ring-2 focus-visible:ring-ns-accent"
                     >
                       {dep}
                     </a>

@@ -40,7 +40,7 @@ export function SaveButton({
         // clearance to the card edge and nothing else nearby) — ::after
         // grows the click region generously within that clearance,
         // 32x32 -> 48x48.
-        className="relative z-20 inline-flex size-8 shrink-0 items-center justify-center rounded-sm border border-border bg-surface/90 text-foreground outline-none backdrop-blur-sm transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:cursor-wait disabled:opacity-60 disabled:pointer-events-none after:absolute after:-inset-[8px] after:content-['']"
+        className="relative z-20 inline-flex size-8 shrink-0 items-center justify-center rounded-sm border border-border-control bg-surface/90 text-foreground outline-none backdrop-blur-sm transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:cursor-wait disabled:opacity-60 disabled:pointer-events-none after:absolute after:-inset-[8px] after:content-['']"
       >
         <BookmarkIcon filled={saved} />
         <span className="sr-only">{pending ? "Saving…" : label}</span>

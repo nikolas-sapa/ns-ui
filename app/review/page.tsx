@@ -530,7 +530,7 @@ export default function ReviewPage() {
             placeholder="Search slug or note"
             autoComplete="off"
             spellCheck={false}
-            className="min-h-11 w-full min-w-0 flex-1 rounded-sm border border-border bg-surface px-2.5 py-1 text-sm text-foreground outline-none transition-colors placeholder:text-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none sm:min-h-0 sm:w-56 sm:flex-none"
+            className="min-h-11 w-full min-w-0 flex-1 rounded-sm border border-border-control bg-surface px-2.5 py-1 text-sm text-foreground outline-none transition-colors placeholder:text-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none sm:min-h-0 sm:w-56 sm:flex-none"
           />
 
           <details className="w-full">
@@ -636,7 +636,7 @@ export default function ReviewPage() {
               type="button"
               aria-pressed={statusOn.working}
               onClick={() => setStatusOn((p) => ({ ...p, working: !p.working }))}
-              className="min-h-11 shrink-0 rounded-sm border border-border px-2.5 py-1 text-sm text-foreground outline-none transition-colors hover:border-ns-accent focus-visible:ring-2 focus-visible:ring-ns-accent sm:min-h-0"
+              className="min-h-11 shrink-0 rounded-sm border border-border-control px-2.5 py-1 text-sm text-foreground outline-none transition-colors hover:border-ns-accent focus-visible:ring-2 focus-visible:ring-ns-accent sm:min-h-0"
             >
               {statusOn.working
                 ? "Hide working"
@@ -648,7 +648,7 @@ export default function ReviewPage() {
             type="button"
             onClick={() => void copyAllNotes()}
             disabled={statusCounts.working === 0 && statusCounts.flagged === 0}
-            className="ml-auto min-h-11 shrink-0 rounded-sm border border-border px-2.5 py-1 text-sm text-foreground outline-none transition-colors hover:enabled:border-ns-accent focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-50 sm:min-h-0"
+            className="ml-auto min-h-11 shrink-0 rounded-sm border border-border-control px-2.5 py-1 text-sm text-foreground outline-none transition-colors hover:enabled:border-ns-accent focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-50 sm:min-h-0"
           >
             {copyStatus === "copied" ? "Copied" : copyStatus === "error" ? "Copy failed" : "Copy all notes"}
           </button>
@@ -1130,7 +1130,7 @@ function Row({
               className={`flex min-h-8 items-center gap-1 rounded-sm border px-2 py-1 text-xs transition-colors sm:min-h-0 ${
                 verdict === "working"
                   ? "border-ns-accent bg-ns-accent/10 text-foreground"
-                  : "border-border text-ns-muted hover:text-foreground"
+                  : "border-border-control text-ns-muted hover:text-foreground"
               }`}
             >
               <CheckIcon />
@@ -1143,7 +1143,7 @@ function Row({
               className={`flex min-h-8 items-center gap-1 rounded-sm border px-2 py-1 text-xs transition-colors sm:min-h-0 ${
                 verdict === "flagged"
                   ? "border-ns-accent bg-ns-accent/10 text-foreground"
-                  : "border-border text-ns-muted hover:text-foreground"
+                  : "border-border-control text-ns-muted hover:text-foreground"
               }`}
             >
               <FlagIcon />
@@ -1244,7 +1244,7 @@ function Row({
                 onBlur={handleNoteBlur}
                 placeholder="What's wrong here…"
                 rows={hasNote ? undefined : 1}
-                className="max-h-40 min-h-8 w-full resize-y rounded-sm border border-border bg-surface px-2 py-1 text-[13px] leading-relaxed text-foreground outline-none transition-colors placeholder:text-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
+                className="max-h-40 min-h-8 w-full resize-y rounded-sm border border-border-control bg-surface px-2 py-1 text-[13px] leading-relaxed text-foreground outline-none transition-colors placeholder:text-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
               />
             </div>
           </div>

@@ -82,13 +82,13 @@ export function WelcomeForm({ candidateHandle }: { candidateHandle: string }) {
             required
             autoFocus
             disabled={pending}
-            className="w-full rounded-sm border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
+            className="w-full rounded-sm border border-border-control bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ns-accent disabled:opacity-60"
           />
         </div>
         <button
           type="submit"
           disabled={pending}
-          className="w-full rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none disabled:opacity-60"
+          className="w-full rounded-sm border border-border-control bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent disabled:pointer-events-none disabled:opacity-60"
         >
           {pending ? "Claiming…" : "Continue"}
         </button>

@@ -63,7 +63,7 @@ export default function NotFound() {
         </a>
       </nav>
 
-      <footer className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 border-t border-border px-6 py-3 font-mono text-xs leading-relaxed text-ns-muted sm:justify-start sm:px-10">
+      <footer className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 border-t border-border-control px-6 py-3 font-mono text-xs leading-relaxed text-ns-muted sm:justify-start sm:px-10">
         <span>
           This page is{" "}
           <a

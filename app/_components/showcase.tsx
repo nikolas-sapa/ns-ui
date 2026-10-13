@@ -792,7 +792,7 @@ export function Showcase({
                   setFilter("all");
                   setNewOnly(false);
                 }}
-                className="rounded-full border border-border px-2.5 py-1 font-mono text-xs text-ns-muted outline-none transition-colors hover:border-ns-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
+                className="rounded-full border border-border-control px-2.5 py-1 font-mono text-xs text-ns-muted outline-none transition-colors hover:border-ns-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
               >
                 {q}
               </button>
@@ -915,7 +915,7 @@ function JumpToTop() {
       onClick={scrollUp}
       aria-label="Back to top"
       tabIndex={visible ? 0 : -1}
-      className={`fixed bottom-6 right-6 z-30 flex size-11 items-center justify-center rounded-full border border-border bg-surface text-ns-muted shadow-sm outline-none transition-[opacity,transform,color] duration-200 ease-out hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none sm:size-10 sm:bottom-8 sm:right-8 ${
+      className={`fixed bottom-6 right-6 z-30 flex size-11 items-center justify-center rounded-full border border-border-control bg-surface text-ns-muted shadow-sm outline-none transition-[opacity,transform,color] duration-200 ease-out hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none sm:size-10 sm:bottom-8 sm:right-8 ${
         visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-2 opacity-0"
       }`}
     >

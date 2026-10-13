@@ -118,7 +118,7 @@ export default async function CommunityPage() {
               href="/account"
               // Isolated block link with no close neighbors — generous
               // overlay, +1px for its own `border`.
-              className="relative mt-6 inline-flex items-center rounded-sm border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent after:absolute after:-inset-[7px] after:content-['']"
+              className="relative mt-6 inline-flex items-center rounded-sm border border-border-control bg-surface px-3.5 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent after:absolute after:-inset-[7px] after:content-['']"
             >
               Sign in
             </Link>

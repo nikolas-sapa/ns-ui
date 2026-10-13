@@ -606,7 +606,7 @@ export function SiteShell({
         }}
         aria-expanded={open}
         aria-controls="site-nav"
-        className="fixed left-3 top-3 z-50 inline-flex h-11 w-11 items-center justify-center rounded-md border border-border bg-background text-ns-muted outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent lg:hidden transition-colors"
+        className="fixed left-3 top-3 z-50 inline-flex h-11 w-11 items-center justify-center rounded-md border border-border-control bg-background text-ns-muted outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent lg:hidden transition-colors"
       >
         <span className="sr-only">
           {open ? "Close component navigation" : "Open component navigation"}
@@ -636,7 +636,7 @@ export function SiteShell({
         onClick={() => setSidebarHiddenPersisted(false)}
         aria-expanded={mounted ? !sidebarHidden : undefined}
         aria-controls="site-nav"
-        className="sidebar-restore fixed left-0 top-4 z-40 h-11 w-6 items-center justify-center rounded-r-md border border-l-0 border-border bg-background text-ns-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
+        className="sidebar-restore fixed left-0 top-4 z-40 h-11 w-6 items-center justify-center rounded-r-md border border-l-0 border-border-control bg-background text-ns-muted outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
       >
         <span className="sr-only">Show sidebar</span>
         <RailChevron direction="right" />
@@ -796,7 +796,7 @@ export function SiteShell({
               setCmdkOpen(true);
             }}
             aria-label="Search components and pages"
-            className="search-trace-field group/cmdk relative flex w-full items-center gap-2 rounded-md border border-border bg-surface px-3 py-2.5 text-left text-sm text-ns-muted outline-none transition-colors hover:border-ns-accent/40 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
+            className="search-trace-field group/cmdk relative flex w-full items-center gap-2 rounded-md border border-border-control bg-surface px-3 py-2.5 text-left text-sm text-ns-muted outline-none transition-colors hover:border-ns-accent/40 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
           >
             <SearchIcon className="size-4 shrink-0" />
             <span className="flex-1 truncate">Search components…</span>
@@ -861,7 +861,7 @@ export function SiteShell({
               wantTree();
               setExpandAll(true);
             }}
-            className="rounded-sm border border-border px-2 py-1 outline-none transition-colors hover:border-ns-muted hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
+            className="rounded-sm border border-border-control px-2 py-1 outline-none transition-colors hover:border-ns-muted hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
           >
             Expand all
           </button>
@@ -872,7 +872,7 @@ export function SiteShell({
               setOpenIds(empty);
               persistOpen(empty);
             }}
-            className="rounded-sm border border-border px-2 py-1 outline-none transition-colors hover:border-ns-muted hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
+            className="rounded-sm border border-border-control px-2 py-1 outline-none transition-colors hover:border-ns-muted hover:bg-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none"
           >
             Collapse all
           </button>

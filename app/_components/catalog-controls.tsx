@@ -250,7 +250,7 @@ export function CatalogControls({
               placeholder="Search catalog"
               autoComplete="off"
               spellCheck={false}
-              className="min-h-11 w-full min-w-0 rounded-sm border border-border bg-surface py-1 pl-2 pr-6 text-sm text-foreground outline-none transition-colors placeholder:text-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none sm:min-h-0 sm:w-56 sm:pl-2.5"
+              className="min-h-11 w-full min-w-0 rounded-sm border border-border-control bg-surface py-1 pl-2 pr-6 text-sm text-foreground outline-none transition-colors placeholder:text-ns-muted focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none sm:min-h-0 sm:w-56 sm:pl-2.5"
             />
             <span aria-hidden className="search-trace pointer-events-none motion-reduce:hidden" />
             {/* Hidden until search is unfocused-and-empty, so the "/" hint
@@ -289,7 +289,7 @@ export function CatalogControls({
               // outright. Chrome and Firefox honour these; where a UA paints
               // its own panel regardless (Safari on macOS) `color-scheme`
               // still gets it dark, so neither path lands back on white.
-              className="min-h-11 shrink-0 appearance-none rounded-sm border border-border bg-surface py-1 pl-1.5 pr-5 text-xs text-ns-muted outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none hover:text-foreground sm:min-h-0 [&>option]:bg-surface [&>option]:text-foreground"
+              className="min-h-11 shrink-0 appearance-none rounded-sm border border-border-control bg-surface py-1 pl-1.5 pr-5 text-xs text-ns-muted outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ns-accent motion-reduce:transition-none hover:text-foreground sm:min-h-0 [&>option]:bg-surface [&>option]:text-foreground"
             >
               {SORTS.map((s) => (
                 <option key={s.key} value={s.key}>
@@ -345,7 +345,7 @@ export function CatalogControls({
                 className={`relative flex min-h-11 items-center justify-center rounded-full border px-2.5 py-1 text-xs outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:min-h-0 sm:w-auto sm:shrink-0 sm:justify-start sm:after:absolute sm:after:-inset-x-[4px] sm:after:-inset-y-[5px] sm:after:content-[''] ${
                   on
                     ? "border-ns-accent bg-ns-accent text-white"
-                    : "border-border text-ns-muted hover:border-ns-muted hover:text-foreground"
+                    : "border-border-control text-ns-muted hover:border-ns-muted hover:text-foreground"
                 }`}
               >
                 {c.label}
