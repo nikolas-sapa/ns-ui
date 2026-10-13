@@ -7,8 +7,9 @@ import { jsonLdScript } from "@/lib/json-ld";
 import { DemoStage } from "@/app/_components/demo-stage";
 import { loadUseWhen } from "@/lib/use-when";
 import { loadComponentProps } from "@/lib/component-props";
-import { loadSource } from "@/lib/source";
+import { loadSource, loadDemoSource } from "@/lib/source";
 import { CopyButton } from "@/app/_components/copy-button";
+import { CodePanel } from "@/app/_components/code-panel";
 import { AskAI } from "@/app/_components/ask-ai";
 import { ComponentSave } from "@/app/_components/component-save";
 import { categoriesFor } from "@/lib/category-pages";
@@ -115,6 +116,11 @@ export default async function ComponentPage({
   const useWhen = item ? loadUseWhen()[item.name] : undefined;
   const props = item ? loadComponentProps(item.name) : null;
   const source = item ? loadSource(item.name) : null;
+  // The demo module the preview iframe below is rendering — see lib/source.ts.
+  // Null only if meta.json's `name` disagrees with its folder, the case
+  // scripts/build-registry.ts warns about; the page just shows one panel
+  // instead of two rather than 404ing on a component that otherwise works.
+  const demo = item ? loadDemoSource(item.name) : null;
   const instruction = item
     ? (item.meta as { instruction?: string } | undefined)?.instruction
     : undefined;
@@ -210,6 +216,74 @@ export default async function ComponentPage({
       {item ? (
         <div className="mx-auto w-full max-w-[1400px] px-6 pt-10 sm:px-10">
           <DemoStage name={name} title={item.title} />
+
+          {/* The code for the thing above it, open on arrival. This content is
+              not new — `component.tsx` was already on this page, inside a
+              collapsed `<details>` two sections down, under a summary reading
+              "Source". That is what the feedback was about: a visitor could
+              read the entire page, copy the install command and leave without
+              ever seeing a call site, because the one artifact that shows how
+              to use the component was behind a click nothing invited them to
+              make. Collapsed markup is also not a weight saving: `<details>`
+              ships its contents in the HTML either way, so opening it costs
+              nothing that was not already being sent.
+
+              Two files, because "how do I drop this in" is two questions.
+              `demo.tsx` is the usage, and specifically the usage THIS page is
+              running: the preview iframe lazy-imports that exact module (see
+              lib/source.ts), so the code and the picture cannot disagree.
+              `component.tsx` is the file `npx shadcn add` writes, which is
+              what you own afterwards.
+
+              Under the stage rather than beside it, which is the one place
+              this diverges from the request. The stage is the reference render
+              — full width at 1400px is what every screenshot, poster and OG
+              card is taken at — and giving a code column half of that band
+              would re-render all 542 demos at a width none of them have been
+              checked at. Two code columns inside the same wide band get the
+              "side by side" reading without touching the preview.
+
+              `lg:grid-cols-2` only: at 390px two columns of source are two
+              unreadable columns, so it stacks, and the preview stays first. */}
+          {demo || source ? (
+            <div className="mt-5 grid gap-6 lg:grid-cols-2 lg:gap-5">
+              {demo ? (
+                <CodePanel
+                  label="Usage"
+                  path={demo.file}
+                  code={demo.code}
+                  copyLabel={`Copy ${item.title} usage example`}
+                />
+              ) : null}
+              {source ? (
+                <CodePanel
+                  label="Component"
+                  path={source.file}
+                  code={source.code}
+                  copyLabel={`Copy ${item.title} source`}
+                />
+              ) : null}
+            </div>
+          ) : null}
+
+          {/* The one thing neither file states and a reader pasting the usage
+              straight into a project hits immediately: the demo's relative
+              import only resolves in THIS repo, where the two files are
+              siblings. The install target comes from
+              scripts/build-registry.ts, which writes every item's single file
+              to `components/ui/<name>.tsx`. */}
+          {demo && source ? (
+            <p className="mt-3 max-w-[70ch] text-xs leading-relaxed text-ns-muted">
+              The usage example imports{" "}
+              <code className="font-mono text-foreground">./component</code>{" "}
+              because it sits next to the component file in this repo. Installed, that
+              file lands at{" "}
+              <code className="font-mono text-foreground">
+                components/ui/{name}.tsx
+              </code>
+              , so point the import there.
+            </p>
+          ) : null}
         </div>
       ) : null}
 
@@ -247,48 +321,27 @@ export default async function ComponentPage({
             <AskAI component={{ title: item.title, slug: name }} />
           </div>
 
-          {source || instruction ? (
+          {/* Source used to be the first disclosure here. It now renders
+              always-visible under the stage (see the comment there), so this
+              region is Build spec only — left as a `<details>` because the
+              instruction is a multi-hundred-word prompt for an agent, not
+              something a human reader is looking for. */}
+          {instruction ? (
             <div className="mt-8 divide-y divide-border border-y border-border">
-              {source ? (
-                <details className="py-3">
-                  <summary className={SUMMARY}>Source</summary>
-                  <div className="mt-3">
-                    <div className="flex items-center justify-between gap-3">
-                      <code className="font-mono text-[11px] text-ns-muted">
-                        {source.file}
-                      </code>
-                      <CopyButton
-                        variant="inline"
-                        value={source.code}
-                        label={`Copy ${item.title} source`}
-                      />
-                    </div>
-                    {/* No highlighter: one <pre> of real source, the same
-                        bytes the CLI would write, nothing to keep in sync
-                        with a theme. */}
-                    <pre className="mt-2 max-h-[60vh] overflow-auto rounded-md border border-border bg-surface p-4 font-mono text-[11px] leading-relaxed text-foreground">
-                      <code>{source.code}</code>
-                    </pre>
-                  </div>
-                </details>
-              ) : null}
-
-              {instruction ? (
-                <details className="py-3">
-                  <summary className={SUMMARY}>Build spec</summary>
-                  <div className="mt-3 flex max-w-3xl items-start gap-3">
-                    <p className="flex-1 whitespace-pre-wrap font-mono text-xs leading-relaxed text-ns-muted">
-                      {instruction}
-                    </p>
-                    <CopyButton
-                      variant="prose"
-                      value={instruction}
-                      label={`Copy ${item.title} build spec`}
-                      className="mt-0.5 shrink-0"
-                    />
-                  </div>
-                </details>
-              ) : null}
+              <details className="py-3">
+                <summary className={SUMMARY}>Build spec</summary>
+                <div className="mt-3 flex max-w-3xl items-start gap-3">
+                  <p className="flex-1 whitespace-pre-wrap font-mono text-xs leading-relaxed text-ns-muted">
+                    {instruction}
+                  </p>
+                  <CopyButton
+                    variant="prose"
+                    value={instruction}
+                    label={`Copy ${item.title} build spec`}
+                    className="mt-0.5 shrink-0"
+                  />
+                </div>
+              </details>
             </div>
           ) : null}
 
