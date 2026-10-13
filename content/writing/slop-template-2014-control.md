@@ -77,7 +77,7 @@ At 20 files I had a clean separation: exemplars at 0 to 2 slop signals, mixed at
 
 Finishing the corpus to 25 and completing a vocabulary re-pass broke it. Exemplars now run 0 to 3, mixed runs 1 to 7, and the two slop pages sit at 6 and 7. The slop band is now entirely inside the mixed band.
 
-Railway's homepage carries seven slop signals, the same count as Heroku 2014, and was rated mixed, because it also pins a 1px rail with a travelling illustrated train down all 12,212px outside the content column and renders its deploy count as a mechanical split-flap departure board.
+Railway's homepage carries eight slop signals, one more than Heroku 2014, and was still rated mixed, because it also pins a 1px rail with a travelling illustrated train down all 12,212px outside the content column and renders its deploy count as a mechanical split-flap departure board.
 
 Two things moved the bands: five new files, and two signals added in a re-pass that raised Heroku from six to seven. Both, not just the files.
 

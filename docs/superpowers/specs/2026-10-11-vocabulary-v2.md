@@ -130,15 +130,21 @@ independently when each file was written:
 | slop | 5, 6 | 6, 7 |
 
 **The separation did not survive. At n=25 the slop band [6,7] sits entirely
-inside the mixed band [1..7].** `railway-com` carries 7 slop signals, the
-same as `heroku-2014`, and is rated `mixed`. Two causes: five files were
-added, and two signals added in the v3 re-pass moved `heroku-2014` 6→7 and
-`openhack` 5→6.
+inside the mixed band [1..7].** `railway-com` carries 8 slop signals, one
+more than `heroku-2014`, and is still rated `mixed`. Two causes: five files
+were added, and two signals added in the v3 re-pass moved `heroku-2014`
+6→7 and `openhack` 5→6.
 
-**What does separate is slop net of craft**, with no overlap at n=25:
-exemplar runs −7 to −2, mixed −5 to +4, slop +4 to +5. `railway-com` nets
-+1 on 7 slop and 6 craft; `heroku-2014` nets +5 on 7 slop and 2 craft. Same
-slop count, opposite verdicts, and craft is the whole difference.
+**Slop net of craft separates better, but not cleanly.** At n=25 exemplar
+runs −7 to −2 and slop +4 to +5, so exemplar and slop do not overlap. The
+mixed band does overlap slop: it reaches +4, which is `openhack`'s net.
+`stripe-2014` is rated `mixed` at +4 and `openhack` `slop` at +4. The
+measure sorts the extremes and is unreliable at the margin, which is where
+the hard verdicts are.
+
+`railway-com` nets +2 on 8 slop and 6 craft; `heroku-2014` nets +5 on 7
+slop and 2 craft. A higher slop count, opposite verdicts, and craft is the
+whole difference — which is the finding worth keeping from this section.
 
 The readable version: **they did not abandon the template moves, they
 stopped running them bare.** Mean slop per page barely moves across twelve
