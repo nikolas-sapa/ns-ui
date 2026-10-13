@@ -546,15 +546,28 @@ const FETCH_TIMEOUT_MS = 8_000;
  * so this module keeps its zero-import property.
  */
 export async function fetchLiveOriginCount(origin: string): Promise<number | null> {
-  // ponytail: 1.24 MB once an hour, server-side only, never shipped to the
-  // client. Ceiling: it is the whole index for one integer. Upgrade path is a
-  // Range request for the first 401 bytes of /llms.txt, whose header line
-  // reads "· Components: 298 ·" (verified 206 + accept-ranges: bytes).
-  // Rejected for now because registry.json is the artifact the claim is about
-  // and the llms header is only a proxy for it.
+  // ponytail: 0.93 MB gzipped once an hour, server-side only, never shipped
+  // to the client. Ceiling: it is the whole index for one integer. Upgrade
+  // path is a Range request for the first 401 bytes of /llms.txt, whose
+  // header line reads "· Components: 298 ·" (verified 206 + accept-ranges:
+  // bytes). Rejected for now because registry.json is the artifact the claim
+  // is about and the llms header is only a proxy for it.
+  //
+  // `cache: "no-store"`, NOT `next: { revalidate: HOUR }`, and the hour has
+  // not gone anywhere — it moved onto the derived integer in
+  // app/status/page.tsx. The revalidate hint was a lie Next printed on every
+  // build: "Failed to set Next.js data cache for
+  // https://design.helpmarq.com/r/registry.json, items over 2MB can not be
+  // cached (3767161 bytes)". Measured 2026-10-13: 950,614 bytes on the wire
+  // (gzip), 2,824,842 decompressed — and it is the DECOMPRESSED body that
+  // Next weighs against its 2 MB ceiling, so the entry was refused and every
+  // render that reached here refetched and reparsed the whole index. Asking
+  // the fetch cache to hold a payload it has already refused is how a build
+  // log fills with warnings nobody can act on; the integer it produces is
+  // what was worth caching all along.
   try {
     const res = await fetch(`${origin}/r/registry.json`, {
-      next: { revalidate: HOUR },
+      cache: "no-store",
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     });
     if (!res.ok) return null;
@@ -639,8 +652,17 @@ async function fetchPublishedIndex(
   const version = await fetchPublishedVersion(pkg);
   if (version === null) return null;
   try {
+    // `cache: "no-store"` for the same measured reason as
+    // `fetchLiveOriginCount` above — the hour now lives on the derived
+    // `{version, components}` pair in app/status/page.tsx, not on a payload
+    // Next refuses to store. The MCP snapshot is the worse of the two:
+    // 3,556,923 bytes on the wire and 12,578,112 decompressed (measured
+    // 2026-10-13), against a 2 MB ceiling. The CLI index is under it today
+    // (566 KB in 2026-08), so this one line is also the thing that keeps the
+    // two hops behaving identically as the registry grows past it, instead
+    // of one silently falling off the cache the way the snapshot already has.
     const res = await fetch(`https://unpkg.com/${pkg}@${version}/${indexFile}`, {
-      next: { revalidate: HOUR },
+      cache: "no-store",
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     });
     if (!res.ok) return null;

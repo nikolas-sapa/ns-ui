@@ -238,6 +238,13 @@ export function CatalogControls({
               type="search"
               value={query}
               onFocus={() => onSearchIntent?.()}
+              // Hover is the earliest honest signal of search intent, and it
+              // precedes focus by the time it takes to move a cursor the last
+              // few pixels and click. It exists so that dropping the
+              // unconditional idle prefetch (showcase.tsx) does not cost the
+              // common case its warm first keystroke. Both handlers set the
+              // same flag, and the fetch is guarded against running twice.
+              onPointerEnter={() => onSearchIntent?.()}
               onChange={(e) => onQuery(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Escape" && query) {

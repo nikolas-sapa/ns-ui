@@ -38,12 +38,6 @@ type SearchCorpus = Record<string, string>;
 
 const SEARCH_INDEX_URL = "/search-index.json";
 
-/** How long to wait before prefetching the corpus on a browser with no
- *  `requestIdleCallback` (Safari). Long enough to be after the catalog's own
- *  first screen of iframes, short enough that a visitor who reads for a
- *  moment before searching still gets an instant first keystroke. */
-const CORPUS_IDLE_FALLBACK_MS = 2500;
-
 /**
  * How many demos may run at once.
  *
@@ -377,21 +371,21 @@ export function Showcase({
   const [corpusWanted, setCorpusWanted] = useState(false);
   const wantCorpus = useCallback(() => setCorpusWanted(true), []);
 
-  // Prefetch once the browser is idle, so the common case (someone reads the
-  // page, then searches) has the corpus in hand before the first keystroke.
-  // It is off the document's critical path either way — a separate,
-  // CDN-cached request that no longer has to be parsed before the page is
-  // interactive.
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const idle = window.requestIdleCallback;
-    if (idle) {
-      const id = idle(() => setCorpusWanted(true), { timeout: CORPUS_IDLE_FALLBACK_MS });
-      return () => window.cancelIdleCallback?.(id);
-    }
-    const id = window.setTimeout(() => setCorpusWanted(true), CORPUS_IDLE_FALLBACK_MS);
-    return () => window.clearTimeout(id);
-  }, []);
+  // NO unconditional prefetch. This used to fire on `requestIdleCallback`
+  // (2.5s timeout on Safari) for every visitor, so the corpus was the single
+  // largest non-document download on the homepage: measured in production,
+  // 146 KB brotli of a 1,296 KB page, fetched whether or not anyone ever
+  // typed a character. The idle window is not free just because it is idle.
+  //
+  // What replaces it is the intent the page already had a signal for:
+  // `onSearchIntent` fires on pointer-enter and focus of the search field
+  // (catalog-controls.tsx), and a `?q=` arrival sets the flag directly
+  // (above). Hover-to-first-keystroke is comfortably longer than one
+  // same-origin CDN fetch, so a visitor who actually searches still has the
+  // corpus before their first character — and one who does not never pays
+  // for it. Searching is never BLOCKED on it either way: name, title,
+  // description and synonyms are already in props, and `corpus` only widens
+  // the haystack with tags and prose when it lands.
 
   useEffect(() => {
     if (!corpusWanted || corpusSettled) return;
