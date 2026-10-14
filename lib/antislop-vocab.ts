@@ -47,9 +47,12 @@ export const ALL_SIGNALS = [...SLOP_SIGNALS, ...CRAFT_SIGNALS] as const;
 // Descriptive facts a page is made of. Deliberately NOT signals: a material
 // cannot carry a stance, so a rule must never be written against one. Open
 // list — extend as evidence demands.
+// `video-embed` added at n=42: subvocal.company ships a 3.79s beauty clip and
+// a 91.8s lab video of the prototype as in-page sections, which `video-hero`
+// describes wrongly. Safe to add because a material can never back a rule.
 export const MATERIALS = [
   "single-theme", "dual-theme", "stock-photo", "commissioned-photo",
-  "illustration", "webgl", "video-hero",
+  "illustration", "webgl", "video-hero", "video-embed",
 ] as const;
 
 export const CONTEXTS = [
