@@ -697,6 +697,30 @@ export function SiteShell({
         <div className="flex items-center justify-between gap-2 pb-3 pl-14 pr-4 pt-7 lg:pl-4 lg:pt-5">
           <Link
             href="/"
+            // `/` has the largest RSC payload on the site — 542 catalog
+            // entries — and this wordmark sits in the sidebar of EVERY page,
+            // inside the viewport, so the default prefetched all 77 KB of it
+            // on every single page view. Measured in production 2026-10-13:
+            // 77 KB of /components/accordion-latch's 681 KB total, 77 KB of
+            // /install's 616 KB, and on `/` itself 80.5 KB spent prefetching
+            // the page the browser had just parsed.
+            //
+            // Not a plain `prefetch={false}` (which in Next 16 also cancels
+            // the hover/touch prefetch — see `prefetchEnabled` in
+            // next/dist/client/app-dir/link.js): off by default, then warmed
+            // by hand on the first sign that someone is going there. A
+            // pointer reaching the wordmark is well over a CDN round-trip
+            // ahead of the click, so "back to the catalog" stays instant for
+            // anyone who takes it, and costs nothing for everyone who does
+            // not. `router.prefetch` is idempotent, so repeated hovers are
+            // free, and it is a no-op on `/` itself.
+            prefetch={false}
+            onMouseEnter={() => {
+              if (pathname !== "/") router.prefetch("/");
+            }}
+            onTouchStart={() => {
+              if (pathname !== "/") router.prefetch("/");
+            }}
             className="rounded-sm font-mono text-sm tracking-tight outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
           >
             ns-ui
@@ -958,7 +982,21 @@ export function SiteShell({
             <span key={gi} className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
               {gi > 0 ? <span aria-hidden className="text-ns-muted/40">·</span> : null}
               {group.map((link) => (
-                <Link key={link.href} href={link.href} className={BOTTOM_BAR_LINK}>
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  // Same reasoning as `NavLink` below, re-measured for this
+                  // bar: it renders in the sidebar of every page, inside the
+                  // viewport, so Next prefetched all 13 targets on every
+                  // single page load — 28 RSC requests totalling 148 KB on
+                  // the production homepage, two per link. These are utility
+                  // pages a catalog visitor opens at most one of, and the
+                  // sidebar's own component tree (the thing people actually
+                  // navigate with) is unaffected: it has its own idle
+                  // prefetch of /nav-tree.json.
+                  prefetch={false}
+                  className={BOTTOM_BAR_LINK}
+                >
                   {link.label}
                 </Link>
               ))}

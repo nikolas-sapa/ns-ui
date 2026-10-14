@@ -122,6 +122,42 @@ const cachedTestimonialsApproved = unstable_cache(
 );
 
 /**
+ * The three multi-megabyte network reads, cached on what they RETURN rather
+ * than on what they download.
+ *
+ * `lib/status-checks.ts` asked Next's fetch cache to hold these payloads for
+ * an hour. It never did: the live registry index decompresses to 2.82 MB and
+ * the published MCP snapshot to 12.58 MB, both past Next's 2 MB data-cache
+ * ceiling, so every build printed two "items over 2MB can not be cached"
+ * lines and every render of this page refetched and reparsed ~4.5 MB of wire
+ * (15.4 MB decompressed) to produce one integer and two small objects.
+ *
+ * `unstable_cache` is the same instrument `cachedHistory` below already uses,
+ * for the same reason: it stores the function's RESULT, which is a few dozen
+ * bytes, so the hour that was always intended actually happens. The cadence
+ * is unchanged (3600s), the values are unchanged, and a failed read still
+ * collapses to `null` inside the wrapped function — so an UNKNOWN row is
+ * cached as UNKNOWN for an hour exactly as a cached fetch would have made it.
+ *
+ * Keyed per package so the CLI and the MCP server never share an entry: this
+ * page's whole argument is that one package's read is not evidence about the
+ * other, and a shared cache key would make it one.
+ */
+const cachedLiveOriginCount = unstable_cache(
+  () => fetchLiveOriginCount(REGISTRY_ORIGIN),
+  ["status-live-origin-count"],
+  { revalidate: 3600 }
+);
+
+const cachedPublishedCli = unstable_cache(fetchPublishedCli, ["status-published-cli"], {
+  revalidate: 3600,
+});
+
+const cachedPublishedMcp = unstable_cache(fetchPublishedMcp, ["status-published-mcp"], {
+  revalidate: 3600,
+});
+
+/**
  * The board's rows, in declaration order. Each id is the check id
  * lib/status-checks.ts already uses, and the `serviceId` the snapshot job
  * writes against. `services` is THIS render's live read (the same array
@@ -233,9 +269,9 @@ export default async function StatusPage() {
     convexReachable,
     history,
   ] = await Promise.all([
-    fetchLiveOriginCount(REGISTRY_ORIGIN),
-    fetchPublishedCli(),
-    fetchPublishedMcp(),
+    cachedLiveOriginCount(),
+    cachedPublishedCli(),
+    cachedPublishedMcp(),
     fetchPublishedVersion(CLI_PACKAGE),
     fetchPublishedVersion(MCP_PACKAGE),
     // The public, unauthenticated query — the only Convex read this page is
