@@ -2,7 +2,7 @@
  * Browsable categories — the "I don't know what this library calls things"
  * entry point.
  *
- * There are 166+ distinct tags across the registry and most appear only once
+ * There are 1,100+ distinct tags across the registry and most appear only once
  * or twice, so tag chips would be noise rather than navigation. These 14
  * buckets are the roles a newcomer already has words for.
  *
@@ -356,7 +356,7 @@ export const CATEGORIES: Category[] = [
 /**
  * name -> the category ids it belongs to.
  *
- * Every component in the registry currently lands in at least one, verified
+ * Most components in the registry currently land in at least one, verified
  * by running this against every `meta.json` — but that is a measured fact
  * about today's registry, not a guarantee the rules provide. A new component
  * whose tags name a role no bucket matches gets an empty array and vanishes
