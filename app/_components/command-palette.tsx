@@ -251,32 +251,51 @@ export function CommandPalette({
 
         <ul id="cmdk-list" ref={listRef} role="listbox" className="max-h-80 overflow-y-auto p-1.5">
           {results.length === 0 ? (
-            <li className="px-3 py-6 text-center text-sm text-ns-muted">No match.</li>
+            // Unreachable in practice (the escape hatch above is always
+            // appended), but `role="presentation"` keeps even the dead branch
+            // from putting a `listitem` inside the listbox — the text itself
+            // still reads, only the <li>'s own role is dropped.
+            <li role="presentation" className="px-3 py-6 text-center text-sm text-ns-muted">
+              No match.
+            </li>
           ) : (
             results.map((r, i) => (
-              <li key={r.href} data-index={i}>
-                <button
-                  id={`cmdk-${i}`}
-                  type="button"
-                  role="option"
-                  aria-selected={i === activeIndex}
-                  onMouseEnter={() => setActiveIndex(i)}
-                  onClick={() => {
-                    close();
-                    go(r.href);
-                  }}
-                  className={`flex w-full items-center justify-between gap-3 rounded-sm px-3 py-2 text-left text-sm outline-none transition-colors motion-reduce:transition-none ${
-                    i === activeIndex ? "bg-surface text-foreground" : "text-ns-muted hover:bg-surface hover:text-foreground"
-                  }`}
-                >
-                  <span className="truncate">{r.label}</span>
-                  {r.hint ? (
-                    <span className="shrink-0 font-mono text-[10px] uppercase tracking-wider text-ns-muted">
-                      {r.hint}
-                    </span>
-                  ) : null}
-                </button>
-              </li>
+              // The `role="option"` button is a DIRECT child of the listbox,
+              // with no <li> in between. It used to be wrapped in one, which
+              // made the markup invalid three ways at once (axe, WCAG 1.3.1):
+              // `role="listbox"` requires its children to be `option`/`group`
+              // and got `listitem`; each `role="option"` requires a
+              // listbox/group parent and got a plain <li>; and the <li> itself
+              // was a list item inside a non-list. The practical cost is that
+              // `aria-activedescendant` below points at an option the listbox
+              // does not own, so a screen reader has no "option 2 of 8" to
+              // announce on the site's primary way of reaching 542 components.
+              // `data-index` moves onto the button because the scroll-into-view
+              // effect above queries for it; nothing styled the <li>, so this
+              // renders identically (verified by pixel diff).
+              <button
+                key={r.href}
+                data-index={i}
+                id={`cmdk-${i}`}
+                type="button"
+                role="option"
+                aria-selected={i === activeIndex}
+                onMouseEnter={() => setActiveIndex(i)}
+                onClick={() => {
+                  close();
+                  go(r.href);
+                }}
+                className={`flex w-full items-center justify-between gap-3 rounded-sm px-3 py-2 text-left text-sm outline-none transition-colors motion-reduce:transition-none ${
+                  i === activeIndex ? "bg-surface text-foreground" : "text-ns-muted hover:bg-surface hover:text-foreground"
+                }`}
+              >
+                <span className="truncate">{r.label}</span>
+                {r.hint ? (
+                  <span className="shrink-0 font-mono text-[10px] uppercase tracking-wider text-ns-muted">
+                    {r.hint}
+                  </span>
+                ) : null}
+              </button>
             ))
           )}
         </ul>

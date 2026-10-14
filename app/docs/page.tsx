@@ -148,7 +148,16 @@ export default function DocsPage() {
           . Never an HTML page: a client that asked for JSON gets JSON, including
           on a 404.
         </p>
-        <pre className="mt-3 overflow-x-auto rounded-md border border-border bg-surface p-3 font-mono text-xs leading-6 text-foreground">
+        {/* Overflows sideways on a phone (measured 600px of JSON in a 340px
+            box at 390 wide) with nothing focusable inside — needs its own tab
+            stop or the right half of the error document is keyboard-
+            unreachable (WCAG 2.1.1). */}
+        <pre
+          tabIndex={0}
+          role="group"
+          aria-label="Example error document, scrollable"
+          className="mt-3 overflow-x-auto rounded-md border border-border bg-surface p-3 font-mono text-xs leading-6 text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
+        >
 {`{
   "type": "${REGISTRY_ORIGIN}/docs#errors",
   "title": "No such component",

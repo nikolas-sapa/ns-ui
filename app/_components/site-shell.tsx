@@ -312,6 +312,18 @@ export function SiteShell({
   // own filter input and any slider-like control elsewhere on the page
   // (e.g. a props table, a future host-rendered slider) are same-document
   // and very much would.
+  //
+  // The source block and the props table also own the horizontal arrows now.
+  // They are `tabIndex={0}` scroll boxes (see app/components/[name]/page.tsx —
+  // they scroll sideways by 290px and 72px respectively and hold nothing
+  // focusable, so WCAG 2.1.1 needs them keyboard-scrollable), and this
+  // listener was swallowing the only key that scrolls them: measured, focus in
+  // the source <pre> plus one ArrowRight navigated to the next component
+  // instead of scrolling, losing the reader's place entirely. Vertical arrows
+  // were never affected. So bail for any ancestor that can still scroll
+  // horizontally in the pressed direction — which also means the shortcut
+  // keeps working the moment that box is scrolled to the end it is heading
+  // for, rather than being dead inside the box forever.
   useEffect(() => {
     if (flatIndex < 0 || !prevItem || !nextItem) return;
     const onKey = (e: KeyboardEvent) => {
@@ -324,6 +336,15 @@ export function SiteShell({
           return;
         }
         if (el.closest('[role="slider"], [contenteditable]')) return;
+        for (let box: HTMLElement | null = el; box; box = box.parentElement) {
+          const overflowX = getComputedStyle(box).overflowX;
+          if (overflowX !== "auto" && overflowX !== "scroll") continue;
+          const room =
+            e.key === "ArrowLeft"
+              ? box.scrollLeft > 0
+              : box.scrollLeft < box.scrollWidth - box.clientWidth - 1;
+          if (room) return;
+        }
       }
       e.preventDefault();
       router.push(`/components/${e.key === "ArrowLeft" ? prevItem.name : nextItem.name}`);

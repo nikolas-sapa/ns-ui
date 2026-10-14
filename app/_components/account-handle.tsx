@@ -84,7 +84,15 @@ export function AccountHandle({
 
   return (
     <form onSubmit={submit} className="flex items-center gap-2">
+      {/* The only field on the site with no label of any kind: no `htmlFor`
+          partner, no wrapping <label>, and no placeholder either, so a screen
+          reader announced it as a bare "edit text" and the Save button beside
+          it was the only clue what it edits (WCAG 4.1.2). `aria-label` rather
+          than a visible <label> because the row is a two-control inline form
+          whose heading already says "Handle" — this names the field without
+          changing what is drawn. */}
       <input
+        aria-label="Handle"
         value={value}
         onChange={(e) => setValue(e.target.value)}
         disabled={pending}

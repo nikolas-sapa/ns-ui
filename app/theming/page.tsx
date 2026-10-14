@@ -140,7 +140,16 @@ export default function ThemingPage() {
           A consuming project can set these to anything: the names and what they mean are
           the contract, not the hex values below.
         </p>
-        <div className="mt-5 overflow-x-auto rounded-md border border-border">
+        {/* `min-w-[560px]` on the table guarantees this box scrolls sideways
+            on a phone (measured 560px of table in a 340px box at 390 wide),
+            and no cell is focusable — so it needs its own tab stop or the
+            Dark and Controls columns are keyboard-unreachable (WCAG 2.1.1). */}
+        <div
+          tabIndex={0}
+          role="group"
+          aria-label="Token reference table, scrollable"
+          className="mt-5 overflow-x-auto rounded-md border border-border outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
+        >
           <table className="w-full min-w-[560px] border-collapse text-sm">
             <thead>
               <tr className="border-b border-border bg-surface text-left font-mono text-[11px] uppercase tracking-wider text-ns-muted">
@@ -235,8 +244,16 @@ export default function ThemingPage() {
         <p className="mt-5 font-mono text-[11px] uppercase tracking-wider text-ns-muted">
           Layer 1: the raw custom properties
         </p>
+        {/* Both code blocks below overflow sideways at phone widths (measured
+            360px of text in a 280px box) with nothing focusable inside, so
+            each takes a tab stop of its own — see the token table above. */}
         <div className={`mt-2 ${CODE_BLOCK}`}>
-          <pre className="min-w-0 flex-1 overflow-x-auto font-mono text-xs leading-6 text-foreground">
+          <pre
+            tabIndex={0}
+            role="group"
+            aria-label=":root and .dark block, scrollable"
+            className="min-w-0 flex-1 overflow-x-auto font-mono text-xs leading-6 text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
+          >
             {GLOBALS_ROOT}
           </pre>
           <CopyButton variant="inline" value={GLOBALS_ROOT} label="Copy :root and .dark block" />
@@ -245,7 +262,12 @@ export default function ThemingPage() {
           Layer 2: the Tailwind utility mapping
         </p>
         <div className={`mt-2 ${CODE_BLOCK}`}>
-          <pre className="min-w-0 flex-1 overflow-x-auto font-mono text-xs leading-6 text-foreground">
+          <pre
+            tabIndex={0}
+            role="group"
+            aria-label="@theme inline block, scrollable"
+            className="min-w-0 flex-1 overflow-x-auto font-mono text-xs leading-6 text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
+          >
             {THEME_INLINE}
           </pre>
           <CopyButton variant="inline" value={THEME_INLINE} label="Copy @theme inline block" />

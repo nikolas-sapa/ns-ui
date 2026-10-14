@@ -44,9 +44,17 @@ function parseBlocks(markdown: string): ReactNode[] {
       }
       i += 1; // skip closing fence
       blocks.push(
+        // Fenced code is the one block here that can be wider than a phone
+        // viewport, and it holds nothing focusable — so it takes a tab stop of
+        // its own, or a keyboard-only reader cannot scroll to the end of a long
+        // line (WCAG 2.1.1). Same `role="group"` + visible ring shape the
+        // changelog scrub track uses.
         <pre
           key={key++}
-          className="overflow-x-auto rounded-md border border-border bg-surface px-4 py-3 text-[13px] leading-relaxed"
+          tabIndex={0}
+          role="group"
+          aria-label="Code block, scrollable"
+          className="overflow-x-auto rounded-md border border-border bg-surface px-4 py-3 text-[13px] leading-relaxed outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
         >
           <code className="font-mono text-foreground">{codeLines.join("\n")}</code>
         </pre>,
@@ -75,7 +83,15 @@ function parseBlocks(markdown: string): ReactNode[] {
         i += 1;
       }
       blocks.push(
-        <div key={key++} className="overflow-x-auto">
+        // A comparison table is the widest shape these posts author, and no
+        // cell is focusable — same tab stop reasoning as the code block above.
+        <div
+          key={key++}
+          tabIndex={0}
+          role="group"
+          aria-label="Table, scrollable"
+          className="overflow-x-auto outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
+        >
           <table className="w-full border-collapse text-[13px] leading-relaxed">
             <thead>
               <tr>

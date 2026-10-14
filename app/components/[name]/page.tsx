@@ -396,7 +396,18 @@ export default async function ComponentPage({
                   label={`Copy ${item.title} props`}
                 />
               </div>
-              <div className="mt-4 overflow-x-auto rounded-md border border-border">
+              {/* `tabIndex` + a name: this box scrolls horizontally on a
+                  narrow viewport, and a scrollable box with no focusable
+                  descendant is unreachable by keyboard (WCAG 2.1.1). axe
+                  caught this one at 390px only. `role="group"` rather than
+                  `region`, so ~540 component pages do not each add a landmark
+                  that a screen reader then has to step past. */}
+              <div
+                tabIndex={0}
+                role="group"
+                aria-label={`${item.title} props, scrollable`}
+                className="mt-4 overflow-x-auto rounded-md border border-border outline-none focus-visible:ring-2 focus-visible:ring-ns-accent"
+              >
                 <table className="w-full border-collapse text-left text-sm">
                   <thead>
                     <tr className="border-b border-border bg-surface font-mono text-[11px] uppercase tracking-wider text-ns-muted">

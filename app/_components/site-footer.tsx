@@ -20,7 +20,18 @@ import { AskAI } from "./ask-ai";
  * Only dark variants are published by both, so they stay dark in either
  * theme. Their artwork, not ours to recolour.
  */
-const DIRECTORY_BADGES = [
+type DirectoryBadge = {
+  href: string;
+  src: string;
+  /** Only for a badge with no background of its own, where one variant
+   *  disappears against one theme. See the render for how it is used. */
+  srcDark?: string;
+  alt: string;
+  width: number;
+  height: number;
+};
+
+const DIRECTORY_BADGES: readonly DirectoryBadge[] = [
   {
     href: "https://launchnest.io/p/ns-ui-react-components-one-interaction-each",
     src: "https://launchnest.io/badge/ns-ui-react-components-one-interaction-each.svg?variant=featured",
@@ -70,7 +81,18 @@ const DIRECTORY_BADGES = [
     width: 206,
     height: 55,
   },
-] as const;
+  {
+    // The only badge here with no background of its own — bare text and a
+    // logo — so one variant always loses. Both are published; `srcDark` in
+    // the render below picks per theme.
+    href: "https://www.directree.io",
+    src: "https://www.directree.io/badge/directree-badge-lightmode.svg",
+    srcDark: "https://www.directree.io/badge/directree-badge-darkmode.svg",
+    alt: "Verified on directree",
+    width: 200,
+    height: 37,
+  },
+];
 
 const COLUMN_LABEL = "font-mono text-[10px] uppercase tracking-wider text-ns-muted";
 
@@ -211,15 +233,48 @@ export function SiteFooter() {
                 href={badge.href}
                 target="_blank"
                 rel="noopener noreferrer"
+                // The name lives on the LINK, not the image, whenever two
+                // theme variants ship. CSS picks which <img> paints, but it
+                // cannot move `alt` — so putting the name on one image gets
+                // it right in one theme and backwards in the other. Caught in
+                // verification: in light mode the VISIBLE badge carried
+                // alt="" aria-hidden while the hidden one was the thing
+                // announced. Naming the anchor is theme-independent and
+                // announces exactly once.
+                aria-label={badge.srcDark ? badge.alt : undefined}
                 className="block rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ns-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
+                {/* `srcDark` exists because directree's badge, unlike the
+                    four opaque pills above it, has NO background fill — it is
+                    bare text plus a logo, so a single variant disappears on
+                    one of the two themes (their lightmode art is #0d1b1f,
+                    invisible on #0a0a0a; darkmode is #faf5f1, invisible on
+                    white). Both are published, so both ship and CSS picks:
+                    same `dark:` swap the theme toggle and cursor toggle
+                    already use, which means the correct one is right on the
+                    first painted frame with no JS. Both are in the markup, so
+                    their verifier finds its asset either way. */}
+                {badge.srcDark ? (
+                  <img
+                    src={badge.srcDark}
+                    alt=""
+                    aria-hidden
+                    width={badge.width}
+                    height={badge.height}
+                    loading="lazy"
+                    decoding="async"
+                    className="hidden dark:block"
+                  />
+                ) : null}
                 <img
                   src={badge.src}
-                  alt={badge.alt}
+                  alt={badge.srcDark ? "" : badge.alt}
+                  aria-hidden={badge.srcDark ? true : undefined}
                   width={badge.width}
                   height={badge.height}
                   loading="lazy"
                   decoding="async"
+                  className={badge.srcDark ? "dark:hidden" : undefined}
                 />
               </a>
             </li>
