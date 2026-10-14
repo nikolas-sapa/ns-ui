@@ -60,6 +60,9 @@ const { chromium } = require('playwright');
       const r = await p.evaluate(() => {
         const body = parseFloat(getComputedStyle(document.body).fontSize);
         const nodes = [];
+        const docOrder = [];
+        const byKey = {};
+        let seq = 0;
         document.querySelectorAll('*').forEach((e) => {
           const direct = [...e.childNodes]
             .filter((n) => n.nodeType === 3)
@@ -70,26 +73,51 @@ const { chromium } = require('playwright');
           if (parseFloat(c.opacity) < 0.1) return;
           const bb = e.getBoundingClientRect();
           if (bb.width < 20 || bb.height < 6) return;
-          // The display term must be PROSE. grep.ai's two largest nodes are
-          // "$ 2.89" and "$ 0.25" -- price figures in a pricing comparison, not
-          // a headline -- which set a 4.0 ratio on a page whose headline is
-          // smaller. A stat figure set large is a different decision from a
-          // display headline and the corpus convention compares headlines.
+          // The display term must contain at least one LETTER. Requiring two
+          // words was the first attempt and it was wrong in both directions:
+          // it correctly excluded grep.ai's "$ 2.89" and "78.6" (price and
+          // stat figures, which set a 4.0 ratio on a page whose headline is
+          // smaller) but it also rejected anthropic.com's "Haiku 5.5", which
+          // IS the display headline, dropping that page to a false 1.2:1.
+          // One letter is the rule that separates a figure from a headline.
           const words = direct.split(/\s+/).filter((w) => /[A-Za-z]{2,}/.test(w));
-          const isProse = words.length >= 2;
-          nodes.push({
+          const isProse = /[A-Za-z]/.test(direct);
+          const key = 'n' + (seq++);
+          const rec = {
             fs: Math.round(parseFloat(c.fontSize) * 10) / 10,
             ff: c.fontFamily.split(',')[0].replace(/["']/g, ''),
-            t: direct.slice(0, 38), prose: isProse,
-          });
+            t: direct.slice(0, 38), prose: isProse, key,
+          };
+          nodes.push(rec);
+          docOrder.push(key);
+          byKey[key] = rec;
         });
         nodes.sort((a, z) => z.fs - a.fs);
         const prose = nodes.filter((n) => n.prose);
+        // The SUBHEAD denominator. railway-com states both readings and scores
+        // on this one: "54/20 = 2.7:1 against the hero subhead, 3.4:1 against
+        // 16px body ... so type-scale-high-contrast is absent." Every
+        // derivation-set disagreement under the body denominator is a file
+        // that scored absent while measuring above the cut against body, which
+        // says the raters' convention was the subhead all along.
+        // Defined as: the first text node after the display node in document
+        // order whose font-size is smaller than it. Document order, not DOM
+        // sibling, because a hero headline and its subhead are rarely siblings.
+        let subheadFs = null;
+        if (prose.length) {
+          const topFs = prose[0].fs;
+          const after = docOrder.slice(docOrder.indexOf(prose[0].key) + 1);
+          for (const k of after) {
+            const n = byKey[k];
+            if (n && n.fs < topFs - 0.5) { subheadFs = n.fs; break; }
+          }
+        }
         const big = [...new Set(nodes.filter((n) => n.fs >= 26).map((n) => n.ff))];
         const small = [...new Set(nodes.filter((n) => n.fs <= 18).map((n) => n.ff))];
         return {
           docH: document.documentElement.scrollHeight,
           bodyFs: body,
+          subheadFs,
           top: nodes.slice(0, 5),
           topProse: prose.slice(0, 3),
           nodeCount: nodes.length,
@@ -99,8 +127,9 @@ const { chromium } = require('playwright');
       const maxFs = r.topProse.length ? r.topProse[0].fs : (r.top.length ? r.top[0].fs : 0);
       const rawMax = r.top.length ? r.top[0].fs : 0;
       const ratio = r.bodyFs ? +(maxFs / r.bodyFs).toFixed(2) : null;
+      const ratioSub = r.subheadFs ? +(maxFs / r.subheadFs).toFixed(2) : null;
       console.log(JSON.stringify({
-        slug, url, ok: true, ratio, maxFs, rawMax,
+        slug, url, ok: true, ratio, ratioSub, maxFs, rawMax,
         realH, innerScroller: probe.sel ? probe.inner : null, ...r,
       }));
     } catch (e) {

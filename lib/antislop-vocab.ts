@@ -45,6 +45,34 @@ export const SLOP_SIGNALS = [
   "hero-mockup-float",
 ] as const;
 
+// `type-scale-high-contrast` has a MEASUREMENT PROCEDURE and a necessary
+// threshold, derived at n=42 and stated here because the signal shipped in v3
+// with no threshold and no stated altitude, and two session-4 raters had to
+// interpolate one. See the v4 proposal, change 1.
+//
+//   ratio = largest text node containing at least one letter, nominal
+//           font-size, divided by getComputedStyle(document.body).fontSize
+//
+// Below 3.75:1 the signal is ABSENT. Necessary, not sufficient.
+//
+// Both halves were measured rather than chosen. Two denominators were run head
+// to head over all 42 files: body computed font-size misclassifies 5/42 at its
+// best cut of 3.75; the adjacent hero subhead misclassifies 8/41 at 3.33. Body
+// wins, which also retires railway-com's own framing ("54/20 = 2.7:1 against
+// the hero subhead, 3.4:1 against 16px body") — at 3.4 against body it falls
+// below the cut and agrees.
+//
+// "At least one letter" is the display-term rule and it is narrower than it
+// looks: requiring two words excluded grep.ai's "$ 2.89" and "78.6" correctly
+// but also rejected anthropic.com's "Haiku 5.5", which IS the headline,
+// dropping that page to a false 1.2:1.
+//
+// NOT SUFFICIENT, and this is the part to respect: five files sit at exactly
+// 3.75:1 — databuddy, decent-com and nxtcure-labs scored present, deepmark and
+// neuron-industries absent. Identical measured ratio, opposite calls. So
+// something other than the ratio decided those five, the threshold rules out
+// rather than ruling in, and no existing value was changed on its strength.
+// scripts/antislop/ladder.cjs implements the procedure.
 export const CRAFT_SIGNALS = [
   "asymmetric-split",
   "single-optical-anchor",

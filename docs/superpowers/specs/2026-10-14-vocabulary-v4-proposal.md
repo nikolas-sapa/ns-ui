@@ -55,92 +55,74 @@ craft side of every net, and 18% of its presents name it.
 
 ---
 
-## Change 1 — `type-scale-high-contrast` gets a derived threshold
+## Change 1 — `type-scale-high-contrast` gets a measured procedure
 
-**Status: NOT APPLICABLE YET. The threshold is probably right and the
-measurement procedure is missing, which is a different problem and has to be
-solved first.** Attempted after the first draft of this document; what the
-attempt found is below, and it is the reason the change did not land.
+**Status: APPLIED as a procedure and a necessary threshold, with zero value
+changes.** It took three attempts and two reversals to get here; the route
+matters more than the number.
 
-### The cut, as derived
-
-Every ratio stated in the corpus prose, paired with the value the file
-scored, taking the figure the rater cites for *this* signal:
+### Final form, in `lib/antislop-vocab.ts`
 
 ```
-present (n=12): 3.00 3.36 3.90 3.96 4.09 4.50 4.50 4.50 5.00 5.90 6.50 8.70
-absent  (n=9):  2.20 2.23 2.46 2.70 2.75 2.92 3.00 3.10 3.26
+ratio = largest text node containing at least one letter, nominal font-size,
+        divided by getComputedStyle(document.body).fontSize
+
+below 3.75:1  ->  ABSENT      (necessary, not sufficient)
 ```
 
-Highest `absent` 3.26, lowest own-page `present` 3.36, **no `absent` file
-cites a ratio at or above 3.36.** A cut at 3.3 sits in the gap and
-misclassifies 1 of 21 (`mailchimp-2014`, which states outright that it scored
-"near 3:1 — the highest in this cohort", a within-cohort comparison).
+### How the denominator was settled, after getting it wrong twice
 
-### Then it was measured, and the measurement is the problem
+The first cut, 3.3:1, came from the 21 files whose prose states a ratio. It
+validated at 18/21 on the held-out 21 and looked clean — then agreed on only
+14/21 of the files it was *derived from*, which is backwards. Cause: the
+corpus's stated ratios do not share a denominator. Raters variously used body
+computed size, the adjacent hero subhead, and the smallest body run, a spread
+reaching 1.6x on one page (`sentient-os`, 2.46 stated vs 4.05 against body).
 
-The other 21 files state no ratio, so they were measured directly — largest
-prose text `font-size` over `getComputedStyle(document.body).fontSize`, both
-nominal px, which is the convention the prose appears to use ("63.4/16 =
-3.96:1").
+Every derivation disagreement was the same shape — scored `absent` while
+measuring above the cut against body — and `railway-com` states why outright:
+*"54/20 = 2.7:1 against the hero subhead, 3.4:1 against 16px body ... so
+`type-scale-high-contrast` is absent."* The rater had both numbers and scored
+the subhead. So the subhead looked like the corpus convention.
 
-On the **held-out** 21 this looks like a clean out-of-sample validation:
-**18/21 agree.** On the **derivation** 21 — the files the cut came from — the
-same procedure agrees on only **14/21.**
+It is not. Run head to head over all 42:
 
-That is backwards, and the reason is not the cut. It is that **the corpus's
-stated ratios do not share a denominator.** Measured consistently against
-`body`, seven derivation files move:
+| denominator | best cut | misclassified |
+|---|---|---|
+| body computed `font-size` | **3.75:1** | **5 / 42 (88% agree)** |
+| adjacent hero subhead | 3.33:1 | 8 / 41 (80% agree) |
 
-| file | prose states | measured vs body | scored |
-|---|---|---|---|
-| `cursor-com` | 2.2:1 | 4.5:1 | absent |
-| `sentient-os` | 2.46:1 | 4.05:1 | absent |
-| `stripe-com` | 3.0:1 | 3.5:1 | absent |
-| `clerk-com` | 3.1:1 | 3.5:1 | absent |
-| `railway-com` | 2.7 / 3.4:1 | 3.38:1 | absent |
-| `neuron-industries` | 3.26 / 3.75:1 | 3.75:1 | absent |
-| `mailchimp-2014` | ~3.0:1 | 2.5:1 | present |
+Body wins, and at 3.4 against body `railway-com` itself falls below the cut
+and agrees. One rater's stated framing was not the corpus's behaviour.
 
-Raters variously used the body computed size, the adjacent hero subhead, and
-the smallest body run. Those are three different measurements and the spread
-between them on one page reaches 1.6x (`sentient-os`). **A threshold cannot
-be stated until the denominator is.**
+### The display term
 
-### The procedure is also still brittle
+"At least one letter." Requiring two words was the first attempt: it correctly
+excluded grep.ai's `$ 2.89` and `78.6` — price and stat figures setting a 4.0
+ratio on a page whose headline is smaller — but also rejected
+`anthropic-com`'s `Haiku 5.5`, which IS the headline, dropping it to a false
+1.2:1. One letter separates a figure from a headline; two words does not.
 
-`anthropic-com` measures **1.2:1** under it, against a raw largest node of
-79.7px. The prose filter — require two words containing letters, added to
-stop grep.ai's `$ 2.89` price figures from setting a 4.0 ratio — rejects
-`Haiku 5.5` as a headline, so the display term falls to a 24px node. A filter
-that excludes stat figures also excludes legitimately terse headlines, and
-nothing in the attempt distinguishes them.
+### Why nothing was re-scored
 
-### What needs deciding before this lands
+**Five files sit at exactly 3.75:1** — `databuddy`, `decent-com` and
+`nxtcure-labs` scored `present`; `deepmark` and `neuron-industries` scored
+`absent`. Identical measured ratio, opposite calls. Something other than the
+ratio decided those five, so the threshold rules *out* rather than ruling in,
+and the remaining five disagreements (`cursor-com` 4.5, `sentient-os` 4.05,
+`deepmark` 3.75, `neuron-industries` 3.75, `mailchimp-2014` 2.5) are left
+standing. Flipping them would substitute arithmetic for judgment that cannot
+be interrogated from the prose.
 
-1. **The denominator.** Body computed `font-size` is the most reproducible
-   and is what this document measured; the adjacent subhead is what several
-   raters appear to have used and is arguably the more meaningful comparison.
-   Pick one, state it, and accept that ~7 files change value.
-2. **The display term.** Largest node catches stat and price figures;
-   largest prose node drops terse headlines. Probably: largest node within
-   the hero, by position, rather than by content heuristics.
-3. **Then re-pass all 42.** Not 21 — the derivation set is as affected as the
-   held-out set.
+The threshold's value is forward-looking: the next rating is reproducible.
 
-**Material consequence, which is why none of this was applied silently:** at
-a 3.3 cut `openhack` flips `absent` → `present`, taking it from net **+4 to
-+3**. `openhack` is one of only **two slop files**, and `deepmark` sits at +3
-and is rated `mixed`. So applying this change mechanically could shrink the
-slop pool from 2 to 1 and move the gate **further** from opening. `deepmark`
-flips too (3.75:1 measured, scored absent — already known-soft #4, "3.58:1 at
-the hero cap-height and 2.6:1 across the page rhythm; which you score changes
-the verdict").
+### One earlier warning in this document was wrong
 
-A threshold that reduces the slop pool is not automatically wrong. It is
-automatically something a human signs off on.
-
----
+It said applying the cut "could shrink the slop pool from 2 to 1." It cannot.
+`eligibility()` pools on the `verdict` field (`e.verdict === "slop"`), not on
+the net — the net is an analysis construct and the build never reads it. A
+signal flip changes that signal's present-rate *within* a pool, which is a far
+smaller and more appropriate consequence.
 
 ## Change 2 — `single-optical-anchor` is rule-ineligible until defined
 
