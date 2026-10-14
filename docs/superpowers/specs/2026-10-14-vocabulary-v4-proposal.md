@@ -57,39 +57,88 @@ craft side of every net, and 18% of its presents name it.
 
 ## Change 1 — `type-scale-high-contrast` gets a derived threshold
 
-**Proposed: present iff display ≥ 3.3× computed body, measured at nominal
-`font-size`, largest display node against the body `font-size`.**
+**Status: NOT APPLICABLE YET. The threshold is probably right and the
+measurement procedure is missing, which is a different problem and has to be
+solved first.** Attempted after the first draft of this document; what the
+attempt found is below, and it is the reason the change did not land.
 
-Not invented. Every ratio stated in the corpus prose, paired with the value
-the file scored, taking the figure the rater cites for *this* signal:
+### The cut, as derived
+
+Every ratio stated in the corpus prose, paired with the value the file
+scored, taking the figure the rater cites for *this* signal:
 
 ```
 present (n=12): 3.00 3.36 3.90 3.96 4.09 4.50 4.50 4.50 5.00 5.90 6.50 8.70
 absent  (n=9):  2.20 2.23 2.46 2.70 2.75 2.92 3.00 3.10 3.26
 ```
 
-- Highest `absent`: **3.26** (`neuron-industries`)
-- Lowest `present` that is the page's own figure: **3.36**
-  (`the-subvocal-company`)
-- **No file scored `absent` cites a ratio at or above 3.36.** One-sided
-  clean.
+Highest `absent` 3.26, lowest own-page `present` 3.36, **no `absent` file
+cites a ratio at or above 3.36.** A cut at 3.3 sits in the gap and
+misclassifies 1 of 21 (`mailchimp-2014`, which states outright that it scored
+"near 3:1 — the highest in this cohort", a within-cohort comparison).
 
-A cut at 3.3 sits in the 3.26–3.36 gap and misclassifies **1 of 21**:
-`mailchimp-2014` at "near 3:1", scored `present` explicitly as "the highest
-in this cohort" — a within-cohort comparison, not an absolute reading. Keep
-it as a documented exception or re-score it; either is defensible, and the
-file says which basis it used.
+### Then it was measured, and the measurement is the problem
 
-**Altitude.** Nominal `font-size`, not cap-height. The `edotenv` rater
-established why this is safe: cap-height and nominal only diverge when
-display and body use different faces, and where they do, the corpus states
-both. Nominal is reproducible from the computed ladder without a font
-metrics table.
+The other 21 files state no ratio, so they were measured directly — largest
+prose text `font-size` over `getComputedStyle(document.body).fontSize`, both
+nominal px, which is the convention the prose appears to use ("63.4/16 =
+3.96:1").
 
-**Impact on the 42 files:** 21 files state a ratio and 20 are consistent
-with the cut. 21 files state none and are unverified against it — they need
-a ladder re-read, which is cheap (`measure2.cjs`) and does not require
-re-capture.
+On the **held-out** 21 this looks like a clean out-of-sample validation:
+**18/21 agree.** On the **derivation** 21 — the files the cut came from — the
+same procedure agrees on only **14/21.**
+
+That is backwards, and the reason is not the cut. It is that **the corpus's
+stated ratios do not share a denominator.** Measured consistently against
+`body`, seven derivation files move:
+
+| file | prose states | measured vs body | scored |
+|---|---|---|---|
+| `cursor-com` | 2.2:1 | 4.5:1 | absent |
+| `sentient-os` | 2.46:1 | 4.05:1 | absent |
+| `stripe-com` | 3.0:1 | 3.5:1 | absent |
+| `clerk-com` | 3.1:1 | 3.5:1 | absent |
+| `railway-com` | 2.7 / 3.4:1 | 3.38:1 | absent |
+| `neuron-industries` | 3.26 / 3.75:1 | 3.75:1 | absent |
+| `mailchimp-2014` | ~3.0:1 | 2.5:1 | present |
+
+Raters variously used the body computed size, the adjacent hero subhead, and
+the smallest body run. Those are three different measurements and the spread
+between them on one page reaches 1.6x (`sentient-os`). **A threshold cannot
+be stated until the denominator is.**
+
+### The procedure is also still brittle
+
+`anthropic-com` measures **1.2:1** under it, against a raw largest node of
+79.7px. The prose filter — require two words containing letters, added to
+stop grep.ai's `$ 2.89` price figures from setting a 4.0 ratio — rejects
+`Haiku 5.5` as a headline, so the display term falls to a 24px node. A filter
+that excludes stat figures also excludes legitimately terse headlines, and
+nothing in the attempt distinguishes them.
+
+### What needs deciding before this lands
+
+1. **The denominator.** Body computed `font-size` is the most reproducible
+   and is what this document measured; the adjacent subhead is what several
+   raters appear to have used and is arguably the more meaningful comparison.
+   Pick one, state it, and accept that ~7 files change value.
+2. **The display term.** Largest node catches stat and price figures;
+   largest prose node drops terse headlines. Probably: largest node within
+   the hero, by position, rather than by content heuristics.
+3. **Then re-pass all 42.** Not 21 — the derivation set is as affected as the
+   held-out set.
+
+**Material consequence, which is why none of this was applied silently:** at
+a 3.3 cut `openhack` flips `absent` → `present`, taking it from net **+4 to
++3**. `openhack` is one of only **two slop files**, and `deepmark` sits at +3
+and is rated `mixed`. So applying this change mechanically could shrink the
+slop pool from 2 to 1 and move the gate **further** from opening. `deepmark`
+flips too (3.75:1 measured, scored absent — already known-soft #4, "3.58:1 at
+the hero cap-height and 2.6:1 across the page rhythm; which you score changes
+the verdict").
+
+A threshold that reduces the slop pool is not automatically wrong. It is
+automatically something a human signs off on.
 
 ---
 
@@ -201,8 +250,36 @@ non-stance-bearing and no rule can be written against it. The eligibility
 thresholds can then normalise a present-rate by surface area instead of
 treating a thin page as a restrained one.
 
-**Impact:** additive. No existing value changes; the two fields are unset on
-all 42 files and derivable from the walk output without re-capture.
+**Status: data measured for all 42, not applied — two blockers, one of them
+a schema decision that is not mine to make silently.**
+
+Page extent is now measured for every file at 1440x900, with the
+inner-scroller probe in front of it, in
+`~/scratch/antislop/page-extents.json`. Range **1203px** (`mailchimp-2014`)
+to **17890px** (`grep-ai`), median ~7200. The thin tail that motivated the
+change: `dipole-labs` 1528, `standard-machines` 1668, `stripe-2014` 1385,
+`mailchimp-2014` 1203.
+
+**Blocker 1 — `materials` is a flat string list.** It cannot carry
+`page-extent: 1528` without becoming a map, which is an `Evidence` schema
+change plus a validator and test change. The alternative is a string entry
+like `page-extent-1528`, which is parseable but is the kind of thing that
+reads as data smuggled into a vocabulary. Either way it is a structural
+decision about the evidence format, not an additive field, so it is proposed
+rather than done.
+
+**Blocker 2 — `section-count` has no definition.** "What is a section" is a
+judgment call, and an undefined count is exactly the failure change 2 holds
+`single-optical-anchor` back for. Page extent is unambiguous and sufficient
+for normalising a present-rate; recommend shipping only that and dropping
+`section-count` until something needs it.
+
+Two measurement notes for whoever applies it. `grep-ai` reads **900px**
+without the inner-scroller probe and **17890px** with it — a 20x error, and
+the single strongest argument for putting the probe in front of any
+measurement that touches page height. And `tsenta` measured 9326 during the
+session-4 walk and 9548 two hours later: these pages change under you, so the
+field wants the capture date beside it, which `studied` already supplies.
 
 ---
 
@@ -277,19 +354,27 @@ it.
 
 ## Suggested order
 
-1. **Change 4** (global scope rule) and **Change 7** (contexts) — no value
-   changes, prevents errors, do them first.
-2. **Change 5** (denominator) — additive, derivable from existing walk
-   output.
-3. **Change 1** (type-scale threshold) — needs a ladder re-read on 21 files,
-   no re-capture.
-4. **Change 2** (mark `single-optical-anchor` rule-ineligible) — one line,
-   and it removes the largest unmeasured signal from the eligible-11 before
-   any gate opens.
-5. **Change 6** (split `generic-sans-default`) — a re-pass on 11 files.
-6. **Change 3** (screenshot/artifact axis) — a re-pass on all 42. Last, and
-   worth its own session.
+**Applied** (commit `3a04ce51`), none of which changed a signal value:
+change 2 (hold `single-optical-anchor` back from backing a rule), change 4
+(global product-surface scope rule), change 7 (five new contexts, with the
+raters' own values restored where now expressible).
 
-Changes 1–5 can land before a third slop file exists. **Change 2 should land
-before any rule is authored from any gate**, because it is the specific
-failure session 3 already paid for once.
+**Attempted and returned as proposals**, because both turned out to need a
+decision rather than a measurement — which is the useful finding from the
+attempt:
+
+- **Change 1** needs the measurement procedure decided first: the
+  denominator and the display term. Measured consistently, 7 derivation
+  files move, and the cut would flip `openhack` from +4 to +3 and shrink the
+  slop pool from 2 to 1.
+- **Change 5** needs a schema decision: `materials` is a flat string list
+  and cannot carry a number. Data is measured for all 42 regardless.
+
+**Remaining, in cost order:**
+
+1. **Change 6** (split `generic-sans-default`) — a re-pass on 11 files.
+2. **Change 3** (screenshot/artifact onto one axis) — a re-pass on all 42,
+   touching 23 and 7 present values. Worth its own session.
+
+**Before any rule is authored from any gate**, change 2 must be in place —
+it is the specific failure session 3 already paid for once. It is.
