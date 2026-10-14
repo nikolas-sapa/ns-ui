@@ -50,12 +50,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import {
-  createBranch,
-  ensureFork,
-  fetchAuthenticatedLogin,
-  openPullRequest,
-  putFile,
-  waitForForkReady,
+  submitComponentToGithub,
+  type SubmitFile,
 } from "@/lib/github-submit";
 import {
   asGithubBodyText,
@@ -75,6 +71,24 @@ import {
 import registry from "@/registry.json";
 
 export const dynamic = "force-dynamic";
+
+// A submission is ~9 sequential GitHub calls plus the fork-ready poll (which
+// exists because GitHub's fork creation is async and can 404 for seconds),
+// so this route is the one in the app that genuinely needs longer than a
+// default. 60s is Vercel's published Hobby maximum — the plan this project
+// is on — so it is a value the tier can grant; `SUBMIT_BUDGET_MS` in
+// lib/github-submit.ts is set under it, so the error a contributor sees is
+// ours and names the step that ran out of time.
+//
+// Deliberately different from `app/api/status-snapshot/route.ts`, which
+// declines to set `maxDuration` at all because it cannot confirm the ceiling
+// and a request above the tier's limit fails the DEPLOYMENT. That reasoning
+// still stands and is why this is 60 and not 300: if a deploy ever rejects
+// this value, the fix is to lower it, and `submitComponentToGithub`'s
+// resume-safety is what keeps a shorter real ceiling merely slow instead of
+// terminal. Worth confirming once against the dashboard
+// (`vercel functions inspect`) rather than left as folklore.
+export const maxDuration = 60;
 
 function originIsAllowed(request: NextRequest): boolean {
   const origin = request.headers.get("origin");
@@ -267,12 +281,16 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const login = await fetchAuthenticatedLogin(githubToken);
-    const fork = await ensureFork(githubToken);
-    await waitForForkReady(githubToken, fork.owner, fork.repo);
-
+    // `submit/<slug>` is deterministic per slug ON PURPOSE: one slug, one
+    // branch, one PR, nothing accumulating on the contributor's fork across
+    // retries. What used to make that a trap — every step after it failing
+    // 422 once the branch existed — is handled inside
+    // `submitComponentToGithub`, which resumes rather than throws. The
+    // alternative (a per-attempt unique branch) would retry cleanly too, but
+    // at the cost of a dead branch per failed attempt and a duplicate
+    // upstream PR per retry, which is the maintainer's problem forever
+    // instead of the contributor's for one click.
     const branch = `submit/${value.slug}`;
-    await createBranch(githubToken, fork.owner, fork.repo, fork.defaultBranch, branch);
 
     const trailer = dcoTrailer(value.dcoName, value.dcoEmail);
     const commitMessage = `feat(${value.collection}): add ${value.slug}\n\n${trailer}`;
@@ -291,22 +309,19 @@ export async function POST(request: NextRequest) {
       2,
     );
 
-    const files: Record<(typeof FIXED_FILENAMES)[number], string> = {
+    const contents: Record<(typeof FIXED_FILENAMES)[number], string> = {
       "component.tsx": value.componentSource,
       "demo.tsx": value.demoSource,
       "meta.json": metaJson,
     };
-    for (const filename of FIXED_FILENAMES) {
-      await putFile(
-        githubToken,
-        fork.owner,
-        fork.repo,
-        branch,
-        submissionPath(value.collection, value.slug, filename),
-        files[filename],
-        commitMessage,
-      );
-    }
+    // D2: the path is always `registry/<collection>/<validated-slug>/<fixed
+    // -filename>`, built here from the validated slug and the fixed filename
+    // constants — never inside the GitHub layer, which only ever receives a
+    // path it is told.
+    const files: SubmitFile[] = FIXED_FILENAMES.map((filename) => ({
+      path: submissionPath(value.collection, value.slug, filename),
+      content: contents[filename],
+    }));
 
     const prBody = [
       `New component: \`${value.slug}\` (${value.collection}).`,
@@ -336,13 +351,13 @@ export async function POST(request: NextRequest) {
     // renders an issue/PR title as plain text (no Markdown, no `@mention`
     // parsing), so it carries neither injection surface finding #3 raises
     // and needs no `asGithubBodyText` treatment.
-    const prUrl = await openPullRequest(
-      githubToken,
-      fork.owner,
+    const { login, prUrl } = await submitComponentToGithub(githubToken, {
       branch,
-      `Add ${value.title}`,
+      commitMessage,
+      files,
+      prTitle: `Add ${value.title}`,
       prBody,
-    );
+    });
 
     await fetchMutation(
       api.submissions.complete,
