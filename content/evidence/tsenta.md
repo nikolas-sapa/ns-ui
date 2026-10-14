@@ -4,7 +4,7 @@ kind: site
 cohort: yc-current
 verdict: mixed
 studied: 2026-10-14
-context: [hero, nav, testimonials, features, pricing, cta, footer]
+context: [hero, nav, testimonials, features, pricing, cta, footer, faq]
 signals:
   gradient-blob: absent
   three-card-row: present

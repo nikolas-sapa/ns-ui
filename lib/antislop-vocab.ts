@@ -8,6 +8,22 @@
 // No I/O, the way lib/css-tokens.ts is the single source for the token line.
 // There is one signal namespace and no third class: whether a signal may back
 // a rule is computed from the evidence, not declared here.
+// SCOPE, and it applies to EVERY signal below, not just the ones whose notes
+// repeat it. **Marketing chrome is the unit of analysis. Content inside an
+// embedded product surface is not scored.** A product screenshot, a dashboard
+// clone, a terminal transcript or a simulated app window is a thing the page
+// is showing, not a decision the page is making about itself.
+//
+// This was attached only to badge-pill-spam in v3 and every session has paid
+// for that. railway-com set the precedent twice (U+2713 inside JetBrains Mono
+// log lines is captured output, not an icon; the six-series chart palette
+// inside the Observability capture is data colour). In session 4 one rater had
+// to extend it by analogy to three more signals in a single sitting —
+// three-card-row on a 4-up of job-match cards inside a dashboard clone,
+// emoji-as-icon on 7 checks used as diff markers, one-accent-discipline on
+// pastel card fills and iOS blue — and the session's own rating brief got that
+// card row wrong until a screenshot was opened.
+// See docs/superpowers/specs/2026-10-14-vocabulary-v4-proposal.md, change 4.
 export const SLOP_SIGNALS = [
   "gradient-blob",
   "three-card-row",
@@ -55,9 +71,18 @@ export const MATERIALS = [
   "illustration", "webgl", "video-hero", "video-embed",
 ] as const;
 
+// faq / team / stats / security / integrations added at n=42. All ten
+// session-4 drafts invented context values and the build rejected every one;
+// sixteen distinct section names had no slot. These five are the ones that
+// recurred and that map to a section with no overlap onto an existing value
+// (faq on 4 pages, team on 3). Low risk: `context` backs no rule and no
+// threshold reads it. The other eleven invented names were dropped rather
+// than reinterpreted — see ~/scratch/antislop/context-normalisation.json and
+// docs/superpowers/specs/2026-10-14-vocabulary-v4-proposal.md, change 7.
 export const CONTEXTS = [
   "hero", "nav", "pricing", "features", "testimonials", "cta", "footer",
   "docs", "dashboard", "empty-state", "404", "auth", "blog-index", "article",
+  "faq", "team", "stats", "security", "integrations",
 ] as const;
 
 export const COHORTS = [

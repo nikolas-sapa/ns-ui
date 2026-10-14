@@ -4,7 +4,7 @@ kind: site
 cohort: yc-current
 verdict: exemplar
 studied: 2026-10-14
-context: [hero, nav, cta, footer]
+context: [hero, nav, cta, footer, faq]
 signals:
   gradient-blob: absent
   three-card-row: absent

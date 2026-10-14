@@ -50,6 +50,25 @@ const PRESENT_MIN_N = 3; // `present` observations corpus-wide before a signal m
 // Named rather than inlined because every verdict here turns on it.
 const CONTROL_COHORT = "pre-ai-2015";
 
+// Signals held back from backing a rule for a reason the rates cannot see.
+// The gates above test whether a signal's present-rate separates the verdict
+// pools; they cannot test whether the signal was applied consistently in the
+// first place. A signal with no definition passes them on noise.
+//
+// Session 3 authored eleven rules and withdrew all eleven when two blind
+// raters split on one craft signal. Session 4 then measured the thing that
+// makes that repeatable: flipping ONE file's verdict moves eleven signals
+// from ineligible to eligible, and `single-optical-anchor` is in that eleven.
+// See docs/superpowers/specs/2026-10-14-vocabulary-v4-proposal.md, change 2.
+//
+// Entries are expected to be removed, not to accumulate. Removing one needs a
+// definition AND a re-pass of the corpus against it — not just a definition,
+// because the existing values were set without one.
+const RULE_INELIGIBLE: Record<string, string> = {
+  "single-optical-anchor":
+    "the only v3 signal with an empty notes cell: it has no definition, and the 25 `present` values in the corpus were each set without one. It also came in at 8/10 in the session-4 batch against 40% in the prior yc-current cohort, a +38pt swing consistent with being marked present by default, and 44% of the files scoring it present discuss it in prose at all. Define it and re-pass the corpus, then delete this entry — a definition alone would retroactively validate or invalidate 25 scores nobody has re-read.",
+};
+
 type Eligibility = {
   eligible: boolean;
   reason: string;
@@ -103,6 +122,9 @@ export function eligibility(signal: string, corpus: Map<string, Evidence>): Elig
     );
   }
   const cls = isSlop ? "slop" : "craft";
+  // Held back by hand, and checked before the rates: a signal that was applied
+  // inconsistently can still pass a separation test on noise.
+  if (RULE_INELIGIBLE[signal]) return no(`'${signal}' is held back from backing a rule: ${RULE_INELIGIBLE[signal]}`);
   // For a slop signal the claim is "commoner among slop"; for a craft signal,
   // "commoner among exemplars". The gap is signed, in that order.
   const [hi, lo] = isSlop ? [slop, exemplar] : [exemplar, slop];
