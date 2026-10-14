@@ -52,7 +52,8 @@
     "preverify": "npm run registry:build",
     "order:build": "node scripts/build-order.ts",
     "record": "node scripts/record.ts",
-    "previews:build": "node scripts/build-previews.ts"
+    "previews:build": "node scripts/build-previews.ts",
+    "test:star-prompt": "node scripts/test-star-prompt.ts"
   },
   "dependencies": {
     "@convex-dev/auth": "0.0.94",

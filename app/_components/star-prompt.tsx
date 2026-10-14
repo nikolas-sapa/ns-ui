@@ -1,6 +1,8 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { VISITED_KEY, readVisits, recordVisit } from "@/lib/star-prompt-rule";
 
 /**
  * Dismissed for good. Separate from the view counter below, same split as
@@ -41,10 +43,13 @@ export const COPIED_EVENT = "ns-ui:copied";
 export function StarPrompt() {
   const [visible, setVisible] = useState(false);
   const [closing, setClosing] = useState(false);
+  /** Which trigger fired, so the copy can tell the truth about it. */
+  const [reason, setReason] = useState<"copied" | "browsed">("copied");
   const retired = useRef(false);
   const exitTimer = useRef<number | null>(null);
   const dismissTimer = useRef<number | null>(null);
   const hovered = useRef(false);
+  const pathname = usePathname();
 
   // Read once on mount. A visitor who already said no, or has seen it
   // MAX_VIEWS times, never arms the listener at all.
@@ -75,22 +80,47 @@ export function StarPrompt() {
     }, EXIT_MS);
   }, []);
 
+  /**
+   * Both triggers go through here, so "one ask per page life" and the view
+   * counter cannot be bypassed by whichever one happens to fire second.
+   */
+  const ask = useCallback((why: "copied" | "browsed") => {
+    if (retired.current) return;
+    retired.current = true;
+    try {
+      const views = Number(localStorage.getItem(VIEWS_KEY) ?? "0");
+      localStorage.setItem(VIEWS_KEY, String(views + 1));
+    } catch {
+      /* exposure just goes uncounted */
+    }
+    setReason(why);
+    setVisible(true);
+  }, []);
+
   useEffect(() => {
-    const onCopied = () => {
-      if (retired.current) return;
-      // One ask per page life, however many things get copied.
-      retired.current = true;
-      try {
-        const views = Number(localStorage.getItem(VIEWS_KEY) ?? "0");
-        localStorage.setItem(VIEWS_KEY, String(views + 1));
-      } catch {
-        /* exposure just goes uncounted */
-      }
-      setVisible(true);
-    };
+    const onCopied = () => ask("copied");
     window.addEventListener(COPIED_EVENT, onCopied);
     return () => window.removeEventListener(COPIED_EVENT, onCopied);
-  }, []);
+  }, [ask]);
+
+  /**
+   * The browse path. A copy is the strongest signal but a narrow one: someone
+   * who opens a dozen components, reads the source and leaves has plainly got
+   * value and never triggered the ask at all.
+   *
+   * The rule itself lives in lib/star-prompt-rule.ts so its test drives this
+   * exact code rather than a reimplementation — see the note in that file.
+   */
+  useEffect(() => {
+    if (retired.current) return;
+    const { seen, ask: earned } = recordVisit(pathname ?? "", readVisits());
+    try {
+      sessionStorage.setItem(VISITED_KEY, JSON.stringify(seen));
+    } catch {
+      /* can't persist — the ask just won't fire on this path */
+    }
+    if (earned) ask("browsed");
+  }, [pathname, ask]);
 
   // Auto-dismiss, paused while the pointer is on it — the one case where the
   // visitor is plainly still reading.
@@ -136,7 +166,9 @@ export function StarPrompt() {
     >
       <div className="flex items-start gap-3">
         <p className="text-[13px] leading-snug text-foreground">
-          Copied. If this saved you time, a star helps other people find it.
+          {reason === "copied"
+            ? "Copied. If this saved you time, a star helps other people find it."
+            : "Still browsing? If any of these are useful, a star helps other people find them."}
         </p>
         <button
           type="button"
