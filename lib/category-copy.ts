@@ -56,6 +56,16 @@ export const CATEGORY_COPY: Record<string, { h1: string; intro: string }> = {
     intro:
       "Dialogs, popovers, tooltips, hover cards and onboarding tours — surfaces that sit above the page rather than in its flow. Reach for one when content needs to interrupt or float over what's already on screen.",
   },
+  cards: {
+    h1: "React card components",
+    intro:
+      "Content cards and feature grids: a bordered or textured surface holding a title, supporting copy and often a link, laid out in a row or grid. Reach for these when a page needs to present several comparable things at once. For a surface that floats above the page instead, see Overlays.",
+  },
+  "social-proof": {
+    h1: "React testimonial and social proof components",
+    intro:
+      "Testimonial walls, quote rotators and logo clouds: the components that show who already uses or vouches for a product. Reach for one when a page needs third-party evidence rather than its own description.",
+  },
   media: {
     h1: "React media and gallery components",
     intro:
