@@ -22,10 +22,14 @@ invariant worth asserting -- and this file does assert it.
 One strip per ~6 bands keeps each image under ~4200px so it stays readable
 in one go, at full 1440 width so body copy is still legible.
 """
-import os, glob, sys
+import os, glob, sys, json
 from PIL import Image
 
 BASE = '/Users/nikolassapalidis/scratch/antislop'
+# Which capture session's tiles to stitch. Session 4's live under s4/; later
+# sessions pass their own so a re-pass never overwrites the capture it is
+# correcting. NS_SESSION=s5 stitch.py truemile
+SESSION = os.environ.get('NS_SESSION', 's4')
 STEP = 700
 VIEWPORT = 900
 BANDS_PER_STRIP = 6
@@ -49,10 +53,10 @@ def bands(tiles, doc_h):
 
 
 def stitch(slug, doc_h):
-    tiles = sorted(glob.glob(f'{BASE}/s4/{slug}/{slug}-*.png'))
+    tiles = sorted(glob.glob(f'{BASE}/{SESSION}/{slug}/{slug}-*.png'))
     if not tiles:
         return [], 0, 0
-    out_dir = f'{BASE}/s4strips'
+    out_dir = f'{BASE}/{SESSION}strips'
     os.makedirs(out_dir, exist_ok=True)
     plan, covered = bands(tiles, doc_h)
     made = []
@@ -71,7 +75,36 @@ def stitch(slug, doc_h):
     return made, covered, len(tiles)
 
 
-# docH per slug, from the shoot-tiles.cjs walk output.
+def walk_height(slug):
+    """Page height for `slug`, read from the walker's own walk.json.
+
+    Was a hardcoded dict, which meant every new capture needed this file
+    hand-edited -- unworkable once raters capture in parallel, and a silent
+    wrong answer if a page's height drifted since the map was written (tsenta
+    moved 9326 -> 9548 inside two hours). The walker now writes walk.json
+    beside its tiles; the map below survives only for the s4 captures taken
+    before it did.
+
+    Refuses a clamped walk outright. The walker's own comment: the tiles lie,
+    do not stitch or rate from them. Stitching one yields a strip whose height
+    matches a page the walk never reached, so the invariant passes and the
+    evidence is still wrong -- failure mode 5's exact shape.
+    """
+    wj = f'{BASE}/{SESSION}/{slug}/walk.json'
+    if os.path.exists(wj):
+        with open(wj) as f:
+            w = json.load(f)
+        assert not w.get('clamped'), (
+            f'{slug}: walk is CLAMPED ({w.get("reachedPx")}px of '
+            f'{w.get("walkHeight")}px) -- re-walk with wheel events, do not stitch'
+        )
+        return w['walkHeight']
+    if slug in DOC_H:
+        return DOC_H[slug]
+    raise SystemExit(f'{slug}: no {wj} and no DOC_H entry -- run shoot-tiles.cjs first')
+
+
+# docH per slug for the s4 captures, taken before the walker wrote walk.json.
 DOC_H = {
     'provenmetal': 4384, 'the-subvocal-company': 13726, 'sentient-os': 14803,
     'neuron-industries': 13947, 'standard-machines': 1668, 'osseus': 2654,
@@ -80,7 +113,7 @@ DOC_H = {
 
 bad = 0
 for s in (sys.argv[1:] or sorted(DOC_H)):
-    doc_h = DOC_H[s]
+    doc_h = walk_height(s)
     made, covered, n = stitch(s, doc_h)
     total = sum(h for _, _, h, _ in made)
     ok = 'OK' if total == doc_h == covered else f'MISMATCH (page {doc_h}, covered {covered})'

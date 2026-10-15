@@ -27,7 +27,7 @@ signals:
   type-scale-high-contrast: present
   editorial-grid-break: present
   custom-type-pairing: absent
-  real-product-screenshot: absent
+  real-product-surface: absent
   shows-deliverable: absent
   density-variation: absent
   one-accent-discipline: present
