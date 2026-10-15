@@ -1,4 +1,4 @@
-# v4 change 3 addendum — what seven independent raters found in the definition
+# v4 change 3 addendum — what the independent raters found in the definition
 
 Date: 2026-10-15
 Follows: `2026-10-14-vocabulary-v4-proposal.md` change 3, applied in
@@ -12,7 +12,8 @@ from 7/42 to 12/42 present** — the starvation the proposal predicted, measured
 
 The change was right. It also exposed six holes in what remains, each found
 independently and each with a file that makes it concrete. They are listed in
-the order a rater is likely to hit them.
+the order a rater is likely to hit them. Hole 7 arrived last and is the one
+most likely to undo the fix.
 
 ---
 
@@ -131,6 +132,46 @@ a faithful live rebuild, failed by a stylised or invented UI. Scores
 `financial-datasets` correctly and still catches the slop case the signal was
 built for, a glassy fake dashboard floating in a hero.
 
+## 7. The definition names two positions and pages occupy a third — and this one interacts with change 4
+
+Found by `tsenta`'s rater, reported last, and it is the hole most likely to
+undo the fix.
+
+The definition covers the deliverable **as product chrome** and, via the hard
+case, **the deliverable inside chrome**. `tsenta`'s strongest content is
+neither. Its scored shortlist — `Senior Frontend Engineer · Stripe` **92%**
+kept against `React Developer (intern)` **31%**, `Lead .NET Engineer` **18%**
+and `Java Backend, on-site Pune` **24%** struck through with genuine CSS
+`line-through`, each refusal explained by its own row content — is a
+**page-authored HTML panel under a marketing eyebrow**. Containment was probed
+directly: `inClone: false` on all of it. Not a screenshot of a running app, not
+an exported file.
+
+Under the current wording a rater can reasonably call that "just a marketing
+graphic" and score `absent` — **landing on v3's wrong answer by the opposite
+route.**
+
+And it is worse than a gap, because it collides with change 4. That change
+globalised the rule that *marketing* signals are not scored off content inside
+an embedded product surface. Read carelessly alongside this definition, the
+same instinct starts **withholding deliverable credit from anything that is
+not in product chrome** — the exact inversion. One rule says "product chrome
+doesn't count for marketing signals"; a rater generalising it concludes "only
+product chrome counts for the deliverable signal."
+
+**Proposed clause, from that rater:** the deliverable may be shown as product
+chrome, as a captured artefact, **or as a page-authored rendering of the
+product's output**. What disqualifies is unreadable or placeholder content, not
+the authoring medium.
+
+That phrasing also resolves hole 3's collapse hazard from the other side: the
+test is readable, falsifiable content, and the authoring medium is irrelevant
+in both directions.
+
+**Smaller, recorded not proposed:** `tsenta` shows the deliverable six distinct
+ways and the signal is binary, so the corpus cannot distinguish it from a page
+with one readable chart. Not a reason to hold anything.
+
 ---
 
 ## Two observations outside the six
@@ -152,6 +193,8 @@ un-deferring it, on one file.
 
 ## Recommended order
 
+0. **Hole 7** — it can reinstate v3's wrong answer by the opposite route, and
+   it mis-interacts with change 4, which is already applied. One clause.
 1. **Hole 2** (which axis the signal is on) — everything else is downstream of
    it, and the 16 untouched files will be scored against whichever reading the
    next rater infers.
@@ -165,7 +208,14 @@ un-deferring it, on one file.
 
 ## Still outstanding from the re-score
 
-`railway-com` and `tsenta` were dispatched and had not reported when this was
-written. `railway-com` is the precedent file for whether live platform
+`railway-com` alone. It is the precedent file for whether live platform
 telemetry counts as a deliverable — a split-flap board showing real aggregate
-throughput — and that question is a sub-case of hole 2.
+throughput — and that question is a sub-case of hole 2. Its value is left
+untouched rather than guessed.
+
+`tsenta` has since reported `present` and is applied. Its file had
+**contradicted itself** — concluding the page "shows no deliverable", then
+later describing the résumé-diff panels and quoting their green `+` lines. The
+rater had the deliverable in hand and wrote it down. That is the cleanest
+evidence in the corpus that the v3 construction rule was producing the
+conclusion rather than the page.

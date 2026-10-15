@@ -28,7 +28,7 @@ signals:
   editorial-grid-break: absent
   custom-type-pairing: absent
   real-product-screenshot: present
-  shows-deliverable: absent
+  shows-deliverable: present
   density-variation: present
   one-accent-discipline: present
   live-claim-control: absent
@@ -293,3 +293,93 @@ scroll hiding 5,700 characters from anyone who does not drive the pin. A page
 that avoids every ornament and invents nothing, with one real robustness defect,
 is the definition of `mixed`. It is also not remotely near `slop`: the floor for
 that verdict is net +4 and this is −2, six slop signals short of openhack.
+
+**v4 change 3 re-score — `shows-deliverable` absent → present, and not
+narrowly.** Re-rated from a fresh walk (14 tiles, `clamped: false`,
+`coverage: 1.0`, docH 9548, footer on the last tile) with the pinned stage
+driven at four scroll fractions so all four states were read at full opacity.
+
+**The scope worry that motivated the re-score never engages.** The page's
+strongest deliverable content is *not* in the dashboard clone: containment was
+probed directly and every item below returned `inClone: false`. These are
+page-authored figures on the page's own canvas under marketing eyebrows, so the
+embedded-product-surface scope rule does not reach them, and the two rules
+never meet.
+
+**A scored shortlist with real refusals**, y2101-2273, under eyebrow
+`02 · QUALITY` / "Matched to your résumé". Kept: `Senior Frontend Engineer ·
+Stripe` **92%**. Refused, with genuine CSS `line-through`: `React Developer
+(intern) · Acme HR` **31%**, `Lead .NET Engineer · Nimbus` **18%**, `Java
+Backend, on-site Pune · Zypher` **24%**. The vocabulary's reference phrase
+literally instantiated, and each refusal is explained by its own row content —
+an intern role for a senior candidate, .NET for a React/TS candidate, on-site
+Pune for an SF candidate. The scores discriminate in the direction the row
+predicts.
+
+**A quantified comparison with its basis stated**, y2321-2633, eyebrow
+`01 · FIND → HEAD START`: `VIA TSENTA 00h 00m` → `APPLICANTS AHEAD OF YOU: #1`
+against `VIA LINKEDIN & CO. 17h 12m` → `#1,247`, plus the mechanism that makes
+the delta mean anything — `Recruiters typically review the first 100
+applications.`
+
+**A generated artefact shown as a diff**, y2411-2755: `original` struck through
+on "Built features for the web app using React." against `rewritten for stripe`
+"Shipped distributed React + TS surfaces serving 4M MAU; cut p95 render time
+38%.", driven by a JD parse (`4+ years`, `React`, `TypeScript`, `design
+systems`, `GraphQL`, `on-site SF`, two tagged `must`) and scored `ATS score 94
+/ 100` with domain-accurate flags.
+
+**A pipeline funnel** at y≈4440-4880: `APPLIED 47 → VIEWED 23 → REPLIED 8 →
+INTERVIEW 4`, monotone decreasing with each stage a strict subset, and the
+12-cell company grid carrying correct tense per stage — past times (`2d ago`,
+`6h ago`) on APPLIED/VIEWED/REPLIED, future (`tomorrow`, `thursday`) on
+INTERVIEW.
+
+**Honesty test: coherent, with three real blemishes.** The number **47** holds
+across four independently-authored surfaces spanning ~4,300px — dashboard
+sidebar `Applications 47`, funnel `APPLIED 47`, summary `47 applied +12 this
+week`, and a mono line `0 manual filings · 47 routed automatically`. Candidate
+identity is consistent the same way (`React / TypeScript / design systems` in
+the JD parse, the rewritten bullet and the live Atlassian row), as is `6
+fields` (Chrome bar `6 fields detected` against Apply stage `6 of 6 fields · 0
+skipped`) and `alex_morgan_stripe_v6.pdf` against the dashboard's `AM Alex
+Morgan`. Filler does not maintain four-way numeric agreement across 4,300px.
+
+The blemishes, recorded because the page is real enough to audit and lorem is
+unfalsifiable: the rewrite claims `8 words → 16` and is **14** by whitespace
+tokens, off by two. The hero cards do not rank — 71/60/64/58 at x519/756/993/
+1230, where a score-ranked top list reads 71/64/60/58, so 60 and 64 are
+transposed and that is the one place a score looks placed rather than computed.
+And the scan log is clock-seeded: session 4 recorded `14:16:32`, this pass got
+`06:44:40` and `07:08:07` on two loads, so it regenerates per visit and is
+simulated rather than recorded — though its structure stays coherent, with a
+monotone clock, 1-2s per career page, two scans sharing a second for concurrent
+fetches, and a realistic yield of mostly `0 new` with occasional `+1`/`+3`.
+
+Mitigating the hero transposition: **the scores are unflattering.** 58-71% on
+the hero and 18-31% on the refusals. A decorative page shows 94/97/91. A 58%
+"top" match beside three sub-32% rejections is a credibility posture rather
+than ornament.
+
+The CLI transcript at y6396-6486 was weighed and is **the weakest of the six
+surfaces**: a typed tool call with a named argument, a real ATS (Greenhouse,
+also named in the hero's ATS list), a duration, and a produced artefact whose
+filename is consistent with both the logged-in user and the target role with a
+`v6` implying iteration. But it is four lines and the PDF it names is never
+shown, so it is product UI demonstrating an invocation rather than a rendered
+deliverable. It supports the score and does not carry it.
+
+**This file contradicted itself, and that is the cleanest evidence in the
+corpus that the v3 construction rule was producing the conclusion rather than
+the page.** The original prose concludes the page "is dashboard-shaped
+throughout and shows no deliverable", then at a later paragraph describes the
+résumé-diff panels and quotes `+ Shipped distributed React + TS surfaces…` as
+"the green `+` lines of the résumé rewrite". The rater had the deliverable in
+hand and wrote it down.
+
+`real-product-screenshot` stays `present`.
+
+Two corrections to the original, neither moving a signal: row 2 of the
+applications table reads **Linktree**, not "Linkbee"; and the page height
+drifts by load — session 4 measured 9326 with a 3493 pin, this pass measured
+9548/3715 then 9326 on a later probe. A live page, not a capture fault.
