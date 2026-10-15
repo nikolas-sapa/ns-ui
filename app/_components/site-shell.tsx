@@ -606,7 +606,27 @@ export function SiteShell({
   if (bare) return <>{children}</>;
 
   return (
-    <div className="lg:flex">
+    /* `lg:grid` with both tracks declared, NOT `lg:flex`.
+
+       A flex row sizes the content column from its siblings, so the column
+       painted full-width at 1440px and was pushed to 272px once the nav
+       arrived — one layout-shift entry of 0.6804 and a homepage CLS of
+       0.6835, against a 0.1 "good" threshold and a 0.11 previous worst for
+       this repo. Measured: same bytes, nav hoisted to first in the DOM gives
+       CLS 0.0012; nav in its shipped position gives 0.75.
+
+       Hoisting the nav is therefore NOT the fix — see the docblock on <nav>
+       below for why its position is deliberate. A grid gets the content
+       column's geometry from `grid-template-columns` on this element, which
+       is known at first paint, so DOM order stays exactly as it is and no
+       sibling has to have painted first.
+
+       17rem matches the nav's own `w-[17rem]`; `minmax(0,1fr)` is what keeps
+       the old `min-w-0` guarantee that long content cannot blow the track
+       out. Collapsing zeroes the first track (globals.css) rather than
+       reserving it, so this adds no dead space — the trap documented in
+       docs/perf-goal.md section 9. */
+    <div id="site-shell" className="lg:grid lg:grid-cols-[17rem_minmax(0,1fr)]">
       {/* First focusable element on every chrome-wrapped page — jumps a
           keyboard visitor straight past the sidebar's ~300 links to the
           actual page content, instead of tabbing through the whole tree
@@ -663,7 +683,7 @@ export function SiteShell({
         <RailChevron direction="right" />
       </button>
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-col lg:col-start-2 lg:row-start-1">
         {/* The skip link above and the route-change focus effect both target
             this — `tabIndex={-1}` makes it (or, more often, the first `h1`
             inside it) programmatically focusable without adding it to the
@@ -675,16 +695,24 @@ export function SiteShell({
       </div>
 
       {/* DOM order: main content first, sidebar after — visually unchanged
-          because this is the flex container's `lg:order-first` child at lg,
-          and below lg the nav is `fixed` (a drawer), where source order has
-          no layout effect at all.
+          because the grid above places this in column 1 row 1 explicitly
+          (`lg:col-start-1 lg:row-start-1`), and below lg the nav is `fixed`
+          (a drawer), where source order has no layout effect at all.
 
-          The reason is what a crawler sees. This tree is ~230KB of markup
-          for ~300 components x every category it belongs to, and it used to
-          sit ahead of every page's <h1>: the homepage heading landed at byte
-          296,479, past where agents that truncate a fetch stop reading. That
-          is why an agent audit reported "no H1" on a page that has always
-          server-rendered one.
+          Explicit placement replaced `lg:order-first`: `order` only works
+          once the flex/grid container has resolved its siblings, which is
+          precisely the dependency that produced the 0.68 CLS. Grid placement
+          is static.
+
+          The reason this order exists at all is what a crawler sees. This
+          tree is ~230KB of markup for ~300 components x every category it
+          belongs to, and it used to sit ahead of every page's <h1>: the
+          homepage heading landed at byte 296,479, past where agents that
+          truncate a fetch stop reading. That is why an agent audit reported
+          "no H1" on a page that has always server-rendered one. Do not
+          "simplify" this by moving the nav back to first in the DOM — that
+          regresses the audit AND the Tab order, and the grid above means it
+          buys nothing.
 
           It also moves ~300 links out from in front of the content in the Tab
           order; the skip link above stays regardless, since it is still the
@@ -693,7 +721,7 @@ export function SiteShell({
         ref={navRef}
         id="site-nav"
         aria-label="Components"
-        className={`fixed inset-y-0 left-0 z-40 flex w-[17rem] flex-col border-r border-border bg-background transition-[transform,translate,visibility] lg:sticky lg:top-0 lg:order-first lg:h-screen lg:translate-x-0 motion-reduce:transition-none ${
+        className={`fixed inset-y-0 left-0 z-40 flex w-[17rem] flex-col border-r border-border bg-background transition-[transform,translate,visibility] lg:sticky lg:top-0 lg:col-start-1 lg:row-start-1 lg:h-screen lg:translate-x-0 motion-reduce:transition-none ${
           open ? "translate-x-0" : "-translate-x-full invisible lg:visible"
         }`}
       >
