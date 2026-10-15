@@ -138,3 +138,45 @@ agent filesystem tree (`supplier-review-agent/`, `instructions.md`,
 `skills/`, `tools.json`), the adjacent `Example workspace` panel whose rows are
 placeholders (`Acme Holdings`, `Cedar Technologies`, `Northstar Trading`), and
 the `Agent OS` circuit-chip SVG at y7384.
+
+**Two corrections from the change-3 re-score, neither moving a signal.**
+
+The failure-mode table at y9603-10424 has **five** rows, not four: the original
+pass misses `Runaway execution 5.1%` at y10309. The five sum to exactly 100.0%,
+so the undercount hid the fact that it is a complete partition rather than a
+selection.
+
+And a correction to a claim made *about* this page during the v4 change-1 work,
+not in this file: the page does **not** lead with figures. The two largest
+nodes are the 64px prices, but they sit at y4301 — fifth section, roughly 4.8
+viewports and 24% into a 17890px page. The page opens at y213 with a 52px `h1`,
+`Self-improving agents that help you scale.`, beside the hero panel over a
+`Backed by Y Combinator` badge and a logo row. Largest type on the page is not
+the first thing on it. This matters because that measurement feeds
+`type-scale-high-contrast`, which this file scores `absent` and which holds:
+64/52/44 display against 15/13/12 body is an ordinary editorial ramp.
+
+**What makes the numbers credible is that the page grades them and demotes most
+of them.** The AML comparison is labelled `Reported`; the vendor costs are
+`Modeled, not benchmarked` and `Illustrative estimates, not a benchmark.`; the
+failure shares are headed `Industry research, not Grep incident rates.` and
+footed `This is a non-random sample; the shares shown are not production
+failure rates.`; and y15554 cross-references that the modelled costs `are
+separate from the measured AML evaluation in the savings section`. A page
+inventing numbers does not build a taxonomy that downgrades three quarters of
+its own output. The refusals are there too: Google's cost cell is left
+`Unconfirmed / Preview pricing incomplete` rather than filled in, and all six
+vendors get a tick on `Managed execution` and `Execution traces`, competitors
+included. One benchmark line discloses the competitor's own score (81.9%), four
+points off its own.
+
+**`real-product-screenshot` stays `present`, flagged.** The page has **zero
+raster product screenshots**: exactly three raster images above 150x100, all
+618x618 case-study photography, and no raster CSS `background-image`. Every
+product surface is a DOM/SVG rebuild (70 `img`, mostly logos and avatars; 296
+`svg`). So the value holds only on the same convention `clerk-com` holds it on,
+which makes this a **fourth** instance of the change-3b defect the proposal's
+table does not list. Weaker than clerk's, too: clerk mounts its live component,
+whereas grep's panels are page-authored replicas, one of which (`Example
+workspace`) is populated with placeholders `Acme Holdings` / `Cedar
+Technologies` / `Northstar Trading`.
