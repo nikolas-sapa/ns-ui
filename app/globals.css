@@ -320,6 +320,22 @@ html.native-cursor .smooth-cursor {
     display: none;
   }
 
+  /* `display: none` alone is not enough once the shell is a grid: the track
+     is declared on the parent, so it keeps its 17rem whether or not a child
+     occupies it, leaving 272px of dead column. Zeroing the track is what
+     lets the content reflow into the freed space — and zeroing rather than
+     removing is deliberate, so the collapsed state reserves nothing (the
+     trap docs/perf-goal.md section 9 documents).
+
+     This rule is the whole point of the collapsed state working, and a stale
+     `.next` once dropped it from the built CSS while keeping the two
+     `display` rules around it, which looks exactly like the fix not working.
+     If the collapsed sidebar leaves a gap, check the served CSS contains
+     this declaration before changing anything here. */
+  html.sidebar-hidden #site-shell {
+    grid-template-columns: 0 minmax(0, 1fr);
+  }
+
   html.sidebar-hidden .sidebar-restore {
     display: flex;
   }
