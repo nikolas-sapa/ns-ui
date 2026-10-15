@@ -2,7 +2,7 @@
  * Browsable categories — the "I don't know what this library calls things"
  * entry point.
  *
- * There are 166+ distinct tags across the registry and most appear only once
+ * There are 1,100+ distinct tags across the registry and most appear only once
  * or twice, so tag chips would be noise rather than navigation. These 14
  * buckets are the roles a newcomer already has words for.
  *

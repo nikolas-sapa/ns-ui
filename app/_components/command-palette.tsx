@@ -88,7 +88,7 @@ export function CommandPalette({
     const q = query.trim().toLowerCase();
     if (!q) {
       // Empty query: the routes are the useful "where can I go" list —
-      // 298 components with no filter would just be the catalog in
+      // 542 components with no filter would just be the catalog in
       // registry order, not a meaningful default.
       return ROUTES.slice(0, MAX_RESULTS);
     }
