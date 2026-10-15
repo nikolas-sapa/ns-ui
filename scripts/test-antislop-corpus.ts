@@ -69,3 +69,81 @@ test("the artifact-not-dashboard rename is complete", () => {
     );
   }
 });
+
+// v4 change 3b renamed `real-product-screenshot` to `real-product-surface`
+// (addendum hole 6). The old name keyed the signal to a FORMAT when the thing
+// worth recording is GENUINENESS: it credited a CAPTURED UI while
+// `hero-mockup-float` penalised a FAKE one, leaving REAL BUT UNCAPTURED with
+// no slot. Four files paid for that at n=42 — financial-datasets (every
+// surface a live DOM rebuild, three instruments confirming no raster UI
+// exists), railway-com (all five product visuals SVG with live `<text>` and
+// zero `<image>`) and grep-ai (page-authored replicas) all read `absent`
+// while plainly showing their product, and clerk-com held `present` only on
+// the convention.
+//
+// This guards the rename, not a constraint. The re-pass that sets values
+// against the new wording is separate, exactly as change 3's rename preceded
+// its re-score.
+test("the real-product-screenshot rename is complete", () => {
+  assert.ok(
+    (ALL_SIGNALS as readonly string[]).includes("real-product-surface"),
+    "real-product-surface must be in the vocabulary",
+  );
+  assert.ok(
+    !(ALL_SIGNALS as readonly string[]).includes("real-product-screenshot"),
+    "real-product-screenshot was renamed to real-product-surface and must not survive",
+  );
+  for (const f of files()) {
+    const e = read(f);
+    assert.ok(
+      !("real-product-screenshot" in e.signals),
+      `${f}: still carries the old signal name real-product-screenshot`,
+    );
+    assert.ok(
+      "real-product-surface" in e.signals,
+      `${f}: missing real-product-surface`,
+    );
+  }
+});
+
+// The spec that applies change 3b states the signal's distribution in prose
+// ("21 `present`, 20 `absent`, 1 `unresolved`"). Session 4's stitcher taught
+// the rule the hard way: A DERIVED ARTEFACT NEEDS AN INVARIANT TYING IT BACK
+// TO ITS SOURCE. That document already drifted once — it was written with 17
+// `absent`, restated the stale figure two lines later, and the only detector
+// was a human recounting by hand.
+//
+// So the prose is the derived artefact and the front-matter is the source.
+// This fails if either moves without the other, which is what the 20-file
+// re-pass is about to do on every flip.
+test("the spec's stated signal distribution matches the corpus", () => {
+  const spec = readFileSync(
+    join(import.meta.dirname, "../docs/superpowers/specs/2026-10-15-holes-7-and-2-applied.md"),
+    "utf8",
+  );
+  const stated = spec.match(
+    /\*\*(\d+)\*\* files read `absent`\s+today, against (\d+) `present` and (\d+) `unresolved`/,
+  );
+  assert.ok(stated, "spec must state the real-product-surface distribution");
+  const [, sAbsent, sPresent, sUnresolved] = stated;
+
+  const actual = { present: 0, absent: 0, unresolved: 0 } as Record<string, number>;
+  for (const f of files()) {
+    const v = read(f).signals["real-product-surface"];
+    assert.ok(v in actual, `${f}: illegal real-product-surface value ${v}`);
+    actual[v] += 1;
+  }
+
+  assert.equal(
+    actual.present + actual.absent + actual.unresolved,
+    files().length,
+    "every file must carry exactly one legal real-product-surface value",
+  );
+  assert.equal(Number(sPresent), actual.present, "spec `present` count is stale");
+  assert.equal(Number(sAbsent), actual.absent, "spec `absent` count is stale");
+  assert.equal(
+    Number(sUnresolved),
+    actual.unresolved,
+    "spec `unresolved` count is stale",
+  );
+});

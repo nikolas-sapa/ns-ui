@@ -3,7 +3,11 @@
 Date: 2026-10-15
 Follows: `2026-10-14-vocabulary-v4-proposal.md` change 3, applied in
 `cde24c02` (mechanism) and `04ca89d9` (five re-scores).
-Status: **findings, not decisions.** Nothing here is applied.
+Status: **findings, not decisions.** Nothing here was applied when written.
+**Holes 7, 2 and 1 are now applied, and hole 3 closed as a side effect, in
+`2026-10-15-holes-7-and-2-applied.md`.** That document also measures what
+the new wording contradicts: six applied `present` values, none of them
+changed. The other findings stand as written.
 
 Change 3 dropped the exclusivity between `real-product-screenshot` and
 `shows-deliverable` and renamed the latter. Seven raters then re-scored the
@@ -18,6 +22,11 @@ most likely to undo the fix.
 ---
 
 ## 1. "Real refusals" is load-bearing and undefined
+
+> **APPLIED** with hole 2, which cannot be stated without it. It bit the file
+> that supplied the example: two of `neuron-industries`'s four refusals are
+> capabilities withheld from the cheap tier, i.e. "Enterprise only" in
+> disguise.
 
 The v3 example is "a priced comparison **with real refusals**." The refusal
 clause is doing the work of separating a deliverable from a pricing grid, and
@@ -39,6 +48,13 @@ all six vendors ticked on `Managed execution`, competitors included.
 
 ## 2. The definition still conflates two axes — the same defect change 3 fixed
 
+> **APPLIED** in `2026-10-15-holes-7-and-2-applied.md`, as
+> railway-com's test plus a procedure: *name the entry that could have
+> embarrassed the vendor.* Thirteen auditors showed the refusal clause does
+> essentially all the discriminating and "whose work" separates one file alone.
+> "Audit" had to be disambiguated — three of thirteen read it as provenance,
+> which silently annexes hole 8.
+
 `neuron-industries`'s rater again, and this is the sharpest of the six. The
 v3 examples are not the same kind of thing:
 
@@ -54,6 +70,11 @@ the screenshot/deliverable conflation survived to n=42.
 files of the 23 will be scored against whichever reading the next rater infers.
 
 ## 3. The collapse hazard, stated as a steelman
+
+> **CLOSED** by hole 2's wording, with no clause of its own. The test is content
+> that could count against the vendor, so a well-populated UI shot earns nothing
+> for being well populated. Note the consequence for this very file: audited
+> against the applied wording, `modal-com` FAILS, and this steelman is why.
 
 `modal-com`'s rater argued the opposite case against their own verdict, which
 is the most useful thing in this addendum.
@@ -104,6 +125,18 @@ self-disclosed illustration `absent` is penalising the disclosure. Probably the
 right answer is `absent` for the signal plus a note, but it needs deciding
 rather than inferring.
 
+> **RENAME APPLIED** in `2026-10-15-holes-7-and-2-applied.md`:
+> `real-product-screenshot` → `real-product-surface` across the vocabulary, all
+> 42 evidence files and a new guard test (83 tests, proven failable). **No value
+> moved with the rename** — the re-pass that sets values against the new wording
+> is separate, as change 3's rename preceded its re-score. Note a scope gap the
+> hole as written does not cover: the motivating cases (`financial-datasets`,
+> `railway-com`) currently read **`absent`**, so a re-pass limited to the
+> files carrying the signal (22 now: 21 `present` + 1 `unresolved`; the "23"
+> below predates change 3's re-scores) would miss them. **20** files read
+> `absent`, and those are the ones a widened definition endangers. The widened definition puts
+> every `absent` file at risk of being wrong, not just the ones holding it.
+
 ## 6. Change 3b — `real-product-screenshot` is keyed to format, not genuineness
 
 Two raters reached this independently, and the count is now **four instances**,
@@ -133,6 +166,12 @@ a faithful live rebuild, failed by a stylised or invented UI. Scores
 built for, a glassy fake dashboard floating in a hero.
 
 ## 7. The definition names two positions and pages occupy a third — and this one interacts with change 4
+
+> **APPLIED** in `2026-10-15-holes-7-and-2-applied.md`, as the
+> proposed clause plus an explicit block on the change-4 inversion. The 16
+> untouched files get **no standalone re-pass**: zero of them mention the word
+> *deliverable*, and all 16 are a strict subset of hole 6's re-pass set, so the
+> question folds into that one capture.
 
 Found by `tsenta`'s rater, reported last, and it is the hole most likely to
 undo the fix.
@@ -251,13 +290,16 @@ un-deferring it, on one file.
 
 ## Recommended order
 
-0. **Hole 7** — it can reinstate v3's wrong answer by the opposite route, and
-   it mis-interacts with change 4, which is already applied. One clause.
-1. **Hole 2** (which axis the signal is on) — everything else is downstream of
-   it, and the 16 untouched files will be scored against whichever reading the
-   next rater infers.
-2. **Holes 1, 3, 4** — one sentence each into the notes column. Cheap, and each
-   prevents a specific rater split that has already nearly happened.
+~~0. **Hole 7**~~ — **DONE.** ~~1. **Hole 2**~~ — **DONE.** ~~Holes 1, 3~~ —
+**DONE** (1 applied with 2; 3 closed by it). Hole 4 was already applied.
+See `2026-10-15-holes-7-and-2-applied.md`.
+
+**0. Re-rate the six files that wording contradicts** — three FAILS
+   (`modal-com`, `sentient-os`, `truemile`) and three TENSION (`papaya`,
+   `browserbase-com`, `the-subvocal-company`), one file per rater from a fresh
+   capture. `modal-com` and `sentient-os` carry `real-product-screenshot:
+   present` and so sit inside hole 6's set — fold those two into that capture.
+   The other four carry it `absent` and are standalone.
 3. **Hole 6** (`real-product-surface`) — now **urgent rather than optional**.
    Three files read `real-product-screenshot: absent` while plainly showing
    their product (`financial-datasets` rebuilt live, `railway-com` drawn in

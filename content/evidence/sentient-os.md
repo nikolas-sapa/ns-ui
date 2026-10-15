@@ -27,8 +27,8 @@ signals:
   type-scale-high-contrast: absent
   editorial-grid-break: present
   custom-type-pairing: present
-  real-product-screenshot: present
-  shows-deliverable: present
+  real-product-surface: present
+  shows-deliverable: absent
   density-variation: present
   one-accent-discipline: absent
   live-claim-control: absent
@@ -399,3 +399,55 @@ page shows the product declining, failing or costing. Read as "shows output
 rather than chrome" this is present; read as "shows evidence the vendor is
 accountable for" it is absent. The stricter reading is not currently written
 into the signal.
+
+**v4 hole-2 re-score — `shows-deliverable` present → absent.** The stricter
+reading above is now written into the signal, so the question the paragraph
+above left open is answerable, and the answer is the one that paragraph
+predicted. The signal now asks whose work the artefact shows and whether a
+reader can audit it against the vendor's interest, with the operative test:
+name the entry that could have embarrassed the vendor.
+
+On this page there is none, and that is measured rather than argued. A text
+sweep of all 14803px, with the deck dwelled through 14 cycles so every one of
+the six cards was sampled, returns **zero** matches for fail, error, denied,
+unable, cannot, retry, timeout, declined, blocked, insufficient, unavailable,
+quota or incorrect. The page is not silent on limits in prose — *"Sentient can
+prepare suggestions overnight, but it waits for your approval before acting on
+them"* — but a design choice to ask permission is not an entry that could have
+come out against the vendor, and no artefact on the page carries a cost, a
+refusal or a failure.
+
+The one piece of evidence that pointed the other way is disproven rather than
+left standing. A rater reported a failed tool call in the status bar of
+`job-application-demo.mp4` (662x388 at y8182) — content a text sweep cannot
+see, since it is inside video. Stepping that 7.8s clip at 16 points and reading
+every status bar gives the full tool sequence: `get_app_state started…` →
+`set_value (completed)…` → `set_value (completed)…` → `click started…` →
+`click (completed)…` → `get_app_state (completed)…` → `click (completed)…`,
+closing on `Remembering Career and Reco…k and Projects/`. Seven calls, every
+one started or completed, **no failure state in any frame**. The pill carries a
+red-magenta gradient glow, which is what reads as an error at a glance. The run
+also succeeds on its own terms: at t3.90 the résumé field still reads `Choose
+File | no file selected`, and by t7.31 the form is complete with `Aditya
+Resume.pdf` attached, `Palo Alto, California, USA` and `3-5 years` filled in.
+
+So the three candidate artefacts fail the test for three different reasons, and
+no fourth candidate exists. The README pane is badged `Example` in its own
+title bar with `5 example files · Plain Markdown` / `Personal details omitted`
+in its footer — the page's own admission that every value in it was chosen,
+which is honest and is why `scroll-reveal-blank` and the honesty reading stay
+intact, but a chosen value cannot embarrass the chooser. The deck is six cards
+of invented scenario with a named cast, each resolving to a win. The demo video
+is the product's own work on a real job and is the strongest of the three, but
+it has no axis on which it could have gone wrong: a success-only trace with no
+partial extraction, no blocked page and no declined action.
+
+Note what does **not** carry the signal, against the temptation to count it:
+`RENEWS TOMORROW · $119` is checkable against Canva's real price list, but it
+audits a third party's published price, not this product's output on a job. The
+precedent excluding odometers excludes it for the same reason.
+
+`real-product-surface` is unaffected and stays `present` — three genuine screen
+recordings, `homescreendemo-1.mp4` over a real `mail.google.com/mail/u/1/#inbox`
+URL. The two axes still separate as cleanly as the change-3 pass found; it is
+only the deliverable half that moves. Verdict stays `mixed`.

@@ -88,15 +88,19 @@ const STEP = 700, SETTLE = 900, MAX = 60;
   const deepest = landings.reduce((m, l) => Math.max(m, l.landed), 0);
   const reached = deepest + 900;
   const clamped = reached < height - 50;
-  console.log(JSON.stringify({
+  const walk = {
     slug, docH_before: probe.docH, docH_after: after,
     scroller: sel || 'window', walkHeight: height, tiles: n,
     // CLAMPED means the capture is incomplete and the tiles lie. Do not stitch
     // or rate from it: re-walk with wheel events (p.mouse.wheel) instead.
     clamped, reachedPx: reached, coverage: +(reached / height).toFixed(3),
     innerCands: probe.cands,
-  }));
+  };
+  // Persist beside the tiles. stitch.py reads walkHeight and `clamped` from
+  // here, so a parallel rater never hand-edits a shared slug->height map --
+  // 26 agents editing one dict is a merge conflict, not a measurement.
+  fs.writeFileSync(outdir + '/walk.json', JSON.stringify(walk, null, 2));
+  console.log(JSON.stringify(walk));
   if (clamped) console.error(`CLAMPED: reached ${reached}px of ${height}px (${Math.round(100 * reached / height)}%) — tiles are incomplete, re-walk with wheel events`);
-  await b.close();
   await b.close();
 })();
