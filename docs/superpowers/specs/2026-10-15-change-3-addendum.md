@@ -172,6 +172,64 @@ in both directions.
 ways and the signal is binary, so the corpus cannot distinguish it from a page
 with one readable chart. Not a reason to hold anything.
 
+## 8. The missing axis: is the deliverable's content sourced or fabricated?
+
+Recorded by `railway-com`, for the second time by that file, and it is the one
+hole change 3 *created* rather than exposed.
+
+Splitting medium from content is right. But Railway's deliverable — an error-log
+table whose decisive row is
+`Error: No route matches URL "//test/wp-includes/wlwmanifest.xml"`, a WordPress
+scanner probing a non-WordPress app — is **rendered in vector, not captured**.
+All five of that page's product visuals are SVG with live `<text>` and zero
+`<image>` elements.
+
+So a page could hand-draw a convincing artefact, score `shows-deliverable:
+present`, and have `real-product-screenshot` correctly record that nothing was
+captured — and **the two axes would read as contradicting each other rather
+than as the precise finding they are.**
+
+The rater's belief that Railway's content is real rests on a single telling
+detail: nobody invents a `wlwmanifest.xml` probe for a mockup. That is a sound
+inference and **the vocabulary gives no way to record it.** The same page
+recorded the same shape of gap the first time it was studied.
+
+**The missing axis is sourced versus fabricated content.** Note it is not the
+same as hole 6: hole 6 asks whether the *medium* was captured or rebuilt; this
+asks whether the *content* came from somewhere real. `tsenta` shows why both
+are needed — its rater found the content coherent across four surfaces spanning
+4,300px and *still* caught three fabrication tells (a miscounted word claim, a
+transposed score order, a clock-seeded log), none of which any current signal
+can hold.
+
+## 9. Precedent set: a vendor-aggregate counter is not a deliverable
+
+Not a hole, a ruling, recorded here because it is cohort-wide precedent and was
+the hardest call in the batch.
+
+`railway-com`'s split-flap board was **verified genuinely live** — a runtime
+fetch to `backboard.railway.com/graphql/internal?q=publicStats` returning
+`totalDeploymentsLastMonth: 209533282`, with field names matching the subhead's
+cumulative-versus-windowed split and values ticking against a read 15 minutes
+earlier. It clears the live-telemetry bar and is **still `absent`.**
+
+The discriminating test, which is the most useful thing to come out of this
+pass: **whose work does the artefact show, and can a reader audit it against
+the vendor's interest?** All three v3 exemplars pass — a priced comparison with
+real refusals contains content against the vendor; a claims ledger enumerates
+assertions so each can be checked; a force-vs-time chart is one unit of the
+product doing its job. Every row of Railway's board can only flatter by being
+larger, no entry can embarrass, and the 209 million deployments are things
+Railway's *customers* did.
+
+The counter nearly wins and is on record: unit-digit precision and liveness make
+`209,533,282` falsifiable in a way `218.7M+` is not. But those are properties of
+the **rendering**, not of the content's relation to the reader.
+
+**Otherwise every odometer scores `present` and the signal collapses into "has a
+nice number"** — useless for re-sorting the 23 files. This test is a strong
+candidate for the hole-2 wording.
+
 ---
 
 ## Two observations outside the six
@@ -200,20 +258,31 @@ un-deferring it, on one file.
    next rater infers.
 2. **Holes 1, 3, 4** — one sentence each into the notes column. Cheap, and each
    prevents a specific rater split that has already nearly happened.
-3. **Hole 6** (`real-product-surface`) — a rename plus a re-pass on the 23
-   files carrying `real-product-screenshot`. Its own change, now with four
-   supporting files.
+3. **Hole 6** (`real-product-surface`) — now **urgent rather than optional**.
+   Three files read `real-product-screenshot: absent` while plainly showing
+   their product (`financial-datasets` rebuilt live, `railway-com` drawn in
+   vector, `grep-ai` page-authored replicas), and a fourth (`clerk-com`) holds
+   `present` only on the convention. A rename plus a re-pass on the 23 files
+   carrying the signal.
+4. **Hole 8** (sourced vs fabricated content) — the one change 3 created. Needs
+   a new axis, not a reworded one.
 4. **Hole 5** — needs a decision, not a measurement. Lowest urgency; no file
    currently turns on it.
 
-## Still outstanding from the re-score
+## The re-score is complete
 
-`railway-com` alone. It is the precedent file for whether live platform
-telemetry counts as a deliverable — a split-flap board showing real aggregate
-throughput — and that question is a sub-case of hole 2. Its value is left
-untouched rather than guessed.
+**All seven reported. `shows-deliverable` went 7/42 → 14/42 present.**
 
-`tsenta` has since reported `present` and is applied. Its file had
+`railway-com` landed last and scored `present` on its **error-log table**, not
+on the split-flap board it was dispatched to adjudicate — see finding 9 for the
+board ruling. It also forced one orchestrator call: its
+`real-product-screenshot` flips to `absent` for consistency with
+`financial-datasets`, flipped on the same fact pattern in the same pass. Both
+pages *show* their product UI and neither *captures* it, and v3's wording is
+"shown as a real screenshot". Applying the letter to one file and not the other
+would be arbitrary.
+
+`tsenta` reported `present` and is applied. Its file had
 **contradicted itself** — concluding the page "shows no deliverable", then
 later describing the résumé-diff panels and quoting their green `+` lines. The
 rater had the deliverable in hand and wrote it down. That is the cleanest
