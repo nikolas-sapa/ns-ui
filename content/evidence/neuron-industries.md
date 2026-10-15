@@ -28,7 +28,7 @@ signals:
   editorial-grid-break: present
   custom-type-pairing: absent
   real-product-screenshot: present
-  shows-deliverable: absent
+  shows-deliverable: present
   density-variation: present
   one-accent-discipline: present
   live-claim-control: absent
@@ -324,3 +324,46 @@ net to -1 and confirms `mixed`; flipping `single-optical-anchor` to present
 (if the wireframe is read as subordinating the hero's other three masses)
 takes it to -3 and makes `exemplar` arguable. Both are judgments on the same
 first viewport and both are stated above with their coordinates.
+
+**v4 change 3 re-score — `shows-deliverable` absent → present.** Re-rated from
+a fresh walk (20 tiles, `clamped: false`, `coverage: 1.0`) by a rater given the
+page and the new independent-axis rule, not this file's prose.
+
+The priced two-up under "Two configurations." (h2 y≈9860) is the vocabulary's
+first worked example — "a priced comparison with real refusals" — verbatim, and
+in no app chrome at all, so the exclusivity was the only thing suppressing it.
+Cortex Mini $2,950 against Cortex $6,450 (y≈10398, each annotated `ONE-TIME ·
+SOFTWARE INCLUDED · ZERO RUNTIME LICENSES`), 1000 vs 4000 Hz max scan, 10 vs
+2.5 µs max jitter, 3 vs 0.5 µs P99.9, `Soft real-time` against `Hard
+real-time`.
+
+The refusals are what separate it from a spec sheet, and they cost the vendor
+something: `Motion: EtherCAT only` on the cheap unit (spec table, y≈11171);
+`Certifications: UL + CE (planned)` on **both** columns, flagship included,
+with the row kept rather than omitted (y≈11390); `Soft real-time` naming the
+weaker class in plain words; CPU/GPU/NPU identical across both columns
+(`ARM A72 Quad + A53 Quad`, `Mali-G52 MC3`, `6 TOPS`) with `Data protocols` and
+`Database support` merged, so the table declines to manufacture
+differentiation where none exists; and `Specifications reflect current
+production targets and are subject to change` plus `Launch windows are
+estimates` at the point of sale, for a product that ships Q1-Q2 2027.
+
+Two corrections to the ranges above: the block runs to the disclaimer at
+y≈11610, not y11400 — the `COMPUTE` sub-band at y≈11418-11573 is inside it.
+And the two-up's own Motion row reads plain `EtherCAT` (y≈10350); the "only"
+that makes it a refusal is in the spec table row.
+
+A second candidate was found and **discounted**: the unit-tests panel
+(y≈5822-6213) is the vocabulary's *third* worked example, a force/temp-vs-time
+curve with an `80.0 °C threshold` line and a timestamped assertion log
+(`t+2.412 s TT_201 crosses 80.0 °C ↑`, `RESULT · PASS  3 assertions · 512
+cycles simulated`). The page captions it itself at y≈6232, 11px mono:
+`ILLUSTRATION: EACH BEHAVIOR BECOMES ONE ISOLATED, TIMED TEST`. Self-disclosed
+as composed, so it is an honest drawing of a result rather than a measured one,
+and the score does not rest on it.
+
+`real-product-screenshot` stays `present`, confirmed directly: nine 789x350
+panels with full app chrome — traffic-light dots, a `synapse · i/o config · 32
+fieldbus channels` title bar, a `● LIVE CONTROLLER` chip, a nine-tab strip, and
+`IDLE  Outputs held safe · machine cannot move`. Both axes fire, which is now
+expressible.

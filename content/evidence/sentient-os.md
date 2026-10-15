@@ -28,7 +28,7 @@ signals:
   editorial-grid-break: present
   custom-type-pairing: present
   real-product-screenshot: present
-  shows-deliverable: absent
+  shows-deliverable: present
   density-variation: present
   one-accent-discipline: absent
   live-claim-control: absent
@@ -345,3 +345,57 @@ real and strictly enforced, the product is shown working inside real third-party
 applications under user-controlled playback, and the density range across the page
 spans 100:1. This is a well-made page with an undisciplined palette and a scroll
 gate, which is what `mixed` is for.
+
+**v4 change 3 re-score — `shows-deliverable` absent → present.** Re-rated from
+a fresh walk (22 tiles, `clamped: false`, `coverage: 1.0`, `animations:
+'disabled'` retained) plus a DOM text probe, so the call rests on what the page
+says rather than on pixels.
+
+The two artefacts are **live DOM, not pictures of documents**, and on this page
+the two axes separate about as literally as they can: the media inventory is
+empty between the y2528 canvas and `grades.svg` at y7448, and empty across
+y9600-10700. The deliverables are rendered text; the screenshots are three
+separate mp4s elsewhere.
+
+The `README.md` knowledge pane (y6356-6990, a 660px column at x=399) carries
+three sections and two sub-headings of actual generated knowledge, with four
+inline live cross-links and a connected-notes rail. Substance, not filler:
+*"A chip's advertised capability matters less than which accelerators software
+can actually use. A larger model is not automatically preferable if a smaller
+one responds sooner, fits the available memory, and produces useful results."*
+
+The proactive deck (y10077-10356, x795-1170) cycles six cards on a timer, each
+with a source, a reasoning chain, a priced or dated specific and a proposed
+action — `THIS WEEKEND · COMPUTER USE` / *"$30, two hours, gets in at 11 AM,
+right as your hotel check-in opens"* → "Shall I book it for you?";
+`RENEWS TOMORROW · $119` on a Canva Pro subscription, which is that product's
+real annual price.
+
+**On the honesty test, which is why this is present and not a plausible fake:**
+it is not lorem — readable values, internally consistent reasoning, no empty
+state — and it is not a live run either, and the page says so rather than
+hiding it. An `Example` badge sits in the window title bar (y6356, x302) and
+the footer reads `5 example files · Plain Markdown` / `Personal details
+omitted`. The README's third person ("Their interests", "They care") is that
+de-identification showing through. Nothing is passed off as a capture.
+
+Two corrections to the above: the footer reads **5** example files, not three;
+and "four real paragraphs" undercounts — there is a third section,
+"Communication and taste", at y6976, below where the session-4 strip crop
+ended.
+
+`real-product-screenshot` stays `present`: three real screen recordings,
+including `homescreendemo-1.mp4` (753x523 at y895) over a real Gmail thread
+showing an actual `mail.google.com/mail/u/1/#inbox/...` URL.
+
+**Where the new definition still strains, recorded because the rater could not
+resolve it and neither can this file.** "A generated artefact with real
+content" cannot separate a de-identified real output from designer-written copy
+in output format, and on this page it is genuinely undecidable which the README
+is — both land `present`. The v3 definition's other examples carry a vendor
+accountability these artefacts lack: every card is a win in an invented
+scenario with a named cast (Carl, Jake, Denver, Hawaii), and nothing on the
+page shows the product declining, failing or costing. Read as "shows output
+rather than chrome" this is present; read as "shows evidence the vendor is
+accountable for" it is absent. The stricter reading is not currently written
+into the signal.

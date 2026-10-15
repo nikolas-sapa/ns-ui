@@ -27,8 +27,8 @@ signals:
   type-scale-high-contrast: present
   editorial-grid-break: absent
   custom-type-pairing: present
-  real-product-screenshot: present
-  shows-deliverable: absent
+  real-product-screenshot: absent
+  shows-deliverable: present
   density-variation: present
   one-accent-discipline: present
   live-claim-control: present
@@ -276,3 +276,79 @@ names its variant. The probe's `pcsRules: 0` is misleading and would read as "no
 theme" if taken at face value. There are no `prefers-color-scheme` CSS at-rules because
 the dark variant is class-based, 12 `dark:` hooks with the class flipped from the media
 query in JS.
+
+**v4 change 3 re-score — BOTH signals flip.** `shows-deliverable` absent →
+present, and `real-product-screenshot` present → **absent**. This file's
+original prose predicted exactly this ("the letter of the definitions gives the
+reverse of what I scored"); it holds on inspection. Re-rated from a fresh walk
+(9 tiles, `clamped: false`, `coverage: 1.0`).
+
+**`shows-deliverable`: the claims ledger at y1416 (894x263) is the v3
+definition's own named example rendered literally, with the column labelled
+`Citation`.** Header `Metric | Type | Period | Value | Citation`, eight rows,
+each with an out-link glyph on a 33px pitch. And the derivation is auditable
+inside the row — Value is normalised, Citation is the raw source string in
+thousands: `$89.0B` ← `"Data Center $89,023"`, `$48.7B` ← `"Hyperscale
+48,710"`, `$64.0B` ← `"Non-GAAP operating income* $63,956"`. A reader can check
+the arithmetic without leaving the page. Not a UI implying a deliverable: the
+deliverable with its provenance.
+
+Four more, any one of which carries the signal alone. A five-era table at y1922
+(`Item | 2025 | 2020 | 2015 | 2010 | 2005`, Revenue $402.8B → $6.1B, operating
+margin 32.0/22.6/25.8/35.4/32.9%). A 10-K excerpt pane at y2468, five rows all
+Item 7, including 2021 *"Revenues were $257.6 billion, an increase of 41%."* An
+accuracy benchmark at y3987 on a 95-100% axis publishing the page's own worse
+past numbers (Earnings 97.50 → 99.99, Segmented Financials 96.10 → 99.96)
+beside a stated methodology: *"Sample: 1,000 companies across 75 sectors,
+20,000 data points verified per audit cycle"* and *"A value is accurate if it
+exactly matches the figure reported in the source document."* And an API
+payload at y4863 carrying `"accession_number": "0000320193-25-000079"` with a
+live `filing_url` to sec.gov — externally falsifiable.
+
+**`real-product-screenshot`: there is no screenshot of any interface on this
+page.** Not a judgement call — three instruments that fail differently all
+agree.
+
+1. *Network log*, every `image/*` response after a full walk so reveal-gated
+   assets fetch: **five of 59 requests.** Four are logos (two wordmark SVGs, a
+   YC mark, a Google G). The only non-logo raster is the hero at y167, an
+   isometric stock-exchange diorama — a city block, not an interface, with no
+   screen, window or panel in it. Its `STOCK EXCHANGE` pediment lettering is
+   live DOM over the image, not baked in.
+2. *DOM walk* over img / picture source / svg / canvas / video / object /
+   embed / iframe plus computed `background-image`, `mask-image`,
+   `border-image-source`, `list-style-image` and `content` on every element:
+   **0 canvas, 0 video/object/embed/iframe, 0 CSS `url()`, 0 `data:` image
+   URIs.** Zero CSS background images on a 5758px page of this density is
+   itself the finding — every surface is markup and text.
+3. *Inline SVG census*, checked for traced-UI signatures rather than counted:
+   37 inline `svg`, largest **20x20**, maximum 4 DOM nodes in any one, **0
+   containing `<text>`, 0 containing `<image>`.** All 37 are Lucide glyphs. A
+   vector-traced UI carries hundreds of rects and texts; nothing here is within
+   two orders of magnitude.
+
+So under v3's wording — "the product's UI shown as a real screenshot" — the
+page satisfies no part of it, independently of the exclusivity. Its product
+surfaces are real buttons, real tabs, a real `readOnly: false` textarea and
+real Shiki highlighting.
+
+Three factual corrections to the original prose, none of which moves a signal:
+the hero is **AVIF**, not WebP (`financial-district-light-800.avif` via
+`<picture><source>`; the WebP survives only as the never-decoded dark-variant
+fallback, so the point about the filename naming its variant holds either way);
+the live inline-SVG count is **37**, not 18, four of them 0x0 inside the
+collapsed mobile menu; and the stats row now reads **27,463** stocks covered
+against the file's 27,529, a live figure 24h apart, which matters because that
+row is cited as evidence under `three-card-row`.
+
+**Change 3b candidate, raised by this page and recorded here.** Post-fix the
+craft row reads `real-product-screenshot: absent`, which scans as "did not show
+its real product" — when this page showed its real product *harder* than a
+screenshot can: interactive, selectable, accessible, theme-aware, and
+structurally incapable of being a stale or doctored capture. The signal is
+keyed to file format rather than to genuineness, and that leaves an asymmetry:
+`hero-mockup-float` penalises a fake UI, `real-product-screenshot` credits a
+captured UI, and nothing covers **real but uncaptured**. A `real-product-
+surface` framing — satisfied by either a genuine capture or a faithful live
+rebuild, failed by a stylised or invented UI — would score this page correctly
+and still catch the slop case the signal was built for.
