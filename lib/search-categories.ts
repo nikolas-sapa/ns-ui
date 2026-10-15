@@ -356,7 +356,7 @@ export const CATEGORIES: Category[] = [
 /**
  * name -> the category ids it belongs to.
  *
- * Most components in the registry currently land in at least one, verified
+ * Every component in the registry currently lands in at least one, verified
  * by running this against every `meta.json` — but that is a measured fact
  * about today's registry, not a guarantee the rules provide. A new component
  * whose tags name a role no bucket matches gets an empty array and vanishes

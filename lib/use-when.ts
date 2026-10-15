@@ -2,7 +2,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 
 /**
- * `useWhen` — the one-line "pick this when…" note most components carry in
+ * `useWhen` — the one-line "pick this when…" note 529 of 542 components carry in
  * meta.json. build-registry.ts deliberately does NOT copy it into
  * registry.json (it is guidance for humans and agents, not install data), so
  * the landing page reads it off disk at build time, the same way /changelog
