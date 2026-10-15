@@ -80,7 +80,7 @@ export const CRAFT_SIGNALS = [
   "editorial-grid-break",
   "custom-type-pairing",
   "real-product-screenshot",
-  "artifact-not-dashboard",
+  "shows-deliverable",
   "density-variation",
   "one-accent-discipline",
   "live-claim-control",

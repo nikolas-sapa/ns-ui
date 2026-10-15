@@ -150,41 +150,72 @@ state whether "one mass dominates because there is only one mass" counts.
 
 ---
 
-## Change 3 — split the screenshot / artifact pair onto one axis
+## Change 3 — the screenshot / deliverable axis
 
-The sharpest gap in the batch, found independently by three raters. The two
-signals were declared mutually exclusive "by construction, not by defect."
-They are not mutually exclusive, because **they are not defined over the same
-axis**: `real-product-screenshot` is defined on a *capture medium* and
-`artifact-not-dashboard` on *content*.
+**Status: the mechanism is APPLIED. The affected values are being re-scored
+by independent raters and land separately.**
 
-Four files break it in four different directions:
+### What was wrong
 
-| file | what it ships | current scoring | problem |
+The two signals were declared mutually exclusive "by construction, not by
+defect." They are not mutually exclusive, because **they are not defined over
+the same axis**: `real-product-screenshot` is defined on a *capture medium*
+and `artifact-not-dashboard` on *content*.
+
+Four files break it in four directions:
+
+| file | what it ships | old scoring | problem |
 |---|---|---|---|
-| `financial-datasets` | **no screenshot at all** — every surface is a live DOM rebuild, rendering a literal `Metric / Type / Period / Value / Citation` ledger | screenshot present, artifact absent | the letter of both definitions gives the reverse |
-| `neuron-industries` | a priced comparison with real refusals — $2,950 vs $6,450, 1000 vs 4000 Hz, `UL + CE (planned)` — which is the vocabulary's **own worked example** | artifact absent | suppressed because the page also ships 9 IDE screenshots |
+| `financial-datasets` | **no screenshot at all** — every surface a live DOM rebuild, rendering a literal `Metric / Type / Period / Value / Citation` ledger | screenshot present, deliverable absent | the letter of both definitions gives the reverse |
+| `neuron-industries` | a priced comparison with real refusals — $2,950 vs $6,450, 1000 vs 4000 Hz, `UL + CE (planned)` — the vocabulary's **own worked example** | deliverable absent | suppressed because the page also ships 9 IDE screenshots |
 | `dipole-labs` | nothing — no die shot, loss curve, latency figure or port count, on a page claiming to beat "the physical limits of silicon" | both absent | identical scoring to a page floating a fake dashboard |
 | `the-subvocal-company` | eyewear; there is no UI to screenshot | screenshot absent | reads as a deficiency when it is a category fact |
 
-**Proposed, from the `neuron-industries` rater:** two signals over one axis.
+### What was applied
 
-- `shows-deliverable` (craft) — the page shows the thing the product
-  produces. Scoreable independently; no exclusivity.
-- `dashboard-instead-of-deliverable` (slop) — the page shows its own UI
-  *in place of* what the product produces. The actual discriminator, and the
-  thing the spec meant by calling `artifact-not-dashboard` its strongest
-  signal.
+- **`artifact-not-dashboard` is renamed `shows-deliverable`.** The old name
+  encoded the exclusivity in the name — "not a dashboard" is a claim about
+  the other signal. The new name names only its own content.
+- **The exclusivity is dropped.** It lived in exactly one place, a test in
+  `scripts/test-antislop-corpus.ts`, now replaced by a test that guards the
+  rename instead of the constraint. Verified it can fail: reintroducing the
+  old name on one file fails 3 of 82 tests.
+- All 42 files carry the new key.
 
-Plus a `materials` entry, not a signal, for "no UI exists" (hardware,
-eyewear, a dataset) so a category fact stops reading as a failure.
+The scoring rule is now: **score the medium and the content independently. A
+page that shows both scores both.** A deliverable rendered inside app chrome
+still counts — the chrome is the medium, which `real-product-screenshot`
+already records, and the content is what `shows-deliverable` scores. A UI that
+merely *implies* a deliverable without showing one is `absent`.
 
-**Impact: this is the expensive one.** It renames two signals and changes
-what they mean, so all 42 files need a re-pass on both. 23 files score
-`real-product-screenshot` present and 7 score `artifact-not-dashboard`
-present. Do not apply this one piecemeal.
+Note this does not cancel the global product-surface scope rule from change
+4. That rule stops *marketing* signals being scored off product chrome. It
+does not mean a deliverable shown inside product chrome cannot count.
 
----
+### What is NOT applied: `dashboard-instead-of-deliverable`
+
+The `neuron-industries` rater proposed a matching slop signal — the page shows
+its own UI *in place of* what the product produces. It is the real
+discriminator and it is deferred, because a new signal unscored on 42 files is
+a dead signal, which the build correctly flags. It wants its own pass.
+
+### Scope of the re-score, and why it is not all 42
+
+23 of 42 files score `real-product-screenshot: present` with the deliverable
+`absent`. Re-scoring all 23 means re-reading 23 pages. **7 of them have prose
+that explicitly argues a deliverable IS shown** — written by a rater who was
+forced to score `absent` and said so: `financial-datasets`, `grep-ai`,
+`modal-com`, `neuron-industries`, `railway-com`, `sentient-os`, `tsenta`.
+Those 7 are being re-scored by independent raters from the page, one per file.
+
+**The remaining 16 are unverified under the new semantics and are left
+standing.** They carry no prose cue either way, so a re-score would be a fresh
+rating rather than a correction, and inventing one from an old screenshot is
+how session 3 lost eleven rules. Named here so the gap is visible rather than
+implied: `basecamp-2014`, `clerk-com`, `cursor-com`, `databuddy`,
+`github-2014`, `heroku-2014`, `linear-app`, `mailchimp-2014`, `melty-gg`,
+`neomatter`, `openhack`, `resend-com`, `sona8`, `squarespace-2014`,
+`stripe-com`, `vercel-com`.
 
 ## Change 4 — the product-screenshot scope rule becomes global
 
