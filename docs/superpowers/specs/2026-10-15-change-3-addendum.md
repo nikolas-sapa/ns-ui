@@ -133,11 +133,19 @@ rather than inferring.
 > moved with the rename** — the re-pass that sets values against the new wording
 > is separate, as change 3's rename preceded its re-score. Note a scope gap the
 > hole as written does not cover: the motivating cases (`financial-datasets`,
-> `railway-com`) currently read **`absent`**, so a re-pass limited to the
-> files carrying the signal (22 now: 21 `present` + 1 `unresolved`; the "23"
-> below predates change 3's re-scores) would miss them. **20** files read
-> `absent`, and those are the ones a widened definition endangers. The widened definition puts
-> every `absent` file at risk of being wrong, not just the ones holding it.
+> `railway-com`) read **`absent`** when this was written, so a re-pass limited
+> to the files carrying the signal (22 then: 21 `present` + 1 `unresolved`;
+> the "23" below predates change 3's re-scores) would miss them. **20** files
+> read `absent` then, and those are the ones a widened definition endangers.
+> The widened definition puts every `absent` file at risk of being wrong, not
+> just the ones holding it.
+>
+> **These counts are as of 2026-10-15 and are a record, not a live figure.**
+> Both motivating cases are now `present` and the set has been re-passed.
+> Current numbers live in `2026-10-15-holes-7-and-2-applied.md`, which a corpus
+> test now holds to the evidence files. Called out because a present-tense
+> count in a dated document reads as live fact — the same failure this
+> addendum already records once, for `grep-ai`.
 
 ## 6. Change 3b — `real-product-screenshot` is keyed to format, not genuineness
 
