@@ -28,7 +28,7 @@ signals:
   editorial-grid-break: present
   custom-type-pairing: absent
   real-product-screenshot: present
-  artifact-not-dashboard: absent
+  shows-deliverable: present
   density-variation: present
   one-accent-discipline: present
   live-claim-control: absent
@@ -151,3 +151,54 @@ above the fold and all four are buttons; the tinted category tags
 ("Customer Stories", "News") sit below 9000px. Zero emoji. Zero `setInterval`,
 and hero text byte-identical across 4.5s, so `typewriter-headline` absent. Single
 theme, dark-native: dark and light renders differ by 0.0% of sampled pixels.
+
+**v4 change 3 re-score — `shows-deliverable` absent → present.** Re-rated from
+a fresh walk (16 tiles, `clamped: false`, `coverage: 1.0`) plus a 12s dwell
+pass to force the WebGL panels to paint, and a digit-bearing text scan for
+anything the tiles left illegible.
+
+**The enterprise row at y6732-7160**, three cards, values read from a DOM text
+scan rather than eyeballed. *Containers* (x536-904) is a two-series
+time-series with a fully labelled axis set — y `100 / 50 / 0`, x `Tue 15 / 03
+AM / 06 AM / 09 AM / 06 PM`, legend `Live` and `Total` — whose curves run
+~45-90 with per-interval variance and where `Total` sits at or above `Live`
+across the whole window, which is correct semantics rather than two random
+paths. *Live Usage* (x982-1346) reads `Time 05:17am`, `Containers 108`, `GPU
+Utilization 94%`, with an `H100s` sub-panel badged `74 GPUs` over a *stepped*
+sparkline — the right shape for an integer allocation series, against the
+smooth curve used for container count. *Audit Logs* (x96-488) carries four
+`timestamp + action + resource-id + actor` rows at second resolution using
+Modal's real API verbs: `Sep 10, 13:54:49 / sandbox.create / sandbox-7f2a /
+modal-bot`, then `sandbox.terminate`, `image.push`, `volume.delete`.
+
+Strip the chrome — the card, the filter input, the column headers, the pill —
+and what remains is a concurrency-vs-time plot with readable values, a measured
+utilisation figure, and a ledger of executed operations. For a serverless
+compute platform that *is* the output: compute produces no file, no document
+and no image, so the artefact of "we ran your job on 74 H100s" is exactly the
+container count, the utilisation number and the log line. A containers-vs-time
+plot is the structural analogue of the vocabulary's "force-vs-time chart".
+
+**The code samples were checked and deliberately not scored.** All four product
+panels (Inference / Training / Sandboxes / Functions, y≈1455-4800) paint only
+after a dwell, and with 12s parked they render a code chip over an abstract
+animated field: `modal deploy` in an orbit of provider marks,
+`Sandbox.create()` over a hexagon grid, `@app.function(gpu="B200:8", timeout=24
+* HOURS, ...)`. Those are **inputs**, and none is paired with a result — no
+return value, no log, no duration. `timeout=24 * HOURS` is a parameter, not a
+measurement.
+
+Also weighed and not load-bearing: the testimonial at y7721 ("Modal served 1
+trillion tokens for Jev within three days of launch") is a measured claim but
+it is prose in a customer quote, not a rendered artefact; and the blog-card
+thumbnail at y8896-9132 renders a real latency A/B (`TRAFFIC → PROD 220 ms` /
+`CANDIDATE 140 ms`) but as editorial illustration for a feature announcement.
+
+**Why this page settles the hard case rather than stretching it: the page draws
+the line itself.** Its "Fast container scheduling and startup" card (y≈5500)
+illustrates a *timing* claim with an abstract isometric cube — the one place a
+cold-start number is the obvious deliverable, and there is none. The product
+panels illustrate execution with valueless hexagons. So Modal demonstrates both
+sides of the distinction in one document, and the enterprise row sits on the
+rendering side of its own line. That contrast is the reason for `present`
+rather than `unresolved`.

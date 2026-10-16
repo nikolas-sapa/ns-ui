@@ -29,7 +29,7 @@ signals:
   editorial-grid-break: absent
   custom-type-pairing: absent
   real-product-screenshot: absent
-  artifact-not-dashboard: present
+  shows-deliverable: present
   density-variation: present
   one-accent-discipline: absent
   live-claim-control: absent
