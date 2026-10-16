@@ -45,6 +45,32 @@ export const SLOP_SIGNALS = [
   "hero-mockup-float",
 ] as const;
 
+// COLOUR: `satPct` is not a measurement, and it was fed to raters as one. It
+// is HSL saturation, `(mx-mn)/(255-|mx+mn-255|)`, whose denominator collapses
+// toward zero as luminance approaches white. `#FBFAF7` -- visually paper --
+// scores 0.333, clears the 0.18 gate, and floors into one hue bucket, so an
+// off-white page reads as fully saturated. The sharpest case: `rgb(253,252,252)`
+// scores 20% on a 0.02 margin, and `rgb(252,252,252)` scores 0.
+//
+//   USE MAX-MIN RGB CHROMA.     chroma = max(r,g,b) - min(r,g,b)
+//
+// It is the number that behaves: the four documented false positives fall from
+// 72-98% to chroma 1, 3, 4 and 16, while a real accent (#006bff, chroma 255)
+// and a red CTA (chroma 182) stay far above any gate. `probe3.cjs` now emits
+// `chromaPct`; its `satPct` is kept only for comparability and is labelled as
+// the lying one on the payload itself.
+//
+// KNOWN LIMIT, so the replacement is not over-read: chroma is necessary, not
+// sufficient. `osseus` cream has a real, subtle all-over tint (chroma 16),
+// which no per-pixel threshold can separate from an accent. Deciding whether
+// low-level chroma is a BACKGROUND FIELD or an ACCENT takes the per-element
+// decomposition `osseus`'s rater ran, not a threshold.
+//
+// The rule that travels: a NUMBER FROM A DERIVED INSTRUMENT IS A CLAIM, NOT
+// EVIDENCE. `satPct` was in four rater briefs as a "finding" and four raters
+// spent their effort disproving it. `chromaPct` replaces it; neither belongs in
+// a brief as an established fact without the reading that produced it.
+//
 // `type-scale-high-contrast` has a MEASUREMENT PROCEDURE and a necessary
 // threshold, derived at n=42 and stated here because the signal shipped in v3
 // with no threshold and no stated altitude, and two session-4 raters had to
