@@ -73,12 +73,18 @@ remains, `1.1M+` / `conversations analyzed` (y 617/645); `4.1B+ tokens`
 and `1.04M+ messages processed` are gone. The hero isometric is an
 animated inline SVG (y 65-1153, 1170x1088): slab tabs `Recommendations`,
 `Analyzing runs`, `Scanning traces`, four `Traces` tags, and a chip panel
-that cycles fifteen failure modes, not three.
+that cycles fifteen failure modes, not three. **[Superseded — the second pass
+below measures twelve modes and twenty-four chips from the served HTML, against
+this pass's fifteen and thirty read off the render. That correction is
+re-verified; this figure is not.]**
 
 Q1 `shows-deliverable`: ABSENT. Entry that could embarrass the vendor:
 none. What was searched:
 
-- Hero chip cycle (y 162-390, x 834-1033): 15 modes, 30 deltas. Every
+- Hero chip cycle (y 162-390, x 834-1033): 15 modes, 30 deltas. **[Count
+  superseded: twelve and twenty-four, per the corrections below. The deltas
+  below were re-read across all twelve and every one still holds, so this
+  bullet's substance stands and only its count is wrong.]** Every
   Cost and Latency delta negative, every Quality delta positive.
   `Redundant retries` `Cost` `−33%` `Latency` `−12%`; `Excessive tool
   calls` `Latency` `−55%` `Cost` `−41%`; `Missing context` `Quality` `+7%`
@@ -100,7 +106,11 @@ none. What was searched:
   check` `412`; `Cancellation And Refunds` `204` `58%` `Failing 42%`,
   `Compensation` `102` `64%` `Failing 36%`; `66 were handed to a person`
   `40 settled for less` `18 gave up`; `SUCCESS` `78%` with the Failed band
-  widening Oct 4 to Oct 7 over a falling Success band. Each is the
+  widening Oct 4 to Oct 7 over a falling Success band. **[Corrected below: the
+  band holds at about 14% through Oct 5 and rises on Oct 6-7, so it does not
+  widen from Oct 4. The Success fall and the direction of travel are unaffected,
+  and this is one of the second pass's raster reads, recorded as such rather
+  than re-measured.]** Each is the
   product's catch, which is what the page sells (`Catch drift before
   customers do`, y 8230), so each argues FOR the vendor. Strongest
   candidate: the P0 card's `Expected impact` `Cost` `Low`. The live app's
@@ -172,3 +182,28 @@ procedure. `real-product-surface: absent` was a below-fold miss, not a
 wrong call on what was seen. Other signals left as rated; `three-card-row`,
 `testimonial-card-row` and `scroll-reveal-blank` still read `unresolved`
 though the full page is now captured, not re-scored here.
+
+**Corrections to the above, from an independent second pass on the same task.**
+None moves a value; both passes reached `shows-deliverable: absent` and
+`real-product-surface: present` independently.
+
+- **The hero cycles 12 modes and 24 chips, not "15 modes, 30 deltas".**
+  Verified from the served HTML rather than the render: the cycle is
+  JS-driven but every mode and chip ships in the document. Twelve mode titles
+  (`Redundant retries` through `Verbose system prompt`), each carrying two
+  `±N%` chips. The document holds 26 `±N%` fragments in all; the other two sit
+  in body copy outside the hero.
+- **The panels only partly cross-check.** The `2,834 of 12,480 traces` and
+  observability `TRACE COUNT 12,480` agreement holds, but the use-cases panel
+  reads `851 traces · 5 use cases` against the 12,480 elsewhere, and its four
+  rows sum to 723. One demo set, not one consistent one.
+- **The Failed band does not widen from Oct 4.** By measurement it holds at
+  about 14% through Oct 5, then rises to 25% on Oct 6 and 34% on Oct 7, while
+  Success falls from 79% to 61%.
+- **The observability chart is recoloured** from the live app: Success is
+  blue on the page where the app's own palette uses teal. One more marketing
+  edit alongside the crops, the dropped Usage tab and the drawn Slack frame,
+  and consistent with `present` for a faithful rebuild.
+
+The first correction was re-verified for this note. The other three are the
+second pass's raster reads and are recorded as such, not re-measured.

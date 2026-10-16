@@ -114,7 +114,7 @@ than the file's enumeration implies.
 
 ---
 
-## The 16 untouched files: no standalone re-pass. Fold into hole 6.
+## The 16 untouched files: a standalone re-pass after all
 
 Hole 7 genuinely changes what a rater looks at on those files — it redirects
 attention from the product chrome to the page's own canvas — so the question was
@@ -126,13 +126,21 @@ the signal key itself: **zero**. Not thin, zero. A hole-7 re-pass there is
 sixteen fresh ratings from fresh captures, which is the shape of work that cost
 session 3 eleven rules.
 
-**2. The 16 are a strict subset of hole 6's re-pass set.** All 16 still carry
-`real-product-screenshot: present`, and hole 6 (`real-product-surface`) needs a
-re-pass on every file carrying that signal — currently 21 `present` plus
-`nxtcure-labs` at `unresolved`. A hole-7 re-pass would therefore re-capture
-exactly the pages hole 6 must re-capture anyway. **One capture, two questions
-per file.** Hole 6 is already ranked urgent; this rides along at near-zero
-marginal cost and standalone costs a full pass.
+**2. The 16 are NOT inside hole 6's re-pass set, and this paragraph first said
+they were.** It reasoned that all 16 carry the surface signal `present`, and
+that hole 6 must re-pass every file carrying the signal, so one capture would
+answer both questions. The premise was the addendum's scope, and that scope was
+wrong: a widening definition endangers the `absent` files, not the `present`
+ones, so hole 6's real re-pass set is the **18** files at `absent`. All 16 here
+read `present`. **The two sets are disjoint**, and the fold this paragraph
+recommended would have re-captured sixteen pages hole 6 has no reason to
+revisit while leaving the hole-7 question unasked on all of them.
+
+What survives is the sizing: 16 pages, zero prose cues, so a fresh rating on
+each. They need their own pass, asking only `shows-deliverable` under holes 7
+and 2. Hole 6's 18 pages get the mirror: the surface question, plus the
+deliverable question folded in, since hole 7 can move an `absent` deliverable on
+any page and the capture is the expensive part.
 
 **3. Two of the 16 describe artefact content, and are not cheaper than the
 rest after all.** Scanning for described artefact content rather than for the
@@ -285,16 +293,19 @@ scored against at the time, same as change 3's handling.
 
 **A scope gap the hole as written does not cover.** The addendum scopes the
 re-pass to "the 23 files carrying the signal". But the two motivating cases,
-`financial-datasets` and `railway-com`, currently read **`absent`** — that is
-the defect. A widening definition puts every `absent` file at risk, not the
-`present` ones, so the re-pass set is the inverse of the one named. **18** files read `absent`
-today, against 23 `present` and 1 `unresolved` (20/21/1 when this was first
-written; `papaya` and `the-subvocal-company` have since moved absent → present
-under the new wording, the first two values the 3b re-pass has set). Scoring that set is a rating act,
-not a correction, and it is the single largest remaining item in this program.
+`financial-datasets` and `railway-com`, read **`absent`** when this was
+written — that is the defect, and both are now `present` (below). A widening definition puts every `absent` file at risk, not the
+`present` ones, so the re-pass set is the inverse of the one named. **16** files read `absent`
+today, against 25 `present` and 1 `unresolved` (20/21/1 when this was first
+written). Four have since moved absent → present under the new wording:
+`papaya` and `the-subvocal-company` on fresh re-rates, then `financial-datasets`
+and `railway-com` on recorded facts (below). Of the 16, `browserbase-com` and
+`truemile` were re-rated under the new wording and held `absent`, so **14 remain
+unscored against it**. Scoring them is a rating act, not a correction, and it
+is the single largest remaining item in this program.
 
-**Cheapest first, and reachable without a capture:** `financial-datasets` and
-`railway-com` were both re-scored from fresh captures today, and their prose
+**Cheapest first, reachable without a capture, and now DONE:**
+`financial-datasets` and `railway-com` were both re-scored from fresh captures today, and their prose
 already establishes the fact pattern in forensic detail — three independent
 instruments confirming no raster UI exists, five product visuals in SVG with
 live `<text>` and zero `<image>`. Those two are the rename's own evidence. Every

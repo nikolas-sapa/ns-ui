@@ -220,3 +220,102 @@ page height or section count, recorded alongside the counts so a reader can tell
 a 0/16 earned across forty sections from a 0/16 earned across five elements.
 Until that exists, this file's net of −3 should be read as much weaker evidence
 than the same net on a long page.
+
+**v4 change 3b surface re-pass**
+
+Re-rated from the live page on 2026-10-16. Values decided before this prose:
+`real-product-surface: absent` (confirmed, no flip) and `shows-deliverable:
+absent` (confirmed, no flip).
+
+Capture facts. `shoot-tiles.cjs` at 1440x900: 2 tiles, `clamped: false`,
+`coverage: 1`, `docH_before` 900, `docH_after` 900, `scroller: window`,
+`innerCands` empty. The two tiles are byte-identical (52526 bytes each) because
+the whole page fits one viewport; the stitcher emitted 1 strip of 900px against a
+900px page and flagged no mismatch, so the duplicate is the expected second shot
+of a non-scrolling page, not a padded walk. A Playwright DOM read agrees:
+`documentElement` `scrollHeight` 900 = `clientHeight` 900, `body` `scrollHeight`
+1111, root `zoom: 0.81`, and 1111 × 0.81 = 899.9, the same zoom mechanics the
+original section documented. No element scrolls internally. No text sits in a
+hidden element. With JavaScript disabled the page returns the same 441
+characters, 900px and 1 image. All y values below are painted (post-zoom) px.
+
+Footer check. The strip ends in a bottom `<nav>` at y833 (h67, flush to y900)
+holding two links, "Careers" and "Blog". That nav is the page's only footer
+furniture: there is no `<footer>` element, no copyright line and no social icons
+any more. Nothing exists below y900.
+
+Every candidate product surface, searched across the full DOM inventory of
+`img, video, canvas, svg, iframe, picture, object, embed`:
+- y126: one IMG, `standard-machines-logo.Dc92TwCz.png`, 71x71 at x677. A brand
+  mark. Not a product surface.
+- That is the entire non-text inventory. Zero canvas, zero video, zero SVG, zero
+  iframe. The 1143x546 pattern canvas and the `sequioas.png` blog card that the
+  sections above describe are gone from this URL.
+
+To decide whether absence is a category fact or a deficiency, I followed the
+three internal links one click out (not scored). `/blog` and `/careers` carry
+only the logo. `/launch` (10709px, the launch post) carries two canvases (charts
+of benchmark scores, e.g. "97% — discriminates nothing"), one inline svg and four
+SVG diagrams. `episode.svg` reads "agent workspace | spec.md | design.sv |
+simulate | synthesize | preview P&R | ... | sealed | submit | grader | hidden
+checks | physical flow | aggregation | one exact reward"; `gate-cascade.svg`
+reads "admission | correctness | feasibility | performance (measured) | reject,
+R = 0 | ...". These are architecture schematics of the environment, drawn boxes
+and arrows, not a capture or faithful rebuild of anything the environment
+actually emits. No trajectory transcript, grader report or task file appears
+anywhere on the site.
+
+Q1 verdict: `absent`. The scored page contains no product surface of any medium,
+genuine or stylised; there is nothing to test for faithfulness. Most of this is a
+category fact. The product, per the page, is "environments to train your models
+on chip design": an RL environment consumed by a lab's training infrastructure,
+with no end-user GUI to screenshot, so the absence of UI chrome is not a design
+failure. The narrower point, recorded so it is not lost: the product does have a
+genuine non-GUI surface (an episode trace, a grader verdict, a task contract),
+and neither the homepage nor the launch post shows one. Read the `absent` as
+"nothing shown, and little to show in the GUI sense", not as a page hiding a UI.
+
+The entry that could have embarrassed the vendor: none exists. The scored content
+is five paragraphs and a two-link nav, quoted in full:
+- y298: "Standard Machines is a research company building autonomous systems to
+  design and discover advanced chips."
+- y374: "We're backed by Top VCs, Y Combinator, and angels from Anthropic,
+  OpenAI, Meta Superintelligence Labs, Amazon AGI, Google, Cognition, Perplexity,
+  a16z, and more."
+- y478: "If you'd like environments to train your models on chip design, reach
+  us." (`reach us` → `mailto:founders@standardmachines.com`)
+- y526: "If you'd like to join us, we're hiring."
+- y574: "We're based in San Francisco and London."
+- y833: "Careers", "Blog".
+
+I searched those 441 characters and 14 links for any number, output, limit,
+failure, cost or refusal. There is no number on the page at all. The backer list
+can only flatter. "research company" is positioning, not a refusal narrowing a
+claim the page would benefit from leaving broad. The `/launch` post does contain
+unflattering figures (CVDP "34% to 97%", testbenches overstating correctness "by
+a factor of four or five"), but they count against other people's benchmarks, not
+the vendor, and they are off the scored URL.
+
+Q2 verdict: `absent`. No artefact of anyone's work is shown, in chrome, capture
+or page-authored rendering, and no scored entry could count against the vendor.
+
+Drift from the earlier prose. The page has been rebuilt, and almost every measured
+fact above no longer matches the live URL:
+- Height 1668 → 900. The page no longer scrolls at 1440x900.
+- The 1143x546 `<canvas class="pattern">` at x140 y247 is gone from the homepage.
+  `sequioas.png` and the dated blog card are gone too; `sequioas.png` now renders
+  at 959x213 inside `/launch`.
+- The two-line 36px statement with three underlined runs ("environments",
+  "evaluations", "chip design") is replaced by five left-aligned paragraphs at
+  x466, all declared 20.88px (≈16.9px painted after zoom), one size for all text.
+- The 52px logo with two top nav links is now a centred 71x71 logo at x677 y126
+  with no top nav; Careers and Blog moved to the bottom nav.
+- The centred 21.6px backer line is now a left-aligned paragraph of nine linked
+  names, adding "Meta Superintelligence Labs" and "Amazon AGI" and opening with
+  "Top VCs".
+- The footer with copyright at x324 and the 11x11 X and LinkedIn SVGs is gone;
+  the page ends at the Careers/Blog nav.
+- innerText 412 → 441 characters; images 2 → 1; canvases 1 → 0; SVGs 2 → 0.
+- The earlier `single-optical-anchor` and `density-variation` readings rested on
+  the canvas and the void beside it, neither of which is on the page now. This
+  pass does not touch those signals; a later re-rate should.

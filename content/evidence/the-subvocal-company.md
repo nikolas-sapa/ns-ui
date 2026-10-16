@@ -356,3 +356,25 @@ loose frames on the table" and never said what the laptop shows; it shows
 three decodes, one of them a shipped misrecognition. (4) The page has a third
 video (8s autoplay hero film) the old prose did not count. The previous
 rater's unfinished crop of the laptop band is completed above.
+
+**Corrections to the above, from an independent second pass on the same task.**
+It reached the same two values and named the same entry, the `I can talk
+primately and nobody can listen` misdecode, from its own reading of the
+byte-identical mp4 (29,038,764 bytes, 91.767s). It reads two details
+differently. Neither moves a value:
+
+- **The yellow state label is legible: `BASELINE`.** The full cycle is
+  therefore BASELINE / RECORDING / PREDICTING / TEXT RESULT / READY.
+- **The misdecode is followed further, to about 76s.** The first pass last
+  sights it in the close-up at about 66-67s; the second follows it through
+  READY and into later shots until the screen changes at about 76s. An
+  extension, not a contradiction, and it strengthens the reading above: the
+  error is not a frame the edit passes over quickly, it is held for roughly
+  eighteen seconds.
+
+One measurement the first pass did not take, recorded because it bears on the
+page's central claim rather than on either signal: audio sits at about
+**-63 dBFS** (room noise) during all three decode windows, against -28 to -40
+dBFS for the narration. The rig is producing text while nobody is audibly
+speaking. These are the second pass's reads and are recorded as such, not
+re-measured.

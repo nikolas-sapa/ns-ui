@@ -27,7 +27,7 @@ signals:
   type-scale-high-contrast: absent
   editorial-grid-break: present
   custom-type-pairing: present
-  real-product-surface: absent
+  real-product-surface: present
   shows-deliverable: present
   density-variation: present
   one-accent-discipline: absent
@@ -265,3 +265,18 @@ belief that this content is real rests on one telling detail (the
 `wlwmanifest.xml` probe is too specific to invent), which is an inference the
 vocabulary gives no way to record. **The missing axis is whether the
 deliverable's content is sourced or fabricated.**
+
+**v4 change 3b — `real-product-surface` absent → present.** No new rating, and
+this reverses an orchestrator call rather than a rater's. The call above flipped
+this file to `absent` for consistency with `financial-datasets` under the old
+wording's letter, "the product's UI shown as a real screenshot", while
+recording that the page "depicts its actual UI extensively and accurately" and
+that both pages *show* their product UI and neither *captures* it. The signal is
+now re-worded to what that paragraph said the vocabulary could not express:
+satisfied by a genuine capture or a faithful live rebuild, failed by a stylised
+or invented UI. Five product visuals in SVG with live `<text>` and zero
+`<image>`, depicting the real UI accurately and in places animated through a
+real interaction sequence, are a faithful rebuild, not a stylised one. Same
+facts, the inverse of yesterday's consistency argument, and it still applies to
+both files together: `financial-datasets` flips in the same pass.
+`shows-deliverable` is unaffected and stays `present`.
