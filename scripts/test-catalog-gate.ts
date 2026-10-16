@@ -1,51 +1,48 @@
 // Pins lib/catalog-gate.ts's inline CATALOG_GATE_SCRIPT to the "is anything
-// filtered" and "is non-default sort active" state predicate in
-// app/_components/showcase.tsx:548.
+// filtered" and "is non-default sort active" predicates that Showcase
+// (app/_components/showcase.tsx) actually renders from.
 //
 // The pre-hydration gate runs in <head> before React mounts and adds
 // `catalog-filtered` and `catalog-sorted` to document.documentElement so
 // app/globals.css can hide the Featured rail and catalog heading on the
-// first paint for filtered URLs. The script duplicates the logic in
-// showcase.tsx; this test ensures both implementations stay identical across
-// all expected URL permutations.
+// first paint for filtered URLs. The gate is an inline string and cannot
+// import anything, so it is the one place the logic is duplicated. The
+// reference side is NOT a copy: it imports catalogStateFromParams,
+// isCatalogFiltered and isCatalogSorted from lib/catalog-state.ts, the same
+// functions Showcase calls, so changing the component's predicate changes
+// what this test expects.
 import vm from "node:vm";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { CATALOG_GATE_SCRIPT } from "../lib/catalog-gate.ts";
+import {
+  catalogStateFromParams,
+  isCatalogFiltered,
+  isCatalogSorted,
+} from "../lib/catalog-state.ts";
+import { CATEGORIES } from "../lib/search-categories.ts";
 
-/**
- * The reference predicate from app/_components/showcase.tsx.
- *
- * In showcase.tsx:
- * - filter defaults to "all", set to "core" | "loud" from ?collection=
- * - newOnly defaults to false, set to true from ?new=1
- * - category defaults to null, set from ?category=
- * - query defaults to "", set from ?q=
- * - sort defaults to "featured", set to "newest" | "oldest" from ?sort=
- *
- * State predicate:
- *   filtered = filter !== "all" || newOnly || category !== null || query !== ""
- *   sorted = sort !== "featured"
- */
+// Showcase must keep calling the shared predicates; if it goes back to an
+// inline copy, the reference below stops describing the component.
+const showcaseSource = readFileSync(
+  new URL("../app/_components/showcase.tsx", import.meta.url),
+  "utf8",
+);
+for (const name of ["catalogStateFromParams(", "isCatalogFiltered(", "isCatalogSorted("]) {
+  assert.ok(
+    showcaseSource.includes(name),
+    `app/_components/showcase.tsx no longer calls ${name}...) from lib/catalog-state.ts; ` +
+      "this test's reference predicate would no longer match the component",
+  );
+}
+
+// Same validator Showcase passes to catalogStateFromParams.
+const isKnownCategory = (id: string) =>
+  id === "other" || CATEGORIES.some((c) => c.id === id);
+
 function showcasePredicate(search: string) {
-  const p = new URLSearchParams(search);
-
-  const collection = p.get("collection");
-  const filter = collection === "core" || collection === "loud" ? collection : "all";
-
-  const newOnly = p.get("new") === "1";
-
-  const categoryParam = p.get("category");
-  const category = categoryParam ? categoryParam : null;
-
-  const query = p.get("q") || "";
-
-  const sortParam = p.get("sort");
-  const sort = sortParam === "newest" || sortParam === "oldest" ? sortParam : "featured";
-
-  const filtered = filter !== "all" || newOnly || category !== null || query !== "";
-  const sorted = sort !== "featured";
-
-  return { filtered, sorted };
+  const state = catalogStateFromParams(new URLSearchParams(search), isKnownCategory);
+  return { filtered: isCatalogFiltered(state), sorted: isCatalogSorted(state.sort) };
 }
 
 /**
@@ -153,7 +150,9 @@ for (const tc of cases) {
   );
 }
 
-// Ensure the sandbox throws if a global is missing in strict mode
+// Harness self-check, not gate coverage: confirms the strict unwrap really
+// surfaces errors (a missing global throws instead of being swallowed), so
+// the green runs above can't come from a silently failing script.
 assert.throws(() => {
   const brokenSandbox = {
     // Missing document and URLSearchParams
