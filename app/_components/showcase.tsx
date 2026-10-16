@@ -9,6 +9,16 @@ import { FeaturedCard } from "./featured-card";
 import { GitHubStarButton, GitHubStarCta } from "./github-star-button";
 import { PreviewCard, type RegistryEntry } from "./preview-card";
 import { useMountManager } from "./use-mount-manager";
+import {
+  CATEGORY_PARAM,
+  FILTER_PARAM,
+  NEW_PARAM,
+  QUERY_PARAM,
+  SORT_PARAM,
+  catalogStateFromParams,
+  isCatalogFiltered,
+  isCatalogSorted,
+} from "@/lib/catalog-state";
 import { REGISTRY_ORIGIN } from "@/lib/registry-origin";
 import { CATEGORIES } from "@/lib/search-categories";
 import { SYNONYM_TEXT } from "@/lib/search-synonyms";
@@ -105,8 +115,6 @@ function useMountCap(): number {
 /** Mount a demo this far outside the viewport so it has run a beat before seen. */
 const PRELOAD_MARGIN = 600;
 
-const SORT_PARAM = "sort";
-
 /**
  * Words a newcomer can click when nothing matched. Each is a real query that
  * returns results through the synonym map.
@@ -119,11 +127,6 @@ const STOPWORDS = new Set([
   "how", "i", "in", "is", "it", "its", "me", "my", "need", "of", "on", "or",
   "some", "that", "the", "this", "to", "use", "want", "when", "with", "you",
 ]);
-
-const FILTER_PARAM = "collection";
-const NEW_PARAM = "new";
-const CATEGORY_PARAM = "category";
-const QUERY_PARAM = "q";
 
 export function Showcase({
   items,
@@ -234,27 +237,19 @@ export function Showcase({
    *  the gate-retirement effect. */
   const [queryFromUrl, setQueryFromUrl] = useState(false);
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const fromUrl = params.get(SORT_PARAM);
-    if (fromUrl === "newest" || fromUrl === "oldest" || fromUrl === "featured") {
-      setSortState(fromUrl);
-    }
-    const filterFromUrl = params.get(FILTER_PARAM);
-    if (filterFromUrl === "core" || filterFromUrl === "loud") {
-      setFilterState(filterFromUrl);
-    }
-    // Validated like sort and collection above: an unknown id (stale link,
-    // renamed category) would otherwise match nothing and empty the catalog
-    // with no chip lit and no filter named in the zero-results copy.
-    const categoryFromUrl = params.get(CATEGORY_PARAM);
-    if (
-      categoryFromUrl === "other" ||
-      CATEGORIES.some((c) => c.id === categoryFromUrl)
-    ) {
-      setCategoryState(categoryFromUrl);
-    }
-    if (params.get(NEW_PARAM) === "1") setNewOnlyState(true);
-    const q = params.get(QUERY_PARAM);
+    const fromUrl = catalogStateFromParams(
+      new URLSearchParams(window.location.search),
+      // Validated like sort and collection: an unknown id (stale link,
+      // renamed category) would otherwise match nothing and empty the catalog
+      // with no chip lit and no filter named in the zero-results copy.
+      (id) => id === "other" || CATEGORIES.some((c) => c.id === id),
+    );
+    // Only touch state the URL actually moved off its default, as before.
+    if (fromUrl.sort !== "featured") setSortState(fromUrl.sort);
+    if (fromUrl.filter !== "all") setFilterState(fromUrl.filter);
+    if (fromUrl.category !== null) setCategoryState(fromUrl.category);
+    if (fromUrl.newOnly) setNewOnlyState(true);
+    const q = fromUrl.query;
     if (q) {
       setQueryState(q);
       // Not on idle, not on focus: this visitor is already searching, so the
@@ -553,8 +548,8 @@ export function Showcase({
   }, [filteredItems, sort]);
 
   const activeCategory = categories.find((c) => c.id === category);
-  const filtered =
-    filter !== "all" || newOnly || category !== null || query !== "";
+  const filtered = isCatalogFiltered({ filter, newOnly, category, query });
+  const sorted = isCatalogSorted(sort);
   const clearAll = () => {
     setFilter("all");
     setNewOnly(false);
@@ -582,12 +577,12 @@ export function Showcase({
   // components that never appeared in the rail. Derived from state, so the
   // pre-hydration catalog gate's first paint is untouched.
   const gridItems = useMemo(() => {
-    if (filtered || sort !== "featured" || featuredItems.length === 0) {
+    if (filtered || sorted || featuredItems.length === 0) {
       return visibleItems;
     }
     const shown = new Set(featuredItems.map((i) => i.name));
     return visibleItems.filter((i) => !shown.has(i.name));
-  }, [visibleItems, featuredItems, filtered, sort]);
+  }, [visibleItems, featuredItems, filtered, sorted]);
 
   return (
     <main className="mx-auto w-full max-w-[1600px] px-6 pb-32 sm:px-10">
