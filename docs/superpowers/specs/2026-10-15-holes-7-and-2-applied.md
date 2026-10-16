@@ -5,9 +5,10 @@ Applies: `2026-10-15-change-3-addendum.md` holes 7 (medium) and 2 (axis), with
 hole 1's refusal test folded in because hole 2's wording cannot be stated
 without it. Hole 3 closes as a side effect and needed no clause of its own.
 Status: **the definition is applied. Six applied signal values were
-contradicted or doubtful under it; three have since been re-rated from fresh
-captures and flipped, three remain open** — that list is at the bottom and the
-three open ones are the decision this document hands back.
+contradicted or doubtful under it, and all six have since been re-rated from
+fresh captures**: five `shows-deliverable` flips to `absent`, one confirmed
+`present` on a different artefact than the one it was scored on. The list is
+at the bottom.
 
 Both clauses landed in `lib/antislop-vocab.ts` above `CRAFT_SIGNALS`, beside
 change 1's procedure and change 4's scope rule, because that comment block is
@@ -133,8 +134,9 @@ exactly the pages hole 6 must re-capture anyway. **One capture, two questions
 per file.** Hole 6 is already ranked urgent; this rides along at near-zero
 marginal cost and standalone costs a full pass.
 
-**3. Two of the 16 are reachable from prose alone and are cheaper than the
-rest.** Scanning for described artefact content rather than for the word:
+**3. Two of the 16 describe artefact content, and are not cheaper than the
+rest after all.** Scanning for described artefact content rather than for the
+word:
 `cursor-com` records readable `+135/-21` diff counts and a model picker listing
 named models inside a real product capture, and `github-2014` records "real
 commit history and a real diff with green and red". Both are **change 3** cases
@@ -142,10 +144,18 @@ commit history and a real diff with green and red". Both are **change 3** cases
 alone already reaches them and neither needs the new clause. They fell outside
 the original seven only because that set was defined as files whose prose
 *argues the signal* rather than files whose prose *describes the content*.
-**Not applied here** — this document changes no value — but they are
-corrections available without a capture, where the other 14 are not.
+An earlier draft of this paragraph called them "corrections available without a
+capture". **That was true under change 3 alone and is false under the procedure
+this document applies.** Change 3 asks only whether a readable artefact is
+shown, and the prose answers that. Hole 2 asks for the entry that could have
+embarrassed the vendor, and `+135/-21` names none: a diff count is the product's
+output on a job, but nothing in either file says whether any line of it could
+have come out against Cursor or GitHub. Answering that means reading the page,
+which makes both of them rating acts like the other 14. They ride along with
+hole 6's capture on the same terms, with one advantage: their raters know where
+to look.
 
-## What was contradicted: three re-rated and flipped, three open
+## What was contradicted: all six re-rated, five flipped
 
 The narrowing half of hole 2 can invalidate an applied `present`, so all
 fourteen were audited against it from their own recorded prose. Seven do not
@@ -206,19 +216,43 @@ audit being applied:
   red-magenta gradient that reads as an error at a glance. The run also
   succeeds, completing the form with the résumé attached.
 
-**Three remain open and are left exactly as they were.** `modal-com` is a
-session-4 score an independent rater captured, contradicted only by an auditor
-reading prose; `papaya` and `the-subvocal-company` are pre-change-3 scores whose
-files may describe less than the pages contain, and
-`the-subvocal-company`'s auditor found a stronger candidate the file assigns to
-a different signal (an unmuted 91.8s rig video, handed to a visitor by a page
-whose claim is that you make no sound). All three should be re-rated from fresh
-captures, one file per rater. `modal-com` carries `real-product-surface:
-present`, so it rides along inside hole 6's set — fold it into that capture and
-ask three questions per page instead of two. `papaya` and
-`the-subvocal-company` carry it `absent` and are two standalone re-rates;
-expect them to move in either direction, since they were scored before the
-signal had any stated test.
+**The remaining three were re-rated on 2026-10-16, one rater per file, each
+reusing an unclamped full-coverage walk.** Two flipped and one held, and the
+one that held shows the procedure working in the direction a flip-bias would
+hide:
+
+- **`modal-com`: `shows-deliverable` present → absent**, overturning a
+  session-4 independent rater on the stance test that rater did not have. A
+  whole-page search for errors, failed states, latency or cold-start numbers,
+  costs, quotas, losing comparison rows and status links found none near the
+  scored row; the page states the opposite of a limit ("without quotas or
+  reservations"). Decisive detail: Modal's own audit-log docs define a `status`
+  field ("Whether the action succeeded or failed"), and the homepage table
+  drops exactly that column. The audit rows (`13:54:49`, then `13:54:32` ×3)
+  are static across loads. `real-product-surface` stays `present`: a faithful
+  HTML/SVG rebuild whose columns match the documented audit fields.
+- **`papaya`: `shows-deliverable` present → absent; `real-product-surface`
+  absent → present.** All 30 hero deltas and every Papaya-effect figure flatter
+  (down to `Cost −6%`); every bad number on the page (`Failing 42%`, `18 gave
+  up`, `+8.2s latency`) is the demo customer's agent failing, which is the
+  thing Papaya sells catching. The seven `.webp` panels were settled against
+  the live product's own bundle (`/app/assets/index-BfPfe5X4.js`), which
+  carries the same components, labels and a `PhiAirwaysExample` demo dataset:
+  faithful renders of the real product with demo data, cropped and lightly
+  edited, so `present` under change 3b.
+- **`the-subvocal-company`: `shows-deliverable` holds `present`, on a new
+  artefact; `real-product-surface` absent → present.** The prose audit was
+  right that the destination panels carry nothing that could embarrass. The
+  91.8s lab video does: from 57.5s the prototype's own screen reads "I can
+  talk primately and nobody can listen", and the editors left it in, stamped a
+  monkey and "**PRIVATELY" over it, and kept the wrong line on screen through
+  the READY state. A misrecognition shipped on purpose is the procedure's
+  embarrassing entry in its plainest form. The same video is a genuine camera
+  capture of the prototype's software on a real laptop, so "no UI exists" no
+  longer holds (a lab app, not the shipping interface; recorded in the file).
+
+**Net on `shows-deliverable`: 14/42 → 9/42 present.** Five flips, one hold,
+each from its own walk.
 
 ## One data-quality note, free
 
@@ -253,8 +287,10 @@ scored against at the time, same as change 3's handling.
 re-pass to "the 23 files carrying the signal". But the two motivating cases,
 `financial-datasets` and `railway-com`, currently read **`absent`** — that is
 the defect. A widening definition puts every `absent` file at risk, not the
-`present` ones, so the re-pass set is the inverse of the one named. **20** files read `absent`
-today, against 21 `present` and 1 `unresolved`. Scoring that set is a rating act,
+`present` ones, so the re-pass set is the inverse of the one named. **18** files read `absent`
+today, against 23 `present` and 1 `unresolved` (20/21/1 when this was first
+written; `papaya` and `the-subvocal-company` have since moved absent → present
+under the new wording, the first two values the 3b re-pass has set). Scoring that set is a rating act,
 not a correction, and it is the single largest remaining item in this program.
 
 **Cheapest first, and reachable without a capture:** `financial-datasets` and
