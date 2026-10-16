@@ -27,7 +27,7 @@ signals:
   type-scale-high-contrast: present
   editorial-grid-break: absent
   custom-type-pairing: present
-  real-product-surface: absent
+  real-product-surface: present
   shows-deliverable: present
   density-variation: present
   one-accent-discipline: present
@@ -352,3 +352,16 @@ captured UI, and nothing covers **real but uncaptured**. A `real-product-
 surface` framing — satisfied by either a genuine capture or a faithful live
 rebuild, failed by a stylised or invented UI — would score this page correctly
 and still catch the slop case the signal was built for.
+
+**v4 change 3b — `real-product-surface` absent → present.** No new rating. The
+signal was renamed and re-worded this session: satisfied by a genuine capture or
+a faithful live rebuild of the real product, failed by a stylised or invented
+UI. This page is the case the re-wording was written for, and the facts above,
+recorded from a fresh walk, already settle it: no raster or vector screenshot of
+any interface exists (three instruments, 37 inline SVG all Lucide glyphs), and
+every product surface is a live DOM rebuild with real buttons, real tabs, a real
+`readOnly: false` textarea and real Shiki highlighting. Faithful, not stylised:
+the rater's own words are that it showed its real product "harder than a
+screenshot can". The earlier `absent` was the old wording's letter ("shown as a
+real screenshot"), not a finding about the page, and this reverses it on the
+same facts. `shows-deliverable` is unaffected and stays `present`.

@@ -171,9 +171,12 @@ built for, a glassy fake dashboard floating in a hero.
 
 > **APPLIED** in `2026-10-15-holes-7-and-2-applied.md`, as the
 > proposed clause plus an explicit block on the change-4 inversion. The 16
-> untouched files get **no standalone re-pass**: zero of them mention the word
-> *deliverable*, and all 16 are a strict subset of hole 6's re-pass set, so the
-> question folds into that one capture.
+> untouched files need **a standalone re-pass**: zero of them mention the word
+> *deliverable*, so each is a fresh rating. An earlier version of this note
+> folded them into hole 6's capture as "a strict subset of hole 6's re-pass
+> set"; that held only under this addendum's original scope (the `present`
+> files). Hole 6's real set is the 18 `absent` files, and all 16 read
+> `present`, so the sets are disjoint.
 
 Found by `tsenta`'s rater, reported last, and it is the hole most likely to
 undo the fix.

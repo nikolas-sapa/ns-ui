@@ -217,3 +217,86 @@ physics claim, "shows nothing" is the whole criticism, and the vocabulary has no
 slot for it. This is the same hole railway-com recorded from the other side, a
 device that proves the claim without being either a UI screenshot or a scored
 artifact.
+
+**v4 change 3b surface re-pass**
+
+Re-walked 2026-10-16 at 1440x900 under the widened `real-product-surface`
+definition (genuineness, not raster format) and the revised `shows-deliverable`
+axis. Both values are confirmed `absent`, for different reasons, set out below.
+
+Capture: 3 tiles, `clamped: false`, `coverage: 1`, scroller `window`,
+`docH_before` 1528 and `docH_after` 1528, `reachedPx` 1528. The stitcher
+produced one strip at 1440x1528 against a 1528px page, so no tile is duplicated.
+The strip ends in the footer: logo at y1444, nav row HOME / ABOUT US / CONTACT /
+CAREERS at y1449, then "© 2026 Dipole Labs", "·", "Boston, USA" at y1449. A DOM
+text walk returns 21 painted text nodes, matching the earlier count.
+
+Candidate product surfaces, all media on the page:
+
+- `img` at x112 y22, 171x36: `dipole-logo-full-B_BzdjSP.svg`, the wordmark.
+- `img` at x112 y217, 147x112: a data-URI SVG (Illustrator export, single fill
+  `#1f4d3a`) that is the "dp" logo mark. Decoded and confirmed.
+- `img` at x112 y1444, 133x28: the same wordmark file in the footer.
+- one inline `svg`: `lucide-menu` (three horizontal paths) inside a `md:hidden`
+  button, measuring 0x0 at 1440. It is the mobile hamburger icon and is not
+  painted at desktop.
+- no `video`, `iframe`, `canvas`, `picture`, `object` or `embed`; no element
+  carries a CSS `background-image`. The hero's right half, x~780-1328 from y81
+  to y900, holds no element at all, so nothing is lazily withheld there.
+
+None of the four is a product surface. To rule out a surface living off the home
+page, I also walked the three linked routes. `/about` (docH 2062) adds two
+200x200 founder portraits (`founder-deepankur-…png` and `founder-gabriele-…png`
+at y242) and a wordmark at y885. `/careers` (docH 2067) adds thirteen 16x16
+inline chevrons at x1111 on accordion rows. `/contact` (docH 999) is a
+four-field form. None of them carries a device photo, a die or wafer shot, a
+test-bench capture, a measurement plot or any software screen.
+
+**Q1 `real-product-surface`: `absent`, confirmed.** There are two halves to the
+reasoning, and only one of them is a category fact. The product named on the page
+is "photonic hardware", "the optical layer", and on `/about` "the photonic fabric".
+An optical interconnect has no user-facing UI, so the lack of a software surface
+(no companion app, no control console) is a category fact and is not a defect of
+the page. The hardware half is not category fact. A genuine capture of the
+device, such as a chip under a microscope, a packaged part or a bench rig, is
+the kind of evidence the widened definition credits, and a photonics company
+could show one. The site shows none on any route. The page cannot say whether
+that is because no device exists yet (it says "founded in 2026", and `/about`
+lists both founders as "Y COMBINATOR S26") or because it was withheld, and this
+re-pass does not guess. The value is `absent` on either reading. The widened
+definition only adds credit for faithful rebuilds and recordings, and the site
+has no stylised UI, rebuilt UI or recording for it to credit, so no flip.
+
+**Q2 `shows-deliverable`: `absent`, confirmed.** The entry that could have
+embarrassed the vendor: none exists. I looked for any figure, limitation,
+measured result, cost, refusal or failure in all 21 home-page text nodes. The
+only numerals are the founding year in "Dipole Labs was founded in 2026 and is
+backed by Y Combinator…" (y1123) and "© 2026 Dipole Labs" (y1449). The two
+statements about the product are open-ended aims, "engineered to move past the
+physical limits of silicon" (y569) and "designed to overcome the limits of
+conventional silicon and unlock new regimes of speed, density, and efficiency"
+(y1015). Neither has a magnitude, so neither could count against the vendor. The
+only narrowing on the page, "If you want to build at that frontier, let's talk."
+(y1123), is an invitation. It is not a refusal. Under Part B there is no medium
+to judge either: no chrome, no captured artefact, and no page-authored rendering
+of anything the product has produced. `/about` is no better. Its only magnitudes,
+"A single AI prompt triggers thousands of these conversions, so we pay that tax
+billions of times a day", describe the incumbent's problem, not Dipole's output.
+
+Drift from the earlier prose:
+
+- The earlier capture recorded a clamped walk, with tiles 1 and 2 as the same
+  frame and a 2300px strip duplicating the nav and the About band. This walk is
+  not clamped, and the strip equals the 1528px page with no repeats. The earlier
+  duplication came from the old walker. The page has not changed.
+- The earlier prose recorded `svgCount` 0. The DOM holds one inline `svg`, the
+  0x0 `md:hidden` hamburger. That is consistent with a count of painted SVGs
+  only. Nothing new is visible at desktop.
+- The earlier prose argues under the retired names `real-product-screenshot` and
+  `artifact-not-dashboard`. Its point that the vocabulary "cannot distinguish
+  'offered no evidence' from 'offered evidence badly'" still applies to the
+  renamed pair. On this page, both are `absent` because there is nothing on the
+  page to score.
+- Copy, image geometry (171x36 y22, 147x112 y217, 133x28 y1444), button labels
+  and the footer text all match the earlier record verbatim. No content has
+  drifted.
