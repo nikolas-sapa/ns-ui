@@ -146,4 +146,84 @@ test("the spec's stated signal distribution matches the corpus", () => {
     actual.unresolved,
     "spec `unresolved` count is stale",
   );
+
+  // The same document states a second distribution -- "Net on
+  // `shows-deliverable`: 14/42 -> 9/42 present" -- and guards nothing. It is
+  // the number the whole change-3 thread turns on, so it gets the same
+  // treatment: the prose is the derived artefact, the front-matter the source.
+  const shows = spec.match(/Net on `shows-deliverable`: \d+\/\d+ → (\d+)\/\d+ present/);
+  assert.ok(shows, "spec must state the net shows-deliverable present count");
+  let showsPresent = 0;
+  for (const f of files()) {
+    if (read(f).signals["shows-deliverable"] === "present") showsPresent += 1;
+  }
+  assert.equal(
+    Number(shows[1]),
+    showsPresent,
+    "spec `shows-deliverable` present count is stale",
+  );
+});
+
+// The `real-product-surface` block in lib/antislop-vocab.ts justifies the
+// widening with four named files, and it named them in the wrong buckets: it
+// read "Three files read `absent` ... grep-ai page-authored replicas ... and a
+// fourth, clerk-com, held `present` only on the convention." grep-ai reads
+// `present` at every commit from its origin commit through HEAD, and its own
+// prose records that ("stays `present`, flagged ... a **fourth** instance").
+// Nobody caught it for a day because the claim lived in prose with nothing
+// tying it to the front-matter it described.
+//
+// Same defect class as the spec's 17-vs-20 drift. The invariant asserts the
+// block's STRUCTURE -- which file sits in which bucket -- and deliberately
+// does NOT assert the two `absent` files' values. Freezing those would block
+// the re-pass they exist to motivate: flipping them to `present` is the whole
+// point of the rename.
+test("the vocab's real-product-surface examples name the right buckets", () => {
+  const vocab = readFileSync(
+    join(import.meta.dirname, "../lib/antislop-vocab.ts"),
+    "utf8",
+  );
+  const block = vocab.slice(
+    vocab.indexOf("`real-product-surface`"),
+    vocab.indexOf("`shows-deliverable`"),
+  );
+  assert.ok(block.length > 0, "the real-product-surface block must exist");
+  for (const f of ["financial-datasets", "railway-com", "clerk-com", "grep-ai"]) {
+    assert.match(block, new RegExp(f), `${f} must be named in the block`);
+  }
+
+  // The convention group is the clause immediately before the phrase that
+  // names it; the `absent` list is everything ahead of that window. A 120-char
+  // window covers "— and two more, clerk-com and grep-ai, " comfortably.
+  const convention = block.indexOf("held `present` only on the convention");
+  assert.ok(convention > 0, "the block must name the convention group");
+  const conventionGroup = block.slice(convention - 120, convention);
+  const absentList = block.slice(
+    block.indexOf("files read `absent`"),
+    convention - 120,
+  );
+
+  for (const f of ["clerk-com", "grep-ai"]) {
+    assert.match(
+      conventionGroup,
+      new RegExp(f),
+      `${f} belongs in the convention group with the others holding present only on the convention`,
+    );
+  }
+  for (const f of ["financial-datasets", "railway-com"]) {
+    assert.match(absentList, new RegExp(f), `${f} must be in the absent list`);
+  }
+  assert.doesNotMatch(
+    absentList,
+    /grep-ai/,
+    "grep-ai reads present and must not be cited as a mis-scored absent",
+  );
+
+  const count = block.match(/(\w+) files read `absent` under the old name/);
+  assert.ok(count, "the block must state its `absent` count");
+  assert.equal(
+    count[1],
+    "Two",
+    "the block must state the mis-scored `absent` count it can support",
+  );
 });

@@ -82,16 +82,26 @@ export const SLOP_SIGNALS = [
 //
 // The asymmetry it closes: `hero-mockup-float` penalises a FAKE UI, the old
 // `real-product-screenshot` credited a CAPTURED UI, and nothing covered REAL
-// BUT UNCAPTURED. Three files read `absent` under the old name while plainly
+// BUT UNCAPTURED. Two files read `absent` under the old name while plainly
 // showing their product — financial-datasets rebuilt live (network log: 5
 // image responses of 59, four of them logos; DOM walk: zero canvas, video,
 // iframe, CSS `url()` or `data:` URI; inline-SVG census: 37 glyphs, largest
 // 20x20, none containing `<text>`), railway-com drawn in vector (all five
-// product visuals SVG with live `<text>` and zero `<image>`), grep-ai
-// page-authored replicas — and a fourth, clerk-com, held `present` only on
-// the convention. financial-datasets showed its product HARDER than a
-// screenshot can: interactive, selectable, accessible, theme-aware, and
-// structurally incapable of being a stale or doctored capture.
+// product visuals SVG with live `<text>` and zero `<image>`) — and two more,
+// clerk-com and grep-ai, held `present` only on the convention. financial-
+// datasets showed its product HARDER than a screenshot can: interactive,
+// selectable, accessible, theme-aware, and structurally incapable of being a
+// stale or doctored capture.
+//
+// CORRECTED 2026-10-16: this block first read "three files ... `grep-ai`
+// page-authored replicas ... and a fourth, clerk-com". grep-ai is not a third
+// `absent`. It reads `present` at every commit from its origin (0d196ebe)
+// through HEAD, and its own prose says so: "`real-product-screenshot` stays
+// `present`, flagged ... a **fourth** instance". It belongs in the convention
+// group with clerk-com, which is where it now sits. The addendum that seeded
+// the sentence carried the same mis-grouping; the count of affected files (4)
+// was right, the split was not. Correcting prose is not a re-score: no value
+// moved, and grep-ai's `present` is still flagged as one of hole 6's cases.
 //
 // It still catches the slop case the signal was built for: a glassy fake
 // dashboard floating in a hero is an invented UI and fails.
@@ -102,9 +112,14 @@ export const SLOP_SIGNALS = [
 // populated with invented data is `present` here and is judged on its content
 // by the other two.
 //
-// RENAME ONLY as applied: no value moved with it. The 22 files carrying the
-// signal are being re-passed against this wording by independent raters, one
-// per file, the way change 3's rename was followed by its re-score.
+// RENAME ONLY as applied: no value moved with it. All 42 evidence files carry
+// the signal — the rename is global scope, so every front-matter has one and
+// the old key survives nowhere — and they are being re-passed against this
+// wording by independent raters, one per file, the way change 3's rename was
+// followed by its re-score. The set that actually needs the pass is the
+// `absent` ones, not the `present` ones: a widening definition puts every
+// `absent` file at risk, so the re-pass set is the inverse of the one the
+// addendum named.
 
 // `shows-deliverable` — THE AXIS IT IS ON, and THE MEDIUM THAT COUNTS. Change 3
 // split this signal from `real-product-screenshot` and left both questions

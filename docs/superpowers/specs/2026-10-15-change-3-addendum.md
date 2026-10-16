@@ -6,8 +6,10 @@ Follows: `2026-10-14-vocabulary-v4-proposal.md` change 3, applied in
 Status: **findings, not decisions.** Nothing here was applied when written.
 **Holes 7, 2 and 1 are now applied, and hole 3 closed as a side effect, in
 `2026-10-15-holes-7-and-2-applied.md`.** That document also measures what
-the new wording contradicts: six applied `present` values, none of them
-changed. The other findings stand as written.
+the new wording contradicts: six applied `present` values. Three have since
+been re-rated from fresh captures and flipped to `absent` (`truemile`,
+`browserbase-com`, `sentient-os`); three remain open. The other findings stand
+as written.
 
 Change 3 dropped the exclusivity between `real-product-screenshot` and
 `shows-deliverable` and renamed the latter. Seven raters then re-scored the
@@ -294,18 +296,30 @@ un-deferring it, on one file.
 **DONE** (1 applied with 2; 3 closed by it). Hole 4 was already applied.
 See `2026-10-15-holes-7-and-2-applied.md`.
 
-**0. Re-rate the six files that wording contradicts** — three FAILS
-   (`modal-com`, `sentient-os`, `truemile`) and three TENSION (`papaya`,
-   `browserbase-com`, `the-subvocal-company`), one file per rater from a fresh
-   capture. `modal-com` and `sentient-os` carry `real-product-screenshot:
-   present` and so sit inside hole 6's set — fold those two into that capture.
-   The other four carry it `absent` and are standalone.
+**0. Re-rate the three files that wording still contradicts** — `modal-com`,
+   `papaya`, `the-subvocal-company`, one file per rater from a fresh capture.
+   `truemile`, `browserbase-com` and `sentient-os` are done: all three flipped
+   to `absent` on their own walks. `modal-com` carries `real-product-surface:
+   present` and sits inside hole 6's set; the other two are standalone.
 3. **Hole 6** (`real-product-surface`) — now **urgent rather than optional**.
-   Three files read `real-product-screenshot: absent` while plainly showing
-   their product (`financial-datasets` rebuilt live, `railway-com` drawn in
-   vector, `grep-ai` page-authored replicas), and a fourth (`clerk-com`) holds
-   `present` only on the convention. A rename plus a re-pass on the 23 files
-   carrying the signal.
+   Two files read `real-product-screenshot: absent` while plainly showing their
+   product (`financial-datasets` rebuilt live, `railway-com` drawn in vector),
+   and two more (`clerk-com` and `grep-ai`) hold `present` only on the
+   convention. A rename plus a re-pass on the files carrying the signal.
+
+   > **CORRECTED 2026-10-16.** This item originally read "Three files read
+   > `absent` ... `grep-ai` page-authored replicas ... and a fourth,
+   > `clerk-com`, holds `present`." That is wrong on the split and it
+   > propagated into the `real-product-surface` block in
+   > `lib/antislop-vocab.ts`, where a rater reads it. `grep-ai` reads
+   > `present` at every commit from its origin (`0d196ebe`) through HEAD, and
+   > its own prose records it: "`real-product-screenshot` stays `present`,
+   > flagged ... a **fourth** instance". It belongs with `clerk-com` in the
+   > convention group. The affected-file count (4) was right; the grouping was
+   > not. Both the vocab block and this item are now corrected, and a corpus
+   > test asserts the four named files' values against their front-matters so
+   > the claim cannot drift again. No signal value moved — this is a prose
+   > correction, not a re-score.
 4. **Hole 8** (sourced vs fabricated content) — the one change 3 created. Needs
    a new axis, not a reworded one.
 4. **Hole 5** — needs a decision, not a measurement. Lowest urgency; no file

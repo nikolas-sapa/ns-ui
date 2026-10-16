@@ -27,7 +27,7 @@ signals:
   type-scale-high-contrast: present
   editorial-grid-break: present
   custom-type-pairing: absent
-  real-product-surface: absent
+  real-product-surface: present
   shows-deliverable: present
   density-variation: present
   one-accent-discipline: present
@@ -238,3 +238,121 @@ takes the two-face scene as competing anchors, the count goes to 6 craft and the
 net to -5 — still exemplar, which is why the verdict does not turn on either.
 What would move it is `generic-sans-default` being joined by anything else, and
 nothing else fired.
+
+**v4 holes 7+2 / change 3b re-score**
+
+Signal profile, decided before the prose: `shows-deliverable: present`
+(value confirmed, basis replaced), `real-product-surface: present` (flipped
+from absent).
+
+*Capture.* Reused `s5/the-subvocal-company/walk.json`: 20 tiles,
+`clamped: false`, `coverage: 1`, `worstLandingErrorPx: 0`, docH 13726 before
+and after, scroller `window+rAF-pin`. Stitched (`NS_SESSION=s5`) to 4 strips,
+13726px against page 13726px. The last strip (1440x926) ends in the footer:
+wordmark "THE Subvocal Company", links "How it works / The prototype / Preorder
+terms / Privacy / LinkedIn", "© 2026 The Subvocal Company". Read from strips.
+Live DOM re-probe found three `<video>` elements, one more than the old prose
+names: an 8s muted autoplay hero film at y0, the 91.767s demonstration at
+y4402 (1344x756, `controls: true`, `muted: false`, `autoplay: false`,
+`aria-label` "Subvocal launch video and silent speech prototype
+demonstration"), and the 3.79s scroll-film clip at y6803.
+
+*Video method.* Fetched the demonstration mp4 directly from its Cloudflare
+Stream `downloads/default.mp4` URL; SHA-256 `8de9f4e2…1669`, byte-identical to
+the copy a previous rater left in `video/`. 1920x1080, 30fps, has an audio
+track. ffmpeg at 1fps (92 frames) for the survey, then `-ss` single-frame seeks
+at 0.3-1s steps around each demo, laptop screen cropped from the 1920x1080
+frame and upscaled 4x (LANCZOS) for the small labels. Audio was not
+transcribed (no speech-to-text installed); the burned-in captions were read
+instead.
+
+*What the rig produces.* The laptop runs a full-screen state app with a
+window title that reads approximately "Text Entry Mode" (blurred even at 4x;
+treat the wording as a reading, not a quote). Each take cycles a coloured
+field with a centred state label: yellow (label illegible), red "RECORDING",
+mid-blue "PREDICTING" (top of the glyphs cropped by the bezel at 54s), green
+"TEXT RESULT", dark blue "READY". Three takes:
+- 0-15s: green "TEXT RESULT" builds "I'm" (10s) → "I'm speaking right now
+  but" (11s) → "I'm speaking right now but you can't hear me" (13s), then
+  READY. Correct.
+- 49-62s: yellow (49s) → "RECORDING" (50-53s) → "PREDICTING" (54-56s) →
+  "TEXT RESULT": "I can" (57s), "I can talk primately" (57.5s), "I can talk
+  primately and nobody" (58s), "I can talk primately and nobody can listen"
+  (59s), then "READY" holding the same line (60-62s); the line is still on
+  screen in the close-up at ~66-67s under the caption "And now we have this
+  palm-sized". The speaker meant "privately". The edit overlays a cartoon-
+  monkey cutout and the caption "**PRIVATELY" at ≈58.0-59.3s (present in
+  seeks at 58.2, 58.5, 58.8, 59.1s; gone at 59.4s). No retake follows; the
+  misdecode is never replaced on screen.
+- 78-88s: yellow (78s) → "RECORDING" (80-82s) → "PREDICTING" (83-85s) → "TEXT
+  RESULT": "Reserve yours today" (86s, rendered over a ghost of "Reserve yours
+  to"), "Reserve yours today at subvocal dot" (87s), "Reserve yours today at
+  subvocal dot co" (88s). Correct. Then an end card "Preorder at
+  https://subvocal.co" and black.
+PREDICTING holds roughly 2-3s between RECORDING and the first word in both
+filmed takes, but camera cuts fall inside the sequences, so this is not a
+latency measurement and none is recorded. No take states a WPM, accuracy or
+confidence value.
+
+**Q1 `shows-deliverable`: present, confirmed, on a different artefact.**
+The entry that could have embarrassed the vendor: the prototype's own output,
+"I can talk primately and nobody can listen" (demo video, 57.5s onward),
+shipped with the vendor's "**PRIVATELY" correction stamped on it (≈58.0-59.3s).
+A misrecognition in the vendor's flagship demo, of the one word that carries
+the page's privacy pitch, kept in rather than retaken. Part A: it is the
+vendor's own decoder at work, and the content says the product got a word
+wrong; that can count against the vendor however charmingly it is framed. The
+gag does not neutralise it; it is the vendor conceding the error on camera.
+Part B: a captured artefact (a camera recording of the real screen), readable
+at playback size. Passes on stance and medium.
+
+The audit's objection to the old basis is correct and is upheld. The three
+destination panels (Claude Code "Add Google OAuth to the login flow. When the
+user clicks the login button..." at strip y≈8966; Voice Agents "Find somewhere
+for dinner near my next stop. Something small and quiet." at strip y≈10366;
+"Glasses to glasses · Alex" "This party is a bit too loud. Let's go home?" at
+strip y≈11100) and the typing panel ("Your words flow" strip y≈5876 → "Your
+words flow at 200+ words per minute." strip y≈6500-6600) are page-authored
+renderings with no entry that can embarrass: every message is a clean decode,
+no error, latency, confidence or accuracy value appears, and "200+" is a floor
+that only flatters. On those alone the signal would be ABSENT. The FAQ was
+also searched (open-state capture `faq-open.png`, strip y≈12130-12380): "Up
+close, someone may notice slight movement" and "Like any input method, it can
+occasionally get something wrong" both narrow claims the page would gain from
+leaving broad, but they are marketing prose, not product chrome, a captured
+artefact, or a rendering of output, so they fail Part B and do not carry this
+signal. The video is the only artefact on the page with an entry that can
+embarrass, and it does.
+
+**Q2 `real-product-surface`: present, flipped from absent.** The old "no UI
+exists" category fact does not survive the frames. The prototype has a
+software surface, the state app above, and the page ships a genuine camera
+capture of it running on a real laptop, wired to the real rig (breadboard,
+wired frames, the cables the speakers say "we won't need ... anymore"), producing text
+including its own mistake. That is a genuine capture of the real product, not a
+stylised or invented UI. The caveat, stated so a second rater can disagree: it
+is a lab harness, not the shipping surface, and its evidence sits behind a play
+button (the poster frame at y4402 shows only an unlabelled blue screen). The
+page's own panels, by contrast, are a stylised rebuild and would fail this
+signal by themselves.
+
+*Video ruling.* The demonstration's evidence belongs to `shows-deliverable`
+(and supplies `real-product-surface`), not to `live-claim-control`. A recorded
+take is fixed content the vendor selected; the visitor can play it and listen
+but cannot choose the input or steer the run, so it is not a control over a
+live claim. What it carries is a product output whose content counts against
+the vendor, which is exactly the shows-deliverable axis. `live-claim-control`
+is not re-rated here; it still stands on the three scene buttons ("09:15 The
+office" / "17:40 The train" / "19:30 Across the room"), which the old prose
+showed are real controls, and its second-affordance paragraph should no longer
+lean on the video.
+
+*Drift from old prose.* (1) The `artifact-not-dashboard` paragraph's evidence
+for the deliverable signal is withdrawn; the value survives on the lab video.
+(2) The near-miss "`real-product-screenshot` is absent and that is a category
+fact" is wrong: a software surface exists and is captured. (3) The old prose
+described the 91.8s video as "two people at a desk, a laptop, a breadboard,
+loose frames on the table" and never said what the laptop shows; it shows
+three decodes, one of them a shipped misrecognition. (4) The page has a third
+video (8s autoplay hero film) the old prose did not count. The previous
+rater's unfinished crop of the laptop band is completed above.
