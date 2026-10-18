@@ -36,6 +36,18 @@ for (const name of ["catalogStateFromParams(", "isCatalogFiltered(", "isCatalogS
   );
 }
 
+// The Featured rail and the "All components" heading are what the gate
+// actually hides, so their conditions must go through the shared predicates
+// too; an inline `sort === "featured"` there would drift unnoticed.
+assert.ok(
+  !/!filtered\s*&&\s*sort\s*===\s*"featured"/.test(showcaseSource),
+  "app/_components/showcase.tsx gates the Featured rail on an inline sort check; use isCatalogSorted() via `sorted`",
+);
+assert.ok(
+  (showcaseSource.match(/!filtered\s*&&\s*!sorted\s*&&\s*featuredItems\.length/g) ?? []).length >= 2,
+  "app/_components/showcase.tsx no longer gates the Featured rail and its heading on !filtered && !sorted",
+);
+
 // Same validator Showcase passes to catalogStateFromParams.
 const isKnownCategory = (id: string) =>
   id === "other" || CATEGORIES.some((c) => c.id === id);

@@ -723,7 +723,7 @@ export function Showcase({
           then unmounts it once React reads the URL; the CSS class keeps it
           invisible from the very first paint instead, so nothing below it
           jumps when React's own unmount happens moments later. */}
-      {!filtered && sort === "featured" && featuredItems.length > 0 ? (
+      {!filtered && !sorted && featuredItems.length > 0 ? (
         <section className="catalog-gate-hide mt-14" aria-labelledby="featured-heading">
           <h2
             id="featured-heading"
@@ -759,7 +759,7 @@ export function Showcase({
           sense as a header for the rest of the grid *after* a curated
           Featured section, so it shares that section's condition exactly
           and needs the same pre-hydration cover. */}
-      {!filtered && sort === "featured" && featuredItems.length > 0 ? (
+      {!filtered && !sorted && featuredItems.length > 0 ? (
         <h2 className="catalog-gate-hide mt-24 font-mono text-xs font-normal uppercase tracking-[0.18em] text-ns-muted">
           All components
         </h2>
