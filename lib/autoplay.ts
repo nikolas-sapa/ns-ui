@@ -2,8 +2,8 @@
  * Autoplay descriptors — how a component demonstrates itself, unattended,
  * inside a landing-page card.
  *
- * 495 of the 542 components only wake on input (hover, pointer movement, drag,
- * press, scroll), so inside a card they froze on a still frame. Rather than
+ * 305 of the 542 components only wake on input (hover, pointer movement, drag,
+ * press, scroll, type), so inside a card they froze on a still frame. Rather than
  * bespoke animations per component, each component declares *what kind of
  * input wakes it* in its `meta.json`, and one shared driver synthesises that
  * input.
