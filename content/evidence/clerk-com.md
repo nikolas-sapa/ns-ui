@@ -28,7 +28,7 @@ signals:
   editorial-grid-break: present
   custom-type-pairing: absent
   real-product-surface: present
-  shows-deliverable: absent
+  shows-deliverable: present
   density-variation: present
   one-accent-discipline: absent
   live-claim-control: absent
@@ -151,3 +151,98 @@ separate pull-quote (Paul Copplestone, Supabase CEO) in the left column.
 bubble. Single theme, light-native: a dark-scheme render differs by 0.0% of
 sampled pixels despite 336 `dark:`-style hooks in source and zero
 `prefers-color-scheme` rules.
+
+**v4 hole-7 deliverable re-pass**
+
+Capture: reused `~/scratch/antislop/s5/clerk-com` (walked 2026-10-16), 11 tiles,
+`clamped: false`, `coverage: 1`, `docH_before` 7187 = `docH_after` 7187 (no
+drift), stitched to two strips totalling 7187px. The last strip ends in the
+footer (Product / SDKs / Resources / Company / Legal columns, `© 2026 Clerk,
+Inc.`, social icons). The fixed cookie banner repeats on every tile; it is
+walker chrome, not page content. The walker shows the hero on its default tab,
+so the other three hero tabs were opened with Playwright and read off the DOM.
+The tabs do not auto-rotate: `User Authentication` is still selected after 12s.
+
+Candidates weighed (page y with the relevant tab selected, scrollY 0):
+
+- Hero, `User Authentication` tab (y≈546-1073): the live `<SignUp />`, inside
+  product chrome. "Create your account", "Continue with Google" / "Last used",
+  "Continue with GitHub", an email field typing `chris.walker@example.com`. A
+  doorway. Nothing in it can count against Clerk. The dimmed raster flanks
+  (user profile, sign-in, waitlist, organization list, at opacity 0.6) are
+  product captures with no adverse entry either.
+- Hero, `Enterprise Authentication` tab, default `Enterprise SSO` sub-tab
+  (y≈568-1032): "Select your identity provider", Okta Workforce / Microsoft
+  Entra / Google Workspace / Custom SAML Provider, "Step 1 of 3". A setup flow
+  with no outcome yet.
+- **Hero, `Enterprise Authentication` tab, `Directory Sync` sub-tab (sub-tab
+  label y=1143; table y≈577-937).** A client-rendered HTML rebuild of Clerk's
+  own "Directory Sync (SCIM)" dashboard: product chrome, readable, not
+  placeholder. A dimmed raster copy
+  (`organization-profile-directory-sync_2x.1b19_bjqbkhd3.webp`) also sits in
+  the Agent tab's flank, off-canvas at x=1652. Four rows:
+  `Okta - HospitalA` / `HospitalA` / `Active` / `1 hr 30 min ago`;
+  `Okta - HospitalB` / `HospitalB` / `Error` / `1 hr 30 min ago`;
+  `Okta - HospitalC` / `HospitalC` / `Setup required` / `–`;
+  `Acme Corp` / `JumpCloud` / `Disabled` / `3 days ago`.
+- Hero, `Agent Authentication` tab (y≈582-1100): an OAuth consent, "Cursor
+  would like to access your Acme account", with "Deny" / "Allow". It then
+  plays "Access granted" and "Cursor can now act for you in Acme, limited to
+  the permissions you approved." Hidden state also carries `scope:
+  projects:read` and `expires in 60 min`. Scoped, expiring access is a limit
+  the page sells, so it does not count.
+- Hero, `Multi-tenancy` tab: Organizations / Members & Invitations / Roles &
+  Permissions. The Roles panel carries `2 / 10 used`, a quota counter. It
+  narrows no claim on the page. Not relied on.
+- Dark bento, Fraud and Abuse Prevention card (y≈2215-2514): "Fraudulent
+  sign-ups detected", then `bad_actor+1@example.com` / `Blocked Aug 4 at
+  14:09` and three more blocked rows. Every row is the product winning.
+  Session Management (y≈2075-2185: "MacBook Pro", "Chrome", "San Francisco,
+  CA", "Sign out of device"), the OTP phone ("Security alert", "Your security
+  passcode is 764676") and API Keys ("Authenticating...") are features
+  shown working. Nothing adverse.
+- Acme `<PricingTable />` and Checkout drawer (y≈4308-4832, page canvas
+  framing a live product component): `$9` / `$19`, "Total Due Today" `USD`
+  `$14.00`, "Payment was successful!", "Your new subscription is all set."
+  Every value is the flattering one, and the prices are Acme's, not Clerk's.
+- Not artefacts: the body copy "Free for your first 50,000 monthly retained
+  users and 100 monthly retained orgs." (y=6184), which is pricing copy, not a
+  refusal. The tweet masonry (y≈5826-6400) is reader content. WebDevCody's
+  "btw, you don't need to remind me that Laravel has all of this out of the
+  box" is a concession inside a testimonial, not in a deliverable.
+
+The entry that could have embarrassed the vendor is `Error` on the
+`Okta - HospitalB` row (status badge at y=800, x=758, red), last sync
+`1 hr 30 min ago`, in the Directory Sync (SCIM) table. It sits next to
+`Setup required` (HospitalC, never synced, `–`) and `Disabled` (Acme Corp /
+JumpCloud, `3 days ago`).
+
+Verdict: **present**, flipped from absent. This is the inverse of the cohort's
+fail cases: browserbase-com's ledger has `Done` and `Uploading` but no
+`Failed`, and modal-com's dashboard has no error row. Clerk's sync ledger
+could have shown four `Active` rows, and instead one of its own SCIM syncs is
+failing on the page. The data is seeded (fictional hospitals), and it is
+scored on what it says. A demo that shows the product erring passes. It is
+not a limit the page sells: no copy anywhere sells sync-error reporting. The
+weakest point is attribution, since the error plausibly sits on the
+customer's Okta side. But railway-com's scanner probe is not Railway's fault
+either, and the test is whether the content could count against the vendor.
+A failing sync in Clerk's directory-sync product does. The artefact is two
+clicks deep (tab, then sub-tab), which is why the original study and the
+walker missed it. Per stripe-2014, content on the studied page behind a
+non-default slide counts, so this flip corrects a capture miss and is not a
+reinterpretation.
+
+Studied-page check: **unchanged.** The Wayback CDX has captures on
+2026-10-08 (19:07:34Z) and 2026-10-10 (03:59:15Z, the nearest before
+`studied`). The server-rendered visible text of the 2026-10-10 capture and
+the live page is 337 lines each with 0 differing lines. The directory-sync
+rows are client-rendered, so they were checked in the archived JS: chunk
+`1khdk5va03oce.js` at 2026-10-10T03:59:15Z carries the identical four-row
+array (`name:"Okta - HospitalB" ... status:"error",lastSync:"1 hr 30 min
+ago"`) and the label map `error:"Error"`. The live chunk `2bskjdt6p8rzz.js`
+matches. The raster asset hash is identical across both captures and live.
+Only rotation differs: the logo strip and the left pull-quote. The prose
+names Paul Copplestone and this capture shows Patrick Collison; both quotes
+are in all three HTML files. The "Clerk raises $50m Series C" banner, not
+mentioned above, is already in the 2026-10-08 capture.

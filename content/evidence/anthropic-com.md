@@ -97,3 +97,68 @@ No product screenshot anywhere on the page: the thing being sold is represented 
 typography and a word, never by a picture of an interface. Single theme — a
 prefers-color-scheme dark capture differs from the light one by 0.1% of pixels, so
 there is no dark variant that could be an afterthought.
+
+**v4 change 3b surface re-pass**
+
+Re-rated 2026-10-16 from the live page. Values decided before this prose:
+`real-product-surface: absent` (confirmed, no flip), `shows-deliverable: absent`
+(confirmed, no flip).
+
+Capture: `shoot-tiles.cjs` walked the window scroller in 5 tiles at 1440x900,
+`clamped: false`, `coverage: 1.002`, `docH_before` 3340, `docH_after` 3346 (the
+larger, 3346, is the page height; the stitched strip is 1440x3340, one strip). The
+last strip ends in the near-black footer (link columns, "© 2026 Anthropic PBC",
+LinkedIn / X / YouTube glyphs), so the walk reached the bottom. The fixed cookie card
+repeats in every tile at the lower right; text it covers was read from the DOM.
+
+Every candidate surface, inventoried from the DOM (Playwright, after a full scroll):
+- 0 `<video>`, 0 `<iframe>`, 0 `<table>`, 0 `<pre>`/`<code>`, 0 CSS background images.
+- 3 `<img>` in `.moo-sq` wrappers at y=675, 228x228, x=206 / 606 / 1007
+  (`hero_moo_1a/1b/1c.webp`). Raster. Fetched and viewed: a yellow paper collage with
+  pencil lines, a dark oil-paint stroke over ochre, white chalk marks on blue. Painted
+  textures. They show for about two seconds of the hero intro animation (frames at
+  0.5s and 2s), then resolve into the panel title and sit at `visibility: hidden`.
+  The walker disables animation, which is why the earlier prose never saw them.
+  Decorative art, not a UI.
+- 2 `<canvas>` in the hero panel: y=651, 777x221 (the curved "Claude Haiku 5.5"
+  title) and y=820, 1285x112 (the two hand-drawn arcs). Typography and line art.
+- 2 `<svg>`: the wordmark lottie at y=26 (143x16) and the footer mark at y=2412
+  (45x32).
+- Nav dropdowns ("Try Claude", Research, Commitments, Learn) add no imagery; the three
+  `<img>` above are the only images in the document.
+
+Q1, `real-product-surface`: absent. Claude, the product, is nowhere on the page as an
+interface: no capture or rebuild of claude.ai, Claude Code, the console or the API,
+no screen recording (no video element exists), no SVG or DOM rendering of a chat,
+terminal or settings pane. The product appears only as words: the "Claude Haiku 5.5"
+title, three release cards, an index of article titles and footer links ("Claude
+Code", "Console login", "Log in to Claude"). The one visual medium that animates is
+painted texture. Under the widened definition there is still nothing to credit.
+
+Q2, `shows-deliverable`: absent. No entry could embarrass the vendor. Searched: every
+text block, the three release cards, the hero panel, the six-row index; for a model
+card, benchmark table, eval figure, system-card excerpt or model output of any kind
+(none exist: 0 tables, 0 code blocks, no rendered output). The nearest candidates are
+the card bodies at y=1405, vendor copy rather than a rendering of anything the product
+produced:
+- "Designed for high-volume, cost-sensitive work. It’s our fastest, cheapest, and most capable small model to date."
+- "A clear upgrade over Sonnet 5 that runs 30% faster and costs up to 30% less for most work."
+- "Opus 5.5 performs at the level of Fable 5.1 on most work, and costs 40% less to run than Opus 5 on typical workloads."
+
+Every value is a win (faster, cheaper, more capable, parity with Fable 5.1). "For most
+work", "up to" and "on typical workloads" are ordinary marketing hedges that keep the
+figures large, not a refusal that narrows a claim against the vendor's interest. The
+hero line at y=914, "The cheapest, fastest, and most capable small model we’ve ever
+released.", is the same claim again. No artefact of the product's work is shown, and
+the claims about it can only flatter.
+
+Drift from the earlier prose: page height now 3346, was 3340. The hero intro animation
+(three painted-texture squares dissolving into the curved title) is new to this record;
+the earlier tile capture had animation off. The "Latest releases" row now reads Haiku
+5.5 (October 7, 2026), Sonnet 5.5 (September 28, 2026), Opus 5.5 (September 22,
+2026). The index beside "At Anthropic, we build AI to serve humanity’s long-term
+well-being." now lists Claude Science, Core views on AI safety, Anthropic’s
+Responsible Scaling Policy, Anthropic Academy: Build and Learn with Claude,
+Anthropic’s Economic Index, Claude’s Constitution. The rest of the earlier description
+(cream field, split hero, curved serif title, spec-table cards, terracotta only on the
+cookie accept button, footer glyphs) still matches.

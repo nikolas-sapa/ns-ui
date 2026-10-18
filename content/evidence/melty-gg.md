@@ -18,7 +18,7 @@ signals:
   testimonial-card-row: absent
   indigo-violet-accent: absent
   gradient-fill-cta: absent
-  scroll-reveal-blank: unresolved
+  scroll-reveal-blank: absent
   typewriter-headline: absent
   stock-photo-generic: absent
   centered-hero-stack: absent
@@ -88,3 +88,34 @@ So `scroll-reveal-blank` is `unresolved`, on the same standard applied to
 scrolling is the gate the signal names and a full-document walk does not open it.
 `openhack` under the identical walk goes 6.0% to 27.8% mean ink, 4.6x — that is what
 a confirmed gate looks like, and this is not it.
+
+**v4 hole-7 deliverable re-pass**
+
+Re-pass 2026-10-16. Value confirmed: `shows-deliverable: absent`. Front-matter unchanged.
+
+Capture: reused `~/scratch/antislop/s5/melty-gg` walk, 13 tiles, `clamped: false`, `coverage: 1`, `docH_before` 9086 = `docH_after` 9086 (no drift). Stitched to 3 strips (4400 + 4200 + 486 = 9086px). The last strip ends in the footer: "© 2026 Stella Montis Inc." at y9048 with Privacy / Terms / Discord / X.com. Text and media read off the DOM with Playwright. The hero video is load-bearing, so it was pulled (`/videos/mashups-reel-1080p.mp4`, 32.0s, 1920x1080, sha256 `ae65b21f…39f0`) and read as 1fps contact sheets plus full-res frames at the text overlays, not from stills.
+
+Unlike the study's capture, this walk renders the band between the cover-art strip and the FAQ. It holds four feature sections, each a page-authored HTML panel of product chrome over a game-frame background. Every candidate weighed:
+
+- **Hero reel**, y100-860, inside a product capture (gameplay footage of mashups running; the clip label rotates with the clip, "Super Mario Ring" in this capture). There are eight ~4s clips: Elden Ring + Minecraft, Mario vs "Margit, the Fell Omen", Portal + Half-Life 2, Minecraft + a CoD rifle, a horde round, Mario in a Minecraft dungeon, MW2 sniping, MW2 skyscraper. The adverse-looking content is all game-internal. A Minecraft death line, "HomeInvader tried to swim in lava" (~21s). An MW2 scoreboard reading "LOSING" 200 / 300 (~24-28s). A boss health bar. These are the games working. None is Melty failing to install, launch, or join. The two overlay strings that are Melty's or the mod's own, "All enemy health x4 (1 = vanilla)." (~17s) and "Original controller controls | Start: pause | J: return to MW2" (~29s), are a difficulty setting and a control hint, both features. The tan pixel cloud in the Elden Craft clip (0-4s) reads as Minecraft hit/death particles, not a texture fault. Its colours rule out the magenta/black missing-texture checker, and I cannot support a glitch reading. No crash, error, hitch, compatibility notice or broken render appears in the 32s.
+- **Cover-art strip**, y~1350-1556, page canvas: covers rotating per load (Skate 3 / GTA V / Terraria in the DOM read) flanking "Download Melty". Not output. The grey card is a crossfade (GTA V at opacity 0.86), not a missing asset.
+- **"Discover" panel**, y2213-2540, page-authored chrome: six mashup tiles ("SkyCraft", "Super Mario Ring", "Skate Warfare", "Portal Life", "Elden Craft", "Spartan Warfare"), each a title, a frame and two covers. No ratings, no counts, no status. Nothing could count against the vendor.
+- **"Forget setup / Play in one click" panel**, y3269-3717, page-authored chrome over `skycraft-1.webp`. The pill animates through "Play" → "Installing" → "Starting Skyrim" → "Playing". The walker froze it mid-transition, so it shows a blank blue pill. Read off the DOM, all four states are the success path. There is no failed-install, missing-game or retry state, even though the FAQ admits one ("If you’re missing one, Melty sends you to its store.").
+- **"Multiplayer / Out of the box" panel**, y4613, page-authored chrome: "melty.gg/j/amber-fox-7k2q" → "Link copied", then a crowd of six initials and "+94". A count that can only flatter by being larger.
+- **"Create and Publish / With your AI" panel**, y5667-5968, page-authored chrome: "My mashups" with "SkyCraft" and "Elden Craft", and "Publish with AI" → "Send instructions to coding agent". No moderation, rejection or failed-build state. (The SkyCraft thumbnail is blank in the strip: lazy `skycraft-2.webp` not yet painted, a capture artefact.)
+- **FAQ**, y6656-8078: prose, excluded from scoring. It holds the page's only concessions: "If you’re missing one, Melty sends you to its store." and "If a mashup looks wrong, report it from its page." Both sit in body copy, not in an artefact (the deepmark ruling).
+
+Entry that could have embarrassed the vendor: **none**. Searched: all 32s of the reel (every clip, every legible overlay), the DOM text of all four chrome panels including every hidden animation state, and the cover strip. Verdict: the deliverable is shown well and in two media. A real product capture (the reel) and page-authored chrome renderings (the four panels) both count under Part B. But every entry is the flattering one. The only adversity on screen belongs to the games, not to Melty. The one admission that Play can fall short lives in FAQ prose. The panel that dramatises Play shows only the success path. Absent on stance, not medium.
+
+Studied-page check: unchanged. Wayback `20261010015523` (raw `id_`, deploy `dpl_82JjYH4NHi6oDne7778Sbueab1Ea`) against the live page (deploy `dpl_4HwXS12vXW4hQ5kLqhykhL9zxwPH`): 103 visible text strings each, zero diff. Every section above, including the four mid-page panels and the reel `mashups-reel-1080p.mp4`, is in the studied page's markup. The study's capture recorded that band as blank. This walk renders it. Since this re-pass covers `shows-deliverable` only, `scroll-reveal-blank` is left as it stands for the orchestrator to revisit. The only differences are per-load rotations (cover art, hero clip label).
+
+**Orchestrator: `scroll-reveal-blank` unresolved → absent.** The `unresolved`
+rested on a ~4000px black band that the study's walk could not open. Today's
+walker renders that band as four content panels, and the Wayback snapshot
+`20261010015523` confirms the page is unchanged, so the blank band was a
+capture failure. Measured with `srb.cjs`/`dwell.cjs`: at rest, 19 of 77 text
+nodes sit under 8% opacity. A full scroll walk crosses **2** of them (27
+characters); a dwell control waiting the same time without scrolling crosses
+**2** (44 characters). Equal counts mean the gate is time, not scroll, and the
+17 nodes that stay faded are a design fade. Absent under the signal's own
+procedure.

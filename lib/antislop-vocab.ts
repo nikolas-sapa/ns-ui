@@ -132,11 +132,35 @@ export const SLOP_SIGNALS = [
 // It still catches the slop case the signal was built for: a glassy fake
 // dashboard floating in a hero is an invented UI and fails.
 //
+// THE DOORWAY IS NOT THE SURFACE. The product surface is what the product
+// presents IN USE, not the act of reaching it. A faithful command line with no
+// prompt and no output, a sign-in or sign-up form, an install snippet: each is
+// real, and each fails, because the product has not answered yet. Settled at
+// n=42 on acyclic, whose four CLI commands were checked flag by flag against
+// the shipped binary (`@acyclic-labs/cli-linux-x64@0.0.6`) and are entirely
+// genuine, while the product's own screens (`--watch` progress, the
+// dashboard, the merged patch) appear nowhere. Same shape as dropbox-2014's
+// real sign-up forms (the account gate, not Dropbox) and browserbase-com.
+// Counter-case, so the rule is not over-read: stripe-2014's Checkout form IS
+// the product — the screen Stripe sells to merchants — and passes even with
+// empty fields.
+//
 // NOT the same question as `shows-deliverable` (medium vs content) and NOT the
 // same question as hole 8 (is the CONTENT sourced or fabricated). This signal
 // asks only whether the SURFACE is the real product. A faithful rebuild
 // populated with invented data is `present` here and is judged on its content
 // by the other two.
+//
+// A RE-PASS RE-INTERPRETS THE PAGE AS STUDIED. These pages change under you:
+// of the fourteen re-passed at n=42, decent-com had removed the band its
+// deliverable rested on and aviern had replaced its hero and gained a video,
+// both since their `studied` date. Flipping one signal to the redesign leaves
+// a file describing two pages at once. So a re-pass asks whether the STUDIED
+// page passes the new wording; a redesign triggers a full re-study (every
+// signal, the verdict, the `studied` date), never a single-signal flip. A flip
+// that corrects a capture miss on the same page is fine: stripe-2014's
+// Checkout slides were on the studied snapshot all along, behind a carousel
+// pinned to another slide.
 //
 // RENAME ONLY as applied: no value moved with it. All 42 evidence files carry
 // the signal — the rename is global scope, so every front-matter has one and
@@ -185,10 +209,13 @@ export const SLOP_SIGNALS = [
 //   95-100% axis beside a live sec.gov `filing_url`; neuron-industries
 //   keeping `Certifications: UL + CE (planned)` on the flagship column;
 //   decent-com answering "Every option you can get, priced." with two of six
-//   rows `Not allowed` / `Too small`; capveon closing its queue `Four
-//   approved in one click each. One escalated.`; silica showing applied force
-//   `2.0 g` against its own joint measurement `1.5 g`, a 25% shortfall on the
-//   number it most benefits from showing exact; railway-com's own error log
+//   rows `Not allowed` / `Too small` (as captured 2026-10-10; a redesign had
+//   removed the band by 2026-10-16, so the example is dated, not live);
+//   capveon closing its queue `Four approved in one click each. One
+//   escalated.`; silica authoring its own
+//   joint reading as applied force plus Gaussian noise (`gauss()*.8`), so at
+//   the 2.0 g rest load its own sensor reads 0.3-3.8 g, under a heading
+//   claiming it can feel "as light as a paperclip"; railway-com's own error log
 //   carrying a WordPress scanner probing a non-WordPress app.
 //
 //   fails, and the absence is the finding — a dashboard with no error row, no
@@ -196,6 +223,20 @@ export const SLOP_SIGNALS = [
 //   range; a card deck where nothing shows the product declining, failing or
 //   costing; a capability diagram whose only quantity is "a billion possible
 //   scenarios", which can only flatter by being larger.
+//
+// WHOSE FAILURE COUNTS, settled across 16 raters at n=42. An unflattering
+// entry counts when it is the product's own operation or unscrubbed output,
+// and NOT the capability the panel is selling. stripe-com's `Disputed` and
+// `Refunded` rows are excluded: the panel's own callouts sell dispute
+// handling. papaya's and linear-app's customer failures are excluded: catching
+// them is the pitch. clerk-com's `Okta - HospitalB` / `Error` sync row counts
+// though Okta may be at fault, as railway-com's scanner probe counts though
+// Railway did not send it: nothing on either page sells error display.
+//
+// THE ENTRY MUST BE LEGIBLE AT PAGE SIZE, in CSS px as rendered. A reader
+// cannot audit text they cannot read. basecamp-2014's "Still only 8 of about
+// 40 attendees actually showed up" is a genuine concession and does not count
+// at about 4 CSS px; heroku-2014's add-on prices fail the same way.
 //
 // A refusal counts when it narrows a claim the page would benefit from leaving
 // broad (hole 1). neuron-industries keeps `Certifications: UL + CE (planned)`

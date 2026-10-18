@@ -115,3 +115,102 @@ Flipping it gives +3, still below both slop anchors.
 **Consequence:** the slop pool returns to 2, below the gate's minimum of 3,
 so no signal is rule-eligible and the eleven rules authored against this
 file are withdrawn.
+
+**v4 change 3b surface re-pass**
+
+Re-rated from the live page on 2026-10-16. Both values are confirmed
+`absent`; neither flipped.
+
+Capture: 16 tiles, `clamped: false`, `coverage: 1`, `docH_before` 10760 =
+`docH_after` 10760, scroller `window` (no inner scroller found). Stitched to
+3 strips totalling 10760px against a 10760px page. The last strip ends in
+the footer (logo, Home/Company/Blog/Contact/Request a Demo, "© 2026
+DeepMark Inc. All rights reserved."). The sticky left column of "How it
+works" repeats its heading once in the stills; that is a sticky artefact,
+not missing content. The DOM carries no `<video>`, no `<canvas>`, no
+`<iframe>`, no `<pre>` or `<code>`, and no CSS background images, so the
+stills are complete.
+
+Candidate product surfaces, every image on the page above 40px:
+
+- y=557, `hero-visual-desktop.svg` (1440x496, SVG as `<img>`; zero `<text>`
+  elements, all type outlined to paths). A phone reading "9:41", "Unknown
+  Caller", "+1 (212) 546-3782", a gradient pill "Verified by DeepMark", and
+  a row "Authenticity" / "100.00%". Not faithful. DeepMark's product is the
+  Vigil C/C++ SDK and a REST API; its own docs (`/docs/vigil/overview`) say
+  the detector returns "a confidence score and a binary decision"
+  (`result.decision: 1 = watermarked, 0 = not watermarked`). I read all 15
+  docs pages linked from the docs nav: none contains "Verified by",
+  "Authenticity", a caller screen, a badge or any end-user UI. The call
+  screen is an invented consumer surface, what a third-party dialler might
+  show, not what DeepMark looks like.
+- y=1382, `capabilities-img-01.svg`: audio, image and video glyphs wired
+  into a DeepMark chip. Diagram.
+- y=1875, `capabilities-img-02.svg`: grey waveform, brain-chip glyph, a
+  "Verifying..." spinner pill. Decorative illustration, no `<text>`.
+- y=4362, `feature-01.svg` and `feature-02.svg`: waveform behind a shield;
+  radar rings with red and cyan dots. Illustration, no readable content.
+- y=5407, `for-developers.svg`: isometric open box with server and database
+  glyphs. Explicitly fails (isometric approximation). The "For developers"
+  section shows no code, no response payload, no console.
+- y=5974, `company.webp`: a person on stage beside a "3:47" timer. Event
+  photo, not product.
+- y=6512, `security-illustration.webp`: shield over a binary-texture page.
+  Illustration.
+- y=7081, `eu-ai-act-01.webp`: "THE EU AI ACT: ARTICLE 50" over a chip
+  with the EU flag. Illustration.
+- y=3505, four use-case photographs (`use-case1.webp` to `use-case3.webp`,
+  `compliance.webp`) and y=8677, four blog thumbnails (one an "AudioSeal
+  vs DeepMark Vigil" title graphic). Not product.
+
+The real product does have a genuine visual surface, but only off this
+page: `/docs/api/audio-vigil` and `/docs/api/audio-metis` carry
+spectrogram examples, and `/docs/api/image-watermarking` shows watermarked
+against passthrough photographs. None of it is on the homepage.
+
+Q1 `real-product-surface`: **absent**. Under the widened definition a
+faithful rebuild in SVG would count, so the hero was checked for exactly
+that: it rebuilds nothing DeepMark ships, an invented call screen with a
+label ("Authenticity") that does not exist in the product's own docs.
+Every other surface is diagram, isometric illustration or photography. Not
+a category fact either: this is a software SDK with real visual output
+(spectrograms, image pairs) that the page does not show.
+
+Q2, the entry that could have embarrassed the vendor: **none in scored
+content.** The one page-authored rendering of the product's output is the
+hero readout, "Verified by DeepMark" / "Authenticity" "100.00%" (y=557),
+which can only flatter. Searched beyond it:
+
+- y=4220 "Real-time watermarking has tradeoffs. We balance them all." and
+  "Holding them at once is the research moat." Names a tradeoff in order
+  to claim it resolved.
+- y=4925 "High capacity. Up to 128 bits": a limit sold as a selling point.
+- y=5075 "Under 2 ms of compute to watermark a second of audio." and
+  "Around 30,000 seconds of audio per second of GPU time on an L40S."
+  Product-output measures, but each value only flatters by being smaller
+  or larger.
+- y=2832 "with clear pass/fail results, from as little as a few seconds of
+  audio": a minimum sold as speed.
+- FAQ answers, collapsed at rest (rendered height 0): y=9372 "No watermark
+  is impossible to remove." and y=9630 "It supports compliance, the legal
+  obligation remains with the provider." These are genuine narrowings of
+  claims the page would benefit from leaving broad, and the nearest thing
+  to an embarrassing entry on the page. They do not count here: they are
+  vendor prose in an accordion, not product chrome, a captured artefact or
+  a rendering of the product's output, so they are not deliverable
+  content.
+
+Q2 `shows-deliverable`: **absent**. The only rendered output is a
+self-awarded 100.00%, and the admissions on the page sit in FAQ copy, not
+in anything the product produced.
+
+Drift from the earlier prose: page height unchanged at 10760px. Two of
+the eleven section pills have been renamed: "Content integrity &
+detection" now reads "Content marking & detection", and "Compliance" now
+reads "EU compliant" (both checked in served HTML; the old strings are
+gone). The Meta / Microsoft / Adobe / "And more" row is captioned "Cited
+by" (y=1093) and its marks link to arXiv 2308.12770, arXiv 2401.17264 and
+IEEE 10447253, papers rather than customers. The hero phone, the four-card
+use-case carousel and the two-card testimonial carousel (Jonathan
+Mortensen, Arjun Gupta) still match. "There is no real product screenshot
+anywhere on 10760px" still holds.

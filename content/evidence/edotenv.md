@@ -238,3 +238,74 @@ page as template-shaped, because nothing measured supports that.
 
 Single theme: 0 `prefers-color-scheme` rules and 0 dark-mode class hooks, so there
 is no second theme to neglect.
+
+**v4 change 3b surface re-pass**
+
+Decided first: `real-product-surface: absent` (confirmed, no flip) and
+`shows-deliverable: absent` (confirmed, no flip).
+
+Capture, 2026-10-16, 1440x900: 5 tiles, `clamped: false`, `coverage: 1`,
+`docH_before` 3098 = `docH_after` 3098, scroller `window`, `reachedPx` 3098. Stitched
+to one 1440x3098 strip, exactly page height. The last strip ends in the footer
+("© 2026 EdotEnv, Inc." left, "Environments for self-improving intelligence" right,
+above a hairline rule). Content read from a Playwright DOM pass on the live page,
+not from pixels.
+
+**Candidate product surfaces: none.** The home render carries 0 `<img>`, 0 `<svg>`,
+0 `<canvas>`, 0 `<video>`, 0 `<picture>`, 0 `<pre>`, 0 `<code>`, 0 `<table>`, 0
+CSS background images, and 0 buttons, inputs, textareas, selects or tabs. The only
+non-text element is one `<iframe>` with no `src`, 1x1 and `visibility: hidden`,
+parented to `<body>`: an infrastructure frame, not a surface. Every visible element is
+type: the h1 "EdotEnv" (y230), one subhead and one mission paragraph, four h2
+sections at y792 / y1405 / y2004 / y2527 with eight paragraphs, and two
+`mailto:info@edotenv.com` links ("GET IN TOUCH" y22, "JOIN THE CONVERSATION ↗"
+y2814). There is no stylised or invented UI either, so the page does not fail the
+signal on fabrication; it fails it on there being nothing to judge.
+
+**The briefing note's premise does not hold for this URL.** edotenv.com is not a
+dotenv developer tool. It is "Quant Neolab working toward RSI." (y375), a lab that
+builds "RL environments at scale from financial market data" (y473). There is no
+CLI invocation, terminal transcript or rendered config file anywhere on the page
+(0 `pre`, 0 `code`), so there was no README or docs to check a rebuild against.
+
+**Q1 verdict, absent.** No raster, video, DOM rebuild or SVG of the product exists
+on the page, genuine or otherwise. This is not a category fact: an RL environment
+has a showable surface (an episode trace, a task spec, a scored agent run, the
+"Oh My Quant" harness the blog names), and the page shows none of them.
+
+**Embarrassing entry: none exists.** Searched all 14 text blocks and every numeric
+token on the page. The only numerals are the section indices "01", "02", "03", "04"
+and the copyright year "2026"; there is no figure, table, list, benchmark, price or
+output of any kind. The nearest thing to a narrowing claim is "We work with frontier
+AI labs and academic groups building research harnesses, evaluation benchmarks, and
+post-training environments." (y1683), which is a flattering customer-class
+statement, not a limit. "The loop only continues when each round gets harder."
+(y955) is the company's thesis about RSI, not a constraint on its own product. No
+refusal, error, cost or failure is stated anywhere.
+
+**Q2 verdict, absent.** There is no artefact, so neither part of the test can start:
+no work of anyone's is shown (Part A), and there is no chrome, captured output or
+page-authored rendering of output to read (Part B).
+
+**Drift from the earlier prose.**
+- The earlier capture clamped tiles 04 and 05 at scroll 2198 and stitched a
+  1440x3700 strip with a ~602px duplicate tail. Today's walk is unclamped and
+  stitches to 3098 exactly; that artifact is gone.
+- Unchanged: docH 3098, innerText 1741 characters, 0 img / svg / canvas / video,
+  0 controls, the single blue link "JOIN THE CONVERSATION ↗".
+- Not recorded earlier: the hidden 1x1 body-level iframe (no bearing on any signal).
+- The earlier prose argued under the retired names `real-product-screenshot` and
+  `artifact-not-dashboard`; its "0 images, so no screenshot" reasoning is format-keyed.
+  Under the genuineness-keyed definition the result is the same, for a stronger
+  reason: there is no surface in any medium.
+- Out of scope but worth flagging: the nav's TEAM / BLOG / NEWS links are client-side
+  states of the same document (`/?tab=team|blog|news`), not part of the scored home
+  render. `/?tab=blog` lists four posts, two labelled "BENCHMARK REPORT"
+  ("Autonomous Research on Low Signal-To-Noise Datasets" → `/blog/alpha-autoresearch`,
+  "Long-Horizon Planning in Nonstationary Environments" → `/blog/long-horizon-planning`),
+  and one research note introduces "Oh My Quant: a research-native agent harness".
+  `/?tab=team` carries 2 `<img>` captioned "EdotEnv team member". None of this is on
+  the scored URL, so none of it is rated here; if the corpus ever widens scope to
+  linked tab states, the benchmark posts are where a deliverable would be looked for.
+  The earlier line "not one environment, one benchmark figure" remains true of the
+  home render.

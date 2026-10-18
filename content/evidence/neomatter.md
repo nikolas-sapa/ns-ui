@@ -91,3 +91,81 @@ crosses zero, so the gate is the scroll and not the clock. The band at y3140-338
 goes from 16.3% to 30.3% ink with ten rows gained and none lost: at rest the
 "Decisions come to you ready" panel shows only its title, and the three options it
 asks the reader to choose between render solely after scrolling.
+
+**v4 hole-7 deliverable re-pass**
+
+`shows-deliverable` stays absent. No entry on the page could have embarrassed the
+vendor.
+
+Capture: the existing s5 walk was reused (13 tiles, `clamped: false`, coverage 1,
+docH 8577 before and after, no drift). Stitched to two strips, 8577px against a
+page of 8577px. The last strip ends in the footer (`© 2026 Lightfield, Inc.`).
+Hidden content was read off the DOM after a wheel walk, and the launch film was
+pulled from its `src` and read as frames every 4s.
+
+The medium is not the problem. Every product card here is a page-authored HTML
+rendering of the product's output on a painted backdrop. All of it is readable,
+none of it is placeholder, and under Part B all of it is eligible. The page fails
+on stance: every value it shows is the flattering one.
+
+Candidates weighed, all on the page's own canvas unless noted:
+
+- Hero card, y836-1283. Active tab: `Northstar expansion — final MSA fallback`,
+  `Worked for 6m 18s`, `Northstar wants a $10M liability cap and uncapped
+  AI‑output indemnity. The defensible package keeps the fees‑paid cap and
+  adds one $2.4M super‑cap.` Then `Decision required` with `Authorize the
+  playbook fallback` marked `Recommended`. The Waiting and Done tabs are in the
+  DOM but hidden until clicked, y878-1170, and none of them shows the product
+  failing. The Waiting items are blocked on people, and the product's own part is
+  finished every time: `The rollout can’t be cleared until IT confirms which
+  fields are switched off.`, `I drafted the disclosure; Product still owes the
+  model documentation.`, `Nothing else is open on our side.` The Done items all
+  closed clean: `Both sides have signed.`, `No objection needed; Security
+  agreed.` The durations (`6m 18s`, `3m 42s`, `2m 05s`, `5m 51s`, `4m 10s`) can
+  only flatter.
+- Step 01 card, y2519-2843. Slack request plus `Working on it`: `Read the
+  redline` and `Checked your MSA playbook` ticked, `Finding your closest
+  precedent` in progress. That is a progress state, not a failure.
+- Step 02 card, y3145-3436. `Liability cap  $10M is 8.3× annual fees. Keep the
+  fees‑paid cap.`, `AI indemnity  Limit it to third‑party IP claims.`, `Data
+  use  Keep security and support uses.`, and a typed reply. It is internally
+  consistent: 2× fees is about $2.4M, which matches the hero's super-cap and the
+  playbook's Fallback 1. It is still all win.
+- Step 03 decision panel, y3805-4059. `Authorize Deal Desk’s final fallback`.
+  This is the limit the page sells (`Decisions come to you ready`), so it is the
+  "approval before execution" case and does not count.
+- Citation card, y4777-4878. `“I don’t want Sales improvising on uncapped
+  indemnity for AI‑generated recommendations or a $10M cap.”` It is a source
+  the recommendation obeys. Note that the prose above misquotes it as "token
+  improvising ... SOW cap". The Oct 10 capture reads exactly as the page does now,
+  so that is a misread, not drift.
+- Team view, y4771-4942. `Waiting for Product`, `Waiting for Lena Morales`,
+  `Decision ready`, `In progress`. This is browserbase's ledger again: states,
+  with no `Failed`.
+- Playbook card, y5395-5828. `§ 8.1 · Redlined in 11 of 14 deals since January`,
+  then Standard, two fallbacks with approvers, and `Walk away  Uncapped general
+  liability, or a one‑way cap.` The 11-of-14 figure counts counterparties
+  redlining the customer's paper, which argues for the product. The walk-away
+  refusal belongs to the customer, not the vendor.
+- Integrations panel, y6214-6607. All four rows read `Connected`.
+- Security grid, y7053-7253, the nearest miss. `SOC 2 Type I` is stated
+  instead of a bare "SOC 2". But it sits in a four-tile icon feature grid. That
+  is body copy laid out as tiles, not an artefact, and it is presented as a
+  credential (`Audited by a licensed CPA firm.`), not as a concession. It is
+  excluded under the in-artefact rule. The Oct 11 walk shows the grid was on
+  the studied page.
+- Launch film, y1390 (`/launch/neomatter-launch-1080.mp4`, 80.1s), inside a
+  captured artefact. It walks the same Northstar matter: `Checked` / `Drafted` /
+  `Ready` pills, an `Approve redline` on §12.2, and the same decision with
+  `Recommended`. Nothing errs. It also post-dates the study (see below), so it
+  could not have moved the value anyway.
+
+Studied-page check: the page has drifted, and the drift does not touch this
+signal. Captures from Oct 10, 11 and 12 are 7832px. The page is now 8577px
+(+745). The added material is a "One System" band at y≈1390-2035, with eight
+integration marks and `Watch the film · 1:20`. The painted backdrops behind
+step 01, step 03 and the closing CTA have also been replaced. The CTA is no
+longer the Tuscan doorway the prose describes; it now shows papers weighted with
+stones on a terrace. Every section the prose describes survives and the hero is
+unchanged, so this re-pass rates the studied content. The value is the same on
+both versions. The added band is flagged for the orchestrator.

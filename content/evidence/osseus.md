@@ -227,3 +227,97 @@ reached them. Two things here are genuine craft rather than vacancy and would
 survive on a longer page: the fully-accounted single-accent chroma budget, and
 siting 60.8px type in the one part of a photograph that has no detail. The serif
 is a third, which the vocabulary cannot currently credit.
+
+**v4 change 3b surface re-pass**
+
+Decided first: `real-product-surface: absent` (confirmed, unchanged) and
+`shows-deliverable: absent` (confirmed, unchanged).
+
+Capture (session 5, 2026-10-16): `shoot-tiles.cjs` walked `window` in 4 tiles,
+`clamped: false`, `coverage: 1`, `reachedPx: 2654`, `docH_before` 2654 =
+`docH_after` 2654. The one inner-scroller candidate is the `html` element itself
+(sh 2654, ch 900), so no child scroller is hiding content. `stitch.py` produced
+one 1440x2654 strip, equal to page height. The strip ends in the footer
+(`hello@osseus.ai`, `Join us`, `LinkedIn`, `X` at y2598). A Playwright DOM read
+of the same page gives `innerText` length 3301, matching session 4.
+
+Duplication check, as instructed: "A continuous data flywheel" appears once in
+the new strip and once in the DOM (one H2 at y1806; the string "flywheel" occurs
+once in `innerText`). The 346px duplicate band described at the top of this file
+was the session-4 stitcher artifact and does not exist on the page.
+
+Candidate product surfaces, every visual element in the DOM:
+
+- `svg` 161x31 at x256 y44: the Osseus wordmark. Logo, not a surface.
+- `svg` 17x17 at x635 y51: the YC mark beside "Backed by Y Combinator".
+- `img` `hero-valley-full.webp`, 1067x534 at y115, `alt=""`: raster of a
+  colonnade over a hazy valley.
+- `img` `reflecting-pool.webp`, 992x410 at y908, `alt=""`: raster of an arcade
+  over still water.
+- `img` `garden-labyrinth.webp`, 992x320 at y2080, `alt=""`: raster of a clipped
+  formal garden.
+- `body` background `paper-grain.svg`: a texture.
+
+No `video`, `canvas`, `iframe`, `object` or `embed`. No `input`, `textarea` or
+`select`. No `table`, `pre`, `code`, `ul`, `ol` or `dl`. A digit search over
+`innerText` returns nothing: the page contains no number at all. The three
+rasters are decorative scenery and contain no software, data or device. The one
+nav link that might lead to a surface, `Research` (`/research`), resolves to
+"Research blog Coming soon." with no image, so there is no off-page surface to
+check faithfulness against either.
+
+Q1, `real-product-surface`: **absent**. The widened definition credits a genuine
+capture or a faithful DOM/SVG rebuild of the product, even one filled with demo
+data. Nothing here qualifies under either branch: no raster or video of the
+product, no DOM rebuild, no drawn UI. This is not a hardware category fact.
+Osseus sells datasets, evaluations and RL environments, all of which have
+showable surfaces (a dataset record, an eval table, an environment trajectory or
+task screen), and the page shows none of them. The absence is a real one.
+
+The entry that could have embarrassed the vendor: **none exists.** Searched for a
+dataset sample, an eval or benchmark result, an environment transcript, a
+schema, a number, a refusal, a limitation of Osseus's own product, an error or a
+cost. The closest candidates, and why each fails:
+
+- y1120: "Early research supports this, and we’re building towards this across a
+  broad range of models." A hedge in thesis copy, not an artefact of the
+  product's output; there is nothing for it to narrow.
+- y1590: "By broadening the data models learn from and evaluating where they
+  still fall short, we aim to improve both their performance and fairness."
+- y1806: "This allows us to identify where models break down in practice."
+  Both name failures of customers' models, which is the problem Osseus sells a
+  fix for. They flatter the vendor rather than count against it.
+- y2292: "We are committed to pushing the frontier forward, and dropped out of an
+  AI safety for health PhD programme at the University of Oxford to do so." A
+  team biography framed as commitment, not product output.
+
+Q2, `shows-deliverable`: **absent**. Part B never gets reached: there is no
+artefact in any medium (chrome, capture or page-authored rendering of output)
+for Part A to score. The page describes its deliverables in two 19.2px
+paragraphs at y728 ("Datasets", "Interactive environments") and shows none of
+them, and the only external evidence on the page is a PubMed citation (y1428) to
+someone else's research on genomic ancestry bias.
+
+Drift from the session-4 prose:
+
+- The "Read the strip with one correction" paragraph no longer applies. The
+  strip is now 2654px for a 2654px page with no duplicate band, so strip and page
+  coordinates agree everywhere. The session-4 coordinates below y2169 were strip
+  coordinates: the CTA recorded at "x993-1183 y2825-2872" and the 90-120 deg
+  chroma bbox at "y2826-2871" sit at page y2479-2527 (DOM: `a` 191x48 at x993
+  y2479). The footer links sit at y2598.
+- "`svgCount: 1`, a 17x17 YC mark": the DOM now holds two `svg` elements, the
+  161x31 wordmark at y44 plus the YC mark. Whether the wordmark was an `svg` in
+  session 4 cannot be settled now; the conclusion that no icon set exists is
+  unaffected.
+- "one button": the closing CTA is an `a` element styled as a button; the DOM
+  has no `button` element. Count of text links is unchanged at seven excluding
+  the logo and the skip link.
+- The session-4 section names its finding under the retired signals
+  `real-product-screenshot` and `artifact-not-dashboard`. Its substance ("The
+  page shows no UI and no deliverable", "no number of any kind") still holds
+  under `real-product-surface` and `shows-deliverable`.
+- Everything else re-checked matches: the three image filenames, sizes and
+  y-positions, all eight heading positions (H1 y179; H2 y611, y956, y1366,
+  y1806, y2128; H3 y679 x2), the 3301-character text length, and the zero-digit
+  page.

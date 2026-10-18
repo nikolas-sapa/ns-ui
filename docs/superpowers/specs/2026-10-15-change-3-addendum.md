@@ -127,6 +127,8 @@ self-disclosed illustration `absent` is penalising the disclosure. Probably the
 right answer is `absent` for the signal plus a note, but it needs deciding
 rather than inferring.
 
+## 6. Change 3b — `real-product-screenshot` is keyed to format, not genuineness
+
 > **RENAME APPLIED** in `2026-10-15-holes-7-and-2-applied.md`:
 > `real-product-screenshot` → `real-product-surface` across the vocabulary, all
 > 42 evidence files and a new guard test (83 tests, proven failable). **No value
@@ -146,8 +148,6 @@ rather than inferring.
 > test now holds to the evidence files. Called out because a present-tense
 > count in a dated document reads as live fact — the same failure this
 > addendum already records once, for `grep-ai`.
-
-## 6. Change 3b — `real-product-screenshot` is keyed to format, not genuineness
 
 Two raters reached this independently, and the count is now **four instances**,
 not the one the proposal's table lists.
@@ -225,6 +225,12 @@ ways and the signal is binary, so the corpus cannot distinguish it from a page
 with one readable chart. Not a reason to hold anything.
 
 ## 8. The missing axis: is the deliverable's content sourced or fabricated?
+
+> **PROPOSAL WRITTEN**: `2026-10-16-hole-8-provenance-proposal.md`. It splits
+> this into three sub-questions (origin, external anchor, disclosure), proposes
+> recording them as `materials` rather than as a signal, and puts a five-test
+> plan ahead of any procedure. It is blocked on the same `materials`-shape
+> decision as change 5. Nothing is applied.
 
 Recorded by `railway-com`, for the second time by that file, and it is the one
 hole change 3 *created* rather than exposed.

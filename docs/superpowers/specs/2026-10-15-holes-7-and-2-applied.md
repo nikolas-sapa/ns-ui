@@ -95,9 +95,9 @@ directions without coordination:
 | `grep-ai` | `This evaluation used a Claude agent baseline, not Codex. Savings vary by workload.` under its own 91% claim; a competitor ticked at parity; its own `56.27/100` |
 | `financial-datasets` | publishes its worse past accuracy (`96.10`) on a 95-100% axis, beside a live sec.gov `filing_url` |
 | `neuron-industries` | `Certifications: UL + CE (planned)` kept on the flagship column rather than omitted |
-| `decent-com` | answers "Every option you can get, priced." with two of six rows `Not allowed` / `Too small` |
+| `decent-com` | answers "Every option you can get, priced." with two of six rows `Not allowed` / `Too small`. **Dated:** as captured 2026-10-10. A redesign had removed the band by 2026-10-16; the example still shows the procedure correctly but no longer describes the live page |
 | `capveon` | closes its queue `Four approved in one click each. One escalated.` |
-| `silica` | applied force `2.0 g` against its own joint measurement `1.5 g` — a 25% shortfall on the number it most benefits from showing exact |
+| `silica` | its force chart authors its own joint reading as applied force plus Gaussian noise (`gauss()*.8`), so at the 2.0 g rest load its own sensor reads 0.3-3.8 g, under a heading claiming it can feel "as light as a paperclip". **Corrected:** this row first cited a fixed `2.0 g` vs `1.5 g` shortfall. The chart is simulated (`Math.random`) and that exact pair is one random frame, 6 of 150 samples. The noise is the designed, stable property, and it is what makes the entry |
 | `railway-com` | its own error log carrying a WordPress scanner probing a non-WordPress app |
 
 Hole 1's refusal test had to come along, because "a priced comparison with real
@@ -259,8 +259,11 @@ hide:
   capture of the prototype's software on a real laptop, so "no UI exists" no
   longer holds (a lab app, not the shipping interface; recorded in the file).
 
-**Net on `shows-deliverable`: 14/42 → 9/42 present.** Five flips, one hold,
-each from its own walk.
+**Net on `shows-deliverable`: 14/42 → 13/42 present.** Five flips and one hold
+in the six-file pass took it to 9; the hole-7 pass then added `resend-com`,
+`github-2014`, `clerk-com` and `sona8`, the aviern re-study added `aviern`, and
+the decent-com re-study removed `decent-com` (its deliverable was redesigned
+away). Each from its own walk.
 
 ## One data-quality note, free
 
@@ -295,14 +298,13 @@ scored against at the time, same as change 3's handling.
 re-pass to "the 23 files carrying the signal". But the two motivating cases,
 `financial-datasets` and `railway-com`, read **`absent`** when this was
 written — that is the defect, and both are now `present` (below). A widening definition puts every `absent` file at risk, not the
-`present` ones, so the re-pass set is the inverse of the one named. **16** files read `absent`
-today, against 25 `present` and 1 `unresolved` (20/21/1 when this was first
-written). Four have since moved absent → present under the new wording:
-`papaya` and `the-subvocal-company` on fresh re-rates, then `financial-datasets`
-and `railway-com` on recorded facts (below). Of the 16, `browserbase-com` and
-`truemile` were re-rated under the new wording and held `absent`, so **14 remain
-unscored against it**. Scoring them is a rating act, not a correction, and it
-is the single largest remaining item in this program.
+`present` ones, so the re-pass set is the inverse of the one named. **14** files read `absent`
+today, against 27 `present` and 1 `unresolved` (20/21/1 when this was first
+written). Five have since moved absent → present under the new wording:
+`papaya` and `the-subvocal-company` on fresh re-rates, `financial-datasets` and
+`railway-com` on recorded facts (below), and `stripe-2014` in the fourteen-file
+pass. **Every `absent` file has now been scored against the new wording** — the
+pass is complete, and its results are in the next section.
 
 **Cheapest first, reachable without a capture, and now DONE:**
 `financial-datasets` and `railway-com` were both re-scored from fresh captures today, and their prose
@@ -310,3 +312,155 @@ already establishes the fact pattern in forensic detail — three independent
 instruments confirming no raster UI exists, five product visuals in SVG with
 live `<text>` and zero `<image>`. Those two are the rename's own evidence. Every
 other `absent` file needs a capture.
+
+## The fourteen-file surface pass: complete
+
+Every file still reading `real-product-surface: absent` after the first four
+flips was re-rated from a fresh capture, one agent per file, under one shared
+brief. Each agent also asked the deliverable question on the same capture,
+since capturing is the expensive part. Results:
+
+- **13 of 14 hold `absent`** on the surface.
+- **One flips, `stripe-2014`.** Two of the four hero slides are genuine
+  screenshots of Stripe Checkout, checked against Stripe's own archived
+  Checkout files from Nov 2014. The earlier rater saw only slide 3, which the
+  page pins as the default.
+- **Two more flipped and were reverted**, see "the studied page" below.
+- **No deliverable value moved.** `capveon` and `silica` hold `present`; the
+  rest hold `absent`.
+
+Of the 13 that hold, three are **category facts**: an optical interconnect
+(`dipole-labs`), RL training environments (`standard-machines`), and
+pre-production robot joints (`silica`). The other ten have a showable product
+and show none of it.
+
+### Two rules this pass forced
+
+**The doorway is not the surface.** `acyclic` shows four CLI commands, every
+flag verified against the shipped binary, with no output and none of the
+product's own screens. A command line, a sign-in form or an install snippet is
+real and still fails, because the product has not answered yet. `stripe-2014`'s
+Checkout form is the counter-case: it *is* the product, and passes with empty
+fields. Now in the vocabulary.
+
+**A re-pass re-interprets the page as studied.** Two agents flipped values on
+pages redesigned since their `studied` date:
+- `decent-com` had removed its priced-carrier band, taking `shows-deliverable`
+  present → absent.
+- `aviern` had gained a segmentation-overlay video, taking both signals absent
+  → present.
+
+Each flip left a file describing two pages: one signal on today's page, the
+verdict and everything else on the studied one. **Both are reverted**, with the
+agents' sections kept as dated drift records.
+
+- **`decent-com`'s studied content still passes the new procedure** (`Not
+  allowed` / `Too small`), so it returns to `present`.
+- **`aviern`'s video is new since the study**:
+  - the 2026-10-13 prose never mentions it;
+  - that prose records a caption reading "A1000 imagery forthcoming";
+  - ~~the 2026-10-08 archive snapshot has no `<video>`~~ — **withdrawn.** That
+    came from grepping the raw HTML of a client-rendered page, which also lacks
+    every visible string on it, so absence proved nothing. Rendered, the
+    snapshot shows three videos on an earlier pipeline-inspection version of
+    the site.
+
+  So aviern returns to `absent`, on the first two points alone. Both re-studies
+  have since landed: `decent-com` went `exemplar` → `mixed` (net −5 → +1) and
+  `aviern` stays `mixed` (net −4) with both signals `present` on the live page.
+
+A redesign triggers a **full re-study** instead. Both files are queued. aviern's
+looks likely to take both signals to `present`: its new perception overlay
+visibly misses a shrub.
+
+### Pages that changed under their evidence
+
+These need re-studying. No value in this pass rests on the stale parts, but
+other signals in these files do:
+
+| file | what changed | signals now resting on gone content |
+|---|---|---|
+| `decent-com` | redesign; deliverable band removed | the `exemplar` verdict, `testimonial-card-row`, `typewriter-headline`, `density-variation` |
+| `aviern` | redesign; 9706 → 6947px, CGI hero, new video | `stock-photo-generic`, the `stock-photo` material |
+| `standard-machines` | rebuilt; 1668 → 900px, canvas gone | `single-optical-anchor`, `density-variation`; change 5's page-extent row |
+| ~~`acyclic`~~ | **not drift.** A 2026-10-13 full-page capture is pixel-identical to today's page; the old study rated the first viewport only and read the fold as the page's end. Re-studied 2026-10-16; the flips are old-rating errors | — |
+| `provenmetal` | CTA labels changed | the `scroll-reveal-blank` paragraph names the old buttons |
+
+### A sixth silent capture failure
+
+**Content shown only during an intro or load-gated animation is never
+captured.** The walker disables animations, which is right for stable tiles,
+but it also hides anything that appears only while an animation runs:
+- `anthropic-com`'s hero shows three painted images for about 2s, then hides
+  them.
+- `dropbox-2014`'s nine hero slides never started at all, because the archive's
+  dead tracking pixels stopped the page's load event from firing.
+
+Both turned out decorative. The next one may not, and neither the stitcher's
+invariant nor the walk check can see it. When a hero visibly animates, read its
+DOM for hidden media before rating.
+
+### And a fix to the stitcher, from the other writer
+
+The stitcher's height check was tied to `walkHeight`, the height *before* the
+walk. A page that grows during the walk therefore stitched short and still
+reported `0 mismatches`. `anthropic-com` did exactly that: 3340 before, 3346
+after. It now stitches to the settled height and prints the drift. That was my
+bug; the fix was made in the other session's working tree and verified here on
+`anthropic-com`.
+
+## The hole-7 pass and the five re-studies: complete
+
+**Hole 7 (16 files, `shows-deliverable` only).** 12 hold `absent`; **4 flip to
+`present`**, each on an entry the earlier study could not have seen:
+
+| file | the entry | why it was missed |
+|---|---|---|
+| `resend-com` | `Bounced` … `to melia@gmail.com with type Spam`, under "reach humans instead of spam folders" | page-authored panel on the page's own canvas: the exact hole-7 case |
+| `github-2014` | a staff commit titled `Sorry VB users` in GitHub's own `octokit.net` history | the client screenshot had not loaded in the capture |
+| `clerk-com` | a Directory Sync row `Okta - HospitalB` / `Error` | two non-default tabs deep |
+| `sona8` | the product's own dashboard: "1 of 1 conversations did not reach" its brief | inside a click-to-play video |
+
+`sona8` and `databuddy` are now redesigned; both are queued for a full
+re-study. The current databuddy page would pass on a `TypeError` in its own
+pricing code, shown by its own error tracker.
+
+**Five re-studies, merged with the old study kept below each:**
+
+| file | verdict | net | cause |
+|---|---|---|---|
+| `decent-com` | exemplar → **mixed** | −5 → +1 | redesign removed its deliverable |
+| `provenmetal` | exemplar → **mixed** | −6 → −3 | **rater disagreement, not the page**; contested, needs a third blind rating |
+| `acyclic` | mixed | +2 → +1 | **not a redesign**: a 2026-10-13 full-page capture is pixel-identical to today's; the old study rated the first viewport only |
+| `aviern` | mixed | −1 → −4 | redesign; both artefact signals now `present` on a perception overlay that misses a shrub |
+| `standard-machines` | mixed | −3 → −1 | rebuilt to one viewport |
+
+Exemplars drop from 16 to 14. Slop stays at 2; both anchors were re-checked
+and unchanged. Still 0 rules.
+
+**Two rules the pass sharpened, now in the vocabulary.** An unflattering
+entry counts when it is the product's own operation or unscrubbed output and
+not the capability the panel is selling (`stripe-com`'s dispute rows are
+excluded because its callouts sell dispute handling; `clerk-com`'s sync error
+counts though Okta may be at fault, as `railway-com`'s probe counted though
+Railway did not send it). And legibility is judged at page size:
+`basecamp-2014`'s "only 8 of about 40 attendees actually showed up" is a real
+concession set at about 4 CSS px, and does not count.
+
+**Withdrawn: the aviern ruling's archive evidence.** It grepped the raw HTML of
+a client-rendered page; rendered, the 2026-10-08 snapshot does carry video.
+
+**Capture.** Four more instances of animation- or load-gated content the walker
+froze blank. `stitch.py` now warns on a uniform band of 600px or more, which
+catches the two large ones (squarespace-2014, mailchimp-2014) and, measured
+across all 40 captures, nothing else. It cannot catch the short ones, and says
+so. `shoot-tiles.cjs` takes `NS_LOAD_MS` for slow archive heroes. All seven
+archive sources are now pinned to exact snapshots.
+
+**Vocabulary gaps this pass surfaced, not decided:** `symmetric-everything` has
+no procedure (text alignment and mass placement disagree on standard-machines);
+`real-product-surface` is undefined for hardware (footage cannot prove
+autonomy); whether an embarrassing entry must be noticeable at normal viewing
+(aviern's 37px shrub); whether text inside the vendor's own marketing film is in
+scope (two decent-com calls hang on it); `glass-card-overuse` counts
+declarations, not visible frost.
