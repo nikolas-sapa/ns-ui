@@ -35,6 +35,8 @@ signals:
 materials: [dual-theme]
 ---
 
+**Sampling: screen-selected.** One of the five top-ranked of about forty showcase-gallery sites by a mechanical pre-screen. The screen ranked on, among others, `gradient-blob`, `three-card-row`, `glass-card-overuse`, `generic-sans-default` and `indigo-violet-accent`, so this file's values for those five are not independent of how it was chosen.
+
 Rated by two independent blind raters on 2026-10-18, neither reading the other's draft. Both reached `mixed`. They agreed on 23 of 26 signals; the 3 splits `hero-mockup-float` (A present, B absent), `single-optical-anchor` (A present, B absent), `density-variation` (A absent, B present) are recorded `unresolved`, which never counts toward a rule. Both write-ups follow in full.
 
 **Rater A.**

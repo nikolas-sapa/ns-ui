@@ -35,6 +35,8 @@ signals:
 materials: [single-theme, commissioned-photo]
 ---
 
+**Sampling: screen-selected.** One of the five top-ranked of about forty showcase-gallery sites by a mechanical pre-screen. The screen ranked on, among others, `gradient-blob`, `three-card-row`, `glass-card-overuse`, `generic-sans-default` and `indigo-violet-accent`, so this file's values for those five are not independent of how it was chosen.
+
 Rated by two independent blind raters on 2026-10-18, neither reading the other's draft. Both reached `slop`. They agreed on 24 of 26 signals; the 2 splits `gradient-blob` (A present, B absent), `asymmetric-split` (A present, B absent) are recorded `unresolved`, which never counts toward a rule. Both write-ups follow in full.
 
 **Rater A.**

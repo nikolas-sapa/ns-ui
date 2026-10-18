@@ -259,7 +259,8 @@ hide:
   capture of the prototype's software on a real laptop, so "no UI exists" no
   longer holds (a lab app, not the shipping interface; recorded in the file).
 
-**Net on `shows-deliverable`: 14/42 → 13/42 present.** Five flips and one hold
+**Net on `shows-deliverable`: 14/42 → 14/55 present** (13/42 before the
+thirteen `ai-builder` pages, of which only `correlation-studio` reads `present`). Five flips and one hold
 in the six-file pass took it to 9; the hole-7 pass then added `resend-com`,
 `github-2014`, `clerk-com` and `sona8`, the aviern re-study added `aviern`, and
 the decent-com and sona8 re-studies removed `decent-com` and `sona8` (both
@@ -301,8 +302,8 @@ scored against at the time, same as change 3's handling.
 re-pass to "the 23 files carrying the signal". But the two motivating cases,
 `financial-datasets` and `railway-com`, read **`absent`** when this was
 written — that is the defect, and both are now `present` (below). A widening definition puts every `absent` file at risk, not the
-`present` ones, so the re-pass set is the inverse of the one named. **17** files read `absent`
-today, against 29 `present` and 1 `unresolved` (15/26/1 at n=42, before the five
+`present` ones, so the re-pass set is the inverse of the one named. **19** files read `absent`
+today, against 34 `present` and 2 `unresolved` (15/26/1 at n=42, before the thirteen
 `ai-builder` pages below; 20/21/1 when this was first written). Five have since moved absent → present under the new wording:
 `papaya` and `the-subvocal-company` on fresh re-rates, `financial-datasets` and
 `railway-com` on recorded facts (below), and `stripe-2014` in the fourteen-file
@@ -535,4 +536,38 @@ first has no procedure (the same defect that holds back
 What would clear it: three or more `slop` files found **without** the screen,
 for example a random draw from the same galleries rated blind, re-measuring the
 five screened signals on that sample alone.
+
+### The random draw: one more slop file, and what survives the clean pool
+
+Eight more gallery sites, drawn with seed 20261018 from the thirty that were
+not screen-selected, calibration sites, unreachable, blank or behind a sign-in,
+two blind raters each. Every pair agreed on the verdict, on 24 to 26 of 26
+signals. **One `slop`: `toppic`** (+8 / +6). Seven `mixed`: `dachly`,
+`glowcase`, `luna-vos`, `toolsapp-work`, `correlation-studio`, `puzzlesbox`,
+`sakura-name-sparkle`. Six of the seven are not landing pages at all: the root
+URL serves the product (a dashboard, a Sudoku, a name generator), which every
+rater flagged as a scope case the vocabulary has no clause for. Each file now
+opens with a **Sampling:** line naming its route. Corpus: **13 exemplar /
+36 mixed / 6 slop**.
+
+The clean pool is the three `slop` files no screen chose: `heroku-2014`,
+`openhack`, `toppic`. Re-running eligibility on the corpus minus the five
+screen-selected files:
+
+| signal | screened on | full corpus | clean pool |
+|---|---|---|---|
+| `gradient-blob` | yes | eligible | **thin** (slop n=2) |
+| `three-card-row` | yes | eligible | **thin** (slop n=2) |
+| `glass-card-overuse` | yes | eligible | eligible, gap 0.33 |
+| `generic-sans-default` | yes | eligible | eligible, gap 0.44 |
+| `indigo-violet-accent` | yes | eligible | eligible, gap 0.33 |
+| `symmetric-everything` | no | eligible | eligible, gap 1.00 |
+| `testimonial-card-row` | no | eligible | thin (slop n=2) |
+| `stock-photo-generic` | no | eligible | eligible, gap 0.33 |
+| five craft signals | no | eligible | eligible |
+
+For the two screened signals that fail on the clean pool, the full-corpus
+eligibility rests on the selection. `testimonial-card-row` was not screened,
+so its full-corpus pass is not circular; it is only thinner without the
+screened files. Three passes sit at 0.33, one file from the 0.30 floor.
 
