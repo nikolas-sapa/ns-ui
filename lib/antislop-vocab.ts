@@ -24,6 +24,23 @@
 // pastel card fills and iOS blue — and the session's own rating brief got that
 // card row wrong until a screenshot was opened.
 // See docs/superpowers/specs/2026-10-14-vocabulary-v4-proposal.md, change 4.
+//
+// WHEN THE PAGE IS THE PRODUCT. Six of the eight randomly drawn ai-builder
+// pages serve the product at the root URL: a dashboard (dachly), a feed
+// (correlation-studio), a Sudoku (puzzlesbox), two generators (luna-vos,
+// sakura-name-sparkle). Nothing is embedded, so SCOPE above excludes nothing:
+// the product's own interface IS the page's chrome, scored as its decisions.
+// Every rater on those pages reached that independently. Two limits:
+//   - DATA IS NOT CHROME. Feed items, generated output, puzzle digits and
+//     other values the product renders are content, as captured output is on
+//     a marketing page. Style the product applies around them is chrome
+//     (correlation-studio: module framing scored, chips inside items not).
+//   - SCORE AT REST. What renders on load and on scroll, not what a click
+//     opens. Marketing pages are rated without opening menus; a product page
+//     is not rated deeper. Settled dachly's `emoji-as-icon`, whose only
+//     emoji sit in a panel one click away: absent.
+// `real-product-surface` and `live-claim-control` fire on such pages by
+// construction. Every rater recorded that and none read it toward `exemplar`.
 export const SLOP_SIGNALS = [
   "gradient-blob",
   "three-card-row",

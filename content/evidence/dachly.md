@@ -9,7 +9,7 @@ signals:
   gradient-blob: absent
   three-card-row: absent
   glass-card-overuse: present
-  emoji-as-icon: unresolved
+  emoji-as-icon: absent
   generic-sans-default: absent
   symmetric-everything: absent
   badge-pill-spam: absent
@@ -38,6 +38,8 @@ materials: [single-theme, illustration]
 **Sampling: random draw.** One of eight drawn with seed 20261018 from the thirty remaining gallery sites (pre-stated exclusions only: unreachable, blank, sign-in wall). Not chosen on any signal.
 
 Rated by two independent blind raters on 2026-10-18, neither reading the other's draft. Both reached `mixed`. They agreed on 25 of 26 signals; the 1 split `emoji-as-icon` (A present, B absent) are recorded `unresolved`, which never counts toward a rule. Both write-ups follow in full.
+
+**Re-pass, 2026-10-18: `emoji-as-icon` unresolved → absent.** The split was over a panel one click from rest, rater A counting it and rater B not. The scope clause "when the page is the product" in `lib/antislop-vocab.ts` now scores at rest, as marketing pages are scored without opening menus, which is rater B's reading. No other value moves.
 
 **Rater A.**
 
