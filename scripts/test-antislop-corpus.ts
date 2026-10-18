@@ -227,3 +227,22 @@ test("the vocab's real-product-surface examples name the right buckets", () => {
     "the block must state the mis-scored `absent` count it can support",
   );
 });
+
+// Hole 8's provenance tokens describe a deliverable's content, so they have no
+// referent on a file without one. They are recorded as materials, which the
+// parser checks only against the vocabulary list, so nothing else stops a token
+// landing on the wrong file or one file claiming both origins.
+const PROVENANCE = ["origin-captured", "origin-authored", "anchored", "disclosed"];
+test("provenance tokens appear only on deliverables, with at most one origin", () => {
+  for (const f of files()) {
+    const e = read(f);
+    const prov = e.materials.filter((m) => PROVENANCE.includes(m));
+    if (e.signals["shows-deliverable"] !== "present") {
+      assert.deepEqual(prov, [], `${f}: provenance ${prov.join(", ")} on a file with no deliverable`);
+    }
+    assert.ok(
+      !(prov.includes("origin-captured") && prov.includes("origin-authored")),
+      `${f}: claims both origin-captured and origin-authored`,
+    );
+  }
+});

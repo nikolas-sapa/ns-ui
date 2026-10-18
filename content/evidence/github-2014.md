@@ -5,7 +5,7 @@ cohort: pre-ai-2015
 context: [hero, features, auth, footer]
 verdict: mixed
 studied: 2026-10-11
-materials: [single-theme, illustration]
+materials: [single-theme, illustration, origin-captured, anchored]
 signals:
   gradient-blob: absent
   three-card-row: absent

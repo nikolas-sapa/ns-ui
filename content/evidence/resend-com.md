@@ -5,7 +5,7 @@ cohort: agent-tools
 context: [hero, nav, features, testimonials, cta, footer]
 verdict: mixed
 studied: 2026-10-10
-materials: [single-theme, illustration]
+materials: [single-theme, illustration, origin-authored]
 signals:
   gradient-blob: absent
   three-card-row: absent

@@ -325,9 +325,35 @@ export const ALL_SIGNALS = [...SLOP_SIGNALS, ...CRAFT_SIGNALS] as const;
 // `video-embed` added at n=42: subvocal.company ships a 3.79s beauty clip and
 // a 91.8s lab video of the prototype as in-page sections, which `video-hero`
 // describes wrongly. Safe to add because a material can never back a rule.
+//
+// PROVENANCE (hole 8), four tokens recording where a deliverable's CONTENT came
+// from. They appear ONLY on files scoring `shows-deliverable: present`, and
+// their absence there means `unresolved` / `unanchored` / `undisclosed`; on
+// any other file there is nothing to have provenance, so nothing is recorded.
+//   origin-captured  a real run of the VENDOR'S OWN product, shown by an
+//                    instrument: a live request returning the values,
+//                    byte-identity with a source, a commit that resolves in
+//                    the real repo, a detail with no authored purpose
+//   origin-authored  the vendor wrote or generated it, shown by an
+//                    instrument: Math.random or a fixture in the bundle, a
+//                    clock seed, failed arithmetic, a placeholder identity
+//   anchored         a value in the artefact checks against an authority the
+//                    vendor does not control (an SEC filing, a published
+//                    datasheet, a third-party benchmark, a public repo)
+//   disclosed        the page labels the artefact as an example or estimate,
+//                    in visible text beside it
+// In materials, not signals, deliberately: `authored` is not slop. silica's
+// simulated chart and financial-datasets' fixture are among the corpus's most
+// honest deliverables, and a rule against fabrication would convict them.
+// Validated before it was applied: 13 files, two blind raters each, agreeing
+// 12/13 on origin and 13/13 on anchor and disclosure. The one split, aviern,
+// is what "of the VENDOR'S OWN product" settles: machine-made masks on real
+// footage show that some model ran, not that it was Aviern's. Test plan and
+// results: docs/superpowers/specs/2026-10-16-hole-8-provenance-proposal.md.
 export const MATERIALS = [
   "single-theme", "dual-theme", "stock-photo", "commissioned-photo",
   "illustration", "webgl", "video-hero", "video-embed",
+  "origin-captured", "origin-authored", "anchored", "disclosed",
 ] as const;
 
 // faq / team / stats / security / integrations added at n=42. All ten

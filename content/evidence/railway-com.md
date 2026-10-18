@@ -32,7 +32,7 @@ signals:
   density-variation: present
   one-accent-discipline: absent
   live-claim-control: absent
-materials: [single-theme, illustration]
+materials: [single-theme, illustration, origin-captured, anchored]
 ---
 Captured at 1440x900; full page 12212px. The most template-shaped page in this
 cohort and simultaneously the one carrying the strongest single piece of

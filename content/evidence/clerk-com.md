@@ -32,7 +32,7 @@ signals:
   density-variation: present
   one-accent-discipline: absent
   live-claim-control: absent
-materials: [single-theme]
+materials: [single-theme, origin-authored]
 ---
 Captured at 1440x900; full page 7187px. An achromatic, card-built page whose two
 most interesting facts are both negatives: a gradient blob that is declared and

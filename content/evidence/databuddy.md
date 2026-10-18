@@ -32,7 +32,7 @@ signals:
   density-variation: present
   one-accent-discipline: absent
   live-claim-control: present
-materials: [single-theme]
+materials: [single-theme, origin-captured]
 ---
 
 **Re-study of a redesigned page, rated blind.** Every value above was set from

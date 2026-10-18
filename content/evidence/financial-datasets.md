@@ -32,7 +32,7 @@ signals:
   density-variation: present
   one-accent-discipline: present
   live-claim-control: present
-materials: [dual-theme, illustration]
+materials: [dual-theme, illustration, origin-authored, anchored]
 ---
 Captured at 1440x900 in 700px steps with a 900ms settle; `documentElement.scrollHeight`
 5758px, 9 tiles, stitched to strips of 4200 and 2300px. The strips overshoot the page by

@@ -32,7 +32,7 @@ signals:
   density-variation: present
   one-accent-discipline: present
   live-claim-control: absent
-materials: [single-theme]
+materials: [single-theme, origin-authored]
 ---
 AI job-application agent, YC S26. Captured at 1440x900, full page 9326px, 14
 tiles at 700px steps with 900ms settle, stitched to three strips (4200 + 4200 +

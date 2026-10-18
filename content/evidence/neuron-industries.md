@@ -32,7 +32,7 @@ signals:
   density-variation: present
   one-accent-discipline: present
   live-claim-control: absent
-materials: [single-theme, illustration, commissioned-photo]
+materials: [single-theme, illustration, commissioned-photo, origin-authored, anchored, disclosed]
 ---
 Industrial controllers, YC Summer 2026. Captured at 1440x900 in 700px steps
 with 900ms settle and animations disabled; document height 13947px; 20 tiles

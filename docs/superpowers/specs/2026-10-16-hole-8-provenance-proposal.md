@@ -4,8 +4,9 @@ Date: 2026-10-16
 Follows: `2026-10-15-change-3-addendum.md` hole 8, and
 `2026-10-15-holes-7-and-2-applied.md`, which carved provenance OUT of
 `shows-deliverable` and left it unscored.
-Status: **proposal, not applied.** No vocabulary entry, no signal value, no
-test. The test plan comes before the procedure, as this program requires.
+Status: **APPLIED 2026-10-18**, after the test plan below passed. See
+"Results" at the end. The test plan came before the procedure, as this program
+requires.
 
 ---
 
@@ -144,3 +145,71 @@ since that rater wasn't blind to the sub-questions).
 Expect `origin` to survive and `disclosure` to be trivial. `anchor` is the
 uncertain one: the evidence that an authority is genuinely outside the vendor's
 control is a judgement, and T1 will say whether raters share it.
+
+## Results, 2026-10-18: all five tests pass, applied
+
+All 13 `shows-deliverable: present` files were rated by two blind raters each,
+26 in all. Neither rater opened the evidence file or any spec. The `materials`
+question resolved as plain tokens, with no schema change.
+
+| file | origin | anchor | disclosure | agree |
+|---|---|---|---|---|
+| github-2014 | captured | anchored | — | 3/3 |
+| railway-com | captured | anchored | — | 3/3 |
+| databuddy | captured | — | — | 3/3 |
+| financial-datasets | authored | anchored | — | 3/3 |
+| neuron-industries | authored | anchored | disclosed | 3/3 |
+| clerk-com | authored | — | — | 3/3 |
+| resend-com | authored | — | — | 3/3 |
+| silica | authored | — | — | 3/3 |
+| tsenta | authored | — | — | 3/3 |
+| grep-ai | unresolved | anchored | — | 3/3 |
+| capveon | unresolved | — | — | 3/3 |
+| the-subvocal-company | unresolved | — | — | 3/3 |
+| aviern | **split** → unresolved | — | — | 2/3 |
+
+- **T1, agreement:** passes. origin 12/13 (92%), anchor 13/13, disclosure
+  13/13, against a bar of 8/9 (89%).
+- **T2, falsifiability:** passes. Every `captured` or `authored` call names
+  its instrument, for example:
+  - github-2014: commit `aad94fe` resolves in octokit.net, every diff line
+    matching;
+  - railway-com: Remix stack frames match the npm source line:col;
+  - databuddy: a live `/v1/query` reproduces every card, and mutating it moves
+    them;
+  - clerk-com: a hardcoded fixture with an `Acme Corp` placeholder;
+  - resend-com: rows built from `Math.random` over fixed name lists.
+- **T3, no collapse onto the surface signal:** passes. Five files have a real
+  product surface and authored content, the faithful-rebuild-with-invented-data
+  case the signals are meant to separate.
+- **T4, anchor survives authored:** passes. financial-datasets is authored and
+  anchored (all 8 rows match NVIDIA's 8-K). silica is authored and unanchored
+  (`Math.random`). Both raters separated them blind.
+- **T5, disclosure recorded, not rewarded:** passes. neuron-industries is the
+  only `disclosed` file, and no craft value moved. sentient-os, the other
+  expected case, no longer has a deliverable.
+
+**The one split, and the clause that settles it.** On aviern, one rater
+called the segmentation overlay `captured`: masks moving in exact 2px steps
+and dropping out for one frame show per-frame inference on real footage. The
+other called it `unresolved`: nothing ties the model to Aviern's aircraft.
+Both readings are faithful to the brief, which said "a real event". The
+applied wording requires **a real run of the vendor's own product**, which
+settles aviern as `unresolved`. That clause was written after seeing the split,
+and is recorded here so the next pass tests it rather than assuming it.
+
+**One brief defect.** grep-ai and tsenta were given two artefacts and asked
+for one rating. Both grep-ai raters split their own pair the same way: the
+leaderboard is anchored to arXiv:2602.11685, while the cost comparison has no
+instrument. A one-value record hides that. Future briefs give one artefact per
+rating.
+
+**A finding for `shows-deliverable`, not for this axis.** resend-com's feed is
+generated in the browser, but `bounced` and `complained` are fixed members of
+its seed fixture, so a failure row appears on every load. Its `present` stands
+under the silica precedent: simulated content, stance chosen.
+
+**Applied as:** four tokens in `MATERIALS` (`origin-captured`,
+`origin-authored`, `anchored`, `disclosed`), set on the 10 files that carry
+any. A corpus test fails if a token lands on a file with no deliverable, or if
+one file claims both origins; both mutations were verified red.

@@ -5,7 +5,7 @@ cohort: yc-current
 context: [hero, features, pricing, testimonials, footer]
 verdict: mixed
 studied: 2026-10-13
-materials: [dual-theme, illustration]
+materials: [dual-theme, illustration, anchored]
 signals:
   gradient-blob: absent
   three-card-row: present

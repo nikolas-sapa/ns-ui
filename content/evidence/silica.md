@@ -5,7 +5,7 @@ cohort: yc-current
 context: [hero, features, footer]
 verdict: exemplar
 studied: 2026-10-10
-materials: [single-theme, illustration]
+materials: [single-theme, illustration, origin-authored]
 signals:
   gradient-blob: absent
   three-card-row: absent
