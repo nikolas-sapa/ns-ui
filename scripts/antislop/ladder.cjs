@@ -80,8 +80,10 @@ const { chromium } = require('playwright');
           // smaller) but it also rejected anthropic.com's "Haiku 5.5", which
           // IS the display headline, dropping that page to a false 1.2:1.
           // One letter is the rule that separates a figure from a headline.
-          const words = direct.split(/\s+/).filter((w) => /[A-Za-z]{2,}/.test(w));
-          const isProse = /[A-Za-z]/.test(direct);
+          // A letter in any script: ASCII-only skipped sakura-name-sparkle's
+          // 96px kanji headline and read its 24px romaji, a false 1.5:1.
+          const words = direct.split(/\s+/).filter((w) => /\p{L}{2,}/u.test(w));
+          const isProse = /\p{L}/u.test(direct);
           const key = 'n' + (seq++);
           const rec = {
             fs: Math.round(parseFloat(c.fontSize) * 10) / 10,
