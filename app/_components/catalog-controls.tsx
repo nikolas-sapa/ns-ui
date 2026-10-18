@@ -2,8 +2,9 @@
 
 import { useEffect, useLayoutEffect, useRef } from "react";
 
-export type Filter = "all" | "core" | "loud";
-export type Sort = "featured" | "newest" | "oldest";
+import type { Filter, Sort } from "@/lib/catalog-state";
+
+export type { Filter, Sort };
 
 export const SORTS: { key: Sort; label: string }[] = [
   { key: "featured", label: "Featured" },

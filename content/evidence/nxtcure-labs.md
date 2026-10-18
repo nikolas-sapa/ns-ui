@@ -28,8 +28,8 @@ signals:
   type-scale-high-contrast: present
   editorial-grid-break: absent
   custom-type-pairing: absent
-  real-product-screenshot: unresolved
-  artifact-not-dashboard: absent
+  real-product-surface: unresolved
+  shows-deliverable: absent
   density-variation: present
   one-accent-discipline: present
   live-claim-control: absent

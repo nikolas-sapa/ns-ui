@@ -40,6 +40,7 @@
     "test:source-invariants": "node scripts/test-source-invariants.ts",
     "test:submit-retry": "node scripts/test-submit-retry.ts",
     "test:animation-gate": "node scripts/test-animation-gate.ts",
+    "test:catalog-gate": "node scripts/test-catalog-gate.ts",
     "test:writing-markdown": "node scripts/test-writing-markdown.ts",
     "test:antislop": "node --test scripts/test-antislop.ts scripts/test-antislop-rules.ts scripts/test-antislop-corpus.ts scripts/test-antislop-build.ts",
     "test:perf-budget": "node scripts/test-perf-budget.ts",

@@ -27,8 +27,8 @@ signals:
   type-scale-high-contrast: present
   editorial-grid-break: present
   custom-type-pairing: present
-  real-product-screenshot: absent
-  artifact-not-dashboard: present
+  real-product-surface: absent
+  shows-deliverable: absent
   density-variation: present
   one-accent-discipline: present
   live-claim-control: absent
@@ -168,3 +168,112 @@ the build derives from it needs both files.
 
 Single theme, light-native: a `prefers-color-scheme: dark` render differs from
 light by 0.0% of sampled pixels, with zero dark hooks in source.
+
+**v4 holes 7+2 / change 3b re-score**
+
+Re-captured 2026-10-15 from the live page, not the prose. 11 tiles at 1440x900,
+`clamped: false`, `coverage: 1.0`, `docH_before` 7426 and `docH_after` 7426 (the
+page is 104px taller than the 7322 session 4 measured; nothing moved
+structurally). Stitched to two strips, 4400px and 3026px, total 7426. Last strip
+ends in the orange footer field — `Primitives / Industries / Developers /
+Company` columns over `Privacy Policy` and `Terms of Service` at y7283-7307 —
+so the walk reached the bottom.
+
+**How the videos were inspected.** The three task-trace panels are `<video>`
+elements at y1273, y1482 and y1691, each 845x384 displayed from a 2142x972
+source, 5.98s, `loop`, `muted`, no `poster`. Stills from the walker are useless
+here, and a fixed-position Playwright capture bled the page's own feature copy
+over the frames. What produced readable content was pulling the three Sanity CDN
+mp4s directly (`c86590df…`, `5fe7eb59…`, `e094ff16…`) and extracting frames with
+ffmpeg at 2fps, then reading them as contact sheets at native width. Everything
+quoted below is from those frames.
+
+**The videos carry much more than the original prose recorded, and it is all
+flattering.** Video 1 is the Search API: `Searching for "roundtrip flight from
+SFO to NYC"` over three skeleton rows, then `Agent reading results...` over a
+JSON body that resolves to four hits, quoted exactly —
+`"url": "https://www.skyscanner.net/routes/sfo/nyca/san-francisco-international-to-new-york.html"`,
+`"url": "https://www.expedia.com/Flights-to-New-York.html"`,
+`"url": "https://www.kayak.fr/vols/New-York"` with `"title": "105€ Vols pas
+chers de San Francisco pour New York (SFO)"`, and
+`"url": "https://www.united.com/Flights-to-United-States"` — closing on
+`Found 4 flights`. Video 2 is the Fetch API: the same Skyscanner row, then
+`Fetched flights from Skyscanner` over a `# Skyscanner` markdown document that
+builds a real table — `| Leg | Airline | Depart | Duration | Arrive | Route |`,
+`| Outbound | Alaska | 22:22 SFO | 5h 37 | 06:59 ¹ EWR | Direct |`,
+`| Return | Alaska | 19:29 EWR | 6h 38 | 23:07 SFO | Direct |`, then
+`> 1 deal — **$635**` and `> [**Select **]`. Video 3 is Browser-as-a-Service:
+a chrome at `flights.example.com/booking` headed `Booking` with a shimmer, then
+one row `San Francisco, CA (SFO) to New York, NY (JFK)` /
+`$279 | Roundtrip | Direct | No Luggage` with a `Book` button, a cursor press,
+and `Trip booked!` over a `BOARDING PASS` / `SFO — JFK` stub.
+
+So the subject is right and the content is now legible: these are real third-party
+hostnames, a real airline, real times, a real price. **No step in any of the three
+can embarrass the vendor.** Nothing is rate-limited, nothing is blocked, nothing
+partially extracts, no site refuses, no row fails. The one quantified moment
+that could have cut against the product does the opposite: video 2's
+`> 1 deal — **$635**` is the fetched page's own figure, and video 3 then books
+the same route at `$279` — the cheaper number is the one the product delivers.
+A `No Luggage` is a property of the fare, not a limit on the product. The whole
+arc is query → four results → clean parse → booked.
+
+**The vignettes confirm as the prose audit described them.** Eight drawn SVGs,
+302x277, in a 4x2 grid at y2767 and y3230, served from Sanity with no `<text>`
+nodes (all type is outlined paths), which is itself the tell that these are
+illustrations rather than captures. Read at native resolution off strip 0: the
+hotel card at y≈3230 col 3 reads `Lower Price Available!` on a green chip,
+`The Empire Hotel`, `$350 $250/Night` with the 350 struck through in orange — a
+saving found, no refusal. The ledger at y≈3230 col 4 is headed `Site` / `Status`
+and admits only two states: `vendor-portal.io 12,440 Done`,
+`supplier-hub.io 10,300 Uploading`, `records.gov.us 3,440 Uploading`, footed
+`247 sites running in parallel`. No `Failed`, no `Blocked`, no retry. The
+hostnames are invented generics. Drift worth noting from the original prose: the
+third host is `records.gov.us`, not `records.gov.uk`.
+
+**The entry that could have embarrassed the vendor: none exists.** Searched the
+full 7426px text dump for failure, error, blocked, rate limit, quota, cost,
+captcha, retry, timeout, partial, degraded, unavailable, and every `$`. Six hits,
+and each one is a sales line rather than an against-interest fact: `Catch broken
+flows before your users do` (y3064) and `Unblock agents that get stuck` (y3528)
+both name a failure the *customer's* stack suffers and the product fixes; `When
+your workflow requires a form, a CAPTCHA, or a login prompt, it's handled.`
+(y3563) converts the hardest case into a closed claim; `Access the 85% APIs
+can't reach` (y3064) is a limit on the competing medium; `No obstacles for your
+agents. / No limits on what they can accomplish.` (y5500) under `100% of the web
+at production scale` (y5436) forecloses the whole category. The stat row at
+y6719-6774 is the precedented vendor aggregate — `800,000 Weekly SDK Downloads`,
+`100,000 Developers`, `10,000 Companies`, `Millions Websites Visited` — plus
+`10,000+ years saved` at y6375, where every row can only flatter by being larger
+and the quantity measures customers' activity, not the product's output on a job.
+There is no pricing figure on the page, no quota, no concurrency ceiling, no
+error state anywhere in 7426px.
+
+`shows-deliverable: absent`, flipped from present. The medium was never the
+problem — Part B explicitly admits a page-authored rendering, and under that the
+mp4 traces and the drawn ledger both qualify as deliverable *media*. The signal
+fails on the procedure: name the entry that could have embarrassed the vendor.
+Across three videos, eight vignettes and a stat row there is not one — not a
+failed site, not a blocked page, not a cost, not a lost comparison row. The
+ledger's two admitted states are `Done` and `Uploading`; the price comparison
+finds only a saving; the booking flow completes. Every value is the flattering
+one, so it fails on stance, exactly as the precedent requires, and the fact that
+the videos turned out to contain far more real content than the prose recorded
+does not change it. The v3 prose reasoned from subject matter ("it shows what the
+product produces") and from the word "real", which this capture substantiates as
+to the hostnames and withdraws as to the stance.
+
+`real-product-surface: absent`, confirmed under the new wording. The rename
+matters and was worth re-checking: a screen recording of the real console would
+have made this present. These are not that. Video 3's chrome is a drawn
+three-dot window at a reserved placeholder domain, `flights.example.com/booking`
+— a *target site* mock, not Browserbase's own UI. Videos 1 and 2 are
+page-authored panels rendering API output, with the loading state animated as
+shimmer bars and the heading typed out character by character (`Booking` →
+`Booking.` → `Booking..` → `Booking...` across consecutive frames), which is a
+motion design decision, not a capture of software running. The vignettes are
+outlined-path SVGs. The `Zero setup. Real results.` three-up at y5217 overlays
+white UI *diagrams* on dithered landscapes. Across 7426px there is still no
+Browserbase console, no session list, no replay viewer, no dashboard: the
+original prose's claim survives re-capture verbatim, and nothing here is a
+genuine capture or a faithful live rebuild of the real product.

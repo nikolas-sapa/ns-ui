@@ -27,8 +27,8 @@ signals:
   type-scale-high-contrast: absent
   editorial-grid-break: present
   custom-type-pairing: present
-  real-product-screenshot: present
-  artifact-not-dashboard: absent
+  real-product-surface: present
+  shows-deliverable: present
   density-variation: present
   one-accent-discipline: absent
   live-claim-control: absent
@@ -161,3 +161,122 @@ currently distinguish them.
 `badge-pill-spam` absent at zero rounded badges above the fold. Single theme,
 dark-native: a `prefers-color-scheme: dark` render differs from light by 0.0% of
 sampled pixels.
+
+**v4 change 3 re-score — `shows-deliverable` absent → present, scored on the
+error-log table and NOT on the split-flap board.** Re-rated from a fresh walk
+(18 tiles, `clamped: false`, `coverage: 1.0`, docH 12212) plus targeted
+re-captures with the cookie banner dismissed, since the banner occludes the
+bottom 160px of every walker tile.
+
+**The deliverable is the Error logs table** in the Observability section
+(heading y5218, panel y5492-6100): columns `Date (GMT-6) / Service / Message`,
+eleven rows across three services. The row at y5982 is what settles it —
+`Error: No route matches URL "//test/wp-includes/wlwmanifest.xml"` is a
+WordPress vulnerability scanner probing a non-WordPress app, the noise floor of
+the public internet, and nobody invents that for a mockup. Alongside it,
+resolved pnpm store paths with exact semver pins
+(`@remix-run+router@1.16.1`, `@remix-run+express@2.9.2_express@4.19.2_typescript@5.1.6`),
+three services with three distinct real failure modes, and six labelled charts
+at y5916+ spanning Sep 4-13. An observability product's job is "tell me what
+broke in my app"; this panel is that answer.
+
+**The split-flap board is a statistic, and `absent` on its own merits — this is
+precedent for the cohort.** The board was verified genuinely live, not a
+build-time bake: a runtime fetch on page load to
+`backboard.railway.com/graphql/internal?q=publicStats` returns
+`{"totalUsers":4709057, "totalProjects":9090470, "totalServices":16054364,
+"totalDeploymentsLastMonth":209533282, "totalLogsLastMonth":1060610900417,
+"totalRequestsLastMonth":320953663061}`, the field names confirm the subhead's
+cumulative-versus-30-day split, and the values ticked against a board read 15
+minutes earlier. Cross-day movement alone could not have separated live from
+baked; the fetch does. **So it clears the live-telemetry bar and is still a
+statistic.**
+
+The test that makes the signal discriminate is **whose work the artefact shows,
+and whether a reader can audit it against the vendor's interest.** All three v3
+exemplars pass it: a priced comparison *with real refusals* contains content
+against the vendor; a claims ledger enumerates assertions so each can be
+checked; a force-vs-time chart is one unit of the product doing its job,
+measured. Every row of this board can only flatter by being larger — no entry
+can embarrass — and those 209 million deployments are things Railway's
+*customers* did. The board measures aggregate adoption, not the product's
+output on any job. It is the "10,000+ teams trust us" genre with real plumbing
+behind it.
+
+The counter nearly wins and is on record: unit-digit precision, a live fetch,
+and the cumulative/windowed distinction make `209,533,282` falsifiable in a way
+`218.7M+` is not, and a five-row labelled grid has a ledger's shape. But
+precision and liveness are properties of the *rendering*, not of the content's
+relation to the reader. The scoring rule warns that unreadable values cannot
+score `present`; it never says readable ones therefore do.
+
+**Precedent: a vendor-aggregate throughput counter is `absent`, however well
+built** — otherwise every odometer scores `present` and the signal collapses
+into "has a nice number".
+
+**`real-product-screenshot` present → absent, and this is an orchestrator
+call rather than the rater's.** The page contains **zero raster screenshots of
+the app**. All five product visuals are vector SVG with live `<text>` nodes and
+zero `<image>` elements, several of them animated (the Observability panel
+plays an interaction sequence, a "New Item" modal opening on a CPU metric
+builder with an `@service:all` filter):
+
+```
+y2226 1160x825:  302 paths, 210 text, 0 images
+y3628  465x509:   17 paths,  22 text, 0 images
+y4394  465x504: 1659 paths,  24 text, 0 images
+y5492 1160x825:  170 paths, 366 text, 0 images
+y7205 1160x602:  346 paths, 330 text, 0 images
+```
+
+The only rasters are `bg-train-dusk-960.webp` and `maskgroup-forest.webp`, both
+illustration. The original file's hero-panel measurements (`box-shadow: none`,
+`border-radius: 0px`) read like they came off a DOM element, consistent with
+SVG rather than an image.
+
+Flipped for consistency with `financial-datasets`, which was flipped on the
+same fact pattern in the same pass: both pages **show** their product UI and
+neither **captures** it, and v3's wording is "the product's UI shown as a real
+screenshot." Applying the letter to one file and not the other would be
+arbitrary. Note the difference the rater was right to draw — Railway *depicts*
+its actual UI extensively and accurately, where financial-datasets rebuilds it
+live — and that difference is precisely what the vocabulary cannot express.
+**Three files now read `absent` while plainly showing their product, which
+makes change 3b (`real-product-surface`) urgent rather than optional.**
+
+**Two parts of the original prose are now stale.** The page changed between
+2026-10-11 and 2026-10-15. `[vite] ✓ built`, `mise node@25.2.1 ✓ installed`
+and the "Build Logs" panel are **no longer on the page**: whole-page innerText
+after a full walk returns 0 hits, and 0 hits for `✓` across 48 dwell samples.
+The `emoji-as-icon: absent` reasoning rested on those eight U+2713 characters
+and now has no referent — the verdict survives, but only because there are no
+check characters at all rather than because the ones present were terminal
+output. And the headline now reads `209.5M+`, not `218.7M+`; all five figures
+moved.
+
+**The axis the vocabulary still lacks, recorded by this file for the second
+time.** Splitting medium from content is right and this page proves it, but it
+opens a gap it does not name: Railway's deliverable content is *rendered in
+vector, not captured*. A page could hand-draw a convincing artefact, score
+`shows-deliverable: present`, and have `real-product-screenshot` correctly
+record that nothing was captured — and the two axes would then read as
+contradicting each other rather than as the precise finding they are. The
+belief that this content is real rests on one telling detail (the
+`wlwmanifest.xml` probe is too specific to invent), which is an inference the
+vocabulary gives no way to record. **The missing axis is whether the
+deliverable's content is sourced or fabricated.**
+
+**v4 change 3b — `real-product-surface` absent → present.** No new rating, and
+this reverses an orchestrator call rather than a rater's. The call above flipped
+this file to `absent` for consistency with `financial-datasets` under the old
+wording's letter, "the product's UI shown as a real screenshot", while
+recording that the page "depicts its actual UI extensively and accurately" and
+that both pages *show* their product UI and neither *captures* it. The signal is
+now re-worded to what that paragraph said the vocabulary could not express:
+satisfied by a genuine capture or a faithful live rebuild, failed by a stylised
+or invented UI. Five product visuals in SVG with live `<text>` and zero
+`<image>`, depicting the real UI accurately and in places animated through a
+real interaction sequence, are a faithful rebuild, not a stylised one. Same
+facts, the inverse of yesterday's consistency argument, and it still applies to
+both files together: `financial-datasets` flips in the same pass.
+`shows-deliverable` is unaffected and stays `present`.

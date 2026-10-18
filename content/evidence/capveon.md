@@ -28,8 +28,8 @@ signals:
   type-scale-high-contrast: present
   editorial-grid-break: absent
   custom-type-pairing: absent
-  real-product-screenshot: absent
-  artifact-not-dashboard: present
+  real-product-surface: absent
+  shows-deliverable: present
   density-variation: present
   one-accent-discipline: present
   live-claim-control: absent
@@ -93,3 +93,97 @@ in the dark water at the left of the dam frame where the image has no detail, so
 scrim is bolted over anything. The material fact is recorded as `materials:
 stock-photo`; the signal asks a different question and answers no. 10869px render
 complete, so `scroll-reveal-blank` is absent.
+
+**v4 change 3b surface re-pass**
+
+Decided first: `real-product-surface` absent (confirmed, no flip). `shows-deliverable`
+present (confirmed, no flip).
+
+Capture, 2026-10-16: 16 tiles at 1440x900, window scroller, `clamped: false`,
+`coverage: 1`, docH 10869 before and after the walk, stitched to three strips of
+4400 + 4200 + 2269 = 10869px. The last strip ends in the footer ("© 2026 Capveon,
+Inc.", hello@capveon.ai, LinkedIn). The full-bleed band photographs under Connects and
+Understands show partly repeated imagery in the stitch (layered backgrounds); heights
+agree and the panel below renders once and intact. No `<video>`, no large `<svg>`, no
+`<canvas>` on the page; the one empty-src `<iframe>` (y≈4538) is not a product surface.
+Exact text below is a Playwright DOM read, not pixels.
+
+Candidate product surfaces. There is one. The "What a morning looks like." section
+(heading y=7455, over the Red Bluff Diversion Dam photograph from y=7110) carries a
+DOM panel at x=744, y=7290 to 7839, w=648: a `<div class="extract glass">`
+(`rgba(18, 22, 28, 0.34)` fill, `backdrop-filter: blur(28px) saturate(1.7)`, 1px
+white-20% border, 20px radius) holding a title, a subtitle and a two-column `<dl>`.
+There is no `<table>` on the page. Its text, exactly:
+
+    Proposed writes, awaiting approval
+    This morning's queue.
+    Create job            Bid 26-041 awarded per email from owner. Create job in ERP from estimate.
+    Update opportunity    Move to Closed Won in the CRM. Amount $3.8M matches signed contract.
+    Merge accounts        'County Utilities' and 'County Util. Dept.' are one customer in both systems.
+    Update contact        Project manager changed per transmittal letter.
+    Flag                  ERP customer credit limit below contract value. Needs a person.
+    Four approved in one click each. One escalated.
+
+Row y: Create job 7417, Update opportunity 7490, Merge accounts 7563, Update contact
+7636, Flag 7684; closing note 7777. Everything else on the page is credited
+photography, a row of seven integration logos (y≈4638) and a line-icon list.
+
+Faithfulness check. The real app is not reachable: `Log in` goes to app.capveon.ai,
+which redirects to a Clerk sign-in at accounts.capveon.ai behind a Cloudflare
+challenge (HTTP 403 to a scripted fetch), so there is no app bundle or chrome to
+compare. The YC profile has `app_video_url: null`, `dday_video_url: null`, no videos
+and no company photos. No subpage pictures the app either: /how-it-works, /security,
+/capabilities and /about carry photographs only. What the subpages do show is that
+`.extract.glass` is the site's own marketing component, reused with different
+content: the same queue verbatim on /use-cases/crm-erp-automation, "Water
+Reclamation Facility Expansion / One record, assembled from six systems." on
+/solutions/contractors, and "Compliance matrix, treatment plant improvements RFP /
+214 requirements found, 6 flagged for a person." on /use-cases/bid-document-review.
+None of the instances contains a button or input. /security describes the real
+surface as "a queue that shows the evidence", and the subhead beside the panel says
+the writes are "waiting for one click each", yet the panel has nothing to click: no
+approve or reject control, no row state, no app navigation.
+
+Q1 verdict: absent. The panel is a page-authored rendering of the queue's output in
+the marketing site's glass card, the same card the site uses for unrelated
+illustrations, with none of the controls the page says the queue has. That is the
+browserbase-com case (page-authored output panels, the real console nowhere), not
+financial-datasets (live DOM rebuild with real controls) or papaya (verbatim app
+components). The one residual: the app is gated, so this card cannot be compared to
+the real queue directly; the missing click target the page itself promises is what
+decides it.
+
+Q2. The entry that could embarrass the vendor is the closing note at y=7777, "Four
+approved in one click each. One escalated.", read with the Flag row at y=7684, "ERP
+customer credit limit below contract value. Needs a person." The subhead beside the
+panel at y=7616 claims the updates are "waiting for one click each"; the panel's own
+tally says one of five was not, and that the product handed it to a person instead of
+proposing a write. The page would benefit from leaving the one-click claim at five
+for five, and the panel narrows it to four. This is not the approval gate repeated as
+a selling point: approval applies to all five rows, and the escalation is the
+exception to it. Counter-reading, recorded: flagging is pitched as a feature
+elsewhere ("with the ones that are slipping flagged first" in the Account
+intelligence row; "6 flagged for a person" on the bid-review subpage), and catching a
+credit-limit gap flatters the product. The count still stands against the page's own
+one-click line 160px above it, so it qualifies. The other rows are all wins ("Amount
+$3.8M matches signed contract", the account merge), and "Read-only first." in the
+Connects band is a limit sold as a feature, so neither counts. Searched: the panel,
+all band copy, the eight-row use-case list, the closing CTA.
+
+Q2 verdict: present. Part A is met by the escalation; Part B is met because a
+page-authored rendering of the product's output counts and this one is readable and
+specific.
+
+Drift from earlier prose. The v1 paragraph no longer matches the page and was wrong
+in form: it is not a "four-column table" but a two-column `<dl>` in a glass card;
+"Bid 24-109" now reads "Bid 26-041"; "Update specification" now reads "Update
+opportunity"; the "Merge accounts" and "Update contact" rows are missing from it;
+"Needs a review" now reads "Needs a person."; "Four approvals in one click each." now
+reads "Four approved in one click each. One escalated." The v3 quotation ("Four
+approved in one click each. One escalated." and "Needs a person.") matches the live
+page exactly and is the settled text. Elsewhere: Understands and Works are no longer
+"on black" but over credited photographs ("Water released from Shasta Dam, 2017.
+Bureau of Reclamation." and "Meadow Lake substation at dusk, White County, Indiana.
+CC BY 2.0, Patrick Finnegan."), and not every frame is CC0: credits now include
+"CC BY 2.0, dbking", "CC BY 4.0, Jon Mallard" and Bureau of Reclamation lines. Page
+height is unchanged at 10869px.

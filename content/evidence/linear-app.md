@@ -28,8 +28,8 @@ signals:
   type-scale-high-contrast: present
   editorial-grid-break: absent
   custom-type-pairing: absent
-  real-product-screenshot: present
-  artifact-not-dashboard: absent
+  real-product-surface: present
+  shows-deliverable: absent
   density-variation: present
   one-accent-discipline: present
   live-claim-control: absent
@@ -111,3 +111,62 @@ shows the phrase needs a scope line.
 
 Nothing else new fires: no photography, a flat white "Get started" pill, and a 9960px
 full-page capture that renders complete.
+
+**v4 hole-7 deliverable re-pass**
+
+Capture: reused `~/scratch/antislop/s5/linear-app`, 15 tiles, `clamped: false`,
+`coverage: 1`, `docH_before` 9960 = `docH_after` 9960, stitched 3 strips to
+9960px. The last strip ends in the footer (`Privacy` / `Terms` / `DPA` / `AUP`
+at y=9885). The walker disables animations, and the agent cards were caught
+mid-state (`Thinking…`), so every animated panel was re-read from the live DOM
+with animations running, sampled once a second for 10-40s per section.
+
+Candidates weighed, all inside product captures unless noted:
+- Hero issue view, y=530-1200. DRV-8852 "Faster app launch": a depicted
+  customer's bug ("Right now we show a spinner forever, which makes it look like
+  the car disappeared..."), and the agent panel resolves it: "Worked for 10 sec",
+  "Pushed and opened a draft PR.", `+22 −10`, "Draft PR awaiting your review".
+  The bug is the fictional team's ride app, not Linear; the agent's own run
+  succeeds. A "Revert" item under Reviews is the same team's PR.
+- Intake board plus Slack thread, y=2918-3460. Bug-labelled rows such as
+  "TypeError: Cannot read properties". Again the depicted team's backlog.
+- Planning roadmap, y=4150-4700. "UI Refresh" with a red "Polish" milestone and
+  a dashed overrun bar: a customer project slipping, shown as the feature
+  surfacing it. A sold capability, not a cost to the vendor.
+- "Cycle time by agent" scatter, y=4154-4650. 438 dots, month ticks only, no
+  y-axis values, no series labels; probed the DOM for `svg`/`text`/`aria-label`
+  in range and found none. Nothing readable enough to count against anyone.
+- AI carousel, y=5488-5900, four cards cycling. Cursor "Started working on
+  ENG-2844 Failed image upload and launched a cloud agent."; ChatPRD "Updated
+  the issue with requirements, open product decisions, and acceptance
+  criteria."; Linear "Three issues ranked by customer impact:" and "Reviewed
+  eight issues: two are ready for backlog, two need details, and four belong to
+  iOS or Android." with "Needs information · 2". The closest call on the page,
+  and it does not pass: the prompt asked to "group the issues by what should
+  happen next", so "need details" is one of the requested buckets and grades
+  the reporters' tickets, not the agent. Unlike capveon's "One escalated.", it
+  narrows no promise the section makes; every agent run completes or is still
+  running.
+- Build, y=6656-7210. PR list and a `HomeScreen.tsx` diff replacing
+  `isFullySynced` with `SyncStatus.PENDING`; rows `Working…`. "Reduce flakiness
+  in mobile UI tests" is the customer's backlog.
+- On the page's own canvas: Changelog, y=7644-7990, four launch entries ("Oct 8,
+  2026" newest), vendor release notes with no output on a job and nothing
+  against the vendor. "Linear powers over 40,000 product teams", y=8766, a
+  vendor-aggregate odometer, absent however built. Two testimonials, y=8262.
+
+Entry that could have embarrassed the vendor: none. Searched the full DOM text,
+static and animated, for failure, refusal, error, cost, decline, risk and
+regression terms. Every hit is a depicted customer's own defect or schedule,
+which the page uses to show Linear working.
+
+Verdict: `shows-deliverable` absent, confirmed. The page shows plenty of
+readable product output across chrome-like panels (Part B is satisfied on
+medium), but Part A fails: no agent run errs, stalls, costs or is declined, and
+every value about Linear itself is the flattering one.
+
+Studied-page check: unchanged. Height 9960 matches the 2026-10-10 prose; hero
+DRV-8852, the FIG 0.1-0.3 row, the 888/432 OpenAI/Ramp testimonials and the
+centered closing CTA are all present. The changelog is not in the original prose
+but its newest entry predates the study date, and nothing here was credited, so
+no Wayback check was needed.
