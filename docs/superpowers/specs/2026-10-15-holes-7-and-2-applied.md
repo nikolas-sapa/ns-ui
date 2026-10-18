@@ -301,9 +301,9 @@ scored against at the time, same as change 3's handling.
 re-pass to "the 23 files carrying the signal". But the two motivating cases,
 `financial-datasets` and `railway-com`, read **`absent`** when this was
 written — that is the defect, and both are now `present` (below). A widening definition puts every `absent` file at risk, not the
-`present` ones, so the re-pass set is the inverse of the one named. **15** files read `absent`
-today, against 26 `present` and 1 `unresolved` (20/21/1 when this was first
-written). Five have since moved absent → present under the new wording:
+`present` ones, so the re-pass set is the inverse of the one named. **17** files read `absent`
+today, against 29 `present` and 1 `unresolved` (15/26/1 at n=42, before the five
+`ai-builder` pages below; 20/21/1 when this was first written). Five have since moved absent → present under the new wording:
 `papaya` and `the-subvocal-company` on fresh re-rates, `financial-datasets` and
 `railway-com` on recorded facts (below), and `stripe-2014` in the fourteen-file
 pass. **Every `absent` file has now been scored against the new wording** — the
@@ -487,3 +487,52 @@ total height still matched. The walker now forces instant scroll and writes
 every landing to `walk.json`. The stitcher refuses any tile that landed more
 than 8px short, and a forged short landing turns it red. Captures written before
 this change carry no landings and cannot be checked retroactively.
+
+## The slop hunt, 2026-10-18: the gate opens, on a selected sample
+
+The rule gate needs three `slop` files; the corpus had two (`heroku-2014`,
+`openhack`). YC cohorts yield about one in twenty-five, so the population
+changed: sites makers launched from AI site builders, harvested from the
+builders' own showcase galleries (madewithlovable.com, madewithbolt.com). A
+new cohort, `ai-builder`, records the sampling source. It is not a verdict.
+
+**Screen, then blind raters.** About forty candidates were ranked by a cheap
+mechanical triage (glass panels, gradient CTA, indigo accent, gradient text,
+generic sans, pills, emoji, blur blob, centred hero, three-card row), which
+scored `openhack` 5 and `linear`/`anthropic`/`provenmetal` 0. The top five each
+went to two independent blind raters who never saw the screen scores. Signals
+were merged agree → value, split → `unresolved`.
+
+| file | verdict | raters' nets | agreed-only net | splits |
+|---|---|---|---|---|
+| `permit-guide-ai` | slop | +6 / +6 | +6 | 2 |
+| `zingy-cannoli` | slop | +12 / +7 | +10 | 5 |
+| `prilo-ai` | slop | +6 / +6 | +6 | 2 |
+| `vizleads` | mixed | +4 / +2 | +3 | 2 |
+| `referable-dev` | mixed | +3 / +2 | +3 | 3 |
+
+Every pair agreed on the verdict; `vizleads` rater A reached +4 and still said
+`mixed`, having no separation argument against the +3 files. All three `slop` files clear `heroku-2014`
+(+5) on agreed values alone. Corpus: **13 exemplar / 29 mixed / 5 slop**.
+
+**The gate opened: 13 signals are rule-eligible**, eight slop and five craft.
+`scripts/build-antislop.ts` exits non-zero while any eligible signal has no
+rule, so this evidence cannot merge until each is authored or held back.
+
+**The defect: five of the eight slop signals were selection criteria.**
+`gradient-blob`, `three-card-row`, `glass-card-overuse`,
+`generic-sans-default` and `indigo-violet-accent` are what the screen ranked
+on, and the three new files supply most of the slop pool for each. Selecting
+on a signal and then measuring that signal in the selection is circular: the
+present-rate is high partly because the screen put it there. The raters being
+blind to the screen does not fix this; it is the sample, not the rating, that
+was chosen on the signal. `asymmetric-split` inherits a weaker version through
+the screen's centred-hero term. `symmetric-everything`,
+`testimonial-card-row` and `stock-photo-generic` were not screened, but the
+first has no procedure (the same defect that holds back
+`single-optical-anchor`).
+
+What would clear it: three or more `slop` files found **without** the screen,
+for example a random draw from the same galleries rated blind, re-measuring the
+five screened signals on that sample alone.
+

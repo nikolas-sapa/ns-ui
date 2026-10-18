@@ -370,9 +370,16 @@ export const CONTEXTS = [
   "faq", "team", "stats", "security", "integrations",
 ] as const;
 
+// `ai-builder` added at n=47: sites launched by their makers from AI site
+// builders (Lovable, Bolt), harvested from the builders' own showcase galleries.
+// Added because YC pages yielded slop at ~4% and the corpus needed a population
+// where it is common; three of five screened candidates were confirmed slop by
+// two blind raters each. It is a sampling source, not a verdict: two of the
+// five came back `mixed`, and the cohort carries no rule weight of its own.
 export const COHORTS = [
   "yc-current", "yc-2015-2019", "agent-tools", "design-studio",
   "pre-ai-2015", "print", "architecture", "infographic", "academic-paper",
+  "ai-builder",
 ] as const;
 
 // `unresolved` is an admission the evidence could not settle the signal,
