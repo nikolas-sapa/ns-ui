@@ -259,11 +259,11 @@ hide:
   capture of the prototype's software on a real laptop, so "no UI exists" no
   longer holds (a lab app, not the shipping interface; recorded in the file).
 
-**Net on `shows-deliverable`: 14/42 → 13/42 present.** Five flips and one hold
+**Net on `shows-deliverable`: 14/42 → 12/42 present.** Five flips and one hold
 in the six-file pass took it to 9; the hole-7 pass then added `resend-com`,
 `github-2014`, `clerk-com` and `sona8`, the aviern re-study added `aviern`, and
-the decent-com re-study removed `decent-com` (its deliverable was redesigned
-away). Each from its own walk.
+the decent-com and sona8 re-studies removed `decent-com` and `sona8` (both
+pages were redesigned). Each from its own walk.
 
 ## One data-quality note, free
 
@@ -419,7 +419,7 @@ bug; the fix was made in the other session's working tree and verified here on
 | `resend-com` | `Bounced` … `to melia@gmail.com with type Spam`, under "reach humans instead of spam folders" | page-authored panel on the page's own canvas: the exact hole-7 case |
 | `github-2014` | a staff commit titled `Sorry VB users` in GitHub's own `octokit.net` history | the client screenshot had not loaded in the capture |
 | `clerk-com` | a Directory Sync row `Okta - HospitalB` / `Error` | two non-default tabs deep |
-| `sona8` | the product's own dashboard: "1 of 1 conversations did not reach" its brief | inside a click-to-play video |
+| `sona8` | the product's own dashboard: "1 of 1 conversations did not reach" its brief | inside a click-to-play video. **Unverified and superseded:** its rendered size was never checked against the legibility rule, and the 2026-10-18 re-study of the redesigned page rates `absent` |
 
 `sona8` and `databuddy` are now redesigned; both are queued for a full
 re-study. The current databuddy page would pass on a `TypeError` in its own

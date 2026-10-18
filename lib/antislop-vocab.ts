@@ -236,7 +236,11 @@ export const SLOP_SIGNALS = [
 // THE ENTRY MUST BE LEGIBLE AT PAGE SIZE, in CSS px as rendered. A reader
 // cannot audit text they cannot read. basecamp-2014's "Still only 8 of about
 // 40 attendees actually showed up" is a genuine concession and does not count
-// at about 4 CSS px; heroku-2014's add-on prices fail the same way.
+// at about 4 CSS px; heroku-2014's add-on prices fail the same way. Video is
+// judged at its INLINE rendered size, not fullscreen: sona8's "58 of 203
+// statements fit none of the 5 themes." renders at about 4px in a 558px player
+// and fails, where aviern's missed shrub (about 37x50 CSS px, 45 of 49 frames)
+// is visible at normal playback and counts.
 //
 // A refusal counts when it narrows a claim the page would benefit from leaving
 // broad (hole 1). neuron-industries keeps `Certifications: UL + CE (planned)`
