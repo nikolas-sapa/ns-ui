@@ -147,6 +147,40 @@ def session_slugs():
     )
 
 
+def longest_blank_band(paths, tol=4):
+    """Longest run of uniform rows (max-min luma <= tol) across the stitched
+    strips, in page px.
+
+    The height invariant cannot see an UNPAINTED band: a tile frozen before its
+    content loaded has the right dimensions and nothing on it. That failure hit
+    four pages in one batch at n=42 -- mailchimp-2014's hero (animation frozen
+    blank), heroku-2014's logo wall, squarespace-2014 (97% white: the 8s settle
+    beat a 25s Wayback hero), github-2014's unloaded client screenshot -- and
+    every one was caught only because a rater happened to read the DOM.
+
+    A WARNING, not an assert, and its reach is measured, not hoped for. Over
+    the 40 session-5 captures the longest uniform band runs:
+        squarespace-2014 3306 (miss)    mailchimp-2014 679 (miss)
+        sentient-os 452                 basecamp-2014 450 (archive gaps)
+        the-subvocal-company 390 ...    heroku-2014 305 (miss)
+    600px separates the two large misses from everything else. It does NOT
+    catch heroku-2014's logo wall or github-2014's missing screenshot: those
+    bands are no longer than designed whitespace on pages that are fine, so no
+    threshold on band length can. Those still need a rater reading the DOM.
+    """
+    import numpy as np
+    best = run = 0
+    for path in paths:
+        a = np.asarray(Image.open(path).convert('L'), dtype=np.int16)
+        flat = (a.max(axis=1) - a.min(axis=1)) <= tol
+        for f in flat:
+            run = run + 1 if f else 0
+            best = max(best, run)
+    return best
+
+
+BLANK_WARN = 600
+
 bad = 0
 for s in (sys.argv[1:] or session_slugs() or sorted(DOC_H)):
     doc_h = walk_height(s)
@@ -158,6 +192,10 @@ for s in (sys.argv[1:] or session_slugs() or sorted(DOC_H)):
     print(f'{s:24s} {n:>3} tiles -> {len(made)} strips, {total}px vs page {doc_h}px  {ok}')
     for _, w, h, kb in made:
         print(f'{"":26s} {w}x{h} {kb}KB')
+    blank = longest_blank_band([p for p, *_ in made])
+    if blank >= BLANK_WARN:
+        print(f'{"":26s} WARNING: {blank}px uniform band -- suspect an unpainted '
+              f'capture (frozen animation, slow hero, unloaded image); read the DOM')
 
 print(f'\n{bad} slug(s) where stitched height != page height')
 assert bad == 0, 'stitched height must equal page height'

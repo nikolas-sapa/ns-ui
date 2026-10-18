@@ -15,7 +15,10 @@ const STEP = 700, SETTLE = 900, MAX = 60;
   const b = await chromium.launch();
   const p = await b.newPage({ viewport: { width: 1440, height: 900 } });
   await p.goto(url, { waitUntil: 'domcontentloaded', timeout: 150000 });
-  await p.waitForTimeout(8000);
+  // NS_LOAD_MS: initial settle before the walk. 8s is right for live pages and
+  // wrong for slow archive heroes: squarespace-2014's first Wayback scene takes
+  // ~25s, and an 8s settle captured 97% white tiles that passed every check.
+  await p.waitForTimeout(Number(process.env.NS_LOAD_MS) || 8000);
 
   // Pick the scroller: window unless a child element scrolls materially further.
   const probe = await p.evaluate(() => {
