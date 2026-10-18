@@ -7,6 +7,6 @@ verdict: slop
 materials: [single-theme]
 studied: 2026-10-11
 signals:
-  gradient-blob: present
+  gradient-fill-cta: present
 ---
 Fixture, not evidence. Stands in for a page that exhibits the signal.

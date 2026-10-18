@@ -17,7 +17,7 @@ repo keeps finding. These files get reviewed once, diff when someone changes
 them, and are fed to the real `parseEvidence`/`parseRule`, so the chain
 exercises the actual parse path.
 
-**Shape.** 10 evidence files: 3 rated `slop` with `gradient-blob: present`,
+**Shape.** 10 evidence files: 3 rated `slop` with `gradient-fill-cta: present`,
 3 `exemplar` and 3 `pre-ai-2015` with it `absent`, plus one `slop` file rating
 it `unresolved`. That clears every eligibility gate for exactly one signal,
 which is the minimum that makes the build do real work. `fixture-hero-gradient`

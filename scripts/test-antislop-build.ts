@@ -37,7 +37,9 @@ const FIXTURE_RULES = join(FIXTURE, "rules");
 // Facts about the committed fixture, asserted rather than assumed. If someone
 // edits those files, the tests that pin these are the ones that fail, instead
 // of every other test quietly going inert.
-const LIVE = "gradient-blob"; // the one signal the fixture makes eligible
+// Never a signal in RULE_INELIGIBLE (scripts/antislop/eligibility.ts): a held
+// signal never goes eligible, so every test using it would go red or inert.
+const LIVE = "gradient-fill-cta"; // the one signal the fixture makes eligible
 const EVIDENCE_COUNT = 10;
 const RULE_ID = "fixture-hero-gradient";
 const NAMED = 7; // evidence slugs the rule names
@@ -268,7 +270,7 @@ test("one broken rule rewrites no other rule's count", (t) => {
   const stale = ruleFile(p);
   writeFileSync(
     join(p.rulesDir, "zz-broken.md"),
-    committedRule().replace(`signal: ${LIVE}`, "signal: three-card-row").replace(/evidence: \[.*\]/, "evidence: [no-such-file]"),
+    committedRule().replace(`signal: ${LIVE}`, "signal: typewriter-headline").replace(/evidence: \[.*\]/, "evidence: [no-such-file]"),
   );
   assert.throws(() => buildAntislop(p), /no-such-file/);
   assert.equal(ruleFile(p), stale);

@@ -59,7 +59,7 @@ const controls = (signal: string, value: string, count = 3, prefix = "ctrl") =>
 const RULE = `---
 id: hero-gradient
 context: hero
-signal: gradient-blob
+signal: gradient-fill-cta
 stance: avoid
 severity: soft
 evidence: [a, b, c]
@@ -71,9 +71,9 @@ evidence: [a, b, c]
 
 test("counts only files where the signal is present", () => {
   const corpus = new Map([
-    ["a", ev("a", "gradient-blob", "present")],
-    ["b", ev("b", "gradient-blob", "absent")],
-    ["c", ev("c", "gradient-blob", "present")],
+    ["a", ev("a", "gradient-fill-cta", "present")],
+    ["b", ev("b", "gradient-fill-cta", "absent")],
+    ["c", ev("c", "gradient-fill-cta", "present")],
   ]);
   const rule = parseRule(RULE, "hero-gradient");
   assert.deepEqual(countRule(rule, corpus), { present: 2, total: 3 });
@@ -87,14 +87,14 @@ test("counts only files where the signal is present", () => {
 // Every failure must name the rule file whoever has to fix it will open.
 test("every rejection is prefixed with the rule's own path", () => {
   for (const broken of [
-    RULE.replace("signal: gradient-blob", "signal: single-theme"),
+    RULE.replace("signal: gradient-fill-cta", "signal: single-theme"),
     RULE.replace("[a, b, c]", "[a, b, a]"),
     RULE.replace("severity: soft\n", ""),
     "no fence at all",
   ]) {
     assert.throws(() => parseRule(broken, "hero-gradient"), /^Error: content\/rules\/hero-gradient\.md: /);
   }
-  const corpus = new Map([["a", ev("a", "gradient-blob", "present")]]);
+  const corpus = new Map([["a", ev("a", "gradient-fill-cta", "present")]]);
   assert.throws(
     () => countRule(parseRule(RULE, "hero-gradient"), corpus),
     /^Error: content\/rules\/hero-gradient\.md: /,
@@ -104,9 +104,9 @@ test("every rejection is prefixed with the rule's own path", () => {
 // Review Focus 3
 test("unresolved never counts toward a rule", () => {
   const corpus = new Map([
-    ["a", ev("a", "gradient-blob", "present")],
-    ["b", ev("b", "gradient-blob", "unresolved")],
-    ["c", ev("c", "gradient-blob", "unresolved")],
+    ["a", ev("a", "gradient-fill-cta", "present")],
+    ["b", ev("b", "gradient-fill-cta", "unresolved")],
+    ["c", ev("c", "gradient-fill-cta", "unresolved")],
   ]);
   const { present, total } = countRule(parseRule(RULE, "hero-gradient"), corpus);
   assert.equal(present, 1, "unresolved is an admission, not a present");
@@ -119,9 +119,9 @@ test("unresolved never counts toward a rule", () => {
 // it puts a file that said nothing into the denominator.
 test("a signal the file never set leaves both sides, like unresolved", () => {
   const corpus = new Map([
-    ["a", ev("a", "gradient-blob", "present")],
-    ["b", ev("b", "three-card-row", "present")], // says nothing about gradient-blob
-    ["c", ev("c", "gradient-blob", "absent")],
+    ["a", ev("a", "gradient-fill-cta", "present")],
+    ["b", ev("b", "typewriter-headline", "present")], // says nothing about gradient-fill-cta
+    ["c", ev("c", "gradient-fill-cta", "absent")],
   ]);
   assert.deepEqual(countRule(parseRule(RULE, "hero-gradient"), corpus), { present: 1, total: 2 });
 });
@@ -132,17 +132,17 @@ test("a duplicate slug in evidence: is rejected, not double-counted", () => {
 });
 
 test("a rule naming a slug with no evidence file fails, naming the slug", () => {
-  const corpus = new Map([["a", ev("a", "gradient-blob", "present")]]);
+  const corpus = new Map([["a", ev("a", "gradient-fill-cta", "present")]]);
   assert.throws(() => countRule(parseRule(RULE, "hero-gradient"), corpus), /\bb\b/);
 });
 
 // Review Focus 5
 test("a rule whose signal is a material is rejected", () => {
-  assert.throws(() => parseRule(RULE.replace("signal: gradient-blob", "signal: single-theme"), "x"), /material|stance/i);
+  assert.throws(() => parseRule(RULE.replace("signal: gradient-fill-cta", "signal: single-theme"), "x"), /material|stance/i);
 });
 
 test("a rule whose signal is outside the vocabulary is rejected", () => {
-  assert.throws(() => parseRule(RULE.replace("gradient-blob", "sparkle"), "x"), /sparkle/);
+  assert.throws(() => parseRule(RULE.replace("gradient-fill-cta", "sparkle"), "x"), /sparkle/);
 });
 
 // parseRule carries its own fence handling via the shared splitFrontmatter, so
@@ -184,11 +184,11 @@ test("a rule with an empty evidence list is rejected", () => {
 
 test("a slop signal that separates exemplar from slop and is rare pre-AI is eligible", () => {
   const corpus = new Map([
-    ...slops("gradient-blob", "present"),
-    ...exemplars("gradient-blob", "absent"),
-    ...controls("gradient-blob", "absent"),
+    ...slops("gradient-fill-cta", "present"),
+    ...exemplars("gradient-fill-cta", "absent"),
+    ...controls("gradient-fill-cta", "absent"),
   ]);
-  assert.equal(eligibility("gradient-blob", corpus).eligible, true);
+  assert.equal(eligibility("gradient-fill-cta", corpus).eligible, true);
 });
 
 // Fix 1. A craft signal is by definition commoner among exemplars, so testing
@@ -211,11 +211,11 @@ test("a craft signal that separates toward exemplars is eligible", () => {
 // classification is wrong, and that has to surface as ineligible.
 test("a slop signal commoner among exemplars stays ineligible, it is not flipped", () => {
   const corpus = new Map([
-    ...exemplars("gradient-blob", "present"),
-    ...slops("gradient-blob", "absent"),
-    ...controls("gradient-blob", "absent"),
+    ...exemplars("gradient-fill-cta", "present"),
+    ...slops("gradient-fill-cta", "absent"),
+    ...controls("gradient-fill-cta", "absent"),
   ]);
-  const r = eligibility("gradient-blob", corpus);
+  const r = eligibility("gradient-fill-cta", corpus);
   assert.equal(r.eligible, false, "an absolute gap would call this eligible with the stance silently inverted");
   assert.match(r.reason, /slop signal/);
 });
@@ -223,11 +223,11 @@ test("a slop signal commoner among exemplars stays ineligible, it is not flipped
 // Fix 1. An ineligible craft signal must not read like an ineligible slop one.
 test("the reason names which direction was tested", () => {
   const slopWrongWay = new Map([
-    ...slops("three-card-row", "present"),
-    ...exemplars("three-card-row", "present"),
-    ...controls("three-card-row", "absent"),
+    ...slops("typewriter-headline", "present"),
+    ...exemplars("typewriter-headline", "present"),
+    ...controls("typewriter-headline", "absent"),
   ]);
-  assert.match(eligibility("three-card-row", slopWrongWay).reason, /as a slop signal/);
+  assert.match(eligibility("typewriter-headline", slopWrongWay).reason, /as a slop signal/);
 
   const craftWrongWay = new Map([
     ...slops("density-variation", "present"),
@@ -270,10 +270,10 @@ test("a signal already common pre-AI is ineligible — it is a convention", () =
 // clears the exact check that exists to catch pre-AI conventions.
 test("no control evidence is ineligible, naming the pool size", () => {
   const corpus = new Map([
-    ...slops("gradient-blob", "present"),
-    ...exemplars("gradient-blob", "absent"),
+    ...slops("gradient-fill-cta", "present"),
+    ...exemplars("gradient-fill-cta", "absent"),
   ]);
-  const r = eligibility("gradient-blob", corpus);
+  const r = eligibility("gradient-fill-cta", corpus);
   assert.equal(r.eligible, false, "a signal with no control evidence must not clear the control gate");
   assert.match(r.reason, /n=0/);
 });
@@ -299,26 +299,26 @@ test("a signal observed fewer than 3 times corpus-wide is ineligible", () => {
 
 test("three observations corpus-wide clears the present-count gate", () => {
   const corpus = new Map([
-    ...slops("gradient-blob", "present"),
-    ...exemplars("gradient-blob", "absent"),
-    ...controls("gradient-blob", "absent"),
+    ...slops("gradient-fill-cta", "present"),
+    ...exemplars("gradient-fill-cta", "absent"),
+    ...controls("gradient-fill-cta", "absent"),
   ]);
-  assert.equal(eligibility("gradient-blob", corpus).eligible, true);
+  assert.equal(eligibility("gradient-fill-cta", corpus).eligible, true);
 });
 
 test("a control pool below the minimum is ineligible", () => {
   const base: [string, Evidence][] = [
-    ...slops("gradient-blob", "present"),
-    ...exemplars("gradient-blob", "absent"),
+    ...slops("gradient-fill-cta", "present"),
+    ...exemplars("gradient-fill-cta", "absent"),
   ];
   for (const n of [1, 2]) {
-    const r = eligibility("gradient-blob", new Map([...base, ...controls("gradient-blob", "absent", n)]));
+    const r = eligibility("gradient-fill-cta", new Map([...base, ...controls("gradient-fill-cta", "absent", n)]));
     assert.equal(r.eligible, false, `${n} control file(s) is not enough to rule out a pre-AI convention`);
     assert.match(r.reason, new RegExp(`n=${n}`));
   }
   // The boundary: the minimum itself is enough.
   assert.equal(
-    eligibility("gradient-blob", new Map([...base, ...controls("gradient-blob", "absent", 3)])).eligible,
+    eligibility("gradient-fill-cta", new Map([...base, ...controls("gradient-fill-cta", "absent", 3)])).eligible,
     true,
   );
 });
@@ -327,22 +327,22 @@ test("a control pool below the minimum is ineligible", () => {
 // the signal does not help the pool reach its minimum.
 test("unresolved control files do not count toward the pool minimum", () => {
   const corpus = new Map([
-    ...slops("gradient-blob", "present"),
-    ...exemplars("gradient-blob", "absent"),
-    ...controls("gradient-blob", "unresolved", 4),
+    ...slops("gradient-fill-cta", "present"),
+    ...exemplars("gradient-fill-cta", "absent"),
+    ...controls("gradient-fill-cta", "unresolved", 4),
   ]);
-  const r = eligibility("gradient-blob", corpus);
+  const r = eligibility("gradient-fill-cta", corpus);
   assert.equal(r.eligible, false, "four files that could not settle the signal are not four rated files");
   assert.match(r.reason, /n=0/);
 });
 
 test("a signal that fires on exemplars as often as slop is ineligible", () => {
   const corpus = new Map([
-    ...slops("three-card-row", "present"),
-    ...exemplars("three-card-row", "present"),
-    ...controls("three-card-row", "absent"),
+    ...slops("typewriter-headline", "present"),
+    ...exemplars("typewriter-headline", "present"),
+    ...controls("typewriter-headline", "absent"),
   ]);
-  assert.equal(eligibility("three-card-row", corpus).eligible, false);
+  assert.equal(eligibility("typewriter-headline", corpus).eligible, false);
 });
 
 test("ineligibility always states the evidence that disqualified it", () => {
@@ -358,11 +358,11 @@ test("ineligibility always states the evidence that disqualified it", () => {
 // printed without the pool it came from reads as a finding at n=20.
 test("every reason states the n behind each rate", () => {
   const ok = new Map([
-    ...slops("gradient-blob", "present"),
-    ...exemplars("gradient-blob", "absent"),
-    ...controls("gradient-blob", "absent"),
+    ...slops("gradient-fill-cta", "present"),
+    ...exemplars("gradient-fill-cta", "absent"),
+    ...controls("gradient-fill-cta", "absent"),
   ]);
-  assert.match(eligibility("gradient-blob", ok).reason, /n=/);
+  assert.match(eligibility("gradient-fill-cta", ok).reason, /n=/);
   const conv = new Map([
     ...slops("hero-mockup-float", "present", 1),
     ...controls("hero-mockup-float", "present"),
@@ -377,12 +377,12 @@ test("every reason states the n behind each rate", () => {
 // counting it in a rule, one layer up.
 test("unresolved leaves the pool in eligibility, it is not a 'not present'", () => {
   const sparse = new Map([
-    ...slops("gradient-blob", "present", 3, "sp"),
-    ...slops("gradient-blob", "unresolved", 3, "su"),
-    ...exemplars("gradient-blob", "absent"),
-    ...controls("gradient-blob", "absent"),
+    ...slops("gradient-fill-cta", "present", 3, "sp"),
+    ...slops("gradient-fill-cta", "unresolved", 3, "su"),
+    ...exemplars("gradient-fill-cta", "absent"),
+    ...controls("gradient-fill-cta", "absent"),
   ]);
-  const r = eligibility("gradient-blob", sparse);
+  const r = eligibility("gradient-fill-cta", sparse);
   assert.equal(r.slopRate, 1, "3 unresolved files must not dilute 3/3 into 3/6");
   assert.equal(r.eligible, true);
 
@@ -401,12 +401,12 @@ test("unresolved leaves the pool in eligibility, it is not a 'not present'", () 
 // deadSignals is exported from this module; the plan tests it in Task 6 against
 // the real corpus, which cannot distinguish a bug here from thin evidence.
 test("deadSignals names every signal no file exhibits, and nothing else", () => {
-  const corpus = new Map([["a", ev("a", "gradient-blob", "present")]]);
+  const corpus = new Map([["a", ev("a", "gradient-fill-cta", "present")]]);
   const dead = deadSignals(corpus);
   assert.ok(dead.includes("emoji-as-icon"), "a signal with no present in any file is dead vocabulary");
-  assert.ok(!dead.includes("gradient-blob"));
+  assert.ok(!dead.includes("gradient-fill-cta"));
   assert.ok(
-    deadSignals(new Map([["a", ev("a", "gradient-blob", "absent")]])).includes("gradient-blob"),
+    deadSignals(new Map([["a", ev("a", "gradient-fill-cta", "absent")]])).includes("gradient-fill-cta"),
     "absent everywhere is still dead — the signal measures nothing yet",
   );
 });
@@ -418,22 +418,22 @@ test("deadSignals names every signal no file exhibits, and nothing else", () => 
 // separation computed from that cannot authorize a rule.
 test("a slop pool below the minimum is ineligible however wide the gap looks", () => {
   const thin = new Map([
-    ...slops("gradient-blob", "present", 2),
-    ...exemplars("gradient-blob", "absent"),
-    ...controls("gradient-blob", "absent"),
+    ...slops("gradient-fill-cta", "present", 2),
+    ...exemplars("gradient-fill-cta", "absent"),
+    ...controls("gradient-fill-cta", "absent"),
   ]);
-  const r = eligibility("gradient-blob", thin);
+  const r = eligibility("gradient-fill-cta", thin);
   assert.equal(r.eligible, false, "a gap of 1.00 over 2 slop files is not evidence");
   assert.equal(r.slopRate, 1, "the rate is still reported, it just cannot authorize anything");
   assert.match(r.reason, /slop.*n=2|n=2.*slop/s);
 
   // The boundary: the minimum itself is enough.
   const enough = new Map([
-    ...slops("gradient-blob", "present", 3),
-    ...exemplars("gradient-blob", "absent"),
-    ...controls("gradient-blob", "absent"),
+    ...slops("gradient-fill-cta", "present", 3),
+    ...exemplars("gradient-fill-cta", "absent"),
+    ...controls("gradient-fill-cta", "absent"),
   ]);
-  assert.equal(eligibility("gradient-blob", enough).eligible, true);
+  assert.equal(eligibility("gradient-fill-cta", enough).eligible, true);
 });
 
 // The same reasoning on the other side of the gap. It cannot bind at n=20
@@ -441,11 +441,11 @@ test("a slop pool below the minimum is ineligible however wide the gap looks", (
 // pool makes it just as unreliable.
 test("an exemplar pool below the minimum is ineligible", () => {
   const thin = new Map([
-    ...slops("gradient-blob", "present"),
-    ...exemplars("gradient-blob", "absent", 2),
-    ...controls("gradient-blob", "absent"),
+    ...slops("gradient-fill-cta", "present"),
+    ...exemplars("gradient-fill-cta", "absent", 2),
+    ...controls("gradient-fill-cta", "absent"),
   ]);
-  const r = eligibility("gradient-blob", thin);
+  const r = eligibility("gradient-fill-cta", thin);
   assert.equal(r.eligible, false);
   assert.match(r.reason, /exemplar.*n=2|n=2.*exemplar/s);
 });
@@ -455,12 +455,12 @@ test("an exemplar pool below the minimum is ineligible", () => {
 // pool any more than it fills the control pool.
 test("unresolved files do not count toward a verdict pool minimum", () => {
   const corpus = new Map([
-    ...slops("three-card-row", "present", 1, "sp"),
-    ...slops("three-card-row", "unresolved", 3, "su"),
-    ...exemplars("three-card-row", "absent"),
-    ...controls("three-card-row", "absent"),
+    ...slops("typewriter-headline", "present", 1, "sp"),
+    ...slops("typewriter-headline", "unresolved", 3, "su"),
+    ...exemplars("typewriter-headline", "absent"),
+    ...controls("typewriter-headline", "absent"),
   ]);
-  const r = eligibility("three-card-row", corpus);
+  const r = eligibility("typewriter-headline", corpus);
   assert.equal(r.eligible, false, "1 rated slop file plus 3 non-answers is 1 rated slop file");
   assert.match(r.reason, /n=1/);
 });
@@ -468,11 +468,11 @@ test("unresolved files do not count toward a verdict pool minimum", () => {
 // Both pools short: the reason must name both, not stop at the first.
 test("a reason naming a thin pool names every thin pool", () => {
   const corpus = new Map([
-    ...slops("gradient-blob", "present", 2),
-    ...exemplars("gradient-blob", "absent", 1),
-    ...controls("gradient-blob", "absent"),
+    ...slops("gradient-fill-cta", "present", 2),
+    ...exemplars("gradient-fill-cta", "absent", 1),
+    ...controls("gradient-fill-cta", "absent"),
   ]);
-  const r = eligibility("gradient-blob", corpus);
+  const r = eligibility("gradient-fill-cta", corpus);
   assert.equal(r.eligible, false);
   assert.match(r.reason, /slop/);
   assert.match(r.reason, /exemplar/);
@@ -512,19 +512,19 @@ test("a craft signal with no control evidence is still eligible", () => {
 // The other half: the gate must stay on for slop signals, both parts of it.
 test("a slop signal still answers to the control gate", () => {
   const common = new Map([
-    ...slops("gradient-blob", "present"),
-    ...exemplars("gradient-blob", "absent"),
-    ...controls("gradient-blob", "present"),
+    ...slops("gradient-fill-cta", "present"),
+    ...exemplars("gradient-fill-cta", "absent"),
+    ...controls("gradient-fill-cta", "present"),
   ]);
-  const r = eligibility("gradient-blob", common);
+  const r = eligibility("gradient-fill-cta", common);
   assert.equal(r.eligible, false, "a slop signal common pre-AI is still a convention");
   assert.match(r.reason, /convention/i);
 
   const none = new Map([
-    ...slops("gradient-blob", "present"),
-    ...exemplars("gradient-blob", "absent"),
+    ...slops("gradient-fill-cta", "present"),
+    ...exemplars("gradient-fill-cta", "absent"),
   ]);
-  assert.equal(eligibility("gradient-blob", none).eligible, false, "and still fails closed with no control evidence");
+  assert.equal(eligibility("gradient-fill-cta", none).eligible, false, "and still fails closed with no control evidence");
 });
 
 // The slop-pool minimum is class-independent: a gap computed from one or two

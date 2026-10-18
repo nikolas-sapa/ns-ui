@@ -1,6 +1,6 @@
 ---
 context: hero
-signal: gradient-blob
+signal: gradient-fill-cta
 stance: avoid
 severity: soft
 evidence: [fixture-slop-1, fixture-slop-2, fixture-slop-3, fixture-slop-unresolved, fixture-exemplar-1, fixture-exemplar-2, fixture-exemplar-3]

@@ -571,3 +571,30 @@ eligibility rests on the selection. `testimonial-card-row` was not screened,
 so its full-corpus pass is not circular; it is only thinner without the
 screened files. Three passes sit at 0.33, one file from the 0.30 floor.
 
+
+### Ten rules authored, three held back
+
+Every rule is `soft`: the slop pool is three to six files, and several gaps sit
+one file above the floor. Each rule's evidence list is the pool its claim is
+about, so the generated count reads as that claim:
+
+- **avoid**, screened signals (`glass-card-overuse`, `generic-sans-default`,
+  `indigo-violet-accent`): the three slop files no screen chose. A screen-picked
+  file cannot vouch for the signal it was picked on.
+- **avoid**, unscreened (`testimonial-card-row`, `stock-photo-generic`): all
+  six slop files.
+- **prefer** (`asymmetric-split`, `type-scale-high-contrast`,
+  `editorial-grid-break`, `density-variation`, `one-accent-discipline`): the
+  thirteen exemplar files. Bodies state the slop and control contrast in words,
+  never as a number the build cannot re-check.
+
+Held back in `RULE_INELIGIBLE`, each with its removal condition:
+`gradient-blob` and `three-card-row` (eligible only through the
+screen-selected files) and `symmetric-everything` (no procedure; raters
+measured it two incompatible ways and split on `toolsapp-work`).
+
+Holding `gradient-blob` and `three-card-row` turned 19 gate tests red: their
+fixtures used those two names as stand-in signals. The stand-ins are now
+`gradient-fill-cta` and `typewriter-headline`, with a note that a stand-in must
+never be a held signal. Both guards were seen red: removing a rule fails the
+build naming the signal, and so does dropping a hold-back.
