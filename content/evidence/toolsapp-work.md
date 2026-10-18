@@ -11,7 +11,7 @@ signals:
   glass-card-overuse: absent
   emoji-as-icon: present
   generic-sans-default: present
-  symmetric-everything: unresolved
+  symmetric-everything: absent
   badge-pill-spam: absent
   generic-line-icon-set: absent
   testimonial-card-row: absent
@@ -34,6 +34,9 @@ signals:
   live-claim-control: absent
 materials: [dual-theme]
 ---
+
+**Re-pass, 2026-10-18: `symmetric-everything` unresolved → absent.** The raters split on alignment against column geometry. Under the `symmetric-everything` procedure in `lib/antislop-vocab.ts` (share of h1/h2 section headings centred, run by `scripts/antislop/symmetry.cjs`; present at 0.85 or more), 0 of 9 section headings compute `text-align: center` and 1 of 9 sits on the axis.
+
 
 **Sampling: random draw.** One of eight drawn with seed 20261018 from the thirty remaining gallery sites (pre-stated exclusions only: unreachable, blank, sign-in wall). Not chosen on any signal.
 

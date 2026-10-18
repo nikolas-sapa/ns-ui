@@ -4,7 +4,7 @@ context: hero
 signal: stock-photo-generic
 stance: avoid
 severity: soft
-evidence: [heroku-2014, openhack, toppic, permit-guide-ai, prilo-ai, zingy-cannoli]
+evidence: [heroku-2014, toppic, permit-guide-ai, prilo-ai, zingy-cannoli]
 ---
 ## Avoid
 
@@ -20,4 +20,4 @@ Absent from the exemplars and the 2014 control studied so far, and present on ab
 
 Counted over every slop-rated file. The pre-screen that found some of them did not rank on this signal.
 
-Present in <!-- generated:count start -->3/6<!-- generated:count end --> of the rated files studied for this rule.
+Present in <!-- generated:count start -->3/5<!-- generated:count end --> of the rated files studied for this rule.

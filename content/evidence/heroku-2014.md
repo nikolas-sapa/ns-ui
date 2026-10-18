@@ -12,7 +12,7 @@ signals:
   glass-card-overuse: absent
   emoji-as-icon: absent
   generic-sans-default: absent
-  symmetric-everything: present
+  symmetric-everything: absent
   badge-pill-spam: absent
   generic-line-icon-set: present
   testimonial-card-row: absent
@@ -34,6 +34,9 @@ signals:
   one-accent-discipline: present
   live-claim-control: absent
 ---
+
+**Re-pass, 2026-10-18: `symmetric-everything` present → absent; verdict stays slop, at the floor.** Under the `symmetric-everything` procedure in `lib/antislop-vocab.ts` (share of h1/h2 section headings centred, run by `scripts/antislop/symmetry.cjs`; present at 0.85 or more), 3 of 4 h1/h2 compute `text-align: center` (0.75) and 1 of 4 sits on the axis; the mirrored panels' headlines are links, not section headings. Net +5 → +4. **Separation from stripe-2014 (+3), checkable:** the slop sets differ by one (`centered-hero-stack` here, `gradient-fill-cta` there), and stripe-2014 carries two craft decisions this page lacks: an asymmetric hero split and varied section density. This page has neither; its one extra craft value is a single accent.
+
 Capture year 2014 (Jan 2015 snapshot). The control cohort's proof that the
 slop template is not an AI invention. This page runs seven of the sixteen
 slop signals simultaneously, in 2014. (Six when first rated against the v1

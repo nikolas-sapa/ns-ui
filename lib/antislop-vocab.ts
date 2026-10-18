@@ -41,6 +41,27 @@
 //     emoji sit in a panel one click away: absent.
 // `real-product-surface` and `live-claim-control` fire on such pages by
 // construction. Every rater recorded that and none read it toward `exemplar`.
+//
+// SYMMETRIC-EVERYTHING PROCEDURE, added at n=55 after the signal was held
+// back for having none. It is page-wide by definition: a centred hero alone
+// is `centered-hero-stack`, already scored, and reading this signal off the
+// hero counts the same decision twice (openhack's `present` did exactly that).
+// MEASURE: the share of visible h1/h2 section headings, outside nav, footer
+// and dialogs, whose text is centred. `scripts/antislop/symmetry.cjs` reports
+// it two ways, computed `text-align: center` and each line box centred on the
+// page axis; they agreed on 15 of the 16 pages they were compared on, and the
+// one exception (heroku-2014, 0.75 against 0.25) is absent on either.
+// CUT: `present` at 0.85 or more. The rated corpus leaves a gap there: every
+// page rated present on a measured basis reads 0.92 or more (toppic,
+// permit-guide-ai, zingy-cannoli, vizleads), and the highest page rated
+// absent reads 0.80 (github-2014; melty-gg, an exemplar, 0.71).
+// FEWER THAN TWO HEADINGS: the script falls back to lettered text at 1.5x
+// body or more. With fewer than two of those too (puzzlesbox, dachly,
+// standard-machines), the procedure does not apply and the rater's placement
+// reading stands, stated as such.
+// Mirrored pairs (heroku-2014's panels, deepmark's wave SVGs) are a recorded
+// counter-case, not a second test: deepmark's #75 note weighed one and held
+// alignment counts decisive.
 export const SLOP_SIGNALS = [
   "gradient-blob",
   "three-card-row",

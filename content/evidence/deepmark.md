@@ -12,7 +12,7 @@ signals:
   glass-card-overuse: absent
   emoji-as-icon: absent
   generic-sans-default: present
-  symmetric-everything: present
+  symmetric-everything: absent
   badge-pill-spam: present
   generic-line-icon-set: present
   testimonial-card-row: absent
@@ -34,6 +34,9 @@ signals:
   one-accent-discipline: present
   live-claim-control: absent
 ---
+
+**Re-pass, 2026-10-18: `symmetric-everything` present → absent, a data fix.** The #75 calibration note below held this `absent` ("22 of 25 headings are left-aligned") and stated net +2, but the front-matter kept `present`. Under the `symmetric-everything` procedure in `lib/antislop-vocab.ts` (share of h1/h2 section headings centred, run by `scripts/antislop/symmetry.cjs`; present at 0.85 or more) the page measures 2 of 13. Net +3 → +2, as the note says.
+
 10760px, walked (docH unchanged before and after, so nothing is scroll-gated).
 
 Centered hero in its textbook form: a top announcement bar, then a Y

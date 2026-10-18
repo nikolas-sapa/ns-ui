@@ -3,7 +3,7 @@ source: https://openhack.com
 kind: site
 cohort: yc-current
 context: [hero, nav, cta]
-verdict: slop
+verdict: mixed
 studied: 2026-10-10
 materials: [single-theme]
 signals:
@@ -12,7 +12,7 @@ signals:
   glass-card-overuse: absent
   emoji-as-icon: absent
   generic-sans-default: present
-  symmetric-everything: present
+  symmetric-everything: absent
   badge-pill-spam: absent
   generic-line-icon-set: unresolved
   testimonial-card-row: unresolved
@@ -34,6 +34,9 @@ signals:
   one-accent-discipline: present
   live-claim-control: absent
 ---
+
+**Re-pass, 2026-10-18: `symmetric-everything` present → absent, verdict slop → mixed.** Under the `symmetric-everything` procedure in `lib/antislop-vocab.ts` (share of h1/h2 section headings centred, run by `scripts/antislop/symmetry.cjs`; present at 0.85 or more), 1 of 12 section headings computes `text-align: center` and 2 of 12 sit centred on the axis. The `present` value was set before any procedure existed and rests on the hero alone ("nothing sits off-axis anywhere above the fold"), which is `centered-hero-stack`, already scored. Net +4 → +3, under the slop floor, so the verdict is `mixed` by rule, as deepmark's was in #75.
+
 AI security scanning, YC F26. This is the reference rendering of the current
 template, and worth filing precisely because nothing about it is distinctive.
 

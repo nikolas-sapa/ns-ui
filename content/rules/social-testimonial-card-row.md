@@ -4,7 +4,7 @@ context: testimonials
 signal: testimonial-card-row
 stance: avoid
 severity: soft
-evidence: [heroku-2014, openhack, toppic, permit-guide-ai, prilo-ai, zingy-cannoli]
+evidence: [heroku-2014, toppic, permit-guide-ai, prilo-ai, zingy-cannoli]
 ---
 ## Avoid
 

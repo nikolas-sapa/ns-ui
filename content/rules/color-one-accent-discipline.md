@@ -12,7 +12,7 @@ One accent hue doing every accent job, or none at all: zero and one are the same
 
 ## Why
 
-Universal among exemplars, but common on slop pages and in the 2014 control too, so it is the weakest separator here: necessary, not distinctive.
+Universal among exemplars, but present on some slop pages and common in the 2014 control, so it is the weakest separator here: necessary, not distinctive.
 
 Counted over the exemplar-rated files.
 

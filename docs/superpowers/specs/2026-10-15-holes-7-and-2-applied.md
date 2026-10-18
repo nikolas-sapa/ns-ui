@@ -598,3 +598,40 @@ fixtures used those two names as stand-in signals. The stand-ins are now
 `gradient-fill-cta` and `typewriter-headline`, with a note that a stand-in must
 never be a held signal. Both guards were seen red: removing a rule fails the
 build naming the signal, and so does dropping a hold-back.
+
+### `symmetric-everything` gets a procedure, and openhack leaves the slop pool
+
+The signal was held for having no procedure. The corpus had in fact applied
+one, "alignment counts" on section headings (edotenv, tsenta, deepmark,
+standard-machines), without writing it down. It is now written down in
+`lib/antislop-vocab.ts` and run by `scripts/antislop/symmetry.cjs`: the share of
+h1/h2 section headings that are centred, `present` at 0.85 or more. It is
+page-wide by definition, because a centred hero alone is `centered-hero-stack`.
+
+Run over all 55 pages, it agrees with every agreed rating but three, all set
+before any procedure existed:
+
+| file | was | measured | now |
+|---|---|---|---|
+| `openhack` | present | 1/12 text-align, 2/12 axis | absent; net +4 → +3, **slop → mixed** |
+| `heroku-2014` | present | 3/4 text-align, 1/4 axis | absent; net +5 → +4, stays slop at the floor |
+| `deepmark` | present | 2/13 | absent; a data fix, its #75 note already said so |
+| `toolsapp-work` | unresolved | 0/9 | absent |
+
+Two probe defects were found and fixed on the way: `<header>` was excluded as
+chrome, which hid heroku-2014's hero and mirrored panels, and a consent
+dialog's heading counted as a section. The two measures, computed alignment
+and axis position, agree on 15 of the 16 contested pages compared.
+
+**Consequence for the rules.** With openhack `mixed`, only two slop files were
+not screen-selected (heroku-2014, toppic). The three rules counted over that
+pool (`glass-card-overuse`, `generic-sans-default`, `indigo-violet-accent`)
+fall under the three-file minimum and are withdrawn into `RULE_INELIGIBLE`,
+two hours after they shipped. `symmetric-everything` is unscreened and
+separates on the full corpus (3/5 slop, 0/13 exemplar, 0/7 control), so it
+gets a rule. **Eight rules now:** avoid `symmetric-everything`,
+`testimonial-card-row`, `stock-photo-generic`; prefer the five craft signals.
+Corpus: **13 exemplar / 37 mixed / 5 slop.**
+
+What reopens the three: one more slop file found without the screen.
+
