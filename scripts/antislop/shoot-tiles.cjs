@@ -64,6 +64,10 @@ const STEP = 700, SETTLE = 900, MAX = 60;
   // and 48.2% of the page was never captured. Neither instrument errored.
   const landings = [];
   let stuck = 0;
+  // Instant scroll. With `scroll-behavior: smooth`, a page's own scroll lock can
+  // catch the animation mid-flight: databuddy asked for y4200 and stopped at
+  // 3907, one short landing, so the two-in-a-row abort below never fired.
+  await p.addStyleTag({ content: 'html, body { scroll-behavior: auto !important; }' });
   for (let y = 0; y < height && n < MAX; y += STEP) {
     if (sel) await p.evaluate((a) => { document.querySelector(a[0]).scrollTop = a[1]; }, [sel, y]);
     else await p.evaluate((yy) => window.scrollTo(0, yy), y);
@@ -98,6 +102,7 @@ const STEP = 700, SETTLE = 900, MAX = 60;
     // or rate from it: re-walk with wheel events (p.mouse.wheel) instead.
     clamped, reachedPx: reached, coverage: +(reached / height).toFixed(3),
     innerCands: probe.cands,
+    landings,
   };
   // Persist beside the tiles. stitch.py reads walkHeight and `clamped` from
   // here, so a parallel rater never hand-edits a shared slug->height map --

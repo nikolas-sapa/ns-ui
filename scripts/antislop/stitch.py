@@ -114,6 +114,18 @@ def walk_height(slug):
             f'{slug}: walk is CLAMPED ({w.get("reachedPx")}px of '
             f'{w.get("walkHeight")}px) -- re-walk with wheel events, do not stitch'
         )
+        # A single short landing passes every other check: the stitcher assumes
+        # tile i sits at min(i*STEP, max scroll), so a stalled tile is pasted
+        # at the wrong y, content repeats, and the total height still matches.
+        # databuddy did exactly that (asked 4200, landed 3907). Refuse instead.
+        # Older walk.json files carry no landings and cannot be checked.
+        doc_max = max(0, w['walkHeight'] - VIEWPORT)
+        for i, l in enumerate(w.get('landings', [])):
+            want = min(l['asked'], doc_max)
+            assert l['landed'] >= want - 8, (
+                f"{slug}: tile {i} asked y{l['asked']}, landed y{l['landed']} -- "
+                f"something held the scroll; re-walk, do not stitch"
+            )
         before, after = w.get('docH_before'), w.get('docH_after')
         if before and after and before != after:
             print(
