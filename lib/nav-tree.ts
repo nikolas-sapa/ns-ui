@@ -38,7 +38,7 @@ export type NavGroup = {
 
 /**
  * What the server actually renders into every document now: one row per
- * category, no items. The tree's 534 components (≥728 rows once the
+ * category, no items. The tree's 542 components (≥728 rows once the
  * multi-match rule duplicates them) arrive from `/nav-tree.json` instead.
  *
  * `total` is carried rather than derived because it cannot be derived from

@@ -2,7 +2,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 
 /**
- * `useWhen` — the one-line "pick this when…" note 23 components carry in
+ * `useWhen` — the one-line "pick this when…" note 529 of 542 components carry in
  * meta.json. build-registry.ts deliberately does NOT copy it into
  * registry.json (it is guidance for humans and agents, not install data), so
  * the landing page reads it off disk at build time, the same way /changelog
@@ -14,7 +14,7 @@ let cached: Record<string, string> | null = null;
 /**
  * Memoized: `/components/[name]` calls this once per page, and
  * `generateStaticParams` prerenders one page per registry item — so an
- * unmemoized scan is 534 readdir/readFileSync/JSON.parse passes over every
+ * unmemoized scan is 542 readdir/readFileSync/JSON.parse passes over every
  * `meta.json` in the tree PER PAGE (measured: 1.7s for one pass, 534 file
  * reads, to return the single string that page needs). The sidecars cannot
  * change inside a single build or a single dev request, so the scan is done

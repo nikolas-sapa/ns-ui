@@ -10,7 +10,7 @@
  * It is derived, not authored. `meta.json` tags are written kind-first by
  * convention — the first tag of dialog-emerge is "dialog", of loader-iris
  * "loader" — so the label is just the first tag that names what the thing IS.
- * About 27 components lead with the technology they happen to be built on
+ * About 44 components lead with the technology they happen to be built on
  * instead, so those words are skipped and the next tag wins.
  */
 const TECH = new Set([

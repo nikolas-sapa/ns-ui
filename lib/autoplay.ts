@@ -2,10 +2,11 @@
  * Autoplay descriptors — how a component demonstrates itself, unattended,
  * inside a landing-page card.
  *
- * 37 of the 50 components only wake on input (hover, pointer movement, drag,
- * press, scroll), so inside a card they froze on a still frame. Rather than 37
- * bespoke animations, each component declares *what kind of input wakes it* in
- * its `meta.json`, and one shared driver synthesises that input.
+ * 305 of the 542 components only wake on input (hover, pointer movement, drag,
+ * press, scroll, type), so inside a card they froze on a still frame. Rather than
+ * bespoke animations per component, each component declares *what kind of
+ * input wakes it* in its `meta.json`, and one shared driver synthesises that
+ * input.
  *
  * This type is the contract. It is site-only metadata: it never reaches
  * `registry.json`, `public/r/*.json` or `llms.txt` — a consumer installing the

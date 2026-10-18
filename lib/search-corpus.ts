@@ -9,7 +9,7 @@ import { loadUseWhen } from "@/lib/use-when";
  * It lives here, behind `/search-index.json`, rather than travelling as props
  * to `<Showcase>`. Measured on the built homepage: as props it was 300.7 KB
  * of the document (`description` 139.6 + this corpus 161.1), serialized into
- * the inline RSC flight payload for all 534 components so that a visitor who
+ * the inline RSC flight payload for all 542 components so that a visitor who
  * never types a character still downloads and parses every word of it.
  * `description` has to stay in props — every card renders it — but this does
  * not, and it is fetched on the first sign of an actual search instead.
