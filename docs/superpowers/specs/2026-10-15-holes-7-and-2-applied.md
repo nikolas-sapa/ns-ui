@@ -259,11 +259,14 @@ hide:
   capture of the prototype's software on a real laptop, so "no UI exists" no
   longer holds (a lab app, not the shipping interface; recorded in the file).
 
-**Net on `shows-deliverable`: 14/42 → 12/42 present.** Five flips and one hold
+**Net on `shows-deliverable`: 14/42 → 13/42 present.** Five flips and one hold
 in the six-file pass took it to 9; the hole-7 pass then added `resend-com`,
 `github-2014`, `clerk-com` and `sona8`, the aviern re-study added `aviern`, and
 the decent-com and sona8 re-studies removed `decent-com` and `sona8` (both
-pages were redesigned). Each from its own walk.
+pages were redesigned), and the databuddy re-study added `databuddy` (its own
+live demo shows `Bounce rate +37%` on the vendor's site). Each from its own
+walk. The vercel-com re-study moved `real-product-surface` present → absent:
+its captures are Notion's, Zapier's and Mintlify's products, not Vercel's.
 
 ## One data-quality note, free
 
@@ -298,8 +301,8 @@ scored against at the time, same as change 3's handling.
 re-pass to "the 23 files carrying the signal". But the two motivating cases,
 `financial-datasets` and `railway-com`, read **`absent`** when this was
 written — that is the defect, and both are now `present` (below). A widening definition puts every `absent` file at risk, not the
-`present` ones, so the re-pass set is the inverse of the one named. **14** files read `absent`
-today, against 27 `present` and 1 `unresolved` (20/21/1 when this was first
+`present` ones, so the re-pass set is the inverse of the one named. **15** files read `absent`
+today, against 26 `present` and 1 `unresolved` (20/21/1 when this was first
 written). Five have since moved absent → present under the new wording:
 `papaya` and `the-subvocal-company` on fresh re-rates, `financial-datasets` and
 `railway-com` on recorded facts (below), and `stripe-2014` in the fourteen-file
@@ -464,3 +467,23 @@ autonomy); whether an embarrassing entry must be noticeable at normal viewing
 (aviern's 37px shrub); whether text inside the vendor's own marketing film is in
 scope (two decent-com calls hang on it); `glass-card-overuse` counts
 declarations, not visible frost.
+
+## Three more re-studies, 2026-10-18
+
+| file | verdict | net | cause |
+|---|---|---|---|
+| `sona8` | mixed | −5 → 0 | redesign; 35 text nodes gated behind scroll against 0 for the dwell control |
+| `databuddy` | mixed | +1 → +1 | redesign; its hero is five live iframes of the real app, showing `Bounce rate +37%` on the vendor's own site |
+| `vercel-com` | exemplar → **mixed** | → −4 | the hero and the bento changed; the page shows no Vercel product UI, and all four substance craft signals are absent |
+
+Corpus: **13 exemplar / 27 mixed / 2 slop**. provenmetal is settled `mixed`,
+2–1, by a third blind rater.
+
+**A fourth silent capture failure, now caught.** On databuddy, smooth scrolling
+plus the page's own scroll lock stalled one tile at y3907 instead of y4200.
+That is a single short landing, so the walker's two-in-a-row abort never fired.
+The stitcher then pasted the tile at its expected y: content repeated, and the
+total height still matched. The walker now forces instant scroll and writes
+every landing to `walk.json`. The stitcher refuses any tile that landed more
+than 8px short, and a forged short landing turns it red. Captures written before
+this change carry no landings and cannot be checked retroactively.
