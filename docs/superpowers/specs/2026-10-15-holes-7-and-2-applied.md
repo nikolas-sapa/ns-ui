@@ -679,3 +679,33 @@ no test for a page-built replica of a login-gated app; `hero-mockup-float` does
 not say whether "hero" is a position; `stock-photo-generic` does not say
 whether generated imagery or abstract video counts.
 
+### `single-optical-anchor`: a procedure tried, and the hold stays
+
+The last held signal was tried the way `symmetric-everything` was released:
+write the procedure the corpus already used once, run it on every page, compare.
+provenmetal's third rater had written one down: first viewport only, each mass
+weighed by luminance ink (sum over its box of |Y − median background|), a mass
+dominates at 2x the next. `scripts/antislop/anchor.cjs` runs it; it reproduces
+that rater's hand numbers on provenmetal exactly (H1 2382, second heading 2238)
+and its `absent`.
+
+Run on all 67 pages, with the 2x cut fixed before the run, it **does not
+reproduce the ratings**. On the 40 pages where it finds two or more masses it
+agrees with the settled rated value on 16 of 38 (42%), under chance. On 23 more
+it finds a single mass, which "dominates because it is alone", the caveat
+raters kept writing; calling those `present` agrees on 9 of 17 settled, about
+chance. Four pages gave no measurable mass. Separately, blind raters
+split on this signal on **8 of the 25 two-rater pages**, the most of any signal
+(`density-variation` is next at 7).
+
+So neither the eye nor this instrument gives a reproducible value, and
+re-scoring 30-odd pages to match an unvalidated script would replace one
+unchecked set of values with another. The hold stays, its reason now carries
+these numbers, and no evidence value moved. What would release it: a definition
+that two blind raters reproduce on a fresh sample before any re-pass.
+
+**A flag on a live rule.** `density-variation` backs a `prefer` rule (12/13
+exemplars) but raters split on it on 7 of 25 pages. Its exemplar values were
+mostly set by one rater each. Worth a two-rater spot check of the exemplars
+before trusting that rule's count.
+
