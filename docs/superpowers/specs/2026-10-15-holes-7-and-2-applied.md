@@ -259,8 +259,8 @@ hide:
   capture of the prototype's software on a real laptop, so "no UI exists" no
   longer holds (a lab app, not the shipping interface; recorded in the file).
 
-**Net on `shows-deliverable`: 14/42 → 14/55 present** (13/42 before the
-thirteen `ai-builder` pages, of which only `correlation-studio` reads `present`). Five flips and one hold
+**Net on `shows-deliverable`: 14/42 → 15/67 present** (13/42 before the
+twenty-five `ai-builder` pages, of which only `correlation-studio` and `grepjob` read `present`). Five flips and one hold
 in the six-file pass took it to 9; the hole-7 pass then added `resend-com`,
 `github-2014`, `clerk-com` and `sona8`, the aviern re-study added `aviern`, and
 the decent-com and sona8 re-studies removed `decent-com` and `sona8` (both
@@ -302,8 +302,8 @@ scored against at the time, same as change 3's handling.
 re-pass to "the 23 files carrying the signal". But the two motivating cases,
 `financial-datasets` and `railway-com`, read **`absent`** when this was
 written — that is the defect, and both are now `present` (below). A widening definition puts every `absent` file at risk, not the
-`present` ones, so the re-pass set is the inverse of the one named. **19** files read `absent`
-today, against 34 `present` and 2 `unresolved` (15/26/1 at n=42, before the thirteen
+`present` ones, so the re-pass set is the inverse of the one named. **25** files read `absent`
+today, against 39 `present` and 3 `unresolved` (15/26/1 at n=42, before the twenty-five
 `ai-builder` pages below; 20/21/1 when this was first written). Five have since moved absent → present under the new wording:
 `papaya` and `the-subvocal-company` on fresh re-rates, `financial-datasets` and
 `railway-com` on recorded facts (below), and `stripe-2014` in the fourteen-file
@@ -634,4 +634,48 @@ gets a rule. **Eight rules now:** avoid `symmetric-everything`,
 Corpus: **13 exemplar / 37 mixed / 5 slop.**
 
 What reopens the three: one more slop file found without the screen.
+
+### The second random draw: two more slop files, and the five holds lift
+
+Twelve more gallery sites, drawn with seed 20261019 from the twenty-two left
+(`gunsvzombies` returned 404, project deleted, and was replaced from the same
+seed by `openmark`), two blind raters each. **Two `slop`:
+`coupleshub` (+7 / +8) and `freesubtitlemaker` (+6 / +5).** Nine `mixed`.
+`pitpicks` split on the verdict (A `exemplar`, B `mixed`, both at −3); a third
+blind rater said `mixed`, so it is settled 2–1 as provenmetal was, with each
+signal taking the value two of three raters gave (`merge-three.py`).
+Corpus: **13 exemplar / 47 mixed / 7 slop.**
+
+**Process defects found and fixed during the draw:**
+- The brief gave both raters on a page one probe folder (`s5work/<slug>/`).
+  On four pages a rater ran or read the other's measurement script or raw DOM
+  output. No rater opened another's draft, and each re-measured what it used;
+  `coupleshub` and `freesubtitlemaker` record it in a note. The brief now gives
+  each rater `s5work/<slug>-<rater>/`.
+- Two raters stopped before writing a usable draft (`siamferry` A wrote
+  nothing; `freesubtitlemaker` A wrote front-matter only). Both were re-run.
+  The idempotency check would have stopped the second re-run on its own stub,
+  so the stub was moved aside first.
+- `merge-pair.py` took the union of both raters' `materials`, so one rater's
+  provenance token survived on `thecurryclub`, where `shows-deliverable` split
+  to `unresolved`. The provenance test caught it; both merge scripts now drop
+  provenance tokens unless the deliverable is settled `present`.
+
+**The holds lift.** The unscreened slop pool is now four: `heroku-2014`,
+`toppic`, `coupleshub`, `freesubtitlemaker`. All five screened signals separate
+on it alone (`gradient-blob` 3/3 settled, `three-card-row` 3/3, both at the
+three-file minimum because one file each split), so all five leave
+`RULE_INELIGIBLE` and get rules counted over that pool. `single-optical-anchor`
+remains the only hold. **Thirteen rules**, all soft: avoid `gradient-blob`,
+`three-card-row`, `glass-card-overuse`, `generic-sans-default`,
+`indigo-violet-accent`, `symmetric-everything`, `testimonial-card-row`,
+`stock-photo-generic`; prefer the five craft signals.
+
+**Vocabulary gaps raised by this draw's raters** (recorded, not acted on):
+`generic-sans-default` and `custom-type-pairing` both fire on an Inter body
+under a chosen display face; a declared font that never loads (four pages) is
+scored by what renders, which no definition states; `real-product-surface` has
+no test for a page-built replica of a login-gated app; `hero-mockup-float` does
+not say whether "hero" is a position; `stock-photo-generic` does not say
+whether generated imagery or abstract video counts.
 

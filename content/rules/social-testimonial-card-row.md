@@ -4,7 +4,7 @@ context: testimonials
 signal: testimonial-card-row
 stance: avoid
 severity: soft
-evidence: [heroku-2014, toppic, permit-guide-ai, prilo-ai, zingy-cannoli]
+evidence: [heroku-2014, toppic, coupleshub, freesubtitlemaker, permit-guide-ai, prilo-ai, zingy-cannoli]
 ---
 ## Avoid
 
@@ -16,8 +16,8 @@ One quote with a named, checkable source and enough context to be specific, a si
 
 ## Why
 
-Common among slop pages, absent from the exemplars and the 2014 control studied so far.
+Absent from every exemplar and the 2014 control studied so far, which is what separates it, but present on fewer than half of the slop pages. Soft for that reason.
 
 Counted over every slop-rated file. The pre-screen that found some of them did not rank on this signal.
 
-Present in <!-- generated:count start -->3/5<!-- generated:count end --> of the rated files studied for this rule.
+Present in <!-- generated:count start -->3/7<!-- generated:count end --> of the rated files studied for this rule.

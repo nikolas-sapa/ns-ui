@@ -4,7 +4,7 @@ context: features
 signal: symmetric-everything
 stance: avoid
 severity: soft
-evidence: [heroku-2014, toppic, permit-guide-ai, prilo-ai, zingy-cannoli]
+evidence: [heroku-2014, toppic, coupleshub, freesubtitlemaker, permit-guide-ai, prilo-ai, zingy-cannoli]
 ---
 ## Avoid
 
@@ -20,4 +20,4 @@ Absent from every exemplar and from the 2014 control studied so far. Soft becaus
 
 Counted over every slop-rated file. The pre-screen that found some of them did not rank on this signal.
 
-Present in <!-- generated:count start -->3/5<!-- generated:count end --> of the rated files studied for this rule.
+Present in <!-- generated:count start -->5/7<!-- generated:count end --> of the rated files studied for this rule.

@@ -4,7 +4,7 @@ context: hero
 signal: stock-photo-generic
 stance: avoid
 severity: soft
-evidence: [heroku-2014, toppic, permit-guide-ai, prilo-ai, zingy-cannoli]
+evidence: [heroku-2014, toppic, coupleshub, freesubtitlemaker, permit-guide-ai, prilo-ai, zingy-cannoli]
 ---
 ## Avoid
 
@@ -16,8 +16,8 @@ Real photographs of the product, the people or the place, or no photograph at al
 
 ## Why
 
-Absent from the exemplars and the 2014 control studied so far, and present on about half of the slop pages. Soft because about half is not a verdict.
+Absent from every exemplar and the 2014 control studied so far, which is what separates it, but present on fewer than half of the slop pages. Soft because a minority is not a verdict.
 
 Counted over every slop-rated file. The pre-screen that found some of them did not rank on this signal.
 
-Present in <!-- generated:count start -->3/5<!-- generated:count end --> of the rated files studied for this rule.
+Present in <!-- generated:count start -->3/7<!-- generated:count end --> of the rated files studied for this rule.

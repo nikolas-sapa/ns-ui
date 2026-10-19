@@ -67,21 +67,6 @@ const CONTROL_COHORT = "pre-ai-2015";
 const RULE_INELIGIBLE: Record<string, string> = {
   "single-optical-anchor":
     "the only v3 signal with an empty notes cell: it has no definition, and the 25 `present` values in the corpus were each set without one. It also came in at 8/10 in the session-4 batch against 40% in the prior yc-current cohort, a +38pt swing consistent with being marked present by default, and 44% of the files scoring it present discuss it in prose at all. Define it and re-pass the corpus, then delete this entry — a definition alone would retroactively validate or invalidate 25 scores nobody has re-read.",
-  // The next two are eligible only through the five screen-selected
-  // ai-builder files: the pre-screen that chose them ranked on these signals,
-  // so their slop present-rate is partly the selection. Remove each once three
-  // or more slop files no screen chose settle it and it still separates.
-  // docs/superpowers/specs/2026-10-15-holes-7-and-2-applied.md, the slop hunt.
-  "gradient-blob":
-    "eligible only through the screen-selected ai-builder files, whose pre-screen ranked on blur blobs. Only two slop files were not screen-selected (heroku-2014, toppic), under the three-file pool minimum.",
-  "three-card-row":
-    "eligible only through the screen-selected ai-builder files, whose pre-screen ranked on three-card rows. Only two slop files were not screen-selected (heroku-2014, toppic), under the three-file pool minimum.",
-  "glass-card-overuse":
-    "eligible only through the screen-selected ai-builder files, whose pre-screen ranked on glass panels. Authored as a rule over heroku-2014, openhack and toppic, then withdrawn when the symmetric-everything re-pass moved openhack to `mixed`: two unscreened slop files remain, under the three-file pool minimum.",
-  "generic-sans-default":
-    "eligible only through the screen-selected ai-builder files, whose pre-screen ranked on generic sans. Authored as a rule over heroku-2014, openhack and toppic, then withdrawn when the symmetric-everything re-pass moved openhack to `mixed`: two unscreened slop files remain, under the three-file pool minimum.",
-  "indigo-violet-accent":
-    "eligible only through the screen-selected ai-builder files, whose pre-screen ranked on an indigo accent. Authored as a rule over heroku-2014, openhack and toppic, then withdrawn when the symmetric-everything re-pass moved openhack to `mixed`: two unscreened slop files remain, under the three-file pool minimum.",
 };
 
 type Eligibility = {
