@@ -66,7 +66,7 @@ const CONTROL_COHORT = "pre-ai-2015";
 // because the existing values were set without one.
 const RULE_INELIGIBLE: Record<string, string> = {
   "single-optical-anchor":
-    "the only v3 signal with an empty notes cell: it has no definition, and the 25 `present` values in the corpus were each set without one. It also came in at 8/10 in the session-4 batch against 40% in the prior yc-current cohort, a +38pt swing consistent with being marked present by default, and 44% of the files scoring it present discuss it in prose at all. Define it and re-pass the corpus, then delete this entry — a definition alone would retroactively validate or invalidate 25 scores nobody has re-read.",
+    "the only v3 signal with an empty notes cell: it has no definition, and the 25 `present` values in the corpus were each set without one. It also came in at 8/10 in the session-4 batch against 40% in the prior yc-current cohort, a +38pt swing consistent with being marked present by default, and 44% of the files scoring it present discuss it in prose at all. Define it and re-pass the corpus, then delete this entry — a definition alone would retroactively validate or invalidate 25 scores nobody has re-read. Tried at n=67: provenmetal's third rater's procedure (first-viewport luminance ink, top mass at 2x the next), run as scripts/antislop/anchor.cjs, agreed with the settled rated value on 16 of 38 pages where it found two or more masses, and blind raters split on this signal on 8 of 25 two-rater pages, the most of any signal. Neither the eye nor the instrument reproduces it yet.",
 };
 
 type Eligibility = {
