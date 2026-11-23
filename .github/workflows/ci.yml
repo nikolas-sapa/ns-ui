@@ -77,6 +77,11 @@ jobs:
       - name: Writing markdown
         run: npm run test:writing-markdown
 
+      # Reads registry.json (built above), so it needs no server. It once went
+      # red on main unnoticed because nothing ran it.
+      - name: Category coverage
+        run: npm run test:category-coverage
+
       - name: Build site
         run: npm run build
 

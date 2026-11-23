@@ -257,6 +257,42 @@ genuinely on screen, not clipped invisible by an ancestor's `overflow: hidden`.
 Screenshots are committed. They are the review artifact, so a component PR
 should include them.
 
+### The `test:*` gates
+
+`package.json` defines a `test:*` script per defect class that has shipped at
+least once. Most are offline: no server, no browser, no network. Run the ones
+near what you touched, or all of them before a PR. Several read generated
+files, so run `npm run registry:build` once first (it already runs before
+`dev`, `typecheck`, `verify` and `build`, but not before a bare `test:*`).
+
+| Gate | What it protects | In CI |
+|---|---|---|
+| `test:source-invariants` | dead CSS tokens, focus-ring traps, mouse-only handlers, colour-only state, unguarded animations, missing landmarks across `app/**`, `lib/**`, `registry/**` | yes |
+| `test:animation-gate` | the inline animation-gate script releases every token it takes (a leak killed tabs after minutes of dwell) | yes |
+| `test:writing-markdown` | `content/writing` posts stay inside the subset the hand-written markdown parser renders | yes |
+| `test:perf-budget` | client JS weight of the build output; needs `npm run build` first | yes |
+| `test:category-coverage` | every component sits in a clickable category page, every category has copy (else its route 404s), and the `other` catch-all holds exactly the untagged orphans | yes |
+| `test:name-policy` | profile display-name rules: banned names and their look-alikes, and the reserved owner name | no |
+| `test:catalog-gate` | the pre-hydration `catalog-filtered`/`catalog-sorted` classes agree with the filter and sort predicates the showcase renders from | no |
+| `test:status-checks` | the `/status` page's check layer against `lib/status.generated.json` (about the status page, not CI status); `--live` also prints four network reads, never asserted | no |
+| `test:submit-retry` | `/submit` stays retryable after its function is killed part-way, against a fake GitHub API at the `fetch` boundary | no |
+| `test:star-prompt` | the star prompt never appears just because someone arrived, plus its trigger and lifetime-cap wiring | no |
+| `test:antislop` | the anti-slop vocabulary, evidence parser, rule counts and the `content/evidence/` corpus behind `content/rules/` | no |
+| `test:agent-readiness` | the agent-facing HTTP contract: markdown negotiation, the recoverable 404, `/.well-known/mcp`, JSON-LD, canonicals | no |
+| `test:convex-deployed` | every `api.<module>.<fn>` the app calls exists on the Convex deployment | no |
+
+Two of these depend on your environment rather than your change:
+
+- **`test:agent-readiness`** asserts against a running server, not the source.
+  Run `npm run build && npm start` first, or point it elsewhere with
+  `BASE_URL=http://localhost:3400 npm run test:agent-readiness`. With nothing
+  listening on `BASE_URL` (default `http://localhost:3000`) it fails, and that
+  failure says nothing about your diff.
+- **`test:convex-deployed`** reads `NEXT_PUBLIC_CONVEX_URL` from the
+  environment, `.env.local` or `.env`. An outside contributor normally has none,
+  so it prints `SKIPPED` and exits 0. That is a skip, not a pass, and not
+  something you broke.
+
 ## Troubleshooting
 
 Every entry below is a failure this repo actually hit and recorded, in
@@ -316,12 +352,13 @@ catastrophic component bug.
 Keep the diff to one component or one concern. Include the dark and light
 resting-state screenshots. Confirm `typecheck` and `verify` are clean, that you
 have looked at the component in both themes and on the homepage card, and that
-no generated file is in the diff. CI runs nine checks on every PR:
+no generated file is in the diff. CI runs ten checks on every PR:
 `registry:build`, an anti-slop count check, `typecheck`,
 `test:source-invariants`, `test:animation-gate`, `test:writing-markdown`,
-`build`, `test:perf-budget`, and a DCO sign-off check. Every one except DCO
-runs locally with the same command, so you can be green before you push.
-`verify` is the exception that stays local: it needs a running server.
+`test:category-coverage`, `build`, `test:perf-budget`, and a DCO sign-off
+check. Every one except DCO runs locally with the same command, so you can be
+green before you push. `verify` and the other `test:*` gates above stay
+local-only.
 
 ## Reporting problems
 

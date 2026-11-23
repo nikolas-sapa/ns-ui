@@ -23,6 +23,7 @@ registerHooks({
 
 const { categoryPages } = await import("../lib/category-pages.ts");
 const { CATEGORY_COPY } = await import("../lib/category-copy.ts");
+const { categorize } = await import("../lib/search-categories.ts");
 const registry = (await import("../registry.json", { with: { type: "json" } })).default;
 
 // The reachability invariant: every published component sits in at least one
@@ -45,12 +46,30 @@ assert.deepEqual(
   `categories with no CATEGORY_COPY entry (their route 404s): ${missingCopy.join(", ")}`,
 );
 
-// id/label must stay verbatim identical to `lib/nav-data.ts`, or tree, chips
-// and `/categories/<id>` disagree about the same bucket.
+// `other` exists only while some component's tags hit no category, exactly as
+// the sidebar (`lib/nav-data.ts`) omits its Other group when empty. Asserting
+// it unconditionally went red the day the last orphan got a category. So
+// derive the orphans independently via `categorize()` and require `other` to
+// hold exactly them: present and complete when there are orphans, absent (no
+// empty page in the sitemap) when there are none.
+const memberships = categorize(
+  registry.items.map((i: { name: string; meta?: { tags?: string[] } }) => ({ name: i.name, tags: i.meta?.tags ?? [] })),
+);
+const orphans = registry.items
+  .map((i: { name: string }) => i.name)
+  .filter((n: string) => !memberships.get(n)?.length)
+  .sort();
 const other = pages.find((p) => p.id === "other");
-assert.ok(other, "no `other` page — the catch-all regressed");
-assert.equal(other.label, "Other");
+if (orphans.length) {
+  assert.ok(other, `no \`other\` page — the catch-all regressed, orphaned: ${orphans.join(", ")}`);
+  // id/label must stay verbatim identical to `lib/nav-data.ts`, or tree, chips
+  // and `/categories/<id>` disagree about the same bucket.
+  assert.equal(other.label, "Other");
+  assert.deepEqual(other.members.map((m) => m.name).sort(), orphans, "`other` members differ from the orphan set");
+} else {
+  assert.equal(other, undefined, "`other` page emitted with zero orphans — an empty category page");
+}
 
 console.log(
-  `category coverage: pass (${registry.items.length} reachable, ${other.members.length} in Other, ${pages.length} categories all have copy)`,
+  `category coverage: pass (${registry.items.length} reachable, ${orphans.length} in Other, ${pages.length} categories all have copy)`,
 );
